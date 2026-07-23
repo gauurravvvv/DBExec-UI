@@ -1,11 +1,7 @@
 import { NotificationRow } from 'src/app/core/services/notification.service';
 
 export type DateBucket =
-  | 'today'
-  | 'yesterday'
-  | 'thisWeek'
-  | 'thisMonth'
-  | 'older';
+  'today' | 'yesterday' | 'thisWeek' | 'thisMonth' | 'older';
 
 export interface NotificationGroup {
   bucket: DateBucket;
@@ -44,11 +40,7 @@ export function groupByDateBucket(
   // ISO week: Monday is day 1; Sunday is day 7.
   const isoDow = now.getDay() === 0 ? 7 : now.getDay();
   const weekStart = todayStart - (isoDow - 1) * 24 * 60 * 60 * 1000;
-  const monthStart = new Date(
-    now.getFullYear(),
-    now.getMonth(),
-    1,
-  ).getTime();
+  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).getTime();
 
   const buckets: Record<DateBucket, NotificationRow[]> = {
     today: [],

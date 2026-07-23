@@ -42,7 +42,11 @@ import {
   syntaxHighlighting,
 } from '@codemirror/language';
 import { lintGutter, setDiagnostics, Diagnostic } from '@codemirror/lint';
-import { search, searchKeymap, highlightSelectionMatches } from '@codemirror/search';
+import {
+  search,
+  searchKeymap,
+  highlightSelectionMatches,
+} from '@codemirror/search';
 import { Compartment, EditorState } from '@codemirror/state';
 import {
   Decoration,
@@ -105,9 +109,28 @@ interface QueryRow {
 }
 type QueryResult =
   | QueryRow
-  | { kind: 'message'; command: string; text: string; elapsedMs: number; statementIndex: number }
-  | { kind: 'error'; message: string; code?: string; hint?: string; offset?: number; statementIndex: number }
-  | { kind: 'explain'; plan: any; analyzed: boolean; elapsedMs: number; statementIndex: number };
+  | {
+      kind: 'message';
+      command: string;
+      text: string;
+      elapsedMs: number;
+      statementIndex: number;
+    }
+  | {
+      kind: 'error';
+      message: string;
+      code?: string;
+      hint?: string;
+      offset?: number;
+      statementIndex: number;
+    }
+  | {
+      kind: 'explain';
+      plan: any;
+      analyzed: boolean;
+      elapsedMs: number;
+      statementIndex: number;
+    };
 
 interface TreeTable {
   name: string;
@@ -200,12 +223,15 @@ const runFlashField = StateField.define<DecorationSet>({
   styleUrls: ['./query-executor.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class QueryExecutorComponent implements OnInit, AfterViewInit, OnDestroy {
+export class QueryExecutorComponent
+  implements OnInit, AfterViewInit, OnDestroy
+{
   private cdr = inject(ChangeDetectorRef);
   private zone = inject(NgZone);
   private translate = inject(TranslateService);
 
-  @ViewChild('editorHost', { static: false }) editorHost!: ElementRef<HTMLDivElement>;
+  @ViewChild('editorHost', { static: false })
+  editorHost!: ElementRef<HTMLDivElement>;
 
   connectionId = '';
   connectionName = '';
@@ -244,7 +270,8 @@ export class QueryExecutorComponent implements OnInit, AfterViewInit, OnDestroy 
   // Editor overlays (command palette / go-to-line / shortcuts help)
   paletteOpen = false;
   paletteQuery = '';
-  paletteItems: { id: string; label: string; hint?: string; icon: string }[] = [];
+  paletteItems: { id: string; label: string; hint?: string; icon: string }[] =
+    [];
   gotoOpen = false;
   gotoValue = '';
   shortcutsOpen = false;
@@ -677,7 +704,10 @@ export class QueryExecutorComponent implements OnInit, AfterViewInit, OnDestroy 
       autocompletion({
         activateOnTyping: true,
         override: [
-          dbexecCompletionSource(this.catalog, this.requestColumnsForCompletion),
+          dbexecCompletionSource(
+            this.catalog,
+            this.requestColumnsForCompletion,
+          ),
           keywordCompletionSource(PostgreSQL, false),
         ],
       }),
@@ -733,13 +763,20 @@ export class QueryExecutorComponent implements OnInit, AfterViewInit, OnDestroy 
             // Compact floating find/replace card (custom panel) instead of the
             // stock full-width strip. Labels resolved once at init — the panel
             // is plain DOM (editor runs outside Angular).
-            search({ top: true, createPanel: buildSearchPanel(this.searchLabels()) }),
+            search({
+              top: true,
+              createPanel: buildSearchPanel(this.searchLabels()),
+            }),
             lintGutter(),
             runFlashField,
-            placeholder('-- Write SQL. Ctrl/Cmd+Enter runs the statement at the cursor.'),
+            placeholder(
+              '-- Write SQL. Ctrl/Cmd+Enter runs the statement at the cursor.',
+            ),
             syntaxHighlighting(defaultHighlightStyle, { fallback: true }),
             this.wrapCompartment.of([]),
-            this.minimapCompartment.of(this.minimapOn ? this.minimapExtension() : []),
+            this.minimapCompartment.of(
+              this.minimapOn ? this.minimapExtension() : [],
+            ),
             this.langCompartment.of(this.buildLanguage()),
             keymap.of([
               {
@@ -880,7 +917,9 @@ export class QueryExecutorComponent implements OnInit, AfterViewInit, OnDestroy 
   /** Bound + persist the row-limit when the toolbar input changes. */
   onRowLimitChange(value: number | string): void {
     const n = typeof value === 'string' ? parseInt(value, 10) : value;
-    this.rowLimit = this.clampLimit(Number.isNaN(n as number) ? 200 : (n as number));
+    this.rowLimit = this.clampLimit(
+      Number.isNaN(n as number) ? 200 : (n as number),
+    );
     try {
       localStorage.setItem('qx-row-limit', String(this.rowLimit));
     } catch {
@@ -891,20 +930,98 @@ export class QueryExecutorComponent implements OnInit, AfterViewInit, OnDestroy 
   // ── command palette ─────────────────────────────────────────────────
 
   /** The full action list the palette (and shortcuts help) surfaces. */
-  private paletteActions(): { id: string; label: string; hint?: string; icon: string; run: () => void }[] {
+  private paletteActions(): {
+    id: string;
+    label: string;
+    hint?: string;
+    icon: string;
+    run: () => void;
+  }[] {
     return [
-      { id: 'run', label: 'Run statement', hint: 'Ctrl/Cmd+Enter', icon: 'pi-play', run: () => this.run('smart') },
-      { id: 'run-all', label: 'Run all', hint: 'Ctrl/Cmd+Shift+Enter', icon: 'pi-forward', run: () => this.run('all') },
-      { id: 'format', label: 'Format SQL', hint: '', icon: 'pi-align-left', run: () => this.format() },
-      { id: 'wrap', label: 'Toggle word wrap', hint: '', icon: 'pi-bars', run: () => this.toggleWrap() },
-      { id: 'minimap', label: 'Toggle minimap', hint: '', icon: 'pi-map', run: () => this.toggleMinimap() },
-      { id: 'explain', label: 'Toggle EXPLAIN mode', hint: '', icon: 'pi-sitemap', run: () => this.toggleExplain() },
-      { id: 'goto', label: 'Go to line…', hint: 'Ctrl/Cmd+G', icon: 'pi-directions', run: () => this.openGoto() },
-      { id: 'upper', label: 'Upper-case selection', hint: '', icon: 'pi-arrow-up', run: () => this.transformCase('upper') },
-      { id: 'lower', label: 'Lower-case selection', hint: '', icon: 'pi-arrow-down', run: () => this.transformCase('lower') },
-      { id: 'clear', label: 'Clear editor', hint: '', icon: 'pi-trash', run: () => this.clearEditor() },
-      { id: 'copy', label: 'Copy all', hint: '', icon: 'pi-copy', run: () => this.copyAll() },
-      { id: 'download', label: 'Download .sql', hint: '', icon: 'pi-download', run: () => this.downloadSql() },
+      {
+        id: 'run',
+        label: 'Run statement',
+        hint: 'Ctrl/Cmd+Enter',
+        icon: 'pi-play',
+        run: () => this.run('smart'),
+      },
+      {
+        id: 'run-all',
+        label: 'Run all',
+        hint: 'Ctrl/Cmd+Shift+Enter',
+        icon: 'pi-forward',
+        run: () => this.run('all'),
+      },
+      {
+        id: 'format',
+        label: 'Format SQL',
+        hint: '',
+        icon: 'pi-align-left',
+        run: () => this.format(),
+      },
+      {
+        id: 'wrap',
+        label: 'Toggle word wrap',
+        hint: '',
+        icon: 'pi-bars',
+        run: () => this.toggleWrap(),
+      },
+      {
+        id: 'minimap',
+        label: 'Toggle minimap',
+        hint: '',
+        icon: 'pi-map',
+        run: () => this.toggleMinimap(),
+      },
+      {
+        id: 'explain',
+        label: 'Toggle EXPLAIN mode',
+        hint: '',
+        icon: 'pi-sitemap',
+        run: () => this.toggleExplain(),
+      },
+      {
+        id: 'goto',
+        label: 'Go to line…',
+        hint: 'Ctrl/Cmd+G',
+        icon: 'pi-directions',
+        run: () => this.openGoto(),
+      },
+      {
+        id: 'upper',
+        label: 'Upper-case selection',
+        hint: '',
+        icon: 'pi-arrow-up',
+        run: () => this.transformCase('upper'),
+      },
+      {
+        id: 'lower',
+        label: 'Lower-case selection',
+        hint: '',
+        icon: 'pi-arrow-down',
+        run: () => this.transformCase('lower'),
+      },
+      {
+        id: 'clear',
+        label: 'Clear editor',
+        hint: '',
+        icon: 'pi-trash',
+        run: () => this.clearEditor(),
+      },
+      {
+        id: 'copy',
+        label: 'Copy all',
+        hint: '',
+        icon: 'pi-copy',
+        run: () => this.copyAll(),
+      },
+      {
+        id: 'download',
+        label: 'Download .sql',
+        hint: '',
+        icon: 'pi-download',
+        run: () => this.downloadSql(),
+      },
     ];
   }
 
@@ -961,7 +1078,10 @@ export class QueryExecutorComponent implements OnInit, AfterViewInit, OnDestroy 
     const total = this.view.state.doc.lines;
     const lineNo = Math.min(Math.max(1, n), total);
     const line = this.view.state.doc.line(lineNo);
-    this.view.dispatch({ selection: { anchor: line.from }, scrollIntoView: true });
+    this.view.dispatch({
+      selection: { anchor: line.from },
+      scrollIntoView: true,
+    });
     this.view.focus();
   }
 
@@ -987,8 +1107,11 @@ export class QueryExecutorComponent implements OnInit, AfterViewInit, OnDestroy 
   private transformCase(mode: 'upper' | 'lower'): void {
     const sel = this.getSelection();
     if (!this.view || !sel) return;
-    const out = mode === 'upper' ? sel.text.toUpperCase() : sel.text.toLowerCase();
-    this.view.dispatch({ changes: { from: sel.from, to: sel.to, insert: out } });
+    const out =
+      mode === 'upper' ? sel.text.toUpperCase() : sel.text.toLowerCase();
+    this.view.dispatch({
+      changes: { from: sel.from, to: sel.to, insert: out },
+    });
   }
 
   clearEditor(): void {
@@ -1083,7 +1206,11 @@ export class QueryExecutorComponent implements OnInit, AfterViewInit, OnDestroy 
 
   // Drag-drop a .sql onto the editor. Only react when files are dragged.
   onDragOver(event: DragEvent): void {
-    if (!event.dataTransfer || !Array.from(event.dataTransfer.types).includes('Files')) return;
+    if (
+      !event.dataTransfer ||
+      !Array.from(event.dataTransfer.types).includes('Files')
+    )
+      return;
     event.preventDefault();
     event.dataTransfer.dropEffect = 'copy';
     if (!this.dragOver) {
@@ -1094,7 +1221,10 @@ export class QueryExecutorComponent implements OnInit, AfterViewInit, OnDestroy 
   onDragLeave(event: DragEvent): void {
     // Ignore leave events bubbling from children — only clear when leaving
     // the editor region entirely.
-    if (event.relatedTarget && (event.currentTarget as HTMLElement).contains(event.relatedTarget as Node)) {
+    if (
+      event.relatedTarget &&
+      (event.currentTarget as HTMLElement).contains(event.relatedTarget as Node)
+    ) {
       return;
     }
     this.dragOver = false;
@@ -1130,18 +1260,44 @@ export class QueryExecutorComponent implements OnInit, AfterViewInit, OnDestroy 
       },
       {
         // Live label reflects current state; menu is rebuilt on toggle.
-        label: this.minimapOn ? t('QUERY_RUNNER.MINIMAP_HIDE') : t('QUERY_RUNNER.MINIMAP_SHOW'),
+        label: this.minimapOn
+          ? t('QUERY_RUNNER.MINIMAP_HIDE')
+          : t('QUERY_RUNNER.MINIMAP_SHOW'),
         icon: this.minimapOn ? 'pi pi-check' : 'pi pi-map',
         command: () => this.toggleMinimap(),
       },
       { separator: true },
-      { label: t('QUERY_RUNNER.DOWNLOAD_SQL'), icon: 'pi pi-download', command: () => this.downloadSql() },
-      { label: t('QUERY_RUNNER.GOTO_LINE'), icon: 'pi pi-directions', command: () => this.openGoto() },
-      { label: t('QUERY_RUNNER.CASE_UPPER'), icon: 'pi pi-arrow-up', command: () => this.transformCase('upper') },
-      { label: t('QUERY_RUNNER.CASE_LOWER'), icon: 'pi pi-arrow-down', command: () => this.transformCase('lower') },
+      {
+        label: t('QUERY_RUNNER.DOWNLOAD_SQL'),
+        icon: 'pi pi-download',
+        command: () => this.downloadSql(),
+      },
+      {
+        label: t('QUERY_RUNNER.GOTO_LINE'),
+        icon: 'pi pi-directions',
+        command: () => this.openGoto(),
+      },
+      {
+        label: t('QUERY_RUNNER.CASE_UPPER'),
+        icon: 'pi pi-arrow-up',
+        command: () => this.transformCase('upper'),
+      },
+      {
+        label: t('QUERY_RUNNER.CASE_LOWER'),
+        icon: 'pi pi-arrow-down',
+        command: () => this.transformCase('lower'),
+      },
       { separator: true },
-      { label: t('QUERY_RUNNER.COPY_ALL'), icon: 'pi pi-copy', command: () => this.copyAll() },
-      { label: t('QUERY_RUNNER.CLEAR_EDITOR'), icon: 'pi pi-trash', command: () => this.clearEditor() },
+      {
+        label: t('QUERY_RUNNER.COPY_ALL'),
+        icon: 'pi pi-copy',
+        command: () => this.copyAll(),
+      },
+      {
+        label: t('QUERY_RUNNER.CLEAR_EDITOR'),
+        icon: 'pi pi-trash',
+        command: () => this.clearEditor(),
+      },
     ];
   }
 
@@ -1196,7 +1352,9 @@ export class QueryExecutorComponent implements OnInit, AfterViewInit, OnDestroy 
   // ── run / cancel / format ──────────────────────────────────────────
 
   private genId(): string {
-    return 'ex_' + Math.random().toString(36).slice(2) + Date.now().toString(36);
+    return (
+      'ex_' + Math.random().toString(36).slice(2) + Date.now().toString(36)
+    );
   }
 
   /**
@@ -1228,7 +1386,10 @@ export class QueryExecutorComponent implements OnInit, AfterViewInit, OnDestroy 
     // Flash the range that will run (~500ms).
     if (range) {
       this.view.dispatch({ effects: setRunFlash.of(range) });
-      setTimeout(() => this.view?.dispatch({ effects: setRunFlash.of(null) }), 500);
+      setTimeout(
+        () => this.view?.dispatch({ effects: setRunFlash.of(null) }),
+        500,
+      );
     }
     // Clear any prior error diagnostics.
     this.view.dispatch(setDiagnostics(this.view.state, []));
@@ -1273,7 +1434,11 @@ export class QueryExecutorComponent implements OnInit, AfterViewInit, OnDestroy 
           }
         } else {
           this.results = [
-            { kind: 'error', message: res?.message ?? 'Execution failed', statementIndex: 0 },
+            {
+              kind: 'error',
+              message: res?.message ?? 'Execution failed',
+              statementIndex: 0,
+            },
           ];
           this.statusText = 'Error';
           this.serverMode = false;
@@ -1281,7 +1446,11 @@ export class QueryExecutorComponent implements OnInit, AfterViewInit, OnDestroy 
       })
       .catch(err => {
         this.results = [
-          { kind: 'error', message: err?.message ?? 'Execution failed', statementIndex: 0 },
+          {
+            kind: 'error',
+            message: err?.message ?? 'Execution failed',
+            statementIndex: 0,
+          },
         ];
         this.statusText = 'Error';
         this.serverMode = false;
@@ -1297,10 +1466,12 @@ export class QueryExecutorComponent implements OnInit, AfterViewInit, OnDestroy 
   private maybeMarkError(base: number): void {
     if (!this.view) return;
     const err = this.results.find(r => r.kind === 'error') as
-      | { kind: 'error'; message: string; offset?: number }
-      | undefined;
+      { kind: 'error'; message: string; offset?: number } | undefined;
     if (!err || err.offset == null) return;
-    const pos = Math.min(Math.max(0, base + err.offset), this.view.state.doc.length);
+    const pos = Math.min(
+      Math.max(0, base + err.offset),
+      this.view.state.doc.length,
+    );
     const diag: Diagnostic = {
       from: pos,
       to: Math.min(pos + 1, this.view.state.doc.length),
@@ -1314,8 +1485,7 @@ export class QueryExecutorComponent implements OnInit, AfterViewInit, OnDestroy 
   goToError(): void {
     if (!this.view) return;
     const err = this.results[this.activeResult] as
-      | { kind: 'error'; offset?: number }
-      | undefined;
+      { kind: 'error'; offset?: number } | undefined;
     if (!err || err.offset == null) return;
     const pos = Math.min(Math.max(0, err.offset), this.view.state.doc.length);
     this.view.dispatch({ selection: { anchor: pos }, scrollIntoView: true });
@@ -1336,7 +1506,9 @@ export class QueryExecutorComponent implements OnInit, AfterViewInit, OnDestroy 
    * to "Save" (update it); "Save as new" flips the mode. A brand-new tab
    * only offers "Save" (as new).
    */
-  openSavePrompt(mode: 'new' | 'update' = this.savedQueryId ? 'update' : 'new'): void {
+  openSavePrompt(
+    mode: 'new' | 'update' = this.savedQueryId ? 'update' : 'new',
+  ): void {
     this.saveMode = mode;
     if (mode === 'update') {
       this.savePromptName = this.savedQueryName;
@@ -1431,7 +1603,11 @@ export class QueryExecutorComponent implements OnInit, AfterViewInit, OnDestroy 
       const sel = this.getSelection();
       if (sel) {
         this.view.dispatch({
-          changes: { from: sel.from, to: sel.to, insert: formatSql(sel.text, opts) },
+          changes: {
+            from: sel.from,
+            to: sel.to,
+            insert: formatSql(sel.text, opts),
+          },
         });
       } else {
         this.replaceAll(formatSql(this.getAll(), opts));
@@ -1447,7 +1623,8 @@ export class QueryExecutorComponent implements OnInit, AfterViewInit, OnDestroy 
     if (r.kind === 'rows') {
       return `${r.rowCount} row${r.rowCount === 1 ? '' : 's'} · ${Math.round(r.elapsedMs)} ms${r.truncated ? ' · truncated' : ''}`;
     }
-    if (r.kind === 'message') return `${r.text} · ${Math.round(r.elapsedMs)} ms`;
+    if (r.kind === 'message')
+      return `${r.text} · ${Math.round(r.elapsedMs)} ms`;
     if (r.kind === 'error') return 'Error';
     if (r.kind === 'explain')
       return `Plan${r.analyzed ? ' (analyzed)' : ''} · ${Math.round(r.elapsedMs)} ms`;
@@ -1472,7 +1649,11 @@ export class QueryExecutorComponent implements OnInit, AfterViewInit, OnDestroy 
    * plus a truncation note). Purely derived from the active result — no new
    * state. Empty string when the active result isn't a row set.
    */
-  get resultContext(): { count: string; elapsed: string; truncated: boolean } | null {
+  get resultContext(): {
+    count: string;
+    elapsed: string;
+    truncated: boolean;
+  } | null {
     const r = this.activeRows;
     if (!r) return null;
     return {
@@ -1501,8 +1682,12 @@ export class QueryExecutorComponent implements OnInit, AfterViewInit, OnDestroy 
   /** "1–200 of 5,240" style range label for the server pager. */
   get serverRangeLabel(): string {
     if (!this.serverMode) return '';
-    const from = this.serverTotal === 0 ? 0 : this.serverPage * this.serverPageSize + 1;
-    const to = Math.min((this.serverPage + 1) * this.serverPageSize, this.serverTotal);
+    const from =
+      this.serverTotal === 0 ? 0 : this.serverPage * this.serverPageSize + 1;
+    const to = Math.min(
+      (this.serverPage + 1) * this.serverPageSize,
+      this.serverTotal,
+    );
     return `${from.toLocaleString()}–${to.toLocaleString()} ${this.translate.instant(
       'QUERY_RUNNER.OF',
     )} ${this.serverTotal.toLocaleString()}`;
@@ -1555,7 +1740,7 @@ export class QueryExecutorComponent implements OnInit, AfterViewInit, OnDestroy 
       const col = this.fieldToName(field);
       if (!col) continue;
       // Flatten simple + (first condition of) combined filter models.
-      const cond = m?.operator ? m.condition1 ?? m : m;
+      const cond = m?.operator ? (m.condition1 ?? m) : m;
       const op = this.mapFilterOp(cond?.type, m?.filterType);
       if (!op) continue;
       out.push({ col, op, value: cond?.filter });
@@ -1580,7 +1765,10 @@ export class QueryExecutorComponent implements OnInit, AfterViewInit, OnDestroy 
   }
 
   /** AG Grid filter type → derived filter op. Null ⇒ unsupported (skip). */
-  private mapFilterOp(type: string | undefined, filterType: string | undefined): string | null {
+  private mapFilterOp(
+    type: string | undefined,
+    filterType: string | undefined,
+  ): string | null {
     switch (type) {
       case 'contains':
         return 'contains';
@@ -1628,17 +1816,24 @@ export class QueryExecutorComponent implements OnInit, AfterViewInit, OnDestroy 
       limit: this.serverPageSize,
     };
     this.service
-      .execute(this.connectionId, this.baseSql, this.autoCommit, this.executionId, {
-        maxRows: this.rowLimit,
-        derived,
-      })
+      .execute(
+        this.connectionId,
+        this.baseSql,
+        this.autoCommit,
+        this.executionId,
+        {
+          maxRows: this.rowLimit,
+          derived,
+        },
+      )
       .then(res => {
         const first = res?.data?.results?.[0];
         if (res?.status && first && first.kind === 'rows') {
           // Replace just the active result's rows/total; keep tab position.
           this.results = [first, ...this.results.slice(1)];
           this.activeResult = 0;
-          this.serverTotal = (first as { total?: number }).total ?? this.serverTotal;
+          this.serverTotal =
+            (first as { total?: number }).total ?? this.serverTotal;
         }
       })
       .catch(() => {
@@ -1672,7 +1867,8 @@ export class QueryExecutorComponent implements OnInit, AfterViewInit, OnDestroy 
     this.showFilters = !this.showFilters;
     // Re-apply colDefs so floatingFilter flips.
     const r = this.activeRows;
-    if (r && this.gridApi) this.gridApi.setGridOption('columnDefs', this.colDefs(r));
+    if (r && this.gridApi)
+      this.gridApi.setGridOption('columnDefs', this.colDefs(r));
     this.cdr.markForCheck();
   }
 
@@ -1700,7 +1896,10 @@ export class QueryExecutorComponent implements OnInit, AfterViewInit, OnDestroy 
   }
 
   private exportName(ext: string): string {
-    const base = (this.datasourceName || 'query').replace(/[^A-Za-z0-9_-]+/g, '_');
+    const base = (this.datasourceName || 'query').replace(
+      /[^A-Za-z0-9_-]+/g,
+      '_',
+    );
     return `${base}_result.${ext}`;
   }
 
@@ -1735,7 +1934,11 @@ export class QueryExecutorComponent implements OnInit, AfterViewInit, OnDestroy 
   }
 
   /** Flatten a plan tree into indented rows for a readable node list. */
-  planRows(node: any, depth = 0, acc: { depth: number; node: any }[] = []): { depth: number; node: any }[] {
+  planRows(
+    node: any,
+    depth = 0,
+    acc: { depth: number; node: any }[] = [],
+  ): { depth: number; node: any }[] {
     if (!node) return acc;
     acc.push({ depth, node });
     for (const child of node.Plans ?? []) this.planRows(child, depth + 1, acc);

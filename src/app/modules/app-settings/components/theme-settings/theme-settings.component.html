@@ -40,7 +40,8 @@
     ></app-content-loader>
 
     <!-- Form -->
-    <form autocomplete="off"
+    <form
+      autocomplete="off"
       *ngIf="!loading() || themeForm.value.primary"
       [formGroup]="themeForm"
       class="admin-form"
@@ -70,7 +71,10 @@
             "
             [errorMessage]="'THEME.HEX_REQUIRED' | translate"
           ></app-custom-input>
-          <label class="color-swatch" [style.background-color]="swatchValue('primary')">
+          <label
+            class="color-swatch"
+            [style.background-color]="swatchValue('primary')"
+          >
             <input
               type="color"
               [value]="swatchValue('primary')"
@@ -95,7 +99,10 @@
             "
             [errorMessage]="'THEME.HEX_INVALID' | translate"
           ></app-custom-input>
-          <label class="color-swatch" [style.background-color]="swatchValue('primaryHover')">
+          <label
+            class="color-swatch"
+            [style.background-color]="swatchValue('primaryHover')"
+          >
             <input
               type="color"
               [value]="swatchValue('primaryHover')"
@@ -120,7 +127,10 @@
             "
             [errorMessage]="'THEME.HEX_INVALID' | translate"
           ></app-custom-input>
-          <label class="color-swatch" [style.background-color]="swatchValue('primaryLight')">
+          <label
+            class="color-swatch"
+            [style.background-color]="swatchValue('primaryLight')"
+          >
             <input
               type="color"
               [value]="swatchValue('primaryLight')"
@@ -138,7 +148,10 @@
             [placeholder]="'THEME.PRIMARY_TEXT_PLACEHOLDER' | translate"
             icon="pi-pencil"
           ></app-custom-input>
-          <label class="color-swatch" [style.background-color]="swatchValue('primaryText')">
+          <label
+            class="color-swatch"
+            [style.background-color]="swatchValue('primaryText')"
+          >
             <input
               type="color"
               [value]="swatchValue('primaryText')"
@@ -173,7 +186,9 @@
     </div>
 
     <div class="standard-delete-section">
-      <p class="delete-intro">{{ 'THEME.RESET_CONFIRM_MESSAGE' | translate }}</p>
+      <p class="delete-intro">
+        {{ 'THEME.RESET_CONFIRM_MESSAGE' | translate }}
+      </p>
 
       <!-- Info list — three rows describing what reset does, same
            rhythm the listing-module delete popups use. -->

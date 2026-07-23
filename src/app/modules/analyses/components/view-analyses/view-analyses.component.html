@@ -23,7 +23,10 @@
           "
           tooltipPosition="bottom"
         >
-          <i class="pi" [ngClass]="isFavourite() ? 'pi-star-fill' : 'pi-star'"></i>
+          <i
+            class="pi"
+            [ngClass]="isFavourite() ? 'pi-star-fill' : 'pi-star'"
+          ></i>
         </button>
         <button
           *hasPermission="'analyses'; level: 'write'"
@@ -52,9 +55,7 @@
           <i
             class="pi"
             [ngClass]="
-              isDeleting(analysisDetails.id)
-                ? 'pi-spin pi-spinner'
-                : 'pi-trash'
+              isDeleting(analysisDetails.id) ? 'pi-spin pi-spinner' : 'pi-trash'
             "
           ></i>
           {{ 'COMMON.DELETE' | translate }}
@@ -63,7 +64,9 @@
     </div>
 
     <!-- Centered branded loader while the GET is in flight. -->
-    <app-content-loader *ngIf="loading() && !analysisDetails"></app-content-loader>
+    <app-content-loader
+      *ngIf="loading() && !analysisDetails"
+    ></app-content-loader>
 
     <!-- Content Section -->
     <div class="content-section" *ngIf="analysisDetails">
@@ -194,7 +197,11 @@
             <h3>
               <i class="pi pi-sliders-h mr-2"></i>
               {{ 'ANALYSES.ANALYSIS_FIELDS' | translate }}
-              <app-chip variant="count" size="sm" [count]="analysisFields.length || 0"></app-chip>
+              <app-chip
+                variant="count"
+                size="sm"
+                [count]="analysisFields.length || 0"
+              ></app-chip>
             </h3>
             <button
               *hasPermission="'analyses'; level: 'write'"
@@ -255,7 +262,11 @@
           <h3>
             <i class="pi pi-chart-bar mr-2"></i>
             {{ 'ANALYSES.VISUALS' | translate }}
-            <app-chip variant="count" size="sm" [count]="visuals.length || 0"></app-chip>
+            <app-chip
+              variant="count"
+              size="sm"
+              [count]="visuals.length || 0"
+            ></app-chip>
           </h3>
           <div class="fields-list">
             <div

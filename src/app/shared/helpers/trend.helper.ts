@@ -117,7 +117,10 @@ export function polyTrend(
     if (y !== null) pts.push({ x: i, y });
   });
   const n = pts.length;
-  const deg = Math.max(2, Math.min(6, Math.min(Math.floor(degree || 2), n - 1)));
+  const deg = Math.max(
+    2,
+    Math.min(6, Math.min(Math.floor(degree || 2), n - 1)),
+  );
   if (n < 3 || deg < 2) {
     // Not enough spread for a curve — fall back to the straight-line fit.
     return linearTrend(values);

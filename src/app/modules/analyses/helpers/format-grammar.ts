@@ -141,12 +141,32 @@ function toDate(value: unknown): Date | null {
 }
 
 const MONTHS_SHORT = [
-  'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-  'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+  'Jan',
+  'Feb',
+  'Mar',
+  'Apr',
+  'May',
+  'Jun',
+  'Jul',
+  'Aug',
+  'Sep',
+  'Oct',
+  'Nov',
+  'Dec',
 ];
 const MONTHS_LONG = [
-  'January', 'February', 'March', 'April', 'May', 'June',
-  'July', 'August', 'September', 'October', 'November', 'December',
+  'January',
+  'February',
+  'March',
+  'April',
+  'May',
+  'June',
+  'July',
+  'August',
+  'September',
+  'October',
+  'November',
+  'December',
 ];
 
 /** Left-pad a number to `len` with leading zeros. */
@@ -359,7 +379,8 @@ function scaleForUnit(
   if (!unit || unit === 'none') return { body: n, unitSuffix: '' };
   const scale =
     unit === 'auto' ? resolveAutoUnit(Math.abs(n)) : UNIT_SCALES[unit];
-  if (!scale || scale.factor === 1) return { body: n, unitSuffix: scale?.suffix ?? '' };
+  if (!scale || scale.factor === 1)
+    return { body: n, unitSuffix: scale?.suffix ?? '' };
   return { body: n / scale.factor, unitSuffix: scale.suffix };
 }
 

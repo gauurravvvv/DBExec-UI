@@ -51,14 +51,15 @@ All parameterised, has_*_privilege-filtered, Postgres.
   cycle, ownedBy }.
 
 Endpoints (all queryRunner READ), on /connections/:id :
-  GET /objects?schema=            → grouped object list
-  GET /object/table?schema=&name=
-  GET /object/view?schema=&name=
-  GET /object/function?schema=&name=&args=
-  GET /object/sequence?schema=&name=
-  POST /object/matview/refresh?schema=&name=   (WRITE — the one mutation)
+GET /objects?schema= → grouped object list
+GET /object/table?schema=&name=
+GET /object/view?schema=&name=
+GET /object/function?schema=&name=&args=
+GET /object/sequence?schema=&name=
+POST /object/matview/refresh?schema=&name= (WRITE — the one mutation)
 
 Queries:
+
 - indexes: pg_index + pg_class + pg_get_indexdef
 - constraints: pg_constraint + pg_get_constraintdef (contype p/f/u/c)
 - triggers: pg_trigger (not tgisinternal) + pg_get_triggerdef

@@ -124,9 +124,13 @@ export class DbAccessService {
   createRole(datasourceId: string, body: any): Promise<any> {
     this._saving.set(true);
     return lastValueFrom(
-      this.http.apiPost(this.base(datasourceId) + DB_ACCESS.ROLES_SUFFIX, body, {
-        skipLoader: true,
-      }),
+      this.http.apiPost(
+        this.base(datasourceId) + DB_ACCESS.ROLES_SUFFIX,
+        body,
+        {
+          skipLoader: true,
+        },
+      ),
     ).finally(() => this._saving.set(false));
   }
 
@@ -134,14 +138,20 @@ export class DbAccessService {
     this._saving.set(true);
     return lastValueFrom(
       this.http.apiPut(
-        this.base(datasourceId) + DB_ACCESS.ROLE_SEGMENT + encodeURIComponent(roleName),
+        this.base(datasourceId) +
+          DB_ACCESS.ROLE_SEGMENT +
+          encodeURIComponent(roleName),
         body,
         { skipLoader: true },
       ),
     ).finally(() => this._saving.set(false));
   }
 
-  renameRole(datasourceId: string, roleName: string, newName: string): Promise<any> {
+  renameRole(
+    datasourceId: string,
+    roleName: string,
+    newName: string,
+  ): Promise<any> {
     this._saving.set(true);
     return lastValueFrom(
       this.http.apiPost(
@@ -315,7 +325,11 @@ export class DbAccessService {
   }
 
   /** GET /:datasourceId/grants/columns?schema=&table= */
-  loadColumnGrants(datasourceId: string, schema: string, table: string): Promise<any> {
+  loadColumnGrants(
+    datasourceId: string,
+    schema: string,
+    table: string,
+  ): Promise<any> {
     return lastValueFrom(
       this.http
         .apiGet(this.base(datasourceId) + DB_ACCESS.GRANTS_COLUMNS_SUFFIX, {
@@ -438,7 +452,10 @@ export class DbAccessService {
     this._saving.set(true);
     return lastValueFrom(
       this.http.apiPost(
-        this.base(datasourceId) + DB_ACCESS.SESSIONS_SEGMENT + pid + DB_ACCESS.CANCEL_SUFFIX,
+        this.base(datasourceId) +
+          DB_ACCESS.SESSIONS_SEGMENT +
+          pid +
+          DB_ACCESS.CANCEL_SUFFIX,
         { confirm: true },
         { skipLoader: true },
       ),
@@ -453,7 +470,10 @@ export class DbAccessService {
     this._saving.set(true);
     return lastValueFrom(
       this.http.apiPost(
-        this.base(datasourceId) + DB_ACCESS.SESSIONS_SEGMENT + pid + DB_ACCESS.TERMINATE_SUFFIX,
+        this.base(datasourceId) +
+          DB_ACCESS.SESSIONS_SEGMENT +
+          pid +
+          DB_ACCESS.TERMINATE_SUFFIX,
         { confirm: true },
         { skipLoader: true },
       ),

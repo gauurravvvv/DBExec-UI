@@ -93,7 +93,11 @@ export interface EngineAdapter {
 }
 
 export interface Pool {
-  query<T = any>(sql: string, params?: any[], opts?: QueryOpts): Promise<QueryResult<T>>;
+  query<T = any>(
+    sql: string,
+    params?: any[],
+    opts?: QueryOpts,
+  ): Promise<QueryResult<T>>;
   end(): Promise<void>;
   totalCount: number;
   idleCount: number;
@@ -109,9 +113,13 @@ export const postgresEngine: EngineAdapter = {
   type: 'postgres',
   buildPool(conn, cfg) {
     return new PgPool({
-      host: cfg.host, port: cfg.port, database: cfg.database,
-      user: conn.username, password: decryptPassword(conn),
-      min: conn.poolMin, max: conn.poolMax,
+      host: cfg.host,
+      port: cfg.port,
+      database: cfg.database,
+      user: conn.username,
+      password: decryptPassword(conn),
+      min: conn.poolMin,
+      max: conn.poolMax,
       idleTimeoutMillis: conn.poolIdleMs,
       ssl: cfg.ssl ?? false,
       application_name: `dbexec:${cfg.appTag ?? 'app'}`,
@@ -150,7 +158,10 @@ Redshift (use postgres adapter with extra options), Databricks
 import { kms } from './kms';
 import { randomBytes, createCipheriv, createDecipheriv } from 'crypto';
 
-export async function encryptSecret(plaintext: string, orgId: string): Promise<{ enc: Buffer; dekId: string }> {
+export async function encryptSecret(
+  plaintext: string,
+  orgId: string,
+): Promise<{ enc: Buffer; dekId: string }> {
   // Per-org KEK (in KMS); per-secret DEK
   const dek = randomBytes(32);
   const iv = randomBytes(12);
@@ -164,15 +175,21 @@ export async function encryptSecret(plaintext: string, orgId: string): Promise<{
   return { enc, dekId };
 }
 
-export async function decryptSecret(enc: Buffer, dekId: string, orgId: string): Promise<string> {
+export async function decryptSecret(
+  enc: Buffer,
+  dekId: string,
+  orgId: string,
+): Promise<string> {
   const iv = enc.subarray(0, 12);
   const tag = enc.subarray(12, 28);
-  const wrappedDek = enc.subarray(28, 28 + 256);  // size depends on KMS algo
+  const wrappedDek = enc.subarray(28, 28 + 256); // size depends on KMS algo
   const ct = enc.subarray(28 + 256);
   const dek = await kms.unwrap(wrappedDek, dekId, orgId);
   const decipher = createDecipheriv('aes-256-gcm', dek, iv);
   decipher.setAuthTag(tag);
-  return Buffer.concat([decipher.update(ct), decipher.final()]).toString('utf8');
+  return Buffer.concat([decipher.update(ct), decipher.final()]).toString(
+    'utf8',
+  );
 }
 ```
 
@@ -188,12 +205,17 @@ current KEK version, updates `rotated_at`. Audit log per row.
 import { LRUCache } from 'lru-cache';
 
 const poolCache = new LRUCache<string, Pool>({
-  max: 200,                                      // 200 active pools
-  ttl: 30 * 60 * 1000,                            // 30 min idle eviction
-  dispose: (pool, key) => { pool.end().catch(() => undefined); },
+  max: 200, // 200 active pools
+  ttl: 30 * 60 * 1000, // 30 min idle eviction
+  dispose: (pool, key) => {
+    pool.end().catch(() => undefined);
+  },
 });
 
-export async function getPool(orgId: string, connectionId: string): Promise<Pool> {
+export async function getPool(
+  orgId: string,
+  connectionId: string,
+): Promise<Pool> {
   const key = `${orgId}:${connectionId}`;
   let pool = poolCache.get(key);
   if (pool) return pool;
@@ -284,26 +306,40 @@ const addDatasource = async (req: Request, res: Response) => {
     const adapter = engineFor(type);
 
     // 1. Test the connection BEFORE saving
-    const { enc, dekId } = await encryptSecret(defaultConnection.password, orgData.orgId);
+    const { enc, dekId } = await encryptSecret(
+      defaultConnection.password,
+      orgData.orgId,
+    );
     const tempPool = adapter.buildPool(
-      { username: defaultConnection.username, password_enc: enc, dek_id: dekId,
-        poolMin: 1, poolMax: 2, poolIdleMs: 5000 } as any,
+      {
+        username: defaultConnection.username,
+        password_enc: enc,
+        dek_id: dekId,
+        poolMin: 1,
+        poolMax: 2,
+        poolIdleMs: 5000,
+      } as any,
       config,
     );
     const health = await adapter.health(tempPool);
     await tempPool.end();
     if (!health.ok) {
       await master_db_connection.close();
-      return sendResponse(res, false, CODE.BAD_REQUEST, DS_MSG.CONNECT_FAILED,
-                          { reason: health.error });
+      return sendResponse(res, false, CODE.BAD_REQUEST, DS_MSG.CONNECT_FAILED, {
+        reason: health.error,
+      });
     }
 
     // 2. Save in a tx
     const ds = await connection.transaction(async (tx: any) => {
       const datasource = await tx.getRepository('Datasource').save({
         orgId: orgData.orgId,
-        name, description, type, config,
-        status: 'active', isDefault: false,
+        name,
+        description,
+        type,
+        config,
+        status: 'active',
+        isDefault: false,
         createdBy: loggedInId,
       });
       await tx.getRepository('DatasourceConnection').save({
@@ -314,13 +350,17 @@ const addDatasource = async (req: Request, res: Response) => {
         dekId,
         scope: defaultConnection.scope ?? 'read',
         isDefault: true,
-        poolMin: 2, poolMax: 10, poolIdleMs: 30000,
+        poolMin: 2,
+        poolMax: 10,
+        poolIdleMs: 30000,
       });
       return datasource;
     });
 
     await auditLogger.logAuditToOrg({
-      connection, req, res,
+      connection,
+      req,
+      res,
       module: AUDIT_MODULES.DATASOURCE,
       action: AUDIT_ACTIONS.CREATE,
       entityName: 'Datasource',
@@ -359,40 +399,42 @@ Existing `datasource-list.component` already exists. Updates:
 
 ## 9. Observability
 
-| Metric | Type | Labels | Purpose |
-|---|---|---|---|
-| `dbexec_ds_pool_total` | gauge | `datasource`, `state` (total/idle/waiting) | pool saturation |
-| `dbexec_ds_health_status` | gauge | `datasource`, `status` | 0/1 per status |
-| `dbexec_ds_health_latency_ms` | histogram | `datasource` | warehouse RT |
-| `dbexec_ds_introspect_ms` | histogram | `datasource` | introspection cost |
-| `dbexec_ds_secret_rotated_total` | counter | `outcome` | rotation cron |
-| `dbexec_ds_connect_failed_total` | counter | `type`, `reason` | onboarding success rate |
+| Metric                           | Type      | Labels                                     | Purpose                 |
+| -------------------------------- | --------- | ------------------------------------------ | ----------------------- |
+| `dbexec_ds_pool_total`           | gauge     | `datasource`, `state` (total/idle/waiting) | pool saturation         |
+| `dbexec_ds_health_status`        | gauge     | `datasource`, `status`                     | 0/1 per status          |
+| `dbexec_ds_health_latency_ms`    | histogram | `datasource`                               | warehouse RT            |
+| `dbexec_ds_introspect_ms`        | histogram | `datasource`                               | introspection cost      |
+| `dbexec_ds_secret_rotated_total` | counter   | `outcome`                                  | rotation cron           |
+| `dbexec_ds_connect_failed_total` | counter   | `type`, `reason`                           | onboarding success rate |
 
 ---
 
 ## 10. Security & threat model
 
-| Threat | Mitigation |
-|---|---|
-| Plaintext password in audit log | Audit metadata fields whitelisted; `password_enc` never serialised |
-| Connection string in URL params | Connection always via id + secret lookup; no params carry secrets |
-| Pool growing unbounded under attack | Per-datasource `poolMax`; queue with bounded wait; reject with 503 on saturation |
-| Schema info leak (table names tell a story) | Schema browser respects `data_visible_to` flag at column granularity (module 09 col security extends here) |
-| SSRF via custom JDBC URL | `config.host` validated against IP allowlist; loopback / metadata / RFC1918 blocked unless org has `allow_internal_datasource = true` |
-| Stale credentials after IdP off-board | `datasource_connection.last_used_at` surfaced; orphan-conn report in admin console |
-| Cross-org pool key collision | Pool key prefixed by `orgId`; LRU cache mutex per key |
-| Replay of decrypted DEK | DEKs are per-secret; replay across secrets ineffective; KMS rate-limits unwrap |
+| Threat                                      | Mitigation                                                                                                                            |
+| ------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| Plaintext password in audit log             | Audit metadata fields whitelisted; `password_enc` never serialised                                                                    |
+| Connection string in URL params             | Connection always via id + secret lookup; no params carry secrets                                                                     |
+| Pool growing unbounded under attack         | Per-datasource `poolMax`; queue with bounded wait; reject with 503 on saturation                                                      |
+| Schema info leak (table names tell a story) | Schema browser respects `data_visible_to` flag at column granularity (module 09 col security extends here)                            |
+| SSRF via custom JDBC URL                    | `config.host` validated against IP allowlist; loopback / metadata / RFC1918 blocked unless org has `allow_internal_datasource = true` |
+| Stale credentials after IdP off-board       | `datasource_connection.last_used_at` surfaced; orphan-conn report in admin console                                                    |
+| Cross-org pool key collision                | Pool key prefixed by `orgId`; LRU cache mutex per key                                                                                 |
+| Replay of decrypted DEK                     | DEKs are per-secret; replay across secrets ineffective; KMS rate-limits unwrap                                                        |
 
 ---
 
 ## 11. Operational runbook
 
 **Symptom: datasource shows red.**
+
 1. Read `health_last_error`. Network? DNS? Wrong credentials?
 2. Manually click "Test connection" — captures fresh error.
 3. If error is "password rotated" — rotate in DBExec to match.
 
 **Symptom: pool saturation.**
+
 1. `dbexec_ds_pool_total{state="waiting"}` > 0 = pool full.
 2. Diagnose: who's hogging? Cross-ref `pg_stat_activity` or
    warehouse equivalent via `/datasource/:id/activity`.
@@ -400,6 +442,7 @@ Existing `datasource-list.component` already exists. Updates:
    query (`POST /datasource/:id/cancel/:pid`).
 
 **Symptom: introspection slow / wrong.**
+
 1. Force refresh via `/schema/refresh`.
 2. For BigQuery: introspection across many datasets is slow;
    limit `config.allowedDatasets` to only the relevant ones.
@@ -408,13 +451,13 @@ Existing `datasource-list.component` already exists. Updates:
 
 ## 12. Performance budget
 
-| Operation | p50 | p95 | Hard ceiling |
-|---|---|---|---|
-| Connect (cold pool) | 200 ms | 1 s | 10 s |
-| Connect (cached pool) | 1 ms | 5 ms | 50 ms |
-| Health ping | 30 ms | 200 ms | 5 s |
-| Introspect (typical 20-schema warehouse) | 800 ms | 3 s | 30 s |
-| Secret decrypt (KMS unwrap) | 15 ms | 50 ms | 500 ms |
+| Operation                                | p50    | p95    | Hard ceiling |
+| ---------------------------------------- | ------ | ------ | ------------ |
+| Connect (cold pool)                      | 200 ms | 1 s    | 10 s         |
+| Connect (cached pool)                    | 1 ms   | 5 ms   | 50 ms        |
+| Health ping                              | 30 ms  | 200 ms | 5 s          |
+| Introspect (typical 20-schema warehouse) | 800 ms | 3 s    | 30 s         |
+| Secret decrypt (KMS unwrap)              | 15 ms  | 50 ms  | 500 ms       |
 
 KMS unwrap is per-pool-build, not per-query — caches via the
 pool LRU.

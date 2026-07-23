@@ -136,7 +136,8 @@ export class RelayComponent implements OnInit, OnDestroy {
     const expanded = this.translate.instant(this.greetingKey(), {
       firstName: NAME_MARKER,
     });
-    const idx = typeof expanded === 'string' ? expanded.indexOf(NAME_MARKER) : -1;
+    const idx =
+      typeof expanded === 'string' ? expanded.indexOf(NAME_MARKER) : -1;
     if (idx < 0) {
       // Locale string didn't include the placeholder, or
       // translate.instant returned the key unchanged because the
@@ -319,10 +320,12 @@ export class RelayComponent implements OnInit, OnDestroy {
       if (this.destroyed) return;
       const s = this.state();
       if (s === 'loading' || s === 'slow') {
-        this.errorDetails.set(this.translateOrFallback(
-          'AUTH.RELAY.TIMEOUT_DETAIL',
-          'Request timed out',
-        ));
+        this.errorDetails.set(
+          this.translateOrFallback(
+            'AUTH.RELAY.TIMEOUT_DETAIL',
+            'Request timed out',
+          ),
+        );
         this.state.set('error');
       }
     }, HARD_TIMEOUT_MS);
@@ -331,7 +334,7 @@ export class RelayComponent implements OnInit, OnDestroy {
   }
 
   private runBootstrap(): void {
-    this.loginService.bootstrapSession().then((outcome) => {
+    this.loginService.bootstrapSession().then(outcome => {
       if (this.destroyed) return;
 
       // Race guard — if the hard timeout already fired, drop the
@@ -348,10 +351,12 @@ export class RelayComponent implements OnInit, OnDestroy {
           // Malformed response — treat as fatal. No retry; a fresh
           // attempt against the same broken BE would just loop.
           this.clearTimers();
-          this.errorDetails.set(this.translateOrFallback(
-            'AUTH.RELAY.MALFORMED_DETAIL',
-            'Malformed session payload',
-          ));
+          this.errorDetails.set(
+            this.translateOrFallback(
+              'AUTH.RELAY.MALFORMED_DETAIL',
+              'Malformed session payload',
+            ),
+          );
           this.state.set('error');
           return;
         }
@@ -397,7 +402,9 @@ export class RelayComponent implements OnInit, OnDestroy {
     // whole message rather than try to redact, since the surround
     // is usually unhelpful too ("User <uuid> not found in org
     // <uuid>").
-    if (/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i.test(s)) {
+    if (
+      /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i.test(s)
+    ) {
       return '';
     }
     return s;

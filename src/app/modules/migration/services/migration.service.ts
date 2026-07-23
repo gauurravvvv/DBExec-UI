@@ -150,8 +150,7 @@ export class MigrationService {
   ): string {
     const cd = res.headers.get('content-disposition') || '';
     // filename*="…"  or  filename="…"  (quoted or bare).
-    const match =
-      /filename\*?=(?:UTF-8'')?"?([^";]+)"?/i.exec(cd) ?? null;
+    const match = /filename\*?=(?:UTF-8'')?"?([^";]+)"?/i.exec(cd) ?? null;
     const fromHeader = match?.[1]?.trim();
     if (fromHeader) return fromHeader;
     const ext = format === 'yaml' ? 'yaml' : 'json';

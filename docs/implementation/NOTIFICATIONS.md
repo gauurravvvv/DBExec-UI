@@ -100,21 +100,25 @@ export interface NotifyArgs {
   body?: string;
   link?: string;
   metadata?: any;
-  bundleKey?: string;    // if set, looks for an existing bundle within 5 min
+  bundleKey?: string; // if set, looks for an existing bundle within 5 min
 }
 
-export async function notify(args: NotifyArgs, ctx: { connection: Connection }): Promise<void> {
+export async function notify(
+  args: NotifyArgs,
+  ctx: { connection: Connection },
+): Promise<void> {
   const sev = args.severity ?? 'info';
 
   // 1. Bundle lookup
   let bundleId: string | null = null;
   if (args.bundleKey) {
-    const existing = await ctx.connection.getRepository('Notification')
+    const existing = await ctx.connection
+      .getRepository('Notification')
       .createQueryBuilder('n')
       .where('n.user_id = :uid', { uid: args.userId })
       .andWhere('n.category = :cat', { cat: args.category })
       .andWhere(`n.metadata->>'bundleKey' = :bk`, { bk: args.bundleKey })
-      .andWhere('n.created_at > NOW() - INTERVAL \'5 minutes\'')
+      .andWhere("n.created_at > NOW() - INTERVAL '5 minutes'")
       .orderBy('n.created_at', 'DESC')
       .getOne();
     if (existing) bundleId = existing.bundleId ?? existing.id;
@@ -122,25 +126,39 @@ export async function notify(args: NotifyArgs, ctx: { connection: Connection }):
 
   // 2. Insert notification row
   const notif = await ctx.connection.getRepository('Notification').save({
-    orgId: args.orgId, userId: args.userId,
-    category: args.category, severity: sev,
-    sourceKind: args.sourceKind, sourceId: args.sourceId,
-    title: args.title, body: args.body, link: args.link,
+    orgId: args.orgId,
+    userId: args.userId,
+    category: args.category,
+    severity: sev,
+    sourceKind: args.sourceKind,
+    sourceId: args.sourceId,
+    title: args.title,
+    body: args.body,
+    link: args.link,
     metadata: { ...args.metadata, bundleKey: args.bundleKey },
-    bundleId, isRead: false,
+    bundleId,
+    isRead: false,
   });
 
   // 3. Per-channel dispatch (in parallel)
-  const prefs = await loadPreferences(ctx.connection, args.userId, args.category);
+  const prefs = await loadPreferences(
+    ctx.connection,
+    args.userId,
+    args.category,
+  );
   const dnd = await loadDnd(ctx.connection, args.userId);
   const inDnd = isInDndWindow(dnd, new Date());
   const allowDnd = inDnd && !(dnd.criticalOverride && sev === 'critical');
 
   const dispatchers: Array<() => Promise<void>> = [];
-  if (prefs.in_app && !allowDnd) dispatchers.push(() => publishSse(args.userId, notif));
-  if (prefs.email && !allowDnd) dispatchers.push(() => emailNotification(notif));
-  if (prefs.push && !allowDnd) dispatchers.push(() => webPushNotification(args.userId, notif));
-  if (prefs.slack && !allowDnd) dispatchers.push(() => slackNotification(notif));
+  if (prefs.in_app && !allowDnd)
+    dispatchers.push(() => publishSse(args.userId, notif));
+  if (prefs.email && !allowDnd)
+    dispatchers.push(() => emailNotification(notif));
+  if (prefs.push && !allowDnd)
+    dispatchers.push(() => webPushNotification(args.userId, notif));
+  if (prefs.slack && !allowDnd)
+    dispatchers.push(() => slackNotification(notif));
 
   await Promise.allSettled(dispatchers.map(fn => fn()));
 }
@@ -183,7 +201,7 @@ function isInDndWindow(dnd: UserDnd, now: Date): boolean {
   const start = timeToMinutes(dnd.startLocal);
   const end = timeToMinutes(dnd.endLocal);
   if (start <= end) return minutes >= start && minutes < end;
-  return minutes >= start || minutes < end;             // crosses midnight
+  return minutes >= start || minutes < end; // crosses midnight
 }
 ```
 
@@ -222,7 +240,10 @@ app.get('/notify/stream', AuthMiddleware, async (req, res) => {
   });
 });
 
-export async function publishSse(userId: string, notification: any): Promise<void> {
+export async function publishSse(
+  userId: string,
+  notification: any,
+): Promise<void> {
   await redis.publish(`notify:${userId}`, JSON.stringify(notification));
 }
 ```
@@ -245,25 +266,31 @@ webPush.setVapidDetails(
   process.env.VAPID_PRIVATE_KEY!,
 );
 
-export async function webPushNotification(userId: string, notif: any): Promise<void> {
+export async function webPushNotification(
+  userId: string,
+  notif: any,
+): Promise<void> {
   const subs = await loadPushSubscriptions(userId);
   for (const sub of subs) {
     try {
       await webPush.sendNotification(
-        { endpoint: sub.endpoint, keys: { p256dh: sub.p256dh, auth: sub.auth } },
+        {
+          endpoint: sub.endpoint,
+          keys: { p256dh: sub.p256dh, auth: sub.auth },
+        },
         JSON.stringify({
           title: notif.title,
-          body:  notif.body,
-          icon:  '/icon-192.png',
+          body: notif.body,
+          icon: '/icon-192.png',
           badge: '/badge-72.png',
-          data:  { link: notif.link, id: notif.id },
+          data: { link: notif.link, id: notif.id },
         }),
         { TTL: 60 * 60 * 24 },
       );
       await markUsed(sub.id);
     } catch (err: any) {
       if (err.statusCode === 410 || err.statusCode === 404) {
-        await deletePushSubscription(sub.id);          // browser unsubscribed
+        await deletePushSubscription(sub.id); // browser unsubscribed
       } else {
         await incrementFailureCount(sub.id);
         if (sub.failureCount > 5) await deletePushSubscription(sub.id);
@@ -280,24 +307,30 @@ export async function webPushNotification(userId: string, notif: any): Promise<v
 ```typescript
 // src/controllers/notify/updatePreferences.ts
 const updatePreferences = async (req: Request, res: Response) => {
-  const { preferences } = req.body;        // [{category, channel, isEnabled}, ...]
+  const { preferences } = req.body; // [{category, channel, isEnabled}, ...]
   const { loggedInId, orgData, master_db_connection } = res.locals;
   const connection = orgData.connection;
   try {
     await connection.transaction(async (tx: any) => {
       for (const p of preferences) {
-        await tx.query(`
+        await tx.query(
+          `
           INSERT INTO notification_preference (user_id, category, channel, is_enabled)
           VALUES ($1, $2, $3, $4)
           ON CONFLICT (user_id, category, channel) DO UPDATE SET is_enabled = EXCLUDED.is_enabled
-        `, [loggedInId, p.category, p.channel, p.isEnabled]);
+        `,
+          [loggedInId, p.category, p.channel, p.isEnabled],
+        );
       }
     });
     await auditLogger.logAuditToOrg({
-      connection, req, res,
+      connection,
+      req,
+      res,
       module: AUDIT_MODULES.NOTIFICATION,
       action: AUDIT_ACTIONS.UPDATE_PREFERENCES,
-      entityName: 'User', entityId: loggedInId,
+      entityName: 'User',
+      entityId: loggedInId,
       metadata: { count: preferences.length },
     });
     await master_db_connection.close();
@@ -337,6 +370,7 @@ Top-bar bell icon with unread badge. Click opens a slide-over.
 ```
 
 Components:
+
 - `notification-bell/` — badge counter + slide-over trigger
 - `notification-list/` — virtualised list
 - `notification-row/` — title + body + link + actions
@@ -347,58 +381,61 @@ Components:
 
 ## 9. Observability
 
-| Metric | Type | Labels | Purpose |
-|---|---|---|---|
-| `dbexec_notify_emitted_total` | counter | `category`, `severity` | volume |
-| `dbexec_notify_delivered_total` | counter | `channel`, `outcome` | per-channel success |
-| `dbexec_notify_bundled_total` | counter | `category` | bundling effectiveness |
-| `dbexec_notify_dnd_suppressed_total` | counter | `category` | DND impact |
-| `dbexec_notify_sse_streams_open` | gauge | — | concurrent SSE connections |
-| `dbexec_notify_webpush_expired_total` | counter | — | 410/404 cleanup |
+| Metric                                | Type    | Labels                 | Purpose                    |
+| ------------------------------------- | ------- | ---------------------- | -------------------------- |
+| `dbexec_notify_emitted_total`         | counter | `category`, `severity` | volume                     |
+| `dbexec_notify_delivered_total`       | counter | `channel`, `outcome`   | per-channel success        |
+| `dbexec_notify_bundled_total`         | counter | `category`             | bundling effectiveness     |
+| `dbexec_notify_dnd_suppressed_total`  | counter | `category`             | DND impact                 |
+| `dbexec_notify_sse_streams_open`      | gauge   | —                      | concurrent SSE connections |
+| `dbexec_notify_webpush_expired_total` | counter | —                      | 410/404 cleanup            |
 
 ---
 
 ## 10. Security & threat model
 
-| Threat | Mitigation |
-|---|---|
-| User A reads user B's notifications | All endpoints filter by `user_id = req.user.id`; no cross-user reads |
+| Threat                                             | Mitigation                                                                                                                               |
+| -------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| User A reads user B's notifications                | All endpoints filter by `user_id = req.user.id`; no cross-user reads                                                                     |
 | Push subscription stolen → can spoof user's device | Endpoint URL is bound to the push provider; stealing it lets attacker send pushes to that device, but VAPID-signed and content is benign |
-| Email-based phishing via notify | Email templates pin DBExec headers; link always to our domain |
-| Slack token leak | Per-user Slack auth uses OAuth; tokens KMS-wrapped; revoke endpoint |
-| SSE used as XHR-CORS bypass | Same-origin cookie auth; CORS denied for cross-origin |
-| Storage growth (huge notification table) | Cron purge: read notifications older than 90 days; unread older than 1 year |
-| Bundle key collision across users | Bundle scoped to `(user_id, category, bundleKey)` |
-| Web Push payload encryption | `web-push` library handles AES-128-GCM per spec |
+| Email-based phishing via notify                    | Email templates pin DBExec headers; link always to our domain                                                                            |
+| Slack token leak                                   | Per-user Slack auth uses OAuth; tokens KMS-wrapped; revoke endpoint                                                                      |
+| SSE used as XHR-CORS bypass                        | Same-origin cookie auth; CORS denied for cross-origin                                                                                    |
+| Storage growth (huge notification table)           | Cron purge: read notifications older than 90 days; unread older than 1 year                                                              |
+| Bundle key collision across users                  | Bundle scoped to `(user_id, category, bundleKey)`                                                                                        |
+| Web Push payload encryption                        | `web-push` library handles AES-128-GCM per spec                                                                                          |
 
 ---
 
 ## 11. Runbook
 
 **Symptom: notifications missing.**
+
 1. Check DND. User likely flipped it on.
 2. Check preferences. Channel for category off?
 3. SSE stream alive? `dbexec_notify_sse_streams_open`.
 
 **Symptom: Web Push not working.**
+
 1. VAPID keys rotated? Subscriptions tied to old key fail.
    Re-subscribe all users (one-shot migration).
 2. `dbexec_notify_webpush_expired_total` rising = healthy
    cleanup, not a problem.
 
 **Symptom: bundles not collapsing.**
+
 1. Caller didn't set `bundleKey`. Audit source services and add.
 
 ---
 
 ## 12. Perf budget
 
-| Operation | p50 | p95 | Hard ceiling |
-|---|---|---|---|
-| notify() end-to-end | 30 ms | 100 ms | 500 ms |
-| SSE event delivery | 20 ms | 80 ms | 500 ms |
-| Web Push dispatch (10 subs) | 200 ms | 800 ms | 5 s |
-| Notification list page (50 rows) | 30 ms | 100 ms | 1 s |
+| Operation                        | p50    | p95    | Hard ceiling |
+| -------------------------------- | ------ | ------ | ------------ |
+| notify() end-to-end              | 30 ms  | 100 ms | 500 ms       |
+| SSE event delivery               | 20 ms  | 80 ms  | 500 ms       |
+| Web Push dispatch (10 subs)      | 200 ms | 800 ms | 5 s          |
+| Notification list page (50 rows) | 30 ms  | 100 ms | 1 s          |
 
 ---
 

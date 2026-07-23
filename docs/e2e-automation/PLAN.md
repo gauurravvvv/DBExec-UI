@@ -15,7 +15,7 @@
 
 **The scenario (in order):**
 
-1. Seed a synthetic clinical warehouse into local Postgres (`clinical` schema in the `DbExec` database). *(raw SQL — the only non-UI step)*
+1. Seed a synthetic clinical warehouse into local Postgres (`clinical` schema in the `DbExec` database). _(raw SQL — the only non-UI step)_
 2. Log in to the DBExec web UI.
 3. Create a **datasource** pointing at that Postgres.
 4. Create a **DB-access role/user** (live Postgres role) + a **query-runner connection**.
@@ -25,11 +25,11 @@
 
 **Confirmed environment (dev, verified against the repos):**
 
-| Piece | URL / DSN | Start command | Notes |
-|---|---|---|---|
-| Frontend (Angular 18 + PrimeNG) | `http://localhost:4200` | `npm start` (`ng serve`) in `DBExec-UI` | `package.json` → `"start": "ng serve"`. `environment.apiServer` dev = `http://localhost:3000/api/v1`. |
-| Backend (Express + TypeORM) | `http://localhost:3000/api/v1` | `npm run dev` in `DBExec-API` | `.env` → `SERVER_PORT=3000`. Health route `GET /health`. |
-| Warehouse Postgres (data source) | `localhost:5432` db `DbExec` user `postgres` pw `<DB_PASSWORD>` | user-managed (Postgres.app / Docker / brew) | Same server + db-name as the app's master DB — see the constraint below. |
+| Piece                            | URL / DSN                                                       | Start command                               | Notes                                                                                                 |
+| -------------------------------- | --------------------------------------------------------------- | ------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| Frontend (Angular 18 + PrimeNG)  | `http://localhost:4200`                                         | `npm start` (`ng serve`) in `DBExec-UI`     | `package.json` → `"start": "ng serve"`. `environment.apiServer` dev = `http://localhost:3000/api/v1`. |
+| Backend (Express + TypeORM)      | `http://localhost:3000/api/v1`                                  | `npm run dev` in `DBExec-API`               | `.env` → `SERVER_PORT=3000`. Health route `GET /health`.                                              |
+| Warehouse Postgres (data source) | `localhost:5432` db `DbExec` user `postgres` pw `<DB_PASSWORD>` | user-managed (Postgres.app / Docker / brew) | Same server + db-name as the app's master DB — see the constraint below.                              |
 
 > **Ignore ports 8755 / 9058** — those are the prod/desktop build ports named
 > in the original brief. Dev (what the executor runs) is **4200 / 3000**.
@@ -38,7 +38,7 @@
 
 ### The one hard constraint (read before running the SQL)
 
-The DBExec **application's own master database is *also* named `DbExec`** on the
+The DBExec **application's own master database is _also_ named `DbExec`** on the
 same `localhost:5432` server (`DBExec-API/.env → DB_NAME=DbExec`). Its master
 tables live in the **`public`** schema; the **GauravOrg** per-org tables live in
 a **`dbexec`** schema (org onboarding "creates dbexec schema"). Therefore the
@@ -122,7 +122,7 @@ the UI — every downstream assertion depends on this data.
   both loaded locally by the bundle — headless Chromium renders them fine, but
   see §7 for the Monaco/CDN caveat.
 - One project, Chromium, `baseURL: http://localhost:4200`, `viewport
-  1920×1080`, `actionTimeout 15000`, `navigationTimeout 30000`,
+1920×1080`, `actionTimeout 15000`, `navigationTimeout 30000`,
   `trace: 'on'`, `video: 'on'`, `screenshot: 'only-on-failure'` (we also take
   explicit milestone screenshots — §6.2).
 
@@ -134,6 +134,7 @@ Read from the actual templates. Every screen is built from `app-custom-*`
 components that wrap PrimeNG. These four patterns cover ~95 % of interactions.
 
 ### 2.1 `app-custom-input` → renders `input[pInputText]` (or `textarea[pInputTextarea]`)
+
 `custom-input.component.html` puts the real `<input>` inside `.form-field`, next
 to a `<label>`. It sets `[attr.id]` from `inputId` when provided.
 
@@ -146,11 +147,13 @@ to a `<label>`. It sets `[attr.id]` from `inputId` when provided.
   click to reveal for a screenshot.
 
 ### 2.2 `app-custom-dropdown` → renders `p-dropdown` with `appendTo="body"`
+
 `custom-dropdown.component.html`: the trigger is `.p-dropdown`; clicking it opens
 an **overlay appended to `document.body`** (`.p-dropdown-panel`). Options are
 `.p-dropdown-item`; the filter box is `input.p-dropdown-filter`.
 
 **Interaction recipe (works for both static `[options]` and `serverMode`+`fetcher`):**
+
 1. Click the trigger: `page.locator('<scope> .p-dropdown').click()`.
 2. Wait for the panel: `page.locator('.p-dropdown-panel').waitFor()`.
 3. If filterable, type into `.p-dropdown-filter` to narrow (server-mode debounces a fetch — wait for `.p-dropdown-item` to refresh).
@@ -161,16 +164,19 @@ an **overlay appended to `document.body`** (`.p-dropdown-panel`). Options are
 > under the field — scope it under `.p-dropdown-panel` (or page root).
 
 ### 2.3 `app-custom-multiselect` → `p-multiSelect`, also `appendTo="body"`
+
 Panel `.p-multiselect-panel`, items `.p-multiselect-item`, filter
 `.p-multiselect-filter`. Used for the analysis **drill dimensions**. Click each
 item; close by clicking the trigger again or pressing `Escape`.
 
 ### 2.4 `app-custom-toggle` / `app-custom-calendar` / `app-custom-number`
+
 - Toggle: click the rendered switch inside the `app-custom-toggle` host.
 - Calendar: `appendTo="body"`; click the input, panel is `.p-datepicker`, pick a day cell, or use the button bar.
 - Number: PrimeNG `inputNumber`; the real input is `input.p-inputnumber-input` (or spinner buttons `.p-inputnumber-button`).
 
 ### 2.5 Confirmations & dialogs
+
 - The app's confirm/save popups use the **`.confirmation-popup`** overlay
   pattern (backdrop + `.popup-content` + `.popup-header` + `.popup-actions`),
   **not** `p-dialog` — except the **calc-field dialog** and the **filter
@@ -183,6 +189,7 @@ item; close by clicking the trigger again or pressing `Escape`.
   doesn't already prove it.
 
 ### 2.6 SPA readiness
+
 - After any `page.goto`, run `waitForAngular` (§6.3) — waits for
   `window.getAllAngularTestabilities()` to be stable — plus a
   `networkidle`-ish wait for the feature's first data call.
@@ -198,6 +205,7 @@ Every step: **navigate → act → assert → screenshot**. Names below use a ru
 suffix `E2E-<timestamp>` so re-runs don't clash on unique-name validators.
 
 ### Step 2 — Log in
+
 - **Route:** `/login` (`AUTH.LOGIN`). Component `app-login`, form `#auth-form`.
 - **Act:**
   - `#auth-account`.fill(`GauravOrg`)
@@ -216,6 +224,7 @@ suffix `E2E-<timestamp>` so re-runs don't clash on unique-name validators.
 - **Evidence:** `01-login.png` (post-login home).
 
 ### Step 3 — Create a datasource (Postgres → DbExec)
+
 - **Route:** list `/app/datasources` (`DATASOURCE.LIST`); create `/app/datasources/new` (`DATASOURCE.ADD`). Navigate straight to `/app/datasources/new`.
 - **Component:** `app-add-datasource`. **Fields (form controls):**
   - `name` → `E2E Clinical PG <suffix>`
@@ -238,6 +247,7 @@ suffix `E2E-<timestamp>` so re-runs don't clash on unique-name validators.
 - **Evidence:** `02-datasource-created.png` (list row + success toast).
 
 ### Step 4a — Create a DB-access role/user (live Postgres role)
+
 - **Route:** list `/app/db-roles` (`DB_ACCESS.ROLES_LIST`); create
   `/app/db-roles/new` (`DB_ACCESS.roleNew()`). Component `app-add-db-role`.
 - **Datasource picker first:** the form body is hidden until a datasource is
@@ -254,11 +264,12 @@ suffix `E2E-<timestamp>` so re-runs don't clash on unique-name validators.
   until `datasourceId && roleForm.valid`. On success it navigates back to
   `/app/db-roles`. **Assert:** the roles list now contains `e2e_clinical_reader`.
 - **What this really does:** issues a live `CREATE ROLE e2e_clinical_reader
-  LOGIN PASSWORD …` against the warehouse Postgres (stateless — no DBExec
+LOGIN PASSWORD …` against the warehouse Postgres (stateless — no DBExec
   mapping table). This role is a **cleanup item** (§7).
 - **Evidence:** `03a-db-role-created.png`.
 
 ### Step 4b — Create a query-runner connection
+
 - **Route:** list `/app/query-runner/connections` (`QUERY_RUNNER.CONNECTIONS_LIST`); create `/app/query-runner/connections/new` (`connectionNew()`). Component `app-add-connection`.
 - **Fill:**
   - `name` → `E2E Clinical Conn <suffix>`
@@ -273,6 +284,7 @@ suffix `E2E-<timestamp>` so re-runs don't clash on unique-name validators.
 - **Evidence:** `03b-connection-created.png`.
 
 ### Step 5 — Create a SQL dataset on the six-table join
+
 - **Entry:** list `/app/datasets` (`DATASET.LIST`), component `app-list-dataset`.
   Click the toolbar **New** button → opens `app-dataset-picker-dialog`
   (`.ds-picker-popup`).
@@ -344,6 +356,7 @@ suffix `E2E-<timestamp>` so re-runs don't clash on unique-name validators.
   `05-dataset-saved.png` (detail page listing typed fields).
 
 ### Step 5b — Add calculated fields (BOTH engines)
+
 Calc fields are added from **`view-dataset`** via the **Add custom field** action
 (the `add-custom-field-dialog`, a `p-dialog` styleClass
 `add-custom-field-dialog`). The dialog has: left rail = dataset fields
@@ -357,6 +370,7 @@ Add each field below (open dialog → set name → set data type → set formula
 dual concept: a field's **display name is also its `{brace}` handle**.
 
 The two engines (per BE `calculated-fields` module):
+
 - **SQL `[bracket]` expression** — references columns as `[col]`, compiled to SQL.
 - **JS `{brace}` FormulaCompiler** — references fields as `{Field Name}`, 137
   functions (e.g. `concat`, `if`, `year`, `datediff`).
@@ -364,14 +378,14 @@ The two engines (per BE `calculated-fields` module):
 Fields to create (mix of both engines, incl. a big-number measure and a
 CASE/`if` bucket):
 
-| # | Display name | Data type | Engine | Formula |
-|---|---|---|---|---|
-| 1 | `Collection Rate` | Number/Measure | SQL bracket | `[amount_paid] / NULLIF([total_charge], 0)` |
-| 2 | `Charge Per Day` | Number/Measure | SQL bracket | `[total_charge] / NULLIF([length_of_stay_days], 0)` |
-| 3 | `Patient Age` | Number/Measure | JS brace | `datediff('year', {birth_date}, now())` *(fallback: `year(now()) - year({birth_date})`)* |
-| 4 | `Provider @ Facility` | Text/Dimension | JS brace | `concat({provider_name}, ' @ ', {facility_name})` |
-| 5 | `Severity Bucket` | Text/Dimension | JS brace | `if({length_of_stay_days} >= 10, 'High', if({length_of_stay_days} >= 4, 'Medium', 'Low'))` |
-| 6 | `Total Charge (Big $)` | Number/Measure | SQL bracket | `[total_charge] * 1.0` *(a passthrough measure so a KPI SUM lands in the millions)* |
+| #   | Display name           | Data type      | Engine      | Formula                                                                                    |
+| --- | ---------------------- | -------------- | ----------- | ------------------------------------------------------------------------------------------ |
+| 1   | `Collection Rate`      | Number/Measure | SQL bracket | `[amount_paid] / NULLIF([total_charge], 0)`                                                |
+| 2   | `Charge Per Day`       | Number/Measure | SQL bracket | `[total_charge] / NULLIF([length_of_stay_days], 0)`                                        |
+| 3   | `Patient Age`          | Number/Measure | JS brace    | `datediff('year', {birth_date}, now())` _(fallback: `year(now()) - year({birth_date})`)_   |
+| 4   | `Provider @ Facility`  | Text/Dimension | JS brace    | `concat({provider_name}, ' @ ', {facility_name})`                                          |
+| 5   | `Severity Bucket`      | Text/Dimension | JS brace    | `if({length_of_stay_days} >= 10, 'High', if({length_of_stay_days} >= 4, 'Medium', 'Low'))` |
+| 6   | `Total Charge (Big $)` | Number/Measure | SQL bracket | `[total_charge] * 1.0` _(a passthrough measure so a KPI SUM lands in the millions)_        |
 
 > Exact function names/spelling for the JS engine (`datediff`, `concat`, `if`,
 > `year`, `now`) should be confirmed against the function-reference rail inside
@@ -464,6 +478,7 @@ for bubble size); `world-map`/`choropleth` need `xAxis`=region-name +
 > `Total Charge (Big $)`).
 
 **Tab 1 — Overview**
+
 1. **KPI — number-card**: yAxis=`Total Charge (Big $)`, aggregate **Sum** →
    big-number in the **millions** (proves the big-number requirement + calc field).
 2. **KPI — kpi-delta** (or number-card): yAxis=`amount_paid` Sum.
@@ -471,51 +486,36 @@ for bubble size); `world-map`/`choropleth` need `xAxis`=region-name +
 4. **Bar (vertical)**: xAxis=`encounter_type`, yAxis=`total_charge` Sum.
 5. **Donut**: xAxis(category)=`department`, yAxis=`total_charge` Sum.
 
-**Tab 2 — Time Trends**
-6. **Line**: xAxis=`encounter_date`, yAxis=`total_charge` Sum; **Compare** =
-   `same_period_last_year` (YoY), compare date col=`encounter_date`.
-7. **Line (2nd)**: xAxis=`encounter_date`, yAxis=`amount_paid` Sum; **Quick calc**
-   = `running_total` (table-calc: cumulative collections).
-8. **Area**: xAxis=`encounter_date`, yAxis=`length_of_stay_days` Average;
-   **Compare** = `previous_period` (MoM-style).
+**Tab 2 — Time Trends** 6. **Line**: xAxis=`encounter_date`, yAxis=`total_charge` Sum; **Compare** =
+`same_period_last_year` (YoY), compare date col=`encounter_date`. 7. **Line (2nd)**: xAxis=`encounter_date`, yAxis=`amount_paid` Sum; **Quick calc**
+= `running_total` (table-calc: cumulative collections). 8. **Area**: xAxis=`encounter_date`, yAxis=`length_of_stay_days` Average;
+**Compare** = `previous_period` (MoM-style).
 
-**Tab 3 — Geography**
-9. **Geo map — choropleth** (or `world-map`): region role (xAxis)=`facility_state`,
-   value (yAxis)=`total_charge` Sum. ← proves the geo/region pipeline.
-10. **Point map / bubble-map** (if lat/lon map available): `lng`=`facility_lon`,
-    `lat`=`facility_lat`, size/value=`total_charge` Sum. ← proves lat/lon geo.
-    *(If the lat/lon map type isn't in the grid post-wave, fall back to a second
-    choropleth on `region`.)*
-11. **Bar (horizontal)**: xAxis=`region`, yAxis=`total_charge` Sum + **reference
-    line** = mean. ← reference-line requirement.
+**Tab 3 — Geography** 9. **Geo map — choropleth** (or `world-map`): region role (xAxis)=`facility_state`,
+value (yAxis)=`total_charge` Sum. ← proves the geo/region pipeline. 10. **Point map / bubble-map** (if lat/lon map available): `lng`=`facility_lon`,
+`lat`=`facility_lat`, size/value=`total_charge` Sum. ← proves lat/lon geo.
+_(If the lat/lon map type isn't in the grid post-wave, fall back to a second
+choropleth on `region`.)_ 11. **Bar (horizontal)**: xAxis=`region`, yAxis=`total_charge` Sum + **reference
+line** = mean. ← reference-line requirement.
 
-**Tab 4 — Providers**
-12. **Bar (horizontal) — Top-N**: xAxis=`provider_name`, yAxis=`total_charge`
-    Sum; **Top-N** limit=Top 10. ← Top-N requirement.
-13. **Bar — Top-N facilities**: xAxis=`facility_name`, yAxis=`amount_paid` Sum;
-    Top 10.
-14. **Scatter**: xAxis=`length_of_stay_days`, yAxis=`Charge Per Day` (calc
-    field), colour by `specialty`. ← proves a chart on a calc field + scatter.
-15. **Table (pivot/crosstab)**: click fields to show `specialty`, `department`,
-    `total_charge`, `Collection Rate` (a tabular crosstab). ← pivot/table
-    requirement.
+**Tab 4 — Providers** 12. **Bar (horizontal) — Top-N**: xAxis=`provider_name`, yAxis=`total_charge`
+Sum; **Top-N** limit=Top 10. ← Top-N requirement. 13. **Bar — Top-N facilities**: xAxis=`facility_name`, yAxis=`amount_paid` Sum;
+Top 10. 14. **Scatter**: xAxis=`length_of_stay_days`, yAxis=`Charge Per Day` (calc
+field), colour by `specialty`. ← proves a chart on a calc field + scatter. 15. **Table (pivot/crosstab)**: click fields to show `specialty`, `department`,
+`total_charge`, `Collection Rate` (a tabular crosstab). ← pivot/table
+requirement.
 
-**Tab 5 — Diagnoses**
-16. **Bar (vertical)**: xAxis=`primary_diagnosis`, yAxis=count of encounters
-    (aggregate Count); Top-N 12.
-17. **Pie**: xAxis(category)=`is_chronic`, yAxis=count.
-18. **Treemap** (or bar): xAxis=`primary_icd10`, yAxis=`total_charge` Sum.
+**Tab 5 — Diagnoses** 16. **Bar (vertical)**: xAxis=`primary_diagnosis`, yAxis=count of encounters
+(aggregate Count); Top-N 12. 17. **Pie**: xAxis(category)=`is_chronic`, yAxis=count. 18. **Treemap** (or bar): xAxis=`primary_icd10`, yAxis=`total_charge` Sum.
 
-**Tab 6 — Financials**
-19. **Combo / dual-axis**: xAxis=`department`, yAxis=`total_charge` Sum,
-    valueColumns=`Collection Rate` (Average) on the secondary axis (enable
-    **Dual-axis** in Analytics). ← dual-axis + calc field.
-20. **Bar (vertical)**: xAxis=`Severity Bucket` (calc field dimension),
-    yAxis=`total_charge` Sum. ← proves categorical calc field.
-21. **Line**: xAxis=`encounter_date`, yAxis=`Collection Rate` Average;
-    **Quick calc** = `percent_of_total` (table-calc variant).
+**Tab 6 — Financials** 19. **Combo / dual-axis**: xAxis=`department`, yAxis=`total_charge` Sum,
+valueColumns=`Collection Rate` (Average) on the secondary axis (enable
+**Dual-axis** in Analytics). ← dual-axis + calc field. 20. **Bar (vertical)**: xAxis=`Severity Bucket` (calc field dimension),
+yAxis=`total_charge` Sum. ← proves categorical calc field. 21. **Line**: xAxis=`encounter_date`, yAxis=`Collection Rate` Average;
+**Quick calc** = `percent_of_total` (table-calc variant).
 
 **Cross-filter + drill wiring (do this on 2 visuals):**
+
 - On visual #4 (Overview bar by `encounter_type`): enable **Cross-filter**.
 - On visual #5 (Overview donut by `department`): enable **Cross-filter** and set
   **Drill dimensions** = [`department`, `specialty`, `provider_name`] (an ordered
@@ -552,6 +552,7 @@ The whole analysis is built **in memory**; nothing persists until Save.
 > version and the old `<analysisId>` is now historical, the executor must
 > **re-open the analysis from the list** (find the row by name → View or Edit),
 > which resolves to the latest version. Then assert persistence:
+>
 > - **All 6 tabs** present in the tab strip (Overview, Time Trends, Geography,
 >   Providers, Diagnoses, Financials).
 > - Visual **count per tab** matches what was built (18–22 total across tabs).
@@ -573,23 +574,24 @@ The whole analysis is built **in memory**; nothing persists until Save.
 Save all artifacts under the session **scratchpad** dir (NOT the repo):
 `<scratchpad>/e2e-evidence/` (Playwright also writes trace + video there).
 
-| File | Proves |
-|---|---|
-| `01-login.png` | Auth works; landed on the app shell (not `/login`). |
-| `02-datasource-created.png` | Datasource saved after a **successful test-connection**; list row present. |
-| `03a-db-role-created.png` | Live Postgres role created via db-access. |
-| `03b-connection-created.png` | Query-runner connection created. |
-| `04-dataset-preview.png` | The join **ran against real data** — ~5000 rows in the grid (not empty/error). |
-| `05-dataset-saved.png` | Dataset persisted with typed fields. |
-| `06-calc-field-collection-rate.png` | **SQL [bracket]** engine validated. |
-| `07-calc-field-severity-js.png` | **JS {brace}** engine validated. |
-| `08-dataset-fields-with-calc.png` | All 6 calc fields persisted on the dataset. |
-| `10..15-tab-*.png` | Each analysis tab **renders real charts** (canvas present, not empty states). |
-| `16-geo-map.png` | Geo pipeline: a **map actually draws** (region choropleth / lat-lon points). |
-| `17-kpi-bignumber.png` | KPI shows the **big number** (total charges in the millions). |
-| `18-reload-verify-tabs.png` | **Persistence**: after re-opening from the list, all tabs + visuals survived. |
+| File                                | Proves                                                                         |
+| ----------------------------------- | ------------------------------------------------------------------------------ |
+| `01-login.png`                      | Auth works; landed on the app shell (not `/login`).                            |
+| `02-datasource-created.png`         | Datasource saved after a **successful test-connection**; list row present.     |
+| `03a-db-role-created.png`           | Live Postgres role created via db-access.                                      |
+| `03b-connection-created.png`        | Query-runner connection created.                                               |
+| `04-dataset-preview.png`            | The join **ran against real data** — ~5000 rows in the grid (not empty/error). |
+| `05-dataset-saved.png`              | Dataset persisted with typed fields.                                           |
+| `06-calc-field-collection-rate.png` | **SQL [bracket]** engine validated.                                            |
+| `07-calc-field-severity-js.png`     | **JS {brace}** engine validated.                                               |
+| `08-dataset-fields-with-calc.png`   | All 6 calc fields persisted on the dataset.                                    |
+| `10..15-tab-*.png`                  | Each analysis tab **renders real charts** (canvas present, not empty states).  |
+| `16-geo-map.png`                    | Geo pipeline: a **map actually draws** (region choropleth / lat-lon points).   |
+| `17-kpi-bignumber.png`              | KPI shows the **big number** (total charges in the millions).                  |
+| `18-reload-verify-tabs.png`         | **Persistence**: after re-opening from the list, all tabs + visuals survived.  |
 
 Assertions that back the screenshots (so evidence isn't just pixels):
+
 - After dataset Run: `.results-sheet .p-table tbody tr` count > 0 **and** a
   known column header (e.g. `total_charge`) present.
 - Per chart: `app-echart-visual .echart-canvas canvas` exists with
@@ -624,18 +626,31 @@ DBExec-UI/e2e/                         (or a sibling e2e workspace)
 ```
 
 ### 5.1 Config (`fixtures/config.ts`)
+
 ```ts
 export const CFG = {
   baseURL: process.env.E2E_BASE_URL ?? 'http://localhost:4200',
-  apiURL:  process.env.E2E_API_URL  ?? 'http://localhost:3000/api/v1',
-  org: 'GauravOrg', user: 'administrator', pass: 'Pass@1234',
-  suffix: process.env.E2E_SUFFIX ?? new Date().toISOString().slice(0,16).replace(/[:T]/g,''),
-  warehouse: { host:'localhost', port:5432, db:'DbExec', user:'postgres', pass:'<DB_PASSWORD>', schema:'clinical' },
+  apiURL: process.env.E2E_API_URL ?? 'http://localhost:3000/api/v1',
+  org: 'GauravOrg',
+  user: 'administrator',
+  pass: 'Pass@1234',
+  suffix:
+    process.env.E2E_SUFFIX ??
+    new Date().toISOString().slice(0, 16).replace(/[:T]/g, ''),
+  warehouse: {
+    host: 'localhost',
+    port: 5432,
+    db: 'DbExec',
+    user: 'postgres',
+    pass: '<DB_PASSWORD>',
+    schema: 'clinical',
+  },
   evidenceDir: process.env.E2E_EVIDENCE ?? '/tmp/e2e-evidence', // executor sets to scratchpad
 };
 ```
 
 ### 5.2 Login helper (`helpers/auth.ts`)
+
 ```ts
 export async function login(page) {
   await page.goto('/login');
@@ -650,44 +665,65 @@ export async function login(page) {
 ```
 
 ### 5.3 Angular readiness (`helpers/angular.ts`)
+
 ```ts
 export async function waitForAngular(page) {
-  await page.waitForFunction(() => {
-    const w = window as any;
-    if (!w.getAllAngularTestabilities) return true; // zone.js exposes this in dev
-    return w.getAllAngularTestabilities().every((t:any) => t.isStable());
-  }, { timeout: 30000 }).catch(() => {});
+  await page
+    .waitForFunction(
+      () => {
+        const w = window as any;
+        if (!w.getAllAngularTestabilities) return true; // zone.js exposes this in dev
+        return w.getAllAngularTestabilities().every((t: any) => t.isStable());
+      },
+      { timeout: 30000 },
+    )
+    .catch(() => {});
   await page.waitForLoadState('networkidle').catch(() => {});
 }
 ```
 
 ### 5.4 `app-custom-*` drivers (`helpers/controls.ts`)
+
 ```ts
 // Text: app-custom-input wraps a real <input pInputText> inside .form-field
 export async function fillCustomInput(scope, formControlName, value) {
-  const input = scope.locator(`app-custom-input[formcontrolname="${formControlName}"] input, ` +
-                              `app-custom-input[formcontrolname="${formControlName}"] textarea`);
+  const input = scope.locator(
+    `app-custom-input[formcontrolname="${formControlName}"] input, ` +
+      `app-custom-input[formcontrolname="${formControlName}"] textarea`,
+  );
   await input.fill(value);
   await input.blur(); // trip zod/blur validators
 }
 
 // Dropdown: p-dropdown trigger opens a panel APPENDED TO BODY.
-export async function pickDropdown(page, triggerScope, optionText, { filter = true } = {}) {
+export async function pickDropdown(
+  page,
+  triggerScope,
+  optionText,
+  { filter = true } = {},
+) {
   await triggerScope.locator('.p-dropdown').click();
   const panel = page.locator('.p-dropdown-panel');
   await panel.waitFor();
   if (filter) {
     const f = panel.locator('input.p-dropdown-filter');
-    if (await f.count()) { await f.fill(optionText); await page.waitForTimeout(400); } // server debounce
+    if (await f.count()) {
+      await f.fill(optionText);
+      await page.waitForTimeout(400);
+    } // server debounce
   }
-  await panel.locator('.p-dropdown-item', { hasText: optionText }).first().click();
-  await panel.waitFor({ state: 'detached' }).catch(()=>{});
+  await panel
+    .locator('.p-dropdown-item', { hasText: optionText })
+    .first()
+    .click();
+  await panel.waitFor({ state: 'detached' }).catch(() => {});
 }
 
 // Multiselect: .p-multiselect-panel / .p-multiselect-item
 export async function pickMulti(page, triggerScope, optionTexts: string[]) {
   await triggerScope.locator('.p-multiselect').click();
-  const panel = page.locator('.p-multiselect-panel'); await panel.waitFor();
+  const panel = page.locator('.p-multiselect-panel');
+  await panel.waitFor();
   for (const t of optionTexts)
     await panel.locator('.p-multiselect-item', { hasText: t }).first().click();
   await page.keyboard.press('Escape');
@@ -696,42 +732,59 @@ export async function pickMulti(page, triggerScope, optionTexts: string[]) {
 // Toggle: click the switch inside the host
 export async function setToggle(hostScope, on = true) {
   const sw = hostScope.locator('.p-inputswitch, [role="switch"]').first();
-  const checked = (await sw.getAttribute('aria-checked')) === 'true'
-               || (await sw.getAttribute('class'))?.includes('p-inputswitch-checked');
+  const checked =
+    (await sw.getAttribute('aria-checked')) === 'true' ||
+    (await sw.getAttribute('class'))?.includes('p-inputswitch-checked');
   if (!!checked !== on) await sw.click();
 }
 ```
 
 ### 5.5 Monaco driver (`helpers/monaco.ts`)
+
 ```ts
 // Set the editor value directly — reliable vs. char typing for big SQL/formulas.
 export async function setMonacoValue(page, containerSelector, value) {
   await page.locator(`${containerSelector} .monaco-editor`).waitFor();
-  await page.evaluate(({ sel, val }) => {
-    const w = window as any;
-    const node = document.querySelector(sel);
-    // Preferred: monaco global getModels(); fallback: focus + clipboard paste.
-    const monaco = w.monaco;
-    if (monaco?.editor?.getModels?.().length) {
-      const editors = monaco.editor.getEditors?.() ?? [];
-      const ed = editors.find((e:any) => node?.contains(e.getDomNode?.()));
-      if (ed) { ed.setValue(val); return; }
-      monaco.editor.getModels()[0].setValue(val); return;
-    }
-    // Fallback path handled in Node side below if this throws.
-  }, { sel: containerSelector, val: value });
+  await page.evaluate(
+    ({ sel, val }) => {
+      const w = window as any;
+      const node = document.querySelector(sel);
+      // Preferred: monaco global getModels(); fallback: focus + clipboard paste.
+      const monaco = w.monaco;
+      if (monaco?.editor?.getModels?.().length) {
+        const editors = monaco.editor.getEditors?.() ?? [];
+        const ed = editors.find((e: any) => node?.contains(e.getDomNode?.()));
+        if (ed) {
+          ed.setValue(val);
+          return;
+        }
+        monaco.editor.getModels()[0].setValue(val);
+        return;
+      }
+      // Fallback path handled in Node side below if this throws.
+    },
+    { sel: containerSelector, val: value },
+  );
   // Fallback if the above no-op'd: click + select-all + type.
-  const box = page.locator(`${containerSelector} .monaco-editor textarea.inputarea`);
+  const box = page.locator(
+    `${containerSelector} .monaco-editor textarea.inputarea`,
+  );
   if (await box.count()) {
-    const current = await page.locator(`${containerSelector} .view-lines`).innerText().catch(()=> '');
+    const current = await page
+      .locator(`${containerSelector} .view-lines`)
+      .innerText()
+      .catch(() => '');
     if (!current.includes(value.slice(0, 20))) {
-      await box.click(); await page.keyboard.press('Control+A'); await box.fill(value);
+      await box.click();
+      await page.keyboard.press('Control+A');
+      await box.fill(value);
     }
   }
 }
 ```
 
 ### 5.6 Analysis helpers (`helpers/analysis.ts`) — thin wrappers over §3 Step 6
+
 `addTab(page, name)`, `selectTab(page, name)`, `addVisual(page)`,
 `pickChart(page, chartName)`, `mapField(page, slotLabel, fieldName)`
 (click `.axis-slot` by label → click `.field-card` by name),
@@ -741,6 +794,7 @@ export async function setMonacoValue(page, containerSelector, value) {
 `setDrill(page, dims)`, `saveAnalysis(page, name)`.
 
 ### 5.7 Spec shape (`specs/clinical-e2e.spec.ts`)
+
 One `test.describe.serial` (order matters; state accumulates):
 `test('login')`, `test('datasource')`, `test('db role + connection')`,
 `test('dataset + calc fields')`, `test('build + save analysis')`,
@@ -766,25 +820,28 @@ One `test.describe.serial` (order matters; state accumulates):
 
 **What gets created / modified, and where:**
 
-| Where | What | Cleanup |
-|---|---|---|
-| Warehouse Postgres `DbExec` | **`clinical` schema** (6 tables + `encounter_analytics` view + indexes + ~20k rows) | `DROP SCHEMA clinical CASCADE;` (idempotent re-run also drops+recreates) |
-| Warehouse Postgres (cluster roles) | **Live PG role** `e2e_clinical_reader` (LOGIN) created by db-access Step 4a | `DROP ROLE IF EXISTS e2e_clinical_reader;` (revoke grants first if any) |
+| Where                              | What                                                                                                                                                          | Cleanup                                                                                                                              |
+| ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| Warehouse Postgres `DbExec`        | **`clinical` schema** (6 tables + `encounter_analytics` view + indexes + ~20k rows)                                                                           | `DROP SCHEMA clinical CASCADE;` (idempotent re-run also drops+recreates)                                                             |
+| Warehouse Postgres (cluster roles) | **Live PG role** `e2e_clinical_reader` (LOGIN) created by db-access Step 4a                                                                                   | `DROP ROLE IF EXISTS e2e_clinical_reader;` (revoke grants first if any)                                                              |
 | GauravOrg app DB (`dbexec` schema) | **1 datasource**, **1 query-runner connection**, **1 dataset** (+ 6 calc fields), **N analyses rows** (one per Save — versioning creates a new row each save) | Delete via the UI (each module's row Delete → `.confirmation-popup`) or leave as demo data. Analyses are soft-deleted (`deletedOn`). |
 
 **Isolation guarantees:**
+
 - The clinical data is confined to the **`clinical`** schema — it never touches
   the app's master tables (`public`) or GauravOrg's org tables (`dbexec`).
 - The datasource stores warehouse creds encrypted app-side; the connection is
   **owner-private** to `administrator`.
 
 **Idempotency / re-run safety:**
+
 - SQL: safe to re-run (drops `clinical` first).
 - UI: names carry a run-suffix so re-runs don't trip unique-name validation. A
   re-run leaves prior datasource/dataset/analysis rows behind unless the executor
   deletes them — note this and offer cleanup.
 
 **Operational risks & mitigations:**
+
 - **Monaco loads from CDN in some builds** (the dataset editor's loading state
   warns about ad-blockers / offline). If Monaco fails to load
   (`monacoLoadFailed`), the SQL editor falls back to a plain textarea and the
@@ -835,17 +892,17 @@ which was the whole point of the domain-neutrality feature program.
 
 ## Appendix A — File / route quick-map (as verified in the repos)
 
-| Concern | FE route | FE component | Key selectors |
-|---|---|---|---|
-| Login | `/login` | `app-login` | `#auth-account/#auth-username/#auth-password`, `button.auth-form__submit`, `.auth-form__error` |
-| Datasource add | `/app/datasources/new` | `app-add-datasource` | inputs by `formcontrolname`, type dropdown `.p-dropdown`, `.test-connection-btn`, `.connection-status.success`, `.btn-save` |
-| DB role add | `/app/db-roles/new` | `app-add-db-role` | `app-datasource-picker`, `name` input, `canLogin` toggle, `password`, `.btn-save` (label Create) |
-| QR connection add | `/app/query-runner/connections/new` | `app-add-connection` | `name`, `datasourceId` dropdown, `username`, `password`, `.btn-save` |
-| Dataset new | list `/app/datasets` → `app-dataset-picker-dialog` → `/app/datasets/new?datasourceId=&schema=` | `app-add-dataset` | `#sql-editor-container`, `.btn-run`, `.btn-dataset`, `.results-sheet`, `app-save-dataset-dialog .btn-confirm` |
-| Calc field | dataset detail `/app/datasets/<id>` | `app-view-dataset` → `add-custom-field-dialog` | `#formula-editor-container`, display-name input, Data type `.p-dropdown`, Validate button, Add Field button, `.acf-validation.is-valid` |
-| Analysis create | dataset list/detail → create-analysis dialog → `/app/analyses` | `app-list-dataset` / `app-view-dataset` | "Use as Analysis" → name/description dialog |
-| Analysis edit | `/app/analyses/<id>/edit` | `app-edit-analyses` | toolbar Save `.a-btn--primary`, `.a-status__dot--loaded`, tabs `.analysis-tab` + `.analysis-tab-add` (`#addTabOp .add-tab-name` + `.add-tab-btn.primary`), Fields `.field-card .field-name`, `.add-visual-button`, `.chart-type-card`, `.axis-slot`, config `.config-section`, canvas `.visual-box` → `app-echart-visual .echart-canvas canvas` |
-| Analysis save dialog | — | `app-save-analyses-dialog` | `.save-analysis-popup`, name input, `.btn-save` |
+| Concern              | FE route                                                                                       | FE component                                   | Key selectors                                                                                                                                                                                                                                                                                                                                   |
+| -------------------- | ---------------------------------------------------------------------------------------------- | ---------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Login                | `/login`                                                                                       | `app-login`                                    | `#auth-account/#auth-username/#auth-password`, `button.auth-form__submit`, `.auth-form__error`                                                                                                                                                                                                                                                  |
+| Datasource add       | `/app/datasources/new`                                                                         | `app-add-datasource`                           | inputs by `formcontrolname`, type dropdown `.p-dropdown`, `.test-connection-btn`, `.connection-status.success`, `.btn-save`                                                                                                                                                                                                                     |
+| DB role add          | `/app/db-roles/new`                                                                            | `app-add-db-role`                              | `app-datasource-picker`, `name` input, `canLogin` toggle, `password`, `.btn-save` (label Create)                                                                                                                                                                                                                                                |
+| QR connection add    | `/app/query-runner/connections/new`                                                            | `app-add-connection`                           | `name`, `datasourceId` dropdown, `username`, `password`, `.btn-save`                                                                                                                                                                                                                                                                            |
+| Dataset new          | list `/app/datasets` → `app-dataset-picker-dialog` → `/app/datasets/new?datasourceId=&schema=` | `app-add-dataset`                              | `#sql-editor-container`, `.btn-run`, `.btn-dataset`, `.results-sheet`, `app-save-dataset-dialog .btn-confirm`                                                                                                                                                                                                                                   |
+| Calc field           | dataset detail `/app/datasets/<id>`                                                            | `app-view-dataset` → `add-custom-field-dialog` | `#formula-editor-container`, display-name input, Data type `.p-dropdown`, Validate button, Add Field button, `.acf-validation.is-valid`                                                                                                                                                                                                         |
+| Analysis create      | dataset list/detail → create-analysis dialog → `/app/analyses`                                 | `app-list-dataset` / `app-view-dataset`        | "Use as Analysis" → name/description dialog                                                                                                                                                                                                                                                                                                     |
+| Analysis edit        | `/app/analyses/<id>/edit`                                                                      | `app-edit-analyses`                            | toolbar Save `.a-btn--primary`, `.a-status__dot--loaded`, tabs `.analysis-tab` + `.analysis-tab-add` (`#addTabOp .add-tab-name` + `.add-tab-btn.primary`), Fields `.field-card .field-name`, `.add-visual-button`, `.chart-type-card`, `.axis-slot`, config `.config-section`, canvas `.visual-box` → `app-echart-visual .echart-canvas canvas` |
+| Analysis save dialog | —                                                                                              | `app-save-analyses-dialog`                     | `.save-analysis-popup`, name input, `.btn-save`                                                                                                                                                                                                                                                                                                 |
 
 ## Appendix B — Backend endpoints touched (for optional API-level asserts)
 

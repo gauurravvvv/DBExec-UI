@@ -79,7 +79,13 @@ export class AssetShareService {
 
   /** `/asset-shares/${assetType}/${assetId}/shares` */
   private sharesUrl(assetType: string, assetId: string): string {
-    return ASSET_SHARE.SHARES_PREFIX + assetType + '/' + assetId + ASSET_SHARE.SHARES_SUFFIX;
+    return (
+      ASSET_SHARE.SHARES_PREFIX +
+      assetType +
+      '/' +
+      assetId +
+      ASSET_SHARE.SHARES_SUFFIX
+    );
   }
 
   /** GET who-has-access for one asset → { owner, shares }. */
@@ -111,7 +117,11 @@ export class AssetShareService {
     this._saving.set(true);
     try {
       const url =
-        ASSET_SHARE.SHARES_PREFIX + assetType + '/' + assetId + ASSET_SHARE.BULK_SUFFIX;
+        ASSET_SHARE.SHARES_PREFIX +
+        assetType +
+        '/' +
+        assetId +
+        ASSET_SHARE.BULK_SUFFIX;
       return await lastValueFrom(
         this.http.apiPost(url, { grants }, { skipLoader: true }),
       );

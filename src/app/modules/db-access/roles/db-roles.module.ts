@@ -14,8 +14,16 @@ import { ViewDbRoleComponent } from './view-db-role/view-db-role.component';
 // The selected datasource travels via ?ds=.
 const routes: Routes = [
   { path: '', component: ListDbRolesComponent },
-  { path: 'new', component: AddDbRoleComponent, canDeactivate: [unsavedChangesGuard] },
-  { path: ':roleName/edit', component: EditDbRoleComponent, canDeactivate: [unsavedChangesGuard] },
+  {
+    path: 'new',
+    component: AddDbRoleComponent,
+    canDeactivate: [unsavedChangesGuard],
+  },
+  {
+    path: ':roleName/edit',
+    component: EditDbRoleComponent,
+    canDeactivate: [unsavedChangesGuard],
+  },
   { path: ':roleName', component: ViewDbRoleComponent },
 ];
 

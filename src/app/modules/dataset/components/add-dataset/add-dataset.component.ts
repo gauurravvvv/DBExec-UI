@@ -567,8 +567,7 @@ export class AddDatasetComponent
     // (size MB, row counts, per-table index counts) we don't render
     // on this page.
     const navState = this.router.getCurrentNavigation()?.extras?.state as
-      | { datasource?: any }
-      | undefined;
+      { datasource?: any } | undefined;
     const stateDs =
       navState?.datasource ??
       // Angular replays state via window.history.state on refresh of

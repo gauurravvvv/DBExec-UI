@@ -156,7 +156,9 @@ export class ListAuditLogsComponent implements OnInit, OnDestroy {
 
     this.tableConfig = {
       ...this.tableConfig,
-      globalSearchPlaceholder: this.translate.instant('AUDIT.SEARCH_PLACEHOLDER'),
+      globalSearchPlaceholder: this.translate.instant(
+        'AUDIT.SEARCH_PLACEHOLDER',
+      ),
     };
 
     // Debounced entity-name search → single re-query after the user pauses.
@@ -178,15 +180,71 @@ export class ListAuditLogsComponent implements OnInit, OnDestroy {
   private buildColumns(): CustomTableColumn[] {
     const t = (k: string) => this.translate.instant(k);
     return [
-      { colId: 'module', field: 'module', header: t('AUDIT.COL_MODULE'), width: '260px', frozen: true, sortable: false },
-      { colId: 'action', field: 'action', header: t('AUDIT.ACTION'), width: '124px', sortable: false },
-      { colId: 'version', field: 'assetVersion', header: t('AUDIT.VERSION'), width: '84px', align: 'center', sortable: false },
-      { colId: 'entity', field: 'entityName', header: t('AUDIT.COL_ENTITY'), width: '188px', sortable: false },
-      { colId: 'actor', field: 'actorName', header: t('AUDIT.PERFORMED_BY'), width: '200px', sortable: false },
-      { colId: 'when', field: 'createdOn', header: t('AUDIT.COL_WHEN'), width: '180px' },
-      { colId: 'origin', field: 'ipAddress', header: t('AUDIT.COL_ORIGIN'), width: '132px', sortable: false },
-      { colId: 'outcome', field: 'responseSuccess', header: t('AUDIT.OUTCOME'), width: '124px', sortable: false },
-      { colId: 'history', field: 'id', header: '', width: '52px', align: 'center', sortable: false },
+      {
+        colId: 'module',
+        field: 'module',
+        header: t('AUDIT.COL_MODULE'),
+        width: '260px',
+        frozen: true,
+        sortable: false,
+      },
+      {
+        colId: 'action',
+        field: 'action',
+        header: t('AUDIT.ACTION'),
+        width: '124px',
+        sortable: false,
+      },
+      {
+        colId: 'version',
+        field: 'assetVersion',
+        header: t('AUDIT.VERSION'),
+        width: '84px',
+        align: 'center',
+        sortable: false,
+      },
+      {
+        colId: 'entity',
+        field: 'entityName',
+        header: t('AUDIT.COL_ENTITY'),
+        width: '188px',
+        sortable: false,
+      },
+      {
+        colId: 'actor',
+        field: 'actorName',
+        header: t('AUDIT.PERFORMED_BY'),
+        width: '200px',
+        sortable: false,
+      },
+      {
+        colId: 'when',
+        field: 'createdOn',
+        header: t('AUDIT.COL_WHEN'),
+        width: '180px',
+      },
+      {
+        colId: 'origin',
+        field: 'ipAddress',
+        header: t('AUDIT.COL_ORIGIN'),
+        width: '132px',
+        sortable: false,
+      },
+      {
+        colId: 'outcome',
+        field: 'responseSuccess',
+        header: t('AUDIT.OUTCOME'),
+        width: '124px',
+        sortable: false,
+      },
+      {
+        colId: 'history',
+        field: 'id',
+        header: '',
+        width: '52px',
+        align: 'center',
+        sortable: false,
+      },
     ];
   }
 
@@ -197,7 +255,8 @@ export class ListAuditLogsComponent implements OnInit, OnDestroy {
   }
 
   moduleLabel(module: string | null | undefined): string {
-    const key = (module && MODULE_META[module]?.labelKey) || MODULE_FALLBACK.labelKey;
+    const key =
+      (module && MODULE_META[module]?.labelKey) || MODULE_FALLBACK.labelKey;
     return this.translate.instant(key);
   }
 
@@ -269,7 +328,8 @@ export class ListAuditLogsComponent implements OnInit, OnDestroy {
 
     if (this.selectedAction) filter['action'] = this.selectedAction;
     if (this.actorSearch.trim()) filter['actor'] = this.actorSearch.trim();
-    if (this.entitySearch.trim()) filter['entityName'] = this.entitySearch.trim();
+    if (this.entitySearch.trim())
+      filter['entityName'] = this.entitySearch.trim();
     if (this.failuresOnly) filter['outcome'] = 'failure';
 
     if (this.dateRange && this.dateRange.length) {
@@ -375,7 +435,12 @@ export class ListAuditLogsComponent implements OnInit, OnDestroy {
   onDateRangeChange(range: Date[] | null): void {
     this.dateRange = range;
     // Only re-query once a full range (or a clear) is picked.
-    if (!range || range.length === 0 || (range[0] && range[1]) || range[0] === null) {
+    if (
+      !range ||
+      range.length === 0 ||
+      (range[0] && range[1]) ||
+      range[0] === null
+    ) {
       this.applyFilter();
     }
   }
@@ -437,8 +502,7 @@ export class ListAuditLogsComponent implements OnInit, OnDestroy {
     if (this.rootEntityName) return this.rootEntityName;
     const type = this.rootType;
     if (type) {
-      const key =
-        MODULE_META[type]?.labelKey ?? MODULE_FALLBACK.labelKey;
+      const key = MODULE_META[type]?.labelKey ?? MODULE_FALLBACK.labelKey;
       return this.translate.instant(key);
     }
     return this.translate.instant('AUDIT.THIS_ASSET');
@@ -509,7 +573,8 @@ export class ListAuditLogsComponent implements OnInit, OnDestroy {
   exportLogs(format: 'pdf'): void {
     const filter = this.buildFilter();
     const params: Record<string, unknown> = { format };
-    if (Object.keys(filter).length > 0) params['filter'] = JSON.stringify(filter);
+    if (Object.keys(filter).length > 0)
+      params['filter'] = JSON.stringify(filter);
 
     this.auditService
       .exportAuditLogs(params)

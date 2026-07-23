@@ -33,7 +33,11 @@
   <div class="search-results" *ngIf="searchResults.length > 0">
     <div
       class="result-item"
-      *ngFor="let result of filteredSearchResults; let i = index; trackBy: trackById"
+      *ngFor="
+        let result of filteredSearchResults;
+        let i = index;
+        trackBy: trackById
+      "
       [class.is-selected]="i === selectedIndex"
       (click)="navigateToResult(result)"
       (mouseenter)="selectedIndex = i"
@@ -56,7 +60,10 @@
   </div>
 
   <!-- Empty state -->
-  <div class="empty-state" *ngIf="searchTerm && searchResults.length === 0 && !loading()">
+  <div
+    class="empty-state"
+    *ngIf="searchTerm && searchResults.length === 0 && !loading()"
+  >
     <i class="pi pi-search empty-icon"></i>
     <p class="empty-text">
       {{ 'SEARCH.NO_RESULTS' | translate }}

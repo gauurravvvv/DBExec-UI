@@ -4,201 +4,654 @@
     /* DBExec tokens (mirrored from the app's _theme-variables.scss) */
     --primary: #2196f3;
     --primary-hover: #1976d2;
-    --primary-tint: rgba(33, 150, 243, 0.10);
-    --ink: #1f2733;            /* text, cool-biased near-black */
-    --muted: #64707f;          /* secondary text, cool grey */
+    --primary-tint: rgba(33, 150, 243, 0.1);
+    --ink: #1f2733; /* text, cool-biased near-black */
+    --muted: #64707f; /* secondary text, cool grey */
     --subtle: #97a1ae;
-    --line: #e2e6eb;           /* borders, slight blue bias */
+    --line: #e2e6eb; /* borders, slight blue bias */
     --line-strong: #cbd2da;
     --surface: #ffffff;
-    --surface-2: #f6f8fb;      /* subtle panel ground */
+    --surface-2: #f6f8fb; /* subtle panel ground */
     --surface-3: #eef2f7;
     --good: #21a366;
     --warn: #e08600;
     --bad: #e5484d;
-    --p0-bg: #fdecec; --p0-fg: #c0353a;
-    --p1-bg: #fdf3e2; --p1-fg: #a86400;
-    --p2-bg: #eef2f7; --p2-fg: #5a6675;
-    --mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
-    --ui: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    --r-sm: 6px; --r-md: 9px; --r-lg: 14px;
-    --shadow: 0 1px 2px rgba(20,30,45,.04), 0 6px 20px rgba(20,30,45,.06);
+    --p0-bg: #fdecec;
+    --p0-fg: #c0353a;
+    --p1-bg: #fdf3e2;
+    --p1-fg: #a86400;
+    --p2-bg: #eef2f7;
+    --p2-fg: #5a6675;
+    --mono:
+      ui-monospace, 'SF Mono', 'JetBrains Mono', Menlo, Consolas, monospace;
+    --ui:
+      'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --r-sm: 6px;
+    --r-md: 9px;
+    --r-lg: 14px;
+    --shadow:
+      0 1px 2px rgba(20, 30, 45, 0.04), 0 6px 20px rgba(20, 30, 45, 0.06);
   }
-  * { box-sizing: border-box; }
+  * {
+    box-sizing: border-box;
+  }
   body {
-    margin: 0; font-family: var(--ui); color: var(--ink);
+    margin: 0;
+    font-family: var(--ui);
+    color: var(--ink);
     background:
-      radial-gradient(1200px 600px at 80% -10%, rgba(33,150,243,.06), transparent 60%),
+      radial-gradient(
+        1200px 600px at 80% -10%,
+        rgba(33, 150, 243, 0.06),
+        transparent 60%
+      ),
       var(--surface-2);
-    line-height: 1.55; -webkit-font-smoothing: antialiased;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
   }
-  .wrap { max-width: 1120px; margin: 0 auto; padding: 0 28px 96px; }
+  .wrap {
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 0 28px 96px;
+  }
 
   /* ── Masthead ── */
   header.mast {
-    padding: 52px 28px 30px; max-width: 1120px; margin: 0 auto;
+    padding: 52px 28px 30px;
+    max-width: 1120px;
+    margin: 0 auto;
   }
   .eyebrow {
-    font-size: 12px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase;
-    color: var(--primary); margin: 0 0 10px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--primary);
+    margin: 0 0 10px;
   }
   h1 {
-    font-size: clamp(28px, 3.4vw, 40px); line-height: 1.1; margin: 0 0 14px;
-    font-weight: 800; letter-spacing: -.02em; text-wrap: balance; max-width: 20ch;
+    font-size: clamp(28px, 3.4vw, 40px);
+    line-height: 1.1;
+    margin: 0 0 14px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    text-wrap: balance;
+    max-width: 20ch;
   }
-  .lede { font-size: 17px; color: var(--muted); max-width: 62ch; margin: 0; }
-  .lede b { color: var(--ink); font-weight: 600; }
+  .lede {
+    font-size: 17px;
+    color: var(--muted);
+    max-width: 62ch;
+    margin: 0;
+  }
+  .lede b {
+    color: var(--ink);
+    font-weight: 600;
+  }
 
   /* ── Scorecard ── */
   .score {
-    display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px;
-    margin: 30px auto 0; max-width: 1120px; padding: 0 28px;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+    margin: 30px auto 0;
+    max-width: 1120px;
+    padding: 0 28px;
   }
   .score .cell {
-    background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-md);
-    padding: 16px 18px; box-shadow: var(--shadow);
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--r-md);
+    padding: 16px 18px;
+    box-shadow: var(--shadow);
   }
-  .score .num { font-size: 30px; font-weight: 800; letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
-  .score .num.red { color: var(--bad); }
-  .score .num.amber { color: var(--warn); }
-  .score .num.green { color: var(--good); }
-  .score .cap { font-size: 12.5px; color: var(--muted); margin-top: 2px; }
+  .score .num {
+    font-size: 30px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    font-variant-numeric: tabular-nums;
+  }
+  .score .num.red {
+    color: var(--bad);
+  }
+  .score .num.amber {
+    color: var(--warn);
+  }
+  .score .num.green {
+    color: var(--good);
+  }
+  .score .cap {
+    font-size: 12.5px;
+    color: var(--muted);
+    margin-top: 2px;
+  }
 
   /* ── Section chrome ── */
-  section { margin-top: 56px; scroll-margin-top: 20px; }
-  .sec-head { display: flex; align-items: baseline; gap: 12px; margin-bottom: 18px; }
+  section {
+    margin-top: 56px;
+    scroll-margin-top: 20px;
+  }
+  .sec-head {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    margin-bottom: 18px;
+  }
   .sec-head h2 {
-    font-size: 22px; font-weight: 750; letter-spacing: -.01em; margin: 0;
+    font-size: 22px;
+    font-weight: 750;
+    letter-spacing: -0.01em;
+    margin: 0;
   }
   .sec-head .ktag {
-    font-family: var(--mono); font-size: 11px; color: var(--muted);
-    background: var(--surface-3); border-radius: 999px; padding: 3px 10px;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted);
+    background: var(--surface-3);
+    border-radius: 999px;
+    padding: 3px 10px;
   }
-  .sec-intro { color: var(--muted); max-width: 68ch; margin: -6px 0 22px; }
+  .sec-intro {
+    color: var(--muted);
+    max-width: 68ch;
+    margin: -6px 0 22px;
+  }
 
   /* ── Before / After visual-box comparison ── */
   .ba {
-    display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: stretch;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    align-items: stretch;
   }
-  @media (max-width: 860px) { .ba { grid-template-columns: 1fr; } .score { grid-template-columns: repeat(2,1fr);} }
+  @media (max-width: 860px) {
+    .ba {
+      grid-template-columns: 1fr;
+    }
+    .score {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
   .ba .panel {
-    background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg);
-    box-shadow: var(--shadow); overflow: hidden; display: flex; flex-direction: column;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--r-lg);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
   }
   .ba .panel > .tag {
-    font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
-    padding: 9px 16px; border-bottom: 1px solid var(--line);
-  }
-  .ba .before > .tag { color: var(--muted); background: var(--surface-2); }
-  .ba .after  > .tag { color: var(--primary); background: var(--primary-tint); }
-
-  /* mock chart card */
-  .mock { padding: 16px; display: flex; flex-direction: column; gap: 12px; flex: 1; }
-  .card {
-    border: 1px solid var(--line); border-radius: var(--r-md); background: var(--surface);
-    display: flex; flex-direction: column; overflow: hidden;
-  }
-  .card.flat-hdr .chdr {
-    display: flex; align-items: center; gap: 6px; padding: 8px 10px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 9px 16px;
     border-bottom: 1px solid var(--line);
   }
-  .chdr .ttl { font-size: 13px; font-weight: 650; }
-  .chdr .sub { font-size: 11px; color: var(--subtle); }
-  .chdr .spacer { flex: 1; }
-  .icobtn { width: 24px; height: 24px; border-radius: var(--r-sm); border: 1px solid transparent;
-    display: grid; place-items: center; color: var(--subtle); font-size: 13px; }
-  .icobtn.soup { color: var(--subtle); }
-  .kebab { color: var(--muted); }
-  .cbody { padding: 14px; }
-  .cbody.tight { padding: 4px; }
+  .ba .before > .tag {
+    color: var(--muted);
+    background: var(--surface-2);
+  }
+  .ba .after > .tag {
+    color: var(--primary);
+    background: var(--primary-tint);
+  }
+
+  /* mock chart card */
+  .mock {
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    flex: 1;
+  }
+  .card {
+    border: 1px solid var(--line);
+    border-radius: var(--r-md);
+    background: var(--surface);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .card.flat-hdr .chdr {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 10px;
+    border-bottom: 1px solid var(--line);
+  }
+  .chdr .ttl {
+    font-size: 13px;
+    font-weight: 650;
+  }
+  .chdr .sub {
+    font-size: 11px;
+    color: var(--subtle);
+  }
+  .chdr .spacer {
+    flex: 1;
+  }
+  .icobtn {
+    width: 24px;
+    height: 24px;
+    border-radius: var(--r-sm);
+    border: 1px solid transparent;
+    display: grid;
+    place-items: center;
+    color: var(--subtle);
+    font-size: 13px;
+  }
+  .icobtn.soup {
+    color: var(--subtle);
+  }
+  .kebab {
+    color: var(--muted);
+  }
+  .cbody {
+    padding: 14px;
+  }
+  .cbody.tight {
+    padding: 4px;
+  }
 
   /* fake bar chart via divs */
-  .bars { display: flex; align-items: flex-end; gap: 10px; height: 110px; padding-top: 6px; }
-  .bars .b { flex: 1; border-radius: 3px 3px 0 0; }
-  .before .bars .b { background: #8fb0c9; }         /* dull default palette */
-  .after  .bars .b { background: linear-gradient(180deg, #4aa3f0, var(--primary)); }
-  .axis { display: flex; gap: 10px; margin-top: 6px; }
-  .axis span { flex: 1; text-align: center; font-size: 10px; color: var(--subtle); }
-  .legend { display: flex; gap: 12px; margin-top: 10px; font-size: 11px; color: var(--muted); }
-  .legend i { display: inline-block; width: 9px; height: 9px; border-radius: 2px; vertical-align: middle; margin-right: 5px; }
+  .bars {
+    display: flex;
+    align-items: flex-end;
+    gap: 10px;
+    height: 110px;
+    padding-top: 6px;
+  }
+  .bars .b {
+    flex: 1;
+    border-radius: 3px 3px 0 0;
+  }
+  .before .bars .b {
+    background: #8fb0c9;
+  } /* dull default palette */
+  .after .bars .b {
+    background: linear-gradient(180deg, #4aa3f0, var(--primary));
+  }
+  .axis {
+    display: flex;
+    gap: 10px;
+    margin-top: 6px;
+  }
+  .axis span {
+    flex: 1;
+    text-align: center;
+    font-size: 10px;
+    color: var(--subtle);
+  }
+  .legend {
+    display: flex;
+    gap: 12px;
+    margin-top: 10px;
+    font-size: 11px;
+    color: var(--muted);
+  }
+  .legend i {
+    display: inline-block;
+    width: 9px;
+    height: 9px;
+    border-radius: 2px;
+    vertical-align: middle;
+    margin-right: 5px;
+  }
 
-  .note { font-size: 11.5px; color: var(--muted); padding: 0 16px 16px; }
-  .note.bad b { color: var(--bad); }
-  .note.good b { color: var(--good); }
+  .note {
+    font-size: 11.5px;
+    color: var(--muted);
+    padding: 0 16px 16px;
+  }
+  .note.bad b {
+    color: var(--bad);
+  }
+  .note.good b {
+    color: var(--good);
+  }
 
   /* ── config panel mock ── */
-  .cfg { border: 1px solid var(--line); border-radius: var(--r-md); overflow: hidden; }
-  .cfg.before .row { padding: 8px 12px; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); }
-  .cfg.before .hr { height: 1px; background: var(--line); }
-  .cfg.before .lbl { font-size: 11px; font-weight: 700; color: var(--ink); padding: 8px 12px; }
+  .cfg {
+    border: 1px solid var(--line);
+    border-radius: var(--r-md);
+    overflow: hidden;
+  }
+  .cfg.before .row {
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--line);
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .cfg.before .hr {
+    height: 1px;
+    background: var(--line);
+  }
+  .cfg.before .lbl {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--ink);
+    padding: 8px 12px;
+  }
 
-  .tabs { display: flex; gap: 2px; background: var(--surface-2); padding: 4px; border-bottom: 1px solid var(--line); }
-  .tabs .t { flex: 1; text-align: center; font-size: 12px; font-weight: 600; padding: 6px; border-radius: var(--r-sm); color: var(--muted); }
-  .tabs .t.on { background: var(--surface); color: var(--primary); box-shadow: var(--shadow); }
-  .acc { }
+  .tabs {
+    display: flex;
+    gap: 2px;
+    background: var(--surface-2);
+    padding: 4px;
+    border-bottom: 1px solid var(--line);
+  }
+  .tabs .t {
+    flex: 1;
+    text-align: center;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 6px;
+    border-radius: var(--r-sm);
+    color: var(--muted);
+  }
+  .tabs .t.on {
+    background: var(--surface);
+    color: var(--primary);
+    box-shadow: var(--shadow);
+  }
+  .acc {
+  }
   .acc .ah {
-    display: flex; align-items: center; gap: 8px; padding: 10px 12px; cursor: default;
-    border-bottom: 1px solid var(--line); font-size: 12px; font-weight: 650;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 12px;
+    cursor: default;
+    border-bottom: 1px solid var(--line);
+    font-size: 12px;
+    font-weight: 650;
   }
-  .acc .ah .chev { color: var(--subtle); font-size: 10px; }
-  .acc .ah .count { margin-left: auto; font-size: 10px; color: var(--muted); background: var(--surface-3); padding: 1px 8px; border-radius: 999px; }
-  .acc .ah.open { color: var(--primary); }
-  .acc .ab { padding: 10px 12px; border-bottom: 1px solid var(--line); display: flex; flex-direction: column; gap: 9px; background: var(--surface-2); }
+  .acc .ah .chev {
+    color: var(--subtle);
+    font-size: 10px;
+  }
+  .acc .ah .count {
+    margin-left: auto;
+    font-size: 10px;
+    color: var(--muted);
+    background: var(--surface-3);
+    padding: 1px 8px;
+    border-radius: 999px;
+  }
+  .acc .ah.open {
+    color: var(--primary);
+  }
+  .acc .ab {
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--line);
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+    background: var(--surface-2);
+  }
   .pill {
-    display: inline-flex; align-items: center; gap: 6px; font-family: var(--mono); font-size: 11px;
-    background: var(--surface); border: 1px solid var(--line-strong); border-radius: 999px;
-    padding: 4px 10px; color: var(--ink); align-self: flex-start;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--mono);
+    font-size: 11px;
+    background: var(--surface);
+    border: 1px solid var(--line-strong);
+    border-radius: 999px;
+    padding: 4px 10px;
+    color: var(--ink);
+    align-self: flex-start;
   }
-  .pill .agg { color: var(--primary); font-weight: 600; }
-  .pill .x { color: var(--subtle); }
-  .field { display: flex; flex-direction: column; gap: 4px; }
-  .field label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
-  .field .ctl { border: 1px solid var(--line-strong); border-radius: var(--r-sm); padding: 6px 9px; font-size: 12px; color: var(--muted); background: var(--surface); }
-  .search { margin: 8px; border: 1px solid var(--line-strong); border-radius: var(--r-sm); padding: 6px 10px; font-size: 12px; color: var(--subtle); display: flex; gap: 6px; }
+  .pill .agg {
+    color: var(--primary);
+    font-weight: 600;
+  }
+  .pill .x {
+    color: var(--subtle);
+  }
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .field label {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--muted);
+  }
+  .field .ctl {
+    border: 1px solid var(--line-strong);
+    border-radius: var(--r-sm);
+    padding: 6px 9px;
+    font-size: 12px;
+    color: var(--muted);
+    background: var(--surface);
+  }
+  .search {
+    margin: 8px;
+    border: 1px solid var(--line-strong);
+    border-radius: var(--r-sm);
+    padding: 6px 10px;
+    font-size: 12px;
+    color: var(--subtle);
+    display: flex;
+    gap: 6px;
+  }
 
   /* ── Gap tables ── */
-  .tablewrap { overflow-x: auto; border: 1px solid var(--line); border-radius: var(--r-md); background: var(--surface); box-shadow: var(--shadow); }
-  table { border-collapse: collapse; width: 100%; font-size: 13.5px; min-width: 560px; }
-  th, td { text-align: left; padding: 11px 16px; border-bottom: 1px solid var(--line); vertical-align: top; }
-  th { font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); font-weight: 700; background: var(--surface-2); }
-  tr:last-child td { border-bottom: none; }
-  td.cap { color: var(--ink); }
-  .st { font-weight: 600; white-space: nowrap; font-size: 12.5px; }
-  .st.have::before { content: "●"; color: var(--good); margin-right: 6px; }
-  .st.partial::before { content: "◐"; color: var(--warn); margin-right: 6px; }
-  .st.missing::before { content: "○"; color: var(--bad); margin-right: 6px; }
-  .prio { display: inline-block; font-size: 11px; font-weight: 700; padding: 2px 9px; border-radius: 999px; }
-  .prio.p0 { background: var(--p0-bg); color: var(--p0-fg); }
-  .prio.p1 { background: var(--p1-bg); color: var(--p1-fg); }
-  .prio.p2 { background: var(--p2-bg); color: var(--p2-fg); }
+  .tablewrap {
+    overflow-x: auto;
+    border: 1px solid var(--line);
+    border-radius: var(--r-md);
+    background: var(--surface);
+    box-shadow: var(--shadow);
+  }
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    font-size: 13.5px;
+    min-width: 560px;
+  }
+  th,
+  td {
+    text-align: left;
+    padding: 11px 16px;
+    border-bottom: 1px solid var(--line);
+    vertical-align: top;
+  }
+  th {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--muted);
+    font-weight: 700;
+    background: var(--surface-2);
+  }
+  tr:last-child td {
+    border-bottom: none;
+  }
+  td.cap {
+    color: var(--ink);
+  }
+  .st {
+    font-weight: 600;
+    white-space: nowrap;
+    font-size: 12.5px;
+  }
+  .st.have::before {
+    content: '●';
+    color: var(--good);
+    margin-right: 6px;
+  }
+  .st.partial::before {
+    content: '◐';
+    color: var(--warn);
+    margin-right: 6px;
+  }
+  .st.missing::before {
+    content: '○';
+    color: var(--bad);
+    margin-right: 6px;
+  }
+  .prio {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 2px 9px;
+    border-radius: 999px;
+  }
+  .prio.p0 {
+    background: var(--p0-bg);
+    color: var(--p0-fg);
+  }
+  .prio.p1 {
+    background: var(--p1-bg);
+    color: var(--p1-fg);
+  }
+  .prio.p2 {
+    background: var(--p2-bg);
+    color: var(--p2-fg);
+  }
 
   /* ── Recommendations ── */
-  .recs { display: grid; gap: 12px; margin-top: 18px; }
-  .rec { background: var(--surface); border: 1px solid var(--line); border-left: 3px solid var(--primary); border-radius: var(--r-sm); padding: 13px 16px; box-shadow: var(--shadow); }
-  .rec.p0 { border-left-color: var(--bad); }
-  .rec .rh { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
-  .rec .rh h4 { font-size: 14px; margin: 0; font-weight: 700; }
-  .rec p { margin: 0; font-size: 13px; color: var(--muted); }
-  .rec code { font-family: var(--mono); font-size: 11.5px; background: var(--surface-3); padding: 1px 5px; border-radius: 4px; color: var(--ink); }
+  .recs {
+    display: grid;
+    gap: 12px;
+    margin-top: 18px;
+  }
+  .rec {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--primary);
+    border-radius: var(--r-sm);
+    padding: 13px 16px;
+    box-shadow: var(--shadow);
+  }
+  .rec.p0 {
+    border-left-color: var(--bad);
+  }
+  .rec .rh {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 4px;
+  }
+  .rec .rh h4 {
+    font-size: 14px;
+    margin: 0;
+    font-weight: 700;
+  }
+  .rec p {
+    margin: 0;
+    font-size: 13px;
+    color: var(--muted);
+  }
+  .rec code {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    background: var(--surface-3);
+    padding: 1px 5px;
+    border-radius: 4px;
+    color: var(--ink);
+  }
 
   /* ── Chart-type ledger ── */
-  .chips { display: flex; flex-wrap: wrap; gap: 7px; }
-  .chip { font-size: 12px; padding: 4px 11px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); }
-  .chip.have { border-color: rgba(33,163,102,.35); background: rgba(33,163,102,.07); color: #17663f; }
-  .chip.gap  { border-color: rgba(229,72,77,.35); background: rgba(229,72,77,.06); color: var(--p0-fg); border-style: dashed; }
-  .grouplbl { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 14px 0 8px; }
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+  }
+  .chip {
+    font-size: 12px;
+    padding: 4px 11px;
+    border-radius: 999px;
+    border: 1px solid var(--line);
+    background: var(--surface);
+  }
+  .chip.have {
+    border-color: rgba(33, 163, 102, 0.35);
+    background: rgba(33, 163, 102, 0.07);
+    color: #17663f;
+  }
+  .chip.gap {
+    border-color: rgba(229, 72, 77, 0.35);
+    background: rgba(229, 72, 77, 0.06);
+    color: var(--p0-fg);
+    border-style: dashed;
+  }
+  .grouplbl {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--muted);
+    margin: 14px 0 8px;
+  }
 
   /* ── nav ── */
-  nav.jump { position: sticky; top: 0; z-index: 5; background: rgba(246,248,251,.86); backdrop-filter: blur(8px); border-bottom: 1px solid var(--line); }
-  nav.jump .inner { max-width: 1120px; margin: 0 auto; padding: 11px 28px; display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
-  nav.jump a { font-size: 12.5px; color: var(--muted); text-decoration: none; padding: 5px 11px; border-radius: 999px; }
-  nav.jump a:hover { color: var(--primary); background: var(--primary-tint); }
-  nav.jump .brand { font-weight: 800; letter-spacing: -.01em; margin-right: 8px; }
-  nav.jump .brand span { color: var(--primary); }
+  nav.jump {
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    background: rgba(246, 248, 251, 0.86);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--line);
+  }
+  nav.jump .inner {
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 11px 28px;
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  nav.jump a {
+    font-size: 12.5px;
+    color: var(--muted);
+    text-decoration: none;
+    padding: 5px 11px;
+    border-radius: 999px;
+  }
+  nav.jump a:hover {
+    color: var(--primary);
+    background: var(--primary-tint);
+  }
+  nav.jump .brand {
+    font-weight: 800;
+    letter-spacing: -0.01em;
+    margin-right: 8px;
+  }
+  nav.jump .brand span {
+    color: var(--primary);
+  }
 
-  footer { max-width: 1120px; margin: 60px auto 0; padding: 24px 28px; border-top: 1px solid var(--line); color: var(--subtle); font-size: 12.5px; }
-  .callout { background: var(--primary-tint); border: 1px solid rgba(33,150,243,.25); border-radius: var(--r-md); padding: 14px 18px; font-size: 13.5px; color: var(--ink); margin-top: 22px; }
-  .callout b { color: var(--primary-hover); }
+  footer {
+    max-width: 1120px;
+    margin: 60px auto 0;
+    padding: 24px 28px;
+    border-top: 1px solid var(--line);
+    color: var(--subtle);
+    font-size: 12.5px;
+  }
+  .callout {
+    background: var(--primary-tint);
+    border: 1px solid rgba(33, 150, 243, 0.25);
+    border-radius: var(--r-md);
+    padding: 14px 18px;
+    font-size: 13.5px;
+    color: var(--ink);
+    margin-top: 22px;
+  }
+  .callout b {
+    color: var(--primary-hover);
+  }
 </style>
 
 <nav class="jump">
@@ -216,26 +669,46 @@
 <header class="mast" id="top">
   <p class="eyebrow">Gap analysis &amp; redesign — Analyses / Dashboards</p>
   <h1>The visual box, brought up to BI-tool standard.</h1>
-  <p class="lede">DBExec already renders <b>24 chart types</b>. The gap isn't coverage — it's the
-    <b>config panel</b>, the <b>chart card chrome</b>, and the <b>interaction model</b>. Benchmarked
-    against Tableau, Power BI, Metabase, Superset, Looker &amp; the modern crop (Hex, Sigma, Preset).
-    Below: what we have, where we fall short, and the ordered fix.</p>
+  <p class="lede">
+    DBExec already renders <b>24 chart types</b>. The gap isn't coverage — it's
+    the <b>config panel</b>, the <b>chart card chrome</b>, and the
+    <b>interaction model</b>. Benchmarked against Tableau, Power BI, Metabase,
+    Superset, Looker &amp; the modern crop (Hex, Sigma, Preset). Below: what we
+    have, where we fall short, and the ordered fix.
+  </p>
 </header>
 
 <div class="score">
-  <div class="cell"><div class="num green">24</div><div class="cap">Chart types wired today</div></div>
-  <div class="cell"><div class="num red">7</div><div class="cap">P0 gaps — must fix</div></div>
-  <div class="cell"><div class="num amber">67</div><div class="cap">Config sections, all flat &amp; always-open</div></div>
-  <div class="cell"><div class="num">4,181</div><div class="cap">Lines in one config template</div></div>
+  <div class="cell">
+    <div class="num green">24</div>
+    <div class="cap">Chart types wired today</div>
+  </div>
+  <div class="cell">
+    <div class="num red">7</div>
+    <div class="cap">P0 gaps — must fix</div>
+  </div>
+  <div class="cell">
+    <div class="num amber">67</div>
+    <div class="cap">Config sections, all flat &amp; always-open</div>
+  </div>
+  <div class="cell">
+    <div class="num">4,181</div>
+    <div class="cap">Lines in one config template</div>
+  </div>
 </div>
 
 <div class="wrap">
-
   <!-- ══════════ CONFIG PANEL ══════════ -->
   <section id="panel">
-    <div class="sec-head"><h2>Config panel</h2><span class="ktag">visual-config-sidebar · 67 sections</span></div>
-    <p class="sec-intro">Functionally deep, structurally flat — a breadth-first property dump, not a task-oriented editor.
-      The lone divider, plain section headings, and every section forced open are exactly what reads as "below standard."</p>
+    <div class="sec-head">
+      <h2>Config panel</h2>
+      <span class="ktag">visual-config-sidebar · 67 sections</span>
+    </div>
+    <p class="sec-intro">
+      Functionally deep, structurally flat — a breadth-first property dump, not
+      a task-oriented editor. The lone divider, plain section headings, and
+      every section forced open are exactly what reads as "below standard."
+    </p>
 
     <div class="ba">
       <!-- BEFORE -->
@@ -255,11 +728,16 @@
             <div class="lbl">Axis</div>
             <div class="row"><span>Show grid</span><span>◻</span></div>
             <div class="row"><span>X rotation</span><span>0°</span></div>
-            <div class="row" style="opacity:.5"><span>…62 more sections</span><span></span></div>
+            <div class="row" style="opacity: 0.5">
+              <span>…62 more sections</span><span></span>
+            </div>
           </div>
         </div>
-        <p class="note bad"><b>Problem:</b> one scroll, query &amp; style controls interleaved, no tabs, no accordion,
-          no search over 67 sections, aggregate lives far from the field it applies to.</p>
+        <p class="note bad">
+          <b>Problem:</b> one scroll, query &amp; style controls interleaved, no
+          tabs, no accordion, no search over 67 sections, aggregate lives far
+          from the field it applies to.
+        </p>
       </div>
 
       <!-- AFTER -->
@@ -267,62 +745,200 @@
         <div class="tag">Proposed</div>
         <div class="mock">
           <div class="cfg after">
-            <div class="tabs"><div class="t on">Data</div><div class="t">Format</div></div>
+            <div class="tabs">
+              <div class="t on">Data</div>
+              <div class="t">Format</div>
+            </div>
             <div class="search">⌕ <span>Search settings…</span></div>
             <div class="acc">
-              <div class="ah open"><span class="chev">▾</span> Fields <span class="count">2 set</span></div>
-              <div class="ab">
-                <span class="pill"><span class="agg">SUM</span>(Revenue) <span class="x">✕</span></span>
-                <span class="pill">Region <span class="x">✕</span></span>
-                <div class="field"><label>Sort</label><div class="ctl">Value · desc ▾</div></div>
+              <div class="ah open">
+                <span class="chev">▾</span> Fields
+                <span class="count">2 set</span>
               </div>
-              <div class="ah"><span class="chev">▸</span> Filters &amp; limit <span class="count">Top 10</span></div>
-              <div class="ah"><span class="chev">▸</span> Analytics <span class="count">2 set</span></div>
+              <div class="ab">
+                <span class="pill"
+                  ><span class="agg">SUM</span>(Revenue)
+                  <span class="x">✕</span></span
+                >
+                <span class="pill">Region <span class="x">✕</span></span>
+                <div class="field">
+                  <label>Sort</label>
+                  <div class="ctl">Value · desc ▾</div>
+                </div>
+              </div>
+              <div class="ah">
+                <span class="chev">▸</span> Filters &amp; limit
+                <span class="count">Top 10</span>
+              </div>
+              <div class="ah">
+                <span class="chev">▸</span> Analytics
+                <span class="count">2 set</span>
+              </div>
             </div>
           </div>
         </div>
-        <p class="note good"><b>Fix:</b> <b>Data / Format tabs</b> (sorted by the re-query test), <b>collapsible accordions</b>
-          collapsed by default with a "set" count, a <b>search box</b>, and the aggregate as a <b>clickable pill</b> on the field.</p>
+        <p class="note good">
+          <b>Fix:</b> <b>Data / Format tabs</b> (sorted by the re-query test),
+          <b>collapsible accordions</b> collapsed by default with a "set" count,
+          a <b>search box</b>, and the aggregate as a <b>clickable pill</b> on
+          the field.
+        </p>
       </div>
     </div>
 
-    <div class="sec-head" style="margin-top:28px"><h3 style="font-size:15px;margin:0;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.06em">Gaps</h3></div>
+    <div class="sec-head" style="margin-top: 28px">
+      <h3
+        style="
+          font-size: 15px;
+          margin: 0;
+          color: var(--muted);
+          font-weight: 700;
+          text-transform: uppercase;
+          letter-spacing: 0.06em;
+        "
+      >
+        Gaps
+      </h3>
+    </div>
     <div class="tablewrap">
       <table>
-        <thead><tr><th>Capability</th><th>DBExec status</th><th>Priority</th></tr></thead>
+        <thead>
+          <tr>
+            <th>Capability</th>
+            <th>DBExec status</th>
+            <th>Priority</th>
+          </tr>
+        </thead>
         <tbody>
-          <tr><td class="cap">Data-vs-Format top-level split</td><td class="st missing">missing — one flat scroll</td><td><span class="prio p0">P0</span></td></tr>
-          <tr><td class="cap">Controls sorted by the re-query test</td><td class="st missing">missing — no repaint/re-query split</td><td><span class="prio p0">P0</span></td></tr>
-          <tr><td class="cap">Collapsible accordion sections</td><td class="st missing">missing — 67 always open</td><td><span class="prio p0">P0</span></td></tr>
-          <tr><td class="cap">Search across the panel</td><td class="st missing">missing — no filter over 67 sections</td><td><span class="prio p0">P0</span></td></tr>
-          <tr><td class="cap">Interactive field pills (inline aggregate)</td><td class="st partial">partial — chips exist, not clickable</td><td><span class="prio p0">P0</span></td></tr>
-          <tr><td class="cap">Format changes never re-query</td><td class="st partial">partial — configChanged fires uniformly</td><td><span class="prio p0">P0</span></td></tr>
-          <tr><td class="cap">Header / separators / sectioning polish</td><td class="st partial">partial — reads as unstyled dump</td><td><span class="prio p0">P0</span></td></tr>
-          <tr><td class="cap">Number/date format editor w/ live preview</td><td class="st partial">partial — no sample, no prefix/suffix</td><td><span class="prio p1">P1</span></td></tr>
-          <tr><td class="cap">Color palette swatches + per-series override</td><td class="st partial">partial — no swatches, no per-series picker</td><td><span class="prio p1">P1</span></td></tr>
-          <tr><td class="cap">Reset-to-default per section</td><td class="st missing">missing — no reset anywhere</td><td><span class="prio p1">P1</span></td></tr>
-          <tr><td class="cap">Named encoding wells / drag-drop</td><td class="st partial">partial — click-to-pick only, tree in separate rail</td><td><span class="prio p1">P1</span></td></tr>
-          <tr><td class="cap">Per-type sections consistent + disabled-with-tooltip</td><td class="st partial">partial — 60+ islands, controls vanish</td><td><span class="prio p1">P1</span></td></tr>
-          <tr><td class="cap">Escape hatch to raw ECharts JSON</td><td class="st missing">missing — GUI is a hard ceiling</td><td><span class="prio p2">P2</span></td></tr>
+          <tr>
+            <td class="cap">Data-vs-Format top-level split</td>
+            <td class="st missing">missing — one flat scroll</td>
+            <td><span class="prio p0">P0</span></td>
+          </tr>
+          <tr>
+            <td class="cap">Controls sorted by the re-query test</td>
+            <td class="st missing">missing — no repaint/re-query split</td>
+            <td><span class="prio p0">P0</span></td>
+          </tr>
+          <tr>
+            <td class="cap">Collapsible accordion sections</td>
+            <td class="st missing">missing — 67 always open</td>
+            <td><span class="prio p0">P0</span></td>
+          </tr>
+          <tr>
+            <td class="cap">Search across the panel</td>
+            <td class="st missing">missing — no filter over 67 sections</td>
+            <td><span class="prio p0">P0</span></td>
+          </tr>
+          <tr>
+            <td class="cap">Interactive field pills (inline aggregate)</td>
+            <td class="st partial">partial — chips exist, not clickable</td>
+            <td><span class="prio p0">P0</span></td>
+          </tr>
+          <tr>
+            <td class="cap">Format changes never re-query</td>
+            <td class="st partial">partial — configChanged fires uniformly</td>
+            <td><span class="prio p0">P0</span></td>
+          </tr>
+          <tr>
+            <td class="cap">Header / separators / sectioning polish</td>
+            <td class="st partial">partial — reads as unstyled dump</td>
+            <td><span class="prio p0">P0</span></td>
+          </tr>
+          <tr>
+            <td class="cap">Number/date format editor w/ live preview</td>
+            <td class="st partial">partial — no sample, no prefix/suffix</td>
+            <td><span class="prio p1">P1</span></td>
+          </tr>
+          <tr>
+            <td class="cap">Color palette swatches + per-series override</td>
+            <td class="st partial">
+              partial — no swatches, no per-series picker
+            </td>
+            <td><span class="prio p1">P1</span></td>
+          </tr>
+          <tr>
+            <td class="cap">Reset-to-default per section</td>
+            <td class="st missing">missing — no reset anywhere</td>
+            <td><span class="prio p1">P1</span></td>
+          </tr>
+          <tr>
+            <td class="cap">Named encoding wells / drag-drop</td>
+            <td class="st partial">
+              partial — click-to-pick only, tree in separate rail
+            </td>
+            <td><span class="prio p1">P1</span></td>
+          </tr>
+          <tr>
+            <td class="cap">
+              Per-type sections consistent + disabled-with-tooltip
+            </td>
+            <td class="st partial">partial — 60+ islands, controls vanish</td>
+            <td><span class="prio p1">P1</span></td>
+          </tr>
+          <tr>
+            <td class="cap">Escape hatch to raw ECharts JSON</td>
+            <td class="st missing">missing — GUI is a hard ceiling</td>
+            <td><span class="prio p2">P2</span></td>
+          </tr>
         </tbody>
       </table>
     </div>
 
     <div class="recs">
-      <div class="rec p0"><div class="rh"><span class="prio p0">P0</span><h4>Fix header, separators &amp; sectioning first</h4></div>
-        <p>Sticky panel header with a <code>p-menu</code> overflow (Reset / Advanced JSON); convert the 67 <code>config-section</code>s to <code>p-accordion</code> panels, only <b>Data</b> + primary options open by default. Pure presentation over the existing DOM — lowest risk, directly answers "below standard."</p></div>
-      <div class="rec p0"><div class="rh"><span class="prio p0">P0</span><h4>Data / Format tabs + carry re-query flag</h4></div>
-        <p>Two <code>p-tabs</code>, Data first; fold the field tree in beside the role slots. Change the emit to <code>configChanged.emit(&#123; config, requiresRequery &#125;)</code> so format-only edits skip the server round-trip and just re-run <code>chart.setOption()</code>.</p></div>
-      <div class="rec p0"><div class="rh"><span class="prio p0">P0</span><h4>Bound fields become clickable pills</h4></div>
-        <p>Wrap each bound column in an <code>app-chip</code> that opens a <code>p-popover</code>: column ▸ aggregate ▸ (percentile / date-trunc) ▸ alias ▸ remove. Shows <code>SUM(Revenue)</code> inline — the single biggest discoverability win.</p></div>
+      <div class="rec p0">
+        <div class="rh">
+          <span class="prio p0">P0</span>
+          <h4>Fix header, separators &amp; sectioning first</h4>
+        </div>
+        <p>
+          Sticky panel header with a <code>p-menu</code> overflow (Reset /
+          Advanced JSON); convert the 67 <code>config-section</code>s to
+          <code>p-accordion</code> panels, only <b>Data</b> + primary options
+          open by default. Pure presentation over the existing DOM — lowest
+          risk, directly answers "below standard."
+        </p>
+      </div>
+      <div class="rec p0">
+        <div class="rh">
+          <span class="prio p0">P0</span>
+          <h4>Data / Format tabs + carry re-query flag</h4>
+        </div>
+        <p>
+          Two <code>p-tabs</code>, Data first; fold the field tree in beside the
+          role slots. Change the emit to
+          <code>configChanged.emit(&#123; config, requiresRequery &#125;)</code>
+          so format-only edits skip the server round-trip and just re-run
+          <code>chart.setOption()</code>.
+        </p>
+      </div>
+      <div class="rec p0">
+        <div class="rh">
+          <span class="prio p0">P0</span>
+          <h4>Bound fields become clickable pills</h4>
+        </div>
+        <p>
+          Wrap each bound column in an <code>app-chip</code> that opens a
+          <code>p-popover</code>: column ▸ aggregate ▸ (percentile / date-trunc)
+          ▸ alias ▸ remove. Shows <code>SUM(Revenue)</code> inline — the single
+          biggest discoverability win.
+        </p>
+      </div>
     </div>
   </section>
 
   <!-- ══════════ CHART CARD CHROME ══════════ -->
   <section id="chrome">
-    <div class="sec-head"><h2>Chart card &amp; ECharts theme</h2><span class="ktag">echart-visual · configurable-card-chart</span></div>
-    <p class="sec-intro">The chart renders, but the card frame and default ECharts look are generic. The highest-leverage single fix
-      is a registered DBExec ECharts theme so every chart inherits the palette, type scale, gridlines &amp; tooltip in one place.</p>
+    <div class="sec-head">
+      <h2>Chart card &amp; ECharts theme</h2>
+      <span class="ktag">echart-visual · configurable-card-chart</span>
+    </div>
+    <p class="sec-intro">
+      The chart renders, but the card frame and default ECharts look are
+      generic. The highest-leverage single fix is a registered DBExec ECharts
+      theme so every chart inherits the palette, type scale, gridlines &amp;
+      tooltip in one place.
+    </p>
 
     <div class="ba">
       <div class="panel before">
@@ -332,15 +948,30 @@
             <div class="chdr">
               <span class="ttl">Revenue by region</span>
               <span class="spacer"></span>
-              <span class="icobtn soup">⤢</span><span class="icobtn soup">⧉</span><span class="icobtn soup">⟳</span><span class="icobtn soup">⋯</span>
+              <span class="icobtn soup">⤢</span
+              ><span class="icobtn soup">⧉</span
+              ><span class="icobtn soup">⟳</span
+              ><span class="icobtn soup">⋯</span>
             </div>
             <div class="cbody">
-              <div class="bars"><div class="b" style="height:40%"></div><div class="b" style="height:72%"></div><div class="b" style="height:55%"></div><div class="b" style="height:88%"></div><div class="b" style="height:33%"></div></div>
-              <div class="axis"><span>NA</span><span>EU</span><span>APAC</span><span>LATAM</span><span>MEA</span></div>
+              <div class="bars">
+                <div class="b" style="height: 40%"></div>
+                <div class="b" style="height: 72%"></div>
+                <div class="b" style="height: 55%"></div>
+                <div class="b" style="height: 88%"></div>
+                <div class="b" style="height: 33%"></div>
+              </div>
+              <div class="axis">
+                <span>NA</span><span>EU</span><span>APAC</span><span>LATAM</span
+                ><span>MEA</span>
+              </div>
             </div>
           </div>
         </div>
-        <p class="note bad"><b>Problem:</b> icon-soup header, dull default palette, no card padding rhythm, no error / no-data / loading state inside the frame.</p>
+        <p class="note bad">
+          <b>Problem:</b> icon-soup header, dull default palette, no card
+          padding rhythm, no error / no-data / loading state inside the frame.
+        </p>
       </div>
 
       <div class="panel after">
@@ -354,58 +985,156 @@
               <span class="icobtn kebab">⋯</span>
             </div>
             <div class="cbody">
-              <div class="bars"><div class="b" style="height:40%"></div><div class="b" style="height:72%"></div><div class="b" style="height:55%"></div><div class="b" style="height:88%"></div><div class="b" style="height:33%"></div></div>
-              <div class="axis"><span>NA</span><span>EU</span><span>APAC</span><span>LATAM</span><span>MEA</span></div>
-              <div class="legend"><span><i style="background:var(--primary)"></i>Revenue</span></div>
+              <div class="bars">
+                <div class="b" style="height: 40%"></div>
+                <div class="b" style="height: 72%"></div>
+                <div class="b" style="height: 55%"></div>
+                <div class="b" style="height: 88%"></div>
+                <div class="b" style="height: 33%"></div>
+              </div>
+              <div class="axis">
+                <span>NA</span><span>EU</span><span>APAC</span><span>LATAM</span
+                ><span>MEA</span>
+              </div>
+              <div class="legend">
+                <span><i style="background: var(--primary)"></i>Revenue</span>
+              </div>
             </div>
           </div>
         </div>
-        <p class="note good"><b>Fix:</b> one <b>kebab</b> for actions, a registered <b>DBExec ECharts theme</b> (brand palette, tabular-nums, faint grid, styled tooltip), consistent body padding, and framed empty / error / loading states.</p>
+        <p class="note good">
+          <b>Fix:</b> one <b>kebab</b> for actions, a registered
+          <b>DBExec ECharts theme</b> (brand palette, tabular-nums, faint grid,
+          styled tooltip), consistent body padding, and framed empty / error /
+          loading states.
+        </p>
       </div>
     </div>
 
     <div class="recs">
-      <div class="rec p0"><div class="rh"><span class="prio p0">P0</span><h4>Register a DBExec ECharts theme</h4></div>
-        <p>One <code>echarts.registerTheme('dbexec', …)</code> so palette, axis, gridline, tooltip &amp; type scale are consistent across all 24 types — instead of per-chart option tweaks. Highest leverage in the whole chrome track.</p></div>
-      <div class="rec p0"><div class="rh"><span class="prio p0">P0</span><h4>Collapse the header icon-soup into a kebab</h4></div>
-        <p>Move export / duplicate / refresh into a single <code>p-menu</code> kebab; keep only the title, subtitle (context: period, unit) and the menu on the header row.</p></div>
-      <div class="rec p0"><div class="rh"><span class="prio p0">P0</span><h4>State components inside the card frame</h4></div>
-        <p>Error, no-data and loading render <b>inside</b> the card (icon + message + retry), not as a blank canvas or a global spinner.</p></div>
+      <div class="rec p0">
+        <div class="rh">
+          <span class="prio p0">P0</span>
+          <h4>Register a DBExec ECharts theme</h4>
+        </div>
+        <p>
+          One <code>echarts.registerTheme('dbexec', …)</code> so palette, axis,
+          gridline, tooltip &amp; type scale are consistent across all 24 types
+          — instead of per-chart option tweaks. Highest leverage in the whole
+          chrome track.
+        </p>
+      </div>
+      <div class="rec p0">
+        <div class="rh">
+          <span class="prio p0">P0</span>
+          <h4>Collapse the header icon-soup into a kebab</h4>
+        </div>
+        <p>
+          Move export / duplicate / refresh into a single
+          <code>p-menu</code> kebab; keep only the title, subtitle (context:
+          period, unit) and the menu on the header row.
+        </p>
+      </div>
+      <div class="rec p0">
+        <div class="rh">
+          <span class="prio p0">P0</span>
+          <h4>State components inside the card frame</h4>
+        </div>
+        <p>
+          Error, no-data and loading render <b>inside</b> the card (icon +
+          message + retry), not as a blank canvas or a global spinner.
+        </p>
+      </div>
     </div>
   </section>
 
   <!-- ══════════ CHART TYPES ══════════ -->
   <section id="types">
-    <div class="sec-head"><h2>Chart types &amp; per-chart features</h2><span class="ktag">24 wired · feature gaps remain</span></div>
-    <p class="sec-intro">Type coverage is strong. The real gaps are <b>per-chart features</b> — reference lines, data labels on more types,
-      map charts, and consistent number formatting — plus surfacing engine capabilities the config UI doesn't yet expose.</p>
+    <div class="sec-head">
+      <h2>Chart types &amp; per-chart features</h2>
+      <span class="ktag">24 wired · feature gaps remain</span>
+    </div>
+    <p class="sec-intro">
+      Type coverage is strong. The real gaps are <b>per-chart features</b> —
+      reference lines, data labels on more types, map charts, and consistent
+      number formatting — plus surfacing engine capabilities the config UI
+      doesn't yet expose.
+    </p>
 
     <div class="grouplbl">Wired today (24)</div>
     <div class="chips">
-      <span class="chip have">Bar</span><span class="chip have">Line</span><span class="chip have">Area</span><span class="chip have">Combo</span>
-      <span class="chip have">Pie</span><span class="chip have">Donut</span><span class="chip have">Funnel</span><span class="chip have">Treemap</span>
-      <span class="chip have">Sunburst</span><span class="chip have">Scatter</span><span class="chip have">Bubble</span><span class="chip have">Histogram</span>
-      <span class="chip have">Boxplot</span><span class="chip have">Gauge</span><span class="chip have">Radar</span><span class="chip have">Heatmap</span>
-      <span class="chip have">Sankey</span><span class="chip have">Waterfall</span><span class="chip have">Candlestick</span><span class="chip have">KPI / Number</span>
-      <span class="chip have">Table</span><span class="chip have">Pivot</span><span class="chip have">Stacked bar</span><span class="chip have">Column</span>
+      <span class="chip have">Bar</span><span class="chip have">Line</span
+      ><span class="chip have">Area</span><span class="chip have">Combo</span>
+      <span class="chip have">Pie</span><span class="chip have">Donut</span
+      ><span class="chip have">Funnel</span
+      ><span class="chip have">Treemap</span>
+      <span class="chip have">Sunburst</span
+      ><span class="chip have">Scatter</span
+      ><span class="chip have">Bubble</span
+      ><span class="chip have">Histogram</span>
+      <span class="chip have">Boxplot</span><span class="chip have">Gauge</span
+      ><span class="chip have">Radar</span
+      ><span class="chip have">Heatmap</span>
+      <span class="chip have">Sankey</span
+      ><span class="chip have">Waterfall</span
+      ><span class="chip have">Candlestick</span
+      ><span class="chip have">KPI / Number</span>
+      <span class="chip have">Table</span><span class="chip have">Pivot</span
+      ><span class="chip have">Stacked bar</span
+      ><span class="chip have">Column</span>
     </div>
 
     <div class="grouplbl">Notable gaps</div>
     <div class="chips">
-      <span class="chip gap">Map / choropleth</span><span class="chip gap">Reference lines &amp; bands</span>
-      <span class="chip gap">Data labels (all types)</span><span class="chip gap">Bullet chart</span>
-      <span class="chip gap">Consistent number format</span><span class="chip gap">Per-series formatting</span>
+      <span class="chip gap">Map / choropleth</span
+      ><span class="chip gap">Reference lines &amp; bands</span>
+      <span class="chip gap">Data labels (all types)</span
+      ><span class="chip gap">Bullet chart</span>
+      <span class="chip gap">Consistent number format</span
+      ><span class="chip gap">Per-series formatting</span>
     </div>
 
-    <div class="tablewrap" style="margin-top:20px">
+    <div class="tablewrap" style="margin-top: 20px">
       <table>
-        <thead><tr><th>Feature</th><th>DBExec status</th><th>Priority</th></tr></thead>
+        <thead>
+          <tr>
+            <th>Feature</th>
+            <th>DBExec status</th>
+            <th>Priority</th>
+          </tr>
+        </thead>
         <tbody>
-          <tr><td class="cap">Reference lines &amp; bands (target, avg, threshold)</td><td class="st partial">partial — some support, not on all cartesian types</td><td><span class="prio p0">P0</span></td></tr>
-          <tr><td class="cap">Data labels available on every applicable type</td><td class="st partial">partial — gated to a subset</td><td><span class="prio p1">P1</span></td></tr>
-          <tr><td class="cap">Map / geo charts</td><td class="st missing">missing — no geo family</td><td><span class="prio p1">P1</span></td></tr>
-          <tr><td class="cap">Consistent number/date formatting across types</td><td class="st partial">partial — valueFormat exists, uneven wiring</td><td><span class="prio p0">P0</span></td></tr>
-          <tr><td class="cap">Surface engine features the UI hides</td><td class="st partial">partial — cheap wiring wins available</td><td><span class="prio p1">P1</span></td></tr>
+          <tr>
+            <td class="cap">
+              Reference lines &amp; bands (target, avg, threshold)
+            </td>
+            <td class="st partial">
+              partial — some support, not on all cartesian types
+            </td>
+            <td><span class="prio p0">P0</span></td>
+          </tr>
+          <tr>
+            <td class="cap">Data labels available on every applicable type</td>
+            <td class="st partial">partial — gated to a subset</td>
+            <td><span class="prio p1">P1</span></td>
+          </tr>
+          <tr>
+            <td class="cap">Map / geo charts</td>
+            <td class="st missing">missing — no geo family</td>
+            <td><span class="prio p1">P1</span></td>
+          </tr>
+          <tr>
+            <td class="cap">Consistent number/date formatting across types</td>
+            <td class="st partial">
+              partial — valueFormat exists, uneven wiring
+            </td>
+            <td><span class="prio p0">P0</span></td>
+          </tr>
+          <tr>
+            <td class="cap">Surface engine features the UI hides</td>
+            <td class="st partial">partial — cheap wiring wins available</td>
+            <td><span class="prio p1">P1</span></td>
+          </tr>
         </tbody>
       </table>
     </div>
@@ -413,52 +1142,166 @@
 
   <!-- ══════════ INTERACTION ══════════ -->
   <section id="interact">
-    <div class="sec-head"><h2>Interaction model</h2><span class="ktag">cross-filter · drill · tooltip</span></div>
-    <p class="sec-intro">Cross-filter exists but is fragmented across modes; the active-state surface (what's filtering what)
-      is what reads as unfinished. The fix is one source→target action primitive and a clear active-filter chrome.</p>
+    <div class="sec-head">
+      <h2>Interaction model</h2>
+      <span class="ktag">cross-filter · drill · tooltip</span>
+    </div>
+    <p class="sec-intro">
+      Cross-filter exists but is fragmented across modes; the active-state
+      surface (what's filtering what) is what reads as unfinished. The fix is
+      one source→target action primitive and a clear active-filter chrome.
+    </p>
 
     <div class="tablewrap">
       <table>
-        <thead><tr><th>Capability</th><th>DBExec status</th><th>Priority</th></tr></thead>
+        <thead>
+          <tr>
+            <th>Capability</th>
+            <th>DBExec status</th>
+            <th>Priority</th>
+          </tr>
+        </thead>
         <tbody>
-          <tr><td class="cap">Single source→target action primitive</td><td class="st partial">partial — 3 target modes, no unified model</td><td><span class="prio p0">P0</span></td></tr>
-          <tr><td class="cap">Active cross-filter chrome (what's filtering what)</td><td class="st missing">missing — no visible active state</td><td><span class="prio p0">P0</span></td></tr>
-          <tr><td class="cap">Drill-down (hierarchy) vs drill-through (to detail)</td><td class="st partial">partial — drill-through only</td><td><span class="prio p1">P1</span></td></tr>
-          <tr><td class="cap">Hover tooltip sync across charts</td><td class="st missing">missing — per-chart tooltip only</td><td><span class="prio p1">P1</span></td></tr>
-          <tr><td class="cap">Brush / zoom / pan</td><td class="st partial">partial — dataZoom toggle, not wired to filters</td><td><span class="prio p2">P2</span></td></tr>
-          <tr><td class="cap">Legend toggle interactions</td><td class="st have">have — ECharts default</td><td><span class="prio p2">P2</span></td></tr>
+          <tr>
+            <td class="cap">Single source→target action primitive</td>
+            <td class="st partial">
+              partial — 3 target modes, no unified model
+            </td>
+            <td><span class="prio p0">P0</span></td>
+          </tr>
+          <tr>
+            <td class="cap">
+              Active cross-filter chrome (what's filtering what)
+            </td>
+            <td class="st missing">missing — no visible active state</td>
+            <td><span class="prio p0">P0</span></td>
+          </tr>
+          <tr>
+            <td class="cap">
+              Drill-down (hierarchy) vs drill-through (to detail)
+            </td>
+            <td class="st partial">partial — drill-through only</td>
+            <td><span class="prio p1">P1</span></td>
+          </tr>
+          <tr>
+            <td class="cap">Hover tooltip sync across charts</td>
+            <td class="st missing">missing — per-chart tooltip only</td>
+            <td><span class="prio p1">P1</span></td>
+          </tr>
+          <tr>
+            <td class="cap">Brush / zoom / pan</td>
+            <td class="st partial">
+              partial — dataZoom toggle, not wired to filters
+            </td>
+            <td><span class="prio p2">P2</span></td>
+          </tr>
+          <tr>
+            <td class="cap">Legend toggle interactions</td>
+            <td class="st have">have — ECharts default</td>
+            <td><span class="prio p2">P2</span></td>
+          </tr>
         </tbody>
       </table>
     </div>
 
     <div class="recs">
-      <div class="rec p0"><div class="rh"><span class="prio p0">P0</span><h4>Unify on one source→target action model</h4></div>
-        <p>Collapse the 3 cross-filter target modes into a single action: a chart click emits <code>&#123;source, field, value&#125;</code>; targets subscribe. One code path for same-tab, dashboard &amp; explicit-visual scopes.</p></div>
-      <div class="rec p0"><div class="rh"><span class="prio p0">P0</span><h4>Show the active filter state</h4></div>
-        <p>A dismissible active-filter bar / chip on filtered charts ("Filtered by Region = EU ✕") — the missing visual that makes cross-filter feel finished.</p></div>
+      <div class="rec p0">
+        <div class="rh">
+          <span class="prio p0">P0</span>
+          <h4>Unify on one source→target action model</h4>
+        </div>
+        <p>
+          Collapse the 3 cross-filter target modes into a single action: a chart
+          click emits <code>&#123;source, field, value&#125;</code>; targets
+          subscribe. One code path for same-tab, dashboard &amp; explicit-visual
+          scopes.
+        </p>
+      </div>
+      <div class="rec p0">
+        <div class="rh">
+          <span class="prio p0">P0</span>
+          <h4>Show the active filter state</h4>
+        </div>
+        <p>
+          A dismissible active-filter bar / chip on filtered charts ("Filtered
+          by Region = EU ✕") — the missing visual that makes cross-filter feel
+          finished.
+        </p>
+      </div>
     </div>
   </section>
 
   <!-- ══════════ SHIP PLAN ══════════ -->
   <section id="plan">
-    <div class="sec-head"><h2>Ship order</h2><span class="ktag">lowest risk → highest leverage</span></div>
+    <div class="sec-head">
+      <h2>Ship order</h2>
+      <span class="ktag">lowest risk → highest leverage</span>
+    </div>
     <div class="tablewrap">
       <table>
-        <thead><tr><th>Wave</th><th>What ships</th><th>Why first</th></tr></thead>
+        <thead>
+          <tr>
+            <th>Wave</th>
+            <th>What ships</th>
+            <th>Why first</th>
+          </tr>
+        </thead>
         <tbody>
-          <tr><td class="cap"><b>1 · Presentation</b></td><td class="cap">Config accordion + sticky header + search · DBExec ECharts theme · kebab header · framed states</td><td>Pure CSS/template over existing DOM. Directly answers "below standard" at lowest risk.</td></tr>
-          <tr><td class="cap"><b>2 · Structure</b></td><td class="cap">Data/Format tabs + re-query flag · clickable field pills · unified cross-filter + active-state chrome</td><td>The behavioural leap — stops over-rendering, makes encoding discoverable, makes interaction feel finished.</td></tr>
-          <tr><td class="cap"><b>3 · Parity</b></td><td class="cap">Format live preview · palette swatches · per-column table config · reference lines · consistent number format · reset-to-default</td><td>Closes the P1 feature gaps against Tableau / Power BI.</td></tr>
-          <tr><td class="cap"><b>4 · Polish</b></td><td class="cap">Raw ECharts JSON escape hatch · map charts · Show-Me picker · tooltip sync · typed config schema (undo/redo, copy-config)</td><td>Differentiators &amp; power-user ceiling once parity is met.</td></tr>
+          <tr>
+            <td class="cap"><b>1 · Presentation</b></td>
+            <td class="cap">
+              Config accordion + sticky header + search · DBExec ECharts theme ·
+              kebab header · framed states
+            </td>
+            <td>
+              Pure CSS/template over existing DOM. Directly answers "below
+              standard" at lowest risk.
+            </td>
+          </tr>
+          <tr>
+            <td class="cap"><b>2 · Structure</b></td>
+            <td class="cap">
+              Data/Format tabs + re-query flag · clickable field pills · unified
+              cross-filter + active-state chrome
+            </td>
+            <td>
+              The behavioural leap — stops over-rendering, makes encoding
+              discoverable, makes interaction feel finished.
+            </td>
+          </tr>
+          <tr>
+            <td class="cap"><b>3 · Parity</b></td>
+            <td class="cap">
+              Format live preview · palette swatches · per-column table config ·
+              reference lines · consistent number format · reset-to-default
+            </td>
+            <td>Closes the P1 feature gaps against Tableau / Power BI.</td>
+          </tr>
+          <tr>
+            <td class="cap"><b>4 · Polish</b></td>
+            <td class="cap">
+              Raw ECharts JSON escape hatch · map charts · Show-Me picker ·
+              tooltip sync · typed config schema (undo/redo, copy-config)
+            </td>
+            <td>
+              Differentiators &amp; power-user ceiling once parity is met.
+            </td>
+          </tr>
         </tbody>
       </table>
     </div>
-    <div class="callout"><b>One-line takeaway:</b> keep the 24 chart types; spend the effort on the config-panel UX, a shared ECharts theme, and a unified interaction model. Wave 1 alone closes most of the "looks below standard" perception at almost no risk.</div>
+    <div class="callout">
+      <b>One-line takeaway:</b> keep the 24 chart types; spend the effort on the
+      config-panel UX, a shared ECharts theme, and a unified interaction model.
+      Wave 1 alone closes most of the "looks below standard" perception at
+      almost no risk.
+    </div>
   </section>
-
 </div>
 
 <footer>
-  DBExec visualization gap analysis · benchmarked against Tableau · Power BI · Metabase · Superset · Looker · Mode · Hex · Sigma · Preset · Observable Plot.
-  Full detail in <code>docs/viz-redesign/GAP-ANALYSIS.md</code>. Diagnosis + plan only — no code changed.
+  DBExec visualization gap analysis · benchmarked against Tableau · Power BI ·
+  Metabase · Superset · Looker · Mode · Hex · Sigma · Preset · Observable Plot.
+  Full detail in <code>docs/viz-redesign/GAP-ANALYSIS.md</code>. Diagnosis +
+  plan only — no code changed.
 </footer>

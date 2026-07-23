@@ -148,8 +148,8 @@
   existing-mode safety check. **Good**.
 - `publishDashboard.ts:140–144` — calls `snapshotAnalysisIntoDashboard`
   for atomic wipe + write. Idempotent. **Good**.
-- `publishDashboard.ts:101–108` — existing-mode publish *wipes
-  visuals*. Renaming a dashboard triggers republish, which
+- `publishDashboard.ts:101–108` — existing-mode publish _wipes
+  visuals_. Renaming a dashboard triggers republish, which
   destructively rewrites the snapshot. UX trap. **P1**.
 - `snapshotAnalysisIntoDashboard.helper.ts:165–208` — solid
   remapping of field IDs across the snapshot boundary, including
@@ -231,7 +231,7 @@
 - **P3** — `rlsResolver.service.ts:54 vs 80` — column name
   lower-cased for grouping but original case passed downstream.
   Silent rule loss on case-sensitive databases.
-- **P3** — only rule edits are audited; rule *application* (which
+- **P3** — only rule edits are audited; rule _application_ (which
   rules fired for which query) is not.
 
 ### Filter compiler (the safeguard layer)

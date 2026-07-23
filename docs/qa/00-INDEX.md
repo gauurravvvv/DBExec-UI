@@ -28,40 +28,40 @@ Each module's deep test doc follows the same shape:
 
 ## Index
 
-| # | Module | File | Cases (target) |
-|---|---|---|---|
-| 01 | Auth (login / OTP / set-password / refresh / logout) | `01-auth.md` | ~120 |
-| 02 | Organisation + System Admin | `02-organisation.md` | ~70 |
-| 03 | Users / Roles / Groups | `03-users-roles-groups.md` | ~110 |
-| 04 | Datasources | `04-datasources.md` | ~100 |
-| 05 | Connections | `05-connections.md` | ~50 |
-| 06 | Access Manager | `06-access.md` | ~45 |
-| 07 | RLS Rules + Column Security | `07-rls.md` | ~60 |
-| 08 | Datasets (SQL + builder + custom fields + upload) | `08-datasets.md` | ~130 |
-| 09 | Semantic Layer | `09-semantic.md` | ~70 |
-| 10 | Query Processor / Cache | `10-query-cache.md` | ~50 |
-| 11 | Analyses + Visual Builder | `11-analyses.md` | ~100 + chart matrix |
-| 12 | Filters / Parameters / Drill / Cross-filter | `12-filters-actions.md` | ~80 |
-| 13 | Dashboards | `13-dashboards.md` | ~70 |
-| 14 | Sharing & Embedding | `14-share-embed.md` | ~50 |
-| 15 | Subscriptions / Alerts / Schedules | `15-scheduling-alerts.md` | ~60 |
-| 16 | Export / Download | `16-export.md` | ~40 |
-| 17 | Notifications | `17-notifications.md` | ~30 |
-| 18 | Search / Tags / Collections / Favourites | `18-search.md` | ~30 |
-| 19 | Audit Logs / Login Activity | `19-audit.md` | ~30 |
-| 20 | Announcements | `20-announcements.md` | ~25 |
-| 21 | Profile + Sessions + MFA | `21-profile-mfa.md` | ~40 |
-| 22 | SSO / SCIM / API Tokens | `22-sso-scim-api.md` | ~50 |
-| 23 | Layout / Sidebar / Permissions | `23-layout.md` | ~40 |
-| 24 | Branding / Theming / White-label | `24-branding.md` | ~25 |
-| 25 | Mobile / PWA / Offline | `25-mobile.md` | ~20 |
-| 26 | Public API / SDK / Plugins | `26-api-sdk.md` | ~40 |
-| 27 | i18n + a11y | `27-i18n-a11y.md` | ~30 |
-| 28 | Admin Console / Backup / GDPR | `28-admin.md` | ~30 |
-| 29 | AI Insights | `29-ai.md` | ~25 |
-| 30 | Geo / Maps | `30-geo.md` | ~20 |
-| 31 | Cost Observability | `31-cost.md` | ~20 |
-| 32 | Cross-cutting Security & Performance | `99-cross-cutting.md` | ~50 |
+| #   | Module                                               | File                       | Cases (target)      |
+| --- | ---------------------------------------------------- | -------------------------- | ------------------- |
+| 01  | Auth (login / OTP / set-password / refresh / logout) | `01-auth.md`               | ~120                |
+| 02  | Organisation + System Admin                          | `02-organisation.md`       | ~70                 |
+| 03  | Users / Roles / Groups                               | `03-users-roles-groups.md` | ~110                |
+| 04  | Datasources                                          | `04-datasources.md`        | ~100                |
+| 05  | Connections                                          | `05-connections.md`        | ~50                 |
+| 06  | Access Manager                                       | `06-access.md`             | ~45                 |
+| 07  | RLS Rules + Column Security                          | `07-rls.md`                | ~60                 |
+| 08  | Datasets (SQL + builder + custom fields + upload)    | `08-datasets.md`           | ~130                |
+| 09  | Semantic Layer                                       | `09-semantic.md`           | ~70                 |
+| 10  | Query Processor / Cache                              | `10-query-cache.md`        | ~50                 |
+| 11  | Analyses + Visual Builder                            | `11-analyses.md`           | ~100 + chart matrix |
+| 12  | Filters / Parameters / Drill / Cross-filter          | `12-filters-actions.md`    | ~80                 |
+| 13  | Dashboards                                           | `13-dashboards.md`         | ~70                 |
+| 14  | Sharing & Embedding                                  | `14-share-embed.md`        | ~50                 |
+| 15  | Subscriptions / Alerts / Schedules                   | `15-scheduling-alerts.md`  | ~60                 |
+| 16  | Export / Download                                    | `16-export.md`             | ~40                 |
+| 17  | Notifications                                        | `17-notifications.md`      | ~30                 |
+| 18  | Search / Tags / Collections / Favourites             | `18-search.md`             | ~30                 |
+| 19  | Audit Logs / Login Activity                          | `19-audit.md`              | ~30                 |
+| 20  | Announcements                                        | `20-announcements.md`      | ~25                 |
+| 21  | Profile + Sessions + MFA                             | `21-profile-mfa.md`        | ~40                 |
+| 22  | SSO / SCIM / API Tokens                              | `22-sso-scim-api.md`       | ~50                 |
+| 23  | Layout / Sidebar / Permissions                       | `23-layout.md`             | ~40                 |
+| 24  | Branding / Theming / White-label                     | `24-branding.md`           | ~25                 |
+| 25  | Mobile / PWA / Offline                               | `25-mobile.md`             | ~20                 |
+| 26  | Public API / SDK / Plugins                           | `26-api-sdk.md`            | ~40                 |
+| 27  | i18n + a11y                                          | `27-i18n-a11y.md`          | ~30                 |
+| 28  | Admin Console / Backup / GDPR                        | `28-admin.md`              | ~30                 |
+| 29  | AI Insights                                          | `29-ai.md`                 | ~25                 |
+| 30  | Geo / Maps                                           | `30-geo.md`                | ~20                 |
+| 31  | Cost Observability                                   | `31-cost.md`               | ~20                 |
+| 32  | Cross-cutting Security & Performance                 | `99-cross-cutting.md`      | ~50                 |
 
 Tabs / Sections / Prompts / Query Builders deliberately omitted per
 project decision (covered indirectly through Datasets module 08).
@@ -79,15 +79,15 @@ project decision (covered indirectly through Datasets module 08).
 
 ## Universal fixtures (every test assumes these exist)
 
-| Fixture | Identifier | Notes |
-|---|---|---|
-| Org | `TestOrg` | Default dev seed |
-| Master admin | `master_admin` / `Pass@1234` | Has every permission |
-| Standard user | `eve_user` / `Pass@1234` | Default member role |
-| Read-only user | `reader_user` / `Pass@1234` | View-only role |
-| Postgres datasource | `pg_local` | Points at the local Postgres |
-| Snowflake datasource | `sf_test` | Optional; skip tests if unset |
-| Sample dataset | `chart_demo` | 5,040-row demo table |
+| Fixture              | Identifier                   | Notes                         |
+| -------------------- | ---------------------------- | ----------------------------- |
+| Org                  | `TestOrg`                    | Default dev seed              |
+| Master admin         | `master_admin` / `Pass@1234` | Has every permission          |
+| Standard user        | `eve_user` / `Pass@1234`     | Default member role           |
+| Read-only user       | `reader_user` / `Pass@1234`  | View-only role                |
+| Postgres datasource  | `pg_local`                   | Points at the local Postgres  |
+| Snowflake datasource | `sf_test`                    | Optional; skip tests if unset |
+| Sample dataset       | `chart_demo`                 | 5,040-row demo table          |
 
 Tests that need additional fixtures call them out in their
 `Prerequisites` section.

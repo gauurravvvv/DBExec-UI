@@ -87,10 +87,16 @@ export class CustomNumberComponent implements ControlValueAccessor {
 
   /** Snapshot of the last validation failure so we can re-translate on
    *  language change without re-running the validation logic. */
-  private lastErrorContext: { key: string; params: Record<string, any> } | null = null;
+  private lastErrorContext: {
+    key: string;
+    params: Record<string, any>;
+  } | null = null;
 
   /** Resolve a validation key from `VALIDATION.*` with interpolation. */
-  private translateBoundsError(ctx: { key: string; params: Record<string, any> }): string {
+  private translateBoundsError(ctx: {
+    key: string;
+    params: Record<string, any>;
+  }): string {
     return this.translate.instant(`VALIDATION.${ctx.key}`, ctx.params);
   }
 
@@ -110,16 +116,18 @@ export class CustomNumberComponent implements ControlValueAccessor {
       return '';
     }
     if (this.min != null && num < this.min) {
-      const ctx = this.max != null
-        ? { key: 'VALUE_BETWEEN', params: { min: this.min, max: this.max } }
-        : { key: 'VALUE_GTE', params: { min: this.min } };
+      const ctx =
+        this.max != null
+          ? { key: 'VALUE_BETWEEN', params: { min: this.min, max: this.max } }
+          : { key: 'VALUE_GTE', params: { min: this.min } };
       this.lastErrorContext = ctx;
       return this.translateBoundsError(ctx);
     }
     if (this.max != null && num > this.max) {
-      const ctx = this.min != null
-        ? { key: 'VALUE_BETWEEN', params: { min: this.min, max: this.max } }
-        : { key: 'VALUE_LTE', params: { max: this.max } };
+      const ctx =
+        this.min != null
+          ? { key: 'VALUE_BETWEEN', params: { min: this.min, max: this.max } }
+          : { key: 'VALUE_LTE', params: { max: this.max } };
       this.lastErrorContext = ctx;
       return this.translateBoundsError(ctx);
     }

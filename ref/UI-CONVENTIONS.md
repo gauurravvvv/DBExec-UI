@@ -15,45 +15,45 @@ properties. They switch light/dark automatically via `theme.service.ts`.
 
 ### Color
 
-| Token | Light value | Use |
-|---|---|---|
-| `--primary-color` | `#2196f3` | primary actions, links, focus |
-| `--primary-hover` | `#1976d2` | hover on primary |
-| `--primary-light` | `#42a5f5` | light accent |
-| `--primary-color-transparent` | `rgba(33,150,243,.15)` | selected-row / chip tint |
-| `--primary-text` | `#fff` | text on primary fill |
-| `--text-color` | `#333` | body text |
-| `--text-muted` | `#6b7280` | secondary text |
-| `--text-subtle` | `#9ca3af` | placeholders, hints |
-| `--secondary-color` | `#757575` | muted labels/icons |
-| `--secondary-background` | `#f8fafc` | subtle surface |
-| `--border-color` | `#e0e0e0` | default borders |
-| `--border-strong` | `#c7c7c7` | emphasized borders |
+| Token                         | Light value            | Use                           |
+| ----------------------------- | ---------------------- | ----------------------------- |
+| `--primary-color`             | `#2196f3`              | primary actions, links, focus |
+| `--primary-hover`             | `#1976d2`              | hover on primary              |
+| `--primary-light`             | `#42a5f5`              | light accent                  |
+| `--primary-color-transparent` | `rgba(33,150,243,.15)` | selected-row / chip tint      |
+| `--primary-text`              | `#fff`                 | text on primary fill          |
+| `--text-color`                | `#333`                 | body text                     |
+| `--text-muted`                | `#6b7280`              | secondary text                |
+| `--text-subtle`               | `#9ca3af`              | placeholders, hints           |
+| `--secondary-color`           | `#757575`              | muted labels/icons            |
+| `--secondary-background`      | `#f8fafc`              | subtle surface                |
+| `--border-color`              | `#e0e0e0`              | default borders               |
+| `--border-strong`             | `#c7c7c7`              | emphasized borders            |
 
 Semantic (state) — **separate from the accent**, don't reuse as decoration:
 
-| Token | Value | Meaning |
-|---|---|---|
-| `--success-color` / `--success-bg` | `#4caf50` / 8% | good / healthy |
-| `--warning-color` / `--warning-bg` | `#ff9800` / 8% | caution |
-| `--error-color` / `--error-bg` | `#f44336` / 8% | error / destructive |
-| `--info-color` / `--info-bg` | `#2196f3` / 8% | informational |
+| Token                              | Value          | Meaning             |
+| ---------------------------------- | -------------- | ------------------- |
+| `--success-color` / `--success-bg` | `#4caf50` / 8% | good / healthy      |
+| `--warning-color` / `--warning-bg` | `#ff9800` / 8% | caution             |
+| `--error-color` / `--error-bg`     | `#f44336` / 8% | error / destructive |
+| `--info-color` / `--info-bg`       | `#2196f3` / 8% | informational       |
 
 There are `-rgb` and `-transparent` variants for tints; `--primary-color-rgb`
 = `33, 150, 243` for `rgba(var(--primary-color-rgb), …)`.
 
 ### Type scale (`--fs-*`)
 
-| Token | Size | Use |
-|---|---|---|
-| `--fs-h1` | 20px | page title (one per page) |
-| `--fs-h2` | 17px | section / dialog title |
-| `--fs-h3` | 15px | sub-section title |
-| `--fs-card-title` | 14px | card / panel title |
-| `--fs-body` / `--fs-table` | 14px | body, inputs, table cells |
-| `--fs-control` | 13px | sidebar rows, buttons, chips, header controls |
-| `--fs-label` | 12px | form labels, captions |
-| `--fs-micro` | 11px | uppercase section headers, footer |
+| Token                      | Size | Use                                           |
+| -------------------------- | ---- | --------------------------------------------- |
+| `--fs-h1`                  | 20px | page title (one per page)                     |
+| `--fs-h2`                  | 17px | section / dialog title                        |
+| `--fs-h3`                  | 15px | sub-section title                             |
+| `--fs-card-title`          | 14px | card / panel title                            |
+| `--fs-body` / `--fs-table` | 14px | body, inputs, table cells                     |
+| `--fs-control`             | 13px | sidebar rows, buttons, chips, header controls |
+| `--fs-label`               | 12px | form labels, captions                         |
+| `--fs-micro`               | 11px | uppercase section headers, footer             |
 
 Weights: `--fw-regular` 400, `--fw-medium` 500, `--fw-semibold` 600,
 `--fw-bold` 700. Line-heights: `--lh-tight` 1.25 (headings), `--lh-snug` 1.4
@@ -89,6 +89,7 @@ Declared/exported by `shared.module.ts`.
 ### Lists — `app-custom-table`
 
 The single list table for the whole app.
+
 - **Infinite scroll** (plain, not virtual), default batch **50**,
   **no page-number paginator**, **no bulk-select**.
 - Server paging via `UsServerListAdapter` (`shared/components` / adapter):
@@ -103,19 +104,19 @@ The single list table for the whole app.
 
 ### Form controls (all support `[label]`, error display, `autocomplete`)
 
-| Component | Notes |
-|---|---|
-| `app-custom-input` | text; `effectiveAutocomplete` getter → `'off'`, or `'new-password'` for password fields (browsers ignore `'off'` on passwords) |
-| `app-custom-textarea` | multiline; monospace variant for SQL |
-| `app-custom-number` | numeric (PrimeNG inputNumber under the hood) |
-| `app-custom-dropdown` | single-select. `serverMode` + `[fetcher]` for lazy options with search/paging; `optionLabel`/`optionValue`; **always `appendTo="body"`** on overlays; `[filter]` + `filterBy` |
-| `app-custom-multiselect` | multi-select, same overlay rules |
-| `app-custom-checkbox` / `app-custom-binary-checkbox` / `app-custom-radio` / `app-custom-toggle` | selections |
-| `app-custom-calendar` / `app-custom-daterange` | dates |
-| `app-custom-rangeslider` | numeric range |
-| `app-chip` | tag/badge (variant + tone); the shared chip primitive |
-| `email-chips-input` | Gmail-style editable recipient chips (alerts, dashboard subscriptions) |
-| `app-button` | button variants (primary / secondary / ghost / danger) |
+| Component                                                                                       | Notes                                                                                                                                                                         |
+| ----------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `app-custom-input`                                                                              | text; `effectiveAutocomplete` getter → `'off'`, or `'new-password'` for password fields (browsers ignore `'off'` on passwords)                                                |
+| `app-custom-textarea`                                                                           | multiline; monospace variant for SQL                                                                                                                                          |
+| `app-custom-number`                                                                             | numeric (PrimeNG inputNumber under the hood)                                                                                                                                  |
+| `app-custom-dropdown`                                                                           | single-select. `serverMode` + `[fetcher]` for lazy options with search/paging; `optionLabel`/`optionValue`; **always `appendTo="body"`** on overlays; `[filter]` + `filterBy` |
+| `app-custom-multiselect`                                                                        | multi-select, same overlay rules                                                                                                                                              |
+| `app-custom-checkbox` / `app-custom-binary-checkbox` / `app-custom-radio` / `app-custom-toggle` | selections                                                                                                                                                                    |
+| `app-custom-calendar` / `app-custom-daterange`                                                  | dates                                                                                                                                                                         |
+| `app-custom-rangeslider`                                                                        | numeric range                                                                                                                                                                 |
+| `app-chip`                                                                                      | tag/badge (variant + tone); the shared chip primitive                                                                                                                         |
+| `email-chips-input`                                                                             | Gmail-style editable recipient chips (alerts, dashboard subscriptions)                                                                                                        |
+| `app-button`                                                                                    | button variants (primary / secondary / ghost / danger)                                                                                                                        |
 
 ### Other shared pieces
 
@@ -161,7 +162,7 @@ popup chrome; reuse it (`@include db.db-access-dialog;`).
 ## 4. i18n (10 locales, no raw strings)
 
 - Locale JSONs in `src/assets/i18n/`: `en, de, es, fr, it, ja, ko, nl,
-  pt-BR, zh-CN`. `en.json` is the source of truth.
+pt-BR, zh-CN`. `en.json` is the source of truth.
 - Every user-facing string is a `| translate` key. Never a raw literal in a
   template.
 - When adding a key: add to **all 10** locales. First check if an equivalent

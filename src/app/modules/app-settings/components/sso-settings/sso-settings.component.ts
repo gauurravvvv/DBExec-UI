@@ -63,16 +63,14 @@ export class SsoSettingsComponent
     // branding-settings). When SSO is off the admin can save freely; when
     // on, all three must be present (matches the BE, which reports
     // sso-incomplete if enabled with any missing).
-    this.ssoForm
-      .get('ssoEnabled')!
-      .valueChanges.subscribe((enabled) => {
-        this.syncRequiredValidators(!!enabled);
-        // Turning SSO off clears the IdP fields — a disabled config keeps
-        // no issuer / entry point / certificate. (Only fires on a real user
-        // toggle; load patches with emitEvent:false so it never clears on
-        // load.) On save the empty cert string clears the stored ciphertext.
-        if (!enabled) this.clearIdpFields();
-      });
+    this.ssoForm.get('ssoEnabled')!.valueChanges.subscribe(enabled => {
+      this.syncRequiredValidators(!!enabled);
+      // Turning SSO off clears the IdP fields — a disabled config keeps
+      // no issuer / entry point / certificate. (Only fires on a real user
+      // toggle; load patches with emitEvent:false so it never clears on
+      // load.) On save the empty cert string clears the stored ciphertext.
+      if (!enabled) this.clearIdpFields();
+    });
   }
 
   /** Blank the three IdP fields + reset the configured badge. */

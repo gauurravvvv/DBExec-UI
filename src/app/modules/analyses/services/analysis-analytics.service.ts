@@ -276,11 +276,7 @@ export class AnalysisAnalyticsService {
    * Aggregate a measure column across raw rows using an aggregate fn.
    * Non-numeric cells contribute 0 (or are counted, for count fns).
    */
-  aggregate(
-    rows: any[],
-    measure: string,
-    fn: string,
-  ): number {
+  aggregate(rows: any[], measure: string, fn: string): number {
     if (!Array.isArray(rows) || rows.length === 0 || !measure) return 0;
     const raw = rows.map(r => r?.[measure]);
     switch (fn) {
@@ -301,9 +297,7 @@ export class AnalysisAnalyticsService {
       }
       case 'avg': {
         const nums = raw.map(v => this.num(v));
-        return nums.length
-          ? nums.reduce((s, v) => s + v, 0) / nums.length
-          : 0;
+        return nums.length ? nums.reduce((s, v) => s + v, 0) / nums.length : 0;
       }
       case 'sum':
       default:
@@ -331,7 +325,8 @@ export class AnalysisAnalyticsService {
     const buckets = new Map<string, any[]>();
     rows.forEach(r => {
       const key = r?.[dateColumn];
-      const k = key === null || key === undefined || key === '' ? '' : String(key);
+      const k =
+        key === null || key === undefined || key === '' ? '' : String(key);
       if (!buckets.has(k)) buckets.set(k, []);
       buckets.get(k)!.push(r);
     });

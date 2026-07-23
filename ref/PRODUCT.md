@@ -64,7 +64,7 @@ get alerted on changes — without leaving the app or juggling separate tools
   BE `CLAUDE.md` "Authorisation model" section for the full invariant.
 - **Auth:** `x-auth-token` header (not `Authorization: Bearer`); permissions
   are DB-backed (per-role JSON tree), resolved at login and stamped into the
-  JWT; routes gate on permission *values*, never role names.
+  JWT; routes gate on permission _values_, never role names.
 
 ## Design principles (how it should feel)
 

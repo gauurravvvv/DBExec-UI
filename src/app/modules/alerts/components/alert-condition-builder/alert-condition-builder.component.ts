@@ -49,15 +49,24 @@ const NULLARY_OPERATORS: AlertOperator[] = ['is_null', 'is_not_null'];
 const RANGE_OPERATORS: AlertOperator[] = ['between', 'not_between'];
 
 /** Require a non-empty RHS unless the operator is nullary / handled elsewhere. */
-function predicateValueValidator(control: AbstractControl): ValidationErrors | null {
+function predicateValueValidator(
+  control: AbstractControl,
+): ValidationErrors | null {
   const group = control.parent as FormGroup | null;
   if (!group) return null;
   const op = group.get('operator')?.value as AlertOperator;
   if (NULLARY_OPERATORS.includes(op)) return null;
   const v = control.value;
   if (RANGE_OPERATORS.includes(op)) {
-    if (!Array.isArray(v) || v[0] === null || v[0] === undefined || v[0] === '' ||
-      v[1] === null || v[1] === undefined || v[1] === '') {
+    if (
+      !Array.isArray(v) ||
+      v[0] === null ||
+      v[0] === undefined ||
+      v[0] === '' ||
+      v[1] === null ||
+      v[1] === undefined ||
+      v[1] === ''
+    ) {
       return { required: true };
     }
     return null;
@@ -101,8 +110,8 @@ export class AlertConditionBuilderComponent implements OnChanges {
 
   /** Distinct-value fetcher for string RHS dropdowns (per field ref). */
   @Input() distinctValuesFetcher:
-    | ((ref: string) => Promise<{ label: string; value: string }[]>)
-    | null = null;
+    ((ref: string) => Promise<{ label: string; value: string }[]>) | null =
+    null;
 
   /** Emits the current condition payload + validity on every change. */
   @Output() conditionChange = new EventEmitter<{
@@ -284,7 +293,10 @@ export class AlertConditionBuilderComponent implements OnChanges {
 
   /** Set the RHS value type (the control lives on right.valueType) and reset
    *  the value so it matches the new editor. */
-  setPredicateValueType(predicate: AbstractControl, valueType: AlertValueType): void {
+  setPredicateValueType(
+    predicate: AbstractControl,
+    valueType: AlertValueType,
+  ): void {
     predicate.get('right.valueType')?.setValue(valueType);
     this.onValueTypeChange(predicate);
   }
@@ -305,9 +317,11 @@ export class AlertConditionBuilderComponent implements OnChanges {
     return predicate.get('operator')?.value ?? 'gt';
   }
 
-  getValueOptions(predicate: AbstractControl): { label: string; value: string }[] {
+  getValueOptions(
+    predicate: AbstractControl,
+  ): { label: string; value: string }[] {
     const ref = predicate.get('left.ref')?.value;
-    return ref ? this.valuesCache[ref] ?? [] : [];
+    return ref ? (this.valuesCache[ref] ?? []) : [];
   }
 
   private defaultValueFor(predicate: AbstractControl): any {
@@ -414,12 +428,22 @@ export class AlertConditionBuilderComponent implements OnChanges {
         const predicates = this.fb.array<FormGroup>([]);
         (g.predicates ?? []).forEach((p: any) => {
           const pg = this.createPredicate();
-          pg.get('left.kind')?.setValue(p.left?.kind ?? 'field', { emitEvent: false });
+          pg.get('left.kind')?.setValue(p.left?.kind ?? 'field', {
+            emitEvent: false,
+          });
           pg.get('left.ref')?.setValue(p.left?.ref ?? '', { emitEvent: false });
-          pg.get('left.aggregate')?.setValue(p.left?.aggregate ?? 'none', { emitEvent: false });
-          pg.get('operator')?.setValue(p.operator ?? 'gt', { emitEvent: false });
-          pg.get('right.valueType')?.setValue(p.right?.valueType ?? 'number', { emitEvent: false });
-          pg.get('right.value')?.setValue(p.right?.value ?? null, { emitEvent: false });
+          pg.get('left.aggregate')?.setValue(p.left?.aggregate ?? 'none', {
+            emitEvent: false,
+          });
+          pg.get('operator')?.setValue(p.operator ?? 'gt', {
+            emitEvent: false,
+          });
+          pg.get('right.valueType')?.setValue(p.right?.valueType ?? 'number', {
+            emitEvent: false,
+          });
+          pg.get('right.value')?.setValue(p.right?.value ?? null, {
+            emitEvent: false,
+          });
           predicates.push(pg);
           if ((p.right?.valueType ?? 'number') === 'string' && p.left?.ref) {
             this.loadDistinctValues(p.left.ref);

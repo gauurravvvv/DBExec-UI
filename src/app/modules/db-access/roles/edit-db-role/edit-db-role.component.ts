@@ -134,7 +134,8 @@ export class EditDbRoleComponent implements OnInit, HasUnsavedChanges {
       attributes.bypassrls = v.bypassrls;
       if (v.connectionLimit !== null && v.connectionLimit !== undefined)
         attributes.connectionLimit = v.connectionLimit;
-      if (v.validUntil) attributes.validUntil = new Date(v.validUntil).toISOString();
+      if (v.validUntil)
+        attributes.validUntil = new Date(v.validUntil).toISOString();
       if (v.password) attributes.password = v.password;
     }
     return attributes;
@@ -143,7 +144,9 @@ export class EditDbRoleComponent implements OnInit, HasUnsavedChanges {
   onSubmit(): void {
     if (this.roleForm.invalid) return;
     const attributes = this.buildAttributes();
-    const needsSuperuserConfirm = !!(attributes.superuser || attributes.bypassrls);
+    const needsSuperuserConfirm = !!(
+      attributes.superuser || attributes.bypassrls
+    );
 
     this.dbAccess
       .updateRole(this.datasourceId, this.roleName, {

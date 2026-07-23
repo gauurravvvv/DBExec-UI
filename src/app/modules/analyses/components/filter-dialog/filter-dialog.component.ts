@@ -901,8 +901,7 @@ export class FilterDialogComponent implements OnChanges {
     let typeAutoPicked = false;
     if (this.filterDialogColumn && !this.filterDialogType) {
       const suggested = suggestFilterType(this.filterDialogColumn.dataType);
-      this.filterDialogType =
-        suggested === 'boolean' ? 'category' : suggested;
+      this.filterDialogType = suggested === 'boolean' ? 'category' : suggested;
       // Reuse the existing type-change plumbing to sync control/operator/
       // default-value shape to the freshly-picked type. onFilterTypeChange
       // already triggers loadColumnDistinctValues for category types, so

@@ -21,11 +21,7 @@ export const VALID_PARAM_IDENTIFIER = /^[a-zA-Z_][a-zA-Z0-9_]*$/;
 
 /** Parameter control types for `{{name}}` tokens (mirrors BE enum). */
 export type DatasetParamType =
-  | 'text'
-  | 'number'
-  | 'date'
-  | 'daterange'
-  | 'dropdown';
+  'text' | 'number' | 'date' | 'daterange' | 'dropdown';
 
 /** Static-list dropdown source. */
 export interface DatasetParamStaticOptions {

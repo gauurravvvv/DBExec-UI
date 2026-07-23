@@ -27,6 +27,7 @@ Reading the actual code:
 > `shared/helpers/**analysis**/`. Phase-2 agents must use the `analysis/` path.
 
 **So the gap is NOT chart count — it is depth + correctness in six areas:**
+
 1. Type-semantics (field role/format/temporal model is display-only-dead)
 2. **Aggregation depth** — no table-calc / window / time-intelligence / LOD engine (genuinely absent)
 3. **Geo is cosmetic** — maps render but aren't data-bound (no GeoJSON/region-join/lat-lon typing)

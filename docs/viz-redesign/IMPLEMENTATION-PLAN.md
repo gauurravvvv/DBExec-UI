@@ -26,7 +26,7 @@
   locales (`en de es fr it ja ko nl pt-BR zh-CN`). Reuse existing keys where the
   wording already exists.
 - **Verify gate (before "done"):** FE `tsc --noEmit` → `ngc -p tsconfig.app.json
-  --noEmit` → `ng build --configuration production`. BE `tsc --noEmit` → build.
+--noEmit` → `ng build --configuration production`. BE `tsc --noEmit` → build.
 - **Onboarding-safe DDL:** any new per-org column is additive + nullable,
   auto-named `@Index`, apostrophe-free entity comment.
 - **Config is a JSONB blob** on `VisualConfig.config` ("40+ tunables") — new
@@ -36,6 +36,7 @@
 ## Key files (current, verified)
 
 **FE — `DBExec-UI/src/app/modules/analyses/components/`**
+
 - `visual-config-sidebar/` — the config panel. `.ts` 1610 lines, `.html` 4181
   lines, 67 `config-section`s. **The central file of Wave 1.**
 - `visuals-chart-sidebar/` — chart-type picker + role-slot field assignment
@@ -50,6 +51,7 @@
 `configurable-card-chart/` (card wrapper).
 
 **BE — `DBExec-API/src/modules/`**
+
 - `analyses/controllers/` — runAnalysisQuery, updateAnalysis, getAnalysis, …
 - `analysis-tabs/controllers/` — add/list/update/delete/reorder **(multitab BE
   exists).**
@@ -72,6 +74,7 @@
 `sectionSearch: string`; each `config-section` wrapped in a keyed accordion panel.
 
 Steps:
+
 1. Add a **sticky panel header** at the top of the sidebar scroll container:
    focused-visual name + chart-type icon (left), overflow `p-menu` (right) with
    placeholders for "Reset section" / "Reset all" / "Advanced JSON" (wired in
@@ -98,9 +101,10 @@ Steps:
 if a `[disabled]`+tooltip forward is needed)
 
 Steps:
+
 1. Apply the **one-layout-per-control-shape rule** mechanically: boolean toggles
-   + single dropdowns → `config-row` (label left, control right); anything with a
-   sub-control / slider-with-value / multi-line → `config-group` (stacked).
+   - single dropdowns → `config-row` (label left, control right); anything with a
+     sub-control / slider-with-value / multi-line → `config-group` (stacked).
 2. Restyle `section-title` as a small-caps tracked label at reduced weight; drop
    inline `<hr>`-style dividers between groups in favour of `--space-*` gaps.
 3. Where a control is inapplicable due to a **sibling setting** (not chart type),
@@ -118,11 +122,12 @@ Steps:
 init; `<div echarts [theme]="'dbexec'">` or `echarts.init(el, 'dbexec')`.
 
 Steps:
+
 1. Build a theme object: brand **color palette** (derived from `--primary-color`
-   + a categorical ramp), axis + **faint gridline** styling, **tooltip** styling
-   (card bg, border, shadow, tabular-nums), legend, `textStyle` (Inter),
-   `valueFormatter` defaults. Read tokens via `getComputedStyle` at register time
-   so light/dark both work.
+   - a categorical ramp), axis + **faint gridline** styling, **tooltip** styling
+     (card bg, border, shadow, tabular-nums), legend, `textStyle` (Inter),
+     `valueFormatter` defaults. Read tokens via `getComputedStyle` at register time
+     so light/dark both work.
 2. `echarts.registerTheme('dbexec', theme)` once; apply on every `echarts.init`
    in `echart-visual`. Remove now-redundant per-chart option color tweaks.
 3. **Verify:** tsc + ngc + prod build; charts render with the brand palette,
@@ -134,6 +139,7 @@ Steps:
 `echart-visual.component.{html,scss}`
 
 Steps:
+
 1. Collapse the header **icon-soup** (export / duplicate / refresh / …) into a
    single **`p-menu` kebab**; header row keeps title, optional subtitle (period /
    unit), and the kebab.
@@ -154,6 +160,7 @@ file), squash to one FE commit. i18n keys for any new labels in all 10 locales.
 # WAVE 2 — Structure (the behavioural leap)
 
 ## Task 2.1 — Data / Format tabs + re-query flag
+
 **FE:** `visual-config-sidebar` — wrap sections in two `p-tabs` (`Data`,
 `Format`), Data first; classify each section `reQueries: boolean`; fold the
 `visuals-chart-sidebar` role slots + field tree into the Data tab.
@@ -162,12 +169,14 @@ file), squash to one FE commit. i18n keys for any new labels in all 10 locales.
 `chart.setOption()` directly. Keep the OnPush + `ngDoCheck` snapshot machinery.
 
 ## Task 2.2 — Interactive field pills (inline aggregate)
+
 **FE:** role-slot bound column → `app-chip` opening a `p-popover` sub-editor
 (column ▸ aggregate ▸ percentile/date-trunc ▸ alias ▸ remove). Chip label shows
 `SUM(Revenue)`. Reuse existing setters (`updateComboMeasure`, `setRoleOnVisual`,
 `percentileValue`).
 
 ## Task 2.3 — Multitab authoring surface (FE — BE already exists)
+
 **FE:** surface the existing `analysis-tabs.service.ts` + BE `analysis-tabs`
 endpoints in `edit-analyses` as a proper tab strip (add / rename / reorder /
 delete, chip-styled add control per the earlier analysis-tab work). Each tab
@@ -179,21 +188,25 @@ reorder) — wire only; verify onboarding-safe.
 # WAVE 3 — Parity (close P1 feature gaps)
 
 ## Task 3.1 — Format live preview + palette swatches
+
 Number/date format group gets a live sample line ("1,234.56 → $1.2K") +
 prefix/suffix inputs. `colorScheme` dropdown → swatch-strip picker + custom
 palette via `p-colorpicker`; per-series color override → ECharts per-series
 `itemStyle.color`.
 
 ## Task 3.2 — Missing chart types + per-chart features
+
 **Missing types** (from gap): **map/geo (choropleth)**, **bullet**. **Per-chart
 features:** reference lines & bands on all cartesian types; data labels on every
 applicable type; consistent number formatting wired across types.
 **FE:** extend the chart-type registry (`visuals-chart-sidebar` + `echart-visual`)
-+ config sections. **BE:** map/geo may need a geo-join data shape on
-`runAnalysisQuery`; per-series formatting persists in the `config` JSONB (no new
-column). Onboarding-safe.
+
+- config sections. **BE:** map/geo may need a geo-join data shape on
+  `runAnalysisQuery`; per-series formatting persists in the `config` JSONB (no new
+  column). Onboarding-safe.
 
 ## Task 3.3 — Reset-to-default + typed config foundation
+
 `CHART_CONFIG_DEFAULTS[chartType]` map powers the per-section + global reset
 stubbed in Wave 1. Introduce a `VisualConfig` TS interface + single
 `patchConfig(path, value)` writer behind the existing getters — foundational for

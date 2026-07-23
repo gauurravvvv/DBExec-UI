@@ -21,8 +21,14 @@ export const MODULE_FALLBACK: ModuleMeta = {
 
 export const MODULE_META: Record<string, ModuleMeta> = {
   auth: { icon: 'pi pi-shield', labelKey: 'AUDIT.MODULE.AUTH' },
-  organisation: { icon: 'pi pi-building', labelKey: 'AUDIT.MODULE.ORGANISATION' },
-  'system-admin': { icon: 'pi pi-verified', labelKey: 'AUDIT.MODULE.SYSTEM_ADMIN' },
+  organisation: {
+    icon: 'pi pi-building',
+    labelKey: 'AUDIT.MODULE.ORGANISATION',
+  },
+  'system-admin': {
+    icon: 'pi pi-verified',
+    labelKey: 'AUDIT.MODULE.SYSTEM_ADMIN',
+  },
   'org-admin': { icon: 'pi pi-user-edit', labelKey: 'AUDIT.MODULE.ORG_ADMIN' },
   user: { icon: 'pi pi-user', labelKey: 'AUDIT.MODULE.USER' },
   datasource: { icon: 'pi pi-database', labelKey: 'AUDIT.MODULE.DATASOURCE' },
@@ -33,23 +39,47 @@ export const MODULE_META: Record<string, ModuleMeta> = {
   category: { icon: 'pi pi-tags', labelKey: 'AUDIT.MODULE.CATEGORY' },
   credential: { icon: 'pi pi-key', labelKey: 'AUDIT.MODULE.CREDENTIAL' },
   dataset: { icon: 'pi pi-table', labelKey: 'AUDIT.MODULE.DATASET' },
-  'calculated-field': { icon: 'pi pi-calculator', labelKey: 'AUDIT.MODULE.CALCULATED_FIELD' },
+  'calculated-field': {
+    icon: 'pi pi-calculator',
+    labelKey: 'AUDIT.MODULE.CALCULATED_FIELD',
+  },
   tab: { icon: 'pi pi-clone', labelKey: 'AUDIT.MODULE.TAB' },
   section: { icon: 'pi pi-th-large', labelKey: 'AUDIT.MODULE.SECTION' },
   prompt: { icon: 'pi pi-comment', labelKey: 'AUDIT.MODULE.PROMPT' },
-  'query-builder': { icon: 'pi pi-sitemap', labelKey: 'AUDIT.MODULE.QUERY_BUILDER' },
+  'query-builder': {
+    icon: 'pi pi-sitemap',
+    labelKey: 'AUDIT.MODULE.QUERY_BUILDER',
+  },
   query: { icon: 'pi pi-code', labelKey: 'AUDIT.MODULE.QUERY' },
-  'saved-query': { icon: 'pi pi-bookmark', labelKey: 'AUDIT.MODULE.SAVED_QUERY' },
+  'saved-query': {
+    icon: 'pi pi-bookmark',
+    labelKey: 'AUDIT.MODULE.SAVED_QUERY',
+  },
   role: { icon: 'pi pi-id-card', labelKey: 'AUDIT.MODULE.ROLE' },
   access: { icon: 'pi pi-lock', labelKey: 'AUDIT.MODULE.ACCESS' },
   analyses: { icon: 'pi pi-chart-line', labelKey: 'AUDIT.MODULE.ANALYSES' },
-  'analysis-filter': { icon: 'pi pi-filter', labelKey: 'AUDIT.MODULE.ANALYSIS_FILTER' },
-  'analysis-parameter': { icon: 'pi pi-sliders-h', labelKey: 'AUDIT.MODULE.ANALYSIS_PARAMETER' },
-  'analysis-widget': { icon: 'pi pi-chart-bar', labelKey: 'AUDIT.MODULE.ANALYSIS_WIDGET' },
-  'analysis-tab': { icon: 'pi pi-clone', labelKey: 'AUDIT.MODULE.ANALYSIS_TAB' },
+  'analysis-filter': {
+    icon: 'pi pi-filter',
+    labelKey: 'AUDIT.MODULE.ANALYSIS_FILTER',
+  },
+  'analysis-parameter': {
+    icon: 'pi pi-sliders-h',
+    labelKey: 'AUDIT.MODULE.ANALYSIS_PARAMETER',
+  },
+  'analysis-widget': {
+    icon: 'pi pi-chart-bar',
+    labelKey: 'AUDIT.MODULE.ANALYSIS_WIDGET',
+  },
+  'analysis-tab': {
+    icon: 'pi pi-clone',
+    labelKey: 'AUDIT.MODULE.ANALYSIS_TAB',
+  },
   visual: { icon: 'pi pi-chart-pie', labelKey: 'AUDIT.MODULE.VISUAL' },
   search: { icon: 'pi pi-search', labelKey: 'AUDIT.MODULE.SEARCH' },
-  announcement: { icon: 'pi pi-megaphone', labelKey: 'AUDIT.MODULE.ANNOUNCEMENT' },
+  announcement: {
+    icon: 'pi pi-megaphone',
+    labelKey: 'AUDIT.MODULE.ANNOUNCEMENT',
+  },
   home: { icon: 'pi pi-home', labelKey: 'AUDIT.MODULE.HOME' },
   dashboard: { icon: 'pi pi-th-large', labelKey: 'AUDIT.MODULE.DASHBOARD' },
   'rls-rule': { icon: 'pi pi-shield', labelKey: 'AUDIT.MODULE.RLS_RULE' },
@@ -58,7 +88,10 @@ export const MODULE_META: Record<string, ModuleMeta> = {
   branding: { icon: 'pi pi-image', labelKey: 'AUDIT.MODULE.BRANDING' },
   folder: { icon: 'pi pi-folder', labelKey: 'AUDIT.MODULE.FOLDER' },
   favourite: { icon: 'pi pi-star', labelKey: 'AUDIT.MODULE.FAVOURITE' },
-  'asset-share': { icon: 'pi pi-share-alt', labelKey: 'AUDIT.MODULE.ASSET_SHARE' },
+  'asset-share': {
+    icon: 'pi pi-share-alt',
+    labelKey: 'AUDIT.MODULE.ASSET_SHARE',
+  },
   migration: { icon: 'pi pi-sync', labelKey: 'AUDIT.MODULE.MIGRATION' },
 };
 
@@ -106,10 +139,12 @@ export const ACTION_LABEL_KEY: Record<string, string> = {
 };
 
 /** Options for the Action filter dropdown (value = BE action, label = i18n). */
-export const ACTION_FILTER_OPTIONS = Object.keys(ACTION_LABEL_KEY).map(value => ({
-  value,
-  labelKey: ACTION_LABEL_KEY[value],
-}));
+export const ACTION_FILTER_OPTIONS = Object.keys(ACTION_LABEL_KEY).map(
+  value => ({
+    value,
+    labelKey: ACTION_LABEL_KEY[value],
+  }),
+);
 
 /**
  * Options for the Module multiselect filter. Ordered roughly by how often a

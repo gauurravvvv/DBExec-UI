@@ -18,12 +18,7 @@ export type ChipVariant =
 
 /** Semantic colour tone (independent of variant). */
 export type ChipTone =
-  | 'neutral'
-  | 'primary'
-  | 'success'
-  | 'warning'
-  | 'error'
-  | 'info';
+  'neutral' | 'primary' | 'success' | 'warning' | 'error' | 'info';
 
 /**
  * app-chip — the single canonical chip / tag / status-pill / badge / count

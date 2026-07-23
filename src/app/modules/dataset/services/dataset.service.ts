@@ -507,11 +507,7 @@ export class DatasetService {
     }
   }
 
-  async duplicateDataset(
-    datasetId: string,
-    name: string,
-    description: string,
-  ) {
+  async duplicateDataset(datasetId: string, name: string, description: string) {
     this._saving.set(true);
     try {
       // POST /datasets/:datasetId/duplicate.
@@ -643,9 +639,12 @@ export class DatasetService {
   async getFreshness(datasetId: string): Promise<any> {
     return await lastValueFrom(
       this.http
-        .apiGet(DATASET.FRESHNESS_PREFIX + datasetId + DATASET.FRESHNESS_SUFFIX, {
-          skipLoader: true,
-        })
+        .apiGet(
+          DATASET.FRESHNESS_PREFIX + datasetId + DATASET.FRESHNESS_SUFFIX,
+          {
+            skipLoader: true,
+          },
+        )
         .pipe(takeUntil(this._cancelReads$)),
     );
   }

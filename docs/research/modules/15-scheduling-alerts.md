@@ -1,9 +1,9 @@
 # 15 · Scheduling & Subscriptions & Alerts
 
 > The "I want to be told when X" surface. Three flavours:
-> *subscriptions* (deliver a snapshot of this dashboard every
-> Monday), *alerts* (tell me when revenue drops below threshold),
-> and *digests* (weekly summary of everything I care about).
+> _subscriptions_ (deliver a snapshot of this dashboard every
+> Monday), _alerts_ (tell me when revenue drops below threshold),
+> and _digests_ (weekly summary of everything I care about).
 >
 > Sister modules:
 > [13 · Export](13-export-download.md) (subscriptions render via
@@ -19,15 +19,15 @@
 
 ## 1. Industry baseline
 
-| Tool | Recurring snapshot | Threshold alert | Anomaly alert | Channels |
-|---|---|---|---|---|
-| **Tableau** | Subscriptions (per workbook / per view), schedule from admin | Data-driven alerts (per metric) | TabPy-driven custom alerts | Email |
-| **Power BI** | Subscriptions on reports + dashboards | Data alerts via Power Automate | n/a (relies on Azure) | Email, Teams, Power Automate |
-| **Looker** | Schedules (LookML or one-off), `data_actions` | Alerts on Looks | n/a | Email, Slack, S3, SFTP, webhook |
-| **Metabase** | Pulses (deprecated v0.50+) → Subscriptions | Alerts on questions | n/a | Email, Slack |
-| **Superset** | Alerts & reports | Threshold alerts (SQL-defined) | n/a | Email, Slack |
-| **Mode** | Schedules on reports | Custom (Python notebook) | Custom | Email, Slack, webhook |
-| **Hex** | Schedules on projects | Notebook code | Custom | Email, Slack, webhook |
+| Tool         | Recurring snapshot                                           | Threshold alert                 | Anomaly alert              | Channels                        |
+| ------------ | ------------------------------------------------------------ | ------------------------------- | -------------------------- | ------------------------------- |
+| **Tableau**  | Subscriptions (per workbook / per view), schedule from admin | Data-driven alerts (per metric) | TabPy-driven custom alerts | Email                           |
+| **Power BI** | Subscriptions on reports + dashboards                        | Data alerts via Power Automate  | n/a (relies on Azure)      | Email, Teams, Power Automate    |
+| **Looker**   | Schedules (LookML or one-off), `data_actions`                | Alerts on Looks                 | n/a                        | Email, Slack, S3, SFTP, webhook |
+| **Metabase** | Pulses (deprecated v0.50+) → Subscriptions                   | Alerts on questions             | n/a                        | Email, Slack                    |
+| **Superset** | Alerts & reports                                             | Threshold alerts (SQL-defined)  | n/a                        | Email, Slack                    |
+| **Mode**     | Schedules on reports                                         | Custom (Python notebook)        | Custom                     | Email, Slack, webhook           |
+| **Hex**      | Schedules on projects                                        | Notebook code                   | Custom                     | Email, Slack, webhook           |
 
 **The patterns to copy:**
 
@@ -52,34 +52,34 @@
 
 ## 3. Gap matrix
 
-| ID | Gap | Severity | Effort |
-|---|---|---|---|
-| SCH-G01 | Subscription entity + scheduler | P0 | M |
-| SCH-G02 | Alert entity + threshold expression evaluation | P0 | L |
-| SCH-G03 | BullMQ-backed worker pool | P0 | M |
-| SCH-G04 | Email channel (SMTP) | P0 | M |
-| SCH-G05 | Slack channel (incoming webhook) | P0 | M |
-| SCH-G06 | Webhook channel (HMAC-signed POST) | P0 | M |
-| SCH-G07 | Microsoft Teams channel | P1 | S |
-| SCH-G08 | SMS channel (Twilio) | P2 | S |
-| SCH-G09 | Per-tab subscription (multi-tab dashboard) | P1 | M |
-| SCH-G10 | Threshold alert (`metric < value`) | P0 | M |
-| SCH-G11 | Anomaly alert (statistical) | P2 | L |
-| SCH-G12 | Trend alert ("week-over-week down 20%") | P1 | M |
-| SCH-G13 | "On dataset refresh" trigger | P1 | M |
-| SCH-G14 | Cooldown (don't fire again for N minutes) | P0 | S |
-| SCH-G15 | Consecutive-breach gate (N hits before fire) | P1 | S |
-| SCH-G16 | Snooze / mute per alert | P1 | S |
-| SCH-G17 | Acknowledge (silence until next breach) | P1 | S |
-| SCH-G18 | Severity (info / warning / critical) | P1 | S |
-| SCH-G19 | Quiet hours per recipient | P1 | S |
-| SCH-G20 | DST-correct timezone handling | P0 | S |
-| SCH-G21 | Per-org daily delivery quota | P1 | S |
-| SCH-G22 | Audit + delivery log | P0 | S |
-| SCH-G23 | Failure backoff (exponential retry) | P0 | S |
-| SCH-G24 | Dead-letter queue + manual re-dispatch | P1 | S |
-| SCH-G25 | Subscription "preview" (show me what it would send) | P1 | S |
-| SCH-G26 | Daily digest (one email summarising N alerts) | P1 | M |
+| ID      | Gap                                                 | Severity | Effort |
+| ------- | --------------------------------------------------- | -------- | ------ |
+| SCH-G01 | Subscription entity + scheduler                     | P0       | M      |
+| SCH-G02 | Alert entity + threshold expression evaluation      | P0       | L      |
+| SCH-G03 | BullMQ-backed worker pool                           | P0       | M      |
+| SCH-G04 | Email channel (SMTP)                                | P0       | M      |
+| SCH-G05 | Slack channel (incoming webhook)                    | P0       | M      |
+| SCH-G06 | Webhook channel (HMAC-signed POST)                  | P0       | M      |
+| SCH-G07 | Microsoft Teams channel                             | P1       | S      |
+| SCH-G08 | SMS channel (Twilio)                                | P2       | S      |
+| SCH-G09 | Per-tab subscription (multi-tab dashboard)          | P1       | M      |
+| SCH-G10 | Threshold alert (`metric < value`)                  | P0       | M      |
+| SCH-G11 | Anomaly alert (statistical)                         | P2       | L      |
+| SCH-G12 | Trend alert ("week-over-week down 20%")             | P1       | M      |
+| SCH-G13 | "On dataset refresh" trigger                        | P1       | M      |
+| SCH-G14 | Cooldown (don't fire again for N minutes)           | P0       | S      |
+| SCH-G15 | Consecutive-breach gate (N hits before fire)        | P1       | S      |
+| SCH-G16 | Snooze / mute per alert                             | P1       | S      |
+| SCH-G17 | Acknowledge (silence until next breach)             | P1       | S      |
+| SCH-G18 | Severity (info / warning / critical)                | P1       | S      |
+| SCH-G19 | Quiet hours per recipient                           | P1       | S      |
+| SCH-G20 | DST-correct timezone handling                       | P0       | S      |
+| SCH-G21 | Per-org daily delivery quota                        | P1       | S      |
+| SCH-G22 | Audit + delivery log                                | P0       | S      |
+| SCH-G23 | Failure backoff (exponential retry)                 | P0       | S      |
+| SCH-G24 | Dead-letter queue + manual re-dispatch              | P1       | S      |
+| SCH-G25 | Subscription "preview" (show me what it would send) | P1       | S      |
+| SCH-G26 | Daily digest (one email summarising N alerts)       | P1       | M      |
 
 ## 4. Target architecture
 
@@ -228,7 +228,11 @@ CREATE INDEX delivery_log_source ON delivery_log (source_type, source_id, occurr
 ```ts
 import { CronExpressionParser } from 'cron-parser';
 
-export function nextRun(cron: string, tz: string, after: Date = new Date()): Date {
+export function nextRun(
+  cron: string,
+  tz: string,
+  after: Date = new Date(),
+): Date {
   const it = CronExpressionParser.parse(cron, { currentDate: after, tz });
   return it.next().toDate();
 }
@@ -254,11 +258,15 @@ export async function tick() {
   });
   for (const sub of dueSubs) {
     if (sub.snoozedUntil && sub.snoozedUntil > now) continue;
-    await scheduleQueue.add('subscription:run', { id: sub.id }, {
-      jobId: `sub:${sub.id}:${sub.nextRunAt?.toISOString()}`,
-      attempts: 5,
-      backoff: { type: 'exponential', delay: 60_000 },
-    });
+    await scheduleQueue.add(
+      'subscription:run',
+      { id: sub.id },
+      {
+        jobId: `sub:${sub.id}:${sub.nextRunAt?.toISOString()}`,
+        attempts: 5,
+        backoff: { type: 'exponential', delay: 60_000 },
+      },
+    );
     await Subscription.update(sub.id, {
       nextRunAt: nextRun(sub.cron, sub.timezone, now),
     });
@@ -271,11 +279,15 @@ export async function tick() {
   for (const a of dueAlerts) {
     if (a.snoozedUntil && a.snoozedUntil > now) continue;
     if (a.ackUntil && a.ackUntil > now) continue;
-    await scheduleQueue.add('alert:evaluate', { id: a.id }, {
-      jobId: `alert:${a.id}:${a.nextRunAt?.toISOString()}`,
-      attempts: 3,
-      backoff: { type: 'exponential', delay: 30_000 },
-    });
+    await scheduleQueue.add(
+      'alert:evaluate',
+      { id: a.id },
+      {
+        jobId: `alert:${a.id}:${a.nextRunAt?.toISOString()}`,
+        attempts: 3,
+        backoff: { type: 'exponential', delay: 30_000 },
+      },
+    );
     await Alert.update(a.id, {
       nextRunAt: nextRun(a.cron, a.timezone, now),
     });
@@ -283,7 +295,9 @@ export async function tick() {
 }
 
 // Started by app.ts:
-setInterval(() => { tick().catch(err => Logger.error(err)); }, 60_000);
+setInterval(() => {
+  tick().catch(err => Logger.error(err));
+}, 60_000);
 ```
 
 Idempotent jobId pattern: every fire window has a unique key
@@ -299,7 +313,7 @@ export default async function runSubscription({ id }: { id: string }) {
 
   const t0 = Date.now();
   let attachment: Attachment | null = null;
-  let lastStatus: 'ok'|'failed'|'empty' = 'ok';
+  let lastStatus: 'ok' | 'failed' | 'empty' = 'ok';
   let errorMsg: string | null = null;
 
   try {
@@ -370,8 +384,10 @@ export default async function evaluateAlert({ id }: { id: string }) {
   if (!a) return;
 
   // Cooldown
-  if (a.lastTriggeredAt &&
-      Date.now() - a.lastTriggeredAt.getTime() < a.cooldownMins * 60_000) {
+  if (
+    a.lastTriggeredAt &&
+    Date.now() - a.lastTriggeredAt.getTime() < a.cooldownMins * 60_000
+  ) {
     return;
   }
 
@@ -380,7 +396,11 @@ export default async function evaluateAlert({ id }: { id: string }) {
   const cfg = await loadDatasourceConfig(dataset!.datasourceId);
   const pool = await acquire(cfg);
 
-  const rls = await resolveRlsFilters(master_db_connection, a.ownerUserId, dataset!.id);
+  const rls = await resolveRlsFilters(
+    master_db_connection,
+    a.ownerUserId,
+    dataset!.id,
+  );
   if (rls.denyAll) return;
 
   const composed = composeRlsSql(dataset!.sql, rls.filters);
@@ -399,8 +419,11 @@ export default async function evaluateAlert({ id }: { id: string }) {
   } catch (e) {
     Logger.error(`Alert ${a.id} expression failed: ${(e as Error).message}`);
     await DeliveryLog.insert({
-      sourceType: 'alert', sourceId: a.id, channel: 'eval',
-      status: 'failed', error: (e as Error).message,
+      sourceType: 'alert',
+      sourceId: a.id,
+      channel: 'eval',
+      status: 'failed',
+      error: (e as Error).message,
     });
     return;
   }
@@ -449,18 +472,30 @@ type ChannelSpec =
 class ChannelDispatcher {
   async send(args: SendArgs) {
     const t0 = Date.now();
-    let status: 'ok'|'failed' = 'ok';
+    let status: 'ok' | 'failed' = 'ok';
     let error: string | null = null;
     try {
       switch (args.channel.type) {
-        case 'email':   await this.sendEmail(args); break;
-        case 'slack':   await this.sendSlack(args); break;
-        case 'webhook': await this.sendWebhook(args); break;
-        case 'teams':   await this.sendTeams(args); break;
-        case 'sms':     await this.sendSms(args); break;
+        case 'email':
+          await this.sendEmail(args);
+          break;
+        case 'slack':
+          await this.sendSlack(args);
+          break;
+        case 'webhook':
+          await this.sendWebhook(args);
+          break;
+        case 'teams':
+          await this.sendTeams(args);
+          break;
+        case 'sms':
+          await this.sendSms(args);
+          break;
       }
     } catch (e) {
-      status = 'failed'; error = (e as Error).message; throw e;
+      status = 'failed';
+      error = (e as Error).message;
+      throw e;
     } finally {
       await DeliveryLog.insert({
         sourceType: args.sourceType,
@@ -468,7 +503,8 @@ class ChannelDispatcher {
         channel: args.channel.type,
         recipients: args.channel,
         status,
-        sizeBytes: args.attachments?.reduce((n, a) => n + a.content.length, 0) ?? 0,
+        sizeBytes:
+          args.attachments?.reduce((n, a) => n + a.content.length, 0) ?? 0,
         durationMs: Date.now() - t0,
         error,
       });
@@ -476,16 +512,20 @@ class ChannelDispatcher {
   }
 
   private async sendEmail(args: SendArgs) {
-    const cfg = await OrgEmailConfig.findOne({ where: { organisationId: args.organisationId } });
+    const cfg = await OrgEmailConfig.findOne({
+      where: { organisationId: args.organisationId },
+    });
     if (!cfg) throw new Error('Email not configured');
     const transport = nodemailer.createTransport({
       host: cfg.smtpHost,
       port: cfg.smtpPort,
       secure: cfg.smtpPort === 465,
-      auth: cfg.smtpUser ? {
-        user: cfg.smtpUser,
-        pass: decryptForOrg(cfg.smtpPasswordEnc!, args.organisationId),
-      } : undefined,
+      auth: cfg.smtpUser
+        ? {
+            user: cfg.smtpUser,
+            pass: decryptForOrg(cfg.smtpPasswordEnc!, args.organisationId),
+          }
+        : undefined,
     });
     await transport.sendMail({
       from: `"${cfg.fromName ?? 'DBExec'}" <${cfg.fromAddress}>`,
@@ -504,14 +544,21 @@ class ChannelDispatcher {
 
   private async sendWebhook(args: SendArgs) {
     const ep = await WebhookEndpoint.findOne({
-      where: { id: (args.channel as any).endpointId, organisationId: args.organisationId, status: 1 },
+      where: {
+        id: (args.channel as any).endpointId,
+        organisationId: args.organisationId,
+        status: 1,
+      },
     });
     if (!ep) throw new Error('Webhook endpoint not found');
     const secret = decryptForOrg(ep.signingSecretEnc, args.organisationId);
 
     const bodyObj = {
       id: randomUUID(),
-      event: args.sourceType === 'subscription' ? 'subscription.fired' : 'alert.fired',
+      event:
+        args.sourceType === 'subscription'
+          ? 'subscription.fired'
+          : 'alert.fired',
       source: { type: args.sourceType, id: args.sourceId },
       occurredAt: new Date().toISOString(),
       subject: args.subject,
@@ -526,7 +573,8 @@ class ChannelDispatcher {
     const body = JSON.stringify(bodyObj);
 
     const ts = Math.floor(Date.now() / 1000);
-    const sig = crypto.createHmac('sha256', secret)
+    const sig = crypto
+      .createHmac('sha256', secret)
       .update(`${ts}.${body}`)
       .digest('hex');
 
@@ -560,7 +608,8 @@ function verifyDBExecWebhook(req: any, signingSecret: string): boolean {
   if (!m) return false;
   const [, ts, sig] = m;
   if (Math.abs(Date.now() / 1000 - Number(ts)) > 300) return false;
-  const expected = crypto.createHmac('sha256', signingSecret)
+  const expected = crypto
+    .createHmac('sha256', signingSecret)
     .update(`${ts}.${req.rawBody}`)
     .digest('hex');
   return crypto.timingSafeEqual(Buffer.from(sig), Buffer.from(expected));
@@ -582,6 +631,7 @@ function verifyDBExecWebhook(req: any, signingSecret: string): boolean {
 ## 5. APIs
 
 ### Subscriptions
+
 - POST/GET/PUT/DELETE `/subscriptions`
 - POST `/subscriptions/:id/run-now`
 - POST `/subscriptions/:id/preview`
@@ -589,6 +639,7 @@ function verifyDBExecWebhook(req: any, signingSecret: string): boolean {
 - GET `/subscriptions/:id/deliveries`
 
 ### Alerts
+
 - POST/GET/PUT/DELETE `/alerts`
 - POST `/alerts/:id/ack` — silence until next breach
 - POST `/alerts/:id/snooze` — silence until timestamp
@@ -596,6 +647,7 @@ function verifyDBExecWebhook(req: any, signingSecret: string): boolean {
 - GET `/alerts/:id/history`
 
 ### Channels
+
 - PUT `/channels/email`
 - POST/GET/DELETE `/channels/slack`
 - POST/GET `/webhooks`
@@ -658,49 +710,77 @@ Send to:
 ## 7. Validators
 
 ```ts
-export const SUB_FORMATS = ['pdf','png','xlsx','csv','jsonl'] as const;
-export const CHANNEL_TYPES = ['email','slack','webhook','teams','sms'] as const;
+export const SUB_FORMATS = ['pdf', 'png', 'xlsx', 'csv', 'jsonl'] as const;
+export const CHANNEL_TYPES = [
+  'email',
+  'slack',
+  'webhook',
+  'teams',
+  'sms',
+] as const;
 
 export const channelSpecSchema = z.discriminatedUnion('type', [
-  z.object({ type: z.literal('email'),
+  z.object({
+    type: z.literal('email'),
     to: z.array(z.string().email()).min(1).max(100),
     cc: z.array(z.string().email()).max(100).optional(),
     bcc: z.array(z.string().email()).max(100).optional(),
   }),
-  z.object({ type: z.literal('slack'),
+  z.object({
+    type: z.literal('slack'),
     configId: z.string().uuid(),
-    channel: z.string().regex(/^[#@].+/).optional(),
+    channel: z
+      .string()
+      .regex(/^[#@].+/)
+      .optional(),
   }),
-  z.object({ type: z.literal('webhook'),
-    endpointId: z.string().uuid(),
+  z.object({ type: z.literal('webhook'), endpointId: z.string().uuid() }),
+  z.object({
+    type: z.literal('teams'),
+    webhookUrl: z
+      .string()
+      .url()
+      .regex(/outlook\.office\.com/),
   }),
-  z.object({ type: z.literal('teams'),
-    webhookUrl: z.string().url().regex(/outlook\.office\.com/),
-  }),
-  z.object({ type: z.literal('sms'),
-    phoneNumbers: z.array(z.string().regex(/^\+\d{6,15}$/)).min(1).max(20),
+  z.object({
+    type: z.literal('sms'),
+    phoneNumbers: z
+      .array(z.string().regex(/^\+\d{6,15}$/))
+      .min(1)
+      .max(20),
   }),
 ]);
 
-export const createSubscriptionSchema = z.object({
-  targetType: z.enum(['dashboard','analysis','dataset','tab']),
-  targetId: z.string().uuid(),
-  tabId: z.string().uuid().optional(),
-  format: z.enum(SUB_FORMATS),
-  cron: z.string().regex(/^[\d\*\/,\-\?LW#]+( [\d\*\/,\-\?LW#]+){4}$/),
-  timezone: z.string().max(64),
-  channels: z.array(channelSpecSchema).min(1).max(10),
-  filterState: z.record(z.string(), z.any()).optional(),
-  includeMessage: z.string().max(2000).optional(),
-}).superRefine((data, ctx) => {
-  if (data.targetType === 'tab' && !data.tabId) {
-    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['tabId'],
-      message: 'validation.subscription.tabId.required' });
-  }
-  try { new Intl.DateTimeFormat('en-US', { timeZone: data.timezone }); }
-  catch { ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['timezone'],
-                          message: 'validation.subscription.tz.invalid' }); }
-});
+export const createSubscriptionSchema = z
+  .object({
+    targetType: z.enum(['dashboard', 'analysis', 'dataset', 'tab']),
+    targetId: z.string().uuid(),
+    tabId: z.string().uuid().optional(),
+    format: z.enum(SUB_FORMATS),
+    cron: z.string().regex(/^[\d\*\/,\-\?LW#]+( [\d\*\/,\-\?LW#]+){4}$/),
+    timezone: z.string().max(64),
+    channels: z.array(channelSpecSchema).min(1).max(10),
+    filterState: z.record(z.string(), z.any()).optional(),
+    includeMessage: z.string().max(2000).optional(),
+  })
+  .superRefine((data, ctx) => {
+    if (data.targetType === 'tab' && !data.tabId) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['tabId'],
+        message: 'validation.subscription.tabId.required',
+      });
+    }
+    try {
+      new Intl.DateTimeFormat('en-US', { timeZone: data.timezone });
+    } catch {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['timezone'],
+        message: 'validation.subscription.tz.invalid',
+      });
+    }
+  });
 
 export const createAlertSchema = z.object({
   name: z.string().min(1).max(100),
@@ -710,8 +790,13 @@ export const createAlertSchema = z.object({
   expression: z.string().min(1).max(2000),
   cron: z.string(),
   timezone: z.string().max(64),
-  severity: z.enum(['info','warning','critical']).default('warning'),
-  cooldownMins: z.number().int().min(1).max(60*24*7).default(60),
+  severity: z.enum(['info', 'warning', 'critical']).default('warning'),
+  cooldownMins: z
+    .number()
+    .int()
+    .min(1)
+    .max(60 * 24 * 7)
+    .default(60),
   consecutiveBreachesRequired: z.number().int().min(1).max(100).default(1),
   channels: z.array(channelSpecSchema).min(1),
 });

@@ -31,24 +31,24 @@ but customers will ask for live mode within months.
 
 ## 3. Gaps
 
-| ID | Gap | Severity |
-|---|---|---|
-| DSH-G01 | Live mode (re-query on render) | P0 |
-| DSH-G02 | Dashboard filter bar | P0 |
-| DSH-G03 | Cross-analysis filters | P0 |
-| DSH-G04 | PDF export | P0 |
-| DSH-G05 | PNG export (per visual + whole-board) | P0 |
-| DSH-G06 | Public share link | P0 |
-| DSH-G07 | Embed (JWT-signed) | P0 |
-| DSH-G08 | Dashboard layout: drag-resize grid | 🟡 partial today, polish needed |
-| DSH-G09 | Dashboard sections / tabs | P1 |
-| DSH-G10 | Mobile layout (auto-stack on narrow screens) | P1 |
-| DSH-G11 | Dashboard description / cover image | P2 |
-| DSH-G12 | Dashboard "follow" + new-comment notification | P2 |
-| DSH-G13 | Dashboard comments + @mentions | P1 |
-| DSH-G14 | Dashboard versioning + restore | P1 |
-| DSH-G15 | Thumbnail caching (Redis) | P1 |
-| DSH-G16 | "Snapshot vs live" override per visual on a board | P2 |
+| ID      | Gap                                               | Severity                        |
+| ------- | ------------------------------------------------- | ------------------------------- |
+| DSH-G01 | Live mode (re-query on render)                    | P0                              |
+| DSH-G02 | Dashboard filter bar                              | P0                              |
+| DSH-G03 | Cross-analysis filters                            | P0                              |
+| DSH-G04 | PDF export                                        | P0                              |
+| DSH-G05 | PNG export (per visual + whole-board)             | P0                              |
+| DSH-G06 | Public share link                                 | P0                              |
+| DSH-G07 | Embed (JWT-signed)                                | P0                              |
+| DSH-G08 | Dashboard layout: drag-resize grid                | 🟡 partial today, polish needed |
+| DSH-G09 | Dashboard sections / tabs                         | P1                              |
+| DSH-G10 | Mobile layout (auto-stack on narrow screens)      | P1                              |
+| DSH-G11 | Dashboard description / cover image               | P2                              |
+| DSH-G12 | Dashboard "follow" + new-comment notification     | P2                              |
+| DSH-G13 | Dashboard comments + @mentions                    | P1                              |
+| DSH-G14 | Dashboard versioning + restore                    | P1                              |
+| DSH-G15 | Thumbnail caching (Redis)                         | P1                              |
+| DSH-G16 | "Snapshot vs live" override per visual on a board | P2                              |
 
 ## 4. Target architecture
 
@@ -98,7 +98,7 @@ export class DashboardExportService {
   constructor(private browser: BrowserPool) {}
 
   async pdf(dashboardId: string, opts: ExportOpts): Promise<Buffer> {
-    return this.browser.use(async (page) => {
+    return this.browser.use(async page => {
       await page.setExtraHTTPHeaders({ 'x-auth-token': opts.serviceToken });
       await page.goto(
         `${FE_URL}/embed/dashboard/${dashboardId}?print=true&filters=${encodeURIComponent(JSON.stringify(opts.filters || {}))}`,
@@ -129,21 +129,21 @@ serving.
 
 ## 5. APIs
 
-| Method | Path | Purpose |
-|---|---|---|
-| POST | `/dashboards/publish` | New or republish (existing) |
-| GET  | `/dashboards/list` | List |
-| GET  | `/dashboards/:id` | Single |
-| GET  | `/dashboards/:id/render` | Render data (live or snapshot) |
-| GET  | `/dashboards/:id/render/visual/:vid` | Single visual data |
-| POST | `/dashboards/:id/filters` | Update dashboard filter bar |
-| POST | `/dashboards/:id/export/pdf` | Export PDF |
-| POST | `/dashboards/:id/export/png` | Export PNG |
-| POST | `/dashboards/:id/export/xlsx` | Export rows as XLSX (multi-sheet) |
-| GET  | `/dashboards/:id/thumbnail` | PNG thumbnail |
-| POST | `/dashboards/:id/follow` | Follow / unfollow |
-| GET  | `/dashboards/:id/comments` | List comments |
-| POST | `/dashboards/:id/comments` | Add comment + @mentions |
+| Method | Path                                 | Purpose                           |
+| ------ | ------------------------------------ | --------------------------------- |
+| POST   | `/dashboards/publish`                | New or republish (existing)       |
+| GET    | `/dashboards/list`                   | List                              |
+| GET    | `/dashboards/:id`                    | Single                            |
+| GET    | `/dashboards/:id/render`             | Render data (live or snapshot)    |
+| GET    | `/dashboards/:id/render/visual/:vid` | Single visual data                |
+| POST   | `/dashboards/:id/filters`            | Update dashboard filter bar       |
+| POST   | `/dashboards/:id/export/pdf`         | Export PDF                        |
+| POST   | `/dashboards/:id/export/png`         | Export PNG                        |
+| POST   | `/dashboards/:id/export/xlsx`        | Export rows as XLSX (multi-sheet) |
+| GET    | `/dashboards/:id/thumbnail`          | PNG thumbnail                     |
+| POST   | `/dashboards/:id/follow`             | Follow / unfollow                 |
+| GET    | `/dashboards/:id/comments`           | List comments                     |
+| POST   | `/dashboards/:id/comments`           | Add comment + @mentions           |
 
 ## 6. UI specs
 
@@ -243,13 +243,19 @@ export class BrowserPool {
   async use<T>(fn: (page: Page) => Promise<T>): Promise<T> {
     const browser = await this.acquire();
     const page = await browser.newPage();
-    try { return await fn(page); }
-    finally { await page.close(); }
+    try {
+      return await fn(page);
+    } finally {
+      await page.close();
+    }
   }
 
   private async acquire(): Promise<Browser> {
     if (this.browsers.length < this.capacity) {
-      const b = await puppeteer.launch({ headless: 'new', args: ['--no-sandbox'] });
+      const b = await puppeteer.launch({
+        headless: 'new',
+        args: ['--no-sandbox'],
+      });
       this.browsers.push(b);
       return b;
     }

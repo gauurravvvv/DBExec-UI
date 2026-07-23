@@ -2,7 +2,7 @@
 
 > Implementation companion to research module 04. The query
 > processor is the single point that turns a `SemanticIntent`
-> (or a raw dataset SQL + filters) into the *exact bytes* sent
+> (or a raw dataset SQL + filters) into the _exact bytes_ sent
 > to a warehouse. It enforces RLS, applies the dialect's quirks,
 > binds parameters, and emits canonical SQL for the cache key.
 
@@ -100,34 +100,42 @@ rendering happens.
 
 ```typescript
 export interface Plan {
-  kind:    'query';
-  select:  SelectItem[];
-  from:    FromNode;             // tree of tables + joins
-  where:   ExprNode[];           // implicit AND
+  kind: 'query';
+  select: SelectItem[];
+  from: FromNode; // tree of tables + joins
+  where: ExprNode[]; // implicit AND
   groupBy: ColumnRef[];
-  having:  ExprNode[];
-  orderBy: Array<{ expr: ExprNode; dir: 'asc' | 'desc'; nulls?: 'first' | 'last' }>;
-  limit?:  number;
+  having: ExprNode[];
+  orderBy: Array<{
+    expr: ExprNode;
+    dir: 'asc' | 'desc';
+    nulls?: 'first' | 'last';
+  }>;
+  limit?: number;
   offset?: number;
-  cte?:    Array<{ name: string; plan: Plan }>;
-  hints?:  Record<string, unknown>;  // dialect-specific, e.g. { bq: { partitionFilter: '...' } }
+  cte?: Array<{ name: string; plan: Plan }>;
+  hints?: Record<string, unknown>; // dialect-specific, e.g. { bq: { partitionFilter: '...' } }
 }
 
 export interface SelectItem {
   alias: string;
-  expr:  ExprNode;
-  origin?: { kind: 'dim' | 'metric' | 'raw'; id?: string };  // for telemetry
+  expr: ExprNode;
+  origin?: { kind: 'dim' | 'metric' | 'raw'; id?: string }; // for telemetry
 }
 
 export type ExprNode =
-  | { type: 'col';    table: string; column: string; quoteOverride?: boolean }
-  | { type: 'lit';    value: string | number | boolean | null | Date; dataType?: string }
-  | { type: 'param';  name: string }
-  | { type: 'fn';     name: string; args: ExprNode[]; over?: WindowSpec }
-  | { type: 'cast';   inner: ExprNode; toType: string }
-  | { type: 'case';   when: Array<[ExprNode, ExprNode]>; else?: ExprNode }
-  | { type: 'op';     op: BinaryOp; left: ExprNode; right: ExprNode }
-  | { type: 'in';     left: ExprNode; values: ExprNode[]; negate?: boolean }
+  | { type: 'col'; table: string; column: string; quoteOverride?: boolean }
+  | {
+      type: 'lit';
+      value: string | number | boolean | null | Date;
+      dataType?: string;
+    }
+  | { type: 'param'; name: string }
+  | { type: 'fn'; name: string; args: ExprNode[]; over?: WindowSpec }
+  | { type: 'cast'; inner: ExprNode; toType: string }
+  | { type: 'case'; when: Array<[ExprNode, ExprNode]>; else?: ExprNode }
+  | { type: 'op'; op: BinaryOp; left: ExprNode; right: ExprNode }
+  | { type: 'in'; left: ExprNode; values: ExprNode[]; negate?: boolean }
   | { type: 'between'; expr: ExprNode; lo: ExprNode; hi: ExprNode }
   | { type: 'subquery'; plan: Plan };
 ```
@@ -142,14 +150,18 @@ dialect renderer is the only thing that produces strings.
 ```typescript
 export interface DialectAdapter {
   name: string;
-  quoteIdent(s: string): string;                                // identifiers
-  quoteString(s: string): string;                               // string literals
-  paramPlaceholder(name: string, position: number): string;     // $1, ?, @p1, etc.
-  renderFn(name: string, args: string[]): string | null;        // null = use default
+  quoteIdent(s: string): string; // identifiers
+  quoteString(s: string): string; // string literals
+  paramPlaceholder(name: string, position: number): string; // $1, ?, @p1, etc.
+  renderFn(name: string, args: string[]): string | null; // null = use default
   renderLimit(limit: number, offset: number | undefined): string;
   renderConcat(parts: string[]): string;
-  renderDateBucket(expr: string, bucket: TimeBucket): string;   // 'month' → DATE_TRUNC('month', …) etc.
-  renderPercentile(expr: string, p: number, method: 'discrete' | 'continuous'): string;
+  renderDateBucket(expr: string, bucket: TimeBucket): string; // 'month' → DATE_TRUNC('month', …) etc.
+  renderPercentile(
+    expr: string,
+    p: number,
+    method: 'discrete' | 'continuous',
+  ): string;
   renderApproxDistinct(expr: string): string;
   identifierCaseFolding: 'preserve' | 'upper' | 'lower';
   supportsFullOuter: boolean;
@@ -157,7 +169,7 @@ export interface DialectAdapter {
   supportsLateralJoin: boolean;
   maxIdentifierLength: number;
   defaultStringConcatOp: '||' | '+' | 'CONCAT';
-  hintsRenderer?(hints: Plan['hints']): string;                  // dialect-specific hint comments
+  hintsRenderer?(hints: Plan['hints']): string; // dialect-specific hint comments
 }
 ```
 
@@ -174,12 +186,12 @@ import { redshiftAdapter } from './redshift';
 import { databricksAdapter } from './databricks';
 
 export const adapters: Record<string, DialectAdapter> = {
-  postgres:   postgresAdapter,
-  mysql:      mysqlAdapter,
-  mssql:      mssqlAdapter,
-  bigquery:   bigqueryAdapter,
-  snowflake:  snowflakeAdapter,
-  redshift:   redshiftAdapter,
+  postgres: postgresAdapter,
+  mysql: mysqlAdapter,
+  mssql: mssqlAdapter,
+  bigquery: bigqueryAdapter,
+  snowflake: snowflakeAdapter,
+  redshift: redshiftAdapter,
   databricks: databricksAdapter,
 };
 
@@ -198,8 +210,8 @@ import { DialectAdapter } from '../types';
 
 export const postgresAdapter: DialectAdapter = {
   name: 'postgres',
-  quoteIdent: (s) => `"${s.replace(/"/g, '""')}"`,
-  quoteString: (s) => `'${s.replace(/'/g, "''")}'`,
+  quoteIdent: s => `"${s.replace(/"/g, '""')}"`,
+  quoteString: s => `'${s.replace(/'/g, "''")}'`,
   paramPlaceholder: (_n, pos) => `$${pos}`,
   renderFn: (name, args) => {
     // dialect-specific overrides; null falls back to FN(args...)
@@ -209,13 +221,13 @@ export const postgresAdapter: DialectAdapter = {
   },
   renderLimit: (limit, offset) =>
     offset != null ? `LIMIT ${limit} OFFSET ${offset}` : `LIMIT ${limit}`,
-  renderConcat: (parts) => parts.join(' || '),
+  renderConcat: parts => parts.join(' || '),
   renderDateBucket: (expr, bucket) => `DATE_TRUNC('${bucket}', ${expr})`,
   renderPercentile: (expr, p, method) =>
     method === 'discrete'
       ? `PERCENTILE_DISC(${p}) WITHIN GROUP (ORDER BY ${expr})`
       : `PERCENTILE_CONT(${p}) WITHIN GROUP (ORDER BY ${expr})`,
-  renderApproxDistinct: (expr) => `COUNT(DISTINCT ${expr})`, // pg has no native HLL in core
+  renderApproxDistinct: expr => `COUNT(DISTINCT ${expr})`, // pg has no native HLL in core
   identifierCaseFolding: 'lower',
   supportsFullOuter: true,
   supportsArrayAgg: true,
@@ -233,23 +245,25 @@ import { DialectAdapter } from '../types';
 
 export const bigqueryAdapter: DialectAdapter = {
   name: 'bigquery',
-  quoteIdent: (s) => `\`${s.replace(/`/g, '\\`')}\``,
-  quoteString: (s) => `'${s.replace(/\\/g, '\\\\').replace(/'/g, "\\'")}'`,
-  paramPlaceholder: (n) => `@${n}`,
+  quoteIdent: s => `\`${s.replace(/`/g, '\\`')}\``,
+  quoteString: s => `'${s.replace(/\\/g, '\\\\').replace(/'/g, "\\'")}'`,
+  paramPlaceholder: n => `@${n}`,
   renderFn: () => null,
   renderLimit: (limit, offset) =>
     offset != null ? `LIMIT ${limit} OFFSET ${offset}` : `LIMIT ${limit}`,
-  renderConcat: (parts) => `CONCAT(${parts.join(', ')})`,
-  renderDateBucket: (expr, bucket) => `TIMESTAMP_TRUNC(${expr}, ${bucket.toUpperCase()})`,
-  renderPercentile: (expr, p) => `APPROX_QUANTILES(${expr}, 100)[OFFSET(${Math.round(p * 100)})]`,
-  renderApproxDistinct: (expr) => `APPROX_COUNT_DISTINCT(${expr})`,
+  renderConcat: parts => `CONCAT(${parts.join(', ')})`,
+  renderDateBucket: (expr, bucket) =>
+    `TIMESTAMP_TRUNC(${expr}, ${bucket.toUpperCase()})`,
+  renderPercentile: (expr, p) =>
+    `APPROX_QUANTILES(${expr}, 100)[OFFSET(${Math.round(p * 100)})]`,
+  renderApproxDistinct: expr => `APPROX_COUNT_DISTINCT(${expr})`,
   identifierCaseFolding: 'preserve',
   supportsFullOuter: true,
   supportsArrayAgg: true,
-  supportsLateralJoin: false,         // UNNEST instead
+  supportsLateralJoin: false, // UNNEST instead
   maxIdentifierLength: 1024,
   defaultStringConcatOp: 'CONCAT',
-  hintsRenderer: (hints) => {
+  hintsRenderer: hints => {
     // Force a partition filter so we don't scan the universe
     if (hints?.bq && (hints.bq as any).partitionFilter) {
       return `-- partition filter: ${(hints.bq as any).partitionFilter}\n`;
@@ -274,7 +288,7 @@ to upper at IR-build time, so quotes pass through losslessly.
 
 `applyRls(plan, user)` is the single place the row-level
 security predicates get woven into the plan. It runs at IR
-time, *before* dialect rendering, so the adapter sees the same
+time, _before_ dialect rendering, so the adapter sees the same
 shape regardless of who's running the query.
 
 ```typescript
@@ -302,7 +316,7 @@ export async function applyRls(
 ```
 
 If RLS evaluates to "no rows" (e.g. user has no group membership
-for any rule on this dataset), we *don't* throw — we add `1 = 0`
+for any rule on this dataset), we _don't_ throw — we add `1 = 0`
 to WHERE. The dashboard renders empty, with the standard
 "No data accessible" placeholder. Throwing here would crash
 every dashboard for users with partial access.
@@ -315,7 +329,10 @@ Two semantically identical plans must produce identical SQL
 strings so the cache key (module 05) is stable.
 
 ```typescript
-export function canonicaliseSql(sql: string, params: ParamBinding[]): {
+export function canonicaliseSql(
+  sql: string,
+  params: ParamBinding[],
+): {
   canonical: string;
   hash: string;
 } {
@@ -380,18 +397,28 @@ const executeQuery = async (req: Request, res: Response) => {
   const startedAt = Date.now();
 
   try {
-    const datasource = await connection.getRepository('Datasource')
+    const datasource = await connection
+      .getRepository('Datasource')
       .findOne({ where: { id: datasourceId } });
     if (!datasource) {
       await master_db_connection.close();
-      return sendResponse(res, false, CODE.NOT_FOUND, QUERY_MSG.DATASOURCE_NOT_FOUND);
+      return sendResponse(
+        res,
+        false,
+        CODE.NOT_FOUND,
+        QUERY_MSG.DATASOURCE_NOT_FOUND,
+      );
     }
 
     const adapter = adapterFor(datasource.type);
     const user = await loadAuthUser(connection, loggedInId);
 
     // 1. IR
-    let plan = await buildPlan(intent, { connection, datasourceId, parameters });
+    let plan = await buildPlan(intent, {
+      connection,
+      datasourceId,
+      parameters,
+    });
     // 2. RLS
     plan = await applyRls(plan, user, { connection });
     // 3. Render
@@ -405,7 +432,9 @@ const executeQuery = async (req: Request, res: Response) => {
       if (cached) {
         await master_db_connection.close();
         return sendResponse(res, true, CODE.SUCCESS, QUERY_MSG.OK, {
-          ...cached, fromCache: true, queryHash: hash,
+          ...cached,
+          fromCache: true,
+          queryHash: hash,
         });
       }
     }
@@ -420,15 +449,25 @@ const executeQuery = async (req: Request, res: Response) => {
     // 7. Cache the result (TTL configurable, default 5 min)
     if (useCache) await cache.set(hash, result, { ttlSec: 300 });
 
-    Logger.info(JSON.stringify({
-      evt: 'query.execute', user_id: loggedInId, datasource: datasource.type,
-      compile_ms: 0, exec_ms: result.execMs, rows: result.rowCount,
-      total_ms: Date.now() - startedAt, cache: false, hash,
-    }));
+    Logger.info(
+      JSON.stringify({
+        evt: 'query.execute',
+        user_id: loggedInId,
+        datasource: datasource.type,
+        compile_ms: 0,
+        exec_ms: result.execMs,
+        rows: result.rowCount,
+        total_ms: Date.now() - startedAt,
+        cache: false,
+        hash,
+      }),
+    );
 
     await master_db_connection.close();
     sendResponse(res, true, CODE.SUCCESS, QUERY_MSG.OK, {
-      ...result, fromCache: false, queryHash: hash,
+      ...result,
+      fromCache: false,
+      queryHash: hash,
     });
   } catch (err: any) {
     Logger.error(`Query execute failed: ${err.message}`);
@@ -444,15 +483,15 @@ export default executeQuery;
 
 ## 8. Observability
 
-| Metric | Type | Labels | Purpose |
-|---|---|---|---|
-| `dbexec_query_compile_ms` | histogram | `dialect` | compile latency |
-| `dbexec_query_execute_ms` | histogram | `dialect`, `cache` | execute latency |
-| `dbexec_query_rows_returned` | histogram | `dialect` | row count distribution |
-| `dbexec_query_cache_hit_total` | counter | `dialect` | cache hit rate |
-| `dbexec_query_canceled_total` | counter | `reason` | timeouts, manual cancel |
-| `dbexec_query_failed_total` | counter | `dialect`, `code` | failures by SQLSTATE/code |
-| `dbexec_query_rls_predicates_added` | histogram | `dataset` | how many RLS rules per query |
+| Metric                              | Type      | Labels             | Purpose                      |
+| ----------------------------------- | --------- | ------------------ | ---------------------------- |
+| `dbexec_query_compile_ms`           | histogram | `dialect`          | compile latency              |
+| `dbexec_query_execute_ms`           | histogram | `dialect`, `cache` | execute latency              |
+| `dbexec_query_rows_returned`        | histogram | `dialect`          | row count distribution       |
+| `dbexec_query_cache_hit_total`      | counter   | `dialect`          | cache hit rate               |
+| `dbexec_query_canceled_total`       | counter   | `reason`           | timeouts, manual cancel      |
+| `dbexec_query_failed_total`         | counter   | `dialect`, `code`  | failures by SQLSTATE/code    |
+| `dbexec_query_rls_predicates_added` | histogram | `dataset`          | how many RLS rules per query |
 
 Tracing: a root span `query.execute` with child spans
 `query.build_plan`, `query.apply_rls`, `query.render`,
@@ -464,24 +503,25 @@ canonical SQL.
 
 ## 9. Security & threat model
 
-| Threat | Mitigation |
-|---|---|
-| SQL injection via filter value | All values bound as parameters; identifiers come from semantic IDs not user strings |
-| SQL injection via dataset SQL editor | Dataset SQL is parsed (sqlite-parser-style AST) on save; only SELECT statements with single statement (`;` rejected) allowed; `DROP`, `INSERT`, `UPDATE`, `DELETE`, `TRUNCATE`, `GRANT`, `ALTER` rejected |
-| RLS bypass via dataset SQL CTE that overrides table refs | RLS hook walks the parsed AST not the string; finds every relation reference regardless of CTE shadowing |
-| Cross-dialect smuggling (writing PG-specific syntax that runs on a customer's BQ) | IR is dialect-neutral; the renderer is the only place dialect appears |
-| Resource exhaustion via massive result | `maxRows` enforced at runner; on excess, return first N + `truncated: true` flag |
-| Long-running query DoS | Per-query timeout (configurable, default 60s); admin can cancel via `/cancel` |
-| Side-channel via execution time | All errors caught and normalised; users never see warehouse-internal error strings |
-| Connection pool exhaustion | Per-datasource pool with bounded size; queue with timeout when full |
-| Cost runaway on BQ / Snowflake | Module 27 cost observability dry-run gate; this module exposes the hook |
-| Stale RLS context (user role changed mid-session) | RLS resolved per-request, not cached across requests |
+| Threat                                                                            | Mitigation                                                                                                                                                                                                |
+| --------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| SQL injection via filter value                                                    | All values bound as parameters; identifiers come from semantic IDs not user strings                                                                                                                       |
+| SQL injection via dataset SQL editor                                              | Dataset SQL is parsed (sqlite-parser-style AST) on save; only SELECT statements with single statement (`;` rejected) allowed; `DROP`, `INSERT`, `UPDATE`, `DELETE`, `TRUNCATE`, `GRANT`, `ALTER` rejected |
+| RLS bypass via dataset SQL CTE that overrides table refs                          | RLS hook walks the parsed AST not the string; finds every relation reference regardless of CTE shadowing                                                                                                  |
+| Cross-dialect smuggling (writing PG-specific syntax that runs on a customer's BQ) | IR is dialect-neutral; the renderer is the only place dialect appears                                                                                                                                     |
+| Resource exhaustion via massive result                                            | `maxRows` enforced at runner; on excess, return first N + `truncated: true` flag                                                                                                                          |
+| Long-running query DoS                                                            | Per-query timeout (configurable, default 60s); admin can cancel via `/cancel`                                                                                                                             |
+| Side-channel via execution time                                                   | All errors caught and normalised; users never see warehouse-internal error strings                                                                                                                        |
+| Connection pool exhaustion                                                        | Per-datasource pool with bounded size; queue with timeout when full                                                                                                                                       |
+| Cost runaway on BQ / Snowflake                                                    | Module 27 cost observability dry-run gate; this module exposes the hook                                                                                                                                   |
+| Stale RLS context (user role changed mid-session)                                 | RLS resolved per-request, not cached across requests                                                                                                                                                      |
 
 ---
 
 ## 10. Operational runbook
 
 **Symptom: queries slow.**
+
 1. Pull `dbexec_query_execute_ms` p95 by dialect. Spike in one
    dialect = warehouse issue, not our compiler.
 2. Pull p95 by `cache=false`. If cache hit rate dropped, cache
@@ -490,11 +530,13 @@ canonical SQL.
    the audit log + run `EXPLAIN` against the source.
 
 **Symptom: cache hit rate falling.**
+
 1. Check `dbexec_query_canonical_diff_total` counter (added in
    v2) — counts cases where two plans differed only in
    whitespace or alias ordering. Spike = canonicaliser bug.
 
 **Symptom: customer reports "wrong rows".**
+
 1. Get the `queryHash` from the dashboard request — it's in
    every audit row.
 2. Look up canonical SQL.
@@ -502,6 +544,7 @@ canonical SQL.
    predicate the user didn't realise was applying.
 
 **Symptom: new dialect rolled out, errors on JOIN.**
+
 1. `supportsFullOuter` / `supportsLateralJoin` may be wrong on
    the adapter. Check Reference docs and flip the bool.
 2. Until fix: the IR builder degrades FULL OUTER to UNION ALL
@@ -511,15 +554,15 @@ canonical SQL.
 
 ## 11. Performance budget
 
-| Operation | p50 | p95 | Hard ceiling |
-|---|---|---|---|
-| buildPlan | 5 ms | 15 ms | 50 ms |
-| applyRls | 3 ms | 10 ms | 30 ms |
-| render | 1 ms | 5 ms | 20 ms |
-| canonicalise | 2 ms | 8 ms | 25 ms |
-| Total compile (above 4) | 15 ms | 50 ms | 150 ms |
-| Execute (depends on warehouse — track separately) | — | — | 60 s default |
-| Cache lookup | 1 ms | 5 ms | 50 ms |
+| Operation                                         | p50   | p95   | Hard ceiling |
+| ------------------------------------------------- | ----- | ----- | ------------ |
+| buildPlan                                         | 5 ms  | 15 ms | 50 ms        |
+| applyRls                                          | 3 ms  | 10 ms | 30 ms        |
+| render                                            | 1 ms  | 5 ms  | 20 ms        |
+| canonicalise                                      | 2 ms  | 8 ms  | 25 ms        |
+| Total compile (above 4)                           | 15 ms | 50 ms | 150 ms       |
+| Execute (depends on warehouse — track separately) | —     | —     | 60 s default |
+| Cache lookup                                      | 1 ms  | 5 ms  | 50 ms        |
 
 Cache hit rate target: 60% steady state on dashboard tile
 loads. Cold-start a new dashboard: 0% for first viewer, 90%+

@@ -99,8 +99,7 @@ export async function parseBundleFile(
   const parsed = migrationBundleSchema.safeParse(raw);
   if (!parsed.success) {
     // The Zod message IS an i18n key; surface the first issue.
-    const key =
-      parsed.error.issues[0]?.message ?? 'MIGRATION.INVALID_FILE';
+    const key = parsed.error.issues[0]?.message ?? 'MIGRATION.INVALID_FILE';
     throw new MigrationFileError(key);
   }
 

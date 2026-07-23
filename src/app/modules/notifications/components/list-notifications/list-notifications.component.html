@@ -50,7 +50,10 @@
           (click)="setStatus('unread')"
         >
           {{ 'NOTIFICATION.FILTER_UNREAD' | translate }}
-          <span class="segment-badge" *ngIf="notificationService.unreadCount() > 0">
+          <span
+            class="segment-badge"
+            *ngIf="notificationService.unreadCount() > 0"
+          >
             {{ notificationService.badgeLabel() }}
           </span>
         </button>
@@ -83,7 +86,9 @@
       <ng-container *ngIf="!loading() || filteredTotal() > 0">
         <ng-container *ngIf="filteredTotal() > 0; else emptyState">
           <div class="feed-scroll" (scroll)="onScroll($event)">
-            <ng-container *ngFor="let group of groups(); trackBy: trackByBucket">
+            <ng-container
+              *ngFor="let group of groups(); trackBy: trackByBucket"
+            >
               <div class="group-header">{{ group.label | translate }}</div>
               <ul class="notification-rows">
                 <li
@@ -96,16 +101,29 @@
                   <div
                     class="notification-icon"
                     [style.color]="accentFor(n.type)"
-                    [style.background]="'color-mix(in srgb, ' + accentFor(n.type) + ' 12%, transparent)'"
+                    [style.background]="
+                      'color-mix(in srgb, ' +
+                      accentFor(n.type) +
+                      ' 12%, transparent)'
+                    "
                   >
-                    <i class="pi" [ngClass]="iconFor(n.type)" aria-hidden="true"></i>
+                    <i
+                      class="pi"
+                      [ngClass]="iconFor(n.type)"
+                      aria-hidden="true"
+                    ></i>
                   </div>
                   <div class="notification-content">
-                    <div class="row-title">{{ titleKeyFor(n) | translate }}</div>
+                    <div class="row-title">
+                      {{ titleKeyFor(n) | translate }}
+                    </div>
                     <div class="row-message">
                       {{ bodyKeyFor(n) | translate: bodyParams(n) }}
                     </div>
-                    <span class="row-time" [title]="n.createdOn | date: 'medium'">
+                    <span
+                      class="row-time"
+                      [title]="n.createdOn | date: 'medium'"
+                    >
                       {{ n.createdOn | relativeTime }}
                     </span>
                   </div>
@@ -124,7 +142,9 @@
                     <button
                       type="button"
                       class="row-action"
-                      [attr.aria-label]="'HEADER.DELETE_NOTIFICATION' | translate"
+                      [attr.aria-label]="
+                        'HEADER.DELETE_NOTIFICATION' | translate
+                      "
                       [pTooltip]="'HEADER.DELETE_NOTIFICATION' | translate"
                       tooltipPosition="top"
                       (click)="onDelete($event, n)"
@@ -152,9 +172,16 @@
             <i class="pi pi-check-circle" aria-hidden="true"></i>
           </div>
           <p class="empty-state-title">
-            {{ (isStatus('unread') ? 'NOTIFICATION.EMPTY_UNREAD' : 'HEADER.ALL_CAUGHT_UP') | translate }}
+            {{
+              (isStatus('unread')
+                ? 'NOTIFICATION.EMPTY_UNREAD'
+                : 'HEADER.ALL_CAUGHT_UP'
+              ) | translate
+            }}
           </p>
-          <p class="empty-state-hint">{{ 'NOTIFICATION.EMPTY_HINT' | translate }}</p>
+          <p class="empty-state-hint">
+            {{ 'NOTIFICATION.EMPTY_HINT' | translate }}
+          </p>
         </div>
       </ng-template>
     </div>

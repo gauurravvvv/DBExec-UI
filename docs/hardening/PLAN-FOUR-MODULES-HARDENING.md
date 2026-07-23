@@ -54,11 +54,11 @@ starts until Week 0 closes.
 
 These were surfaced by the code-reads and are not abstract.
 
-| ID | File:line | Defect | Fix |
-|---|---|---|---|
-| **RLS-P0-1** | `shared/services/rlsResolver.service.ts:46` | If a user has zero RLS rules on a dataset, `resolveRlsFilters` returns `[]` → query runs unrestricted → user sees every row. Allow-by-default. | Replace with deny-by-default *opt-in per dataset*. New column `dataset.rls_default_policy` (`'allow' \| 'deny'`, default `'allow'` to preserve existing behaviour); after backfill, switch enforcement so that `deny` + zero rules returns `WHERE FALSE`. Log the decision in audit. |
-| **RLS-P1-1** | `shared/services/rlsResolver.service.ts:82` | `BETWEEN` rules get hard-mapped to `EQUALS` filter, silently dropping the numeric range. | Preserve the source operator through `AppliedFilter`. Add unit tests with all four operators × {string, numeric, date} value shapes. |
-| **RLS-P2-1** | `modules/queries/controllers/executeQuery.ts:50` & `modules/datasources/controllers/runQuery.ts:29` | Ad-hoc query endpoints execute raw SQL **without** invoking `resolveRlsFilters`. Anyone with the query-execute permission can `SELECT * FROM <sensitive_table>` and bypass RLS. | Two changes, both required: (a) gate these endpoints behind a new permission `datasource.rawSql` separate from `analysis.run`; (b) when the endpoint is used to populate prompt/filter values for a dataset, route through `resolveRlsFilters` exactly like the analysis path. |
+| ID           | File:line                                                                                           | Defect                                                                                                                                                                          | Fix                                                                                                                                                                                                                                                                                  |
+| ------------ | --------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **RLS-P0-1** | `shared/services/rlsResolver.service.ts:46`                                                         | If a user has zero RLS rules on a dataset, `resolveRlsFilters` returns `[]` → query runs unrestricted → user sees every row. Allow-by-default.                                  | Replace with deny-by-default _opt-in per dataset_. New column `dataset.rls_default_policy` (`'allow' \| 'deny'`, default `'allow'` to preserve existing behaviour); after backfill, switch enforcement so that `deny` + zero rules returns `WHERE FALSE`. Log the decision in audit. |
+| **RLS-P1-1** | `shared/services/rlsResolver.service.ts:82`                                                         | `BETWEEN` rules get hard-mapped to `EQUALS` filter, silently dropping the numeric range.                                                                                        | Preserve the source operator through `AppliedFilter`. Add unit tests with all four operators × {string, numeric, date} value shapes.                                                                                                                                                 |
+| **RLS-P2-1** | `modules/queries/controllers/executeQuery.ts:50` & `modules/datasources/controllers/runQuery.ts:29` | Ad-hoc query endpoints execute raw SQL **without** invoking `resolveRlsFilters`. Anyone with the query-execute permission can `SELECT * FROM <sensitive_table>` and bypass RLS. | Two changes, both required: (a) gate these endpoints behind a new permission `datasource.rawSql` separate from `analysis.run`; (b) when the endpoint is used to populate prompt/filter values for a dataset, route through `resolveRlsFilters` exactly like the analysis path.       |
 
 Each fix lands behind a feature flag (`rlsDenyByDefault`,
 `rlsOperatorFix`, `rawSqlPermissionEnforced`) so we can dark-launch
@@ -105,7 +105,7 @@ fix lands, the harness needs to work:
   - applies migrations OR runs `synchronize: true` against the empty DB;
   - exposes `withOrgConn(fn)` so a test gets a transaction-scoped
     shared-DB connection and a rollback at teardown.
-  This gives integration tests with real SQL and zero mock SQL strings.
+    This gives integration tests with real SQL and zero mock SQL strings.
 - **FE**: Angular tests already use Karma; raise the bar so a test must
   assert something (no more "should create" stubs). A trivial lint
   rule (`no-empty-it`) rejects empty `it()` blocks.
@@ -117,9 +117,11 @@ fix lands, the harness needs to work:
 
 `PgDatasourcePool` already accepts a `statement_timeout` — but the
 existing pool factory doesn't set it. Two-line fix at pool init:
+
 ```ts
 statement_timeout: cfg.statementTimeoutMs ?? 60_000,
 ```
+
 This is the single most important production-hardening change in the
 whole plan and it lands today. It defuses **DSH-H02** (runaway SQL
 hang) before we touch the rest.
@@ -127,8 +129,8 @@ hang) before we touch the rest.
 #### 0.2.5 Soft-delete cascade registry
 
 Lift the registry from BE-implementation doc § 0.6 into
-`src/shared/services/cascade.registry.ts` *with only the four modules
-wired* (dataset, analysis, dashboard, rls_rule). `precheckDelete()` is
+`src/shared/services/cascade.registry.ts` _with only the four modules
+wired_ (dataset, analysis, dashboard, rls_rule). `precheckDelete()` is
 called by every delete controller in the four modules. This kills the
 class of "zombie dashboard" / "orphan filter" bugs each agent surfaced.
 
@@ -197,7 +199,7 @@ isn't done until all of them are green.
    is re-queried on every preview. Add `dataset_introspection_cache`
    row (jsonb of `ColumnMeta[]` + ttl). Invalidate on dataset update
    and on a manual "refresh schema" button.
-6. **File upload pipeline** — *only* the slice that fixes a real defect:
+6. **File upload pipeline** — _only_ the slice that fixes a real defect:
    uploads exist in the gap list but DBExec has none today. Decision:
    the Dataset module ships **CSV-only** upload in W3 (see below). Skip
    xlsx / tus / URL fetch for now.
@@ -320,7 +322,7 @@ isn't done until all of them are green.
     "Re-map column" CTA that opens the field picker.
 13. **Parameters (the gap-list addition that actually unblocks
     something)** — wire the `analysis_parameter` table per
-    BE-implementation § 6.2. This is the *only* greenfield addition
+    BE-implementation § 6.2. This is the _only_ greenfield addition
     we pull into Analysis hardening because parameters are a
     prerequisite for snapshot-stable dashboards (next track).
 
@@ -411,9 +413,9 @@ isn't done until all of them are green.
     - "Apply / Reset" pair,
     - filter scope picker (which visuals each filter affects),
     - persisted URL state for filters.
-   This is the closest the dashboard module has to a P0 user pain
-   point and the work is described in
-   `docs/research/modules/07-filters-actions.md`.
+      This is the closest the dashboard module has to a P0 user pain
+      point and the work is described in
+      `docs/research/modules/07-filters-actions.md`.
 11. **Empty / error / loading states on the view page**:
     - explicit "no dashboards yet" empty card,
     - per-visual loading skeleton,
@@ -433,7 +435,7 @@ isn't done until all of them are green.
     - delete source analysis → dashboard list excludes,
     - statement-timeout → user sees clear error,
     - bulk delete → audit row exists.
-    ~15 specs.
+      ~15 specs.
 
 #### Exit criteria
 
@@ -553,9 +555,9 @@ When all four tracks signal exit-criteria-green:
    - analysis run,
    - dashboard render,
    - distinct-values for column with 1/100/10k cardinality.
-   Targets per your bar: P95 dashboard render < 2 s with snapshot
-   cache warm. Where we miss, the cache strategy from
-   BE-implementation § 5 lands now.
+     Targets per your bar: P95 dashboard render < 2 s with snapshot
+     cache warm. Where we miss, the cache strategy from
+     BE-implementation § 5 lands now.
 3. **Security review part 2**. Same reviewer, but now on the
    integrated system rather than module-by-module.
 4. **Observability sweep**. Wire OpenTelemetry per BE-implementation
@@ -576,16 +578,16 @@ When all four tracks signal exit-criteria-green:
 
 ## How this maps to your decisions
 
-| You picked | How the plan honours it |
-|---|---|
-| **All four quality bars** | Each track's exit criteria covers all four (functional ✓, hardening ✓, perf/UX ✓, tests/security ✓). |
+| You picked                             | How the plan honours it                                                                                                                                                                                                                                |
+| -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **All four quality bars**              | Each track's exit criteria covers all four (functional ✓, hardening ✓, perf/UX ✓, tests/security ✓).                                                                                                                                                   |
 | **Pull in gap features when relevant** | Pulled: deny-by-default RLS policy, column masking, test-as-user, parameters (for Analysis), CSV upload (for Dataset), statement timeout, cascade registry, audit hash chain. Deferred: live dashboards, semantic layer, NL-AI, embed JWT, scheduling. |
-| **Code-read first, plan in parallel** | This document is the output of a parallel code-read pass; every concrete defect is traceable to a file:line. |
-| **All four in parallel tracks** | Weeks 1–4 are four tracks, one prerequisite week (W0) for the foundation they share. |
+| **Code-read first, plan in parallel**  | This document is the output of a parallel code-read pass; every concrete defect is traceable to a file:line.                                                                                                                                           |
+| **All four in parallel tracks**        | Weeks 1–4 are four tracks, one prerequisite week (W0) for the foundation they share.                                                                                                                                                                   |
 
 ---
 
-## What we *don't* do in this phase
+## What we _don't_ do in this phase
 
 Listed explicitly so we can defend scope creep:
 
@@ -595,7 +597,7 @@ Listed explicitly so we can defend scope creep:
   feature, not a bug. Live-mode is a downstream feature whose work
   starts after this phase.
 - **No new visualisations**. The 73 (or 86) we have are enough. We
-  *verify* every existing one as part of Analysis Track W4.
+  _verify_ every existing one as part of Analysis Track W4.
 - **No public REST API / OpenAPI / SDK / embed**. Save for the
   next phase.
 - **No mobile-app shell / PWA / web-push**. The mobile-responsive
@@ -606,13 +608,13 @@ Listed explicitly so we can defend scope creep:
 
 ## Risk register
 
-| Risk | Likelihood | Mitigation |
-|---|---|---|
-| RLS deny-by-default rollout breaks existing customer dashboards | High | Per-dataset opt-in, default `'allow'`, scheduled communication to admins, dry-run preview before enable. |
-| Typing `config` JSONB exposes bad shapes already in prod | Medium | Migration scans every row, logs invalid shapes to a triage table; UI surfaces them as "republish required". |
-| Statement timeout cuts off a legitimately-slow query | Low | Per-dataset override (`statement_timeout_ms` column); admin can raise it. |
-| Test harness flake on Postgres testcontainer | Medium | Pin image, use deterministic seeds, retry-once + report. |
-| One track blocks another | Low (parallel by design) | Daily 10-minute sync; the four tracks share only the foundation, not features. |
+| Risk                                                            | Likelihood               | Mitigation                                                                                                  |
+| --------------------------------------------------------------- | ------------------------ | ----------------------------------------------------------------------------------------------------------- |
+| RLS deny-by-default rollout breaks existing customer dashboards | High                     | Per-dataset opt-in, default `'allow'`, scheduled communication to admins, dry-run preview before enable.    |
+| Typing `config` JSONB exposes bad shapes already in prod        | Medium                   | Migration scans every row, logs invalid shapes to a triage table; UI surfaces them as "republish required". |
+| Statement timeout cuts off a legitimately-slow query            | Low                      | Per-dataset override (`statement_timeout_ms` column); admin can raise it.                                   |
+| Test harness flake on Postgres testcontainer                    | Medium                   | Pin image, use deterministic seeds, retry-once + report.                                                    |
+| One track blocks another                                        | Low (parallel by design) | Daily 10-minute sync; the four tracks share only the foundation, not features.                              |
 
 ---
 

@@ -249,7 +249,9 @@
       color var(--motion-fast) ease,
       opacity var(--motion-fast) ease;
 
-    i { font-size: var(--fs-control); }
+    i {
+      font-size: var(--fs-control);
+    }
 
     &:hover:not(:disabled) {
       background: var(--hover-background);
@@ -280,7 +282,10 @@
     font-size: var(--fs-control);
     font-weight: var(--fw-medium);
 
-    i { font-size: var(--fs-control); flex-shrink: 0; }
+    i {
+      font-size: var(--fs-control);
+      flex-shrink: 0;
+    }
 
     &.success {
       color: var(--success-color);

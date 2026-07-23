@@ -94,14 +94,59 @@ export class ListSavedQueriesComponent implements OnInit, OnDestroy {
   private buildColumns(): CustomTableColumn[] {
     const t = (k: string) => this.translate.instant(k);
     return [
-      { colId: 'name', field: 'name', header: t('COMMON.NAME'), width: '220px', frozen: true, filter: 'text' },
-      { colId: 'description', field: 'description', header: t('COMMON.DESCRIPTION'), width: '260px', sortable: false },
-      { colId: 'datasource', field: 'datasourceName', header: t('COMMON.DATASOURCE'), width: '170px' },
-      { colId: 'connection', field: 'connectionName', header: t('QUERY_RUNNER.STEP_CONNECTION'), width: '170px', sortable: false },
-      { colId: 'rowLimit', field: 'rowLimit', header: t('QUERY_RUNNER.ROW_LIMIT'), width: '110px', sortable: false },
-      { colId: 'lastRun', field: 'lastRunAt', header: t('QUERY_RUNNER.LAST_RUN'), width: '150px' },
-      { colId: 'updated', field: 'updatedOn', header: t('QUERY_RUNNER.UPDATED'), width: '150px' },
-      { colId: 'actions', header: t('COMMON.ACTIONS'), width: '110px', sortable: false },
+      {
+        colId: 'name',
+        field: 'name',
+        header: t('COMMON.NAME'),
+        width: '220px',
+        frozen: true,
+        filter: 'text',
+      },
+      {
+        colId: 'description',
+        field: 'description',
+        header: t('COMMON.DESCRIPTION'),
+        width: '260px',
+        sortable: false,
+      },
+      {
+        colId: 'datasource',
+        field: 'datasourceName',
+        header: t('COMMON.DATASOURCE'),
+        width: '170px',
+      },
+      {
+        colId: 'connection',
+        field: 'connectionName',
+        header: t('QUERY_RUNNER.STEP_CONNECTION'),
+        width: '170px',
+        sortable: false,
+      },
+      {
+        colId: 'rowLimit',
+        field: 'rowLimit',
+        header: t('QUERY_RUNNER.ROW_LIMIT'),
+        width: '110px',
+        sortable: false,
+      },
+      {
+        colId: 'lastRun',
+        field: 'lastRunAt',
+        header: t('QUERY_RUNNER.LAST_RUN'),
+        width: '150px',
+      },
+      {
+        colId: 'updated',
+        field: 'updatedOn',
+        header: t('QUERY_RUNNER.UPDATED'),
+        width: '150px',
+      },
+      {
+        colId: 'actions',
+        header: t('COMMON.ACTIONS'),
+        width: '110px',
+        sortable: false,
+      },
     ];
   }
 
@@ -125,7 +170,10 @@ export class ListSavedQueriesComponent implements OnInit, OnDestroy {
           .then(res => {
             const rows = res?.status ? (res.data?.queries ?? []) : [];
             this.queries = rows; // keep for any template refs
-            return { rows, total: res?.data?.count ?? res?.data?.total ?? rows.length };
+            return {
+              rows,
+              total: res?.data?.count ?? res?.data?.total ?? rows.length,
+            };
           }),
       unwrap: (res: any) => ({ rows: res.rows, total: res.total }),
       sortFieldMap: {

@@ -80,7 +80,12 @@ export class KpiCardComponent implements OnChanges {
     // Sparkline trend over the date dimension (when configured).
     const dateColumn: string | null = cfg.dateColumn ?? null;
     if (dateColumn && rows.length > 0) {
-      this.trend = this.analytics.buildTrend(rows, measure, aggregate, dateColumn);
+      this.trend = this.analytics.buildTrend(
+        rows,
+        measure,
+        aggregate,
+        dateColumn,
+      );
     } else {
       this.trend = [];
     }
@@ -105,11 +110,9 @@ export class KpiCardComponent implements OnChanges {
     }
 
     // Target badge (independent of compare) — matches prior inline behaviour.
-    const target =
-      typeof cfg.targetValue === 'number' ? cfg.targetValue : null;
+    const target = typeof cfg.targetValue === 'number' ? cfg.targetValue : null;
     if (target !== null) {
-      const pct =
-        target !== 0 ? ((raw - target) / Math.abs(target)) * 100 : 0;
+      const pct = target !== 0 ? ((raw - target) / Math.abs(target)) * 100 : 0;
       this.targetText = `${this.translate.instant('ANALYSES.KPI.TARGET')}: ${this.formatValue(
         target,
         cfg.format,

@@ -115,10 +115,9 @@ export class DashboardService {
       const res: any = await lastValueFrom(
         // GET /dashboards/:id/render
         this.http
-          .apiGet(
-            DASHBOARD.RENDER_PREFIX + id + DASHBOARD.RENDER_SUFFIX,
-            { skipLoader: true },
-          )
+          .apiGet(DASHBOARD.RENDER_PREFIX + id + DASHBOARD.RENDER_SUFFIX, {
+            skipLoader: true,
+          })
           .pipe(takeUntil(this._cancelReads$)),
       );
       if (res?.status) this._rendered.set(res.data);

@@ -75,7 +75,10 @@
             [disabled]="testInFlight()"
             (click)="onTestConnection()"
           >
-            <i class="pi" [ngClass]="testInFlight() ? 'pi-spin pi-spinner' : 'pi-bolt'"></i>
+            <i
+              class="pi"
+              [ngClass]="testInFlight() ? 'pi-spin pi-spinner' : 'pi-bolt'"
+            ></i>
             {{ 'DATASOURCE.TEST_CONNECTION' | translate }}
           </button>
           <button
@@ -94,7 +97,10 @@
             [disabled]="isDeleting(dbId)"
             (click)="confirmDelete()"
           >
-            <i class="pi" [ngClass]="isDeleting(dbId) ? 'pi-spin pi-spinner' : 'pi-trash'"></i>
+            <i
+              class="pi"
+              [ngClass]="isDeleting(dbId) ? 'pi-spin pi-spinner' : 'pi-trash'"
+            ></i>
             {{ 'COMMON.DELETE' | translate }}
           </button>
         </div>
@@ -191,7 +197,9 @@
           </h3>
         </div>
         <div class="card-content">
-          <ng-container *ngIf="!usageLoading() && usage(); else usageLoadingTpl">
+          <ng-container
+            *ngIf="!usageLoading() && usage(); else usageLoadingTpl"
+          >
             <div class="usage-grid">
               <div class="usage-card">
                 <div class="usage-value">{{ usage()?.datasets }}</div>
@@ -248,7 +256,10 @@
         </div>
         <div class="card-content">
           <ng-container *ngIf="!activityLoading(); else activityLoadingTpl">
-            <ul class="activity-list" *ngIf="activity().length > 0; else activityEmpty">
+            <ul
+              class="activity-list"
+              *ngIf="activity().length > 0; else activityEmpty"
+            >
               <li
                 class="activity-row"
                 *ngFor="let event of activity(); trackBy: trackByEventId"
@@ -262,7 +273,10 @@
                     <span class="activity-actor">· {{ event.actorName }}</span>
                   </div>
                   <div class="activity-meta">
-                    <span class="activity-time" [title]="event.at | date: 'medium'">
+                    <span
+                      class="activity-time"
+                      [title]="event.at | date: 'medium'"
+                    >
                       {{ event.at | relativeTime }}
                     </span>
                     <span
@@ -319,7 +333,9 @@
       <ul class="delete-info-list">
         <li>
           <i class="pi pi-info-circle"></i>
-          <span>{{ 'DATASOURCE.DELETE_INFO_ASSOCIATED_DATA' | translate }}</span>
+          <span>{{
+            'DATASOURCE.DELETE_INFO_ASSOCIATED_DATA' | translate
+          }}</span>
         </li>
         <li>
           <i class="pi pi-info-circle"></i>
@@ -358,7 +374,10 @@
         (click)="proceedDelete()"
         [disabled]="!deleteJustification.trim() || isDeleting(dbId)"
       >
-        <i class="pi" [ngClass]="isDeleting(dbId) ? 'pi-spin pi-spinner' : 'pi-trash'"></i>
+        <i
+          class="pi"
+          [ngClass]="isDeleting(dbId) ? 'pi-spin pi-spinner' : 'pi-trash'"
+        ></i>
         {{ 'COMMON.DELETE' | translate }}
       </button>
     </div>

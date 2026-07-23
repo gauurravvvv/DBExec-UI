@@ -194,7 +194,8 @@ export class AnalysisWidgetEditorComponent
       this.kpiLabel = k.label || '';
       this.kpiFormat = k.format || 'number';
       this.kpiComparePeriod = k.comparePeriod || '';
-      this.kpiTargetValue = typeof k.targetValue === 'number' ? k.targetValue : null;
+      this.kpiTargetValue =
+        typeof k.targetValue === 'number' ? k.targetValue : null;
       this.kpiDateColumn = k.dateColumn || '';
       this.kpiCompareMode = k.compareMode || '';
     }
@@ -224,8 +225,10 @@ export class AnalysisWidgetEditorComponent
       label: this.kpiLabel.trim(),
       format: this.kpiFormat,
     };
-    if (this.kpiComparePeriod.trim()) cfg.comparePeriod = this.kpiComparePeriod.trim();
-    if (typeof this.kpiTargetValue === 'number') cfg.targetValue = this.kpiTargetValue;
+    if (this.kpiComparePeriod.trim())
+      cfg.comparePeriod = this.kpiComparePeriod.trim();
+    if (typeof this.kpiTargetValue === 'number')
+      cfg.targetValue = this.kpiTargetValue;
     if (this.kpiDateColumn) cfg.dateColumn = this.kpiDateColumn;
     if (this.kpiCompareMode) {
       cfg.compareMode = this.kpiCompareMode as KpiWidgetConfig['compareMode'];
@@ -253,8 +256,8 @@ export class AnalysisWidgetEditorComponent
         });
       }
       if (this.globalService.handleSuccessService(res, true)) {
-        const saved: AnalysisWidget =
-          res?.data?.widget ?? res?.data ?? {
+        const saved: AnalysisWidget = res?.data?.widget ??
+          res?.data ?? {
             id: this.editingWidget?.id ?? '',
             analysisId: this.analysisId,
             widgetType: this.widgetType,

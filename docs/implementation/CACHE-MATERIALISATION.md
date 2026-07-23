@@ -38,20 +38,20 @@ The hard parts:
 
 ```typescript
 function cacheKey(args: {
-  canonicalSql: string;             // from query processor canonicaliser
-  paramValues: any[];                // bound values in stable order
-  rlsRuleIds: string[];              // sorted ascending
-  rlsParamValues: any[];             // values bound by RLS predicates
+  canonicalSql: string; // from query processor canonicaliser
+  paramValues: any[]; // bound values in stable order
+  rlsRuleIds: string[]; // sorted ascending
+  rlsParamValues: any[]; // values bound by RLS predicates
   semanticModelVersion: string | null;
   datasetVersion: string;
 }): string {
   const payload = JSON.stringify({
     sql: args.canonicalSql,
-    p:   args.paramValues,
-    r:   args.rlsRuleIds,
-    rp:  args.rlsParamValues,
-    sm:  args.semanticModelVersion,
-    dv:  args.datasetVersion,
+    p: args.paramValues,
+    r: args.rlsRuleIds,
+    rp: args.rlsParamValues,
+    sm: args.semanticModelVersion,
+    dv: args.datasetVersion,
   });
   return `qc:${sha256(payload).toString('hex').slice(0, 32)}`;
 }
@@ -74,10 +74,10 @@ Why each piece:
 
 Two tiers:
 
-| Tier | Store | TTL | Purpose |
-|---|---|---|---|
-| L1 (process) | In-memory LRU (per API instance) | 60 s | Bursty repeat reads from the same instance |
-| L2 (shared) | Redis | configurable per result (default 5 min) | Cross-instance + cross-user sharing |
+| Tier         | Store                            | TTL                                     | Purpose                                    |
+| ------------ | -------------------------------- | --------------------------------------- | ------------------------------------------ |
+| L1 (process) | In-memory LRU (per API instance) | 60 s                                    | Bursty repeat reads from the same instance |
+| L2 (shared)  | Redis                            | configurable per result (default 5 min) | Cross-instance + cross-user sharing        |
 
 ```typescript
 // src/services/cache/queryCache.ts
@@ -101,7 +101,11 @@ export async function getCache(key: string): Promise<CachedResult | null> {
   return null;
 }
 
-export async function setCache(key: string, value: CachedResult, ttlSec = 300): Promise<void> {
+export async function setCache(
+  key: string,
+  value: CachedResult,
+  ttlSec = 300,
+): Promise<void> {
   l1.set(key, value);
   await redis.set(`cache:${key}`, JSON.stringify(value), 'EX', ttlSec);
 }
@@ -143,7 +147,9 @@ export async function getOrCompute(
     // Release lock if we still hold it
     await redis.eval(
       `if redis.call("get", KEYS[1]) == ARGV[1] then return redis.call("del", KEYS[1]) else return 0 end`,
-      1, lockKey, lockToken,
+      1,
+      lockKey,
+      lockToken,
     );
   }
 }
@@ -158,16 +164,22 @@ unique key in a 30-second window.
 
 ```typescript
 // Hooks
-export async function invalidateOnDatasetWrite(datasetId: string): Promise<void> {
+export async function invalidateOnDatasetWrite(
+  datasetId: string,
+): Promise<void> {
   // Bump dataset version; all keys baked with the old version naturally expire.
   // (We don't scan/delete — that's expensive at scale.)
-  await connection.getRepository('Dataset').update({ id: datasetId },
-    { cacheVersion: () => 'gen_random_uuid()' });
+  await connection
+    .getRepository('Dataset')
+    .update({ id: datasetId }, { cacheVersion: () => 'gen_random_uuid()' });
 }
 
-export async function invalidateOnSemanticPublish(modelId: string): Promise<void> {
-  await connection.getRepository('SemanticModel').update({ id: modelId },
-    { cacheVersion: () => 'gen_random_uuid()' });
+export async function invalidateOnSemanticPublish(
+  modelId: string,
+): Promise<void> {
+  await connection
+    .getRepository('SemanticModel')
+    .update({ id: modelId }, { cacheVersion: () => 'gen_random_uuid()' });
 }
 ```
 
@@ -179,7 +191,7 @@ TTL. Accepted.
 Hard invalidate (admin-triggered):
 
 ```typescript
-POST /admin/cache/purge
+POST / admin / cache / purge;
 // scans cache:* and deletes; gated by org-admin role; rate-limited
 ```
 
@@ -228,7 +240,9 @@ const cacheStats = async (req: Request, res: Response) => {
     await master_db_connection.close();
     sendResponse(res, true, CODE.SUCCESS, CACHE_MSG.OK, {
       keyspaceSize: dbsize,
-      hitRate: parseRedisInfo(info).keyspace_hits / parseRedisInfo(info).keyspace_misses,
+      hitRate:
+        parseRedisInfo(info).keyspace_hits /
+        parseRedisInfo(info).keyspace_misses,
       samples: sampleKeys[1].length,
     });
   } catch (err: any) {
@@ -243,15 +257,15 @@ const cacheStats = async (req: Request, res: Response) => {
 
 ## 7. Observability
 
-| Metric | Type | Labels | Purpose |
-|---|---|---|---|
-| `dbexec_cache_hit_total` | counter | `tier` (l1/l2), `kind` | hit rate per tier |
-| `dbexec_cache_miss_total` | counter | `kind` | miss rate |
-| `dbexec_cache_set_total` | counter | `kind`, `outcome` | writes |
-| `dbexec_cache_stampede_lock_acquired_total` | counter | — | single-flight effectiveness |
-| `dbexec_cache_stampede_lock_failed_total` | counter | — | concurrent compute attempts |
-| `dbexec_cache_size_bytes` | gauge | — | Redis memory |
-| `dbexec_cache_ttl_seconds` | histogram | `kind` | TTL distribution |
+| Metric                                      | Type      | Labels                 | Purpose                     |
+| ------------------------------------------- | --------- | ---------------------- | --------------------------- |
+| `dbexec_cache_hit_total`                    | counter   | `tier` (l1/l2), `kind` | hit rate per tier           |
+| `dbexec_cache_miss_total`                   | counter   | `kind`                 | miss rate                   |
+| `dbexec_cache_set_total`                    | counter   | `kind`, `outcome`      | writes                      |
+| `dbexec_cache_stampede_lock_acquired_total` | counter   | —                      | single-flight effectiveness |
+| `dbexec_cache_stampede_lock_failed_total`   | counter   | —                      | concurrent compute attempts |
+| `dbexec_cache_size_bytes`                   | gauge     | —                      | Redis memory                |
+| `dbexec_cache_ttl_seconds`                  | histogram | `kind`                 | TTL distribution            |
 
 Target hit rate: 60% steady-state on dashboard tile reads.
 
@@ -259,32 +273,35 @@ Target hit rate: 60% steady-state on dashboard tile reads.
 
 ## 8. Security & threat model
 
-| Threat | Mitigation |
-|---|---|
-| Cross-user data leak via missing RLS in key | RLS rule IDs + rule param values part of the key; rls hook required before cache lookup |
-| Cache poisoning by malicious payload | Cache writes only from server-side after successful query; clients can't influence value |
-| Redis exposure | Network-isolated; AUTH required; TLS on the wire if cross-VPC |
-| Stale data after admin RLS change | Admin endpoint invalidates by bumping rule version; alternative: ACL-change hook |
-| OOM via huge result cached | Per-entry size cap (default 5 MB); larger results bypass cache |
-| Stampede lock held forever | 30s TTL on lock; lua-eval check-and-delete prevents wrong release |
-| Tampered cache entry | We trust Redis; signature on payload optional (overkill for most orgs) |
+| Threat                                      | Mitigation                                                                               |
+| ------------------------------------------- | ---------------------------------------------------------------------------------------- |
+| Cross-user data leak via missing RLS in key | RLS rule IDs + rule param values part of the key; rls hook required before cache lookup  |
+| Cache poisoning by malicious payload        | Cache writes only from server-side after successful query; clients can't influence value |
+| Redis exposure                              | Network-isolated; AUTH required; TLS on the wire if cross-VPC                            |
+| Stale data after admin RLS change           | Admin endpoint invalidates by bumping rule version; alternative: ACL-change hook         |
+| OOM via huge result cached                  | Per-entry size cap (default 5 MB); larger results bypass cache                           |
+| Stampede lock held forever                  | 30s TTL on lock; lua-eval check-and-delete prevents wrong release                        |
+| Tampered cache entry                        | We trust Redis; signature on payload optional (overkill for most orgs)                   |
 
 ---
 
 ## 9. Runbook
 
 **Symptom: cache hit rate low (< 30%).**
+
 1. Check key cardinality. Too many users with distinct RLS
    attribute values = cache effectively per-user.
 2. Promote hot aggregations to materialised views.
 
 **Symptom: redis memory growth.**
+
 1. TTLs too long? Default 5 min; some org may have configured 1
    hour. Tune.
 2. Single-entry huge? `dbexec_cache_size_bytes` histogram
    shows distribution.
 
 **Symptom: stale data after a metric change.**
+
 1. Did the model publish bump `cacheVersion`? Check the publish
    controller's audit row.
 
@@ -292,13 +309,13 @@ Target hit rate: 60% steady-state on dashboard tile reads.
 
 ## 10. Perf budget
 
-| Operation | p50 | p95 | Hard ceiling |
-|---|---|---|---|
-| L1 lookup | < 1 ms | 1 ms | 5 ms |
-| L2 lookup (Redis) | 2 ms | 10 ms | 50 ms |
-| L2 write | 3 ms | 15 ms | 100 ms |
-| Stampede wait | 200 ms | 2 s | 30 s |
-| Materialised refresh (10M rows) | depends | depends | 10 min |
+| Operation                       | p50     | p95     | Hard ceiling |
+| ------------------------------- | ------- | ------- | ------------ |
+| L1 lookup                       | < 1 ms  | 1 ms    | 5 ms         |
+| L2 lookup (Redis)               | 2 ms    | 10 ms   | 50 ms        |
+| L2 write                        | 3 ms    | 15 ms   | 100 ms       |
+| Stampede wait                   | 200 ms  | 2 s     | 30 s         |
+| Materialised refresh (10M rows) | depends | depends | 10 min       |
 
 ---
 

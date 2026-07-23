@@ -77,9 +77,7 @@ export class ViewProfileComponent implements OnInit, OnDestroy {
    * `roleNames` (older payloads), then to empty.
    */
   get roleLabel(): string {
-    const p = this.profile() as
-      | { role?: string; roleNames?: string[] }
-      | null;
+    const p = this.profile() as { role?: string; roleNames?: string[] } | null;
     if (!p) return '';
     if (Array.isArray(p.roleNames) && p.roleNames.length > 0) {
       return p.roleNames.join(', ');

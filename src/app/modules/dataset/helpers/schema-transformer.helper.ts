@@ -120,25 +120,21 @@ export class SchemaTransformerHelper {
     const schemas: SchemaGroup[] = schemasData.map(
       (schemaData): SchemaGroup => ({
         name: schemaData.schema_name || 'public',
-        tables: (schemaData.tables ?? []).map(
-          (tableData): TableSchema => ({
-            name: tableData.table_name,
-            alias: tableData.table_alias,
-            columns: (tableData.columns ?? []).map(
-              (col): TableColumn => ({
-                name: col.name,
-                type: col.type,
-                nullable: col.nullable === true,
-                defaultValue: col.default_value ?? null,
-                isPrimaryKey: col.is_primary_key === true,
-                isForeignKey: col.is_foreign_key === true,
-                foreignKeySchema: col.foreign_key_schema ?? undefined,
-                foreignKeyTable: col.foreign_key_table ?? undefined,
-                foreignKeyColumn: col.foreign_key_column ?? undefined,
-              }),
-            ),
-          }),
-        ),
+        tables: (schemaData.tables ?? []).map((tableData): TableSchema => ({
+          name: tableData.table_name,
+          alias: tableData.table_alias,
+          columns: (tableData.columns ?? []).map((col): TableColumn => ({
+            name: col.name,
+            type: col.type,
+            nullable: col.nullable === true,
+            defaultValue: col.default_value ?? null,
+            isPrimaryKey: col.is_primary_key === true,
+            isForeignKey: col.is_foreign_key === true,
+            foreignKeySchema: col.foreign_key_schema ?? undefined,
+            foreignKeyTable: col.foreign_key_table ?? undefined,
+            foreignKeyColumn: col.foreign_key_column ?? undefined,
+          })),
+        })),
       }),
     );
 
@@ -277,13 +273,11 @@ export class SchemaTransformerHelper {
       ? response
       : (response?.data ?? []);
 
-    return tablesData.map(
-      (t): TableSchema => ({
-        name: t.table_name,
-        alias: t.table_alias,
-        columns: [], // populated lazily on column expand
-      }),
-    );
+    return tablesData.map((t): TableSchema => ({
+      name: t.table_name,
+      alias: t.table_alias,
+      columns: [], // populated lazily on column expand
+    }));
   }
 
   /**
@@ -310,13 +304,11 @@ export class SchemaTransformerHelper {
         }[],
   ): TableColumn[] {
     const rows = Array.isArray(response) ? response : (response?.data ?? []);
-    return rows.map(
-      (c): TableColumn => ({
-        name: c.column_name,
-        type: c.data_type,
-        nullable: c.is_nullable === true || c.is_nullable === 'YES',
-        defaultValue: c.column_default ?? null,
-      }),
-    );
+    return rows.map((c): TableColumn => ({
+      name: c.column_name,
+      type: c.data_type,
+      nullable: c.is_nullable === true || c.is_nullable === 'YES',
+      defaultValue: c.column_default ?? null,
+    }));
   }
 }

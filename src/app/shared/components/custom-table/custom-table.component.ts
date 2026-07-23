@@ -162,7 +162,10 @@ export class CustomTableComponent
       this.restorePrefs();
       // Keep the adapter's page size in sync with the table's fetch size so
       // each scroll batch matches what the BE returns.
-      if (this.serverAdapter && this.serverAdapter.limit() !== this.cfg.pageSize) {
+      if (
+        this.serverAdapter &&
+        this.serverAdapter.limit() !== this.cfg.pageSize
+      ) {
         this.serverAdapter.setLimit(this.cfg.pageSize);
       }
     }
@@ -422,7 +425,11 @@ export class CustomTableComponent
   private buildExportMenu(): void {
     this.exportMenuItems = [
       { label: 'CSV', icon: 'pi pi-file', command: () => this.export('csv') },
-      { label: 'Excel', icon: 'pi pi-file-excel', command: () => this.export('xls') },
+      {
+        label: 'Excel',
+        icon: 'pi pi-file-excel',
+        command: () => this.export('xls'),
+      },
     ];
   }
 
@@ -441,7 +448,8 @@ export class CustomTableComponent
     const csv = [header, ...body]
       .map(line => line.map(esc).join(','))
       .join('\n');
-    const mime = ext === 'csv' ? 'text/csv;charset=utf-8;' : 'application/vnd.ms-excel';
+    const mime =
+      ext === 'csv' ? 'text/csv;charset=utf-8;' : 'application/vnd.ms-excel';
     const url = URL.createObjectURL(new Blob([csv], { type: mime }));
     const a = document.createElement('a');
     a.href = url;

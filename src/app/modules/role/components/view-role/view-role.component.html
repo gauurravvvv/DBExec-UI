@@ -103,11 +103,17 @@
           >
             <div class="grid-module">
               <div class="grid-row grid-row--module" role="row">
-                <div class="grid-cell grid-cell--label grid-cell--module" role="rowheader">
+                <div
+                  class="grid-cell grid-cell--label grid-cell--module"
+                  role="rowheader"
+                >
                   <i *ngIf="module.icon" class="pi" [ngClass]="module.icon"></i>
                   {{ module.name }}
                 </div>
-                <div class="grid-cell grid-cell--level" aria-hidden="true"></div>
+                <div
+                  class="grid-cell grid-cell--level"
+                  aria-hidden="true"
+                ></div>
               </div>
 
               <div class="grid-children">
@@ -116,7 +122,10 @@
                   role="row"
                   *ngFor="let leaf of module.submodules; trackBy: trackByLeafId"
                 >
-                  <div class="grid-cell grid-cell--label grid-cell--leaf" role="rowheader">
+                  <div
+                    class="grid-cell grid-cell--label grid-cell--leaf"
+                    role="rowheader"
+                  >
                     {{ leaf.name }}
                   </div>
                   <div class="grid-cell grid-cell--level" role="gridcell">

@@ -22,7 +22,9 @@
                 : 'info'
           "
         >
-          {{ 'ALERTS.SEVERITY_' + (current()!.severity | uppercase) | translate }}
+          {{
+            'ALERTS.SEVERITY_' + (current()!.severity | uppercase) | translate
+          }}
         </app-chip>
       </div>
       <div class="header-actions" *ngIf="current()">
@@ -35,7 +37,9 @@
             (isFavourite() ? 'FAVOURITE.REMOVE' : 'FAVOURITE.ADD') | translate
           "
           tooltipPosition="bottom"
-          [title]="(isFavourite() ? 'FAVOURITE.REMOVE' : 'FAVOURITE.ADD') | translate"
+          [title]="
+            (isFavourite() ? 'FAVOURITE.REMOVE' : 'FAVOURITE.ADD') | translate
+          "
           (clicked)="toggleFavourite()"
         ></app-button>
         <app-button
@@ -56,7 +60,10 @@
           [disabled]="saving()"
           (clicked)="onToggle()"
         >
-          {{ (current()!.enabled ? 'ALERTS.DISABLE' : 'ALERTS.ENABLE') | translate }}
+          {{
+            (current()!.enabled ? 'ALERTS.DISABLE' : 'ALERTS.ENABLE')
+              | translate
+          }}
         </app-button>
         <app-button
           *hasPermission="'alertManagement'; level: 'write'"
@@ -129,7 +136,10 @@
         <div class="details-grid">
           <!-- Basic -->
           <div class="info-section">
-            <h3><i class="pi pi-info-circle mr-2"></i>{{ 'COMMON.BASIC_INFORMATION' | translate }}</h3>
+            <h3>
+              <i class="pi pi-info-circle mr-2"></i
+              >{{ 'COMMON.BASIC_INFORMATION' | translate }}
+            </h3>
             <div class="info-grid">
               <div class="info-item">
                 <label>{{ 'ALERTS.ALERT_NAME' | translate }}</label>
@@ -137,22 +147,35 @@
               </div>
               <div class="info-item">
                 <label>{{ 'COMMON.DESCRIPTION' | translate }}</label>
-                <p>{{ current()!.description || ('COMMON.NO_DESCRIPTION' | translate) }}</p>
+                <p>
+                  {{
+                    current()!.description ||
+                      ('COMMON.NO_DESCRIPTION' | translate)
+                  }}
+                </p>
               </div>
               <div class="info-item">
                 <label>{{ 'COMMON.STATUS' | translate }}</label>
                 <app-chip
                   variant="status"
                   [tone]="current()!.enabled ? 'success' : 'error'"
-                  [icon]="current()!.enabled ? 'pi pi-check-circle' : 'pi pi-times-circle'"
+                  [icon]="
+                    current()!.enabled
+                      ? 'pi pi-check-circle'
+                      : 'pi pi-times-circle'
+                  "
                 >
-                  {{ (current()!.enabled ? 'COMMON.ENABLED' : 'COMMON.DISABLED') | translate }}
+                  {{
+                    (current()!.enabled ? 'COMMON.ENABLED' : 'COMMON.DISABLED')
+                      | translate
+                  }}
                 </app-chip>
               </div>
               <div class="info-item" *ngIf="current()!.snoozedUntil">
                 <label>{{ 'ALERTS.SNOOZED_UNTIL' | translate }}</label>
                 <p class="with-icon">
-                  <i class="pi pi-moon mr-2"></i>{{ current()!.snoozedUntil | date: 'medium' }}
+                  <i class="pi pi-moon mr-2"></i
+                  >{{ current()!.snoozedUntil | date: 'medium' }}
                 </p>
               </div>
             </div>
@@ -160,13 +183,26 @@
 
           <!-- Source -->
           <div class="info-section">
-            <h3><i class="pi pi-database mr-2"></i>{{ 'ALERTS.SOURCE' | translate }}</h3>
+            <h3>
+              <i class="pi pi-database mr-2"></i
+              >{{ 'ALERTS.SOURCE' | translate }}
+            </h3>
             <div class="info-grid">
               <div class="info-item">
                 <label>{{ 'ALERTS.SOURCE_TYPE' | translate }}</label>
                 <p class="with-icon">
-                  <i class="pi" [ngClass]="current()!.sourceType === 'analysis' ? 'pi-chart-line' : 'pi-database'"></i>
-                  {{ 'ALERTS.SOURCE_' + (current()!.sourceType | uppercase) | translate }}
+                  <i
+                    class="pi"
+                    [ngClass]="
+                      current()!.sourceType === 'analysis'
+                        ? 'pi-chart-line'
+                        : 'pi-database'
+                    "
+                  ></i>
+                  {{
+                    'ALERTS.SOURCE_' + (current()!.sourceType | uppercase)
+                      | translate
+                  }}
                 </p>
               </div>
               <div class="info-item">
@@ -178,32 +214,60 @@
 
           <!-- Condition -->
           <div class="info-section span-2">
-            <h3><i class="pi pi-filter mr-2"></i>{{ 'ALERTS.CONDITION' | translate }}</h3>
+            <h3>
+              <i class="pi pi-filter mr-2"></i
+              >{{ 'ALERTS.CONDITION' | translate }}
+            </h3>
 
             <!-- expression mode -->
-            <div class="condition-expression" *ngIf="current()!.conditionMode === 'expression'">
+            <div
+              class="condition-expression"
+              *ngIf="current()!.conditionMode === 'expression'"
+            >
               <code>{{ current()!.conditionExpression }}</code>
             </div>
 
             <!-- builder mode -->
-            <div class="condition-groups" *ngIf="current()!.conditionMode !== 'expression'">
+            <div
+              class="condition-groups"
+              *ngIf="current()!.conditionMode !== 'expression'"
+            >
               <div
                 class="cond-group"
-                *ngFor="let g of conditionGroups; let gi = index; trackBy: trackByIndex"
+                *ngFor="
+                  let g of conditionGroups;
+                  let gi = index;
+                  trackBy: trackByIndex
+                "
               >
-                <span class="group-tag" *ngIf="gi > 0">{{ 'ALERTS.OR' | translate }}</span>
+                <span class="group-tag" *ngIf="gi > 0">{{
+                  'ALERTS.OR' | translate
+                }}</span>
                 <div class="cond-predicates">
                   <div
                     class="cond-predicate"
-                    *ngFor="let p of g.predicates; let pi = index; trackBy: trackByIndex"
+                    *ngFor="
+                      let p of g.predicates;
+                      let pi = index;
+                      trackBy: trackByIndex
+                    "
                   >
                     <span class="pred-conn" *ngIf="pi > 0">{{ g.join }}</span>
-                    <span class="pred-agg" *ngIf="p.left?.aggregate && p.left?.aggregate !== 'none'">
-                      {{ 'ALERTS.AGGREGATE.' + (p.left.aggregate | uppercase) | translate }}
+                    <span
+                      class="pred-agg"
+                      *ngIf="p.left?.aggregate && p.left?.aggregate !== 'none'"
+                    >
+                      {{
+                        'ALERTS.AGGREGATE.' + (p.left.aggregate | uppercase)
+                          | translate
+                      }}
                     </span>
                     <span class="pred-field">{{ p.left?.ref }}</span>
                     <span class="pred-op">
-                      {{ 'ALERTS.OPERATOR.' + (p.operator | uppercase) | translate }}
+                      {{
+                        'ALERTS.OPERATOR.' + (p.operator | uppercase)
+                          | translate
+                      }}
                     </span>
                     <span class="pred-val">{{ formatValue(p.right) }}</span>
                   </div>
@@ -214,11 +278,16 @@
 
           <!-- Schedule -->
           <div class="info-section">
-            <h3><i class="pi pi-clock mr-2"></i>{{ 'ALERTS.SCHEDULE' | translate }}</h3>
+            <h3>
+              <i class="pi pi-clock mr-2"></i
+              >{{ 'ALERTS.SCHEDULE' | translate }}
+            </h3>
             <div class="info-grid">
               <div class="info-item">
                 <label>{{ 'ALERTS.CRON_EXPRESSION' | translate }}</label>
-                <p><code class="cron-code">{{ current()!.cronExpression }}</code></p>
+                <p>
+                  <code class="cron-code">{{ current()!.cronExpression }}</code>
+                </p>
               </div>
               <div class="info-item">
                 <label>{{ 'ALERTS.TIMEZONE' | translate }}</label>
@@ -226,39 +295,56 @@
               </div>
               <div class="info-item">
                 <label>{{ 'ALERTS.NEXT_RUN' | translate }}</label>
-                <p>{{ current()!.nextRunAt ? (current()!.nextRunAt | date: 'medium') : ('COMMON.NA' | translate) }}</p>
+                <p>
+                  {{
+                    current()!.nextRunAt
+                      ? (current()!.nextRunAt | date: 'medium')
+                      : ('COMMON.NA' | translate)
+                  }}
+                </p>
               </div>
               <div class="info-item">
                 <label>{{ 'ALERTS.LAST_RUN' | translate }}</label>
-                <p>{{ current()!.lastRunAt ? (current()!.lastRunAt | date: 'medium') : ('COMMON.NA' | translate) }}</p>
+                <p>
+                  {{
+                    current()!.lastRunAt
+                      ? (current()!.lastRunAt | date: 'medium')
+                      : ('COMMON.NA' | translate)
+                  }}
+                </p>
               </div>
             </div>
           </div>
 
           <!-- Delivery + gating -->
           <div class="info-section">
-            <h3><i class="pi pi-send mr-2"></i>{{ 'ALERTS.DELIVERY' | translate }}</h3>
+            <h3>
+              <i class="pi pi-send mr-2"></i>{{ 'ALERTS.DELIVERY' | translate }}
+            </h3>
             <div class="info-grid">
               <div class="info-item">
                 <label>{{ 'ALERTS.CHANNELS' | translate }}</label>
                 <p class="channels">
                   <span class="chan" [class.on]="current()!.notifyEmail">
-                    <i class="pi pi-envelope"></i> {{ 'ALERTS.NOTIFY_EMAIL' | translate }}
+                    <i class="pi pi-envelope"></i>
+                    {{ 'ALERTS.NOTIFY_EMAIL' | translate }}
                   </span>
                   <span class="chan" [class.on]="current()!.notifyInApp">
-                    <i class="pi pi-bell"></i> {{ 'ALERTS.NOTIFY_IN_APP' | translate }}
+                    <i class="pi pi-bell"></i>
+                    {{ 'ALERTS.NOTIFY_IN_APP' | translate }}
                   </span>
                 </p>
               </div>
               <div class="info-item">
                 <label>{{ 'ALERTS.RECIPIENTS' | translate }}</label>
                 <p>
-                  {{ 'ALERTS.RECIPIENTS_SUMMARY'
-                    | translate
-                      : {
-                          users: current()!.recipients?.userIds?.length || 0,
-                          emails: current()!.recipients?.emails?.length || 0,
-                        }
+                  {{
+                    'ALERTS.RECIPIENTS_SUMMARY'
+                      | translate
+                        : {
+                            users: current()!.recipients?.userIds?.length || 0,
+                            emails: current()!.recipients?.emails?.length || 0,
+                          }
                   }}
                 </p>
               </div>
@@ -314,7 +400,11 @@
       ></app-custom-number>
     </div>
     <div class="popup-actions">
-      <app-button variant="secondary" icon="pi pi-times" (clicked)="cancelSnooze()">
+      <app-button
+        variant="secondary"
+        icon="pi pi-times"
+        (clicked)="cancelSnooze()"
+      >
         {{ 'COMMON.CANCEL' | translate }}
       </app-button>
       <app-button
@@ -369,7 +459,11 @@
       </div>
     </div>
     <div class="popup-actions">
-      <app-button variant="secondary" icon="pi pi-times" (clicked)="cancelDelete()">
+      <app-button
+        variant="secondary"
+        icon="pi pi-times"
+        (clicked)="cancelDelete()"
+      >
         {{ 'COMMON.CANCEL' | translate }}
       </app-button>
       <app-button

@@ -10,7 +10,10 @@
       class="params-panel__toggle"
       [attr.aria-expanded]="!collapsed"
     >
-      <i class="pi" [ngClass]="collapsed ? 'pi-chevron-right' : 'pi-chevron-down'"></i>
+      <i
+        class="pi"
+        [ngClass]="collapsed ? 'pi-chevron-right' : 'pi-chevron-down'"
+      ></i>
       <i class="pi pi-sliders-h params-panel__icon"></i>
       <span class="params-panel__title">
         {{ 'DATASET.PARAMS.TITLE' | translate }}
@@ -40,7 +43,9 @@
       <div class="param-row__name">
         <code>{{ tokenDisplay(param) }}</code>
         <small class="param-row__error-msg" *ngIf="isErrored(param)">
-          {{ 'DATASET.PARAMS.REQUIRED_ERROR' | translate: { name: param.name } }}
+          {{
+            'DATASET.PARAMS.REQUIRED_ERROR' | translate: { name: param.name }
+          }}
         </small>
       </div>
 

@@ -225,9 +225,7 @@ export class SidebarComponent implements OnInit {
       // A hub is shown when the user holds the parent grant OR holds any of
       // its (tab) children — mirror the "parent grants all" intent by
       // surfacing the hub if any child grant is present.
-      const hasChildGrant = isLeafHub
-        ? this.anyDescendantGranted(node)
-        : false;
+      const hasChildGrant = isLeafHub ? this.anyDescendantGranted(node) : false;
 
       if (!hasGrant && !hasChildGrant && processedChildren.length === 0)
         continue;

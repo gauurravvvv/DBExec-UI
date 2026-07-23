@@ -39,9 +39,13 @@
                capability badge (once a datasource is chosen) — all inline on the
                table's single toolbar row, opposite the action icons. -->
           <div tableToolbarStart class="sessions-toolbar-start">
-            <app-datasource-picker (changed)="onDatasourceChange($event)"></app-datasource-picker>
+            <app-datasource-picker
+              (changed)="onDatasourceChange($event)"
+            ></app-datasource-picker>
 
-            <ng-container *ngIf="datasourceId && !unsupported() && !capabilityLoading()">
+            <ng-container
+              *ngIf="datasourceId && !unsupported() && !capabilityLoading()"
+            >
               <app-custom-input
                 [(ngModel)]="filterValues.name"
                 (ngModelChange)="onFilterChange()"
@@ -61,7 +65,11 @@
                 (onChangeEvent)="onFilterChange()"
                 icon="pi-circle-fill"
               ></app-custom-dropdown>
-              <span class="hide-bg-toggle" [pTooltip]="'DB_ACCESS.HIDE_BACKGROUND_HINT' | translate" tooltipPosition="bottom">
+              <span
+                class="hide-bg-toggle"
+                [pTooltip]="'DB_ACCESS.HIDE_BACKGROUND_HINT' | translate"
+                tooltipPosition="bottom"
+              >
                 <app-custom-binary-checkbox
                   [(ngModel)]="filterValues.hideBackground"
                   [label]="'DB_ACCESS.HIDE_BACKGROUND' | translate"
@@ -74,19 +82,25 @@
                 tone="success"
                 icon="pi pi-check-circle"
                 *ngIf="capability() && canManage"
-              >{{ 'DB_ACCESS.CAP_FULL_BADGE' | translate }}</app-chip>
+                >{{ 'DB_ACCESS.CAP_FULL_BADGE' | translate }}</app-chip
+              >
               <app-chip
                 variant="badge"
                 tone="neutral"
                 icon="pi pi-lock"
                 *ngIf="capability() && !canManage"
-              >{{ 'DB_ACCESS.CAP_READONLY_BADGE' | translate }}</app-chip>
+                >{{ 'DB_ACCESS.CAP_READONLY_BADGE' | translate }}</app-chip
+              >
             </ng-container>
 
             <!-- Capability spinner sits inline while the chosen datasource is
                  being probed. -->
-            <span class="cap-loading" *ngIf="datasourceId && capabilityLoading()">
-              <i class="pi pi-spin pi-spinner"></i>{{ 'DB_ACCESS.CHECKING_CAPABILITY' | translate }}
+            <span
+              class="cap-loading"
+              *ngIf="datasourceId && capabilityLoading()"
+            >
+              <i class="pi pi-spin pi-spinner"></i
+              >{{ 'DB_ACCESS.CHECKING_CAPABILITY' | translate }}
             </span>
           </div>
 
@@ -111,7 +125,13 @@
 
           <ng-template usGridCell="pid" let-s>
             <span class="pid-text">{{ s.pid }}</span>
-            <app-chip variant="tag" tone="primary" size="sm" *ngIf="isSelf(s)">{{ 'DB_ACCESS.THIS_SESSION' | translate }}</app-chip>
+            <app-chip
+              variant="tag"
+              tone="primary"
+              size="sm"
+              *ngIf="isSelf(s)"
+              >{{ 'DB_ACCESS.THIS_SESSION' | translate }}</app-chip
+            >
           </ng-template>
 
           <ng-template usGridCell="user" let-s>
@@ -127,8 +147,12 @@
           </ng-template>
 
           <ng-template usGridCell="applicationName" let-s>
-            <span class="description-text" [title]="s.applicationName">{{ s.applicationName || '—' }}</span>
-            <app-chip variant="tag" size="sm" *ngIf="!isClientBackend(s)">{{ s.backendType }}</app-chip>
+            <span class="description-text" [title]="s.applicationName">{{
+              s.applicationName || '—'
+            }}</span>
+            <app-chip variant="tag" size="sm" *ngIf="!isClientBackend(s)">{{
+              s.backendType
+            }}</app-chip>
           </ng-template>
 
           <ng-template usGridCell="state" let-s>
@@ -147,13 +171,24 @@
           </ng-template>
 
           <ng-template usGridCell="query" let-s>
-            <span class="query-text" *ngIf="s.query; else noQuery" [title]="s.query">{{ s.query }}</span>
-            <ng-template #noQuery><span class="description-text">—</span></ng-template>
+            <span
+              class="query-text"
+              *ngIf="s.query; else noQuery"
+              [title]="s.query"
+              >{{ s.query }}</span
+            >
+            <ng-template #noQuery
+              ><span class="description-text">—</span></ng-template
+            >
           </ng-template>
 
           <ng-template usGridCell="queryStart" let-s>
-            <span class="date-text" *ngIf="s.queryStart; else noStart">{{ s.queryStart | relativeTime }}</span>
-            <ng-template #noStart><span class="description-text">—</span></ng-template>
+            <span class="date-text" *ngIf="s.queryStart; else noStart">{{
+              s.queryStart | relativeTime
+            }}</span>
+            <ng-template #noStart
+              ><span class="description-text">—</span></ng-template
+            >
           </ng-template>
 
           <ng-template usGridCell="actions" let-s>
@@ -163,7 +198,12 @@
                 class="icon-btn"
                 (click)="askCancel(s)"
                 [disabled]="!canManage || isSelf(s)"
-                [pTooltip]="(isSelf(s) ? 'DB_ACCESS.THIS_SESSION' : 'DB_ACCESS.CANCEL_QUERY') | translate"
+                [pTooltip]="
+                  (isSelf(s)
+                    ? 'DB_ACCESS.THIS_SESSION'
+                    : 'DB_ACCESS.CANCEL_QUERY'
+                  ) | translate
+                "
                 tooltipPosition="bottom"
               >
                 <i class="pi pi-ban"></i>
@@ -173,7 +213,12 @@
                 class="icon-btn delete-btn"
                 (click)="askTerminate(s)"
                 [disabled]="!canManage || isSelf(s)"
-                [pTooltip]="(isSelf(s) ? 'DB_ACCESS.THIS_SESSION' : 'DB_ACCESS.TERMINATE_SESSION') | translate"
+                [pTooltip]="
+                  (isSelf(s)
+                    ? 'DB_ACCESS.THIS_SESSION'
+                    : 'DB_ACCESS.TERMINATE_SESSION'
+                  ) | translate
+                "
                 tooltipPosition="bottom"
               >
                 <i class="pi pi-times-circle"></i>
@@ -191,7 +236,10 @@
   <div class="popup-content">
     <div class="popup-header">
       <div class="popup-icon" [class.destructive]="confirmIsDestructive">
-        <i class="pi" [ngClass]="confirmIsDestructive ? 'pi-times-circle' : 'pi-ban'"></i>
+        <i
+          class="pi"
+          [ngClass]="confirmIsDestructive ? 'pi-times-circle' : 'pi-ban'"
+        ></i>
       </div>
       <h3>{{ confirmTitle }}</h3>
     </div>
@@ -208,8 +256,22 @@
         [disabled]="saving()"
         (click)="confirm()"
       >
-        <i class="pi" [ngClass]="saving() ? 'pi-spin pi-spinner' : (confirmIsDestructive ? 'pi-times-circle' : 'pi-ban')"></i>
-        {{ (confirmIsDestructive ? 'DB_ACCESS.TERMINATE' : 'DB_ACCESS.CANCEL_QUERY') | translate }}
+        <i
+          class="pi"
+          [ngClass]="
+            saving()
+              ? 'pi-spin pi-spinner'
+              : confirmIsDestructive
+                ? 'pi-times-circle'
+                : 'pi-ban'
+          "
+        ></i>
+        {{
+          (confirmIsDestructive
+            ? 'DB_ACCESS.TERMINATE'
+            : 'DB_ACCESS.CANCEL_QUERY'
+          ) | translate
+        }}
       </button>
     </div>
   </div>

@@ -190,10 +190,7 @@ const US_STATE_ABBREV: Record<string, string> = {
 
 /** Collapse whitespace + strip surrounding punctuation for a stable key. */
 function normalizeKey(raw: string): string {
-  return String(raw)
-    .trim()
-    .replace(/\s+/g, ' ')
-    .toLowerCase();
+  return String(raw).trim().replace(/\s+/g, ' ').toLowerCase();
 }
 
 /**
@@ -406,7 +403,8 @@ export interface LatLonResult {
   invalidCount: number;
 }
 
-const inLatRange = (n: number): boolean => Number.isFinite(n) && n >= -90 && n <= 90;
+const inLatRange = (n: number): boolean =>
+  Number.isFinite(n) && n >= -90 && n <= 90;
 const inLonRange = (n: number): boolean =>
   Number.isFinite(n) && n >= -180 && n <= 180;
 

@@ -9,14 +9,16 @@
       <div class="header-actions">
         <!-- Bulk Delete Button -->
         <ng-container *hasPermission="'queryBuilderSection'; level: 'delete'">
-        <button
-          *ngIf="selectedCount > 0"
-          pButton
-          [label]="'COMMON.DELETE_COUNT' | translate: { count: selectedCount }"
-          icon="pi pi-trash"
-          (click)="confirmBulkDelete()"
-          class="p-button-raised p-button-danger modern-button"
-        ></button>
+          <button
+            *ngIf="selectedCount > 0"
+            pButton
+            [label]="
+              'COMMON.DELETE_COUNT' | translate: { count: selectedCount }
+            "
+            icon="pi pi-trash"
+            (click)="confirmBulkDelete()"
+            class="p-button-raised p-button-danger modern-button"
+          ></button>
         </ng-container>
 
         <!-- Clear Filters Button -->
@@ -117,12 +119,14 @@
                   {{ 'COMMON.CREATED_ON' | translate }}
                 </div>
               </th>
-              <ng-container *hasPermission="'queryBuilderSection'; level: 'write'">
-              <th style="width: 7rem; min-width: 7rem">
-                <div class="th-content actions-th">
-                  {{ 'COMMON.ACTIONS' | translate }}
-                </div>
-              </th>
+              <ng-container
+                *hasPermission="'queryBuilderSection'; level: 'write'"
+              >
+                <th style="width: 7rem; min-width: 7rem">
+                  <div class="th-content actions-th">
+                    {{ 'COMMON.ACTIONS' | translate }}
+                  </div>
+                </th>
               </ng-container>
             </tr>
             <!-- Filter Row -->
@@ -179,10 +183,12 @@
                   (onChangeEvent)="onCreatedDateRangeChange($event)"
                 ></app-custom-daterange>
               </th>
-              <ng-container *hasPermission="'queryBuilderSection'; level: 'write'">
-              <th>
-                <!-- No filter for Actions -->
-              </th>
+              <ng-container
+                *hasPermission="'queryBuilderSection'; level: 'write'"
+              >
+                <th>
+                  <!-- No filter for Actions -->
+                </th>
               </ng-container>
             </tr>
           </ng-template>
@@ -235,33 +241,40 @@
                 </span>
               </td>
               <td>
-                <span class="date-text" [pTooltip]="(section.createdOn | date: 'dd MMM yyyy, HH:mm:ss') || ''" tooltipPosition="top">{{
-                  section.createdOn | relativeTime
-                }}</span>
+                <span
+                  class="date-text"
+                  [pTooltip]="
+                    (section.createdOn | date: 'dd MMM yyyy, HH:mm:ss') || ''
+                  "
+                  tooltipPosition="top"
+                  >{{ section.createdOn | relativeTime }}</span
+                >
               </td>
-              <ng-container *hasPermission="'queryBuilderSection'; level: 'write'">
-              <td>
-                <div class="row-actions">
-                  <button
-                    *hasPermission="'queryBuilderSection'; level: 'write'"
-                    class="icon-btn edit-btn"
-                    (click)="onEdit(section.id)"
-                    [pTooltip]="'COMMON.EDIT' | translate"
-                    tooltipPosition="bottom"
-                  >
-                    <i class="pi pi-pencil"></i>
-                  </button>
-                  <button
-                    *hasPermission="'queryBuilderSection'; level: 'delete'"
-                    class="icon-btn delete-btn"
-                    (click)="confirmDelete(section.id)"
-                    [pTooltip]="'COMMON.DELETE' | translate"
-                    tooltipPosition="bottom"
-                  >
-                    <i class="pi pi-trash"></i>
-                  </button>
-                </div>
-              </td>
+              <ng-container
+                *hasPermission="'queryBuilderSection'; level: 'write'"
+              >
+                <td>
+                  <div class="row-actions">
+                    <button
+                      *hasPermission="'queryBuilderSection'; level: 'write'"
+                      class="icon-btn edit-btn"
+                      (click)="onEdit(section.id)"
+                      [pTooltip]="'COMMON.EDIT' | translate"
+                      tooltipPosition="bottom"
+                    >
+                      <i class="pi pi-pencil"></i>
+                    </button>
+                    <button
+                      *hasPermission="'queryBuilderSection'; level: 'delete'"
+                      class="icon-btn delete-btn"
+                      (click)="confirmDelete(section.id)"
+                      [pTooltip]="'COMMON.DELETE' | translate"
+                      tooltipPosition="bottom"
+                    >
+                      <i class="pi pi-trash"></i>
+                    </button>
+                  </div>
+                </td>
               </ng-container>
             </tr>
           </ng-template>

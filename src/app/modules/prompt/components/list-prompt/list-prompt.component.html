@@ -9,14 +9,16 @@
       <div class="header-actions">
         <!-- Bulk Delete Button -->
         <ng-container *hasPermission="'queryBuilderPrompt'; level: 'delete'">
-        <button
-          *ngIf="selectedCount > 0"
-          pButton
-          [label]="'COMMON.DELETE_COUNT' | translate: { count: selectedCount }"
-          icon="pi pi-trash"
-          (click)="confirmBulkDelete()"
-          class="p-button-raised p-button-danger modern-button"
-        ></button>
+          <button
+            *ngIf="selectedCount > 0"
+            pButton
+            [label]="
+              'COMMON.DELETE_COUNT' | translate: { count: selectedCount }
+            "
+            icon="pi pi-trash"
+            (click)="confirmBulkDelete()"
+            class="p-button-raised p-button-danger modern-button"
+          ></button>
         </ng-container>
 
         <!-- Clear Filters Button -->
@@ -121,12 +123,14 @@
                   {{ 'COMMON.CREATED_ON' | translate }}
                 </div>
               </th>
-              <ng-container *hasPermission="'queryBuilderPrompt'; level: 'write'">
-              <th style="width: 7rem; min-width: 7rem">
-                <div class="th-content actions-th">
-                  {{ 'COMMON.ACTIONS' | translate }}
-                </div>
-              </th>
+              <ng-container
+                *hasPermission="'queryBuilderPrompt'; level: 'write'"
+              >
+                <th style="width: 7rem; min-width: 7rem">
+                  <div class="th-content actions-th">
+                    {{ 'COMMON.ACTIONS' | translate }}
+                  </div>
+                </th>
               </ng-container>
             </tr>
             <!-- Filter Row -->
@@ -196,10 +200,12 @@
                   (onChangeEvent)="onCreatedDateRangeChange($event)"
                 ></app-custom-daterange>
               </th>
-              <ng-container *hasPermission="'queryBuilderPrompt'; level: 'write'">
-              <th>
-                <!-- No filter for Actions -->
-              </th>
+              <ng-container
+                *hasPermission="'queryBuilderPrompt'; level: 'write'"
+              >
+                <th>
+                  <!-- No filter for Actions -->
+                </th>
               </ng-container>
             </tr>
           </ng-template>
@@ -254,42 +260,49 @@
                 </span>
               </td>
               <td>
-                <span class="date-text" [pTooltip]="(prompt.createdOn | date: 'dd MMM yyyy, HH:mm:ss') || ''" tooltipPosition="top">{{
-                  prompt.createdOn | relativeTime
-                }}</span>
+                <span
+                  class="date-text"
+                  [pTooltip]="
+                    (prompt.createdOn | date: 'dd MMM yyyy, HH:mm:ss') || ''
+                  "
+                  tooltipPosition="top"
+                  >{{ prompt.createdOn | relativeTime }}</span
+                >
               </td>
-              <ng-container *hasPermission="'queryBuilderPrompt'; level: 'write'">
-              <td>
-                <div class="row-actions">
-                  <button
-                    *hasPermission="'queryBuilderPrompt'; level: 'write'"
-                    class="icon-btn"
-                    (click)="onEdit(prompt.id)"
-                    [pTooltip]="'COMMON.EDIT' | translate"
-                    tooltipPosition="bottom"
-                  >
-                    <i class="pi pi-pencil"></i>
-                  </button>
-                  <button
-                    *hasPermission="'queryBuilderPrompt'; level: 'write'"
-                    class="icon-btn"
-                    (click)="onConfig(prompt.id)"
-                    [pTooltip]="'COMMON.CONFIG' | translate"
-                    tooltipPosition="bottom"
-                  >
-                    <i class="pi pi-cog"></i>
-                  </button>
-                  <button
-                    *hasPermission="'queryBuilderPrompt'; level: 'delete'"
-                    class="icon-btn delete-btn"
-                    (click)="confirmDelete(prompt.id)"
-                    [pTooltip]="'COMMON.DELETE' | translate"
-                    tooltipPosition="bottom"
-                  >
-                    <i class="pi pi-trash"></i>
-                  </button>
-                </div>
-              </td>
+              <ng-container
+                *hasPermission="'queryBuilderPrompt'; level: 'write'"
+              >
+                <td>
+                  <div class="row-actions">
+                    <button
+                      *hasPermission="'queryBuilderPrompt'; level: 'write'"
+                      class="icon-btn"
+                      (click)="onEdit(prompt.id)"
+                      [pTooltip]="'COMMON.EDIT' | translate"
+                      tooltipPosition="bottom"
+                    >
+                      <i class="pi pi-pencil"></i>
+                    </button>
+                    <button
+                      *hasPermission="'queryBuilderPrompt'; level: 'write'"
+                      class="icon-btn"
+                      (click)="onConfig(prompt.id)"
+                      [pTooltip]="'COMMON.CONFIG' | translate"
+                      tooltipPosition="bottom"
+                    >
+                      <i class="pi pi-cog"></i>
+                    </button>
+                    <button
+                      *hasPermission="'queryBuilderPrompt'; level: 'delete'"
+                      class="icon-btn delete-btn"
+                      (click)="confirmDelete(prompt.id)"
+                      [pTooltip]="'COMMON.DELETE' | translate"
+                      tooltipPosition="bottom"
+                    >
+                      <i class="pi pi-trash"></i>
+                    </button>
+                  </div>
+                </td>
               </ng-container>
             </tr>
           </ng-template>

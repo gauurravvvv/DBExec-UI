@@ -63,16 +63,16 @@ custom-field formula editor, or per-dialect snippets.
 
 ## 2. Non-goals (deferred)
 
-| Feature | Why deferred | Lives in |
-|---|---|---|
-| CSV / XLSX / JSON upload | Owned by import module | m12 |
-| Google Sheets connector | Cross-cutting OAuth surface | m12 |
-| Dataset version history (DB + diff UI) | Owned by versioning module | m18 |
-| Physical-table mirror (`source_kind = 'table'`) | Marginal value vs writing `SELECT * FROM schema.tbl` | follow-up |
-| Materialised refresh | Needs scheduler | m15 |
-| Cross-datasource joins | Federation work | semantic layer m02 |
-| Reusable parameters (`:param`) | Couples to RLS + scheduler | next pass |
-| PII auto-flag | Couples to RLS column security | m09 |
+| Feature                                         | Why deferred                                         | Lives in           |
+| ----------------------------------------------- | ---------------------------------------------------- | ------------------ |
+| CSV / XLSX / JSON upload                        | Owned by import module                               | m12                |
+| Google Sheets connector                         | Cross-cutting OAuth surface                          | m12                |
+| Dataset version history (DB + diff UI)          | Owned by versioning module                           | m18                |
+| Physical-table mirror (`source_kind = 'table'`) | Marginal value vs writing `SELECT * FROM schema.tbl` | follow-up          |
+| Materialised refresh                            | Needs scheduler                                      | m15                |
+| Cross-datasource joins                          | Federation work                                      | semantic layer m02 |
+| Reusable parameters (`:param`)                  | Couples to RLS + scheduler                           | next pass          |
+| PII auto-flag                                   | Couples to RLS column security                       | m09                |
 
 ## 3. Architecture changes
 
@@ -201,9 +201,9 @@ this?" Returns three lists:
 
 ```json
 {
-  "analyses":  [{ "id": "...", "name": "Sales Q4" }],
+  "analyses": [{ "id": "...", "name": "Sales Q4" }],
   "dashboards": [{ "id": "...", "name": "Exec Overview" }],
-  "rlsRules":  [{ "id": "...", "name": "EMEA only" }]
+  "rlsRules": [{ "id": "...", "name": "EMEA only" }]
 }
 ```
 
@@ -273,10 +273,10 @@ new columns (`kind`, `target_table`, `last_refresh_at`, `version`)
 
 ## 5. API surface added
 
-| Method | Path | Purpose |
-|---|---|---|
-| GET | `/datasets/:id/lineage` | Downstream consumers |
-| GET | `/datasets/:id/usage` | 30-day usage stats |
+| Method | Path                    | Purpose              |
+| ------ | ----------------------- | -------------------- |
+| GET    | `/datasets/:id/lineage` | Downstream consumers |
+| GET    | `/datasets/:id/usage`   | 30-day usage stats   |
 
 Routes added to `src/modules/datasets/datasets.routes.ts` behind
 `VerifyPermissionMiddleware('datasetManager', 'read')`.
@@ -287,27 +287,27 @@ get safer internals.
 
 ## 6. Security threat model
 
-| Threat | Mitigation |
-|---|---|
-| Multi-statement injection in SQL | `isSafeSelect` rejects on save AND on every run |
-| DDL/DML hidden in comments | Comment-strip happens before keyword scan |
-| Long-running query DoSes the warehouse | Per-engine statement timeout, default 30s |
-| Unbounded row fetch | Hard cap 10k rows; configurable; -1 sentinel removed |
-| Engine driver crash on unusual column types | Fallback to `text` data type |
-| Cross-org dataset access | Existing `organisationId` filter on every find — unchanged |
-| Dataset_run table growth | Index supports range delete; trim job deferred to m19 |
-| Stale lineage causing delete failure | Lineage endpoint is best-effort read; not transactional |
+| Threat                                      | Mitigation                                                 |
+| ------------------------------------------- | ---------------------------------------------------------- |
+| Multi-statement injection in SQL            | `isSafeSelect` rejects on save AND on every run            |
+| DDL/DML hidden in comments                  | Comment-strip happens before keyword scan                  |
+| Long-running query DoSes the warehouse      | Per-engine statement timeout, default 30s                  |
+| Unbounded row fetch                         | Hard cap 10k rows; configurable; -1 sentinel removed       |
+| Engine driver crash on unusual column types | Fallback to `text` data type                               |
+| Cross-org dataset access                    | Existing `organisationId` filter on every find — unchanged |
+| Dataset_run table growth                    | Index supports range delete; trim job deferred to m19      |
+| Stale lineage causing delete failure        | Lineage endpoint is best-effort read; not transactional    |
 
 ## 7. Perf budgets
 
-| Operation | p50 target | p95 target |
-|---|---|---|
-| SQL safety validation | <1 ms | <5 ms |
-| Column introspection (any engine) | <100 ms | <500 ms |
-| Preview (200 rows, simple query) | <200 ms | <800 ms |
-| Usage endpoint | <50 ms | <200 ms |
-| Lineage endpoint | <50 ms | <200 ms |
-| Editor save end-to-end | <500 ms | <2 s |
+| Operation                         | p50 target | p95 target |
+| --------------------------------- | ---------- | ---------- |
+| SQL safety validation             | <1 ms      | <5 ms      |
+| Column introspection (any engine) | <100 ms    | <500 ms    |
+| Preview (200 rows, simple query)  | <200 ms    | <800 ms    |
+| Usage endpoint                    | <50 ms     | <200 ms    |
+| Lineage endpoint                  | <50 ms     | <200 ms    |
+| Editor save end-to-end            | <500 ms    | <2 s       |
 
 ## 8. Implementation order
 

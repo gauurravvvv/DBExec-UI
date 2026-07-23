@@ -78,7 +78,7 @@ export class AiFeaturesComponent implements OnInit, SettingsTabForm {
     // a mask when already configured, which satisfies `required`.
     this.form
       .get('aiEnabled')!
-      .valueChanges.subscribe((enabled) =>
+      .valueChanges.subscribe(enabled =>
         this.syncRequiredValidators(!!enabled),
       );
     this.load();
@@ -130,7 +130,7 @@ export class AiFeaturesComponent implements OnInit, SettingsTabForm {
         skipLoader: true,
       })
       .subscribe({
-        next: (res) => {
+        next: res => {
           const d = res?.data;
           if (d) {
             this.keyConfigured = !!d.aiApiKeyConfigured;

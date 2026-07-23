@@ -62,8 +62,12 @@ export const visualTitleSchema = z.preprocess(
   trimOrUndefined,
   z
     .string({ message: 'validation.visuals.title.required' })
-    .min(VISUAL_LIMITS.TITLE_MIN, { message: 'validation.visuals.title.required' })
-    .max(VISUAL_LIMITS.TITLE_MAX, { message: 'validation.visuals.title.tooLong' }),
+    .min(VISUAL_LIMITS.TITLE_MIN, {
+      message: 'validation.visuals.title.required',
+    })
+    .max(VISUAL_LIMITS.TITLE_MAX, {
+      message: 'validation.visuals.title.tooLong',
+    }),
 );
 
 export const chartTypeSchema = z.preprocess(

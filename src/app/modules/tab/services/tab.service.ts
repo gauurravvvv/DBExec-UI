@@ -49,9 +49,7 @@ export class TabService {
     this._loading.set(true);
     try {
       const res: any = await lastValueFrom(
-        this.http
-          .apiGet(TAB.GET + tabId)
-          .pipe(takeUntil(this._cancelReads$)),
+        this.http.apiGet(TAB.GET + tabId).pipe(takeUntil(this._cancelReads$)),
       );
       if (res?.status) this._current.set(res.data);
     } catch (err) {

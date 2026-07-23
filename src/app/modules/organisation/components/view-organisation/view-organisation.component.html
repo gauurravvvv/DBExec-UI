@@ -41,285 +41,292 @@
     </div>
 
     <!-- Centered branded loader while the GET is in flight. -->
-    <app-content-loader *ngIf="loading() && !organisationData"></app-content-loader>
+    <app-content-loader
+      *ngIf="loading() && !organisationData"
+    ></app-content-loader>
     <ng-container *ngIf="organisationData">
-
-    <!-- Profile Section -->
-    <div class="profile-container">
-      <div class="details-grid">
-        <!-- First Row -->
-        <div class="first-row">
-          <!-- Organisation Identity -->
-          <div class="identity-section">
-            <div class="avatar-section">
-              <div
-                class="avatar-circle"
-                [style.background-color]="avatarBackground"
-              >
-                {{ organisationInitials }}
-              </div>
-              <h3 class="organisation-name">{{ organisationData.name }}</h3>
-              <div class="status-indicator">
-                <span
-                  class="status-badge"
-                  [class.active]="organisationData.status === 1"
+      <!-- Profile Section -->
+      <div class="profile-container">
+        <div class="details-grid">
+          <!-- First Row -->
+          <div class="first-row">
+            <!-- Organisation Identity -->
+            <div class="identity-section">
+              <div class="avatar-section">
+                <div
+                  class="avatar-circle"
+                  [style.background-color]="avatarBackground"
                 >
-                  {{
-                    organisationData.status === 1
-                      ? ('COMMON.ACTIVE' | translate)
-                      : ('COMMON.INACTIVE' | translate)
-                  }}
+                  {{ organisationInitials }}
+                </div>
+                <h3 class="organisation-name">{{ organisationData.name }}</h3>
+                <div class="status-indicator">
+                  <span
+                    class="status-badge"
+                    [class.active]="organisationData.status === 1"
+                  >
+                    {{
+                      organisationData.status === 1
+                        ? ('COMMON.ACTIVE' | translate)
+                        : ('COMMON.INACTIVE' | translate)
+                    }}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Basic Information -->
+            <div class="detail-group">
+              <h4>{{ 'ORG.BASIC_INFORMATION' | translate }}</h4>
+              <div class="detail-item">
+                <span class="label">
+                  <i class="pi pi-building"></i>
+                  {{ 'ORG.ORG_NAME' | translate }}
                 </span>
+                <span class="value">{{ organisationData.name }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="label">
+                  <i class="pi pi-id-card"></i>
+                  {{ 'COMMON.ORG_ID' | translate }}
+                </span>
+                <span class="value">#{{ organisationData.id }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="label">
+                  <i class="pi pi-calendar"></i>
+                  {{ 'COMMON.CREATED_ON' | translate }}
+                </span>
+                <span class="value">{{
+                  organisationData.createdOn | date: 'medium'
+                }}</span>
               </div>
             </div>
           </div>
 
-          <!-- Basic Information -->
-          <div class="detail-group">
-            <h4>{{ 'ORG.BASIC_INFORMATION' | translate }}</h4>
-            <div class="detail-item">
-              <span class="label">
-                <i class="pi pi-building"></i>
-                {{ 'ORG.ORG_NAME' | translate }}
-              </span>
-              <span class="value">{{ organisationData.name }}</span>
-            </div>
-            <div class="detail-item">
-              <span class="label">
-                <i class="pi pi-id-card"></i>
-                {{ 'COMMON.ORG_ID' | translate }}
-              </span>
-              <span class="value">#{{ organisationData.id }}</span>
-            </div>
-            <div class="detail-item">
-              <span class="label">
-                <i class="pi pi-calendar"></i>
-                {{ 'COMMON.CREATED_ON' | translate }}
-              </span>
-              <span class="value">{{
-                organisationData.createdOn | date: 'medium'
-              }}</span>
-            </div>
+          <!-- Datasource Status Banner -->
+          <div
+            class="db-status-banner connection-failed"
+            *ngIf="organisationData.dbStatus === 'connection_failed'"
+          >
+            <i class="pi pi-exclamation-triangle"></i>
+            <span>{{ 'ORG.DB_CONNECTION_FAILED_BANNER' | translate }}</span>
           </div>
-        </div>
 
-        <!-- Datasource Status Banner -->
-        <div
-          class="db-status-banner connection-failed"
-          *ngIf="organisationData.dbStatus === 'connection_failed'"
-        >
-          <i class="pi pi-exclamation-triangle"></i>
-          <span>{{ 'ORG.DB_CONNECTION_FAILED_BANNER' | translate }}</span>
-        </div>
-
-        <!-- Stats Overview -->
-        <div class="stats-row">
-          <div class="stats-bar">
-            <div class="stat-item">
-              <i class="pi pi-user"></i>
-              <span class="stat-value">{{
-                organisationData.usersCount || 0
-              }}</span>
-              <span class="stat-label">{{ 'ORG.USERS' | translate }}</span>
-            </div>
-            <div class="stat-divider"></div>
-            <div class="stat-item">
-              <i class="pi pi-shield"></i>
-              <span class="stat-value">{{
-                organisationData.adminsCount || 0
-              }}</span>
-              <span class="stat-label">{{ 'ORG.ADMINS' | translate }}</span>
-            </div>
-            <div class="stat-divider"></div>
-            <div class="stat-item">
-              <i class="pi pi-users"></i>
-              <span class="stat-value">{{
-                organisationData.groupsCount || 0
-              }}</span>
-              <span class="stat-label">{{ 'ORG.GROUPS' | translate }}</span>
-            </div>
-            <div class="stat-divider"></div>
-            <div class="stat-item">
-              <i class="pi pi-database"></i>
-              <span class="stat-value">{{
-                organisationData.datasourcesCount || 0
-              }}</span>
-              <span class="stat-label">{{
-                'ORG.DATASOURCES' | translate
-              }}</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Master Datasource Details -->
-        <div
-          class="detail-group master-db-section"
-          *ngIf="organisationData.masterDbConfig"
-        >
-          <div class="section-header-row">
-            <h4>
-              <i class="pi pi-database"></i>
-              {{ 'ORG.MASTER_DATASOURCE' | translate }}
-            </h4>
-            <button
-              *hasPermission="'orgManagement'; level: 'write'"
-              class="btn-refresh-db"
-              (click)="refreshMasterDb()"
-              [disabled]="
-                isRefreshingMasterDb ||
-                organisationData.dbStatus !== 'connected'
-              "
-              [title]="'ORG.REFRESH_SCHEMA_TOOLTIP' | translate"
-            >
-              <i
-                class="pi"
-                [ngClass]="
-                  isRefreshingMasterDb ? 'pi-spin pi-spinner' : 'pi-refresh'
-                "
-              ></i>
-              {{
-                isRefreshingMasterDb
-                  ? ('ORG.REFRESHING' | translate)
-                  : ('ORG.REFRESH_SCHEMA' | translate)
-              }}
-            </button>
-          </div>
-          <div class="master-db-grid">
-            <div class="detail-item">
-              <span class="label">
-                <i class="pi pi-desktop"></i>
-                {{ 'ORG.HOSTNAME' | translate }}
-              </span>
-              <span class="value">{{
-                organisationData.masterDbConfig.hostname
-              }}</span>
-            </div>
-            <div class="detail-item">
-              <span class="label">
-                <i class="pi pi-hashtag"></i>
-                {{ 'ORG.PORT' | translate }}
-              </span>
-              <span class="value">{{
-                organisationData.masterDbConfig.port
-              }}</span>
-            </div>
-            <div class="detail-item">
-              <span class="label">
-                <i class="pi pi-database"></i>
-                {{ 'ORG.DATASOURCE_NAME' | translate }}
-              </span>
-              <span class="value">{{
-                organisationData.masterDbConfig.dbName
-              }}</span>
-            </div>
-            <div class="detail-item">
-              <span class="label">
-                <i class="pi pi-sitemap"></i>
-                {{ 'ORG.DB_SCHEMA' | translate }}
-              </span>
-              <span class="value">{{
-                organisationData.masterDbConfig.schema
-              }}</span>
-            </div>
-            <div class="detail-item">
-              <span class="label">
+          <!-- Stats Overview -->
+          <div class="stats-row">
+            <div class="stats-bar">
+              <div class="stat-item">
                 <i class="pi pi-user"></i>
-                {{ 'COMMON.USERNAME' | translate }}
-              </span>
-              <span class="value">{{
-                organisationData.masterDbConfig.username
-              }}</span>
+                <span class="stat-value">{{
+                  organisationData.usersCount || 0
+                }}</span>
+                <span class="stat-label">{{ 'ORG.USERS' | translate }}</span>
+              </div>
+              <div class="stat-divider"></div>
+              <div class="stat-item">
+                <i class="pi pi-shield"></i>
+                <span class="stat-value">{{
+                  organisationData.adminsCount || 0
+                }}</span>
+                <span class="stat-label">{{ 'ORG.ADMINS' | translate }}</span>
+              </div>
+              <div class="stat-divider"></div>
+              <div class="stat-item">
+                <i class="pi pi-users"></i>
+                <span class="stat-value">{{
+                  organisationData.groupsCount || 0
+                }}</span>
+                <span class="stat-label">{{ 'ORG.GROUPS' | translate }}</span>
+              </div>
+              <div class="stat-divider"></div>
+              <div class="stat-item">
+                <i class="pi pi-database"></i>
+                <span class="stat-value">{{
+                  organisationData.datasourcesCount || 0
+                }}</span>
+                <span class="stat-label">{{
+                  'ORG.DATASOURCES' | translate
+                }}</span>
+              </div>
             </div>
           </div>
-        </div>
 
-        <!-- Security + email config moved to the per-org OrgPolicy
+          <!-- Master Datasource Details -->
+          <div
+            class="detail-group master-db-section"
+            *ngIf="organisationData.masterDbConfig"
+          >
+            <div class="section-header-row">
+              <h4>
+                <i class="pi pi-database"></i>
+                {{ 'ORG.MASTER_DATASOURCE' | translate }}
+              </h4>
+              <button
+                *hasPermission="'orgManagement'; level: 'write'"
+                class="btn-refresh-db"
+                (click)="refreshMasterDb()"
+                [disabled]="
+                  isRefreshingMasterDb ||
+                  organisationData.dbStatus !== 'connected'
+                "
+                [title]="'ORG.REFRESH_SCHEMA_TOOLTIP' | translate"
+              >
+                <i
+                  class="pi"
+                  [ngClass]="
+                    isRefreshingMasterDb ? 'pi-spin pi-spinner' : 'pi-refresh'
+                  "
+                ></i>
+                {{
+                  isRefreshingMasterDb
+                    ? ('ORG.REFRESHING' | translate)
+                    : ('ORG.REFRESH_SCHEMA' | translate)
+                }}
+              </button>
+            </div>
+            <div class="master-db-grid">
+              <div class="detail-item">
+                <span class="label">
+                  <i class="pi pi-desktop"></i>
+                  {{ 'ORG.HOSTNAME' | translate }}
+                </span>
+                <span class="value">{{
+                  organisationData.masterDbConfig.hostname
+                }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="label">
+                  <i class="pi pi-hashtag"></i>
+                  {{ 'ORG.PORT' | translate }}
+                </span>
+                <span class="value">{{
+                  organisationData.masterDbConfig.port
+                }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="label">
+                  <i class="pi pi-database"></i>
+                  {{ 'ORG.DATASOURCE_NAME' | translate }}
+                </span>
+                <span class="value">{{
+                  organisationData.masterDbConfig.dbName
+                }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="label">
+                  <i class="pi pi-sitemap"></i>
+                  {{ 'ORG.DB_SCHEMA' | translate }}
+                </span>
+                <span class="value">{{
+                  organisationData.masterDbConfig.schema
+                }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="label">
+                  <i class="pi pi-user"></i>
+                  {{ 'COMMON.USERNAME' | translate }}
+                </span>
+                <span class="value">{{
+                  organisationData.masterDbConfig.username
+                }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Security + email config moved to the per-org OrgPolicy
              entity, managed by the Org Admin under App Settings.
              System Admin only sees an informational note here. -->
-        <div class="second-row">
-          <div class="detail-group org-policy-managed">
-            <h4>
-              <i class="pi pi-shield"></i>
-              {{ 'ORG.SECURITY_AND_EMAIL' | translate }}
-            </h4>
-            <p class="org-policy-note">
-              <i class="pi pi-info-circle"></i>
-              {{ 'ORG.SECURITY_EMAIL_MANAGED_BY_ORG_ADMIN' | translate }}
-            </p>
-            <div class="detail-item">
-              <span class="label">
-                <i class="pi pi-lock"></i>
-                {{ 'ORG.ENCRYPTION_ALGORITHM' | translate }}
-              </span>
-              <span class="value">{{
-                'ORG.REVIEW_ENCRYPTION_VALUE' | translate
-              }}</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Third Row -->
-        <div class="second-row">
-          <!-- Configuration Limits -->
-          <div class="detail-group">
-            <h4>{{ 'ORG.CONFIGURATION_LIMITS' | translate }}</h4>
-            <div class="detail-item">
-              <span class="label">
-                <i class="pi pi-database"></i>
-                {{ 'ORG.MAX_DATASOURCES' | translate }}
-              </span>
-              <span class="value">{{
-                organisationData.config.maxDatasources
-              }}</span>
-            </div>
-            <div class="detail-item">
-              <span class="label">
-                <i class="pi pi-user"></i>
-                {{ 'ORG.MAX_USERS' | translate }}
-              </span>
-              <span class="value">{{ organisationData.config.maxUsers }}</span>
-            </div>
-            <div class="detail-item">
-              <span class="label">
+          <div class="second-row">
+            <div class="detail-group org-policy-managed">
+              <h4>
                 <i class="pi pi-shield"></i>
-                {{ 'ORG.MAX_ADMINS' | translate }}
-              </span>
-              <span class="value">{{ organisationData.config.maxAdmins }}</span>
+                {{ 'ORG.SECURITY_AND_EMAIL' | translate }}
+              </h4>
+              <p class="org-policy-note">
+                <i class="pi pi-info-circle"></i>
+                {{ 'ORG.SECURITY_EMAIL_MANAGED_BY_ORG_ADMIN' | translate }}
+              </p>
+              <div class="detail-item">
+                <span class="label">
+                  <i class="pi pi-lock"></i>
+                  {{ 'ORG.ENCRYPTION_ALGORITHM' | translate }}
+                </span>
+                <span class="value">{{
+                  'ORG.REVIEW_ENCRYPTION_VALUE' | translate
+                }}</span>
+              </div>
             </div>
           </div>
 
-          <!-- Additional Limits -->
-          <div class="detail-group">
-            <h4>{{ 'ORG.ADDITIONAL_LIMITS' | translate }}</h4>
-            <div class="detail-item">
-              <span class="label">
-                <i class="pi pi-users"></i>
-                {{ 'ORG.MAX_GROUPS' | translate }}
-              </span>
-              <span class="value">{{ organisationData.config.maxGroups }}</span>
+          <!-- Third Row -->
+          <div class="second-row">
+            <!-- Configuration Limits -->
+            <div class="detail-group">
+              <h4>{{ 'ORG.CONFIGURATION_LIMITS' | translate }}</h4>
+              <div class="detail-item">
+                <span class="label">
+                  <i class="pi pi-database"></i>
+                  {{ 'ORG.MAX_DATASOURCES' | translate }}
+                </span>
+                <span class="value">{{
+                  organisationData.config.maxDatasources
+                }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="label">
+                  <i class="pi pi-user"></i>
+                  {{ 'ORG.MAX_USERS' | translate }}
+                </span>
+                <span class="value">{{
+                  organisationData.config.maxUsers
+                }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="label">
+                  <i class="pi pi-shield"></i>
+                  {{ 'ORG.MAX_ADMINS' | translate }}
+                </span>
+                <span class="value">{{
+                  organisationData.config.maxAdmins
+                }}</span>
+              </div>
             </div>
-            <div class="detail-item">
-              <span class="label">
-                <i class="pi pi-globe"></i>
-                {{ 'ORG.MAX_ENVIRONMENTS' | translate }}
-              </span>
-              <span class="value">{{
-                organisationData.config.maxEnvironment
-              }}</span>
-            </div>
-            <div class="detail-item">
-              <span class="label">
-                <i class="pi pi-list"></i>
-                {{ 'ORG.MAX_CATEGORIES' | translate }}
-              </span>
-              <span class="value">{{
-                organisationData.config.maxCategories
-              }}</span>
+
+            <!-- Additional Limits -->
+            <div class="detail-group">
+              <h4>{{ 'ORG.ADDITIONAL_LIMITS' | translate }}</h4>
+              <div class="detail-item">
+                <span class="label">
+                  <i class="pi pi-users"></i>
+                  {{ 'ORG.MAX_GROUPS' | translate }}
+                </span>
+                <span class="value">{{
+                  organisationData.config.maxGroups
+                }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="label">
+                  <i class="pi pi-globe"></i>
+                  {{ 'ORG.MAX_ENVIRONMENTS' | translate }}
+                </span>
+                <span class="value">{{
+                  organisationData.config.maxEnvironment
+                }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="label">
+                  <i class="pi pi-list"></i>
+                  {{ 'ORG.MAX_CATEGORIES' | translate }}
+                </span>
+                <span class="value">{{
+                  organisationData.config.maxCategories
+                }}</span>
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
     </ng-container>
   </div>
 </div>

@@ -80,7 +80,9 @@
                 variant="status"
                 [tone]="current()!.isEnabled ? 'success' : 'error'"
                 [icon]="
-                  current()!.isEnabled ? 'pi pi-check-circle' : 'pi pi-times-circle'
+                  current()!.isEnabled
+                    ? 'pi pi-check-circle'
+                    : 'pi pi-times-circle'
                 "
               >
                 {{
@@ -219,12 +221,18 @@
               </span>
               <app-chip variant="tag" size="sm">{{ mc.strategy }}</app-chip>
               <div class="cond-values">
-                <app-chip variant="tag" size="sm" *ngIf="mc.strategy === 'redact'">{{
-                  mc.maskValue || '***'
-                }}</app-chip>
-                <app-chip variant="tag" size="sm" *ngIf="mc.strategy !== 'redact'">{{
-                  'COMMON.NA' | translate
-                }}</app-chip>
+                <app-chip
+                  variant="tag"
+                  size="sm"
+                  *ngIf="mc.strategy === 'redact'"
+                  >{{ mc.maskValue || '***' }}</app-chip
+                >
+                <app-chip
+                  variant="tag"
+                  size="sm"
+                  *ngIf="mc.strategy !== 'redact'"
+                  >{{ 'COMMON.NA' | translate }}</app-chip
+                >
               </div>
             </div>
           </div>

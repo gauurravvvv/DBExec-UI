@@ -84,10 +84,17 @@ export class ScheduleDeliveryDialogComponent implements OnChanges {
     label: this.translate.instant(o.label),
   }));
   readonly timezoneOptions = TIMEZONE_OPTIONS;
-  readonly formatOptions: { label: string; value: DashboardDeliveryFormat }[] = [
-    { label: this.translate.instant('DASHBOARD.SCHEDULE.FORMAT_PDF'), value: 'pdf' },
-    { label: this.translate.instant('DASHBOARD.SCHEDULE.FORMAT_PNG'), value: 'png' },
-  ];
+  readonly formatOptions: { label: string; value: DashboardDeliveryFormat }[] =
+    [
+      {
+        label: this.translate.instant('DASHBOARD.SCHEDULE.FORMAT_PDF'),
+        value: 'pdf',
+      },
+      {
+        label: this.translate.instant('DASHBOARD.SCHEDULE.FORMAT_PNG'),
+        value: 'png',
+      },
+    ];
 
   form: FormGroup = this.fb.group({
     cronExpression: ['0 9 * * 1', Validators.required],
@@ -134,7 +141,9 @@ export class ScheduleDeliveryDialogComponent implements OnChanges {
     this.loading = true;
     this.cdr.markForCheck();
     try {
-      this.subscriptions = await this.subscriptionService.list(this.dashboardId);
+      this.subscriptions = await this.subscriptionService.list(
+        this.dashboardId,
+      );
     } catch {
       this.subscriptions = [];
     } finally {

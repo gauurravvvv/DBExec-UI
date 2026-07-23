@@ -29,17 +29,17 @@
 
 ## 3. Gaps
 
-| ID | Gap | Severity |
-|---|---|---|
-| RLS-G01 | Column-level security (hide column) | P0 |
-| RLS-G02 | Column masking (substring / hash / category) | P0 |
-| RLS-G03 | User attributes (e.g. `region`, `client_id`) → injected into predicates | P0 |
-| RLS-G04 | Connection impersonation (run as DB user X) | P1 |
-| RLS-G05 | Test-as-user (admin previews what user X sees) | P0 |
-| RLS-G06 | Group-level overrides | P1 |
-| RLS-G07 | "Allow override for owner" | P1 |
-| RLS-G08 | Audit row per RLS predicate fired | P1 |
-| RLS-G09 | Composable rule expressions (AND/OR across rules) | P1 |
+| ID      | Gap                                                                     | Severity |
+| ------- | ----------------------------------------------------------------------- | -------- |
+| RLS-G01 | Column-level security (hide column)                                     | P0       |
+| RLS-G02 | Column masking (substring / hash / category)                            | P0       |
+| RLS-G03 | User attributes (e.g. `region`, `client_id`) → injected into predicates | P0       |
+| RLS-G04 | Connection impersonation (run as DB user X)                             | P1       |
+| RLS-G05 | Test-as-user (admin previews what user X sees)                          | P0       |
+| RLS-G06 | Group-level overrides                                                   | P1       |
+| RLS-G07 | "Allow override for owner"                                              | P1       |
+| RLS-G08 | Audit row per RLS predicate fired                                       | P1       |
+| RLS-G09 | Composable rule expressions (AND/OR across rules)                       | P1       |
 
 ## 4. Target architecture
 
@@ -87,7 +87,7 @@ export class SecurityCompiler {
     caller: AuthCtx,
   ): { sql: string; bindings: unknown[]; projection: ProjectionRewrite } {
     const rules = await this.loadRowRules(dataset.id, caller);
-    const cols  = await this.loadColumnRules(dataset.id, caller);
+    const cols = await this.loadColumnRules(dataset.id, caller);
     const userAttrs = await this.loadUserAttributes(caller.userId);
 
     const predicates = rules.map(r => this.renderRow(r, userAttrs));
@@ -95,26 +95,34 @@ export class SecurityCompiler {
 
     const projection = this.rewriteProjection(sql, cols);
 
-    const wrapped = predicates.length > 0
-      ? `SELECT * FROM (${sql}) base WHERE ${predicates.join(' AND ')}`
-      : sql;
+    const wrapped =
+      predicates.length > 0
+        ? `SELECT * FROM (${sql}) base WHERE ${predicates.join(' AND ')}`
+        : sql;
     return { sql: wrapped, bindings, projection };
   }
 
   private renderRow(rule: RlsRule, attrs: Record<string, unknown>): string {
     // Support `{{user.region}}` style substitution.
     let values = rule.values;
-    if (Array.isArray(values) && values.some(v => typeof v === 'string' && v.startsWith('{{'))) {
+    if (
+      Array.isArray(values) &&
+      values.some(v => typeof v === 'string' && v.startsWith('{{'))
+    ) {
       values = values.map(v => {
         const m = /^\{\{user\.(\w+)\}\}$/.exec(String(v));
         return m ? attrs[m[1]] : v;
       });
     }
     switch (rule.operator) {
-      case 'in':      return `${q(rule.columnName)} IN (${list(values)})`;
-      case 'not_in':  return `${q(rule.columnName)} NOT IN (${list(values)})`;
-      case 'equals':  return `${q(rule.columnName)} = ${lit(values[0])}`;
-      case 'between': return `${q(rule.columnName)} BETWEEN ${lit(values[0])} AND ${lit(values[1])}`;
+      case 'in':
+        return `${q(rule.columnName)} IN (${list(values)})`;
+      case 'not_in':
+        return `${q(rule.columnName)} NOT IN (${list(values)})`;
+      case 'equals':
+        return `${q(rule.columnName)} = ${lit(values[0])}`;
+      case 'between':
+        return `${q(rule.columnName)} BETWEEN ${lit(values[0])} AND ${lit(values[1])}`;
     }
   }
 }
@@ -137,7 +145,10 @@ private rewriteProjection(sql: string, rules: ColumnRule[]): ProjectionRewrite {
 Then the executing layer (after fetching rows) drops or masks:
 
 ```ts
-function applyProjection(rows: Record<string, unknown>[], p: ProjectionRewrite) {
+function applyProjection(
+  rows: Record<string, unknown>[],
+  p: ProjectionRewrite,
+) {
   if (!p.hide.length && !p.mask.length) return rows;
   return rows.map(r => {
     const o: Record<string, unknown> = { ...r };
@@ -165,7 +176,10 @@ function applyMask(v: unknown, pattern: string): unknown {
   return pattern
     .replace(/\{last(\d+)\}/g, (_, n) => s.slice(-Number(n)))
     .replace(/\{first(\d+)\}/g, (_, n) => s.slice(0, Number(n)))
-    .replace(/\{hash\}/g, crypto.createHash('sha256').update(s).digest('hex').slice(0, 12))
+    .replace(
+      /\{hash\}/g,
+      crypto.createHash('sha256').update(s).digest('hex').slice(0, 12),
+    )
     .replace(/\{category\}/g, () => categorise(Number(s)));
 }
 ```
@@ -183,16 +197,16 @@ banner: "Previewing as Alice (member of group APAC)".
 
 ## 5. APIs
 
-| Method | Path | Purpose |
-|---|---|---|
-| POST   | `/column-security` | Add column rule |
-| PUT    | `/column-security/:id` | Update |
-| DELETE | `/column-security/:id` | Delete |
-| GET    | `/column-security/list/:datasetId` | List |
-| POST   | `/user-attributes` | Define attribute |
-| GET    | `/user-attributes/list` | List |
-| PUT    | `/user-attributes/value` | Set value for user |
-| POST   | `/dataset/:id/preview-as` | Test-as-user |
+| Method | Path                               | Purpose            |
+| ------ | ---------------------------------- | ------------------ |
+| POST   | `/column-security`                 | Add column rule    |
+| PUT    | `/column-security/:id`             | Update             |
+| DELETE | `/column-security/:id`             | Delete             |
+| GET    | `/column-security/list/:datasetId` | List               |
+| POST   | `/user-attributes`                 | Define attribute   |
+| GET    | `/user-attributes/list`            | List               |
+| PUT    | `/user-attributes/value`           | Set value for user |
+| POST   | `/dataset/:id/preview-as`          | Test-as-user       |
 
 ## 6. UI specs
 
@@ -234,7 +248,8 @@ export default async function datasetPreview(req, res) {
   const safeCols = columns.filter(c => !sec.projection.hide.includes(c.name));
 
   return sendResponse(res, true, CODE.SUCCESS, 'ok', {
-    rows: safeRows, columns: safeCols,
+    rows: safeRows,
+    columns: safeCols,
   });
 }
 ```

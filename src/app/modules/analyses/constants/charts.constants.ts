@@ -1,7 +1,4 @@
-import {
-  ChartCapabilities,
-  getChartCapabilities,
-} from './chart-capabilities';
+import { ChartCapabilities, getChartCapabilities } from './chart-capabilities';
 
 /**
  * Raw chart-type definitions. Each entry gets a `capabilities` object stamped
@@ -728,7 +725,10 @@ export const LABEL_POSITIONS = [
   { label: 'CHART_OPTIONS.LABEL_POSITIONS.INSIDELEFT', value: 'insideLeft' },
   { label: 'CHART_OPTIONS.LABEL_POSITIONS.INSIDERIGHT', value: 'insideRight' },
   { label: 'CHART_OPTIONS.LABEL_POSITIONS.INSIDETOP', value: 'insideTop' },
-  { label: 'CHART_OPTIONS.LABEL_POSITIONS.INSIDEBOTTOM', value: 'insideBottom' },
+  {
+    label: 'CHART_OPTIONS.LABEL_POSITIONS.INSIDEBOTTOM',
+    value: 'insideBottom',
+  },
 ];
 
 export const TOOLTIP_TRIGGERS = [
@@ -761,8 +761,14 @@ export const ANIMATION_EASINGS = [
   { label: 'CHART_OPTIONS.ANIMATION_EASINGS.CUBICOUT', value: 'cubicOut' },
   { label: 'CHART_OPTIONS.ANIMATION_EASINGS.ELASTICOUT', value: 'elasticOut' },
   { label: 'CHART_OPTIONS.ANIMATION_EASINGS.BOUNCEOUT', value: 'bounceOut' },
-  { label: 'CHART_OPTIONS.ANIMATION_EASINGS.QUADRATICINOUT', value: 'quadraticInOut' },
-  { label: 'CHART_OPTIONS.ANIMATION_EASINGS.EXPONENTIALOUT', value: 'exponentialOut' },
+  {
+    label: 'CHART_OPTIONS.ANIMATION_EASINGS.QUADRATICINOUT',
+    value: 'quadraticInOut',
+  },
+  {
+    label: 'CHART_OPTIONS.ANIMATION_EASINGS.EXPONENTIALOUT',
+    value: 'exponentialOut',
+  },
 ];
 
 // Line/Area chart ECharts options
@@ -877,7 +883,10 @@ export const TREEMAP_NODE_CLICK_OPTIONS = [
 // Sunburst node click actions
 export const SUNBURST_NODE_CLICK_OPTIONS = [
   { label: 'CHART_OPTIONS.SUNBURST_NODE_CLICK.FALSE', value: 'false' },
-  { label: 'CHART_OPTIONS.SUNBURST_NODE_CLICK.ROOTTONODE', value: 'rootToNode' },
+  {
+    label: 'CHART_OPTIONS.SUNBURST_NODE_CLICK.ROOTTONODE',
+    value: 'rootToNode',
+  },
   { label: 'CHART_OPTIONS.SUNBURST_NODE_CLICK.LINK', value: 'link' },
 ];
 
@@ -1054,7 +1063,10 @@ export const DATA_ZOOM_TYPE_OPTIONS = [
 
 export const DATA_ZOOM_FILTER_MODE_OPTIONS = [
   { label: 'CHART_OPTIONS.DATA_ZOOM_FILTER_MODE.FILTER', value: 'filter' },
-  { label: 'CHART_OPTIONS.DATA_ZOOM_FILTER_MODE.WEAKFILTER', value: 'weakFilter' },
+  {
+    label: 'CHART_OPTIONS.DATA_ZOOM_FILTER_MODE.WEAKFILTER',
+    value: 'weakFilter',
+  },
   { label: 'CHART_OPTIONS.DATA_ZOOM_FILTER_MODE.EMPTY', value: 'empty' },
   { label: 'CHART_OPTIONS.DATA_ZOOM_FILTER_MODE.NONE', value: 'none' },
 ];
@@ -1067,7 +1079,10 @@ export const AREA_ORIGIN_OPTIONS = [
 
 export const SUNBURST_LABEL_ROTATE_OPTIONS = [
   { label: 'CHART_OPTIONS.SUNBURST_LABEL_ROTATE.RADIAL', value: 'radial' },
-  { label: 'CHART_OPTIONS.SUNBURST_LABEL_ROTATE.TANGENTIAL', value: 'tangential' },
+  {
+    label: 'CHART_OPTIONS.SUNBURST_LABEL_ROTATE.TANGENTIAL',
+    value: 'tangential',
+  },
   { label: 'CHART_OPTIONS.SUNBURST_LABEL_ROTATE.0', value: 0 },
 ];
 

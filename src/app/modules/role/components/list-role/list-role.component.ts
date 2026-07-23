@@ -93,7 +93,9 @@ export class ListRoleComponent implements OnInit, OnDestroy {
     // Field-specific search placeholder so the user knows what's matched.
     this.tableConfig = {
       ...this.tableConfig,
-      globalSearchPlaceholder: this.translate.instant('ROLE.SEARCH_PLACEHOLDER'),
+      globalSearchPlaceholder: this.translate.instant(
+        'ROLE.SEARCH_PLACEHOLDER',
+      ),
     };
     this.bindAdapter();
   }
@@ -109,11 +111,40 @@ export class ListRoleComponent implements OnInit, OnDestroy {
   private buildColumns(): CustomTableColumn[] {
     const t = (k: string) => this.translate.instant(k);
     return [
-      { colId: 'name', field: 'name', header: t('COMMON.NAME'), width: '224px', frozen: true, filter: 'text' },
-      { colId: 'description', field: 'description', header: t('ROLE.DESCRIPTION'), width: '320px', sortable: false, filter: 'text' },
-      { colId: 'status', field: 'status', header: t('COMMON.STATUS'), width: '144px' },
-      { colId: 'createdOn', field: 'createdOn', header: t('COMMON.CREATED_ON'), width: '192px' },
-      { colId: 'actions', header: t('COMMON.ACTIONS'), width: '144px', sortable: false },
+      {
+        colId: 'name',
+        field: 'name',
+        header: t('COMMON.NAME'),
+        width: '224px',
+        frozen: true,
+        filter: 'text',
+      },
+      {
+        colId: 'description',
+        field: 'description',
+        header: t('ROLE.DESCRIPTION'),
+        width: '320px',
+        sortable: false,
+        filter: 'text',
+      },
+      {
+        colId: 'status',
+        field: 'status',
+        header: t('COMMON.STATUS'),
+        width: '144px',
+      },
+      {
+        colId: 'createdOn',
+        field: 'createdOn',
+        header: t('COMMON.CREATED_ON'),
+        width: '192px',
+      },
+      {
+        colId: 'actions',
+        header: t('COMMON.ACTIONS'),
+        width: '144px',
+        sortable: false,
+      },
     ];
   }
 

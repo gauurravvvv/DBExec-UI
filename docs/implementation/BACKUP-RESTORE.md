@@ -114,6 +114,7 @@ the restorer remaps if needed (when restoring to a different
 org).
 
 Why logical not physical:
+
 - Cross-engine portable.
 - Easier diff at restore time.
 - Storage cheaper (gzip ratios for relational JSON are good).
@@ -126,19 +127,26 @@ Why logical not physical:
 
 ```typescript
 // src/services/backup/take.ts
-export async function takeBackup(orgId: string, kind: 'full' | 'incremental' = 'full'): Promise<BackupArtifact> {
+export async function takeBackup(
+  orgId: string,
+  kind: 'full' | 'incremental' = 'full',
+): Promise<BackupArtifact> {
   const conn = await getOrgConnection(orgId);
   const tables = await listTables(conn);
   const ts = new Date().toISOString().replace(/[:.]/g, '-');
   const key = `backups/org_${orgId}/${ts}/`;
   const dek = randomBytes(32);
-  const wrappedDek = await wrapDekForOrg(dek, orgId);   // BYOK-aware
+  const wrappedDek = await wrapDekForOrg(dek, orgId); // BYOK-aware
 
   let byteCount = 0;
   const fileHashes: Record<string, string> = {};
 
   for (const table of tables) {
-    const stream = await streamRows(conn, table, kind === 'incremental' ? lastBackupAt(orgId) : null);
+    const stream = await streamRows(
+      conn,
+      table,
+      kind === 'incremental' ? lastBackupAt(orgId) : null,
+    );
     const cipher = createCipheriv('aes-256-gcm', dek, randomBytes(12));
     const gz = zlib.createGzip();
     const upload = await storage.openWrite(`${key}${table}.jsonl.gz.enc`);
@@ -146,23 +154,35 @@ export async function takeBackup(orgId: string, kind: 'full' | 'incremental' = '
 
     await pipeline(
       stream.pipe(stringifyJsonl),
-      gz, cipher,
-      tap(chunk => { byteCount += chunk.length; hashStream.update(chunk); }),
+      gz,
+      cipher,
+      tap(chunk => {
+        byteCount += chunk.length;
+        hashStream.update(chunk);
+      }),
       upload,
     );
     fileHashes[table] = hashStream.digest('hex');
   }
 
   const meta = {
-    orgId, schemaVersion: SCHEMA_VERSION, kind,
-    tables, fileHashes, takenAt: ts,
+    orgId,
+    schemaVersion: SCHEMA_VERSION,
+    kind,
+    tables,
+    fileHashes,
+    takenAt: ts,
   };
   await storage.writeJson(`${key}meta.json`, meta);
 
-  const totalSha = sha256(JSON.stringify(meta) + Object.values(fileHashes).join(''));
+  const totalSha = sha256(
+    JSON.stringify(meta) + Object.values(fileHashes).join(''),
+  );
 
   const artifact = await connection.getRepository('BackupArtifact').save({
-    orgId, kind, scope: 'org',
+    orgId,
+    kind,
+    scope: 'org',
     storageUrl: `s3://${BUCKET}/${key}`,
     byteSize: byteCount,
     sha256: totalSha,
@@ -193,7 +213,9 @@ export async function verifyLatestBackup(orgId: string): Promise<void> {
 
   // Restore into a sandbox Postgres schema
   const sandboxSchema = `verify_${orgId.replace(/-/g, '_')}`;
-  await managedPool.query(`DROP SCHEMA IF EXISTS ${sandboxSchema} CASCADE; CREATE SCHEMA ${sandboxSchema};`);
+  await managedPool.query(
+    `DROP SCHEMA IF EXISTS ${sandboxSchema} CASCADE; CREATE SCHEMA ${sandboxSchema};`,
+  );
 
   try {
     await restoreToSchema(latest, sandboxSchema, { dryRun: false });
@@ -201,14 +223,20 @@ export async function verifyLatestBackup(orgId: string): Promise<void> {
     // Run a row-count + checksum check vs metadata
     const ok = await crossCheck(latest, sandboxSchema);
 
-    await connection.getRepository('BackupArtifact').update({ id: latest.id }, {
-      verifiedAt: new Date(),
-      verifyStatus: ok ? 'ok' : 'failed',
-    });
+    await connection.getRepository('BackupArtifact').update(
+      { id: latest.id },
+      {
+        verifiedAt: new Date(),
+        verifyStatus: ok ? 'ok' : 'failed',
+      },
+    );
 
     if (!ok) {
       await notify({
-        orgId, userId: SUPER_ADMIN_USER_ID, category: 'admin', severity: 'critical',
+        orgId,
+        userId: SUPER_ADMIN_USER_ID,
+        category: 'admin',
+        severity: 'critical',
         title: `Backup verify failed for org ${orgId}`,
         body: `Latest backup ${latest.id} could not be restored cleanly.`,
       });
@@ -228,7 +256,15 @@ Runs Sunday 03:00 UTC. Alerts on failure.
 ```typescript
 // src/controllers/backup/restore.ts
 const initiateRestore = async (req: Request, res: Response) => {
-  const { backupId, scope, entityKind, entityId, targetKind, dryRun, confirmation } = req.body;
+  const {
+    backupId,
+    scope,
+    entityKind,
+    entityId,
+    targetKind,
+    dryRun,
+    confirmation,
+  } = req.body;
   const { loggedInId, orgData, master_db_connection } = res.locals;
   const connection = orgData.connection;
   try {
@@ -238,17 +274,27 @@ const initiateRestore = async (req: Request, res: Response) => {
     }
 
     const job = await connection.getRepository('RestoreJob').save({
-      orgId: orgData.orgId, backupId, initiatedBy: loggedInId,
-      scope, entityKind, entityId, targetKind, dryRun: !!dryRun,
+      orgId: orgData.orgId,
+      backupId,
+      initiatedBy: loggedInId,
+      scope,
+      entityKind,
+      entityId,
+      targetKind,
+      dryRun: !!dryRun,
       status: 'pending',
     });
 
     await restoreQueue.add('restore', { jobId: job.id });
 
     await auditLogger.logAuditToOrg({
-      connection, req, res,
-      module: AUDIT_MODULES.RESTORE, action: AUDIT_ACTIONS.INITIATE,
-      entityName: 'RestoreJob', entityId: job.id,
+      connection,
+      req,
+      res,
+      module: AUDIT_MODULES.RESTORE,
+      action: AUDIT_ACTIONS.INITIATE,
+      entityName: 'RestoreJob',
+      entityId: job.id,
       metadata: { backupId, scope, targetKind, dryRun: !!dryRun },
     });
 
@@ -276,7 +322,7 @@ For the org's Postgres shared DB (when we own it), wal-g or
 pgBackRest streams WAL segments to S3 continuously. Restore at
 T = restore base + replay until T.
 
-PITR is an *infra* lift, not application code, but the API
+PITR is an _infra_ lift, not application code, but the API
 surface lets an org admin pick a target timestamp from the
 restore UI.
 
@@ -309,7 +355,7 @@ function deriveRetentionTier(date: Date): RetentionTier {
   const d = new Date(date);
   if (isLastDayOfYear(d)) return 'yearly';
   if (isLastDayOfMonth(d)) return 'monthly';
-  if (d.getDay() === 0) return 'weekly';   // Sunday
+  if (d.getDay() === 0) return 'weekly'; // Sunday
   return 'daily';
 }
 ```
@@ -322,51 +368,55 @@ yearly). Customers configure.
 
 ## 9. Observability
 
-| Metric | Type | Labels | Purpose |
-|---|---|---|---|
-| `dbexec_backup_take_total` | counter | `kind`, `outcome` | reliability |
-| `dbexec_backup_size_bytes` | histogram | `kind` | size distribution |
-| `dbexec_backup_take_ms` | histogram | `kind` | latency |
-| `dbexec_backup_verify_total` | counter | `outcome` | nightly verify |
-| `dbexec_backup_pruned_total` | counter | `tier` | retention pruning |
-| `dbexec_restore_initiated_total` | counter | `target` | usage |
-| `dbexec_restore_ms` | histogram | `target` | latency |
-| `dbexec_backup_storage_bytes` | gauge | `org` | per-org footprint |
+| Metric                           | Type      | Labels            | Purpose           |
+| -------------------------------- | --------- | ----------------- | ----------------- |
+| `dbexec_backup_take_total`       | counter   | `kind`, `outcome` | reliability       |
+| `dbexec_backup_size_bytes`       | histogram | `kind`            | size distribution |
+| `dbexec_backup_take_ms`          | histogram | `kind`            | latency           |
+| `dbexec_backup_verify_total`     | counter   | `outcome`         | nightly verify    |
+| `dbexec_backup_pruned_total`     | counter   | `tier`            | retention pruning |
+| `dbexec_restore_initiated_total` | counter   | `target`          | usage             |
+| `dbexec_restore_ms`              | histogram | `target`          | latency           |
+| `dbexec_backup_storage_bytes`    | gauge     | `org`             | per-org footprint |
 
 ---
 
 ## 10. Security & threat model
 
-| Threat | Mitigation |
-|---|---|
-| Backup stolen from S3 | KMS envelope encryption; without DEK access the bytes are useless |
-| BYOK key revocation | Without the customer's KEK, even DBExec can't decrypt — this is the customer's safety property |
-| Restore reintroduces PII | Restore audit captures actor + scope; subjects of GDPR erasure are checked before restore (`gdpr_request.kind='erasure'` blocks restore unless super-admin override) |
-| Restore wipes legitimate data | In-place restore requires typed-org-name confirmation; sandbox-first preview always available |
-| Legal hold bypass | S3 Object Lock + app-layer block + audit-logged release |
-| Cross-org restore | Backup org_id required to match target unless super-admin moving an org |
-| Backup buffer overflow | Streaming pipeline; no full-table in memory |
-| Race on retention prune vs restore | Restore acquires advisory lock on artifact; prune respects lock |
-| WAL gap | Continuous-archiving health check; alert if gap > 5 min |
+| Threat                             | Mitigation                                                                                                                                                           |
+| ---------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Backup stolen from S3              | KMS envelope encryption; without DEK access the bytes are useless                                                                                                    |
+| BYOK key revocation                | Without the customer's KEK, even DBExec can't decrypt — this is the customer's safety property                                                                       |
+| Restore reintroduces PII           | Restore audit captures actor + scope; subjects of GDPR erasure are checked before restore (`gdpr_request.kind='erasure'` blocks restore unless super-admin override) |
+| Restore wipes legitimate data      | In-place restore requires typed-org-name confirmation; sandbox-first preview always available                                                                        |
+| Legal hold bypass                  | S3 Object Lock + app-layer block + audit-logged release                                                                                                              |
+| Cross-org restore                  | Backup org_id required to match target unless super-admin moving an org                                                                                              |
+| Backup buffer overflow             | Streaming pipeline; no full-table in memory                                                                                                                          |
+| Race on retention prune vs restore | Restore acquires advisory lock on artifact; prune respects lock                                                                                                      |
+| WAL gap                            | Continuous-archiving health check; alert if gap > 5 min                                                                                                              |
 
 ---
 
 ## 11. Operational runbook
 
 **Symptom: nightly verify fails for one org.**
+
 1. Storage corruption? Re-run download with sha256 check.
    If hash mismatches stored value, S3 corruption — alert.
 2. Schema migration drift? Verify catches version skew; bump
    `schema_version` and re-run migration.
 
 **Symptom: restore stuck in `pending`.**
+
 1. Queue worker down. Check BullMQ admin.
 
 **Symptom: customer demands proof of restore.**
+
 1. Verify-restore log per artifact lives in `backup_artifact.
-   verified_at`. Export the audit chain for that period.
+verified_at`. Export the audit chain for that period.
 
 **Symptom: region outage.**
+
 1. Failover: spin up replica in DR region, swap DNS, point app
    to DR shared DB. Documented in DR runbook; this module's
    schema makes it possible.
@@ -375,14 +425,14 @@ yearly). Customers configure.
 
 ## 12. Perf budget
 
-| Operation | p50 | p95 | Hard ceiling |
-|---|---|---|---|
-| Take backup (small org, 100 MB DB) | 30 s | 90 s | 5 min |
-| Take backup (large org, 50 GB DB) | 20 min | 60 min | 4 h |
-| Restore dry-run | 60 s | 5 min | 30 min |
-| Restore in-place | 2 min | 10 min | 1 h |
-| Verify-restore | 1 min | 5 min | 30 min |
-| KMS DEK unwrap | 20 ms | 80 ms | 500 ms |
+| Operation                          | p50    | p95    | Hard ceiling |
+| ---------------------------------- | ------ | ------ | ------------ |
+| Take backup (small org, 100 MB DB) | 30 s   | 90 s   | 5 min        |
+| Take backup (large org, 50 GB DB)  | 20 min | 60 min | 4 h          |
+| Restore dry-run                    | 60 s   | 5 min  | 30 min       |
+| Restore in-place                   | 2 min  | 10 min | 1 h          |
+| Verify-restore                     | 1 min  | 5 min  | 30 min       |
+| KMS DEK unwrap                     | 20 ms  | 80 ms  | 500 ms       |
 
 ---
 

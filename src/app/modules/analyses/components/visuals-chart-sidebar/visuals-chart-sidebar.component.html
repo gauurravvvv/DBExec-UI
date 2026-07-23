@@ -112,7 +112,11 @@
           >
             <div class="axis-label">
               {{ slot.label | translate
-              }}{{ slot.required ? '' : ' ' + ('ANALYSES.OPTIONAL_SUFFIX' | translate) }}
+              }}{{
+                slot.required
+                  ? ''
+                  : ' ' + ('ANALYSES.OPTIONAL_SUFFIX' | translate)
+              }}
             </div>
             <div
               class="axis-value"
@@ -157,14 +161,20 @@
                 styleClass="pill-menu-panel"
               >
                 <div class="pill-menu" *ngIf="pillMenuRole === slot.key">
-                  <div class="pill-menu__section" *ngIf="isMeasureRole(slot.key)">
+                  <div
+                    class="pill-menu__section"
+                    *ngIf="isMeasureRole(slot.key)"
+                  >
                     <div class="pill-menu__label">
                       {{ 'ANALYSES.ENCODING.MENU_AGG' | translate }}
                     </div>
                     <button
                       type="button"
                       class="pill-menu__item"
-                      *ngFor="let opt of aggregateOptions; trackBy: trackByIndex"
+                      *ngFor="
+                        let opt of aggregateOptions;
+                        trackBy: trackByIndex
+                      "
                       [class.is-active]="currentAggregate === opt.value"
                       (click)="setPillAggregate(opt.value, pillOp)"
                     >
@@ -189,7 +199,9 @@
                       (click)="setPillSort(slot.key, 'asc', pillOp)"
                     >
                       <i class="pi pi-sort-amount-up"></i>
-                      <span>{{ 'ANALYSES.ENCODING.MENU_SORT_ASC' | translate }}</span>
+                      <span>{{
+                        'ANALYSES.ENCODING.MENU_SORT_ASC' | translate
+                      }}</span>
                     </button>
                     <button
                       type="button"
@@ -198,7 +210,9 @@
                       (click)="setPillSort(slot.key, 'desc', pillOp)"
                     >
                       <i class="pi pi-sort-amount-down"></i>
-                      <span>{{ 'ANALYSES.ENCODING.MENU_SORT_DESC' | translate }}</span>
+                      <span>{{
+                        'ANALYSES.ENCODING.MENU_SORT_DESC' | translate
+                      }}</span>
                     </button>
                     <button
                       type="button"
@@ -207,7 +221,9 @@
                       (click)="setPillSort(slot.key, 'none', pillOp)"
                     >
                       <i class="pi pi-ban"></i>
-                      <span>{{ 'ANALYSES.ENCODING.MENU_SORT_NONE' | translate }}</span>
+                      <span>{{
+                        'ANALYSES.ENCODING.MENU_SORT_NONE' | translate
+                      }}</span>
                     </button>
                   </div>
 
@@ -218,7 +234,9 @@
                       (click)="openPillFormat(slot.key, pillOp)"
                     >
                       <i class="pi pi-sliders-h"></i>
-                      <span>{{ 'ANALYSES.ENCODING.MENU_FORMAT' | translate }}</span>
+                      <span>{{
+                        'ANALYSES.ENCODING.MENU_FORMAT' | translate
+                      }}</span>
                     </button>
                     <button
                       type="button"
@@ -226,7 +244,9 @@
                       (click)="removePillField(slot.key, pillOp)"
                     >
                       <i class="pi pi-times"></i>
-                      <span>{{ 'ANALYSES.ENCODING.MENU_REMOVE' | translate }}</span>
+                      <span>{{
+                        'ANALYSES.ENCODING.MENU_REMOVE' | translate
+                      }}</span>
                     </button>
                   </div>
                 </div>
@@ -268,7 +288,11 @@
           >
             <div class="axis-label">
               {{ slot.label | translate
-              }}{{ slot.required ? '' : ' ' + ('ANALYSES.OPTIONAL_SUFFIX' | translate) }}
+              }}{{
+                slot.required
+                  ? ''
+                  : ' ' + ('ANALYSES.OPTIONAL_SUFFIX' | translate)
+              }}
             </div>
             <div class="axis-chips">
               <app-chip

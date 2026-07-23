@@ -20,7 +20,11 @@ export function splitStatements(input: string): SqlStatement[] {
     const trimmed = raw.trim();
     if (trimmed) {
       const lead = raw.length - raw.trimStart().length;
-      out.push({ sql: trimmed, from: start + lead, to: start + lead + trimmed.length });
+      out.push({
+        sql: trimmed,
+        from: start + lead,
+        to: start + lead + trimmed.length,
+      });
     }
     start = end + 1;
   };

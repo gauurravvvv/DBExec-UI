@@ -127,12 +127,47 @@ export class ListTabComponent implements OnInit, OnDestroy {
   private buildColumns(): CustomTableColumn[] {
     const t = (k: string) => this.translate.instant(k);
     return [
-      { colId: 'name', field: 'name', header: t('COMMON.NAME'), width: '224px', frozen: true, filter: 'text' },
-      { colId: 'description', field: 'description', header: t('COMMON.DESCRIPTION'), width: '320px', filter: 'text', sortable: false },
-      { colId: 'sections', field: 'sections', header: t('COMMON.SECTIONS'), width: '128px', sortable: false },
-      { colId: 'status', field: 'status', header: t('COMMON.STATUS'), width: '144px' },
-      { colId: 'createdOn', field: 'createdOn', header: t('COMMON.CREATED_ON'), width: '192px' },
-      { colId: 'actions', header: t('COMMON.ACTIONS'), width: '112px', sortable: false },
+      {
+        colId: 'name',
+        field: 'name',
+        header: t('COMMON.NAME'),
+        width: '224px',
+        frozen: true,
+        filter: 'text',
+      },
+      {
+        colId: 'description',
+        field: 'description',
+        header: t('COMMON.DESCRIPTION'),
+        width: '320px',
+        filter: 'text',
+        sortable: false,
+      },
+      {
+        colId: 'sections',
+        field: 'sections',
+        header: t('COMMON.SECTIONS'),
+        width: '128px',
+        sortable: false,
+      },
+      {
+        colId: 'status',
+        field: 'status',
+        header: t('COMMON.STATUS'),
+        width: '144px',
+      },
+      {
+        colId: 'createdOn',
+        field: 'createdOn',
+        header: t('COMMON.CREATED_ON'),
+        width: '192px',
+      },
+      {
+        colId: 'actions',
+        header: t('COMMON.ACTIONS'),
+        width: '112px',
+        sortable: false,
+      },
     ];
   }
 

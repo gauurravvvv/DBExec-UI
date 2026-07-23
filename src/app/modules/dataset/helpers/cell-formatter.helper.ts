@@ -32,13 +32,7 @@
 export const CELL_JSON_DISPLAY_CAP = 5_000;
 
 export type CellKind =
-  | 'null'
-  | 'number'
-  | 'json'
-  | 'date'
-  | 'bool'
-  | 'buffer'
-  | 'text';
+  'null' | 'number' | 'json' | 'date' | 'bool' | 'buffer' | 'text';
 
 export interface FormattedCell {
   /** Pre-stringified display value. The template renders this as

@@ -20,7 +20,7 @@ DBExec already has, in research, two related concepts:
 - **Drill-through** (extra-tab): click cell → navigate elsewhere,
   carrying context.
 
-The product gap is the *cross-tab* variant: navigation stays
+The product gap is the _cross-tab_ variant: navigation stays
 inside the same dashboard but lands on a different tab, with
 the clicked-cell's dimension values prefilled into the target
 tab's filters.
@@ -28,8 +28,8 @@ tab's filters.
 Example:
 
 > User looks at the **Sales by Region** bar chart on the
-> *Overview* tab. They click the "APAC" bar. The dashboard
-> switches to the *Regional Detail* tab and the tab's
+> _Overview_ tab. They click the "APAC" bar. The dashboard
+> switches to the _Regional Detail_ tab and the tab's
 > `region` filter is set to `APAC`.
 
 This is what every mature BI product calls "tab navigation
@@ -161,18 +161,23 @@ function resolveAction(
   echartParams: ECEventParams,
   dashboardCtx: DashboardCtx,
 ): ResolvedAction | null {
-  const action = visualActionsFor(visualId, dashboardCtx.dashboardId)
-    .find(a => a.is_enabled && matchesTrigger(a.trigger, echartParams.event));
+  const action = visualActionsFor(visualId, dashboardCtx.dashboardId).find(
+    a => a.is_enabled && matchesTrigger(a.trigger, echartParams.event),
+  );
 
   if (!action) return null;
 
-  const cellDims = dimsFromEchartClick(echartParams);     // { region: 'APAC', ... }
+  const cellDims = dimsFromEchartClick(echartParams); // { region: 'APAC', ... }
 
   switch (action.kind) {
-    case 'tab_nav': return buildTabNavUrl(action.config, cellDims, dashboardCtx);
-    case 'drill_through': return buildDrillThroughUrl(action.config, cellDims);
-    case 'url': return buildExternalUrl(action.config, cellDims);
-    case 'raw_rows': return openRawRowsSheet(action.config, cellDims, visualId);
+    case 'tab_nav':
+      return buildTabNavUrl(action.config, cellDims, dashboardCtx);
+    case 'drill_through':
+      return buildDrillThroughUrl(action.config, cellDims);
+    case 'url':
+      return buildExternalUrl(action.config, cellDims);
+    case 'raw_rows':
+      return openRawRowsSheet(action.config, cellDims, visualId);
   }
 }
 ```
@@ -215,28 +220,33 @@ POST   /visual-action/reorder
 
 ```ts
 const Body = z.object({
-  visualId:    z.string().uuid(),
-  dashboardId: z.string().uuid().optional(),    // null = global to visual
-  name:        z.string().min(1).max(80),
-  trigger:     z.enum(['click', 'dblclick', 'menu']),
-  kind:        z.enum(['tab_nav', 'drill_through', 'url', 'raw_rows']),
-  config:      z.unknown(),                     // refined per-kind below
+  visualId: z.string().uuid(),
+  dashboardId: z.string().uuid().optional(), // null = global to visual
+  name: z.string().min(1).max(80),
+  trigger: z.enum(['click', 'dblclick', 'menu']),
+  kind: z.enum(['tab_nav', 'drill_through', 'url', 'raw_rows']),
+  config: z.unknown(), // refined per-kind below
   displayOrder: z.number().int().min(0).default(0),
 });
 
 // Discriminated config refinement
 const TabNavConfig = z.object({
   targetTabId: z.string().uuid(),
-  dimMap: z.array(z.object({
-    sourceColumn:   z.string(),
-    targetFilterId: z.string().uuid(),
-  })).min(1),
+  dimMap: z
+    .array(
+      z.object({
+        sourceColumn: z.string(),
+        targetFilterId: z.string().uuid(),
+      }),
+    )
+    .min(1),
   scrollToVisualId: z.string().uuid().optional(),
 });
 // + DrillThroughConfig, UrlConfig, RawRowsConfig
 ```
 
 Validation in the controller:
+
 - `tab_nav`: `targetTabId` must belong to the dashboard the
   action is scoped to. Reject `BAD_REQUEST_TAB_NOT_IN_DASHBOARD`
   otherwise.
@@ -333,6 +343,7 @@ A small interaction signal goes a long way:
   glance.
 
 Accessibility:
+
 - Click actions must also be keyboard-reachable: `Enter` /
   `Space` on a focused chart cell triggers the same action.
 - The `↗︎` icon's tooltip is real text in an `aria-label`.
@@ -341,18 +352,18 @@ Accessibility:
 
 ## 7. Edge cases
 
-| # | Scenario | Expected |
-|---|---|---|
-| C1 | Target tab deleted | Action remains in DB but is grey-listed in UI; runtime no-ops with a console warning |
-| C2 | Target filter deleted | Same — grey-listed |
-| C3 | Author maps two source columns to the same target filter | Reject at validation: `BAD_REQUEST_DUPLICATE_TARGET_FILTER` |
-| C4 | Source column not present in the clicked row's encoding (e.g. user clicked a tooltip-only series) | Skip the mapping silently for that entry; if all mappings skip, no-op the action |
-| C5 | Cross-filter and tab-nav both configured | Cross-filter applies first (intra-tab visual state), then the tab-nav fires; documented order |
-| C6 | RLS hides the target tab from the current user | Show a non-blocking toast "You don't have access to the Regional Detail tab" instead of navigating |
-| C7 | Embedded dashboard | Tab-nav actions work; URL actions opt-in per embed app config (default disallow `target=_blank` for security) |
-| C8 | The same visual used on two dashboards with different actions | Actions are scoped by `(visualId, dashboardId)`; the resolver picks the matching one |
-| C9 | Mobile / touch | Tap fires `click`; long-press fires `menu`; double-tap is unreliable on mobile so dblclick actions auto-fall-back to click on touch devices |
-| C10 | Action chains (A → B → C) | Allowed; we use the standard router navigation, so chains naturally work via further click → resolveAction calls |
+| #   | Scenario                                                                                          | Expected                                                                                                                                    |
+| --- | ------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| C1  | Target tab deleted                                                                                | Action remains in DB but is grey-listed in UI; runtime no-ops with a console warning                                                        |
+| C2  | Target filter deleted                                                                             | Same — grey-listed                                                                                                                          |
+| C3  | Author maps two source columns to the same target filter                                          | Reject at validation: `BAD_REQUEST_DUPLICATE_TARGET_FILTER`                                                                                 |
+| C4  | Source column not present in the clicked row's encoding (e.g. user clicked a tooltip-only series) | Skip the mapping silently for that entry; if all mappings skip, no-op the action                                                            |
+| C5  | Cross-filter and tab-nav both configured                                                          | Cross-filter applies first (intra-tab visual state), then the tab-nav fires; documented order                                               |
+| C6  | RLS hides the target tab from the current user                                                    | Show a non-blocking toast "You don't have access to the Regional Detail tab" instead of navigating                                          |
+| C7  | Embedded dashboard                                                                                | Tab-nav actions work; URL actions opt-in per embed app config (default disallow `target=_blank` for security)                               |
+| C8  | The same visual used on two dashboards with different actions                                     | Actions are scoped by `(visualId, dashboardId)`; the resolver picks the matching one                                                        |
+| C9  | Mobile / touch                                                                                    | Tap fires `click`; long-press fires `menu`; double-tap is unreliable on mobile so dblclick actions auto-fall-back to click on touch devices |
+| C10 | Action chains (A → B → C)                                                                         | Allowed; we use the standard router navigation, so chains naturally work via further click → resolveAction calls                            |
 
 ---
 
@@ -366,7 +377,7 @@ Accessibility:
   region filter set, viewport scrolled to v.
 - `CTDT-002` keyboard: focus cell + Enter → same outcome.
 - `CTDT-010` deleted target tab: action grey-listed, click no-ops
-  + toast.
+  - toast.
 - `CTDT-020` chain: A click → tab 2; tab 2 click → tab 3.
 - `CTDT-030` embed: action fires inside iframe; URL action
   blocked when embed_app config disallows external navigation.
@@ -389,7 +400,7 @@ Accessibility:
 
 1. **Click on multi-series cells**: when a stacked bar represents
    multiple series, which series's value flows through the
-   mapping? Today: the *clicked* series's encoding wins; the
+   mapping? Today: the _clicked_ series's encoding wins; the
    author can pick a different series via a "Apply to: stack
    total / clicked series / category" radio in the wizard.
    Defer to v2 if surface area is tight.
@@ -420,38 +431,59 @@ import { AUDIT_MODULES, AUDIT_ACTIONS } from '../../constants/audit.constants';
 import Logger from '../../utility/logger';
 
 const addVisualAction = async (req: Request, res: Response) => {
-  const { visualId, dashboardId, name, trigger, kind, config, displayOrder } = req.body;
+  const { visualId, dashboardId, name, trigger, kind, config, displayOrder } =
+    req.body;
   const { orgData, master_db_connection } = res.locals;
   const connection = orgData.connection;
 
   try {
-    const visual = await connection.getRepository('AnalysisVisual')
+    const visual = await connection
+      .getRepository('AnalysisVisual')
       .findOne({ where: { id: visualId } });
     if (!visual) {
       await master_db_connection.close();
-      return sendResponse(res, false, CODE.NOT_FOUND, VISUAL_ACTION_MSG.VISUAL_NOT_FOUND);
+      return sendResponse(
+        res,
+        false,
+        CODE.NOT_FOUND,
+        VISUAL_ACTION_MSG.VISUAL_NOT_FOUND,
+      );
     }
 
     // Per-kind business validation
     if (kind === 'tab_nav') {
-      const tab = await connection.getRepository('DashboardTab')
+      const tab = await connection
+        .getRepository('DashboardTab')
         .findOne({ where: { id: config.targetTabId, dashboardId } });
       if (!tab) {
         await master_db_connection.close();
-        return sendResponse(res, false, CODE.BAD_REQUEST, VISUAL_ACTION_MSG.TAB_NOT_IN_DASHBOARD);
+        return sendResponse(
+          res,
+          false,
+          CODE.BAD_REQUEST,
+          VISUAL_ACTION_MSG.TAB_NOT_IN_DASHBOARD,
+        );
       }
 
       // Resolve all targetFilterIds → ensure they belong to this dashboard or this tab
       const filterIds = config.dimMap.map((m: any) => m.targetFilterId);
-      const filters = await connection.getRepository('DashboardFilter')
+      const filters = await connection
+        .getRepository('DashboardFilter')
         .createQueryBuilder('f')
         .where('f.id IN (:...ids)', { ids: filterIds })
-        .andWhere('(f.dashboardId = :dashId OR f.dashboardTabId = :tabId)',
-                  { dashId: dashboardId, tabId: tab.id })
+        .andWhere('(f.dashboardId = :dashId OR f.dashboardTabId = :tabId)', {
+          dashId: dashboardId,
+          tabId: tab.id,
+        })
         .getMany();
       if (filters.length !== filterIds.length) {
         await master_db_connection.close();
-        return sendResponse(res, false, CODE.BAD_REQUEST, VISUAL_ACTION_MSG.BAD_DIM_MAP);
+        return sendResponse(
+          res,
+          false,
+          CODE.BAD_REQUEST,
+          VISUAL_ACTION_MSG.BAD_DIM_MAP,
+        );
       }
 
       // sourceColumn must exist on the visual's encoded fields
@@ -459,8 +491,12 @@ const addVisualAction = async (req: Request, res: Response) => {
       for (const m of config.dimMap) {
         if (!encoded.has(m.sourceColumn)) {
           await master_db_connection.close();
-          return sendResponse(res, false, CODE.BAD_REQUEST,
-            `${VISUAL_ACTION_MSG.UNKNOWN_SOURCE_COLUMN}: ${m.sourceColumn}`);
+          return sendResponse(
+            res,
+            false,
+            CODE.BAD_REQUEST,
+            `${VISUAL_ACTION_MSG.UNKNOWN_SOURCE_COLUMN}: ${m.sourceColumn}`,
+          );
         }
       }
     } else if (kind === 'drill_through') {
@@ -468,13 +504,20 @@ const addVisualAction = async (req: Request, res: Response) => {
     }
 
     const action = await connection.getRepository('VisualAction').save({
-      visualId, dashboardId, name, trigger, kind, config,
+      visualId,
+      dashboardId,
+      name,
+      trigger,
+      kind,
+      config,
       displayOrder: displayOrder ?? 0,
       isEnabled: true,
     });
 
     await auditLogger.logAuditToOrg({
-      connection, req, res,
+      connection,
+      req,
+      res,
       module: AUDIT_MODULES.VISUAL_ACTION,
       action: AUDIT_ACTIONS.CREATE,
       entityName: 'VisualAction',
@@ -536,17 +579,22 @@ export class VisualActionResolverService {
     if (!cellDims || Object.keys(cellDims).length === 0) return null;
 
     switch (action.kind) {
-      case 'tab_nav': return this.buildTabNav(action, cellDims, ctx);
-      case 'drill_through': return this.buildDrillThrough(action, cellDims);
-      case 'url': return this.buildExternalUrl(action, cellDims);
-      case 'raw_rows': return this.buildRawRows(action, cellDims, visualId);
+      case 'tab_nav':
+        return this.buildTabNav(action, cellDims, ctx);
+      case 'drill_through':
+        return this.buildDrillThrough(action, cellDims);
+      case 'url':
+        return this.buildExternalUrl(action, cellDims);
+      case 'raw_rows':
+        return this.buildRawRows(action, cellDims, visualId);
     }
   }
 
   private matchesTrigger(trigger: string, event: string): boolean {
     if (trigger === event) return true;
     // Touch fall-back: configured 'dblclick' degrades to 'click' on touch
-    if (trigger === 'dblclick' && event === 'click' && this.isTouch()) return true;
+    if (trigger === 'dblclick' && event === 'click' && this.isTouch())
+      return true;
     return false;
   }
 
@@ -575,12 +623,19 @@ export class VisualActionResolverService {
     cellDims: Record<string, unknown>,
     ctx: DashboardCtx,
   ): ResolvedAction {
-    const cfg = action.config as { targetTabId: string; dimMap: any[]; scrollToVisualId?: string };
+    const cfg = action.config as {
+      targetTabId: string;
+      dimMap: any[];
+      scrollToVisualId?: string;
+    };
     const params = new URLSearchParams();
     params.set('tab', cfg.targetTabId);
     for (const m of cfg.dimMap) {
       if (m.sourceColumn in cellDims) {
-        params.set(`f.${m.targetFilterId}`, this.encodeFilterValue(cellDims[m.sourceColumn]));
+        params.set(
+          `f.${m.targetFilterId}`,
+          this.encodeFilterValue(cellDims[m.sourceColumn]),
+        );
       }
     }
     if (cfg.scrollToVisualId) params.set('scroll', cfg.scrollToVisualId);
@@ -590,13 +645,23 @@ export class VisualActionResolverService {
     };
   }
 
-  private buildDrillThrough(action: VisualAction, cellDims: Record<string, unknown>): ResolvedAction {
-    const cfg = action.config as { targetAnalysisId: string; targetTabId?: string; paramMap: any[] };
+  private buildDrillThrough(
+    action: VisualAction,
+    cellDims: Record<string, unknown>,
+  ): ResolvedAction {
+    const cfg = action.config as {
+      targetAnalysisId: string;
+      targetTabId?: string;
+      paramMap: any[];
+    };
     const params = new URLSearchParams();
     if (cfg.targetTabId) params.set('tab', cfg.targetTabId);
     for (const m of cfg.paramMap) {
       if (m.sourceColumn in cellDims) {
-        params.set(`p.${m.targetParameterId}`, this.encodeFilterValue(cellDims[m.sourceColumn]));
+        params.set(
+          `p.${m.targetParameterId}`,
+          this.encodeFilterValue(cellDims[m.sourceColumn]),
+        );
       }
     }
     return {
@@ -605,7 +670,10 @@ export class VisualActionResolverService {
     };
   }
 
-  private buildExternalUrl(action: VisualAction, cellDims: Record<string, unknown>): ResolvedAction {
+  private buildExternalUrl(
+    action: VisualAction,
+    cellDims: Record<string, unknown>,
+  ): ResolvedAction {
     const cfg = action.config as { urlTemplate: string; newTab: boolean };
     const url = cfg.urlTemplate.replace(/\{\{(\w+)\}\}/g, (_, key) => {
       const v = cellDims[key];
@@ -624,7 +692,11 @@ export class VisualActionResolverService {
       kind: 'open-raw-rows',
       visualId,
       cellDims,
-      rowFilters: Object.entries(cellDims).map(([col, val]) => ({ column: col, op: 'eq', value: val })),
+      rowFilters: Object.entries(cellDims).map(([col, val]) => ({
+        column: col,
+        op: 'eq',
+        value: val,
+      })),
       limit: cfg.limit ?? 100,
       columns: cfg.columns ?? null,
     };
@@ -666,11 +738,11 @@ log line. We sample at 100% for first-week soak, then drop to
 
 Metrics:
 
-| Metric | Type | Labels | Purpose |
-|---|---|---|---|
-| `dbexec_visual_action_fired_total` | counter | `kind`, `trigger` | usage by feature |
-| `dbexec_visual_action_no_resolve_total` | counter | `reason` | `cell_empty`, `target_deleted`, `dim_mismatch` |
-| `dbexec_visual_action_resolve_ms` | histogram | `kind` | resolver latency (should stay sub-1ms) |
+| Metric                                  | Type      | Labels            | Purpose                                        |
+| --------------------------------------- | --------- | ----------------- | ---------------------------------------------- |
+| `dbexec_visual_action_fired_total`      | counter   | `kind`, `trigger` | usage by feature                               |
+| `dbexec_visual_action_no_resolve_total` | counter   | `reason`          | `cell_empty`, `target_deleted`, `dim_mismatch` |
+| `dbexec_visual_action_resolve_ms`       | histogram | `kind`            | resolver latency (should stay sub-1ms)         |
 
 The "no resolve" counter is the leading indicator: a spike on
 `reason='target_deleted'` means a customer just deleted a tab
@@ -679,24 +751,24 @@ proactively.
 
 ## 14. Security & threat model
 
-| Threat | Mitigation |
-|---|---|
-| Action navigates to a tab the user can't see (RLS) | Resolver checks tab visibility against the user's resolved RLS context before navigating; non-blocking toast on deny |
-| URL action template contains attacker-injected fragment | Template substitution `urlencode`s every value; no raw HTML rendering; `urlTemplate` must match `^https?://` and pass per-org allowlist if `embed_app.disallow_external_links = true` |
-| Cell dim value is null/undefined → ends up as the literal string "undefined" | Substitution skips null/undefined; if every value skips, the action no-ops |
-| Author maps two source columns to the same target filter | Reject at validation (`BAD_REQUEST_DUPLICATE_TARGET_FILTER`) |
-| Drill-through into an analysis the user can't access | The downstream analysis page enforces RLS; resolver doesn't bypass anything — worst case is a "permission denied" landing |
-| Embed mode: malicious parent page intercepts the action | Tab nav stays inside the iframe (`router.navigateByUrl`); URL actions emit a `postMessage` to the parent so the parent decides; both controlled by `embed_app` config |
-| Stored XSS via action `name` displayed in author UI | The action name is rendered as text (`{{ action.name }}` in Angular templates auto-escapes); no `[innerHTML]` ever |
-| URL template length DoS | Validation caps `urlTemplate` length at 1024 chars |
+| Threat                                                                       | Mitigation                                                                                                                                                                            |
+| ---------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Action navigates to a tab the user can't see (RLS)                           | Resolver checks tab visibility against the user's resolved RLS context before navigating; non-blocking toast on deny                                                                  |
+| URL action template contains attacker-injected fragment                      | Template substitution `urlencode`s every value; no raw HTML rendering; `urlTemplate` must match `^https?://` and pass per-org allowlist if `embed_app.disallow_external_links = true` |
+| Cell dim value is null/undefined → ends up as the literal string "undefined" | Substitution skips null/undefined; if every value skips, the action no-ops                                                                                                            |
+| Author maps two source columns to the same target filter                     | Reject at validation (`BAD_REQUEST_DUPLICATE_TARGET_FILTER`)                                                                                                                          |
+| Drill-through into an analysis the user can't access                         | The downstream analysis page enforces RLS; resolver doesn't bypass anything — worst case is a "permission denied" landing                                                             |
+| Embed mode: malicious parent page intercepts the action                      | Tab nav stays inside the iframe (`router.navigateByUrl`); URL actions emit a `postMessage` to the parent so the parent decides; both controlled by `embed_app` config                 |
+| Stored XSS via action `name` displayed in author UI                          | The action name is rendered as text (`{{ action.name }}` in Angular templates auto-escapes); no `[innerHTML]` ever                                                                    |
+| URL template length DoS                                                      | Validation caps `urlTemplate` length at 1024 chars                                                                                                                                    |
 
 ## 15. Performance budget
 
-| Operation | Target | Hard ceiling |
-|---|---|---|
-| Resolver compute (click → ResolvedAction) | p99 < 1 ms | 5 ms |
-| Tab nav (click → first paint of target tab) | p95 < 250 ms (cached) / 1.5 s (cold) | 5 s |
-| Cross-tab filter apply (URL state → query re-run) | p50 < 800 ms | reuses module 04 budget |
+| Operation                                         | Target                               | Hard ceiling            |
+| ------------------------------------------------- | ------------------------------------ | ----------------------- |
+| Resolver compute (click → ResolvedAction)         | p99 < 1 ms                           | 5 ms                    |
+| Tab nav (click → first paint of target tab)       | p95 < 250 ms (cached) / 1.5 s (cold) | 5 s                     |
+| Cross-tab filter apply (URL state → query re-run) | p50 < 800 ms                         | reuses module 04 budget |
 
 The resolver runs synchronously on the click handler, so latency
 shows up as input lag. The 1 ms p99 target is what gives the

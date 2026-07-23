@@ -1,7 +1,7 @@
 # Semantic layer
 
 > Implementation companion to research module 02 (Semantic Layer).
-> The semantic layer is the *missing middle* in DBExec today: the
+> The semantic layer is the _missing middle_ in DBExec today: the
 > place where business definitions live so every analyst, alert,
 > and AI tool computes the same numbers the same way. This doc
 > pins exactly what to ship, in what order, with what code.
@@ -26,8 +26,8 @@ semantic layer prevents.
   owned by a team, scoped to one or more datasets).
 - Reusable building blocks: entity, dimension, metric, segment,
   join.
-- A compiler step that takes a *semantic intent* (chose metrics
-  + dimensions + filters) and emits canonical SQL.
+- A compiler step that takes a _semantic intent_ (chose metrics
+  - dimensions + filters) and emits canonical SQL.
 - A FE author UI to build/edit the model.
 - A linter that catches the common mistakes (metric without
   filter, ambiguous join path, non-additive metric used in a
@@ -261,10 +261,10 @@ import { renderDimensionExpr, renderMetricExpr } from './exprRenderer';
 import { applyRls } from './rlsHook';
 
 export interface CompiledQuery {
-  sql:        string;
-  params:     Array<{ name: string; value: unknown }>;
-  selectMap:  Record<string, string>;  // alias → original metric/dim name
-  warnings:   Array<{ code: string; message: string }>;
+  sql: string;
+  params: Array<{ name: string; value: unknown }>;
+  selectMap: Record<string, string>; // alias → original metric/dim name
+  warnings: Array<{ code: string; message: string }>;
 }
 
 export async function compileIntent(
@@ -275,11 +275,12 @@ export async function compileIntent(
   const warnings: CompiledQuery['warnings'] = [];
 
   // 1. Resolve entities referenced
-  const usedDims    = intent.dimensions.map(d => findDim(model, d.dimensionId));
+  const usedDims = intent.dimensions.map(d => findDim(model, d.dimensionId));
   const usedMetrics = intent.metrics.map(m => findMetric(model, m.metricId));
   const usedFilters = intent.filters.map(f => findDim(model, f.dimensionId));
-  const allRefs = [...usedDims, ...usedFilters].map(d => d.entityId)
-                  .concat(usedMetrics.map(m => m.entityId).filter(Boolean));
+  const allRefs = [...usedDims, ...usedFilters]
+    .map(d => d.entityId)
+    .concat(usedMetrics.map(m => m.entityId).filter(Boolean));
 
   const entities = uniqueEntities(model, allRefs);
 
@@ -294,7 +295,9 @@ export async function compileIntent(
   const selectMap: Record<string, string> = {};
   usedDims.forEach((d, i) => {
     const alias = `dim_${i}`;
-    selectParts.push(`${renderDimensionExpr(d, intent.dimensions[i].bucket)} AS "${alias}"`);
+    selectParts.push(
+      `${renderDimensionExpr(d, intent.dimensions[i].bucket)} AS "${alias}"`,
+    );
     selectMap[alias] = d.name;
   });
   usedMetrics.forEach((m, i) => {
@@ -326,7 +329,9 @@ export async function compileIntent(
   const groupByParts = usedDims.map((_, i) => `"dim_${i}"`);
 
   // 7. Render ORDER BY
-  const orderByParts = (intent.orderBy ?? []).map(o => `"${o.field}" ${o.dir.toUpperCase()}`);
+  const orderByParts = (intent.orderBy ?? []).map(
+    o => `"${o.field}" ${o.dir.toUpperCase()}`,
+  );
 
   // 8. Additivity check
   for (const m of usedMetrics) {
@@ -347,7 +352,9 @@ export async function compileIntent(
     groupByParts.length ? `GROUP BY ${groupByParts.join(', ')}` : '',
     orderByParts.length ? `ORDER BY ${orderByParts.join(', ')}` : '',
     intent.limit ? `LIMIT ${intent.limit}` : '',
-  ].filter(Boolean).join('\n');
+  ]
+    .filter(Boolean)
+    .join('\n');
 
   return { sql, params: rls.params ?? [], selectMap, warnings };
 }
@@ -364,19 +371,19 @@ how SQL injection is impossible-by-design.
 Runs on `POST /lint` and on every save. Returns an array of
 issues with `severity` (`error`, `warning`, `info`).
 
-| Rule | Severity | Description |
-|---|---|---|
-| `entity_no_primary` | error | At least one entity must have `is_primary = true` |
-| `duplicate_dim_name` | error | Two dimensions can't share `(model, name)` |
-| `metric_unknown_column` | error | Metric `expr.column` must exist on the entity's dataset |
-| `metric_unknown_dep` | error | Derived metric's `deps` must reference real metric names |
-| `join_no_path` | error | Required entity not reachable from primary entity by declared joins |
-| `join_ambiguous` | warning | Two valid paths between same entities |
-| `non_additive_missing_along` | warning | Non-additive metric must declare its non-additive dims |
-| `pii_dim_no_mask` | warning | PII dimension referenced but no column mask in module 09 |
-| `unused_entity` | info | Entity declared but not referenced by any dim/metric |
-| `circular_derived` | error | Derived metric depends on itself transitively |
-| `expr_unparseable` | error | `expr` field doesn't parse as an expression in the configured dialect |
+| Rule                         | Severity | Description                                                           |
+| ---------------------------- | -------- | --------------------------------------------------------------------- |
+| `entity_no_primary`          | error    | At least one entity must have `is_primary = true`                     |
+| `duplicate_dim_name`         | error    | Two dimensions can't share `(model, name)`                            |
+| `metric_unknown_column`      | error    | Metric `expr.column` must exist on the entity's dataset               |
+| `metric_unknown_dep`         | error    | Derived metric's `deps` must reference real metric names              |
+| `join_no_path`               | error    | Required entity not reachable from primary entity by declared joins   |
+| `join_ambiguous`             | warning  | Two valid paths between same entities                                 |
+| `non_additive_missing_along` | warning  | Non-additive metric must declare its non-additive dims                |
+| `pii_dim_no_mask`            | warning  | PII dimension referenced but no column mask in module 09              |
+| `unused_entity`              | info     | Entity declared but not referenced by any dim/metric                  |
+| `circular_derived`           | error    | Derived metric depends on itself transitively                         |
+| `expr_unparseable`           | error    | `expr` field doesn't parse as an expression in the configured dialect |
 
 ---
 
@@ -411,25 +418,35 @@ const publishSemanticModel = async (req: Request, res: Response) => {
     const errors = lintResult.issues.filter(i => i.severity === 'error');
     if (errors.length) {
       await master_db_connection.close();
-      return sendResponse(res, false, CODE.BAD_REQUEST,
-        SEMANTIC_MSG.LINT_FAILED, { errors });
+      return sendResponse(
+        res,
+        false,
+        CODE.BAD_REQUEST,
+        SEMANTIC_MSG.LINT_FAILED,
+        { errors },
+      );
     }
 
     await connection.transaction(async (tx: any) => {
       // Snapshot version
       await saveModelVersion(tx, model, { actorUserId: loggedInId });
       // Flip status
-      await tx.getRepository('SemanticModel').update(
-        { id }, { status: 'published', updatedAt: new Date() });
+      await tx
+        .getRepository('SemanticModel')
+        .update({ id }, { status: 'published', updatedAt: new Date() });
     });
 
     await auditLogger.logAuditToOrg({
-      connection, req, res,
+      connection,
+      req,
+      res,
       module: AUDIT_MODULES.SEMANTIC_MODEL,
       action: AUDIT_ACTIONS.PUBLISH,
       entityName: 'SemanticModel',
       entityId: id,
-      metadata: { warnings: lintResult.issues.filter(i => i.severity === 'warning') },
+      metadata: {
+        warnings: lintResult.issues.filter(i => i.severity === 'warning'),
+      },
     });
 
     await master_db_connection.close();
@@ -507,7 +524,10 @@ import { SemanticModel, Dimension, Metric } from '../models';
 @Injectable({ providedIn: 'root' })
 export class SemanticStateService {
   private _model = signal<SemanticModel | null>(null);
-  private _selected = signal<{ kind: 'dim' | 'metric' | 'join' | 'segment'; id: string } | null>(null);
+  private _selected = signal<{
+    kind: 'dim' | 'metric' | 'join' | 'segment';
+    id: string;
+  } | null>(null);
   private _dirty = signal(false);
   private _lintIssues = signal<LintIssue[]>([]);
 
@@ -515,14 +535,26 @@ export class SemanticStateService {
   readonly selected = this._selected.asReadonly();
   readonly dirty = this._dirty.asReadonly();
   readonly lintIssues = this._lintIssues.asReadonly();
-  readonly errorCount = computed(() =>
-    this._lintIssues().filter(i => i.severity === 'error').length);
-  readonly canPublish = computed(() => this.errorCount() === 0 && !this._dirty());
+  readonly errorCount = computed(
+    () => this._lintIssues().filter(i => i.severity === 'error').length,
+  );
+  readonly canPublish = computed(
+    () => this.errorCount() === 0 && !this._dirty(),
+  );
 
-  load(m: SemanticModel): void { this._model.set(m); this._dirty.set(false); }
-  select(s: typeof this._selected extends signal<infer T> ? T : never): void { this._selected.set(s); }
-  patchDimension(id: string, patch: Partial<Dimension>): void { /* … */ this._dirty.set(true); }
-  patchMetric(id: string, patch: Partial<Metric>): void { /* … */ this._dirty.set(true); }
+  load(m: SemanticModel): void {
+    this._model.set(m);
+    this._dirty.set(false);
+  }
+  select(s: typeof this._selected extends signal<infer T> ? T : never): void {
+    this._selected.set(s);
+  }
+  patchDimension(id: string, patch: Partial<Dimension>): void {
+    /* … */ this._dirty.set(true);
+  }
+  patchMetric(id: string, patch: Partial<Metric>): void {
+    /* … */ this._dirty.set(true);
+  }
 }
 ```
 
@@ -530,13 +562,13 @@ export class SemanticStateService {
 
 ## 7. Observability
 
-| Metric | Type | Labels | Purpose |
-|---|---|---|---|
-| `dbexec_semantic_compile_total` | counter | `org`, `model`, `outcome` | compile attempts |
-| `dbexec_semantic_compile_ms` | histogram | `model` | compile latency |
-| `dbexec_semantic_lint_issue_total` | counter | `rule`, `severity` | which rules fire — leading indicator of teaching gaps |
-| `dbexec_semantic_models_published` | gauge | `org` | currently-published count per org |
-| `dbexec_semantic_intent_warnings_total` | counter | `code` | per warning kind (NON_ADDITIVE_USE etc.) |
+| Metric                                  | Type      | Labels                    | Purpose                                               |
+| --------------------------------------- | --------- | ------------------------- | ----------------------------------------------------- |
+| `dbexec_semantic_compile_total`         | counter   | `org`, `model`, `outcome` | compile attempts                                      |
+| `dbexec_semantic_compile_ms`            | histogram | `model`                   | compile latency                                       |
+| `dbexec_semantic_lint_issue_total`      | counter   | `rule`, `severity`        | which rules fire — leading indicator of teaching gaps |
+| `dbexec_semantic_models_published`      | gauge     | `org`                     | currently-published count per org                     |
+| `dbexec_semantic_intent_warnings_total` | counter   | `code`                    | per warning kind (NON_ADDITIVE_USE etc.)              |
 
 Structured log on compile:
 
@@ -558,21 +590,22 @@ Structured log on compile:
 
 ## 8. Security & threat model
 
-| Threat | Mitigation |
-|---|---|
+| Threat                                                 | Mitigation                                                                                                                                                         |
+| ------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | SQL injection via dimension `expr` (author-controlled) | `expr` parsed against an AST whitelist on save; only column refs + a defined set of functions (LOWER, COALESCE, CAST, …) allowed. Any unknown identifier rejected. |
-| Author exposes a PII column via a derived dimension | PII dims tagged at the entity dataset (module 09); compiler refuses to render in a context where the user lacks the masking role |
-| Cross-org model reference | `model_id` joins always scoped by `org_id`; cross-org dim/metric IDs simply don't resolve |
-| Linter bypass via direct entity edit | Publish always reruns lint server-side; lint state at FE is advisory only |
-| Metric formula `eval` injection | Derived metric formulas parsed by a custom expression parser (no `eval`, no `new Function`) |
-| RLS bypass via segment | Segments are appended to WHERE; they CANNOT shorten an RLS predicate, only add to it. Documented and tested |
-| Model used after dataset deleted | `dataset_id` ON DELETE RESTRICT; deleting a dataset that backs a published model is rejected with the dependency list |
+| Author exposes a PII column via a derived dimension    | PII dims tagged at the entity dataset (module 09); compiler refuses to render in a context where the user lacks the masking role                                   |
+| Cross-org model reference                              | `model_id` joins always scoped by `org_id`; cross-org dim/metric IDs simply don't resolve                                                                          |
+| Linter bypass via direct entity edit                   | Publish always reruns lint server-side; lint state at FE is advisory only                                                                                          |
+| Metric formula `eval` injection                        | Derived metric formulas parsed by a custom expression parser (no `eval`, no `new Function`)                                                                        |
+| RLS bypass via segment                                 | Segments are appended to WHERE; they CANNOT shorten an RLS predicate, only add to it. Documented and tested                                                        |
+| Model used after dataset deleted                       | `dataset_id` ON DELETE RESTRICT; deleting a dataset that backs a published model is rejected with the dependency list                                              |
 
 ---
 
 ## 9. Operational runbook
 
 **Symptom: published model returns wrong numbers for one metric.**
+
 1. Open the model in author mode, click the metric, hit "Test compile".
 2. Inspect the SELECT clause. Mismatch usually = wrong `agg` or
    missing required segment.
@@ -580,12 +613,14 @@ Structured log on compile:
    the issue may be source data.
 
 **Symptom: compile times spike.**
+
 1. Check `dbexec_semantic_compile_ms` p99 by `model`. The model
    with the largest join graph is usually the offender.
 2. The join-path solver is BFS; deep graphs slow it. Add a
    `join_path_hint` on the model that pins the canonical path.
 
 **Symptom: linter false-positives.**
+
 1. Lint rules are versioned. Roll forward by editing
    `src/services/semantic/linter/<rule>.ts` and bumping
    `LINTER_VERSION` so older saved warnings are recomputed.
@@ -594,13 +629,13 @@ Structured log on compile:
 
 ## 10. Performance budget
 
-| Operation | p50 | p95 | Hard ceiling |
-|---|---|---|---|
-| Lint full model (50 dims, 30 metrics) | 80 ms | 250 ms | 1 s |
-| Compile a single intent (5 dims, 3 metrics) | 12 ms | 40 ms | 200 ms |
-| Save model (all entities + dims + metrics) | 250 ms | 800 ms | 3 s |
-| Publish (lint + version snapshot + flip status) | 400 ms | 1.2 s | 5 s |
-| Distinct-value preview (per dim) | 200 ms | 1 s | 5 s |
+| Operation                                       | p50    | p95    | Hard ceiling |
+| ----------------------------------------------- | ------ | ------ | ------------ |
+| Lint full model (50 dims, 30 metrics)           | 80 ms  | 250 ms | 1 s          |
+| Compile a single intent (5 dims, 3 metrics)     | 12 ms  | 40 ms  | 200 ms       |
+| Save model (all entities + dims + metrics)      | 250 ms | 800 ms | 3 s          |
+| Publish (lint + version snapshot + flip status) | 400 ms | 1.2 s  | 5 s          |
+| Distinct-value preview (per dim)                | 200 ms | 1 s    | 5 s          |
 
 Compile time matters because it's on the hot path of every
 analysis run, every dashboard tile load, every AI tool call.

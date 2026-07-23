@@ -28,9 +28,7 @@ import type { Visual } from 'src/app/modules/analyses/models/visual.model';
  */
 
 export type CrossFilterTargets =
-  | 'same-tab'
-  | 'dashboard'
-  | { visualIds: string[] };
+  'same-tab' | 'dashboard' | { visualIds: string[] };
 
 /** The active cross-filter emitted by a source visual click. */
 export interface DashboardCrossFilterState {

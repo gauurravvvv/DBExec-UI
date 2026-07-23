@@ -32,8 +32,12 @@
           </div>
           <ng-template usGridCell="name" let-c>
             <span class="dataset-name-link">{{ c.name }}</span>
-            <span class="default-badge" *ngIf="c.isDefault"
-              [pTooltip]="'QUERY_RUNNER.DEFAULT_BADGE' | translate" tooltipPosition="top">
+            <span
+              class="default-badge"
+              *ngIf="c.isDefault"
+              [pTooltip]="'QUERY_RUNNER.DEFAULT_BADGE' | translate"
+              tooltipPosition="top"
+            >
               <i class="pi pi-star-fill"></i>
             </span>
           </ng-template>
@@ -48,50 +52,122 @@
           </ng-template>
 
           <ng-template usGridCell="health" let-c>
-            <span class="status-pill" [ngClass]="c.lastTestStatus === 'success' ? 'active' : (c.lastTestStatus === 'failure' ? 'expired' : 'no-login')">
+            <span
+              class="status-pill"
+              [ngClass]="
+                c.lastTestStatus === 'success'
+                  ? 'active'
+                  : c.lastTestStatus === 'failure'
+                    ? 'expired'
+                    : 'no-login'
+              "
+            >
               <span class="dot"></span>
-              {{ (c.lastTestStatus === 'success' ? 'QUERY_RUNNER.HEALTH_OK' : (c.lastTestStatus === 'failure' ? 'QUERY_RUNNER.HEALTH_FAIL' : 'QUERY_RUNNER.HEALTH_UNKNOWN')) | translate }}
+              {{
+                (c.lastTestStatus === 'success'
+                  ? 'QUERY_RUNNER.HEALTH_OK'
+                  : c.lastTestStatus === 'failure'
+                    ? 'QUERY_RUNNER.HEALTH_FAIL'
+                    : 'QUERY_RUNNER.HEALTH_UNKNOWN'
+                ) | translate
+              }}
             </span>
           </ng-template>
 
           <ng-template usGridCell="state" let-c>
-            <span class="status-pill" [ngClass]="c.enabled === false ? 'expired' : 'active'">
+            <span
+              class="status-pill"
+              [ngClass]="c.enabled === false ? 'expired' : 'active'"
+            >
               <span class="dot"></span>
-              {{ (c.enabled === false ? 'QUERY_RUNNER.DISABLED' : 'QUERY_RUNNER.ENABLED') | translate }}
+              {{
+                (c.enabled === false
+                  ? 'QUERY_RUNNER.DISABLED'
+                  : 'QUERY_RUNNER.ENABLED'
+                ) | translate
+              }}
             </span>
           </ng-template>
 
           <ng-template usGridCell="actions" let-c>
             <div class="row-actions">
-              <button *hasPermission="'connectionManager'; level: 'write'"
-                class="icon-btn" (click)="onSetDefault(c)"
-                [disabled]="busyId === c.id || c.isDefault || c.enabled === false"
-                [pTooltip]="(c.isDefault ? 'QUERY_RUNNER.IS_DEFAULT' : 'QUERY_RUNNER.SET_DEFAULT') | translate" tooltipPosition="bottom">
-                <i class="pi" [ngClass]="c.isDefault ? 'pi-star-fill' : 'pi-star'"></i>
+              <button
+                *hasPermission="'connectionManager'; level: 'write'"
+                class="icon-btn"
+                (click)="onSetDefault(c)"
+                [disabled]="
+                  busyId === c.id || c.isDefault || c.enabled === false
+                "
+                [pTooltip]="
+                  (c.isDefault
+                    ? 'QUERY_RUNNER.IS_DEFAULT'
+                    : 'QUERY_RUNNER.SET_DEFAULT'
+                  ) | translate
+                "
+                tooltipPosition="bottom"
+              >
+                <i
+                  class="pi"
+                  [ngClass]="c.isDefault ? 'pi-star-fill' : 'pi-star'"
+                ></i>
               </button>
-              <button class="icon-btn"
-                (click)="onTest(c)" [disabled]="testingId === c.id"
-                [pTooltip]="'QUERY_RUNNER.TEST' | translate" tooltipPosition="bottom">
-                <i class="pi" [ngClass]="testingId === c.id ? 'pi-spin pi-spinner' : 'pi-bolt'"></i>
+              <button
+                class="icon-btn"
+                (click)="onTest(c)"
+                [disabled]="testingId === c.id"
+                [pTooltip]="'QUERY_RUNNER.TEST' | translate"
+                tooltipPosition="bottom"
+              >
+                <i
+                  class="pi"
+                  [ngClass]="
+                    testingId === c.id ? 'pi-spin pi-spinner' : 'pi-bolt'
+                  "
+                ></i>
               </button>
-              <button class="icon-btn view-btn"
-                (click)="onOpen(c)" [disabled]="c.enabled === false"
-                [pTooltip]="'QUERY_RUNNER.OPEN' | translate" tooltipPosition="bottom">
+              <button
+                class="icon-btn view-btn"
+                (click)="onOpen(c)"
+                [disabled]="c.enabled === false"
+                [pTooltip]="'QUERY_RUNNER.OPEN' | translate"
+                tooltipPosition="bottom"
+              >
                 <i class="pi pi-external-link"></i>
               </button>
-              <button *hasPermission="'connectionManager'; level: 'write'"
-                class="icon-btn" (click)="onToggleEnabled(c)" [disabled]="busyId === c.id"
-                [pTooltip]="(c.enabled === false ? 'QUERY_RUNNER.ENABLE' : 'QUERY_RUNNER.DISABLE') | translate" tooltipPosition="bottom">
-                <i class="pi" [ngClass]="c.enabled === false ? 'pi-check-circle' : 'pi-ban'"></i>
+              <button
+                *hasPermission="'connectionManager'; level: 'write'"
+                class="icon-btn"
+                (click)="onToggleEnabled(c)"
+                [disabled]="busyId === c.id"
+                [pTooltip]="
+                  (c.enabled === false
+                    ? 'QUERY_RUNNER.ENABLE'
+                    : 'QUERY_RUNNER.DISABLE'
+                  ) | translate
+                "
+                tooltipPosition="bottom"
+              >
+                <i
+                  class="pi"
+                  [ngClass]="c.enabled === false ? 'pi-check-circle' : 'pi-ban'"
+                ></i>
               </button>
-              <button *hasPermission="'connectionManager'; level: 'write'"
-                class="icon-btn edit-btn" (click)="onEdit(c)"
-                [pTooltip]="'COMMON.EDIT' | translate" tooltipPosition="bottom">
+              <button
+                *hasPermission="'connectionManager'; level: 'write'"
+                class="icon-btn edit-btn"
+                (click)="onEdit(c)"
+                [pTooltip]="'COMMON.EDIT' | translate"
+                tooltipPosition="bottom"
+              >
                 <i class="pi pi-pencil"></i>
               </button>
-              <button *hasPermission="'connectionManager'; level: 'delete'"
-                class="icon-btn delete-btn" (click)="confirmDelete(c)"
-                [pTooltip]="'COMMON.DELETE' | translate" tooltipPosition="bottom">
+              <button
+                *hasPermission="'connectionManager'; level: 'delete'"
+                class="icon-btn delete-btn"
+                (click)="confirmDelete(c)"
+                [pTooltip]="'COMMON.DELETE' | translate"
+                tooltipPosition="bottom"
+              >
                 <i class="pi pi-trash"></i>
               </button>
             </div>
@@ -106,18 +182,31 @@
 <div class="confirmation-popup" *ngIf="showDeleteConfirm">
   <div class="popup-content">
     <div class="popup-header">
-      <div class="popup-icon danger"><i class="pi pi-exclamation-triangle"></i></div>
+      <div class="popup-icon danger">
+        <i class="pi pi-exclamation-triangle"></i>
+      </div>
       <h3>{{ 'QUERY_RUNNER.DELETE_CONNECTION' | translate }}</h3>
     </div>
     <div class="popup-body">
-      <p>{{ 'QUERY_RUNNER.DELETE_CONFIRM' | translate: { name: toDelete?.name } }}</p>
+      <p>
+        {{
+          'QUERY_RUNNER.DELETE_CONFIRM' | translate: { name: toDelete?.name }
+        }}
+      </p>
     </div>
     <div class="popup-actions">
       <button class="btn-cancel" (click)="cancelDelete()">
         <i class="pi pi-times"></i>{{ 'COMMON.CANCEL' | translate }}
       </button>
-      <button class="btn-confirm" (click)="proceedDelete()" [disabled]="deleting">
-        <i class="pi" [ngClass]="deleting ? 'pi-spin pi-spinner' : 'pi-trash'"></i>
+      <button
+        class="btn-confirm"
+        (click)="proceedDelete()"
+        [disabled]="deleting"
+      >
+        <i
+          class="pi"
+          [ngClass]="deleting ? 'pi-spin pi-spinner' : 'pi-trash'"
+        ></i>
         {{ 'COMMON.DELETE' | translate }}
       </button>
     </div>

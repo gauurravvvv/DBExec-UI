@@ -23,9 +23,7 @@ import { TabService } from '../../services/tab.service';
   styleUrls: ['./edit-tab.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class EditTabComponent
-  implements OnInit, OnDestroy, HasUnsavedChanges
-{
+export class EditTabComponent implements OnInit, OnDestroy, HasUnsavedChanges {
   ngOnDestroy() {
     // Abort in-flight reads if the user navigates away.
     this.tabService.cancelReads();

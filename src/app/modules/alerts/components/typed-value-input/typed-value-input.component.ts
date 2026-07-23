@@ -6,10 +6,7 @@ import {
   forwardRef,
   inject,
 } from '@angular/core';
-import {
-  ControlValueAccessor,
-  NG_VALUE_ACCESSOR,
-} from '@angular/forms';
+import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import type { AlertValueType } from 'src/app/shared/validators/alerts';
 
 /**
@@ -74,7 +71,9 @@ export class TypedValueInputComponent implements ControlValueAccessor {
 
   writeValue(v: any): void {
     if (this.range) {
-      this.rangeValue = Array.isArray(v) ? [v[0] ?? null, v[1] ?? null] : [null, null];
+      this.rangeValue = Array.isArray(v)
+        ? [v[0] ?? null, v[1] ?? null]
+        : [null, null];
     } else {
       this.value = v ?? null;
     }
@@ -107,9 +106,10 @@ export class TypedValueInputComponent implements ControlValueAccessor {
 
   onRangeChange(index: 0 | 1, v: any): void {
     const coerced = v instanceof Date ? v.toISOString() : v;
-    this.rangeValue = index === 0
-      ? [coerced, this.rangeValue[1]]
-      : [this.rangeValue[0], coerced];
+    this.rangeValue =
+      index === 0
+        ? [coerced, this.rangeValue[1]]
+        : [this.rangeValue[0], coerced];
     this.onChange(this.rangeValue);
     this.onTouched();
   }

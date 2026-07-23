@@ -5,8 +5,8 @@
 > visualisation — they're in the metric definition.
 >
 > Sister module: [02 · Semantic Layer](02-semantic-layer.md) defines
-> the *containers* (`SemMetric` rows). This doc dives into the
-> *contents*: every metric kind, the SQL it compiles to, the edge
+> the _containers_ (`SemMetric` rows). This doc dives into the
+> _contents_: every metric kind, the SQL it compiles to, the edge
 > cases that break in production.
 
 **Depends on:** Semantic Layer (02), Query Compiler (04)
@@ -17,17 +17,17 @@
 
 ## 1. Industry baseline
 
-| Tool | Metric type system | Distinguishing trait |
-|---|---|---|
-| **Looker** | `measure: { type: sum }`, `type: count_distinct`, `type: percentile`, `derived_table` for cumulative | Type is a closed list; the LookML compiler picks the SQL per dialect. |
-| **dbt MetricFlow / Cube.js** | `simple`, `ratio`, `derived`, `cumulative`, `conversion`. Cube adds `count_distinct_approx`. | First to formalise `conversion` as a first-class metric kind. |
-| **Power BI (DAX)** | Open expression language — `SUM`, `DISTINCTCOUNT`, `CALCULATE` w/ filter context | Most powerful; most foot-guns. |
-| **Tableau LOD** | `{ FIXED dim : agg }` syntax for explicit aggregation scope | Resolves the "totals don't add up" problem by giving the user a knob. |
-| **Sigma** | "Worksheet calc" + SQL custom metric | Mixed visual/text authoring. |
-| **Mode / Metabase** | Mostly SQL, metric concept is light | Less abstraction means more SQL copy-paste. |
+| Tool                         | Metric type system                                                                                   | Distinguishing trait                                                  |
+| ---------------------------- | ---------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------- |
+| **Looker**                   | `measure: { type: sum }`, `type: count_distinct`, `type: percentile`, `derived_table` for cumulative | Type is a closed list; the LookML compiler picks the SQL per dialect. |
+| **dbt MetricFlow / Cube.js** | `simple`, `ratio`, `derived`, `cumulative`, `conversion`. Cube adds `count_distinct_approx`.         | First to formalise `conversion` as a first-class metric kind.         |
+| **Power BI (DAX)**           | Open expression language — `SUM`, `DISTINCTCOUNT`, `CALCULATE` w/ filter context                     | Most powerful; most foot-guns.                                        |
+| **Tableau LOD**              | `{ FIXED dim : agg }` syntax for explicit aggregation scope                                          | Resolves the "totals don't add up" problem by giving the user a knob. |
+| **Sigma**                    | "Worksheet calc" + SQL custom metric                                                                 | Mixed visual/text authoring.                                          |
+| **Mode / Metabase**          | Mostly SQL, metric concept is light                                                                  | Less abstraction means more SQL copy-paste.                           |
 
 **The lesson DBExec needs to internalise:** a metric is not a number,
-it's a *named function* `f(filter_context, time_grain, group_by) → number`.
+it's a _named function_ `f(filter_context, time_grain, group_by) → number`.
 The kind determines which arguments are valid and how the SQL
 materialises. Most production bugs ("why doesn't year total equal
 sum of months?") come from treating a non-additive function as if it
@@ -48,22 +48,22 @@ were additive.
 
 ## 3. Gap matrix
 
-| ID | Gap | Severity | Effort |
-|---|---|---|---|
-| MET-G01 | `derived` metric (math over other metrics) | P0 | M |
-| MET-G02 | `cumulative` metric (running totals, MTD/QTD/YTD) | P0 | M |
-| MET-G03 | `conversion` metric (event-A → event-B within window) | P0 | L |
-| MET-G04 | Non-additive flag (refuse to sum across windows) | P0 | S |
-| MET-G05 | Semi-additive (`LAST`/`FIRST`/`AVG` over time) | P1 | M |
-| MET-G06 | Period-over-period (`prior_period`, `prior_year`) | P1 | M |
-| MET-G07 | Approx distinct (`HLL` on Snowflake/BQ) | P1 | M |
-| MET-G08 | Window functions (`RANK`, `NTILE`, `LAG`, `LEAD`) | P1 | M |
-| MET-G09 | Percentile with dialect-correct SQL | P1 | S |
-| MET-G10 | Cross-metric "virtual" expressions on the FE | P1 | M |
-| MET-G11 | Metric format strings beyond currency/percent | P2 | S |
-| MET-G12 | Metric description tooltip on legend hover | P2 | S |
-| MET-G13 | "Allowed aggregations" whitelist per metric | P2 | S |
-| MET-G14 | Snapshot-stable metric (metric value frozen at publish) | P2 | M |
+| ID      | Gap                                                     | Severity | Effort |
+| ------- | ------------------------------------------------------- | -------- | ------ |
+| MET-G01 | `derived` metric (math over other metrics)              | P0       | M      |
+| MET-G02 | `cumulative` metric (running totals, MTD/QTD/YTD)       | P0       | M      |
+| MET-G03 | `conversion` metric (event-A → event-B within window)   | P0       | L      |
+| MET-G04 | Non-additive flag (refuse to sum across windows)        | P0       | S      |
+| MET-G05 | Semi-additive (`LAST`/`FIRST`/`AVG` over time)          | P1       | M      |
+| MET-G06 | Period-over-period (`prior_period`, `prior_year`)       | P1       | M      |
+| MET-G07 | Approx distinct (`HLL` on Snowflake/BQ)                 | P1       | M      |
+| MET-G08 | Window functions (`RANK`, `NTILE`, `LAG`, `LEAD`)       | P1       | M      |
+| MET-G09 | Percentile with dialect-correct SQL                     | P1       | S      |
+| MET-G10 | Cross-metric "virtual" expressions on the FE            | P1       | M      |
+| MET-G11 | Metric format strings beyond currency/percent           | P2       | S      |
+| MET-G12 | Metric description tooltip on legend hover              | P2       | S      |
+| MET-G13 | "Allowed aggregations" whitelist per metric             | P2       | S      |
+| MET-G14 | Snapshot-stable metric (metric value frozen at publish) | P2       | M      |
 
 ## 4. Target architecture
 
@@ -73,17 +73,17 @@ Every metric is exactly one of these kinds. Adding a new kind is a
 schema migration + compiler branch + UI form — not a freeform
 field.
 
-| Kind | What it computes | Example | Compile shape |
-|---|---|---|---|
-| `simple` | One aggregation over one expression | `SUM(revenue)`, `COUNT(DISTINCT user_id)` | `<agg>(<expr>)` |
-| `ratio` | Numerator / denominator | `revenue_per_user = SUM(revenue) / COUNT(DISTINCT user_id)` | `SUM(num) / NULLIF(SUM(den), 0)` (null-safe) |
-| `derived` | Math over other metrics | `gross_margin = revenue - cogs` | references resolved to their compiled SQL, composed in outer SELECT |
-| `cumulative` | Running total with a reset boundary | `mtd_revenue` | `SUM() OVER (PARTITION BY <reset> ORDER BY <time> ROWS UNBOUNDED PRECEDING)` |
-| `conversion` | Funnel over events with a window | `signup_to_paid_in_7d` | two CTEs (event A, event B), LEFT JOIN, conditional COUNT(DISTINCT) |
-| `prior_period` | Same metric shifted by one period | `revenue_prior_month` | `LAG(<metric>) OVER (ORDER BY <time>)` OR self-join (depending on grouping) |
-| `window` | Rank / ntile / lag / lead | `revenue_rank` | `<window_fn>() OVER (PARTITION BY ... ORDER BY ...)` |
-| `percentile` | p50/p90/p95/p99 | `p95_latency` | `PERCENTILE_CONT(0.95) WITHIN GROUP (ORDER BY <expr>)` (dialect-aware) |
-| `approx_distinct` | Approximate distinct count | `approx_unique_users` | `APPROX_COUNT_DISTINCT(user_id)` on Snowflake/BQ; `COUNT(DISTINCT user_id)` falls back on Postgres |
+| Kind              | What it computes                    | Example                                                     | Compile shape                                                                                      |
+| ----------------- | ----------------------------------- | ----------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
+| `simple`          | One aggregation over one expression | `SUM(revenue)`, `COUNT(DISTINCT user_id)`                   | `<agg>(<expr>)`                                                                                    |
+| `ratio`           | Numerator / denominator             | `revenue_per_user = SUM(revenue) / COUNT(DISTINCT user_id)` | `SUM(num) / NULLIF(SUM(den), 0)` (null-safe)                                                       |
+| `derived`         | Math over other metrics             | `gross_margin = revenue - cogs`                             | references resolved to their compiled SQL, composed in outer SELECT                                |
+| `cumulative`      | Running total with a reset boundary | `mtd_revenue`                                               | `SUM() OVER (PARTITION BY <reset> ORDER BY <time> ROWS UNBOUNDED PRECEDING)`                       |
+| `conversion`      | Funnel over events with a window    | `signup_to_paid_in_7d`                                      | two CTEs (event A, event B), LEFT JOIN, conditional COUNT(DISTINCT)                                |
+| `prior_period`    | Same metric shifted by one period   | `revenue_prior_month`                                       | `LAG(<metric>) OVER (ORDER BY <time>)` OR self-join (depending on grouping)                        |
+| `window`          | Rank / ntile / lag / lead           | `revenue_rank`                                              | `<window_fn>() OVER (PARTITION BY ... ORDER BY ...)`                                               |
+| `percentile`      | p50/p90/p95/p99                     | `p95_latency`                                               | `PERCENTILE_CONT(0.95) WITHIN GROUP (ORDER BY <expr>)` (dialect-aware)                             |
+| `approx_distinct` | Approximate distinct count          | `approx_unique_users`                                       | `APPROX_COUNT_DISTINCT(user_id)` on Snowflake/BQ; `COUNT(DISTINCT user_id)` falls back on Postgres |
 
 **Closed-list reasoning.** Every kind has different SQL, different
 validation rules, different FE form. An open `expression` field means
@@ -103,15 +103,28 @@ export class SemMetric {
   @Column({ length: 64 }) name!: string;
   @Column({ length: 128, nullable: true }) label?: string;
   @Column({ length: 32 }) kind!:
-    | 'simple' | 'ratio' | 'derived' | 'cumulative'
-    | 'conversion' | 'prior_period' | 'window'
-    | 'percentile' | 'approx_distinct';
+    | 'simple'
+    | 'ratio'
+    | 'derived'
+    | 'cumulative'
+    | 'conversion'
+    | 'prior_period'
+    | 'window'
+    | 'percentile'
+    | 'approx_distinct';
 
   // simple / approx_distinct / percentile
   @Column('text', { nullable: true }) expression?: string;
   @Column({ length: 16, nullable: true }) agg?:
-    'sum' | 'count' | 'count_distinct' | 'avg'
-    | 'min' | 'max' | 'median' | 'stddev' | 'variance';
+    | 'sum'
+    | 'count'
+    | 'count_distinct'
+    | 'avg'
+    | 'min'
+    | 'max'
+    | 'median'
+    | 'stddev'
+    | 'variance';
 
   // ratio
   @Column('uuid', { nullable: true }) numeratorId?: string;
@@ -119,7 +132,8 @@ export class SemMetric {
 
   // derived
   @Column('text', { nullable: true }) derivedExpression?: string;
-  @Column('uuid', { array: true, nullable: true }) referencedMetricIds?: string[];
+  @Column('uuid', { array: true, nullable: true })
+  referencedMetricIds?: string[];
 
   // cumulative
   @Column({ length: 16, nullable: true }) windowReset?:
@@ -131,10 +145,10 @@ export class SemMetric {
     eventColumn: string;
     eventA: string;
     eventB: string;
-    entityColumn: string;     // user_id, account_id, ...
-    timeColumn: string;       // event_ts
+    entityColumn: string; // user_id, account_id, ...
+    timeColumn: string; // event_ts
     windowDays: number;
-    requireOrder?: boolean;   // B must be strictly after A
+    requireOrder?: boolean; // B must be strictly after A
   };
 
   // prior_period
@@ -147,11 +161,11 @@ export class SemMetric {
     partitionBy?: string[];
     orderBy: Array<{ col: string; dir: 'asc' | 'desc' }>;
     ntileBuckets?: number;
-    offset?: number;          // for lag / lead
+    offset?: number; // for lag / lead
   };
 
   // percentile
-  @Column('numeric', { nullable: true }) percentileQ?: number;  // 0–1
+  @Column('numeric', { nullable: true }) percentileQ?: number; // 0–1
 
   // Additive flags — see §4.3
   @Column({ default: true }) isAdditive!: boolean;
@@ -167,7 +181,8 @@ export class SemMetric {
   @Column({ default: false }) hidden!: boolean;
 
   // Compile-time guard rails
-  @Column('text', { array: true, nullable: true }) allowedAggregations?: string[];
+  @Column('text', { array: true, nullable: true })
+  allowedAggregations?: string[];
   @Column('text', { array: true, nullable: true }) allowedDimensions?: string[];
 }
 ```
@@ -207,7 +222,7 @@ function resolveAggregation(metric: SemMetric, groupBy: string[]) {
   if (metric.isSemiAdditive && groupsAcrossTime) {
     return `${metric.semiAdditiveFunc}_OVER_TIME`;
   }
-  return 'RECOMPUTE_AT_GROUP';   // non-additive
+  return 'RECOMPUTE_AT_GROUP'; // non-additive
 }
 ```
 
@@ -219,24 +234,33 @@ forever.
 ```ts
 // src/shared/services/metricCompiler.ts
 type CompiledMetric = {
-  projection: string;       // goes into outer SELECT
-  ctes?: string[];          // shared subqueries (conversion needs these)
-  groupBy?: string[];       // when the kind dictates extra GROUP BY
-  postProcess?: (rows: any[]) => any[];   // window resets that can't be SQL
+  projection: string; // goes into outer SELECT
+  ctes?: string[]; // shared subqueries (conversion needs these)
+  groupBy?: string[]; // when the kind dictates extra GROUP BY
+  postProcess?: (rows: any[]) => any[]; // window resets that can't be SQL
 };
 
 class MetricCompiler {
   compile(metric: SemMetric, ctx: CompileCtx): CompiledMetric {
     switch (metric.kind) {
-      case 'simple':         return compileSimple(metric, ctx);
-      case 'ratio':          return compileRatio(metric, ctx);
-      case 'derived':        return compileDerived(metric, ctx);
-      case 'cumulative':     return compileCumulative(metric, ctx);
-      case 'conversion':     return compileConversion(metric, ctx);
-      case 'prior_period':   return compilePriorPeriod(metric, ctx);
-      case 'window':         return compileWindow(metric, ctx);
-      case 'percentile':     return compilePercentile(metric, ctx);
-      case 'approx_distinct':return compileApproxDistinct(metric, ctx);
+      case 'simple':
+        return compileSimple(metric, ctx);
+      case 'ratio':
+        return compileRatio(metric, ctx);
+      case 'derived':
+        return compileDerived(metric, ctx);
+      case 'cumulative':
+        return compileCumulative(metric, ctx);
+      case 'conversion':
+        return compileConversion(metric, ctx);
+      case 'prior_period':
+        return compilePriorPeriod(metric, ctx);
+      case 'window':
+        return compileWindow(metric, ctx);
+      case 'percentile':
+        return compilePercentile(metric, ctx);
+      case 'approx_distinct':
+        return compileApproxDistinct(metric, ctx);
     }
   }
 }
@@ -247,7 +271,7 @@ class MetricCompiler {
 ```ts
 function compileSimple(m: SemMetric, ctx: CompileCtx): CompiledMetric {
   const expr = m.expression ?? ctx.column(m.name);
-  const agg  = (m.agg || 'sum').toUpperCase();
+  const agg = (m.agg || 'sum').toUpperCase();
   if (agg === 'COUNT_DISTINCT') {
     return { projection: `COUNT(DISTINCT ${expr}) AS ${q(m.name)}` };
   }
@@ -271,7 +295,7 @@ function compileRatio(m: SemMetric, ctx: CompileCtx): CompiledMetric {
       ELSE (${stripAlias(num.projection)})::numeric / ${stripAlias(den.projection)}::numeric
     END AS ${q(m.name)}
   `;
-  return { projection, ctes: [...(num.ctes||[]), ...(den.ctes||[])] };
+  return { projection, ctes: [...(num.ctes || []), ...(den.ctes || [])] };
 }
 ```
 
@@ -285,22 +309,26 @@ their dependencies are emitted in a sub-CTE first.
 function compileDerived(m: SemMetric, ctx: CompileCtx): CompiledMetric {
   // Parse {name} tokens, resolve each to its compiled projection,
   // splice them into the derivedExpression.
-  const refs = parseRefs(m.derivedExpression!);   // ['revenue', 'cogs']
+  const refs = parseRefs(m.derivedExpression!); // ['revenue', 'cogs']
   for (const r of refs) {
     if (!ctx.modelHasMetric(r))
-      throw new BadRequest(`Derived metric ${m.name} references unknown metric "${r}"`);
+      throw new BadRequest(
+        `Derived metric ${m.name} references unknown metric "${r}"`,
+      );
   }
   let expr = m.derivedExpression!;
   for (const r of refs) {
     const compiled = ctx.metric(ctx.metricIdByName(r));
-    expr = expr.replace(new RegExp(`\\{${r}\\}`, 'g'),
-                        `(${stripAlias(compiled.projection)})`);
+    expr = expr.replace(
+      new RegExp(`\\{${r}\\}`, 'g'),
+      `(${stripAlias(compiled.projection)})`,
+    );
   }
   return { projection: `${expr} AS ${q(m.name)}` };
 }
 ```
 
-Cycle detection happens at the *validator* layer (see [02 · Semantic
+Cycle detection happens at the _validator_ layer (see [02 · Semantic
 Layer §2.3](02-semantic-layer.md)) before the metric is saved. The
 compiler trusts the validator.
 
@@ -308,7 +336,7 @@ compiler trusts the validator.
 
 ```ts
 function compileCumulative(m: SemMetric, ctx: CompileCtx): CompiledMetric {
-  const inner = ctx.metric(m.id);  // the base aggregation
+  const inner = ctx.metric(m.id); // the base aggregation
   const timeCol = m.cumulativeTimeColumn || ctx.defaultTimeColumn;
   const reset = m.windowReset || 'none';
 
@@ -350,7 +378,7 @@ function compileConversion(m: SemMetric, ctx: CompileCtx): CompiledMetric {
   // Pseudo-typed: the user said "from event-A to event-B within
   // windowDays, per entity". We materialise two CTEs.
   const cteA = `
-    sem_conv_a_${m.id.slice(0,8)} AS (
+    sem_conv_a_${m.id.slice(0, 8)} AS (
       SELECT ${q(c.entityColumn)} AS entity,
              MIN(${q(c.timeColumn)}) AS ts
       FROM ${ctx.fromExpr}
@@ -358,7 +386,7 @@ function compileConversion(m: SemMetric, ctx: CompileCtx): CompiledMetric {
       GROUP BY 1
     )`;
   const cteB = `
-    sem_conv_b_${m.id.slice(0,8)} AS (
+    sem_conv_b_${m.id.slice(0, 8)} AS (
       SELECT ${q(c.entityColumn)} AS entity,
              MIN(${q(c.timeColumn)}) AS ts
       FROM ${ctx.fromExpr}
@@ -366,9 +394,7 @@ function compileConversion(m: SemMetric, ctx: CompileCtx): CompiledMetric {
       GROUP BY 1
     )`;
 
-  const orderClause = c.requireOrder !== false
-    ? `AND b.ts > a.ts`
-    : '';
+  const orderClause = c.requireOrder !== false ? `AND b.ts > a.ts` : '';
 
   const projection = `
     (
@@ -378,8 +404,8 @@ function compileConversion(m: SemMetric, ctx: CompileCtx): CompiledMetric {
           ${orderClause}
       )::numeric
       / NULLIF(COUNT(DISTINCT a.entity), 0)
-      FROM sem_conv_a_${m.id.slice(0,8)} a
-      LEFT JOIN sem_conv_b_${m.id.slice(0,8)} b USING (entity)
+      FROM sem_conv_a_${m.id.slice(0, 8)} a
+      LEFT JOIN sem_conv_b_${m.id.slice(0, 8)} b USING (entity)
     ) AS ${q(m.name)}`;
 
   return { projection, ctes: [cteA, cteB] };
@@ -390,7 +416,7 @@ function compileConversion(m: SemMetric, ctx: CompileCtx): CompiledMetric {
 
 ```ts
 function compilePriorPeriod(m: SemMetric, ctx: CompileCtx): CompiledMetric {
-  const base = ctx.metric(m.id);          // the source metric
+  const base = ctx.metric(m.id); // the source metric
   const timeCol = ctx.defaultTimeColumn;
   const offset = m.priorPeriodOffset || 'month';
 
@@ -414,7 +440,7 @@ function compilePriorPeriod(m: SemMetric, ctx: CompileCtx): CompiledMetric {
 
   // Strategy B: separate CTE with shifted dates, joined back.
   const shifted = `
-    prior_${m.id.slice(0,8)} AS (
+    prior_${m.id.slice(0, 8)} AS (
       SELECT ${ctx.dialect.dateAdd(offset, 1, q(timeCol))} AS ts_shifted, *
       FROM ${ctx.fromExpr}
     )`;
@@ -437,12 +463,24 @@ function compileWindow(m: SemMetric, ctx: CompileCtx): CompiledMetric {
 
   let fnExpr: string;
   switch (w.fn) {
-    case 'rank':       fnExpr = 'RANK()'; break;
-    case 'dense_rank': fnExpr = 'DENSE_RANK()'; break;
-    case 'row_number': fnExpr = 'ROW_NUMBER()'; break;
-    case 'ntile':      fnExpr = `NTILE(${w.ntileBuckets || 10})`; break;
-    case 'lag':        fnExpr = `LAG(${ctx.column('value')}, ${w.offset || 1})`; break;
-    case 'lead':       fnExpr = `LEAD(${ctx.column('value')}, ${w.offset || 1})`; break;
+    case 'rank':
+      fnExpr = 'RANK()';
+      break;
+    case 'dense_rank':
+      fnExpr = 'DENSE_RANK()';
+      break;
+    case 'row_number':
+      fnExpr = 'ROW_NUMBER()';
+      break;
+    case 'ntile':
+      fnExpr = `NTILE(${w.ntileBuckets || 10})`;
+      break;
+    case 'lag':
+      fnExpr = `LAG(${ctx.column('value')}, ${w.offset || 1})`;
+      break;
+    case 'lead':
+      fnExpr = `LEAD(${ctx.column('value')}, ${w.offset || 1})`;
+      break;
   }
 
   return {
@@ -498,10 +536,10 @@ function compileApproxDistinct(m: SemMetric, ctx: CompileCtx): CompiledMetric {
   };
 }
 // Dialect dispatch:
-postgresDialect.approxCountDistinct  = undefined;            // fall back
+postgresDialect.approxCountDistinct = undefined; // fall back
 snowflakeDialect.approxCountDistinct = 'APPROX_COUNT_DISTINCT(';
-bigqueryDialect.approxCountDistinct  = 'APPROX_COUNT_DISTINCT(';
-duckdbDialect.approxCountDistinct    = 'APPROX_COUNT_DISTINCT(';
+bigqueryDialect.approxCountDistinct = 'APPROX_COUNT_DISTINCT(';
+duckdbDialect.approxCountDistinct = 'APPROX_COUNT_DISTINCT(';
 ```
 
 ### 4.5 Cross-metric "virtual" expressions on the FE
@@ -518,8 +556,8 @@ not `sem_metric`, and dropped when the analysis is.
 export class AnalysisCalcField {
   @PrimaryGeneratedColumn('uuid') id!: string;
   @Column('uuid') analysisId!: string;
-  @Column({ length: 64 }) name!: string;          // local name
-  @Column('text') expression!: string;             // `{revenue} - {cogs}`
+  @Column({ length: 64 }) name!: string; // local name
+  @Column('text') expression!: string; // `{revenue} - {cogs}`
   @Column('uuid', { array: true }) referencedMetricIds!: string[];
   @Column({ length: 32, nullable: true }) format?: string;
 }
@@ -530,35 +568,46 @@ scopes the resolution to the owning analysis.
 
 ## 5. APIs
 
-| Method | Path | Purpose |
-|---|---|---|
-| POST | `/semantic-models/:id/metrics` | Create metric (kind in body) |
-| PUT | `/semantic-models/:id/metrics/:metricId` | Update |
-| DELETE | `/semantic-models/:id/metrics/:metricId` | Delete |
-| GET | `/semantic-models/:id/metrics` | List |
-| POST | `/semantic-models/:id/metrics/validate` | Dry-run a metric definition before saving |
-| POST | `/semantic-models/:id/metrics/:id/explain` | Return the compiled SQL for the given filter ctx (admin only) |
-| POST | `/analyses/:id/calc-fields` | Add inline derived expression scoped to one analysis |
+| Method | Path                                       | Purpose                                                       |
+| ------ | ------------------------------------------ | ------------------------------------------------------------- |
+| POST   | `/semantic-models/:id/metrics`             | Create metric (kind in body)                                  |
+| PUT    | `/semantic-models/:id/metrics/:metricId`   | Update                                                        |
+| DELETE | `/semantic-models/:id/metrics/:metricId`   | Delete                                                        |
+| GET    | `/semantic-models/:id/metrics`             | List                                                          |
+| POST   | `/semantic-models/:id/metrics/validate`    | Dry-run a metric definition before saving                     |
+| POST   | `/semantic-models/:id/metrics/:id/explain` | Return the compiled SQL for the given filter ctx (admin only) |
+| POST   | `/analyses/:id/calc-fields`                | Add inline derived expression scoped to one analysis          |
 
 ## 6. Validator rules (Zod)
 
 ```ts
 // src/shared/validators/metrics.ts
 export const METRIC_KINDS = [
-  'simple','ratio','derived','cumulative','conversion',
-  'prior_period','window','percentile','approx_distinct',
+  'simple',
+  'ratio',
+  'derived',
+  'cumulative',
+  'conversion',
+  'prior_period',
+  'window',
+  'percentile',
+  'approx_distinct',
 ] as const;
 
 const baseMetricSchema = z.object({
-  name: z.string().regex(/^[a-z][a-z0-9_]{0,63}$/, 'validation.metric.name.invalid'),
+  name: z
+    .string()
+    .regex(/^[a-z][a-z0-9_]{0,63}$/, 'validation.metric.name.invalid'),
   label: z.string().max(128).optional(),
   description: z.string().max(500).optional(),
   format: z.string().max(32).optional(),
-  valueType: z.enum(['currency','percent','count','duration','bytes','plain']).optional(),
+  valueType: z
+    .enum(['currency', 'percent', 'count', 'duration', 'bytes', 'plain'])
+    .optional(),
   hidden: z.boolean().optional(),
   isAdditive: z.boolean().optional(),
   isSemiAdditive: z.boolean().optional(),
-  semiAdditiveFunc: z.enum(['LAST','FIRST','AVG']).optional(),
+  semiAdditiveFunc: z.enum(['LAST', 'FIRST', 'AVG']).optional(),
   allowedAggregations: z.array(z.string()).optional(),
   allowedDimensions: z.array(z.string()).optional(),
 });
@@ -566,7 +615,17 @@ const baseMetricSchema = z.object({
 export const simpleMetricSchema = baseMetricSchema.extend({
   kind: z.literal('simple'),
   expression: z.string().min(1).max(2000),
-  agg: z.enum(['sum','count','count_distinct','avg','min','max','median','stddev','variance']),
+  agg: z.enum([
+    'sum',
+    'count',
+    'count_distinct',
+    'avg',
+    'min',
+    'max',
+    'median',
+    'stddev',
+    'variance',
+  ]),
 });
 
 export const ratioMetricSchema = baseMetricSchema.extend({
@@ -586,7 +645,15 @@ export const cumulativeMetricSchema = baseMetricSchema.extend({
   // metric by id (the running total of a ratio is a ratio).
   expression: z.string().optional(),
   agg: z.string().optional(),
-  windowReset: z.enum(['none','day','week','month','quarter','year','fiscal_year']),
+  windowReset: z.enum([
+    'none',
+    'day',
+    'week',
+    'month',
+    'quarter',
+    'year',
+    'fiscal_year',
+  ]),
   cumulativeTimeColumn: z.string().max(64),
 });
 
@@ -605,19 +672,23 @@ export const conversionMetricSchema = baseMetricSchema.extend({
 
 export const priorPeriodMetricSchema = baseMetricSchema.extend({
   kind: z.literal('prior_period'),
-  numeratorId: z.string().uuid(),       // points at the source metric
-  priorPeriodOffset: z.enum(['day','week','month','quarter','year']),
+  numeratorId: z.string().uuid(), // points at the source metric
+  priorPeriodOffset: z.enum(['day', 'week', 'month', 'quarter', 'year']),
 });
 
 export const windowMetricSchema = baseMetricSchema.extend({
   kind: z.literal('window'),
   windowConfig: z.object({
-    fn: z.enum(['rank','dense_rank','row_number','ntile','lag','lead']),
+    fn: z.enum(['rank', 'dense_rank', 'row_number', 'ntile', 'lag', 'lead']),
     partitionBy: z.array(z.string().max(64)).optional(),
-    orderBy: z.array(z.object({
-      col: z.string().max(64),
-      dir: z.enum(['asc','desc']),
-    })).min(1),
+    orderBy: z
+      .array(
+        z.object({
+          col: z.string().max(64),
+          dir: z.enum(['asc', 'desc']),
+        }),
+      )
+      .min(1),
     ntileBuckets: z.number().int().min(2).max(1000).optional(),
     offset: z.number().int().min(1).max(100).optional(),
   }),
@@ -635,9 +706,15 @@ export const approxDistinctMetricSchema = baseMetricSchema.extend({
 });
 
 export const metricSchema = z.discriminatedUnion('kind', [
-  simpleMetricSchema, ratioMetricSchema, derivedMetricSchema,
-  cumulativeMetricSchema, conversionMetricSchema, priorPeriodMetricSchema,
-  windowMetricSchema, percentileMetricSchema, approxDistinctMetricSchema,
+  simpleMetricSchema,
+  ratioMetricSchema,
+  derivedMetricSchema,
+  cumulativeMetricSchema,
+  conversionMetricSchema,
+  priorPeriodMetricSchema,
+  windowMetricSchema,
+  percentileMetricSchema,
+  approxDistinctMetricSchema,
 ]);
 ```
 
@@ -651,8 +728,8 @@ Three steps wizard:
    of two metrics, e.g. revenue per user"). The kind never changes
    after step 1.
 2. **Define inputs** — kind-specific form. `simple` shows expression
-   + agg dropdown. `cumulative` shows reset + time column. `conversion`
-   shows event A, event B, entity, window. Etc.
+   - agg dropdown. `cumulative` shows reset + time column. `conversion`
+     shows event A, event B, entity, window. Etc.
 3. **Format & preview** — format string picker, value type, live
    preview against a sample 100-row slice of the dataset.
 
@@ -799,8 +876,8 @@ missing and are listed here for the implementer:
 - **Non-additive metric flag**: `sem_metric.is_additive boolean`.
   Distinct counts can't sum across windows; compiler must refuse.
 - **Semi-additive metrics** (Power BI terminology): `sem_metric.is_semi_additive`
-  + `sem_metric.semi_additive_func varchar` ('LAST'|'FIRST'|'AVG').
-  Use case: bank balance = LAST(balance) per month, not SUM.
+  - `sem_metric.semi_additive_func varchar` ('LAST'|'FIRST'|'AVG').
+    Use case: bank balance = LAST(balance) per month, not SUM.
 - **Window reset semantics**: `sem_metric.window_reset varchar`
   ('day'|'week'|'month'|'year'|'fiscal_year'). MTD resets at month
   boundary; YTD at year; fiscal at fiscal year start.

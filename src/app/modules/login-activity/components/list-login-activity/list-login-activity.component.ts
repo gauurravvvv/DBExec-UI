@@ -126,12 +126,48 @@ export class ListLoginActivityComponent implements OnInit, OnDestroy {
   private buildColumns(): CustomTableColumn[] {
     const t = (k: string) => this.translate.instant(k);
     return [
-      { colId: 'event', field: 'eventType', header: t('LOGIN_ACTIVITY.EVENT'), width: '224px', frozen: true, sortable: false },
-      { colId: 'actor', field: 'username', header: t('COMMON.USERNAME'), width: '208px', sortable: false },
-      { colId: 'reason', field: 'failureReason', header: t('LOGIN_ACTIVITY.FAILURE_REASON'), width: '224px', sortable: false },
-      { colId: 'when', field: 'createdOn', header: t('LOGIN_ACTIVITY.TIMESTAMP'), width: '188px' },
-      { colId: 'origin', field: 'ipAddress', header: t('LOGIN_ACTIVITY.IP_ADDRESS'), width: '140px', sortable: false },
-      { colId: 'outcome', field: 'success', header: t('AUDIT.OUTCOME'), width: '132px', sortable: false },
+      {
+        colId: 'event',
+        field: 'eventType',
+        header: t('LOGIN_ACTIVITY.EVENT'),
+        width: '224px',
+        frozen: true,
+        sortable: false,
+      },
+      {
+        colId: 'actor',
+        field: 'username',
+        header: t('COMMON.USERNAME'),
+        width: '208px',
+        sortable: false,
+      },
+      {
+        colId: 'reason',
+        field: 'failureReason',
+        header: t('LOGIN_ACTIVITY.FAILURE_REASON'),
+        width: '224px',
+        sortable: false,
+      },
+      {
+        colId: 'when',
+        field: 'createdOn',
+        header: t('LOGIN_ACTIVITY.TIMESTAMP'),
+        width: '188px',
+      },
+      {
+        colId: 'origin',
+        field: 'ipAddress',
+        header: t('LOGIN_ACTIVITY.IP_ADDRESS'),
+        width: '140px',
+        sortable: false,
+      },
+      {
+        colId: 'outcome',
+        field: 'success',
+        header: t('AUDIT.OUTCOME'),
+        width: '132px',
+        sortable: false,
+      },
     ];
   }
 
@@ -142,16 +178,22 @@ export class ListLoginActivityComponent implements OnInit, OnDestroy {
   }
 
   eventClass(eventType: string | null | undefined): string {
-    return (eventType && EVENT_META[eventType]?.cssClass) || EVENT_FALLBACK.cssClass;
+    return (
+      (eventType && EVENT_META[eventType]?.cssClass) || EVENT_FALLBACK.cssClass
+    );
   }
 
   eventLabel(eventType: string | null | undefined): string {
-    const key = (eventType && EVENT_META[eventType]?.labelKey) || EVENT_FALLBACK.labelKey;
+    const key =
+      (eventType && EVENT_META[eventType]?.labelKey) || EVENT_FALLBACK.labelKey;
     return this.translate.instant(key);
   }
 
   actorDisplay(log: LoginActivity): string {
-    return log.username?.trim() || this.translate.instant('LOGIN_ACTIVITY.UNKNOWN_USER');
+    return (
+      log.username?.trim() ||
+      this.translate.instant('LOGIN_ACTIVITY.UNKNOWN_USER')
+    );
   }
 
   initials(log: LoginActivity): string {
@@ -239,7 +281,12 @@ export class ListLoginActivityComponent implements OnInit, OnDestroy {
 
   onDateRangeChange(range: Date[] | null): void {
     this.dateRange = range;
-    if (!range || range.length === 0 || (range[0] && range[1]) || range[0] === null) {
+    if (
+      !range ||
+      range.length === 0 ||
+      (range[0] && range[1]) ||
+      range[0] === null
+    ) {
       this.applyFilter();
     }
   }
@@ -324,7 +371,8 @@ export class ListLoginActivityComponent implements OnInit, OnDestroy {
   exportActivity(format: 'pdf') {
     const filter = this.buildFilter();
     const params: Record<string, unknown> = { format };
-    if (Object.keys(filter).length > 0) params['filter'] = JSON.stringify(filter);
+    if (Object.keys(filter).length > 0)
+      params['filter'] = JSON.stringify(filter);
 
     this.isExporting = true;
     this.cdr.markForCheck();

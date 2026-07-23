@@ -108,10 +108,18 @@
     }
   }
 
-  .f-event ::ng-deep { width: 12rem; }
-  .f-actor ::ng-deep { width: 12rem; }
-  .f-date ::ng-deep { width: 14rem; }
-  .f-failures { flex: none; }
+  .f-event ::ng-deep {
+    width: 12rem;
+  }
+  .f-actor ::ng-deep {
+    width: 12rem;
+  }
+  .f-date ::ng-deep {
+    width: 14rem;
+  }
+  .f-failures {
+    flex: none;
+  }
 }
 
 /* ── bespoke login cells (reach into projected cell markup) ──────────────── */
@@ -140,13 +148,30 @@
       flex: none;
       background: var(--hover-background);
       color: var(--text-color-secondary);
-      i { font-size: var(--fs-control); }
+      i {
+        font-size: var(--fs-control);
+      }
 
-      &.ev-success { color: var(--success-color); background: var(--success-bg); }
-      &.ev-failed { color: var(--error-color); background: var(--error-bg); }
-      &.ev-warning { color: var(--warning-color); background: var(--warning-bg); }
-      &.ev-logout { color: var(--text-color-secondary); background: var(--hover-background); }
-      &.ev-refresh { color: var(--primary-color); background: var(--primary-color-transparent); }
+      &.ev-success {
+        color: var(--success-color);
+        background: var(--success-bg);
+      }
+      &.ev-failed {
+        color: var(--error-color);
+        background: var(--error-bg);
+      }
+      &.ev-warning {
+        color: var(--warning-color);
+        background: var(--warning-bg);
+      }
+      &.ev-logout {
+        color: var(--text-color-secondary);
+        background: var(--hover-background);
+      }
+      &.ev-refresh {
+        color: var(--primary-color);
+        background: var(--primary-color-transparent);
+      }
     }
 
     .ev-name {
@@ -156,7 +181,9 @@
       overflow: hidden;
       text-overflow: ellipsis;
     }
-    &:hover .ev-name { color: var(--primary-color); }
+    &:hover .ev-name {
+      color: var(--primary-color);
+    }
   }
 
   .actor-cell {
@@ -187,10 +214,15 @@
 
   .reason-text {
     max-width: 220px;
-    &.muted { color: var(--text-muted); }
+    &.muted {
+      color: var(--text-muted);
+    }
   }
 
-  .ts { white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .ts {
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+  }
 
   .ip-text {
     font-family: var(--font-mono);
@@ -206,9 +238,15 @@
     font-weight: var(--fw-semibold);
     white-space: nowrap;
 
-    &.ok { color: var(--success-color); }
-    &.fail { color: var(--error-color); }
-    i { font-size: var(--fs-control); }
+    &.ok {
+      color: var(--success-color);
+    }
+    &.fail {
+      color: var(--error-color);
+    }
+    i {
+      font-size: var(--fs-control);
+    }
   }
 }
 
@@ -223,6 +261,11 @@
   color: var(--text-muted);
   text-align: center;
 
-  i { font-size: 1.6rem; opacity: 0.6; }
-  span { font-size: var(--fs-body); }
+  i {
+    font-size: 1.6rem;
+    opacity: 0.6;
+  }
+  span {
+    font-size: var(--fs-body);
+  }
 }

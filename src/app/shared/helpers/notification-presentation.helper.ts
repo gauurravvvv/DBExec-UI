@@ -84,7 +84,9 @@ export function notificationBodyKey(n: NotificationRow): string {
  * body key might reference, defaulted to '' so a missing field renders
  * empty rather than the literal "undefined".
  */
-export function notificationBodyParams(n: NotificationRow): Record<string, string> {
+export function notificationBodyParams(
+  n: NotificationRow,
+): Record<string, string> {
   const m = n.meta ?? {};
   return {
     groupName: m.groupName ?? '',

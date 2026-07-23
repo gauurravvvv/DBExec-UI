@@ -57,7 +57,8 @@ export class SchemaCatalog {
    */
   private resolveSchema(table: string): string {
     const t = table.toLowerCase();
-    if (this.byTable.has(`${this.defaultSchema}.${t}`)) return this.defaultSchema;
+    if (this.byTable.has(`${this.defaultSchema}.${t}`))
+      return this.defaultSchema;
     for (const key of this.byTable.keys()) {
       if (key.endsWith(`.${t}`)) return key.slice(0, key.length - t.length - 1);
     }

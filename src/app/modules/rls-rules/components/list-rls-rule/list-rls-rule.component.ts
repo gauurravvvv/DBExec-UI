@@ -118,12 +118,49 @@ export class ListRlsRuleComponent implements OnInit, OnDestroy {
   private buildColumns(): CustomTableColumn[] {
     const t = (k: string) => this.translate.instant(k);
     return [
-      { colId: 'name', field: 'name', header: t('COMMON.NAME'), width: '240px', frozen: true, filter: 'text' },
-      { colId: 'datasourceName', field: 'datasourceName', header: t('COMMON.DATASOURCE'), width: '192px', filter: 'text', sortable: false },
-      { colId: 'datasetName', field: 'datasetName', header: t('RLS.DATASET'), width: '200px', filter: 'text', sortable: false },
-      { colId: 'conditions', field: 'conditions', header: t('RLS.CONDITIONS'), width: '360px', sortable: false },
-      { colId: 'status', field: 'status', header: t('COMMON.STATUS'), width: '144px' },
-      { colId: 'actions', header: t('COMMON.ACTIONS'), width: '144px', sortable: false },
+      {
+        colId: 'name',
+        field: 'name',
+        header: t('COMMON.NAME'),
+        width: '240px',
+        frozen: true,
+        filter: 'text',
+      },
+      {
+        colId: 'datasourceName',
+        field: 'datasourceName',
+        header: t('COMMON.DATASOURCE'),
+        width: '192px',
+        filter: 'text',
+        sortable: false,
+      },
+      {
+        colId: 'datasetName',
+        field: 'datasetName',
+        header: t('RLS.DATASET'),
+        width: '200px',
+        filter: 'text',
+        sortable: false,
+      },
+      {
+        colId: 'conditions',
+        field: 'conditions',
+        header: t('RLS.CONDITIONS'),
+        width: '360px',
+        sortable: false,
+      },
+      {
+        colId: 'status',
+        field: 'status',
+        header: t('COMMON.STATUS'),
+        width: '144px',
+      },
+      {
+        colId: 'actions',
+        header: t('COMMON.ACTIONS'),
+        width: '144px',
+        sortable: false,
+      },
     ];
   }
 

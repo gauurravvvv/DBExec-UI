@@ -37,9 +37,7 @@ export class QueryService {
 
   readonly running = computed(() => this._runningCount() > 0);
   readonly exporting = computed(() => this._exportingCount() > 0);
-  readonly loadingStructure = computed(
-    () => this._loadingStructureCount() > 0,
-  );
+  readonly loadingStructure = computed(() => this._loadingStructureCount() > 0);
 
   constructor(private httpClientService: HttpClientService) {}
 
@@ -79,7 +77,10 @@ export class QueryService {
    * "query cancelled" error and surfaces it via the existing
    * typed-error code path. This call just kicks the engine.
    */
-  cancelQuery(payload: { requestId: string; datasourceId: string }): Observable<any> {
+  cancelQuery(payload: {
+    requestId: string;
+    datasourceId: string;
+  }): Observable<any> {
     return this.httpClientService.queryPost(QUERY.CANCEL, payload, {
       skipLoader: true,
     });
@@ -91,7 +92,10 @@ export class QueryService {
    * return JSON; Oracle returns text. Caller gets back
    * { engine, plan, raw, durationMs }.
    */
-  explainQuery(payload: { datasourceId: string; query: string }): Observable<any> {
+  explainQuery(payload: {
+    datasourceId: string;
+    query: string;
+  }): Observable<any> {
     return this.httpClientService.queryPost(QUERY.EXPLAIN, payload, {
       skipLoader: true,
     });

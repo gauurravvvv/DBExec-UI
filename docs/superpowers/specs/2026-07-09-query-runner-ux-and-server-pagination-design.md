@@ -20,6 +20,7 @@ Three cross-cutting problems, all confirmed against the code:
    ALL rows and paginate client-side.
 
 Decisions locked with the user:
+
 - Executor sort/filter → **server-side via SQL wrapping**, with safe fallback
   to client-side when wrapping isn't valid.
 - Pagination scope → **every list in the app** (no fetch-all-then-paginate).
@@ -34,7 +35,7 @@ never push. Standard commit trailer.
 - Executor `execute` FE call:
   `execute(id, sql, write, executionId, { explain, analyze, maxRows })` →
   `POST /connections/:id/execute` body `{ sql, write, executionId, explain,
-  analyze, maxRows? }` (`query-runner.service.ts:241`).
+analyze, maxRows? }` (`query-runner.service.ts:241`).
 - BE `execute.ts` → `executeScript(conn, sql, opts)` runs on a single pinned
   pg backend. `splitStatements(script)` yields statements; `isPlannable(sql)`
   classifies SELECT/WITH/VALUES/TABLE/INSERT/UPDATE/DELETE. Array row-mode
@@ -47,12 +48,12 @@ never push. Standard commit trailer.
   (`us-data-grid.component.scss:14`).
 - Launcher: `launcher/launcher.component.{html,scss,ts}`. Uses
   `app-custom-dropdown` (correct control) inside `.launcher-card`/`.launcher-
-  step` under the list-page mixin. Canonical form chrome =
+step` under the list-page mixin. Canonical form chrome =
   `add-admin-wrapper`/`add-admin-container` + `db-access-form` mixin (see
   `add-db-role.component.html` + `_db-access-shared.scss` `@mixin
-  db-access-form` lines ~741–946).
+db-access-form` lines ~741–946).
 - Pagination shared pattern: `UsServerListAdapter<T>({ load, unwrap,
-  sortFieldMap, filterBuilders, initial })` + `us-data-grid`. Reference
+sortFieldMap, filterBuilders, initial })` + `us-data-grid`. Reference
   implementations: `list-connections`, `list-user`, `list-dataset`,
   `list-datasource`, `list-audit-logs`, `list-organisation`,
   `list-login-activity`.
@@ -85,6 +86,7 @@ params: `rowHeight: 30`, `headerHeight: 32`, and font tied to `--fs-control`
 app's data density.
 
 **A3. Server-side sort/filter/paging via SQL wrapping (BE + FE).**
+
 - **BE** (`execute` controller + `executeScript` or a new `deriveQuery`
   helper): accept an optional body field `derived`:
   ```
@@ -124,13 +126,14 @@ app's data density.
 
 Convert `launcher.component.{html,scss}` from list chrome to the canonical
 add/edit-form chrome:
+
 - `.dataset-page-wrapper`/`.dataset-content-container` + `db-access-page` →
   `.add-admin-wrapper`/`.add-admin-container` + `@include db.db-access-form`.
 - Wrap the selectors in `<form class="admin-form">` → `.left-section` →
   `.form-grid` (50% width, `--space-8` gap, responsive to 100%). Drop
   `.launcher-step`.
 - Keep `app-custom-dropdown` for Datasource + Connection; consistent `[label]`
-  + static `[placeholder]` + `icon` (`pi-database` / `pi-link`).
+  - static `[placeholder]` + `icon` (`pi-database` / `pi-link`).
 - Header: canonical `.page-header` with back affordance + `.action-buttons`
   (Manage Connections as secondary). **Open Executor** becomes a right-aligned
   form action (canonical primary), not floating.

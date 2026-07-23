@@ -47,7 +47,9 @@
             [required]="true"
             [rows]="6"
             resize="none"
-            [placeholder]="'APP_SETTINGS.SSO.CERTIFICATE_PLACEHOLDER' | translate"
+            [placeholder]="
+              'APP_SETTINGS.SSO.CERTIFICATE_PLACEHOLDER' | translate
+            "
           ></app-custom-textarea>
           <span class="configured-badge" *ngIf="certConfigured">
             <i class="pi pi-check-circle"></i>

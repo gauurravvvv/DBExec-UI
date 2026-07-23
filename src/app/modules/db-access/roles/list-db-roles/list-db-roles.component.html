@@ -46,28 +46,35 @@
                capability badge (once a datasource is chosen) — all inline on
                the table's single toolbar row, opposite the search + icons. -->
           <div tableToolbarStart class="roles-toolbar-start">
-            <app-datasource-picker (changed)="onDatasourceChange($event)"></app-datasource-picker>
+            <app-datasource-picker
+              (changed)="onDatasourceChange($event)"
+            ></app-datasource-picker>
 
-            <ng-container *ngIf="datasourceId && !unsupported() && !capabilityLoading()">
+            <ng-container
+              *ngIf="datasourceId && !unsupported() && !capabilityLoading()"
+            >
               <div class="type-filter">
                 <app-chip
                   variant="filter"
                   icon="pi pi-list"
                   [active]="typeFilter === 'all'"
                   (clicked)="setTypeFilter('all')"
-                >{{ 'DB_ACCESS.TYPE_ALL' | translate }}</app-chip>
+                  >{{ 'DB_ACCESS.TYPE_ALL' | translate }}</app-chip
+                >
                 <app-chip
                   variant="filter"
                   icon="pi pi-user"
                   [active]="typeFilter === 'login'"
                   (clicked)="setTypeFilter('login')"
-                >{{ 'DB_ACCESS.TYPE_LOGIN' | translate }}</app-chip>
+                  >{{ 'DB_ACCESS.TYPE_LOGIN' | translate }}</app-chip
+                >
                 <app-chip
                   variant="filter"
                   icon="pi pi-users"
                   [active]="typeFilter === 'group'"
                   (clicked)="setTypeFilter('group')"
-                >{{ 'DB_ACCESS.TYPE_GROUP' | translate }}</app-chip>
+                  >{{ 'DB_ACCESS.TYPE_GROUP' | translate }}</app-chip
+                >
               </div>
 
               <app-chip
@@ -75,19 +82,25 @@
                 tone="success"
                 icon="pi pi-check-circle"
                 *ngIf="capability() && canManage"
-              >{{ 'DB_ACCESS.CAP_FULL_BADGE' | translate }}</app-chip>
+                >{{ 'DB_ACCESS.CAP_FULL_BADGE' | translate }}</app-chip
+              >
               <app-chip
                 variant="badge"
                 tone="neutral"
                 icon="pi pi-lock"
                 *ngIf="capability() && !canManage"
-              >{{ 'DB_ACCESS.CAP_READONLY_BADGE' | translate }}</app-chip>
+                >{{ 'DB_ACCESS.CAP_READONLY_BADGE' | translate }}</app-chip
+              >
             </ng-container>
 
             <!-- Capability spinner sits inline while the chosen datasource is
                  being probed. -->
-            <span class="cap-loading" *ngIf="datasourceId && capabilityLoading()">
-              <i class="pi pi-spin pi-spinner"></i>{{ 'DB_ACCESS.CHECKING_CAPABILITY' | translate }}
+            <span
+              class="cap-loading"
+              *ngIf="datasourceId && capabilityLoading()"
+            >
+              <i class="pi pi-spin pi-spinner"></i
+              >{{ 'DB_ACCESS.CHECKING_CAPABILITY' | translate }}
             </span>
           </div>
 
@@ -111,7 +124,9 @@
           </div>
 
           <ng-template usGridCell="name" let-role>
-            <a class="dataset-name-link" (click)="onView(role)">{{ role.name }}</a>
+            <a class="dataset-name-link" (click)="onView(role)">{{
+              role.name
+            }}</a>
           </ng-template>
 
           <ng-template usGridCell="type" let-role>
@@ -121,7 +136,12 @@
               [tone]="isLogin(role) ? 'primary' : 'neutral'"
               [icon]="isLogin(role) ? 'pi pi-user' : 'pi pi-users'"
             >
-              {{ (isLogin(role) ? 'DB_ACCESS.TYPE_LOGIN' : 'DB_ACCESS.TYPE_GROUP') | translate }}
+              {{
+                (isLogin(role)
+                  ? 'DB_ACCESS.TYPE_LOGIN'
+                  : 'DB_ACCESS.TYPE_GROUP'
+                ) | translate
+              }}
             </app-chip>
           </ng-template>
 
@@ -132,48 +152,87 @@
               [tone]="statusToneOf(role)"
               [dot]="'currentColor'"
             >
-              {{ 'DB_ACCESS.STATUS_' + (statusOf(role) | uppercase) | translate }}
+              {{
+                'DB_ACCESS.STATUS_' + (statusOf(role) | uppercase) | translate
+              }}
             </app-chip>
           </ng-template>
 
           <ng-template usGridCell="validUntil" let-role>
             <span
               class="date-text"
-              *ngIf="isLogin(role) && (role.attributes?.validUntil || role.validUntil) as vu; else noExpiry"
+              *ngIf="
+                isLogin(role) &&
+                  (role.attributes?.validUntil || role.validUntil) as vu;
+                else noExpiry
+              "
             >
               {{ vu | date: 'dd MMM yyyy' }}
             </span>
-            <ng-template #noExpiry><span class="description-text">—</span></ng-template>
+            <ng-template #noExpiry
+              ><span class="description-text">—</span></ng-template
+            >
           </ng-template>
 
           <ng-template usGridCell="connectionLimit" let-role>
-            <span class="description-text">{{ isLogin(role) ? connLimitOf(role) : '—' }}</span>
+            <span class="description-text">{{
+              isLogin(role) ? connLimitOf(role) : '—'
+            }}</span>
           </ng-template>
 
           <ng-template usGridCell="flags" let-role>
-            <app-chip variant="tag" tone="primary" size="sm" *ngFor="let f of flagsOf(role)">{{ f }}</app-chip>
-            <span class="description-text" *ngIf="!flagsOf(role).length">—</span>
+            <app-chip
+              variant="tag"
+              tone="primary"
+              size="sm"
+              *ngFor="let f of flagsOf(role)"
+              >{{ f }}</app-chip
+            >
+            <span class="description-text" *ngIf="!flagsOf(role).length"
+              >—</span
+            >
           </ng-template>
 
           <ng-template usGridCell="memberOf" let-role>
-            <app-chip variant="tag" size="sm" *ngFor="let m of (role.memberOf ?? [])">{{ m }}</app-chip>
-            <span class="description-text" *ngIf="!(role.memberOf ?? []).length">—</span>
+            <app-chip
+              variant="tag"
+              size="sm"
+              *ngFor="let m of role.memberOf ?? []"
+              >{{ m }}</app-chip
+            >
+            <span class="description-text" *ngIf="!(role.memberOf ?? []).length"
+              >—</span
+            >
           </ng-template>
 
           <ng-template usGridCell="actions" let-role>
             <div class="row-actions">
-              <button class="icon-btn view-btn" (click)="onView(role)"
-                [pTooltip]="'COMMON.VIEW' | translate" tooltipPosition="bottom">
+              <button
+                class="icon-btn view-btn"
+                (click)="onView(role)"
+                [pTooltip]="'COMMON.VIEW' | translate"
+                tooltipPosition="bottom"
+              >
                 <i class="pi pi-eye"></i>
               </button>
-              <button *hasPermission="'dbRoles'; level: 'write'"
-                class="icon-btn" (click)="openMembership('attach', role)" [disabled]="!canManage"
-                [pTooltip]="'DB_ACCESS.ATTACH' | translate" tooltipPosition="bottom">
+              <button
+                *hasPermission="'dbRoles'; level: 'write'"
+                class="icon-btn"
+                (click)="openMembership('attach', role)"
+                [disabled]="!canManage"
+                [pTooltip]="'DB_ACCESS.ATTACH' | translate"
+                tooltipPosition="bottom"
+              >
                 <i class="pi pi-link"></i>
               </button>
-              <button *hasPermission="'dbRoles'; level: 'write'"
-                class="icon-btn edit-btn" (click)="onEdit(role)" [disabled]="!canManage"
-                [pTooltip]="'COMMON.EDIT' | translate" tooltipPosition="bottom">
+              <button
+                *hasPermission="'dbRoles'; level: 'write'"
+                class="icon-btn edit-btn"
+                (click)="onEdit(role)"
+                [disabled]="!canManage"
+                [pTooltip]="'COMMON.EDIT' | translate"
+                tooltipPosition="bottom"
+              >
                 <i class="pi pi-pencil"></i>
               </button>
               <ng-container *hasPermission="'dbRoles'; level: 'write'">
@@ -188,9 +247,14 @@
                   <i class="pi pi-ban"></i>
                 </button>
               </ng-container>
-              <button *hasPermission="'dbRoles'; level: 'delete'"
-                class="icon-btn delete-btn" (click)="openDelete(role)" [disabled]="!canManage"
-                [pTooltip]="'COMMON.DELETE' | translate" tooltipPosition="bottom">
+              <button
+                *hasPermission="'dbRoles'; level: 'delete'"
+                class="icon-btn delete-btn"
+                (click)="openDelete(role)"
+                [disabled]="!canManage"
+                [pTooltip]="'COMMON.DELETE' | translate"
+                tooltipPosition="bottom"
+              >
                 <i class="pi pi-trash"></i>
               </button>
             </div>
@@ -210,10 +274,18 @@
     </div>
     <div class="popup-body">
       <div class="mode-tabs">
-        <button type="button" [class.active]="membershipMode === 'attach'" (click)="membershipMode = 'attach'">
+        <button
+          type="button"
+          [class.active]="membershipMode === 'attach'"
+          (click)="membershipMode = 'attach'"
+        >
           {{ 'DB_ACCESS.ATTACH' | translate }}
         </button>
-        <button type="button" [class.active]="membershipMode === 'detach'" (click)="membershipMode = 'detach'">
+        <button
+          type="button"
+          [class.active]="membershipMode === 'detach'"
+          (click)="membershipMode = 'detach'"
+        >
           {{ 'DB_ACCESS.DETACH' | translate }}
         </button>
       </div>
@@ -277,12 +349,24 @@
       <h3>{{ 'DB_ACCESS.DELETE_ROLE' | translate }}</h3>
     </div>
     <div class="popup-body">
-      <p class="delete-intro" [innerHTML]="'DB_ACCESS.DELETE_ROLE_INTRO' | translate: { name: deleteTarget?.name }"></p>
+      <p
+        class="delete-intro"
+        [innerHTML]="
+          'DB_ACCESS.DELETE_ROLE_INTRO'
+            | translate: { name: deleteTarget?.name }
+        "
+      ></p>
       <div class="owned-summary" *ngIf="ownedLoading">
-        <i class="pi pi-spin pi-spinner"></i>{{ 'DB_ACCESS.CHECKING_OWNED' | translate }}
+        <i class="pi pi-spin pi-spinner"></i
+        >{{ 'DB_ACCESS.CHECKING_OWNED' | translate }}
       </div>
       <ul class="info-list" *ngIf="!ownedLoading">
-        <li><i class="pi pi-box"></i><span>{{ 'DB_ACCESS.OWNED_COUNT' | translate: { count: ownedCount } }}</span></li>
+        <li>
+          <i class="pi pi-box"></i
+          ><span>{{
+            'DB_ACCESS.OWNED_COUNT' | translate: { count: ownedCount }
+          }}</span>
+        </li>
       </ul>
       <div class="delete-mode" *ngIf="!ownedLoading && ownedCount > 0">
         <app-custom-radio
@@ -293,9 +377,16 @@
           layout="vertical"
         ></app-custom-radio>
         <div class="reassign-picker" *ngIf="deleteMode === 'reassign'">
-          <app-custom-dropdown [(ngModel)]="reassignTo" [options]="allRoleOptions"
-            optionLabel="label" optionValue="value" [filter]="true" filterBy="label"
-            appendTo="body" [label]="'DB_ACCESS.TARGET_ROLE' | translate"></app-custom-dropdown>
+          <app-custom-dropdown
+            [(ngModel)]="reassignTo"
+            [options]="allRoleOptions"
+            optionLabel="label"
+            optionValue="value"
+            [filter]="true"
+            filterBy="label"
+            appendTo="body"
+            [label]="'DB_ACCESS.TARGET_ROLE' | translate"
+          ></app-custom-dropdown>
         </div>
       </div>
     </div>
@@ -303,9 +394,14 @@
       <button class="btn-cancel" (click)="cancelDelete()">
         <i class="pi pi-times"></i>{{ 'COMMON.CANCEL' | translate }}
       </button>
-      <button class="btn-confirm btn-danger"
-        [disabled]="ownedLoading || (ownedCount > 0 && deleteMode === 'reassign' && !reassignTo)"
-        (click)="proceedDelete()">
+      <button
+        class="btn-confirm btn-danger"
+        [disabled]="
+          ownedLoading ||
+          (ownedCount > 0 && deleteMode === 'reassign' && !reassignTo)
+        "
+        (click)="proceedDelete()"
+      >
         <i class="pi pi-eye"></i>{{ 'DB_ACCESS.REVIEW_SQL' | translate }}
       </button>
     </div>

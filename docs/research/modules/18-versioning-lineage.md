@@ -23,16 +23,16 @@
 
 ## 1. Industry baseline
 
-| Tool | Versioning | Diff | Rollback | Branches | Git sync |
-|---|---|---|---|---|---|
-| **Tableau** | revisions per published workbook | view-only diff | yes | no | no |
-| **Power BI** | OneDrive integration (~ish) | partial | yes (via OneDrive) | no | no |
-| **Looker** | LookML in Git (native) | git diff | yes | yes | first-class |
-| **Hex** | project versions | yes | yes | yes (notebook branches) | yes (paid) |
-| **Mode** | report versions | line-level | yes | no | no |
-| **Metabase** | revision history | per-question | yes | no | no |
-| **Superset** | dashboards versioned in db | partial | yes | no | partial |
-| **dbt** | (model layer) git-native | git diff | git revert | git branches | first-class |
+| Tool         | Versioning                       | Diff           | Rollback           | Branches                | Git sync    |
+| ------------ | -------------------------------- | -------------- | ------------------ | ----------------------- | ----------- |
+| **Tableau**  | revisions per published workbook | view-only diff | yes                | no                      | no          |
+| **Power BI** | OneDrive integration (~ish)      | partial        | yes (via OneDrive) | no                      | no          |
+| **Looker**   | LookML in Git (native)           | git diff       | yes                | yes                     | first-class |
+| **Hex**      | project versions                 | yes            | yes                | yes (notebook branches) | yes (paid)  |
+| **Mode**     | report versions                  | line-level     | yes                | no                      | no          |
+| **Metabase** | revision history                 | per-question   | yes                | no                      | no          |
+| **Superset** | dashboards versioned in db       | partial        | yes                | no                      | partial     |
+| **dbt**      | (model layer) git-native         | git diff       | git revert         | git branches            | first-class |
 
 **The patterns to copy:**
 
@@ -61,26 +61,26 @@
 
 ## 3. Gap matrix
 
-| ID | Gap | Severity | Effort |
-|---|---|---|---|
-| VR-G01 | Versioned dataset (every save = new version) | P0 | M |
-| VR-G02 | Versioned dashboard | P0 | M |
-| VR-G03 | Versioned RLS rules | P1 | M |
-| VR-G04 | Versioned semantic model | P1 | M |
-| VR-G05 | Diff view (JSON-patch or field-level) | P0 | M |
-| VR-G06 | Rollback to version | P0 | M |
-| VR-G07 | Compare two versions side-by-side | P1 | M |
-| VR-G08 | Tag a version (release name) | P1 | S |
-| VR-G09 | Branches (dataset / analysis fork) | P2 | L |
-| VR-G10 | Lineage graph entity + edges table | P0 | L |
-| VR-G11 | "Impact analysis" UI | P1 | M |
-| VR-G12 | Column-level lineage (which output col comes from which input col) | P2 | L |
-| VR-G13 | Git export (read-only YAML) | P1 | L |
-| VR-G14 | Git import (write-back from YAML) | P2 | L |
-| VR-G15 | Git webhook (CI-style PR check) | P2 | M |
-| VR-G16 | Version retention policy | P0 | S |
-| VR-G17 | "Drafts" — unpublished edits visible only to author | P1 | M |
-| VR-G18 | Blame view ("who changed this column?") | P1 | M |
+| ID     | Gap                                                                | Severity | Effort |
+| ------ | ------------------------------------------------------------------ | -------- | ------ |
+| VR-G01 | Versioned dataset (every save = new version)                       | P0       | M      |
+| VR-G02 | Versioned dashboard                                                | P0       | M      |
+| VR-G03 | Versioned RLS rules                                                | P1       | M      |
+| VR-G04 | Versioned semantic model                                           | P1       | M      |
+| VR-G05 | Diff view (JSON-patch or field-level)                              | P0       | M      |
+| VR-G06 | Rollback to version                                                | P0       | M      |
+| VR-G07 | Compare two versions side-by-side                                  | P1       | M      |
+| VR-G08 | Tag a version (release name)                                       | P1       | S      |
+| VR-G09 | Branches (dataset / analysis fork)                                 | P2       | L      |
+| VR-G10 | Lineage graph entity + edges table                                 | P0       | L      |
+| VR-G11 | "Impact analysis" UI                                               | P1       | M      |
+| VR-G12 | Column-level lineage (which output col comes from which input col) | P2       | L      |
+| VR-G13 | Git export (read-only YAML)                                        | P1       | L      |
+| VR-G14 | Git import (write-back from YAML)                                  | P2       | L      |
+| VR-G15 | Git webhook (CI-style PR check)                                    | P2       | M      |
+| VR-G16 | Version retention policy                                           | P0       | S      |
+| VR-G17 | "Drafts" — unpublished edits visible only to author                | P1       | M      |
+| VR-G18 | Blame view ("who changed this column?")                            | P1       | M      |
 
 ## 4. Target architecture
 
@@ -140,17 +140,26 @@ JSON-patch-ish but flattened for ergonomic UI rendering:
 
 ```ts
 type Diff = {
-  added: Record<string, unknown>;          // field → new value
-  removed: Record<string, unknown>;        // field → old value
-  changed: Record<string, {                // field → {from, to}
-    from: unknown;
-    to: unknown;
-  }>;
+  added: Record<string, unknown>; // field → new value
+  removed: Record<string, unknown>; // field → old value
+  changed: Record<
+    string,
+    {
+      // field → {from, to}
+      from: unknown;
+      to: unknown;
+    }
+  >;
 };
 
 function computeDiff(prev: any, next: any): Diff {
-  const added: any = {}, removed: any = {}, changed: any = {};
-  const keys = new Set([...Object.keys(prev || {}), ...Object.keys(next || {})]);
+  const added: any = {},
+    removed: any = {},
+    changed: any = {};
+  const keys = new Set([
+    ...Object.keys(prev || {}),
+    ...Object.keys(next || {}),
+  ]);
   for (const k of keys) {
     if (!(k in prev)) added[k] = next[k];
     else if (!(k in next)) removed[k] = prev[k];
@@ -188,11 +197,13 @@ export async function recordDatasetVersion(
   options: { branchName?: string; isDraft?: boolean } = {},
 ) {
   const branchName = options.branchName ?? 'main';
-  const next = await manager.query(`
+  const next = await manager.query(
+    `
     SELECT COALESCE(MAX(version_number), 0) + 1 AS n
     FROM dataset_version
     WHERE dataset_id = $1 AND branch_name = $2`,
-    [dataset.id, branchName]);
+    [dataset.id, branchName],
+  );
   const versionNumber = next[0].n;
 
   const parent = await manager.getRepository(DatasetVersion).findOne({
@@ -209,14 +220,20 @@ export async function recordDatasetVersion(
     description: dataset.description,
     sql: dataset.sql,
     fields: fields.map(f => ({
-      name: f.name, dataType: f.dataType,
-      customLogic: f.customLogic, columnToView: f.columnToView,
+      name: f.name,
+      dataType: f.dataType,
+      customLogic: f.customLogic,
+      columnToView: f.columnToView,
     })),
   };
-  const prevSnapshot = prev ? {
-    name: prev.name, description: prev.description, sql: prev.sql,
-    fields: (prev as any).fields ?? [],
-  } : {};
+  const prevSnapshot = prev
+    ? {
+        name: prev.name,
+        description: prev.description,
+        sql: prev.sql,
+        fields: (prev as any).fields ?? [],
+      }
+    : {};
   const diff = computeDiff(prevSnapshot, newSnapshot);
 
   await manager.getRepository(DatasetVersion).save({
@@ -240,7 +257,7 @@ export async function recordDatasetVersion(
 ```
 
 Called from `addDataset` + `updateDataset` + any other dataset
-mutation, *inside* the same transaction so a version is never
+mutation, _inside_ the same transaction so a version is never
 missing for an applied change.
 
 ### 4.4 Rollback
@@ -252,15 +269,21 @@ async function rollbackDataset(req, res) {
   const { versionId, justification } = req.body;
 
   const target = await DatasetVersion.findOne({
-    where: { id: versionId, datasetId: id, organisationId: res.locals.orgData.id },
+    where: {
+      id: versionId,
+      datasetId: id,
+      organisationId: res.locals.orgData.id,
+    },
   });
   if (!target) return sendResponse(res, false, 404, 'version.not_found');
 
   // Restore via a fresh update — which itself records a new version
   // tagged as a rollback. Never directly write the old row over the
   // new one — we want full forward history.
-  await master_db_connection.manager.transaction(async (manager) => {
-    const current = await manager.getRepository(Dataset).findOne({ where: { id } });
+  await master_db_connection.manager.transaction(async manager => {
+    const current = await manager
+      .getRepository(Dataset)
+      .findOne({ where: { id } });
     if (!current) throw new Error('not found');
 
     current.name = target.name!;
@@ -273,14 +296,19 @@ async function rollbackDataset(req, res) {
     await manager.getRepository(DatasetField).delete({ datasetId: id });
     for (const f of target.fields as any[]) {
       await manager.getRepository(DatasetField).save({
-        datasetId: id, ...f,
+        datasetId: id,
+        ...f,
       });
     }
 
     // Record the rollback as its own version with an explicit message
-    await recordDatasetVersion(manager, current, /* prev */ current,
-                                res.locals.loggedInId,
-                                `Rolled back to v${target.versionNumber}. ${justification ?? ''}`);
+    await recordDatasetVersion(
+      manager,
+      current,
+      /* prev */ current,
+      res.locals.loggedInId,
+      `Rolled back to v${target.versionNumber}. ${justification ?? ''}`,
+    );
   });
 
   await auditLogger.logAuditToOrg({
@@ -348,28 +376,35 @@ export async function rebuildLineageForDataset(
   if (!ds) return;
 
   // Clear all edges where this dataset is downstream (we re-add)
-  await manager.query(`
+  await manager.query(
+    `
     DELETE FROM lineage_edge
-    WHERE downstream_type = 'dataset' AND downstream_id = $1`, [datasetId]);
+    WHERE downstream_type = 'dataset' AND downstream_id = $1`,
+    [datasetId],
+  );
 
-  await manager.query(`
+  await manager.query(
+    `
     INSERT INTO lineage_edge (organisation_id, upstream_type, upstream_id,
                               downstream_type, downstream_id,
                               relationship, confidence, reason)
     VALUES ($1, 'datasource', $2, 'dataset', $3, 'direct', 100, 'dataset.datasourceId')`,
-    [ds.organisationId, ds.datasourceId, ds.id]);
+    [ds.organisationId, ds.datasourceId, ds.id],
+  );
 
   // 2. Parse SQL → tables referenced (column-level later)
-  const tables = parseTablesFromSql(ds.sql);     // see §4.7
+  const tables = parseTablesFromSql(ds.sql); // see §4.7
   for (const t of tables) {
-    await manager.query(`
+    await manager.query(
+      `
       INSERT INTO lineage_edge (organisation_id, upstream_type, upstream_id,
                                 downstream_type, downstream_id,
                                 relationship, confidence, reason)
       VALUES ($1, 'datasource_table', $2, 'dataset', $3, 'direct', 80,
               'parsed from SQL FROM/JOIN')
       ON CONFLICT DO NOTHING`,
-      [ds.organisationId, t.tableRef, ds.id]);
+      [ds.organisationId, t.tableRef, ds.id],
+    );
   }
 }
 
@@ -393,9 +428,7 @@ export function parseTablesFromSql(sql: string): TableRef[] {
     const collect = (node: any) => {
       if (!node) return;
       if (node.type === 'tableRef') {
-        const ref = node.schema
-          ? `${node.schema}.${node.name}`
-          : node.name;
+        const ref = node.schema ? `${node.schema}.${node.name}` : node.name;
         found.add(ref);
       }
       for (const v of Object.values(node)) {
@@ -406,7 +439,7 @@ export function parseTablesFromSql(sql: string): TableRef[] {
     collect(ast);
     return Array.from(found).map(t => ({ tableRef: t }));
   } catch {
-    return [];     // parse failure — log but don't block save
+    return []; // parse failure — log but don't block save
   }
 }
 ```
@@ -424,7 +457,8 @@ async function lineageUpstream(req, res) {
   const depth = Math.min(Number(req.query.depth) || 3, 10);
 
   // Recursive CTE — fan out upstream up to `depth` hops
-  const rows = await master_db_connection.query(`
+  const rows = await master_db_connection.query(
+    `
     WITH RECURSIVE lineage(level, upstream_type, upstream_id, downstream_type, downstream_id, reason) AS (
       SELECT 0, le.upstream_type, le.upstream_id, le.downstream_type, le.downstream_id, le.reason
       FROM lineage_edge le
@@ -436,7 +470,8 @@ async function lineageUpstream(req, res) {
       WHERE l.level < $3
     )
     SELECT * FROM lineage`,
-    [type, id, depth]);
+    [type, id, depth],
+  );
 
   return sendResponse(res, true, 200, '', { edges: rows });
 }
@@ -451,7 +486,8 @@ When the user opens "Edit dataset", the FE shows an Impact panel:
 async function impactAnalysis(req, res) {
   const { type, id } = req.query;
   // Downstream lineage to depth=5
-  const downstream = await master_db_connection.query(`
+  const downstream = await master_db_connection.query(
+    `
     WITH RECURSIVE downstream(level, edge_id, dtype, did, reason) AS (
       SELECT 1, le.id, le.downstream_type, le.downstream_id, le.reason
       FROM lineage_edge le
@@ -465,7 +501,9 @@ async function impactAnalysis(req, res) {
     SELECT level, dtype, did,
            COUNT(*) OVER (PARTITION BY dtype) AS type_count,
            reason
-    FROM downstream`, [type, id]);
+    FROM downstream`,
+    [type, id],
+  );
 
   // Group and pretty up — return shape like:
   //   { datasets: 3, analyses: 12, dashboards: 7, rls_rules: 2, subscriptions: 4 }
@@ -484,7 +522,7 @@ A simple per-field history endpoint:
 // GET /datasets/:id/blame?field=sql
 async function datasetBlame(req, res) {
   const { id } = req.params;
-  const field = req.query.field as string;   // 'sql', 'name', etc.
+  const field = req.query.field as string; // 'sql', 'name', etc.
 
   const versions = await DatasetVersion.find({
     where: { datasetId: id, organisationId: res.locals.orgData.id },
@@ -501,7 +539,11 @@ async function datasetBlame(req, res) {
   }> = [];
   for (const v of versions) {
     const diff = v.diffFromParent as any;
-    if (diff?.changed?.[field] || diff?.added?.[field] || diff?.removed?.[field]) {
+    if (
+      diff?.changed?.[field] ||
+      diff?.added?.[field] ||
+      diff?.removed?.[field]
+    ) {
       changes.push({
         versionNumber: v.versionNumber,
         editedBy: v.editedBy,
@@ -558,7 +600,9 @@ async function createBranch(req, res) {
     versionNumber: 1,
     parentVersionId: base.id,
     branchName: name,
-    name: base.name, description: base.description, sql: base.sql,
+    name: base.name,
+    description: base.description,
+    sql: base.sql,
     fields: base.fields,
     diffFromParent: { added: {}, removed: {}, changed: {} },
     editedBy: res.locals.loggedInId,
@@ -649,23 +693,23 @@ sync is a thin client on top of that schema.
 
 ## 5. APIs
 
-| Method | Path | Purpose |
-|---|---|---|
-| GET | `/datasets/:id/versions` | List versions |
-| GET | `/datasets/:id/versions/:vid` | Detail |
-| GET | `/datasets/:id/versions/:vid/diff?against=:prevId` | Diff two versions |
-| POST | `/datasets/:id/rollback` | Roll back to version |
-| POST | `/datasets/:id/versions/:vid/tag` | Tag version |
-| POST | `/datasets/:id/branches` | Create branch |
-| GET | `/datasets/:id/branches` | List branches |
-| POST | `/datasets/:id/drafts` | Open / get a draft |
-| POST | `/datasets/:id/drafts/publish` | Publish draft |
-| DELETE | `/datasets/:id/drafts` | Discard draft |
-| GET | `/datasets/:id/blame?field=sql` | Blame for a field |
-| GET | `/lineage/upstream?type&id&depth` | Upstream chain |
-| GET | `/lineage/downstream?type&id&depth` | Downstream chain |
-| GET | `/lineage/impact?type&id` | Impact analysis summary |
-| GET | `/workspace/export.yaml` | YAML bundle |
+| Method                                                                     | Path                                               | Purpose                 |
+| -------------------------------------------------------------------------- | -------------------------------------------------- | ----------------------- |
+| GET                                                                        | `/datasets/:id/versions`                           | List versions           |
+| GET                                                                        | `/datasets/:id/versions/:vid`                      | Detail                  |
+| GET                                                                        | `/datasets/:id/versions/:vid/diff?against=:prevId` | Diff two versions       |
+| POST                                                                       | `/datasets/:id/rollback`                           | Roll back to version    |
+| POST                                                                       | `/datasets/:id/versions/:vid/tag`                  | Tag version             |
+| POST                                                                       | `/datasets/:id/branches`                           | Create branch           |
+| GET                                                                        | `/datasets/:id/branches`                           | List branches           |
+| POST                                                                       | `/datasets/:id/drafts`                             | Open / get a draft      |
+| POST                                                                       | `/datasets/:id/drafts/publish`                     | Publish draft           |
+| DELETE                                                                     | `/datasets/:id/drafts`                             | Discard draft           |
+| GET                                                                        | `/datasets/:id/blame?field=sql`                    | Blame for a field       |
+| GET                                                                        | `/lineage/upstream?type&id&depth`                  | Upstream chain          |
+| GET                                                                        | `/lineage/downstream?type&id&depth`                | Downstream chain        |
+| GET                                                                        | `/lineage/impact?type&id`                          | Impact analysis summary |
+| GET                                                                        | `/workspace/export.yaml`                           | YAML bundle             |
 | (analogous endpoints for dashboards, analyses, rls_rules, semantic_models) |
 
 ## 6. FE specs
@@ -771,11 +815,23 @@ export const createBranchSchema = z.object({
 
 export const tagVersionSchema = z.object({
   versionId: z.string().uuid(),
-  tagName: z.string().min(1).max(64).regex(/^[a-zA-Z][a-zA-Z0-9._-]{0,63}$/),
+  tagName: z
+    .string()
+    .min(1)
+    .max(64)
+    .regex(/^[a-zA-Z][a-zA-Z0-9._-]{0,63}$/),
 });
 
 export const lineageQuerySchema = z.object({
-  type: z.enum(['dataset','analysis','dashboard','datasource','rls_rule','semantic_model','datasource_table']),
+  type: z.enum([
+    'dataset',
+    'analysis',
+    'dashboard',
+    'datasource',
+    'rls_rule',
+    'semantic_model',
+    'datasource_table',
+  ]),
   id: z.string().uuid(),
   depth: z.coerce.number().int().min(1).max(10).optional(),
 });

@@ -51,7 +51,11 @@ export class ViewAlertComponent implements OnInit, OnDestroy {
     { label: 'ALERTS.SNOOZE_1D', value: 1440 },
   ];
 
-  testResult: { breached?: boolean; observedValue?: any; error?: string } | null = null;
+  testResult: {
+    breached?: boolean;
+    observedValue?: any;
+    error?: string;
+  } | null = null;
 
   /* ── favourite star (Track F) ───────────────────────────────────── */
   readonly objectType: FavouriteObjectType = 'alert';
@@ -79,10 +83,12 @@ export class ViewAlertComponent implements OnInit, OnDestroy {
   }
 
   toggleFavourite(): void {
-    this.favouritesService.toggle(this.objectType, this.alertId).then((res: any) => {
-      this.globalService.handleSuccessService(res, false);
-      this.cdr.markForCheck();
-    });
+    this.favouritesService
+      .toggle(this.objectType, this.alertId)
+      .then((res: any) => {
+        this.globalService.handleSuccessService(res, false);
+        this.cdr.markForCheck();
+      });
   }
 
   ngOnDestroy(): void {
@@ -157,7 +163,9 @@ export class ViewAlertComponent implements OnInit, OnDestroy {
         this.cdr.markForCheck();
       })
       .catch(() => {
-        this.testResult = { error: this.translate.instant('ALERTS.TEST_FAILED') };
+        this.testResult = {
+          error: this.translate.instant('ALERTS.TEST_FAILED'),
+        };
         this.cdr.markForCheck();
       });
   }

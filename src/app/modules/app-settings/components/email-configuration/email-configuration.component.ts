@@ -72,7 +72,8 @@ export class EmailConfigurationComponent
   }
 
   get selectedProvider(): EmailProvider {
-    return (this.emailForm.get('emailProvider')?.value ?? 'NONE') as EmailProvider;
+    return (this.emailForm.get('emailProvider')?.value ??
+      'NONE') as EmailProvider;
   }
 
   ngOnInit(): void {
@@ -199,7 +200,8 @@ export class EmailConfigurationComponent
     } else if (provider === 'SES') {
       payload.sesRegion = v.sesRegion?.toString().trim() || null;
       payload.sesAccessKeyId = v.sesAccessKeyId?.toString().trim() || null;
-      if (v.sesSecretAccessKey) payload.sesSecretAccessKey = v.sesSecretAccessKey;
+      if (v.sesSecretAccessKey)
+        payload.sesSecretAccessKey = v.sesSecretAccessKey;
       payload.sesFrom = v.sesFrom?.toString().trim() || null;
     }
     const res = await this.orgPolicyService.updateEmail(payload);

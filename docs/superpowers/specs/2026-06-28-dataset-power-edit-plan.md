@@ -12,15 +12,15 @@
 
 Sorted by (impact ÷ effort), highest first:
 
-| # | Feature | Impact | Effort | Notes |
-|---|---|---|---|---|
-| 1 | AG Grid result pane (drag-reorder, resize, column chooser, CSV/XLSX, density, saved views, quick filters) | Very high | Low (component already built on the `ag-grid` branch) | Cherry-pick + wire into result sheet |
-| 2 | Bind parameters (`:as_of_date`, `:region`) | Very high | Medium | One dataset → many dashboards instead of N duplicates |
-| 3 | Save + run inline (no navigate-away) | High | Low | Stop forcing the redirect after save |
-| 4 | Diff preview before destructive update | High | Medium | Removed/retyped columns warning + justification gate |
-| 5 | Cancel running query | High | Low | `pg_cancel_backend(pid)` + per-engine equivalent |
-| 6 | EXPLAIN plan toggle | High (for power users) | Low | Engine-aware EXPLAIN endpoint + collapsible JSON tree |
-| 7 | Per-column display name + description + format hint on DatasetField | Medium | Low | Already partly in the schema, just expose in the field editor |
+| #   | Feature                                                                                                   | Impact                 | Effort                                                | Notes                                                         |
+| --- | --------------------------------------------------------------------------------------------------------- | ---------------------- | ----------------------------------------------------- | ------------------------------------------------------------- |
+| 1   | AG Grid result pane (drag-reorder, resize, column chooser, CSV/XLSX, density, saved views, quick filters) | Very high              | Low (component already built on the `ag-grid` branch) | Cherry-pick + wire into result sheet                          |
+| 2   | Bind parameters (`:as_of_date`, `:region`)                                                                | Very high              | Medium                                                | One dataset → many dashboards instead of N duplicates         |
+| 3   | Save + run inline (no navigate-away)                                                                      | High                   | Low                                                   | Stop forcing the redirect after save                          |
+| 4   | Diff preview before destructive update                                                                    | High                   | Medium                                                | Removed/retyped columns warning + justification gate          |
+| 5   | Cancel running query                                                                                      | High                   | Low                                                   | `pg_cancel_backend(pid)` + per-engine equivalent              |
+| 6   | EXPLAIN plan toggle                                                                                       | High (for power users) | Low                                                   | Engine-aware EXPLAIN endpoint + collapsible JSON tree         |
+| 7   | Per-column display name + description + format hint on DatasetField                                       | Medium                 | Low                                                   | Already partly in the schema, just expose in the field editor |
 
 Out of scope for THIS slice (deferred):
 
@@ -36,6 +36,7 @@ Each slice gets its own commit, ships green to `version_261`,
 tested via Playwright before moving on.
 
 ### Slice A — AG Grid in the result sheet
+
 1. Cherry-pick the `us-data-grid` files from `f30b0136`.
 2. Install `ag-grid-community` dep (community is enough for what we
    use; enterprise features are off).
@@ -56,6 +57,7 @@ tested via Playwright before moving on.
    toggle, CSV export, XLSX export, sort, filter, scroll, copy.
 
 ### Slice B — Cancel running query (cheap, big UX win)
+
 1. Track PG `pg_backend_pid()` per executeQuery request — capture it
    right after opening the connection, expose via in-memory map
    keyed by request id (UUID generated server-side).
@@ -73,6 +75,7 @@ tested via Playwright before moving on.
    want to add that).
 
 ### Slice C — EXPLAIN plan
+
 1. New `POST /queries/explain` endpoint. Same payload as execute
    (datasourceId + query + safety check). Dialect-aware EXPLAIN:
    - PG: `EXPLAIN (FORMAT JSON, ANALYZE FALSE, VERBOSE TRUE) <sql>`
@@ -82,13 +85,14 @@ tested via Playwright before moving on.
      `SET SHOWPLAN_TEXT ON` for older MSSQL)
    - Snowflake: `EXPLAIN USING JSON <sql>`
    - Oracle: `EXPLAIN PLAN FOR <sql>; SELECT * FROM
-     TABLE(DBMS_XPLAN.DISPLAY)`
+TABLE(DBMS_XPLAN.DISPLAY)`
 2. Response: `{ engine, plan: any, raw: string }`.
 3. FE: "Explain" button next to Run. Click → fires explain endpoint
    → opens a side panel with a collapsible tree of the plan.
 4. Test: PG, see node list + estimated cost.
 
 ### Slice D — Bind parameters
+
 1. New entity `DatasetParameter` per docs/implementation/DATASET.md
    §1 (id, datasetId, name, displayName, dataType, defaultValue,
    isRequired, sequence). Auto-syncs via TypeORM.
@@ -113,6 +117,7 @@ tested via Playwright before moving on.
    North rows. Re-run with 'East' → returns East rows.
 
 ### Slice E — Save + run inline
+
 1. Currently `onDatasetDialogClose` on add-dataset navigates to
    `DATASET.LIST` after a successful save. Replace with: stay on
    page, swap to "edit" mode (or just push the new dataset id into
@@ -123,6 +128,7 @@ tested via Playwright before moving on.
    editor still focused with the same SQL, can immediately Run.
 
 ### Slice F — Diff preview before update
+
 1. Add `GET /datasets/:id/diff-preview` (or extend update endpoint
    to take a `dryRun: true` param). Returns:
    ```json
@@ -142,6 +148,7 @@ tested via Playwright before moving on.
    count.
 
 ### Slice G — Field metadata (display name + description + format)
+
 1. Extend `DatasetField` entity with `description: text nullable`
    and `formatHint: varchar nullable`.
 2. Extend `edit-dataset-fields-dialog` to expose both fields.
@@ -166,7 +173,7 @@ Helper in `add-dataset.component.ts`:
 
 ```ts
 function colDefsFromResult(result: QueryResult): ColDef[] {
-  return result.columns.map((name) => {
+  return result.columns.map(name => {
     const t = result.columnTypes?.[name] ?? 'text';
     return {
       colId: name,
@@ -198,6 +205,7 @@ function filterFor(t: string) {
 - Typed error card
 
 What we delete:
+
 - Hand-rolled per-column input filter row (AG Grid floating filters
   replace it)
 - `measureColumnWidths` helper (AG Grid auto-sizes natively)

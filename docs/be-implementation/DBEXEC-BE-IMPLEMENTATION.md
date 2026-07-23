@@ -16,7 +16,7 @@
 - Controllers default-export a single async function.
 - Response goes through `sendResponse(res, status, code, message, data)`.
 - Validators are Zod schemas under `src/shared/validators/<module>.ts`
-  + `zodValidate(schema)` middleware factory.
+  - `zodValidate(schema)` middleware factory.
 - Auth context: `res.locals.orgData.id`, `res.locals.loggedInId`,
   `res.locals.master_db_connection` (shared DB), `res.locals.user`.
 - Audit:
@@ -93,15 +93,20 @@ export class FeatureFlagService {
 
   async set(orgId: string, flag: string, enabled: boolean, byUserId: string) {
     const repo = this.conn.getRepository(FeatureFlag);
-    const existing = await repo.findOne({ where: { organisationId: orgId, name: flag } });
+    const existing = await repo.findOne({
+      where: { organisationId: orgId, name: flag },
+    });
     if (existing) {
       existing.enabled = enabled;
       existing.updatedBy = byUserId;
       await repo.save(existing);
     } else {
       await repo.save({
-        organisationId: orgId, name: flag, enabled,
-        createdBy: byUserId, updatedBy: byUserId,
+        organisationId: orgId,
+        name: flag,
+        enabled,
+        createdBy: byUserId,
+        updatedBy: byUserId,
       });
     }
     cache.delete(`${orgId}:${flag}`);
@@ -113,7 +118,14 @@ Entity:
 
 ```ts
 // src/shared/db/shared_entity/featureFlag.entity.ts
-import { Entity, PrimaryGeneratedColumn, Column, Index, UpdateDateColumn, CreateDateColumn } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  Index,
+  UpdateDateColumn,
+  CreateDateColumn,
+} from 'typeorm';
 
 @Entity('feature_flag')
 @Index(['organisationId', 'name'], { unique: true })
@@ -133,7 +145,7 @@ Pattern for every "new feature" controller:
 
 ```ts
 import { ff } from '../../shared/services/featureFlags.singleton';
-if (!await ff.isEnabled(orgData.id, 'enableSemanticLayer'))
+if (!(await ff.isEnabled(orgData.id, 'enableSemanticLayer')))
   return sendResponse(res, false, CODE.FORBIDDEN, 'feature not enabled');
 ```
 
@@ -156,24 +168,36 @@ export default function idempotency(opts: { ttlHours?: number } = {}) {
     if (!/^POST|PUT|PATCH$/.test(req.method)) return next();
     const { master_db_connection, orgData } = res.locals;
     const repo = master_db_connection.getRepository(IdempotencyRecord);
-    const reqHash = crypto.createHash('sha256')
+    const reqHash = crypto
+      .createHash('sha256')
       .update(JSON.stringify({ p: req.path, b: req.body }))
       .digest('hex');
-    const existing = await repo.findOne({ where: { key, organisationId: orgData.id } });
+    const existing = await repo.findOne({
+      where: { key, organisationId: orgData.id },
+    });
     if (existing) {
       if (existing.requestHash !== reqHash) {
-        return sendResponse(res, false, 409,
-          'Idempotency key reused with a different request body');
+        return sendResponse(
+          res,
+          false,
+          409,
+          'Idempotency key reused with a different request body',
+        );
       }
       return res.status(existing.responseStatus).json(existing.responseBody);
     }
     const json = res.json.bind(res);
     res.json = (body: any) => {
-      repo.save({
-        key, organisationId: orgData.id, requestHash: reqHash,
-        responseStatus: res.statusCode, responseBody: body,
-        expiresAt: new Date(Date.now() + ttl),
-      }).catch(() => {});
+      repo
+        .save({
+          key,
+          organisationId: orgData.id,
+          requestHash: reqHash,
+          responseStatus: res.statusCode,
+          responseBody: body,
+          expiresAt: new Date(Date.now() + ttl),
+        })
+        .catch(() => {});
       return json(body);
     };
     next();
@@ -216,16 +240,19 @@ export function encodeCursor(payload: object): string {
 }
 export function decodeCursor<T>(cursor?: string): T | null {
   if (!cursor) return null;
-  try { return JSON.parse(Buffer.from(cursor, 'base64url').toString('utf8')); }
-  catch { return null; }
+  try {
+    return JSON.parse(Buffer.from(cursor, 'base64url').toString('utf8'));
+  } catch {
+    return null;
+  }
 }
 
 export async function paginate<T>(opts: {
   qb: import('typeorm').SelectQueryBuilder<T>;
   cursor?: string;
   limit: number;
-  cursorField: keyof T & string;        // e.g. 'createdOn'
-  tieBreaker: keyof T & string;          // e.g. 'id'
+  cursorField: keyof T & string; // e.g. 'createdOn'
+  tieBreaker: keyof T & string; // e.g. 'id'
   direction?: 'ASC' | 'DESC';
 }): Promise<CursorPage<T>> {
   const dir = opts.direction ?? 'DESC';
@@ -233,10 +260,12 @@ export async function paginate<T>(opts: {
   if (dec) {
     opts.qb.andWhere(
       `("${opts.cursorField}", "${opts.tieBreaker}") ${dir === 'DESC' ? '<' : '>'} (:v, :id)`,
-      { v: dec.v, id: dec.id }
+      { v: dec.v, id: dec.id },
     );
   }
-  opts.qb.orderBy(`"${opts.cursorField}"`, dir).addOrderBy(`"${opts.tieBreaker}"`, dir);
+  opts.qb
+    .orderBy(`"${opts.cursorField}"`, dir)
+    .addOrderBy(`"${opts.tieBreaker}"`, dir);
   opts.qb.limit(opts.limit + 1);
   const rows = await opts.qb.getMany();
   const hasMore = rows.length > opts.limit;
@@ -244,9 +273,10 @@ export async function paginate<T>(opts: {
   const last = items.at(-1) as any;
   return {
     items,
-    nextCursor: hasMore && last
-      ? encodeCursor({ v: last[opts.cursorField], id: last[opts.tieBreaker] })
-      : null,
+    nextCursor:
+      hasMore && last
+        ? encodeCursor({ v: last[opts.cursorField], id: last[opts.tieBreaker] })
+        : null,
   };
 }
 ```
@@ -276,7 +306,8 @@ export function rateLimit(opts: {
     res.setHeader('X-RateLimit-Limit', String(opts.limit));
     res.setHeader('X-RateLimit-Remaining', String(Math.max(0, opts.limit - n)));
     res.setHeader('X-RateLimit-Reset', String(Date.now() + ttl * 1000));
-    if (n > opts.limit) return sendResponse(res, false, 429, 'Too many requests');
+    if (n > opts.limit)
+      return sendResponse(res, false, 429, 'Too many requests');
     next();
   };
 }
@@ -293,7 +324,7 @@ import { redis } from './redis.singleton';
 const webhookQueue = new Queue('webhook-deliver', { connection: redis });
 
 export async function emit(event: {
-  type: string;                     // e.g. 'dataset.created'
+  type: string; // e.g. 'dataset.created'
   organisationId: string;
   payload: Record<string, unknown>;
   actor: { type: 'user' | 'service'; id: string };
@@ -314,8 +345,8 @@ export class WebhookSubscription {
   @Column('uuid') organisationId!: string;
   @Column({ length: 64 }) name!: string;
   @Column('text') targetUrl!: string;
-  @Column('text', { array: true }) events!: string[];   // ['dataset.created','dataset.updated']
-  @Column('bytea') secretEnc!: Buffer;                  // HMAC secret
+  @Column('text', { array: true }) events!: string[]; // ['dataset.created','dataset.updated']
+  @Column('bytea') secretEnc!: Buffer; // HMAC secret
   @Column({ default: 1 }) status!: number;
   @Column('uuid') createdBy!: string;
   @CreateDateColumn() createdOn!: Date;
@@ -331,21 +362,24 @@ A registry mapping parent type → child types with policy:
 
 ```ts
 // src/shared/services/cascade.registry.ts
-export const CASCADE: Record<string, { childType: string; policy: 'restrict'|'cascade'|'set_null' }[]> = {
+export const CASCADE: Record<
+  string,
+  { childType: string; policy: 'restrict' | 'cascade' | 'set_null' }[]
+> = {
   dataset: [
-    { childType: 'analysis',           policy: 'restrict' },
-    { childType: 'rls_rule',           policy: 'cascade'  },
-    { childType: 'column_security',    policy: 'cascade'  },
-    { childType: 'dataset_field',      policy: 'cascade'  },
-    { childType: 'semantic_model',     policy: 'cascade'  },
+    { childType: 'analysis', policy: 'restrict' },
+    { childType: 'rls_rule', policy: 'cascade' },
+    { childType: 'column_security', policy: 'cascade' },
+    { childType: 'dataset_field', policy: 'cascade' },
+    { childType: 'semantic_model', policy: 'cascade' },
   ],
   analysis: [
-    { childType: 'dashboard',          policy: 'restrict' },  // dashboard.snapshot may reference
-    { childType: 'analysis_filter',    policy: 'cascade'  },
-    { childType: 'analysis_parameter', policy: 'cascade'  },
+    { childType: 'dashboard', policy: 'restrict' }, // dashboard.snapshot may reference
+    { childType: 'analysis_filter', policy: 'cascade' },
+    { childType: 'analysis_parameter', policy: 'cascade' },
   ],
   organisation: [
-    { childType: 'user',               policy: 'cascade'  },
+    { childType: 'user', policy: 'cascade' },
     // ...
   ],
 };
@@ -363,7 +397,11 @@ export async function precheckDelete(
       `SELECT id FROM ${p.childType} WHERE ${parentType}_id = $1 AND status = 1 LIMIT 5`,
       [parentId],
     );
-    if (rows.length) blockers.push({ childType: p.childType, ids: rows.map((r: any) => r.id) });
+    if (rows.length)
+      blockers.push({
+        childType: p.childType,
+        ids: rows.map((r: any) => r.id),
+      });
   }
   return { ok: blockers.length === 0, blockers };
 }
@@ -377,12 +415,18 @@ Use in every delete controller as the first step.
 
 ```ts
 export function sendResponse(
-  res: Response, status: boolean, code: number, msg: any, data: any = null,
+  res: Response,
+  status: boolean,
+  code: number,
+  msg: any,
+  data: any = null,
   errors: Array<{ field?: string; code?: string; message: string }> = [],
 ) {
   // localise msg if it's a translation key
-  const message = typeof msg === 'string' && msg.startsWith('validation.')
-    ? t(res, msg) : msg;
+  const message =
+    typeof msg === 'string' && msg.startsWith('validation.')
+      ? t(res, msg)
+      : msg;
   return res.status(code).json({ status, code, message, data, errors });
 }
 ```
@@ -399,8 +443,14 @@ export function zodValidate(schema: ZodSchema) {
         code: i.code,
         message: t(res, String(i.message)),
       }));
-      return sendResponse(res, false, 400,
-        errors[0]?.message || 'Validation failed', null, errors);
+      return sendResponse(
+        res,
+        false,
+        400,
+        errors[0]?.message || 'Validation failed',
+        null,
+        errors,
+      );
     }
     req.body = r.data;
     next();
@@ -489,16 +539,25 @@ export async function refresh(id: string): Promise<void> {
 
 async function build(cfg: DatasourceConfig): Promise<DatasourcePool> {
   switch (cfg.dbType) {
-    case 'postgres':   return new PgDatasourcePool(cfg);
+    case 'postgres':
+      return new PgDatasourcePool(cfg);
     case 'mysql':
-    case 'mariadb':    return new MySqlDatasourcePool(cfg);
-    case 'mssql':      return new MssqlDatasourcePool(cfg);
-    case 'snowflake':  return new SnowflakeDatasourcePool(cfg);
-    case 'bigquery':   return new BigQueryDatasourcePool(cfg);
-    case 'databricks': return new DatabricksDatasourcePool(cfg);
-    case 'oracle':     return new OracleDatasourcePool(cfg);
-    case 'duckdb':     return new DuckDbDatasourcePool(cfg);
-    default: throw new Error(`Unsupported db type ${cfg.dbType}`);
+    case 'mariadb':
+      return new MySqlDatasourcePool(cfg);
+    case 'mssql':
+      return new MssqlDatasourcePool(cfg);
+    case 'snowflake':
+      return new SnowflakeDatasourcePool(cfg);
+    case 'bigquery':
+      return new BigQueryDatasourcePool(cfg);
+    case 'databricks':
+      return new DatabricksDatasourcePool(cfg);
+    case 'oracle':
+      return new OracleDatasourcePool(cfg);
+    case 'duckdb':
+      return new DuckDbDatasourcePool(cfg);
+    default:
+      throw new Error(`Unsupported db type ${cfg.dbType}`);
   }
 }
 ```
@@ -563,11 +622,18 @@ export class PgDatasourcePool implements DatasourcePool {
     const client = await this.pool.connect();
     try {
       this.metricsState.totalCheckouts++;
-      const r = await client.query({ text: sql, values: params, rowMode: 'array' });
-      const cols = r.fields.map(f => ({ name: f.name, type: pgTypeMap(f.dataTypeID) }));
-      const rows = r.rows.map(row => Object.fromEntries(
-        cols.map((c, i) => [c.name, row[i]])
-      )) as T[];
+      const r = await client.query({
+        text: sql,
+        values: params,
+        rowMode: 'array',
+      });
+      const cols = r.fields.map(f => ({
+        name: f.name,
+        type: pgTypeMap(f.dataTypeID),
+      }));
+      const rows = r.rows.map(row =>
+        Object.fromEntries(cols.map((c, i) => [c.name, row[i]])),
+      ) as T[];
       this.recordDuration(Date.now() - t0);
       return { rows, columns: cols, pid: (client as any).processID };
     } catch (e) {
@@ -586,7 +652,13 @@ export class PgDatasourcePool implements DatasourcePool {
       while (true) {
         const r = await client.query('FETCH 1000 FROM c1');
         if (r.rows.length === 0) break;
-        yield { rows: r.rows, columns: r.fields.map(f => ({ name: f.name, type: pgTypeMap(f.dataTypeID) })) };
+        yield {
+          rows: r.rows,
+          columns: r.fields.map(f => ({
+            name: f.name,
+            type: pgTypeMap(f.dataTypeID),
+          })),
+        };
       }
       await client.query('CLOSE c1');
       await client.query('COMMIT');
@@ -597,14 +669,20 @@ export class PgDatasourcePool implements DatasourcePool {
 
   async cancel(pid: number): Promise<void> {
     const c = await this.pool.connect();
-    try { await c.query('SELECT pg_cancel_backend($1)', [pid]); }
-    finally { c.release(); }
+    try {
+      await c.query('SELECT pg_cancel_backend($1)', [pid]);
+    } finally {
+      c.release();
+    }
   }
 
-  async destroy() { await this.pool.end(); }
+  async destroy() {
+    await this.pool.end();
+  }
 
   metrics(): PoolMetrics {
-    return { ...this.metricsState,
+    return {
+      ...this.metricsState,
       size: (this.pool as any).totalCount,
       idle: (this.pool as any).idleCount,
       waiting: (this.pool as any).waitingCount,
@@ -626,15 +704,24 @@ export class PgDatasourcePool implements DatasourcePool {
 export class BigQueryDatasourcePool implements DatasourcePool {
   private client: BigQuery;
   constructor(private cfg: DatasourceConfig) {
-    const sa = JSON.parse(decrypt(cfg.serviceAccountJsonEnc!, cfg.organisationId));
+    const sa = JSON.parse(
+      decrypt(cfg.serviceAccountJsonEnc!, cfg.organisationId),
+    );
     this.client = new BigQuery({ projectId: sa.project_id, credentials: sa });
   }
   async query<T>(sql: string, params: unknown[] = []) {
-    const [job] = await this.client.createQueryJob({ query: sql, params, useLegacySql: false });
+    const [job] = await this.client.createQueryJob({
+      query: sql,
+      params,
+      useLegacySql: false,
+    });
     const [rows, , meta] = await job.getQueryResults();
     return {
       rows: rows as T[],
-      columns: meta.schema!.fields!.map((f: any) => ({ name: f.name, type: bqTypeMap(f.type) })),
+      columns: meta.schema!.fields!.map((f: any) => ({
+        name: f.name,
+        type: bqTypeMap(f.type),
+      })),
       bytesScanned: Number(job.metadata.statistics?.totalBytesProcessed ?? 0),
     };
   }
@@ -642,9 +729,13 @@ export class BigQueryDatasourcePool implements DatasourcePool {
     const r = await this.query(sql, params);
     yield { rows: r.rows, columns: r.columns };
   }
-  async cancel(pid: number) { /* BQ has job.cancel() */ }
+  async cancel(pid: number) {
+    /* BQ has job.cancel() */
+  }
   async destroy() {}
-  metrics() { return zeroMetrics(); }
+  metrics() {
+    return zeroMetrics();
+  }
 }
 ```
 
@@ -662,9 +753,11 @@ import { CODE } from '../../../../config/config';
 export default async function getPoolMetrics(req: Request, res: Response) {
   const { id } = req.params;
   const { master_db_connection, orgData } = res.locals;
-  const cfg = await master_db_connection.getRepository(DatasourceConfigS)
+  const cfg = await master_db_connection
+    .getRepository(DatasourceConfigS)
     .findOne({ where: { id, organisationId: orgData.id } });
-  if (!cfg) return sendResponse(res, false, CODE.NOT_FOUND, 'datasource not found');
+  if (!cfg)
+    return sendResponse(res, false, CODE.NOT_FOUND, 'datasource not found');
   const pool = await acquire(cfg as any);
   return sendResponse(res, true, CODE.SUCCESS, 'ok', pool.metrics());
 }
@@ -690,12 +783,15 @@ export default async function refreshPool(req: Request, res: Response) {
   const { master_db_connection, orgData } = res.locals;
   const exists = await master_db_connection.query(
     `SELECT 1 FROM datasource WHERE id=$1 AND organisation_id=$2`,
-    [id, orgData.id]);
-  if (!exists.length) return sendResponse(res, false, CODE.NOT_FOUND, 'not found');
+    [id, orgData.id],
+  );
+  if (!exists.length)
+    return sendResponse(res, false, CODE.NOT_FOUND, 'not found');
   await refresh(id);
   await master_db_connection.query(
     `INSERT INTO datasource_pool_event (datasource_id, event, detail) VALUES ($1,'refreshed',$2)`,
-    [id, { by: res.locals.loggedInId }]);
+    [id, { by: res.locals.loggedInId }],
+  );
   return sendResponse(res, true, CODE.SUCCESS, 'pool refreshed');
 }
 ```
@@ -709,10 +805,16 @@ export function mapDriverError(e: any): Error {
   const msg = e?.message ?? String(e);
   if (/ECONNREFUSED|ETIMEDOUT|EAI_AGAIN/.test(msg))
     return new BadRequest('Could not reach the database server.');
-  if (/password authentication failed|Access denied|ORA-01017|Login failed/i.test(msg))
+  if (
+    /password authentication failed|Access denied|ORA-01017|Login failed/i.test(
+      msg,
+    )
+  )
     return new BadRequest('Invalid database credentials.');
   if (/permission denied|insufficient privilege/i.test(msg))
-    return new BadRequest('The database user lacks permission for this operation.');
+    return new BadRequest(
+      'The database user lacks permission for this operation.',
+    );
   if (/statement timeout|canceling statement|ERR_CANCELED/i.test(msg))
     return new BadRequest('Query timed out.');
   if (/SSL handshake|certificate verify failed/i.test(msg))
@@ -756,14 +858,15 @@ export class SemDimension {
   @PrimaryGeneratedColumn('uuid') id!: string;
   @Column('uuid') semanticModelId!: string;
   @Column({ length: 64 }) name!: string;
-  @Column({ length: 16 }) type!: 'string'|'numeric'|'time'|'bool'|'geo';
+  @Column({ length: 16 }) type!: 'string' | 'numeric' | 'time' | 'bool' | 'geo';
   @Column('text') expression!: string;
-  @Column({ length: 16, nullable: true }) timeGrain?: 'day'|'week'|'month'|'quarter'|'year';
+  @Column({ length: 16, nullable: true }) timeGrain?:
+    'day' | 'week' | 'month' | 'quarter' | 'year';
   @Column({ length: 128, nullable: true }) label?: string;
   @Column({ length: 32, nullable: true }) format?: string;
   @Column('text', { nullable: true }) description?: string;
   @Column({ default: false }) hidden!: boolean;
-  @Column('uuid', { nullable: true }) parentId?: string;          // hierarchy
+  @Column('uuid', { nullable: true }) parentId?: string; // hierarchy
   @Column({ default: false }) isRequired!: boolean;
   @Column('text', { nullable: true }) displaySql?: string;
 }
@@ -776,7 +879,8 @@ export class SemMetric {
   @PrimaryGeneratedColumn('uuid') id!: string;
   @Column('uuid') semanticModelId!: string;
   @Column({ length: 64 }) name!: string;
-  @Column({ length: 16 }) kind!: 'simple'|'ratio'|'derived'|'cumulative'|'conversion';
+  @Column({ length: 16 }) kind!:
+    'simple' | 'ratio' | 'derived' | 'cumulative' | 'conversion';
   @Column('text') expression!: string;
   @Column({ length: 16, nullable: true }) agg?: string;
   @Column('text', { nullable: true }) filter?: string;
@@ -789,9 +893,12 @@ export class SemMetric {
   @Column({ default: false }) hidden!: boolean;
   @Column({ default: true }) isAdditive!: boolean;
   @Column({ default: false }) isSemiAdditive!: boolean;
-  @Column({ length: 16, nullable: true }) semiAdditiveFunc?: 'LAST'|'FIRST'|'AVG';
-  @Column({ length: 16, nullable: true }) windowReset?: 'day'|'week'|'month'|'year'|'fiscal_year';
-  @Column('text', { array: true, nullable: true }) allowedAggregations?: string[];
+  @Column({ length: 16, nullable: true }) semiAdditiveFunc?:
+    'LAST' | 'FIRST' | 'AVG';
+  @Column({ length: 16, nullable: true }) windowReset?:
+    'day' | 'week' | 'month' | 'year' | 'fiscal_year';
+  @Column('text', { array: true, nullable: true })
+  allowedAggregations?: string[];
 }
 ```
 
@@ -804,33 +911,50 @@ import { z } from 'zod';
 
 export const semanticModelSchema = z.object({
   datasetId: z.string().uuid(),
-  name: z.string().regex(/^[a-z][a-z0-9_]{0,63}$/, 'validation.semantic.name.invalid'),
+  name: z
+    .string()
+    .regex(/^[a-z][a-z0-9_]{0,63}$/, 'validation.semantic.name.invalid'),
   description: z.string().max(500).optional(),
   primaryEntity: z.string().max(128).optional(),
   defaultTimeColumn: z.string().max(128).optional(),
   sqlAlwaysWhere: z.string().max(2000).optional(),
 });
 
-export const dimensionSchema = z.object({
-  name: z.string().regex(/^[a-z][a-z0-9_]{0,63}$/),
-  type: z.enum(['string','numeric','time','bool','geo']),
-  expression: z.string().min(1).max(2000),
-  timeGrain: z.enum(['day','week','month','quarter','year']).optional(),
-  label: z.string().max(128).optional(),
-  format: z.string().max(32).optional(),
-  description: z.string().max(500).optional(),
-  hidden: z.boolean().optional(),
-  parentId: z.string().uuid().optional(),
-  isRequired: z.boolean().optional(),
-  displaySql: z.string().max(2000).optional(),
-}).refine(v => v.type !== 'time' || v.timeGrain,
-  { message: 'validation.semantic.dimension.timeGrainRequired' });
+export const dimensionSchema = z
+  .object({
+    name: z.string().regex(/^[a-z][a-z0-9_]{0,63}$/),
+    type: z.enum(['string', 'numeric', 'time', 'bool', 'geo']),
+    expression: z.string().min(1).max(2000),
+    timeGrain: z.enum(['day', 'week', 'month', 'quarter', 'year']).optional(),
+    label: z.string().max(128).optional(),
+    format: z.string().max(32).optional(),
+    description: z.string().max(500).optional(),
+    hidden: z.boolean().optional(),
+    parentId: z.string().uuid().optional(),
+    isRequired: z.boolean().optional(),
+    displaySql: z.string().max(2000).optional(),
+  })
+  .refine(v => v.type !== 'time' || v.timeGrain, {
+    message: 'validation.semantic.dimension.timeGrainRequired',
+  });
 
 export const metricSchema = z.object({
   name: z.string().regex(/^[a-z][a-z0-9_]{0,63}$/),
-  kind: z.enum(['simple','ratio','derived','cumulative','conversion']),
+  kind: z.enum(['simple', 'ratio', 'derived', 'cumulative', 'conversion']),
   expression: z.string().min(1).max(2000),
-  agg: z.enum(['sum','count','count_distinct','avg','min','max','median','stddev','variance']).optional(),
+  agg: z
+    .enum([
+      'sum',
+      'count',
+      'count_distinct',
+      'avg',
+      'min',
+      'max',
+      'median',
+      'stddev',
+      'variance',
+    ])
+    .optional(),
   filter: z.string().max(2000).optional(),
   numeratorId: z.string().uuid().optional(),
   denominatorId: z.string().uuid().optional(),
@@ -841,8 +965,10 @@ export const metricSchema = z.object({
   hidden: z.boolean().optional(),
   isAdditive: z.boolean().optional(),
   isSemiAdditive: z.boolean().optional(),
-  semiAdditiveFunc: z.enum(['LAST','FIRST','AVG']).optional(),
-  windowReset: z.enum(['day','week','month','year','fiscal_year']).optional(),
+  semiAdditiveFunc: z.enum(['LAST', 'FIRST', 'AVG']).optional(),
+  windowReset: z
+    .enum(['day', 'week', 'month', 'year', 'fiscal_year'])
+    .optional(),
   allowedAggregations: z.array(z.string()).optional(),
 });
 ```
@@ -852,10 +978,22 @@ export const metricSchema = z.object({
 `src/modules/semantic/services/lint.service.ts`:
 
 ```ts
-export interface LintIssue { where: string; severity: 'error'|'warning'; message: string; }
+export interface LintIssue {
+  where: string;
+  severity: 'error' | 'warning';
+  message: string;
+}
 
-export async function lintSemanticModel(conn: Connection, modelId: string): Promise<LintIssue[]> {
-  const model = await conn.getRepository(SemanticModel).findOne({ where: { id: modelId }, relations: ['dimensions','metrics','segments','joins'] }) as any;
+export async function lintSemanticModel(
+  conn: Connection,
+  modelId: string,
+): Promise<LintIssue[]> {
+  const model = (await conn
+    .getRepository(SemanticModel)
+    .findOne({
+      where: { id: modelId },
+      relations: ['dimensions', 'metrics', 'segments', 'joins'],
+    })) as any;
   if (!model) throw new Error('not found');
   const issues: LintIssue[] = [];
   const dimNames = new Set(model.dimensions.map((d: any) => d.name));
@@ -865,36 +1003,57 @@ export async function lintSemanticModel(conn: Connection, modelId: string): Prom
     if (m.kind === 'derived') {
       for (const ref of refs(m.expression)) {
         if (!metNames.has(ref))
-          issues.push({ where: `metric.${m.name}`, severity: 'error',
-            message: `references unknown metric {${ref}}` });
+          issues.push({
+            where: `metric.${m.name}`,
+            severity: 'error',
+            message: `references unknown metric {${ref}}`,
+          });
       }
       if (hasCycle(m, model.metrics))
-        issues.push({ where: `metric.${m.name}`, severity: 'error',
-          message: 'derived expression has a cycle' });
+        issues.push({
+          where: `metric.${m.name}`,
+          severity: 'error',
+          message: 'derived expression has a cycle',
+        });
     }
     if (m.kind === 'ratio' && (!m.numeratorId || !m.denominatorId))
-      issues.push({ where: `metric.${m.name}`, severity: 'error',
-        message: 'ratio needs both numerator and denominator' });
+      issues.push({
+        where: `metric.${m.name}`,
+        severity: 'error',
+        message: 'ratio needs both numerator and denominator',
+      });
     if (m.kind === 'simple' && !m.agg)
-      issues.push({ where: `metric.${m.name}`, severity: 'error',
-        message: 'simple metric needs an aggregation' });
+      issues.push({
+        where: `metric.${m.name}`,
+        severity: 'error',
+        message: 'simple metric needs an aggregation',
+      });
   }
   for (const d of model.dimensions) {
     if (d.type === 'time' && !d.timeGrain)
-      issues.push({ where: `dim.${d.name}`, severity: 'error',
-        message: 'time dimension needs a grain' });
+      issues.push({
+        where: `dim.${d.name}`,
+        severity: 'error',
+        message: 'time dimension needs a grain',
+      });
   }
   // unused-dim warning
   const used = collectUsedDims(model);
   for (const d of model.dimensions)
     if (!used.has(d.name))
-      issues.push({ where: `dim.${d.name}`, severity: 'warning', message: 'unused dimension' });
+      issues.push({
+        where: `dim.${d.name}`,
+        severity: 'warning',
+        message: 'unused dimension',
+      });
 
   return issues;
 }
 
 function refs(expr: string) {
-  return [...new Set([...(expr.match(/\{(\w+)\}/g) || []).map(s => s.slice(1, -1))])];
+  return [
+    ...new Set([...(expr.match(/\{(\w+)\}/g) || []).map(s => s.slice(1, -1))]),
+  ];
 }
 function hasCycle(start: any, all: any[]): boolean {
   const stack = new Set<string>();
@@ -902,13 +1061,16 @@ function hasCycle(start: any, all: any[]): boolean {
     if (stack.has(name)) return true;
     stack.add(name);
     const m = all.find(x => x.name === name);
-    if (m && m.kind === 'derived') for (const r of refs(m.expression)) if (visit(r)) return true;
+    if (m && m.kind === 'derived')
+      for (const r of refs(m.expression)) if (visit(r)) return true;
     stack.delete(name);
     return false;
   }
   return visit(start.name);
 }
-function collectUsedDims(model: any): Set<string> { /* … */ return new Set(model.dimensions.map((d: any) => d.name)); }
+function collectUsedDims(model: any): Set<string> {
+  /* … */ return new Set(model.dimensions.map((d: any) => d.name));
+}
 ```
 
 ### 2.4 Controllers
@@ -920,21 +1082,41 @@ export default async function addSemanticModel(req: Request, res: Response) {
   const body = req.body; // already Zod-validated
   const ds = await master_db_connection.query(
     'SELECT id FROM dataset WHERE id=$1 AND organisation_id=$2',
-    [body.datasetId, orgData.id]);
-  if (!ds.length) return sendResponse(res, false, CODE.NOT_FOUND, 'dataset not found');
+    [body.datasetId, orgData.id],
+  );
+  if (!ds.length)
+    return sendResponse(res, false, CODE.NOT_FOUND, 'dataset not found');
 
   const repo = master_db_connection.getRepository(SemanticModel);
-  if (await repo.findOne({ where: { organisationId: orgData.id, datasetId: body.datasetId, name: body.name } }))
-    return sendResponse(res, false, CODE.ALREADY_EXISTS, 'semantic.alreadyExists');
+  if (
+    await repo.findOne({
+      where: {
+        organisationId: orgData.id,
+        datasetId: body.datasetId,
+        name: body.name,
+      },
+    })
+  )
+    return sendResponse(
+      res,
+      false,
+      CODE.ALREADY_EXISTS,
+      'semantic.alreadyExists',
+    );
 
   const m = new SemanticModel();
   Object.assign(m, body, { organisationId: orgData.id, createdBy: loggedInId });
   await repo.save(m);
 
   await auditLogger.logAuditToOrg({
-    connection: master_db_connection, req, res,
-    module: AUDIT_MODULES.SEMANTIC_MODEL, action: AUDIT_ACTIONS.CREATE,
-    entityName: 'SemanticModel', entityId: m.id, metadata: { entity: snapshotEntity(m, AUDIT_FIELDS.SEMANTIC_MODEL) },
+    connection: master_db_connection,
+    req,
+    res,
+    module: AUDIT_MODULES.SEMANTIC_MODEL,
+    action: AUDIT_ACTIONS.CREATE,
+    entityName: 'SemanticModel',
+    entityId: m.id,
+    metadata: { entity: snapshotEntity(m, AUDIT_FIELDS.SEMANTIC_MODEL) },
   });
   return sendResponse(res, true, CODE.SUCCESS, 'semantic.created', m);
 }
@@ -953,18 +1135,26 @@ export default async function semanticQuery(req: Request, res: Response) {
 
   const compiler = new SemanticCompiler(master_db_connection);
   const compiled = await compiler.compile(body, {
-    callerId: loggedInId, orgId: orgData.id,
+    callerId: loggedInId,
+    orgId: orgData.id,
   });
 
-  const result = await cache.getOrCompute(compiled.cacheKey, body.cacheTtlSecs ?? 300, async () => {
-    const cfg = await master_db_connection.getRepository(DatasourceConfigS).findOne({ where: { id: compiled.datasourceId } });
-    const pool = await acquire(cfg as any);
-    const r = await pool.query(compiled.sql, compiled.bindings);
-    return r;
-  });
+  const result = await cache.getOrCompute(
+    compiled.cacheKey,
+    body.cacheTtlSecs ?? 300,
+    async () => {
+      const cfg = await master_db_connection
+        .getRepository(DatasourceConfigS)
+        .findOne({ where: { id: compiled.datasourceId } });
+      const pool = await acquire(cfg as any);
+      const r = await pool.query(compiled.sql, compiled.bindings);
+      return r;
+    },
+  );
 
   return sendResponse(res, true, CODE.SUCCESS, 'ok', {
-    columns: result.columns, rows: result.rows,
+    columns: result.columns,
+    rows: result.rows,
     meta: { cacheKey: compiled.cacheKey, sqlCompiled: compiled.sql },
   });
 }
@@ -1012,25 +1202,54 @@ export type ProjectionAst =
   | { kind: 'col'; expr: string; alias?: string }
   | { kind: 'agg'; agg: AggFn; expr: string; alias: string }
   | { kind: 'time'; grain: TimeGrain; expr: string; alias: string }
-  | { kind: 'window'; agg: AggFn; expr: string; partitionBy?: string[]; orderBy?: OrderAst[]; frame?: WindowFrame; alias: string };
+  | {
+      kind: 'window';
+      agg: AggFn;
+      expr: string;
+      partitionBy?: string[];
+      orderBy?: OrderAst[];
+      frame?: WindowFrame;
+      alias: string;
+    };
 
 export type FromAst =
   | { kind: 'subquery'; sql: string }
   | { kind: 'table'; schema?: string; table: string };
 
 export type PredicateAst =
-  | { op: 'eq'|'ne'|'gt'|'lt'|'gte'|'lte'; col: string; value: unknown }
-  | { op: 'in'|'not_in'; col: string; values: unknown[] }
+  | {
+      op: 'eq' | 'ne' | 'gt' | 'lt' | 'gte' | 'lte';
+      col: string;
+      value: unknown;
+    }
+  | { op: 'in' | 'not_in'; col: string; values: unknown[] }
   | { op: 'between'; col: string; lo: unknown; hi: unknown }
-  | { op: 'like'|'ilike'; col: string; pattern: string }
-  | { op: 'is_null'|'is_not_null'; col: string }
-  | { op: 'and'|'or'; clauses: PredicateAst[] }
+  | { op: 'like' | 'ilike'; col: string; pattern: string }
+  | { op: 'is_null' | 'is_not_null'; col: string }
+  | { op: 'and' | 'or'; clauses: PredicateAst[] }
   | { op: 'raw'; sql: string };
 
-export type AggFn = 'sum'|'count'|'count_distinct'|'avg'|'min'|'max'|'median'|'percentile';
-export type TimeGrain = 'second'|'minute'|'hour'|'day'|'week'|'month'|'quarter'|'year';
-export type WindowFrame = { type: 'rows'|'range'; start: string; end: string };
-export type OrderAst = { col: string; dir: 'asc'|'desc'; nulls?: 'first'|'last' };
+export type AggFn =
+  | 'sum'
+  | 'count'
+  | 'count_distinct'
+  | 'avg'
+  | 'min'
+  | 'max'
+  | 'median'
+  | 'percentile';
+export type TimeGrain =
+  'second' | 'minute' | 'hour' | 'day' | 'week' | 'month' | 'quarter' | 'year';
+export type WindowFrame = {
+  type: 'rows' | 'range';
+  start: string;
+  end: string;
+};
+export type OrderAst = {
+  col: string;
+  dir: 'asc' | 'desc';
+  nulls?: 'first' | 'last';
+};
 ```
 
 ### 4.2 Dialect adapter contract
@@ -1045,7 +1264,7 @@ export interface DialectAdapter {
   cast(expr: string, type: string): string;
   limitOffset(limit?: number, offset?: number): string;
   agg(fn: AggFn, expr: string, ...rest: string[]): string;
-  nullsOrder(dir: 'asc'|'desc', nulls?: 'first'|'last'): string;
+  nullsOrder(dir: 'asc' | 'desc', nulls?: 'first' | 'last'): string;
   bigintCast(expr: string): string;
   print(ast: QueryAst, bindings: unknown[], rls: string[]): string;
 }
@@ -1057,29 +1276,43 @@ export interface DialectAdapter {
 // src/shared/queryCompiler/postgres.ts
 export class PostgresDialect implements DialectAdapter {
   readonly name = 'postgres';
-  quoteIdent(s: string): string { return `"${s.replace(/"/g, '""')}"`; }
-  paramPlaceholder(i: number): string { return `$${i}`; }
+  quoteIdent(s: string): string {
+    return `"${s.replace(/"/g, '""')}"`;
+  }
+  paramPlaceholder(i: number): string {
+    return `$${i}`;
+  }
 
   dateTrunc(grain: TimeGrain, expr: string): string {
     return `DATE_TRUNC('${grain}', ${expr})`;
   }
-  cast(expr: string, type: string): string { return `(${expr})::${type}`; }
+  cast(expr: string, type: string): string {
+    return `(${expr})::${type}`;
+  }
   limitOffset(limit?: number, offset?: number): string {
-    return [limit ? `LIMIT ${limit}` : '', offset ? `OFFSET ${offset}` : ''].filter(Boolean).join(' ');
+    return [limit ? `LIMIT ${limit}` : '', offset ? `OFFSET ${offset}` : '']
+      .filter(Boolean)
+      .join(' ');
   }
   agg(fn: AggFn, expr: string, ...rest: string[]) {
     switch (fn) {
-      case 'count_distinct': return `COUNT(DISTINCT ${expr})`;
-      case 'median': return `PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY ${expr})`;
-      case 'percentile': return `PERCENTILE_CONT(${rest[0]}) WITHIN GROUP (ORDER BY ${expr})`;
-      default: return `${fn.toUpperCase()}(${expr})`;
+      case 'count_distinct':
+        return `COUNT(DISTINCT ${expr})`;
+      case 'median':
+        return `PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY ${expr})`;
+      case 'percentile':
+        return `PERCENTILE_CONT(${rest[0]}) WITHIN GROUP (ORDER BY ${expr})`;
+      default:
+        return `${fn.toUpperCase()}(${expr})`;
     }
   }
-  nullsOrder(dir: 'asc'|'desc', nulls?: 'first'|'last') {
+  nullsOrder(dir: 'asc' | 'desc', nulls?: 'first' | 'last') {
     const d = dir.toUpperCase();
     return nulls ? `${d} NULLS ${nulls.toUpperCase()}` : d;
   }
-  bigintCast(expr: string) { return `(${expr})::bigint`; }
+  bigintCast(expr: string) {
+    return `(${expr})::bigint`;
+  }
 
   print(ast: QueryAst, bindings: unknown[], rls: string[]): string {
     return new Printer(this).print(ast, bindings, rls);
@@ -1090,36 +1323,54 @@ class Printer {
   constructor(private d: DialectAdapter) {}
   print(ast: QueryAst, bindings: unknown[], rls: string[]): string {
     const cols = ast.cols.map(c => this.col(c)).join(', ');
-    const from = ast.from.kind === 'subquery'
-      ? `(${ast.from.sql})`
-      : `${ast.from.schema ? this.d.quoteIdent(ast.from.schema) + '.' : ''}${this.d.quoteIdent(ast.from.table)}`;
+    const from =
+      ast.from.kind === 'subquery'
+        ? `(${ast.from.sql})`
+        : `${ast.from.schema ? this.d.quoteIdent(ast.from.schema) + '.' : ''}${this.d.quoteIdent(ast.from.table)}`;
     const wheres: string[] = [];
     if (ast.where) wheres.push(this.pred(ast.where, bindings));
     wheres.push(...rls);
     const where = wheres.length ? `WHERE ${wheres.join(' AND ')}` : '';
-    const groupBy = ast.groupBy?.length ? `GROUP BY ${ast.groupBy.join(', ')}` : '';
+    const groupBy = ast.groupBy?.length
+      ? `GROUP BY ${ast.groupBy.join(', ')}`
+      : '';
     const orderBy = ast.orderBy?.length
       ? `ORDER BY ${ast.orderBy.map(o => `${this.d.quoteIdent(o.col)} ${this.d.nullsOrder(o.dir, o.nulls)}`).join(', ')}`
       : '';
     return [
       `SELECT ${cols}`,
       `FROM ${from} AS base`,
-      where, groupBy, orderBy,
+      where,
+      groupBy,
+      orderBy,
       this.d.limitOffset(ast.limit, ast.offset),
-    ].filter(Boolean).join('\n');
+    ]
+      .filter(Boolean)
+      .join('\n');
   }
 
   private col(c: ProjectionAst): string {
     switch (c.kind) {
-      case 'col':    return c.alias ? `${c.expr} AS ${this.d.quoteIdent(c.alias)}` : c.expr;
-      case 'time':   return `${this.d.dateTrunc(c.grain, c.expr)} AS ${this.d.quoteIdent(c.alias)}`;
-      case 'agg':    return `${this.d.agg(c.agg, c.expr)} AS ${this.d.quoteIdent(c.alias)}`;
+      case 'col':
+        return c.alias ? `${c.expr} AS ${this.d.quoteIdent(c.alias)}` : c.expr;
+      case 'time':
+        return `${this.d.dateTrunc(c.grain, c.expr)} AS ${this.d.quoteIdent(c.alias)}`;
+      case 'agg':
+        return `${this.d.agg(c.agg, c.expr)} AS ${this.d.quoteIdent(c.alias)}`;
       case 'window': {
         const parts = [
-          c.partitionBy?.length ? `PARTITION BY ${c.partitionBy.map(p => this.d.quoteIdent(p)).join(', ')}` : '',
-          c.orderBy?.length ? `ORDER BY ${c.orderBy.map(o => `${this.d.quoteIdent(o.col)} ${this.d.nullsOrder(o.dir, o.nulls)}`).join(', ')}` : '',
-          c.frame ? `${c.frame.type.toUpperCase()} BETWEEN ${c.frame.start} AND ${c.frame.end}` : '',
-        ].filter(Boolean).join(' ');
+          c.partitionBy?.length
+            ? `PARTITION BY ${c.partitionBy.map(p => this.d.quoteIdent(p)).join(', ')}`
+            : '',
+          c.orderBy?.length
+            ? `ORDER BY ${c.orderBy.map(o => `${this.d.quoteIdent(o.col)} ${this.d.nullsOrder(o.dir, o.nulls)}`).join(', ')}`
+            : '',
+          c.frame
+            ? `${c.frame.type.toUpperCase()} BETWEEN ${c.frame.start} AND ${c.frame.end}`
+            : '',
+        ]
+          .filter(Boolean)
+          .join(' ');
         return `${this.d.agg(c.agg, c.expr)} OVER (${parts}) AS ${this.d.quoteIdent(c.alias)}`;
       }
     }
@@ -1127,24 +1378,43 @@ class Printer {
 
   private pred(p: PredicateAst, b: unknown[]): string {
     const q = this.d.quoteIdent.bind(this.d);
-    const ph = (v: unknown) => { b.push(v); return this.d.paramPlaceholder(b.length); };
+    const ph = (v: unknown) => {
+      b.push(v);
+      return this.d.paramPlaceholder(b.length);
+    };
     switch (p.op) {
-      case 'eq':  return `${q(p.col)} = ${ph(p.value)}`;
-      case 'ne':  return `${q(p.col)} <> ${ph(p.value)}`;
-      case 'gt':  return `${q(p.col)} > ${ph(p.value)}`;
-      case 'lt':  return `${q(p.col)} < ${ph(p.value)}`;
-      case 'gte': return `${q(p.col)} >= ${ph(p.value)}`;
-      case 'lte': return `${q(p.col)} <= ${ph(p.value)}`;
-      case 'in':  return `${q(p.col)} IN (${p.values.map(ph).join(', ')})`;
-      case 'not_in':  return `${q(p.col)} NOT IN (${p.values.map(ph).join(', ')})`;
-      case 'between': return `${q(p.col)} BETWEEN ${ph(p.lo)} AND ${ph(p.hi)}`;
-      case 'like':    return `${q(p.col)} LIKE ${ph(p.pattern)}`;
-      case 'ilike':   return `${q(p.col)} ILIKE ${ph(p.pattern)}`;
-      case 'is_null':     return `${q(p.col)} IS NULL`;
-      case 'is_not_null': return `${q(p.col)} IS NOT NULL`;
-      case 'and': return '(' + p.clauses.map(c => this.pred(c, b)).join(' AND ') + ')';
-      case 'or':  return '(' + p.clauses.map(c => this.pred(c, b)).join(' OR ') + ')';
-      case 'raw': return p.sql;
+      case 'eq':
+        return `${q(p.col)} = ${ph(p.value)}`;
+      case 'ne':
+        return `${q(p.col)} <> ${ph(p.value)}`;
+      case 'gt':
+        return `${q(p.col)} > ${ph(p.value)}`;
+      case 'lt':
+        return `${q(p.col)} < ${ph(p.value)}`;
+      case 'gte':
+        return `${q(p.col)} >= ${ph(p.value)}`;
+      case 'lte':
+        return `${q(p.col)} <= ${ph(p.value)}`;
+      case 'in':
+        return `${q(p.col)} IN (${p.values.map(ph).join(', ')})`;
+      case 'not_in':
+        return `${q(p.col)} NOT IN (${p.values.map(ph).join(', ')})`;
+      case 'between':
+        return `${q(p.col)} BETWEEN ${ph(p.lo)} AND ${ph(p.hi)}`;
+      case 'like':
+        return `${q(p.col)} LIKE ${ph(p.pattern)}`;
+      case 'ilike':
+        return `${q(p.col)} ILIKE ${ph(p.pattern)}`;
+      case 'is_null':
+        return `${q(p.col)} IS NULL`;
+      case 'is_not_null':
+        return `${q(p.col)} IS NOT NULL`;
+      case 'and':
+        return '(' + p.clauses.map(c => this.pred(c, b)).join(' AND ') + ')';
+      case 'or':
+        return '(' + p.clauses.map(c => this.pred(c, b)).join(' OR ') + ')';
+      case 'raw':
+        return p.sql;
     }
   }
 }
@@ -1160,18 +1430,38 @@ Snowflake / BigQuery / MySQL / MSSQL dialects override `dateTrunc`,
 import { parse } from 'pgsql-ast-parser';
 
 const FORBIDDEN = new Set([
-  'create','drop','alter','truncate','insert','update','delete',
-  'grant','revoke','merge','lock','vacuum','analyze',
-  'commit','rollback','savepoint','copy','call',
+  'create',
+  'drop',
+  'alter',
+  'truncate',
+  'insert',
+  'update',
+  'delete',
+  'grant',
+  'revoke',
+  'merge',
+  'lock',
+  'vacuum',
+  'analyze',
+  'commit',
+  'rollback',
+  'savepoint',
+  'copy',
+  'call',
 ]);
 
 export function assertSafeSql(sql: string) {
   let ast;
-  try { ast = parse(sql); }
-  catch (e) { throw new BadRequest(`Invalid SQL: ${(e as Error).message}`); }
+  try {
+    ast = parse(sql);
+  } catch (e) {
+    throw new BadRequest(`Invalid SQL: ${(e as Error).message}`);
+  }
   for (const stmt of ast) {
     if (FORBIDDEN.has((stmt as any).type))
-      throw new BadRequest(`SQL statement "${(stmt as any).type}" is not allowed.`);
+      throw new BadRequest(
+        `SQL statement "${(stmt as any).type}" is not allowed.`,
+      );
   }
   if (ast.length > 1)
     throw new BadRequest('Multiple SQL statements are not allowed.');
@@ -1224,7 +1514,11 @@ export class CacheService {
     }
   }
 
-  async getOrCompute<T>(key: string, ttlSecs: number, compute: () => Promise<T>): Promise<T> {
+  async getOrCompute<T>(
+    key: string,
+    ttlSecs: number,
+    compute: () => Promise<T>,
+  ): Promise<T> {
     const hit = await this.get<T>(key);
     if (hit !== null) {
       metrics.counter('cache_hit_total').inc();
@@ -1251,7 +1545,12 @@ export class CacheService {
     }
   }
 
-  async swr<T>(key: string, ttlSecs: number, staleSecs: number, compute: () => Promise<T>): Promise<T> {
+  async swr<T>(
+    key: string,
+    ttlSecs: number,
+    staleSecs: number,
+    compute: () => Promise<T>,
+  ): Promise<T> {
     const value = await this.get<T>(key);
     if (value !== null) {
       const ttl = await redis.ttl(key);
@@ -1265,9 +1564,16 @@ export class CacheService {
   }
 
   async invalidate(prefix: string): Promise<number> {
-    let cursor = '0', deleted = 0;
+    let cursor = '0',
+      deleted = 0;
     do {
-      const [next, keys] = await redis.scan(cursor, 'MATCH', `${prefix}*`, 'COUNT', 500);
+      const [next, keys] = await redis.scan(
+        cursor,
+        'MATCH',
+        `${prefix}*`,
+        'COUNT',
+        500,
+      );
       cursor = next;
       if (keys.length) deleted += await redis.del(...keys);
     } while (cursor !== '0');
@@ -1288,18 +1594,46 @@ import { redis } from './redis.singleton';
 const connection = redis.options;
 export const scheduleQueue = new Queue('dbexec-schedule', { connection });
 
-new Worker('dbexec-schedule', async (job) => {
-  switch (job.name) {
-    case 'subscription:run':     return (await import('../../modules/subscriptions/jobs/runSubscription')).default(job.data.id);
-    case 'alert:check':          return (await import('../../modules/alerts/jobs/checkAlert')).default(job.data.id);
-    case 'materialised:refresh': return (await import('../../modules/materialised/jobs/refresh')).default(job.data.id);
-    case 'cache:warm':           return (await import('../../modules/cache/jobs/warm')).default(job.data);
-    case 'export:render':        return (await import('../../modules/exports/jobs/render')).default(job.data);
-    case 'webhook:deliver':      return (await import('../../modules/webhooks/jobs/deliver')).default(job.data);
-    case 'dataset:refresh':      return (await import('../../modules/datasets/jobs/refresh')).default(job.data.id);
-    case 'thumbnail:generate':   return (await import('../../modules/dashboards/jobs/thumbnail')).default(job.data.id);
-  }
-}, { connection, concurrency: 10 });
+new Worker(
+  'dbexec-schedule',
+  async job => {
+    switch (job.name) {
+      case 'subscription:run':
+        return (
+          await import('../../modules/subscriptions/jobs/runSubscription')
+        ).default(job.data.id);
+      case 'alert:check':
+        return (await import('../../modules/alerts/jobs/checkAlert')).default(
+          job.data.id,
+        );
+      case 'materialised:refresh':
+        return (
+          await import('../../modules/materialised/jobs/refresh')
+        ).default(job.data.id);
+      case 'cache:warm':
+        return (await import('../../modules/cache/jobs/warm')).default(
+          job.data,
+        );
+      case 'export:render':
+        return (await import('../../modules/exports/jobs/render')).default(
+          job.data,
+        );
+      case 'webhook:deliver':
+        return (await import('../../modules/webhooks/jobs/deliver')).default(
+          job.data,
+        );
+      case 'dataset:refresh':
+        return (await import('../../modules/datasets/jobs/refresh')).default(
+          job.data.id,
+        );
+      case 'thumbnail:generate':
+        return (
+          await import('../../modules/dashboards/jobs/thumbnail')
+        ).default(job.data.id);
+    }
+  },
+  { connection, concurrency: 10 },
+);
 ```
 
 ### 5.4 Materialised view
@@ -1319,10 +1653,11 @@ export class MaterialisedView {
   @Column('jsonb', { nullable: true }) dimensions?: string[];
   @Column('jsonb', { nullable: true }) metrics?: string[];
   @Column('timestamptz', { nullable: true }) lastRefreshAt?: Date;
-  @Column({ length: 16, nullable: true }) lastStatus?: 'ok'|'failed';
+  @Column({ length: 16, nullable: true }) lastStatus?: 'ok' | 'failed';
   @Column('int', { nullable: true }) lastDurationMs?: number;
   @Column('bigint', { nullable: true }) rowCount?: number;
-  @Column('uuid', { array: true, nullable: true }) dependsOnDatasetIds?: string[];
+  @Column('uuid', { array: true, nullable: true })
+  dependsOnDatasetIds?: string[];
 }
 ```
 
@@ -1341,16 +1676,21 @@ export default async function refreshMv(id: string) {
     await managed.query(`DROP TABLE IF EXISTS "${mv.targetTable}"`);
     await managed.query(`ALTER TABLE "${tmp}" RENAME TO "${mv.targetTable}"`);
     await managed.query('COMMIT');
-    const [{ count }] = await managed.query(`SELECT COUNT(*)::bigint AS count FROM "${mv.targetTable}"`);
+    const [{ count }] = await managed.query(
+      `SELECT COUNT(*)::bigint AS count FROM "${mv.targetTable}"`,
+    );
     await MaterialisedView.update(id, {
-      lastRefreshAt: new Date(), lastStatus: 'ok',
-      lastDurationMs: Date.now() - t0, rowCount: Number(count),
+      lastRefreshAt: new Date(),
+      lastStatus: 'ok',
+      lastDurationMs: Date.now() - t0,
+      rowCount: Number(count),
     });
     await cache.invalidate(`DBExec:sem:${mv.datasetId}`);
   } catch (e) {
     await managed.query('ROLLBACK').catch(() => {});
     await MaterialisedView.update(id, {
-      lastRefreshAt: new Date(), lastStatus: 'failed',
+      lastRefreshAt: new Date(),
+      lastStatus: 'failed',
       lastDurationMs: Date.now() - t0,
     });
     throw e;
@@ -1373,8 +1713,11 @@ import { ALL_SPECS } from '../../../shared/visualisations/registry';
 export default async function listSpecs(req: Request, res: Response) {
   return sendResponse(res, true, CODE.SUCCESS, 'ok', {
     specs: ALL_SPECS.map(s => ({
-      chartType: s.chartType, family: s.family, description: s.description,
-      roles: s.roles, properties: s.properties,
+      chartType: s.chartType,
+      family: s.family,
+      description: s.description,
+      roles: s.roles,
+      properties: s.properties,
     })),
   });
 }
@@ -1389,7 +1732,7 @@ export class AnalysisParameter {
   @Column('uuid') analysisId!: string;
   @Column({ length: 64 }) name!: string;
   @Column({ length: 128, nullable: true }) label?: string;
-  @Column({ length: 16 }) type!: 'text'|'number'|'date'|'enum';
+  @Column({ length: 16 }) type!: 'text' | 'number' | 'date' | 'enum';
   @Column('text', { nullable: true }) defaultValue?: string;
   @Column('text', { array: true, nullable: true }) enumValues?: string[];
   @Column({ length: 128, nullable: true }) bindToField?: string;
@@ -1419,14 +1762,25 @@ export async function renderVisual(opts: {
   const visual = (analysis.visuals as any[]).find(v => v.id === opts.visualId);
   if (!visual) throw new NotFound('visual');
 
-  const semReq = mapVisualToSemanticRequest(visual, opts.filters, opts.parameters, opts.drillState);
+  const semReq = mapVisualToSemanticRequest(
+    visual,
+    opts.filters,
+    opts.parameters,
+    opts.drillState,
+  );
   const compiler = new SemanticCompiler();
   const compiled = await compiler.compile(semReq, { caller: opts.caller });
-  return await cache.getOrCompute(compiled.cacheKey, analysis.cacheTtlSecs || 300, async () => {
-    const cfg = await DatasourceConfigS.findOne({ where: { id: compiled.datasourceId } });
-    const pool = await acquire(cfg as any);
-    return await pool.query(compiled.sql, compiled.bindings);
-  });
+  return await cache.getOrCompute(
+    compiled.cacheKey,
+    analysis.cacheTtlSecs || 300,
+    async () => {
+      const cfg = await DatasourceConfigS.findOne({
+        where: { id: compiled.datasourceId },
+      });
+      const pool = await acquire(cfg as any);
+      return await pool.query(compiled.sql, compiled.bindings);
+    },
+  );
 }
 ```
 
@@ -1481,7 +1835,8 @@ CREATE TABLE dashboard_tab (
 export default async function renderDashboard(req: Request, res: Response) {
   const { id } = req.params;
   const { master_db_connection, orgData, loggedInId } = res.locals;
-  const dashboard = await master_db_connection.getRepository(Dashboard)
+  const dashboard = await master_db_connection
+    .getRepository(Dashboard)
     .findOne({ where: { id, organisationId: orgData.id } });
   if (!dashboard) return sendResponse(res, false, CODE.NOT_FOUND, 'not found');
 
@@ -1491,11 +1846,22 @@ export default async function renderDashboard(req: Request, res: Response) {
   const filters = mergeFilters(dashboard.filters, parseFilterQuery(req.query));
   const layout = dashboard.layout as any;
   const visualResults = await Promise.allSettled(
-    layout.visuals.map((v: any) => renderVisual({
-      analysisId: v.analysisId, visualId: v.visualId,
-      filters, parameters: req.query.params ? JSON.parse(req.query.params as string) : undefined,
-      caller: { userId: loggedInId, organisationId: orgData.id, scopes: [], userAttributes: await loadUserAttrs(loggedInId) },
-    }))
+    layout.visuals.map((v: any) =>
+      renderVisual({
+        analysisId: v.analysisId,
+        visualId: v.visualId,
+        filters,
+        parameters: req.query.params
+          ? JSON.parse(req.query.params as string)
+          : undefined,
+        caller: {
+          userId: loggedInId,
+          organisationId: orgData.id,
+          scopes: [],
+          userAttributes: await loadUserAttrs(loggedInId),
+        },
+      }),
+    ),
   );
 
   const visuals = visualResults.map((r, i) => {
@@ -1505,7 +1871,8 @@ export default async function renderDashboard(req: Request, res: Response) {
   });
 
   return sendResponse(res, true, CODE.SUCCESS, 'ok', {
-    layout: dashboard.layout, visuals,
+    layout: dashboard.layout,
+    visuals,
     meta: { mode: 'live', generatedAt: new Date().toISOString() },
   });
 }
@@ -1519,22 +1886,29 @@ import { BrowserPool } from '../../../shared/services/browserPool';
 
 const pool = new BrowserPool({ capacity: 4 });
 
-export async function renderDashboardPdf(dashboardId: string, opts: {
-  serviceToken: string;
-  filters?: Record<string, unknown>;
-  format?: 'A3'|'A4'|'Letter';
-  landscape?: boolean;
-  watermark?: string;
-}): Promise<Buffer> {
-  return pool.use(async (page) => {
+export async function renderDashboardPdf(
+  dashboardId: string,
+  opts: {
+    serviceToken: string;
+    filters?: Record<string, unknown>;
+    format?: 'A3' | 'A4' | 'Letter';
+    landscape?: boolean;
+    watermark?: string;
+  },
+): Promise<Buffer> {
+  return pool.use(async page => {
     await page.setExtraHTTPHeaders({ 'x-auth-token': opts.serviceToken });
     const url = `${process.env.FE_URL}/embed/dashboard/${dashboardId}?print=true&filters=${encodeURIComponent(JSON.stringify(opts.filters || {}))}`;
     await page.goto(url, { waitUntil: 'networkidle0', timeout: 90_000 });
-    await page.waitForFunction(() => (window as any).__DASHBOARD_READY__ === true, { timeout: 90_000 });
+    await page.waitForFunction(
+      () => (window as any).__DASHBOARD_READY__ === true,
+      { timeout: 90_000 },
+    );
     if (opts.watermark) {
-      await page.evaluate((wm) => {
+      await page.evaluate(wm => {
         const d = document.createElement('div');
-        d.style.cssText = 'position:fixed;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;z-index:9999';
+        d.style.cssText =
+          'position:fixed;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;z-index:9999';
         d.innerHTML = `<div style="opacity:.07;font-size:120px;transform:rotate(-30deg);font-family:sans-serif">${wm}</div>`;
         document.body.appendChild(d);
       }, opts.watermark);
@@ -1561,9 +1935,19 @@ export default async function generateThumbnail(dashboardId: string) {
     viewport: { width: 1280, height: 800 },
     scale: 0.5,
   });
-  const small = await sharp(buf).resize(640, 400).png({ quality: 80 }).toBuffer();
-  await DashboardThumbnail.upsert({ dashboardId, bytes: small, generatedAt: new Date() }, ['dashboardId']);
-  await cache.set(`thumb:dashboard:${dashboardId}`, small.toString('base64'), 86400);
+  const small = await sharp(buf)
+    .resize(640, 400)
+    .png({ quality: 80 })
+    .toBuffer();
+  await DashboardThumbnail.upsert(
+    { dashboardId, bytes: small, generatedAt: new Date() },
+    ['dashboardId'],
+  );
+  await cache.set(
+    `thumb:dashboard:${dashboardId}`,
+    small.toString('base64'),
+    86400,
+  );
 }
 ```
 
@@ -1637,7 +2021,8 @@ export class SecurityCompiler {
     const attrs = await this.loadUserAttrs(caller.userId);
 
     const out: string[] = [];
-    if (rules.some(r => r.denyByDefault) && rules.length === 0) out.push('FALSE');
+    if (rules.some(r => r.denyByDefault) && rules.length === 0)
+      out.push('FALSE');
 
     const sorted = rules.sort((a, b) => a.precedence - b.precedence);
     for (const r of sorted) {
@@ -1646,11 +2031,16 @@ export class SecurityCompiler {
     return out;
   }
 
-  async projection(datasetId: string, caller: AuthCtx): Promise<ProjectionRewrite> {
+  async projection(
+    datasetId: string,
+    caller: AuthCtx,
+  ): Promise<ProjectionRewrite> {
     const cols = await this.loadColumnRules(datasetId, caller);
     return {
       hide: cols.filter(c => c.action === 'hide').map(c => c.columnName),
-      mask: cols.filter(c => c.action === 'mask').map(c => ({ col: c.columnName, pattern: c.maskPattern! })),
+      mask: cols
+        .filter(c => c.action === 'mask')
+        .map(c => ({ col: c.columnName, pattern: c.maskPattern! })),
     };
   }
 
@@ -1673,14 +2063,20 @@ export class SecurityCompiler {
       });
     }
     const q = (s: string) => `"${s.replace(/"/g, '""')}"`;
-    const lit = (v: any) => typeof v === 'number' ? String(v) : `'${String(v).replace(/'/g, "''")}'`;
+    const lit = (v: any) =>
+      typeof v === 'number' ? String(v) : `'${String(v).replace(/'/g, "''")}'`;
     const list = (vs: any[]) => vs.map(lit).join(', ');
     switch (rule.operator) {
-      case 'in':       return `${q(rule.columnName)} IN (${list(values)})`;
-      case 'not_in':   return `${q(rule.columnName)} NOT IN (${list(values)})`;
-      case 'equals':   return `${q(rule.columnName)} = ${lit(values[0])}`;
-      case 'between':  return `${q(rule.columnName)} BETWEEN ${lit(values[0])} AND ${lit(values[1])}`;
-      default: throw new Error(`unknown operator ${rule.operator}`);
+      case 'in':
+        return `${q(rule.columnName)} IN (${list(values)})`;
+      case 'not_in':
+        return `${q(rule.columnName)} NOT IN (${list(values)})`;
+      case 'equals':
+        return `${q(rule.columnName)} = ${lit(values[0])}`;
+      case 'between':
+        return `${q(rule.columnName)} BETWEEN ${lit(values[0])} AND ${lit(values[1])}`;
+      default:
+        throw new Error(`unknown operator ${rule.operator}`);
     }
   }
 
@@ -1691,39 +2087,59 @@ export class SecurityCompiler {
     return pattern
       .replace(/\{last(\d+)\}/g, (_, n) => s.slice(-Number(n)))
       .replace(/\{first(\d+)\}/g, (_, n) => s.slice(0, Number(n)))
-      .replace(/\{hash\}/g, crypto.createHash('sha256').update(s).digest('hex').slice(0, 12))
+      .replace(
+        /\{hash\}/g,
+        crypto.createHash('sha256').update(s).digest('hex').slice(0, 12),
+      )
       .replace(/\{category\}/g, () => {
         const n = Number(s);
-        return Number.isNaN(n) ? '?' : n < 100 ? 'low' : n < 1000 ? 'medium' : 'high';
+        return Number.isNaN(n)
+          ? '?'
+          : n < 100
+            ? 'low'
+            : n < 1000
+              ? 'medium'
+              : 'high';
       });
   }
 
   private async loadRowRules(datasetId: string, c: AuthCtx) {
-    return this.conn.query(`
+    return this.conn.query(
+      `
       SELECT * FROM rls_rule
       WHERE dataset_id = $1 AND is_enabled = true
         AND (
           (scope = 'user' AND scope_id = $2)
           OR (scope = 'group' AND scope_id = ANY($3))
         )
-      ORDER BY precedence ASC`, [datasetId, c.userId, c.groupIds ?? []]);
+      ORDER BY precedence ASC`,
+      [datasetId, c.userId, c.groupIds ?? []],
+    );
   }
 
   private async loadColumnRules(datasetId: string, c: AuthCtx) {
-    return this.conn.query(`
+    return this.conn.query(
+      `
       SELECT * FROM column_security
       WHERE dataset_id = $1 AND is_enabled = true
         AND (
           (scope = 'user' AND scope_id = $2)
           OR (scope = 'group' AND scope_id = ANY($3))
-        )`, [datasetId, c.userId, c.groupIds ?? []]);
+        )`,
+      [datasetId, c.userId, c.groupIds ?? []],
+    );
   }
 
-  private async loadUserAttrs(userId: string): Promise<Record<string, unknown>> {
-    const rows = await this.conn.query(`
+  private async loadUserAttrs(
+    userId: string,
+  ): Promise<Record<string, unknown>> {
+    const rows = await this.conn.query(
+      `
       SELECT a.name, COALESCE(uav.value, a.default_value) AS value
       FROM user_attribute a
-      LEFT JOIN user_attribute_value uav ON uav.attribute_id = a.id AND uav.user_id = $1`, [userId]);
+      LEFT JOIN user_attribute_value uav ON uav.attribute_id = a.id AND uav.user_id = $1`,
+      [userId],
+    );
     return Object.fromEntries(rows.map((r: any) => [r.name, r.value]));
   }
 }
@@ -1734,20 +2150,32 @@ export class SecurityCompiler {
 ```ts
 // src/modules/security/services/piiScanner.ts
 const PII_PATTERNS: { name: string; re: RegExp; piiClass: string }[] = [
-  { name: 'email', re: /^[A-Za-z0-9._-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/, piiClass: 'email' },
+  {
+    name: 'email',
+    re: /^[A-Za-z0-9._-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/,
+    piiClass: 'email',
+  },
   { name: 'phone', re: /^\+?\d[\d \-()]{6,}$/, piiClass: 'phone' },
-  { name: 'ssn',   re: /^\d{3}-\d{2}-\d{4}$/, piiClass: 'us_ssn' },
-  { name: 'ccn',   re: /^\d{13,19}$/, piiClass: 'credit_card' },
+  { name: 'ssn', re: /^\d{3}-\d{2}-\d{4}$/, piiClass: 'us_ssn' },
+  { name: 'ccn', re: /^\d{13,19}$/, piiClass: 'credit_card' },
 ];
 
-export async function scanColumns(datasetId: string, pool: DatasourcePool, columns: ColumnMeta[]): Promise<Record<string, string>> {
+export async function scanColumns(
+  datasetId: string,
+  pool: DatasourcePool,
+  columns: ColumnMeta[],
+): Promise<Record<string, string>> {
   const out: Record<string, string> = {};
   for (const c of columns) {
     if (c.type !== 'text') continue;
-    const { rows } = await pool.query(`SELECT "${c.name}" FROM (${'<dataset.sql>'}) base WHERE "${c.name}" IS NOT NULL LIMIT 100`);
+    const { rows } = await pool.query(
+      `SELECT "${c.name}" FROM (${'<dataset.sql>'}) base WHERE "${c.name}" IS NOT NULL LIMIT 100`,
+    );
     const sample = rows.map(r => r[c.name]);
     for (const p of PII_PATTERNS) {
-      const matches = sample.filter(v => typeof v === 'string' && p.re.test(v)).length;
+      const matches = sample.filter(
+        v => typeof v === 'string' && p.re.test(v),
+      ).length;
       if (matches / Math.max(sample.length, 1) > 0.6) {
         out[c.name] = p.piiClass;
         break;
@@ -1836,7 +2264,9 @@ import { decrypt } from '../../../shared/utility/encryptDecrypt';
 
 export default async function samlAcs(req: Request, res: Response) {
   const orgId = req.query.orgId as string;
-  const cfg = await SsoConfig.findOne({ where: { organisationId: orgId, protocol: 'saml', status: 'enabled' } });
+  const cfg = await SsoConfig.findOne({
+    where: { organisationId: orgId, protocol: 'saml', status: 'enabled' },
+  });
   if (!cfg) return res.status(404).end();
 
   const saml = new SAML({
@@ -1848,8 +2278,13 @@ export default async function samlAcs(req: Request, res: Response) {
   });
 
   let profile;
-  try { ({ profile } = await saml.validatePostResponseAsync(req.body)); }
-  catch (e) { return res.status(401).send('SAML validation failed: ' + (e as Error).message); }
+  try {
+    ({ profile } = await saml.validatePostResponseAsync(req.body));
+  } catch (e) {
+    return res
+      .status(401)
+      .send('SAML validation failed: ' + (e as Error).message);
+  }
 
   const map = cfg.samlAttributeMapping || {};
   const email = profile[map.email || 'email'] as string;
@@ -1861,7 +2296,9 @@ export default async function samlAcs(req: Request, res: Response) {
 
   const tokens = await issueJwt(user);
   await createSession(user, req, tokens);
-  res.redirect(`${FE_URL}/auth/sso-callback?token=${tokens.access}&refresh=${tokens.refresh}`);
+  res.redirect(
+    `${FE_URL}/auth/sso-callback?token=${tokens.access}&refresh=${tokens.refresh}`,
+  );
 }
 ```
 
@@ -1872,7 +2309,9 @@ export default async function samlAcs(req: Request, res: Response) {
 import { Issuer, generators } from 'openid-client';
 
 export async function oidcStart(req: Request, res: Response) {
-  const cfg = await SsoConfig.findOne({ where: { organisationId: req.query.orgId } });
+  const cfg = await SsoConfig.findOne({
+    where: { organisationId: req.query.orgId },
+  });
   if (!cfg || cfg.protocol !== 'oidc') return res.status(404).end();
   const issuer = await Issuer.discover(cfg.oidcIssuer!);
   const client = new issuer.Client({
@@ -1884,7 +2323,9 @@ export async function oidcStart(req: Request, res: Response) {
   const state = generators.state();
   const nonce = generators.nonce();
   req.session!.oidc = { state, nonce, orgId: cfg.organisationId };
-  res.redirect(client.authorizationUrl({ scope: cfg.oidcScopes!.join(' '), state, nonce }));
+  res.redirect(
+    client.authorizationUrl({ scope: cfg.oidcScopes!.join(' '), state, nonce }),
+  );
 }
 export async function oidcCallback(req: Request, res: Response) {
   const { state, nonce, orgId } = req.session!.oidc!;
@@ -1897,7 +2338,11 @@ export async function oidcCallback(req: Request, res: Response) {
     response_types: ['code'],
   });
   const params = client.callbackParams(req);
-  const tokens = await client.callback(`${BACKEND_URL}/api/v1/auth/sso/oidc/callback`, params, { state, nonce });
+  const tokens = await client.callback(
+    `${BACKEND_URL}/api/v1/auth/sso/oidc/callback`,
+    params,
+    { state, nonce },
+  );
   const userinfo = await client.userinfo(tokens.access_token!);
   // ... JIT provision, JWT, redirect
 }
@@ -1912,11 +2357,22 @@ import qrcode from 'qrcode';
 
 export async function totpEnrolStart(req: Request, res: Response) {
   const user = res.locals.user;
-  const secret = speakeasy.generateSecret({ name: `DBExec (${user.email})`, length: 32 });
-  await UserMfa.upsert({
-    userId: user.id, method: 'totp', totpSecretEnc: encrypt(secret.base32, user.organisationId),
-  } as any, ['userId']);
-  res.json({ qrDataUrl: await qrcode.toDataURL(secret.otpauth_url!), secret: secret.base32 });
+  const secret = speakeasy.generateSecret({
+    name: `DBExec (${user.email})`,
+    length: 32,
+  });
+  await UserMfa.upsert(
+    {
+      userId: user.id,
+      method: 'totp',
+      totpSecretEnc: encrypt(secret.base32, user.organisationId),
+    } as any,
+    ['userId'],
+  );
+  res.json({
+    qrDataUrl: await qrcode.toDataURL(secret.otpauth_url!),
+    secret: secret.base32,
+  });
 }
 
 export async function totpEnrolConfirm(req: Request, res: Response) {
@@ -1925,12 +2381,19 @@ export async function totpEnrolConfirm(req: Request, res: Response) {
   if (!mfa) return res.status(400).end();
   const ok = speakeasy.totp.verify({
     secret: decrypt(mfa.totpSecretEnc!, user.organisationId),
-    encoding: 'base32', token: req.body.code, window: 1,
+    encoding: 'base32',
+    token: req.body.code,
+    window: 1,
   });
   if (!ok) return res.status(400).json({ error: 'invalid code' });
-  const codes = Array.from({ length: 10 }, () => crypto.randomBytes(5).toString('hex'));
+  const codes = Array.from({ length: 10 }, () =>
+    crypto.randomBytes(5).toString('hex'),
+  );
   await UserMfa.update(user.id, {
-    recoveryCodesEnc: encrypt(JSON.stringify(codes.map(c => bcrypt.hashSync(c, 8))), user.organisationId),
+    recoveryCodesEnc: encrypt(
+      JSON.stringify(codes.map(c => bcrypt.hashSync(c, 8))),
+      user.organisationId,
+    ),
     enrolledAt: new Date(),
   });
   res.json({ recoveryCodes: codes });
@@ -1942,14 +2405,22 @@ export async function mfaVerify(req: Request, res: Response) {
   if (!mfa) return res.status(400).end();
   const ok = speakeasy.totp.verify({
     secret: decrypt(mfa.totpSecretEnc!, user.organisationId),
-    encoding: 'base32', token: req.body.code, window: 1,
+    encoding: 'base32',
+    token: req.body.code,
+    window: 1,
   });
   if (!ok) {
-    const hashed = JSON.parse(decrypt(mfa.recoveryCodesEnc!, user.organisationId));
-    const idx = hashed.findIndex((h: string) => bcrypt.compareSync(req.body.code, h));
+    const hashed = JSON.parse(
+      decrypt(mfa.recoveryCodesEnc!, user.organisationId),
+    );
+    const idx = hashed.findIndex((h: string) =>
+      bcrypt.compareSync(req.body.code, h),
+    );
     if (idx === -1) return res.status(400).end();
     hashed.splice(idx, 1);
-    await UserMfa.update(user.id, { recoveryCodesEnc: encrypt(JSON.stringify(hashed), user.organisationId) });
+    await UserMfa.update(user.id, {
+      recoveryCodesEnc: encrypt(JSON.stringify(hashed), user.organisationId),
+    });
   }
   await UserMfa.update(user.id, { lastUsedAt: new Date() });
   res.json({ ok: true, stepUpExpiry: Date.now() + 10 * 60_000 });
@@ -1964,21 +2435,34 @@ export default async function refreshToken(req: Request, res: Response) {
   const oldRt = req.body.refreshToken as string;
   if (!oldRt) return res.status(401).end();
   const oldHash = sha256(oldRt);
-  const stored = await UserSession.findOne({ where: { refreshTokenHash: oldHash } });
+  const stored = await UserSession.findOne({
+    where: { refreshTokenHash: oldHash },
+  });
   if (!stored) return res.status(401).end();
   if (stored.revokedAt) {
     // REUSE detected — kill ALL sessions for this user
-    await UserSession.update({ userId: stored.userId, revokedAt: IsNull() }, {
-      revokedAt: new Date(), revokedReason: 'reuse-detected',
-    });
-    return res.status(401).json({ error: 'Token reuse detected; all sessions revoked.' });
+    await UserSession.update(
+      { userId: stored.userId, revokedAt: IsNull() },
+      {
+        revokedAt: new Date(),
+        revokedReason: 'reuse-detected',
+      },
+    );
+    return res
+      .status(401)
+      .json({ error: 'Token reuse detected; all sessions revoked.' });
   }
   const newRt = base64url(crypto.randomBytes(48));
-  await UserSession.update(stored.id, { revokedAt: new Date(), revokedReason: 'rotation' });
+  await UserSession.update(stored.id, {
+    revokedAt: new Date(),
+    revokedReason: 'rotation',
+  });
   await UserSession.insert({
-    userId: stored.userId, organisationId: stored.organisationId,
+    userId: stored.userId,
+    organisationId: stored.organisationId,
     refreshTokenHash: sha256(newRt),
-    userAgent: req.headers['user-agent'], ip: req.ip,
+    userAgent: req.headers['user-agent'],
+    ip: req.ip,
   });
   const access = signJwt({ sub: stored.userId, org: stored.organisationId });
   res.json({ access, refresh: newRt });
@@ -1989,15 +2473,21 @@ export default async function refreshToken(req: Request, res: Response) {
 
 ```ts
 // src/shared/middleware/apiToken.middleware.ts
-export async function apiToken(req: Request, res: Response, next: NextFunction) {
-  const raw = (req.headers.authorization || '').replace(/^Bearer\s+/, '')
-           || (req.headers['x-api-token'] as string);
+export async function apiToken(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
+  const raw =
+    (req.headers.authorization || '').replace(/^Bearer\s+/, '') ||
+    (req.headers['x-api-token'] as string);
   if (!raw || !raw.startsWith('dbe_')) return next();
   const hash = crypto.createHash('sha256').update(raw).digest('hex');
   const row = await ApiToken.findOne({ where: { tokenHash: hash, status: 1 } });
   if (!row) return res.status(401).json({ error: 'invalid token' });
   if (row.expiresAt && row.expiresAt < new Date()) return res.status(401).end();
-  if (row.allowedIps?.length && !row.allowedIps.includes(req.ip)) return res.status(403).end();
+  if (row.allowedIps?.length && !row.allowedIps.includes(req.ip))
+    return res.status(403).end();
   ApiToken.update(row.id, { lastUsedAt: new Date() }).catch(() => {});
   res.locals.apiAuth = row;
   res.locals.scopes = row.scopes;
@@ -2028,7 +2518,9 @@ router.get('/ServiceProviderConfig', serviceProviderConfig);
 export async function scimAuth(req, res, next) {
   const t = (req.headers.authorization || '').replace(/^Bearer\s+/, '');
   if (!t) return res.status(401).end();
-  const row = await ScimToken.findOne({ where: { tokenHash: sha256(t), status: 1 } });
+  const row = await ScimToken.findOne({
+    where: { tokenHash: sha256(t), status: 1 },
+  });
   if (!row) return res.status(401).end();
   res.locals.scim = { organisationId: row.organisationId };
   next();
@@ -2060,7 +2552,11 @@ function scimUserOf(u: User) {
     name: { givenName: u.firstName, familyName: u.lastName },
     emails: [{ value: u.email, primary: true }],
     active: u.status === 1,
-    meta: { resourceType: 'User', created: u.createdOn, lastModified: u.updatedOn },
+    meta: {
+      resourceType: 'User',
+      created: u.createdOn,
+      lastModified: u.updatedOn,
+    },
   };
 }
 ```
@@ -2096,7 +2592,10 @@ import { ManagedDatasourceService } from '../services/managedDatasource.service'
 import { Dataset } from '../../../shared/db/shared_entity/dataset.entity';
 import { DatasetField } from '../../../shared/db/shared_entity/datasetField.entity';
 import { auditLogger } from '../../../shared/services/auditLogger.service';
-import { AUDIT_MODULES, AUDIT_ACTIONS } from '../../../shared/constants/audit.constants';
+import {
+  AUDIT_MODULES,
+  AUDIT_ACTIONS,
+} from '../../../shared/constants/audit.constants';
 import sendResponse from '../../../shared/utility/response';
 import { CODE } from '../../../../config/config';
 import * as crypto from 'node:crypto';
@@ -2108,9 +2607,16 @@ export default async function uploadDatasetCsv(req: Request, res: Response) {
   const { master_db_connection, orgData, loggedInId } = res.locals;
 
   // Quota check
-  const quota = await master_db_connection.getRepository(OrgStorageQuota).findOne({ where: { organisationId: orgData.id } });
+  const quota = await master_db_connection
+    .getRepository(OrgStorageQuota)
+    .findOne({ where: { organisationId: orgData.id } });
   if (quota && quota.usedBytes + file.size > quota.maxBytes)
-    return sendResponse(res, false, 413, 'Upload quota exceeded for this organisation');
+    return sendResponse(
+      res,
+      false,
+      413,
+      'Upload quota exceeded for this organisation',
+    );
 
   // Idempotent re-upload via hash
   const hash = crypto.createHash('sha256').update(file.buffer).digest('hex');
@@ -2119,21 +2625,37 @@ export default async function uploadDatasetCsv(req: Request, res: Response) {
     // metadata.sha256 — handled by query builder
   });
   if (existing && (existing.uploadSourceMeta as any)?.sha256 === hash) {
-    return sendResponse(res, true, CODE.SUCCESS, 'identical file already uploaded', existing);
+    return sendResponse(
+      res,
+      true,
+      CODE.SUCCESS,
+      'identical file already uploaded',
+      existing,
+    );
   }
 
   // Parse
   const rows: Record<string, string>[] = [];
-  const parseResult = Papa.parse<Record<string, string>>(file.buffer.toString('utf8'), {
-    header: true, skipEmptyLines: true,
-  });
+  const parseResult = Papa.parse<Record<string, string>>(
+    file.buffer.toString('utf8'),
+    {
+      header: true,
+      skipEmptyLines: true,
+    },
+  );
   if (parseResult.errors.length) {
-    return sendResponse(res, false, CODE.BAD_REQUEST,
-      `CSV parse error on row ${parseResult.errors[0].row}: ${parseResult.errors[0].message}`);
+    return sendResponse(
+      res,
+      false,
+      CODE.BAD_REQUEST,
+      `CSV parse error on row ${parseResult.errors[0].row}: ${parseResult.errors[0].message}`,
+    );
   }
   rows.push(...(parseResult.data as any));
-  if (rows.length === 0) return sendResponse(res, false, CODE.BAD_REQUEST, 'empty file');
-  if (rows.length > 1_000_000) return sendResponse(res, false, 413, 'over 1M rows');
+  if (rows.length === 0)
+    return sendResponse(res, false, CODE.BAD_REQUEST, 'empty file');
+  if (rows.length > 1_000_000)
+    return sendResponse(res, false, 413, 'over 1M rows');
 
   // Infer columns
   const columns = inferColumns(rows);
@@ -2179,19 +2701,27 @@ export default async function uploadDatasetCsv(req: Request, res: Response) {
   }
 
   // Quota update
-  if (quota) await OrgStorageQuota.update(quota.id, { usedBytes: quota.usedBytes + file.size });
+  if (quota)
+    await OrgStorageQuota.update(quota.id, {
+      usedBytes: quota.usedBytes + file.size,
+    });
 
   // Audit
   await auditLogger.logAuditToOrg({
-    connection: master_db_connection, req, res,
-    module: AUDIT_MODULES.DATASET, action: AUDIT_ACTIONS.CREATE,
-    entityName: 'Dataset (upload)', entityId: ds.id,
+    connection: master_db_connection,
+    req,
+    res,
+    module: AUDIT_MODULES.DATASET,
+    action: AUDIT_ACTIONS.CREATE,
+    entityName: 'Dataset (upload)',
+    entityId: ds.id,
     metadata: { rowCount: rows.length, format: 'csv', sha256: hash },
   });
 
   // Webhook
   await eventBus.emit({
-    type: 'dataset.uploaded', organisationId: orgData.id,
+    type: 'dataset.uploaded',
+    organisationId: orgData.id,
     payload: { datasetId: ds.id, rowCount: rows.length, format: 'csv' },
     actor: { type: 'user', id: loggedInId },
   });
@@ -2201,14 +2731,17 @@ export default async function uploadDatasetCsv(req: Request, res: Response) {
 
 function inferColumns(rows: any[]) {
   const sample = rows.slice(0, Math.min(rows.length, 100));
-  const out: { name: string; type: 'bool'|'numeric'|'timestamp'|'text' }[] = [];
+  const out: {
+    name: string;
+    type: 'bool' | 'numeric' | 'timestamp' | 'text';
+  }[] = [];
   for (const name of Object.keys(sample[0])) {
     const t = sample.map(r => detect(r[name]));
     out.push({ name, type: dominant(t) });
   }
   return out;
 }
-function detect(v: any): 'bool'|'numeric'|'timestamp'|'text' {
+function detect(v: any): 'bool' | 'numeric' | 'timestamp' | 'text' {
   if (v == null || v === '') return 'text';
   const s = String(v);
   if (/^(true|false)$/i.test(s)) return 'bool';
@@ -2222,10 +2755,18 @@ function dominant(arr: string[]): any {
   return Object.entries(cnt).sort((a, b) => b[1] - a[1])[0][0];
 }
 const pgType = (t: string) =>
-  ({ bool: 'boolean', numeric: 'numeric', timestamp: 'timestamptz', text: 'text' } as any)[t] || 'text';
+  (
+    ({
+      bool: 'boolean',
+      numeric: 'numeric',
+      timestamp: 'timestamptz',
+      text: 'text',
+    }) as any
+  )[t] || 'text';
 const q = (s: string) => `"${s.replace(/"/g, '""')}"`;
 const shortOrgId = (uuid: string) => uuid.replace(/-/g, '').slice(0, 8);
-const sanitiseName = (name: string) => name.replace(/\.[^.]+$/, '').slice(0, 100);
+const sanitiseName = (name: string) =>
+  name.replace(/\.[^.]+$/, '').slice(0, 100);
 ```
 
 ### 12.3 COPY-based bulk insert
@@ -2234,17 +2775,27 @@ const sanitiseName = (name: string) => name.replace(/\.[^.]+$/, '').slice(0, 100
 // src/modules/datasets/services/batchInsert.ts
 import { from as copyFrom } from 'pg-copy-streams';
 
-export async function batchInsertCopy(pool: any, table: string, columns: { name: string; type: string }[], rows: any[]) {
+export async function batchInsertCopy(
+  pool: any,
+  table: string,
+  columns: { name: string; type: string }[],
+  rows: any[],
+) {
   const client = await pool.connect();
   try {
     const colList = columns.map(c => q(c.name)).join(', ');
-    const stream = client.query(copyFrom(`COPY ${q(table)} (${colList}) FROM STDIN WITH (FORMAT csv)`));
+    const stream = client.query(
+      copyFrom(`COPY ${q(table)} (${colList}) FROM STDIN WITH (FORMAT csv)`),
+    );
     let buf = '';
     let i = 0;
     for (const r of rows) {
       buf += columns.map(c => csvCell(r[c.name])).join(',') + '\n';
       i++;
-      if (i % 50_000 === 0) { stream.write(buf); buf = ''; }
+      if (i % 50_000 === 0) {
+        stream.write(buf);
+        buf = '';
+      }
     }
     if (buf) stream.write(buf);
     stream.end();
@@ -2273,7 +2824,10 @@ const tus = new Server({
   datastore: new FileStore({ directory: '.tus' }),
   onUploadFinish: async (req, res, upload) => {
     // Move from FS to processing queue
-    await scheduleQueue.add('upload:process', { uploadId: upload.id, orgId: getOrgIdFromAuth(req) });
+    await scheduleQueue.add('upload:process', {
+      uploadId: upload.id,
+      orgId: getOrgIdFromAuth(req),
+    });
     return res;
   },
 });
@@ -2290,7 +2844,9 @@ app.all('/api/v1/upload/tus*', tus.handle.bind(tus));
 // src/modules/exports/controllers/exportDatasetCsv.ts
 export default async function exportDatasetCsv(req: Request, res: Response) {
   const ds = await loadDataset(req.params.id, res.locals.orgData.id);
-  const cfg = await DatasourceConfigS.findOne({ where: { id: ds.datasourceId } });
+  const cfg = await DatasourceConfigS.findOne({
+    where: { id: ds.datasourceId },
+  });
   const pool = await acquire(cfg as any);
 
   res.setHeader('Content-Type', 'text/csv; charset=utf-8');
@@ -2309,9 +2865,13 @@ export default async function exportDatasetCsv(req: Request, res: Response) {
   res.end();
 
   await auditLogger.logAuditToOrg({
-    connection: res.locals.master_db_connection, req, res,
-    module: AUDIT_MODULES.DATASET, action: AUDIT_ACTIONS.EXPORT,
-    entityName: 'Dataset', entityId: ds.id,
+    connection: res.locals.master_db_connection,
+    req,
+    res,
+    module: AUDIT_MODULES.DATASET,
+    action: AUDIT_ACTIONS.EXPORT,
+    entityName: 'Dataset',
+    entityId: ds.id,
     metadata: { format: 'csv' },
   });
 }
@@ -2325,7 +2885,10 @@ import ExcelJS from 'exceljs';
 
 export default async function exportDashboardXlsx(req: Request, res: Response) {
   const data = await renderDashboardLive(req.params.id, res.locals);
-  res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+  res.setHeader(
+    'Content-Type',
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+  );
   res.setHeader('Content-Disposition', `attachment; filename="dashboard.xlsx"`);
 
   const wb = new ExcelJS.stream.xlsx.WorkbookWriter({ stream: res });
@@ -2348,7 +2911,10 @@ function sanitiseSheet(s: string) {
 ```ts
 import { PDFDocument } from 'pdf-lib';
 
-export async function pdfWithPassword(buf: Buffer, password: string): Promise<Buffer> {
+export async function pdfWithPassword(
+  buf: Buffer,
+  password: string,
+): Promise<Buffer> {
   const doc = await PDFDocument.load(buf);
   // pdf-lib doesn't directly encrypt — use HummusJS or qpdf shell-out.
   // Here we shell out to qpdf:
@@ -2358,12 +2924,21 @@ export async function pdfWithPassword(buf: Buffer, password: string): Promise<Bu
   const out = `${path}.enc.pdf`;
   await new Promise((resolve, reject) => {
     const child = require('child_process').spawn('qpdf', [
-      '--encrypt', password, password, '256', '--', path, out,
+      '--encrypt',
+      password,
+      password,
+      '256',
+      '--',
+      path,
+      out,
     ]);
-    child.on('exit', (c: number) => c === 0 ? resolve(null) : reject(new Error('qpdf failed')));
+    child.on('exit', (c: number) =>
+      c === 0 ? resolve(null) : reject(new Error('qpdf failed')),
+    );
   });
   const result = await fs.readFile(out);
-  await fs.unlink(path); await fs.unlink(out);
+  await fs.unlink(path);
+  await fs.unlink(out);
   return result;
 }
 ```
@@ -2411,27 +2986,46 @@ export default async function signEmbed(req: Request, res: Response) {
   // Requires API token with scope 'embed:sign'
   if (!res.locals.scopes?.includes('embed:sign'))
     return sendResponse(res, false, 403, 'insufficient scope');
-  const { targetType, targetId, externalUserId, permissions, attrs, ttlSecs } = req.body;
-  const token = jwt.sign({
-    sub: externalUserId,
-    org: res.locals.orgData.id,
-    target: { type: targetType, id: targetId },
-    perms: permissions,
-    attrs: attrs || {},
-  }, process.env.EMBED_SIGNING_SECRET!, { algorithm: 'HS256', expiresIn: ttlSecs || 3600 });
-  return sendResponse(res, true, CODE.SUCCESS, 'ok', { token, expiresIn: ttlSecs || 3600 });
+  const { targetType, targetId, externalUserId, permissions, attrs, ttlSecs } =
+    req.body;
+  const token = jwt.sign(
+    {
+      sub: externalUserId,
+      org: res.locals.orgData.id,
+      target: { type: targetType, id: targetId },
+      perms: permissions,
+      attrs: attrs || {},
+    },
+    process.env.EMBED_SIGNING_SECRET!,
+    { algorithm: 'HS256', expiresIn: ttlSecs || 3600 },
+  );
+  return sendResponse(res, true, CODE.SUCCESS, 'ok', {
+    token,
+    expiresIn: ttlSecs || 3600,
+  });
 }
 ```
 
 ```ts
 // src/modules/embed/middleware/embedGuard.ts
-export default function embedGuard(req: Request, res: Response, next: NextFunction) {
-  const token = (req.query.token as string) || (req.headers['x-embed-token'] as string);
+export default function embedGuard(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
+  const token =
+    (req.query.token as string) || (req.headers['x-embed-token'] as string);
   if (!token) return sendResponse(res, false, 401, 'embed token required');
   let payload: any;
-  try { payload = jwt.verify(token, process.env.EMBED_SIGNING_SECRET!); }
-  catch (e) { return sendResponse(res, false, 401, 'invalid embed token'); }
-  if (payload.target.type !== req.params.type || payload.target.id !== req.params.id)
+  try {
+    payload = jwt.verify(token, process.env.EMBED_SIGNING_SECRET!);
+  } catch (e) {
+    return sendResponse(res, false, 401, 'invalid embed token');
+  }
+  if (
+    payload.target.type !== req.params.type ||
+    payload.target.id !== req.params.id
+  )
     return sendResponse(res, false, 403, 'token-target mismatch');
   res.locals.embedCtx = {
     organisationId: payload.org,
@@ -2526,7 +3120,10 @@ import nodemailer from 'nodemailer';
 import { Templates } from './templates';
 
 export interface SendOpts {
-  to: string[]; subject: string; html: string; text?: string;
+  to: string[];
+  subject: string;
+  html: string;
+  text?: string;
   attachments?: { filename: string; content: Buffer; contentType?: string }[];
   headers?: Record<string, string>;
 }
@@ -2543,9 +3140,23 @@ class EmailService {
   async send(opts: SendOpts) {
     return this.transporter.sendMail({ from: process.env.SMTP_FROM!, ...opts });
   }
-  async sendTemplated(opts: { to: string[]; template: string; data: any; attachments?: any[] }) {
-    const { subject, html, text } = await this.templates.render(opts.template, opts.data);
-    return this.send({ to: opts.to, subject, html, text, attachments: opts.attachments });
+  async sendTemplated(opts: {
+    to: string[];
+    template: string;
+    data: any;
+    attachments?: any[];
+  }) {
+    const { subject, html, text } = await this.templates.render(
+      opts.template,
+      opts.data,
+    );
+    return this.send({
+      to: opts.to,
+      subject,
+      html,
+      text,
+      attachments: opts.attachments,
+    });
   }
 }
 export const emailService = new EmailService();
@@ -2555,7 +3166,11 @@ export const emailService = new EmailService();
 
 ```ts
 // src/modules/subscriptions/jobs/runSubscription.ts
-import { renderDashboardPdf, renderDashboardPng, renderDashboardXlsx } from '../../dashboards/services/dashboardExport.service';
+import {
+  renderDashboardPdf,
+  renderDashboardPng,
+  renderDashboardXlsx,
+} from '../../dashboards/services/dashboardExport.service';
 import { signServiceToken } from '../../../shared/services/serviceToken';
 
 export default async function runSubscription(id: string) {
@@ -2564,20 +3179,35 @@ export default async function runSubscription(id: string) {
   if (sub.snoozedUntil && sub.snoozedUntil > new Date()) return;
 
   const t0 = Date.now();
-  let status: 'ok'|'failed' = 'ok'; let err: string | null = null;
+  let status: 'ok' | 'failed' = 'ok';
+  let err: string | null = null;
   let bytes = 0;
   try {
     const token = await signServiceToken(sub.organisationId);
     let attachment;
     switch (sub.format) {
       case 'pdf':
-        attachment = { filename: 'dashboard.pdf', content: await renderDashboardPdf(sub.targetId, { serviceToken: token, filters: sub.filterState as any }) };
+        attachment = {
+          filename: 'dashboard.pdf',
+          content: await renderDashboardPdf(sub.targetId, {
+            serviceToken: token,
+            filters: sub.filterState as any,
+          }),
+        };
         break;
       case 'png':
-        attachment = { filename: 'dashboard.png', content: await renderDashboardPng(sub.targetId, { serviceToken: token }) };
+        attachment = {
+          filename: 'dashboard.png',
+          content: await renderDashboardPng(sub.targetId, {
+            serviceToken: token,
+          }),
+        };
         break;
       case 'xlsx':
-        attachment = { filename: 'dashboard.xlsx', content: await renderDashboardXlsx(sub.targetId, token) };
+        attachment = {
+          filename: 'dashboard.xlsx',
+          content: await renderDashboardXlsx(sub.targetId, token),
+        };
         break;
     }
     bytes = attachment!.content.length;
@@ -2586,22 +3216,41 @@ export default async function runSubscription(id: string) {
       await emailService.sendTemplated({
         to: sub.recipients as string[],
         template: 'subscription',
-        data: { message: sub.includeMessage, dashboardName: (await Dashboard.findOne({ where: { id: sub.targetId } }))?.name },
+        data: {
+          message: sub.includeMessage,
+          dashboardName: (
+            await Dashboard.findOne({ where: { id: sub.targetId } })
+          )?.name,
+        },
         attachments: [attachment],
       });
     } else if (sub.channel === 'slack') {
-      await slackUpload(sub.recipients as string[], attachment!, sub.includeMessage);
+      await slackUpload(
+        sub.recipients as string[],
+        attachment!,
+        sub.includeMessage,
+      );
     } else if (sub.channel === 'webhook') {
       await webhookPost(sub.recipients as string[], attachment!, sub);
     }
   } catch (e) {
-    status = 'failed'; err = (e as Error).message;
+    status = 'failed';
+    err = (e as Error).message;
   }
-  await Subscription.update(sub.id, { lastRunAt: new Date(), lastStatus: status, nextRunAt: nextCron(sub.cron, sub.timezone) });
+  await Subscription.update(sub.id, {
+    lastRunAt: new Date(),
+    lastStatus: status,
+    nextRunAt: nextCron(sub.cron, sub.timezone),
+  });
   await DeliveryLog.insert({
-    sourceType: 'subscription', sourceId: sub.id, status,
-    channel: sub.channel, recipientsCount: (sub.recipients as string[]).length,
-    sizeBytes: bytes, durationMs: Date.now() - t0, error: err,
+    sourceType: 'subscription',
+    sourceId: sub.id,
+    status,
+    channel: sub.channel,
+    recipientsCount: (sub.recipients as string[]).length,
+    sizeBytes: bytes,
+    durationMs: Date.now() - t0,
+    error: err,
   });
 }
 ```
@@ -2619,12 +3268,22 @@ export default async function checkAlert(id: string) {
   if (!a) return;
   if (a.snoozedUntil && a.snoozedUntil > new Date()) return;
   if (a.acknowledgedUntil && a.acknowledgedUntil > new Date()) return;
-  if (a.lastTriggeredAt && Date.now() - +a.lastTriggeredAt < a.cooldownMins * 60_000) return;
+  if (
+    a.lastTriggeredAt &&
+    Date.now() - +a.lastTriggeredAt < a.cooldownMins * 60_000
+  )
+    return;
 
   const dataset = await Dataset.findOne({ where: { id: a.datasetId } });
-  const cfg = await DatasourceConfigS.findOne({ where: { id: dataset.datasourceId } });
+  const cfg = await DatasourceConfigS.findOne({
+    where: { id: dataset.datasourceId },
+  });
   const pool = await acquire(cfg as any);
-  const sec = await new SecurityCompiler().apply(dataset.sql, dataset, serviceAccountCtx(a.organisationId));
+  const sec = await new SecurityCompiler().apply(
+    dataset.sql,
+    dataset,
+    serviceAccountCtx(a.organisationId),
+  );
   const { rows } = await pool.query(sec.sql, sec.bindings);
   const ctx = rows[0] || {};
   const expr = parser.parse(a.expression);
@@ -2653,7 +3312,9 @@ import { decrypt } from '../../../shared/utility/encryptDecrypt';
 const delays = [1, 5, 25, 125, 625];
 
 export default async function deliver({ subscriptionId, event }: any) {
-  const sub = await WebhookSubscription.findOne({ where: { id: subscriptionId, status: 1 } });
+  const sub = await WebhookSubscription.findOne({
+    where: { id: subscriptionId, status: 1 },
+  });
   if (!sub) return;
   const secret = decrypt(sub.secretEnc, sub.organisationId);
   const body = JSON.stringify({ event });
@@ -2674,14 +3335,22 @@ export default async function deliver({ subscriptionId, event }: any) {
         body,
       });
       await DeliveryLog.insert({
-        sourceType: 'webhook', sourceId: sub.id, status: res.ok ? 'ok' : 'failed',
-        channel: 'webhook', recipientsCount: 1, attemptNo: attempt,
+        sourceType: 'webhook',
+        sourceId: sub.id,
+        status: res.ok ? 'ok' : 'failed',
+        channel: 'webhook',
+        recipientsCount: 1,
+        attemptNo: attempt,
       });
       if (res.ok) return;
     } catch (e) {
       await DeliveryLog.insert({
-        sourceType: 'webhook', sourceId: sub.id, status: 'failed',
-        channel: 'webhook', recipientsCount: 1, attemptNo: attempt,
+        sourceType: 'webhook',
+        sourceId: sub.id,
+        status: 'failed',
+        channel: 'webhook',
+        recipientsCount: 1,
+        attemptNo: attempt,
         error: (e as Error).message,
       });
     }
@@ -2723,17 +3392,23 @@ export class PushSubscription {
 ```ts
 // src/modules/notifications/services/notify.service.ts
 export async function notify(opts: {
-  userId: string; category: string; payload: any; bundleKey?: string; url?: string;
+  userId: string;
+  category: string;
+  payload: any;
+  bundleKey?: string;
+  url?: string;
 }) {
   const prefs = await NotificationPreference.findOne({
     where: { userId: opts.userId, category: opts.category },
   });
   const inApp = prefs?.inApp ?? true;
   const email = prefs?.email ?? false;
-  const push  = prefs?.push  ?? false;
+  const push = prefs?.push ?? false;
 
   // DND check
-  const dnd = await UserDnd.findOne({ where: { userId: opts.userId, enabled: true } });
+  const dnd = await UserDnd.findOne({
+    where: { userId: opts.userId, enabled: true },
+  });
   if (dnd && inDndWindow(dnd)) {
     // Queue for later — leave inApp delivery happen; queue email + push.
   }
@@ -2742,7 +3417,11 @@ export async function notify(opts: {
     if (opts.bundleKey) {
       // Try to merge with an existing unread notification of same bundle key in last 5 min.
       const recent = await Notification.findOne({
-        where: { userId: opts.userId, bundleKey: opts.bundleKey, readAt: IsNull() },
+        where: {
+          userId: opts.userId,
+          bundleKey: opts.bundleKey,
+          readAt: IsNull(),
+        },
         order: { createdOn: 'DESC' },
       });
       if (recent && Date.now() - +recent.createdOn < 5 * 60_000) {
@@ -2753,15 +3432,36 @@ export async function notify(opts: {
         return;
       }
     }
-    await Notification.insert({ userId: opts.userId, category: opts.category, payload: opts.payload, url: opts.url, bundleKey: opts.bundleKey });
+    await Notification.insert({
+      userId: opts.userId,
+      category: opts.category,
+      payload: opts.payload,
+      url: opts.url,
+      bundleKey: opts.bundleKey,
+    });
     sse.publish(opts.userId, { kind: 'notification', ...opts });
   }
-  if (email) emailService.sendTemplated({ to: [(await User.findOne({ where: { id: opts.userId } }))!.email], template: opts.category, data: opts.payload }).catch(() => {});
+  if (email)
+    emailService
+      .sendTemplated({
+        to: [(await User.findOne({ where: { id: opts.userId } }))!.email],
+        template: opts.category,
+        data: opts.payload,
+      })
+      .catch(() => {});
   if (push) {
-    const subs = await PushSubscription.find({ where: { userId: opts.userId } });
+    const subs = await PushSubscription.find({
+      where: { userId: opts.userId },
+    });
     for (const s of subs) {
-      try { await webpush.sendNotification({ endpoint: s.endpoint, keys: s.keys }, JSON.stringify(opts.payload)); }
-      catch (e) { if ((e as any).statusCode === 410) await PushSubscription.delete(s.id); }
+      try {
+        await webpush.sendNotification(
+          { endpoint: s.endpoint, keys: s.keys },
+          JSON.stringify(opts.payload),
+        );
+      } catch (e) {
+        if ((e as any).statusCode === 410) await PushSubscription.delete(s.id);
+      }
     }
   }
 }
@@ -2801,14 +3501,23 @@ CREATE TRIGGER dashboard_search_update BEFORE INSERT OR UPDATE ON dashboard
 export default async function search(req: Request, res: Response) {
   const { orgData } = res.locals;
   const q = (req.query.q as string)?.trim() ?? '';
-  const types = (req.query.types as string)?.split(',') ?? ['dashboards','analyses','datasets','users'];
+  const types = (req.query.types as string)?.split(',') ?? [
+    'dashboards',
+    'analyses',
+    'datasets',
+    'users',
+  ];
   if (!q) return sendResponse(res, true, CODE.SUCCESS, 'ok', { results: [] });
 
-  const tsq = q.split(/\s+/).map(w => `${w}:*`).join(' & ');
+  const tsq = q
+    .split(/\s+/)
+    .map(w => `${w}:*`)
+    .join(' & ');
   const out: Record<string, any[]> = {};
 
   if (types.includes('dashboards')) {
-    out.dashboards = await master_db_connection.query(`
+    out.dashboards = await master_db_connection.query(
+      `
       SELECT id, name, description,
              ts_rank(search_doc, to_tsquery('english', $1)) AS rank,
              similarity(name, $2) AS sim
@@ -2817,7 +3526,8 @@ export default async function search(req: Request, res: Response) {
         AND (search_doc @@ to_tsquery('english', $1) OR name % $2)
       ORDER BY (ts_rank(search_doc, to_tsquery('english', $1)) + similarity(name, $2)) DESC
       LIMIT 10`,
-      [tsq, q, orgData.id]);
+      [tsq, q, orgData.id],
+    );
   }
   // ... same for analyses, datasets, users
   return sendResponse(res, true, CODE.SUCCESS, 'ok', out);
@@ -2842,10 +3552,13 @@ ALTER TABLE audit_log
 async function chained(payload: any) {
   const prev = await master_db_connection.query(
     'SELECT row_hash FROM audit_log WHERE organisation_id = $1 ORDER BY occurred_at DESC LIMIT 1',
-    [payload.organisationId]);
+    [payload.organisationId],
+  );
   const prevHash = prev[0]?.row_hash ?? '';
-  const rowHash = crypto.createHash('sha256')
-    .update(prevHash + JSON.stringify(payload)).digest('hex');
+  const rowHash = crypto
+    .createHash('sha256')
+    .update(prevHash + JSON.stringify(payload))
+    .digest('hex');
   return { prevHash, rowHash };
 }
 ```
@@ -2864,7 +3577,9 @@ export function startTelemetry() {
     resource: new Resource({
       [SemanticResourceAttributes.SERVICE_NAME]: 'dbexec-api',
     }),
-    traceExporter: new OTLPTraceExporter({ url: process.env.OTEL_EXPORTER_OTLP_ENDPOINT }),
+    traceExporter: new OTLPTraceExporter({
+      url: process.env.OTEL_EXPORTER_OTLP_ENDPOINT,
+    }),
     instrumentations: [],
   });
   sdk.start();
@@ -2875,7 +3590,8 @@ Wrap every controller with `tracer.startActiveSpan`. Use middleware:
 
 ```ts
 app.use((req, res, next) => {
-  const cid = req.headers['x-correlation-id'] as string ?? crypto.randomUUID();
+  const cid =
+    (req.headers['x-correlation-id'] as string) ?? crypto.randomUUID();
   res.setHeader('x-correlation-id', cid);
   res.locals.correlationId = cid;
   next();
@@ -2896,8 +3612,12 @@ router.get('/healthz/ready', async (_, res) => {
   res.status(ok ? 200 : 503).json({
     ok,
     checks: ['db', 'redis', 'email'].map((n, i) => ({
-      name: n, status: checks[i].status,
-      reason: checks[i].status === 'rejected' ? String((checks[i] as any).reason) : null,
+      name: n,
+      status: checks[i].status,
+      reason:
+        checks[i].status === 'rejected'
+          ? String((checks[i] as any).reason)
+          : null,
     })),
   });
 });
@@ -2911,18 +3631,29 @@ router.get('/healthz/ready', async (_, res) => {
 
 ```ts
 // src/openapi/build.ts
-import { OpenApiGeneratorV3, OpenAPIRegistry, extendZodWithOpenApi } from '@asteasolutions/zod-to-openapi';
+import {
+  OpenApiGeneratorV3,
+  OpenAPIRegistry,
+  extendZodWithOpenApi,
+} from '@asteasolutions/zod-to-openapi';
 import { z } from 'zod';
 extendZodWithOpenApi(z);
 
 const registry = new OpenAPIRegistry();
 
 // register every Zod schema with .openapi() metadata
-import { datasourceSchema, datasourceUpdateSchema } from '../shared/validators/datasources';
-registry.register('Datasource', datasourceSchema.openapi({ title: 'Datasource' }));
+import {
+  datasourceSchema,
+  datasourceUpdateSchema,
+} from '../shared/validators/datasources';
+registry.register(
+  'Datasource',
+  datasourceSchema.openapi({ title: 'Datasource' }),
+);
 
 registry.registerPath({
-  method: 'post', path: '/api/public/v1/datasources',
+  method: 'post',
+  path: '/api/public/v1/datasources',
   summary: 'Create a datasource',
   tags: ['Datasources'],
   request: {
@@ -2933,7 +3664,10 @@ registry.registerPath({
     body: { content: { 'application/json': { schema: datasourceSchema } } },
   },
   responses: {
-    201: { description: 'Created', content: { 'application/json': { schema: datasourceSchema } } },
+    201: {
+      description: 'Created',
+      content: { 'application/json': { schema: datasourceSchema } },
+    },
     400: { description: 'Validation failed' },
     409: { description: 'Idempotency conflict' },
   },
@@ -2941,7 +3675,8 @@ registry.registerPath({
 
 const generator = new OpenApiGeneratorV3(registry.definitions);
 const spec = generator.generateDocument({
-  openapi: '3.0.0', info: { title: 'DBExec Public API', version: '1.0.0' },
+  openapi: '3.0.0',
+  info: { title: 'DBExec Public API', version: '1.0.0' },
   servers: [{ url: 'https://app.dbexec.com' }],
 });
 fs.writeFileSync('public-openapi.json', JSON.stringify(spec, null, 2));
@@ -2956,7 +3691,9 @@ app.get('/docs', (_, res) => {
     <script src="https://cdn.jsdelivr.net/npm/redoc@next/bundles/redoc.standalone.js"></script>
     </head><body><redoc spec-url="/openapi.json"></redoc></body></html>`);
 });
-app.get('/openapi.json', (_, res) => res.sendFile(path.resolve('public-openapi.json')));
+app.get('/openapi.json', (_, res) =>
+  res.sendFile(path.resolve('public-openapi.json')),
+);
 ```
 
 ### 22.3 Public router
@@ -2964,17 +3701,17 @@ app.get('/openapi.json', (_, res) => res.sendFile(path.resolve('public-openapi.j
 ```ts
 // src/modules/public/public.router.ts
 const router = Router();
-router.use(apiToken);                          // bearer dbe_…
-router.use(idempotency({ ttlHours: 24 }));     // Idempotency-Key
+router.use(apiToken); // bearer dbe_…
+router.use(idempotency({ ttlHours: 24 })); // Idempotency-Key
 router.use(rateLimit({ windowSecs: 60, limit: 100 }));
 
 // Mount sanitised public-facing controllers
-router.post('/datasources', /* zodValidate, controller */);
-router.get('/datasources/list', /* ... */);
-router.post('/datasets/preview', /* ... */);
-router.post('/semantic/query', /* ... */);
-router.post('/exports/dataset/:id/csv', /* ... */);
-router.post('/embed/sign', /* requires embed:sign scope */);
+router.post('/datasources' /* zodValidate, controller */);
+router.get('/datasources/list' /* ... */);
+router.post('/datasets/preview' /* ... */);
+router.post('/semantic/query' /* ... */);
+router.post('/exports/dataset/:id/csv' /* ... */);
+router.post('/embed/sign' /* requires embed:sign scope */);
 // ...
 
 export default router;
@@ -2997,20 +3734,45 @@ app.use('/api/public/v1', publicRouter);
 export default async function backupOrg(orgId: string) {
   const conn = await openOrgConnection(orgId);
   const out: Record<string, any[]> = {};
-  for (const t of ['user','role','group','datasource','dataset','analyses','dashboard','rls_rule','semantic_model','sem_dimension','sem_metric','subscription','alert']) {
+  for (const t of [
+    'user',
+    'role',
+    'group',
+    'datasource',
+    'dataset',
+    'analyses',
+    'dashboard',
+    'rls_rule',
+    'semantic_model',
+    'sem_dimension',
+    'sem_metric',
+    'subscription',
+    'alert',
+  ]) {
     out[t] = await conn.query(`SELECT * FROM "${t}"`);
   }
-  const json = JSON.stringify({ version: 1, generatedAt: new Date().toISOString(), org: orgId, tables: out });
+  const json = JSON.stringify({
+    version: 1,
+    generatedAt: new Date().toISOString(),
+    org: orgId,
+    tables: out,
+  });
   const buf = await pipe(gzip(Buffer.from(json)));
   // Optional KMS encryption
   const enc = await kmsEncrypt(buf);
   const key = `backup/${orgId}/${Date.now()}.json.gz`;
-  await s3.upload({ Bucket: process.env.BACKUP_BUCKET, Key: key, Body: enc }).promise();
+  await s3
+    .upload({ Bucket: process.env.BACKUP_BUCKET, Key: key, Body: enc })
+    .promise();
   const checksum = crypto.createHash('sha256').update(buf).digest('hex');
   await BackupArtifact.insert({
-    organisationId: orgId, kind: 'full', locationUri: `s3://${process.env.BACKUP_BUCKET}/${key}`,
-    sizeBytes: enc.length, checksumSha256: checksum,
-    encryptedBy: 'kms', createdAt: new Date(),
+    organisationId: orgId,
+    kind: 'full',
+    locationUri: `s3://${process.env.BACKUP_BUCKET}/${key}`,
+    sizeBytes: enc.length,
+    checksumSha256: checksum,
+    encryptedBy: 'kms',
+    createdAt: new Date(),
   });
 }
 ```
@@ -3018,10 +3780,21 @@ export default async function backupOrg(orgId: string) {
 ### 24.2 Restore
 
 ```ts
-export default async function restoreOrg(orgId: string, backupId: string, opts: { selective?: string[]; dryRun?: boolean }) {
-  const artifact = await BackupArtifact.findOne({ where: { id: backupId, organisationId: orgId } });
+export default async function restoreOrg(
+  orgId: string,
+  backupId: string,
+  opts: { selective?: string[]; dryRun?: boolean },
+) {
+  const artifact = await BackupArtifact.findOne({
+    where: { id: backupId, organisationId: orgId },
+  });
   if (!artifact) throw new NotFound();
-  const enc = await s3.getObject({ Bucket: bucket(artifact.locationUri), Key: keyOf(artifact.locationUri) }).promise();
+  const enc = await s3
+    .getObject({
+      Bucket: bucket(artifact.locationUri),
+      Key: keyOf(artifact.locationUri),
+    })
+    .promise();
   const buf = await kmsDecrypt(enc.Body as Buffer);
   const json = JSON.parse((await pipe(gunzip(buf))).toString('utf8'));
 
@@ -3033,14 +3806,23 @@ export default async function restoreOrg(orgId: string, backupId: string, opts: 
   const conn = await openOrgConnection(orgId);
   await conn.query('BEGIN');
   try {
-    const tables = opts.selective?.length ? opts.selective : Object.keys(json.tables);
+    const tables = opts.selective?.length
+      ? opts.selective
+      : Object.keys(json.tables);
     for (const t of tables) {
       for (const row of json.tables[t]) {
         // upsert by id
-        const cols = Object.keys(row); const vals = cols.map(c => row[c]);
+        const cols = Object.keys(row);
+        const vals = cols.map(c => row[c]);
         const params = cols.map((_, i) => `$${i + 1}`).join(', ');
-        const updates = cols.filter(c => c !== 'id').map(c => `"${c}"=EXCLUDED."${c}"`).join(', ');
-        await conn.query(`INSERT INTO "${t}" (${cols.map(c => `"${c}"`).join(',')}) VALUES (${params}) ON CONFLICT (id) DO UPDATE SET ${updates}`, vals);
+        const updates = cols
+          .filter(c => c !== 'id')
+          .map(c => `"${c}"=EXCLUDED."${c}"`)
+          .join(', ');
+        await conn.query(
+          `INSERT INTO "${t}" (${cols.map(c => `"${c}"`).join(',')}) VALUES (${params}) ON CONFLICT (id) DO UPDATE SET ${updates}`,
+          vals,
+        );
       }
     }
     await conn.query('COMMIT');
@@ -3060,14 +3842,22 @@ export default async function erasure(userId: string, orgId: string) {
   await conn.query('BEGIN');
   try {
     // Anonymise references in audit logs (keep the action, lose the identity)
-    await conn.query(`UPDATE audit_log SET user_id = NULL, summary = REGEXP_REPLACE(summary, '<<USER:${userId}>>', '[ERASED]') WHERE user_id = $1`, [userId]);
+    await conn.query(
+      `UPDATE audit_log SET user_id = NULL, summary = REGEXP_REPLACE(summary, '<<USER:${userId}>>', '[ERASED]') WHERE user_id = $1`,
+      [userId],
+    );
     // Cascade-delete notifications, favourites, sessions
     await conn.query('DELETE FROM notification WHERE user_id = $1', [userId]);
     await conn.query('DELETE FROM favourite WHERE user_id = $1', [userId]);
-    await conn.query('UPDATE user_session SET revoked_at = now(), revoked_reason = $1 WHERE user_id = $2', ['erasure', userId]);
+    await conn.query(
+      'UPDATE user_session SET revoked_at = now(), revoked_reason = $1 WHERE user_id = $2',
+      ['erasure', userId],
+    );
     // Replace PII fields on the user record
-    await conn.query(`UPDATE "user" SET email = $1, first_name = '[erased]', last_name = '', username = $2, status = 0 WHERE id = $3`,
-      [`erased-${userId}@dbexec.invalid`, `erased-${userId}`, userId]);
+    await conn.query(
+      `UPDATE "user" SET email = $1, first_name = '[erased]', last_name = '', username = $2, status = 0 WHERE id = $3`,
+      [`erased-${userId}@dbexec.invalid`, `erased-${userId}`, userId],
+    );
     await conn.query('COMMIT');
   } catch (e) {
     await conn.query('ROLLBACK');
@@ -3087,7 +3877,12 @@ export default async function erasure(userId: string, orgId: string) {
 import { OpenAI } from 'openai';
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
-export async function answerNL(orgId: string, userId: string, prompt: string, sessionId?: string) {
+export async function answerNL(
+  orgId: string,
+  userId: string,
+  prompt: string,
+  sessionId?: string,
+) {
   // 1. Sanitise schema (drop PII column names + sample values).
   const models = await listSemanticModels(orgId);
   const schema = sanitiseSchemaForLLM(models);
@@ -3099,7 +3894,7 @@ export async function answerNL(orgId: string, userId: string, prompt: string, se
       function: {
         name: 'execute_semantic_query',
         description: 'Run a semantic query against a model',
-        parameters: { /* JSON schema for SemanticQueryRequest */ },
+        parameters: {/* JSON schema for SemanticQueryRequest */},
       },
     },
   ];
@@ -3110,11 +3905,17 @@ export async function answerNL(orgId: string, userId: string, prompt: string, se
     : await AiSession.save({ organisationId: orgId, userId });
 
   // 4. Pull conversation history
-  const history = await AiTurn.find({ where: { sessionId: session.id }, order: { createdAt: 'ASC' } });
+  const history = await AiTurn.find({
+    where: { sessionId: session.id },
+    order: { createdAt: 'ASC' },
+  });
 
   // 5. Call LLM
   const messages = [
-    { role: 'system' as const, content: `You are a data analyst assistant. Available models:\n${JSON.stringify(schema)}` },
+    {
+      role: 'system' as const,
+      content: `You are a data analyst assistant. Available models:\n${JSON.stringify(schema)}`,
+    },
     ...history.map(t => ({ role: t.role as any, content: t.content || '' })),
     { role: 'user' as const, content: prompt },
   ];
@@ -3134,22 +3935,39 @@ export async function answerNL(orgId: string, userId: string, prompt: string, se
     const args = JSON.parse(call.function.arguments);
     const rows = await runSemanticQuery(args, { userId, orgId });
     await AiTurn.save({
-      sessionId: session.id, role: 'tool',
+      sessionId: session.id,
+      role: 'tool',
       content: JSON.stringify({ args, rows: rows.slice(0, 5) }),
-      toolCalls: { name: call.function.name, args }, tokensIn: response.usage?.prompt_tokens, tokensOut: response.usage?.completion_tokens,
+      toolCalls: { name: call.function.name, args },
+      tokensIn: response.usage?.prompt_tokens,
+      tokensOut: response.usage?.completion_tokens,
     });
-    return { sessionId: session.id, query: args, rows, visualSuggestion: suggestVisual(args, rows) };
+    return {
+      sessionId: session.id,
+      query: args,
+      rows,
+      visualSuggestion: suggestVisual(args, rows),
+    };
   }
   // Plain text response
-  await AiTurn.save({ sessionId: session.id, role: 'assistant', content: choice.message.content || '' });
+  await AiTurn.save({
+    sessionId: session.id,
+    role: 'assistant',
+    content: choice.message.content || '',
+  });
   return { sessionId: session.id, text: choice.message.content };
 }
 
 function sanitiseSchemaForLLM(models: any[]) {
   return models.map(m => ({
-    id: m.id, name: m.name,
-    dimensions: m.dimensions.filter((d: any) => !d.isPii).map((d: any) => ({ name: d.name, type: d.type, label: d.label })),
-    metrics: m.metrics.filter((mm: any) => !mm.hidden).map((mm: any) => ({ name: mm.name, kind: mm.kind, label: mm.label })),
+    id: m.id,
+    name: m.name,
+    dimensions: m.dimensions
+      .filter((d: any) => !d.isPii)
+      .map((d: any) => ({ name: d.name, type: d.type, label: d.label })),
+    metrics: m.metrics
+      .filter((mm: any) => !mm.hidden)
+      .map((mm: any) => ({ name: mm.name, kind: mm.kind, label: mm.label })),
   }));
 }
 
@@ -3167,10 +3985,19 @@ function suggestVisual(req: any, rows: any[]) {
 ### 27.1 BigQuery dry-run
 
 ```ts
-async function estimateBigqueryBytes(sql: string, cfg: DatasourceConfig): Promise<number> {
-  const sa = JSON.parse(decrypt(cfg.serviceAccountJsonEnc!, cfg.organisationId));
+async function estimateBigqueryBytes(
+  sql: string,
+  cfg: DatasourceConfig,
+): Promise<number> {
+  const sa = JSON.parse(
+    decrypt(cfg.serviceAccountJsonEnc!, cfg.organisationId),
+  );
   const bq = new BigQuery({ projectId: sa.project_id, credentials: sa });
-  const [job] = await bq.createQueryJob({ query: sql, dryRun: true, useLegacySql: false });
+  const [job] = await bq.createQueryJob({
+    query: sql,
+    dryRun: true,
+    useLegacySql: false,
+  });
   return Number(job.metadata.statistics.totalBytesProcessed);
 }
 ```
@@ -3191,10 +4018,14 @@ Wrap every pool.query in semantic compiler path with:
 ```ts
 async function enforceBudget(orgId: string, dsId: string, estBytes: number) {
   const usage = await sumCostsThisPeriod(orgId, dsId);
-  const limits = await Budget.find({ where: { organisationId: orgId, scope: In(['org','datasource']) }, });
+  const limits = await Budget.find({
+    where: { organisationId: orgId, scope: In(['org', 'datasource']) },
+  });
   for (const l of limits) {
-    if ((l.scope === 'org' || (l.scope === 'datasource' && l.scopeId === dsId)) &&
-        usage + estBytes > l.limitBytes!) {
+    if (
+      (l.scope === 'org' || (l.scope === 'datasource' && l.scopeId === dsId)) &&
+      usage + estBytes > l.limitBytes!
+    ) {
       if (l.hardLimit) throw new BadRequest('Budget exceeded; query blocked.');
       if (l.autoPause) await pauseSnowflakeWarehouse(/* cfg */);
       notifyAdmin(orgId, 'budget exceeded');
@@ -3225,10 +4056,16 @@ export default async function verifyBackup(id: string) {
     for (const [t, rows] of Object.entries(json.tables)) {
       totalRows += (rows as any[]).length;
     }
-    await BackupArtifact.update(id, { verifiedAt: new Date(), verifiedOk: true });
+    await BackupArtifact.update(id, {
+      verifiedAt: new Date(),
+      verifiedOk: true,
+    });
     await dropSandbox(sandbox);
   } catch (e) {
-    await BackupArtifact.update(id, { verifiedAt: new Date(), verifiedOk: false });
+    await BackupArtifact.update(id, {
+      verifiedAt: new Date(),
+      verifiedOk: false,
+    });
   }
 }
 ```

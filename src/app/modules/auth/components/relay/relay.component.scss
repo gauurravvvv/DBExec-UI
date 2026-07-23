@@ -97,10 +97,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: rgba(
-    var(--primary-color-rgb, 33, 150, 243),
-    0.12
-  );
+  background: rgba(var(--primary-color-rgb, 33, 150, 243), 0.12);
   color: var(--primary-color);
   font-weight: var(--fw-semibold, 600);
   font-size: 16px;
@@ -239,7 +236,9 @@
   font-size: var(--fs-body, 14px);
   font-weight: var(--fw-medium, 500);
   cursor: pointer;
-  transition: background 160ms ease-out, border-color 160ms ease-out;
+  transition:
+    background 160ms ease-out,
+    border-color 160ms ease-out;
 
   &:hover {
     background: var(--surface-subtle, rgba(0, 0, 0, 0.04));

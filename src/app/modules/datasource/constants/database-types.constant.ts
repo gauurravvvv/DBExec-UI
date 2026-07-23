@@ -9,12 +9,7 @@
  * so there's no remote dependency at render time.
  */
 export type DatabaseTypeValue =
-  | 'postgres'
-  | 'mysql'
-  | 'mariadb'
-  | 'mssql'
-  | 'oracle'
-  | 'snowflake';
+  'postgres' | 'mysql' | 'mariadb' | 'mssql' | 'oracle' | 'snowflake';
 
 export interface DatabaseTypeOption {
   value: DatabaseTypeValue;

@@ -2,18 +2,16 @@
   [isOpen]="isOpen()"
   [showInput]="false"
   [title]="'HEADER.NOTIFICATIONS' | translate"
-  [headerActionLabel]="hasNotifications && hasUnread ? ('HEADER.MARK_ALL_READ' | translate) : null"
+  [headerActionLabel]="
+    hasNotifications && hasUnread ? ('HEADER.MARK_ALL_READ' | translate) : null
+  "
   (headerAction)="onMarkAllRead()"
   (closed)="close()"
 >
   <ng-container *ngIf="hasNotifications; else emptyState">
     <!-- Actions toolbar — Clear removes all READ rows. -->
     <div class="notification-toolbar" *ngIf="hasRead">
-      <button
-        type="button"
-        class="notification-clear"
-        (click)="onClear()"
-      >
+      <button type="button" class="notification-clear" (click)="onClear()">
         <i class="pi pi-trash" aria-hidden="true"></i>
         {{ 'HEADER.CLEAR' | translate }}
       </button>
@@ -32,7 +30,9 @@
           <div
             class="notification-icon"
             [style.color]="accentFor(n.type)"
-            [style.background]="'color-mix(in srgb, ' + accentFor(n.type) + ' 12%, transparent)'"
+            [style.background]="
+              'color-mix(in srgb, ' + accentFor(n.type) + ' 12%, transparent)'
+            "
           >
             <i class="pi" [ngClass]="iconFor(n.type)" aria-hidden="true"></i>
           </div>
@@ -73,7 +73,9 @@
         <i class="pi pi-check-circle" aria-hidden="true"></i>
       </div>
       <p class="empty-state-title">{{ 'HEADER.ALL_CAUGHT_UP' | translate }}</p>
-      <p class="empty-state-hint">{{ 'NOTIFICATION.EMPTY_HINT' | translate }}</p>
+      <p class="empty-state-hint">
+        {{ 'NOTIFICATION.EMPTY_HINT' | translate }}
+      </p>
     </div>
   </ng-template>
 </app-command-modal>

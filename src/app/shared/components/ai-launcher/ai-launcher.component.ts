@@ -195,11 +195,7 @@ export class AiLauncherComponent implements OnInit {
   copySql(card: SqlCard): void {
     try {
       navigator.clipboard?.writeText(card.sql);
-      this.toast(
-        'success',
-        this.translate.instant('AI_WORKSPACE.COPIED'),
-        '',
-      );
+      this.toast('success', this.translate.instant('AI_WORKSPACE.COPIED'), '');
     } catch {
       /* clipboard unavailable */
     }
@@ -269,7 +265,7 @@ export class AiLauncherComponent implements OnInit {
   startEdit(card: ConfirmCard): void {
     const s = this.stateFor(card);
     const payload = (card.payload ?? {}) as Record<string, unknown>;
-    s.rows = Object.keys(payload).map((key) => {
+    s.rows = Object.keys(payload).map(key => {
       const v = payload[key];
       const simple =
         v === null ||

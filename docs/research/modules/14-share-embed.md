@@ -19,13 +19,13 @@
 
 ## 1. Industry baseline
 
-| Mode | Tableau | Looker | Metabase | Superset | Mode |
-|---|---|---|---|---|---|
-| **Internal share** | Permission-on-content | Folders + groups | Collections | Roles + datasets | Workspaces |
-| **Public link** | "Share to web" toggle | Public LookML scheduled exports | "Public link" with password | Public chart links | Public reports |
-| **Embed (anon)** | Tableau Embed API + JWT | Looker embed URL with signed token | Static iframe | iframe (chart only) | Reports embed iframe |
-| **Embed (authed)** | Connected Apps + JWT | Embed SDK + signed user | "Application Embedding" tier (paid) | Native filters via URL | Mode SDK |
-| **White-label** | Mostly Tableau Server | Looker Embed SDK | Metabase white-label paid | Custom theme | Mode white-label |
+| Mode               | Tableau                 | Looker                             | Metabase                            | Superset               | Mode                 |
+| ------------------ | ----------------------- | ---------------------------------- | ----------------------------------- | ---------------------- | -------------------- |
+| **Internal share** | Permission-on-content   | Folders + groups                   | Collections                         | Roles + datasets       | Workspaces           |
+| **Public link**    | "Share to web" toggle   | Public LookML scheduled exports    | "Public link" with password         | Public chart links     | Public reports       |
+| **Embed (anon)**   | Tableau Embed API + JWT | Looker embed URL with signed token | Static iframe                       | iframe (chart only)    | Reports embed iframe |
+| **Embed (authed)** | Connected Apps + JWT    | Embed SDK + signed user            | "Application Embedding" tier (paid) | Native filters via URL | Mode SDK             |
+| **White-label**    | Mostly Tableau Server   | Looker Embed SDK                   | Metabase white-label paid           | Custom theme           | Mode white-label     |
 
 **The patterns to copy:**
 
@@ -57,26 +57,26 @@ theme).
 
 ## 3. Gap matrix
 
-| ID | Gap | Severity | Effort |
-|---|---|---|---|
-| SH-G01 | Internal share (org user / group with view/edit perm) | P0 | M |
-| SH-G02 | Public link (no auth, optional password, optional expiry) | P0 | M |
-| SH-G03 | Signed JWT embed for customer apps | P0 | L |
-| SH-G04 | `frame-ancestors` CSP per link | P0 | S |
-| SH-G05 | Per-link visible visuals (whitelist a subset) | P1 | M |
-| SH-G06 | Per-link theme override (light/dark/custom) | P1 | S |
-| SH-G07 | Per-link disabled chrome (hide title, filters) | P1 | S |
-| SH-G08 | Per-link RLS user-attribute injection | P0 | M |
-| SH-G09 | Audit log per view (IP, UA, geo, duration) | P0 | M |
-| SH-G10 | Per-link max-views-per-hour rate limit | P1 | S |
-| SH-G11 | Captcha gate on public link (abuse mitigation) | P1 | M |
-| SH-G12 | postMessage protocol (host ↔ iframe events) | P1 | M |
-| SH-G13 | Embed SDK npm package (`@dbexec/embed`) | P1 | M |
-| SH-G14 | Embed analytics dashboard (views, users, top dashboards) | P2 | M |
-| SH-G15 | "Refresh" button hidden in embed mode by default | P2 | S |
-| SH-G16 | Org-level "max active embeds" billing limit | P2 | S |
-| SH-G17 | Per-link revocation + force-disconnect open sessions | P1 | S |
-| SH-G18 | Share-link rename without invalidating the link | P2 | S |
+| ID     | Gap                                                       | Severity | Effort |
+| ------ | --------------------------------------------------------- | -------- | ------ |
+| SH-G01 | Internal share (org user / group with view/edit perm)     | P0       | M      |
+| SH-G02 | Public link (no auth, optional password, optional expiry) | P0       | M      |
+| SH-G03 | Signed JWT embed for customer apps                        | P0       | L      |
+| SH-G04 | `frame-ancestors` CSP per link                            | P0       | S      |
+| SH-G05 | Per-link visible visuals (whitelist a subset)             | P1       | M      |
+| SH-G06 | Per-link theme override (light/dark/custom)               | P1       | S      |
+| SH-G07 | Per-link disabled chrome (hide title, filters)            | P1       | S      |
+| SH-G08 | Per-link RLS user-attribute injection                     | P0       | M      |
+| SH-G09 | Audit log per view (IP, UA, geo, duration)                | P0       | M      |
+| SH-G10 | Per-link max-views-per-hour rate limit                    | P1       | S      |
+| SH-G11 | Captcha gate on public link (abuse mitigation)            | P1       | M      |
+| SH-G12 | postMessage protocol (host ↔ iframe events)               | P1       | M      |
+| SH-G13 | Embed SDK npm package (`@dbexec/embed`)                   | P1       | M      |
+| SH-G14 | Embed analytics dashboard (views, users, top dashboards)  | P2       | M      |
+| SH-G15 | "Refresh" button hidden in embed mode by default          | P2       | S      |
+| SH-G16 | Org-level "max active embeds" billing limit               | P2       | S      |
+| SH-G17 | Per-link revocation + force-disconnect open sessions      | P1       | S      |
+| SH-G18 | Share-link rename without invalidating the link           | P2       | S      |
 
 ## 4. Target architecture
 
@@ -97,7 +97,7 @@ theme).
 ```
 
 The same `share_link` table backs all three modes. Mode discriminates
-how the link is *invoked* (URL with token vs URL with short code vs
+how the link is _invoked_ (URL with token vs URL with short code vs
 JWT in header). The dashboard rendering pipeline doesn't care which.
 
 ### 4.2 Schema
@@ -205,7 +205,7 @@ export class ShareLink {
   @Column('int', { nullable: true }) maxViews?: number;
   @Column('bigint', { default: 0 }) viewCount!: number;
 
-  @Column('text', { array: true, default: () => "ARRAY[]::text[]" })
+  @Column('text', { array: true, default: () => 'ARRAY[]::text[]' })
   allowedDomains!: string[];
 
   @Column('uuid', { array: true, nullable: true }) visibleVisuals?: string[];
@@ -222,7 +222,7 @@ export class ShareLink {
   @Column('uuid', { nullable: true }) defaultTabId?: string;
   @Column('jsonb', { nullable: true }) defaultFilters?: Record<string, unknown>;
 
-  @Column({ type: 'enum', enum: [0,1], default: 1 }) status!: number;
+  @Column({ type: 'enum', enum: [0, 1], default: 1 }) status!: number;
   @Column('uuid') createdBy!: string;
   @CreateDateColumn() createdOn!: Date;
   @Column('uuid', { nullable: true }) updatedBy?: string;
@@ -265,7 +265,7 @@ async function createInternalShare(req, res) {
   for (const grant of shareWith) {
     await DashboardPermission.upsert({
       dashboardId: targetId,
-      principalType: grant.kind,    // 'user'|'group'
+      principalType: grant.kind, // 'user'|'group'
       principalId: grant.id,
       permission: grant.permission,
     });
@@ -286,9 +286,19 @@ keeps the mental model coherent.)
 //                            password?, expiresAt?, allowedDomains? }
 
 async function createPublicShareLink(req, res) {
-  const { targetType, targetId, password, expiresAt, allowedDomains,
-          visibleVisuals, themeOverride, chrome, defaultTabId,
-          defaultFilters, maxViews } = req.body;
+  const {
+    targetType,
+    targetId,
+    password,
+    expiresAt,
+    allowedDomains,
+    visibleVisuals,
+    themeOverride,
+    chrome,
+    defaultTabId,
+    defaultFilters,
+    maxViews,
+  } = req.body;
   const { orgData, loggedInId } = res.locals;
 
   // Verify the target exists in this org.
@@ -299,7 +309,8 @@ async function createPublicShareLink(req, res) {
 
   const link = await ShareLink.save({
     organisationId: orgData.id,
-    targetType, targetId,
+    targetType,
+    targetId,
     mode: 'public',
     shortCode,
     passwordHash: password ? await bcrypt.hash(password, 10) : null,
@@ -307,21 +318,27 @@ async function createPublicShareLink(req, res) {
     maxViews: maxViews ?? null,
     allowedDomains: allowedDomains ?? [],
     visibleVisuals: visibleVisuals ?? null,
-    themeOverride, chrome,
-    defaultTabId, defaultFilters,
+    themeOverride,
+    chrome,
+    defaultTabId,
+    defaultFilters,
     createdBy: loggedInId,
   });
 
   // Audit + webhook
   await auditLogger.logAuditToOrg({
-    connection: master_db_connection, req, res,
-    module: AUDIT_MODULES.SHARE_LINK, action: AUDIT_ACTIONS.CREATE,
+    connection: master_db_connection,
+    req,
+    res,
+    module: AUDIT_MODULES.SHARE_LINK,
+    action: AUDIT_ACTIONS.CREATE,
     entityId: link.id,
     metadata: { mode: 'public', targetType, targetId, hasPassword: !!password },
   });
 
   return sendResponse(res, true, CODE.SUCCESS, 'share.created', {
-    link, url: `${FE_URL}/share/${shortCode}`,
+    link,
+    url: `${FE_URL}/share/${shortCode}`,
   });
 }
 ```
@@ -381,7 +398,9 @@ export default function cspFrameAncestors(req, res, next) {
     return next();
   }
   const policy = shareLink.allowedDomains
-    .map(d => d.startsWith('https://') || d.startsWith('http://') ? d : `https://${d}`)
+    .map(d =>
+      d.startsWith('https://') || d.startsWith('http://') ? d : `https://${d}`,
+    )
     .join(' ');
   res.setHeader('Content-Security-Policy', `frame-ancestors ${policy}`);
   next();
@@ -449,13 +468,15 @@ crypto envelope as datasource passwords).
 import * as jwt from 'jsonwebtoken';
 
 export default async function verifyEmbedJwt(req, res, next) {
-  const token = req.headers['x-embed-token'] as string
-             ?? (req.query.token as string);
-  if (!token) return sendResponse(res, false, CODE.UNAUTHORIZED, 'embed.token.missing');
+  const token =
+    (req.headers['x-embed-token'] as string) ?? (req.query.token as string);
+  if (!token)
+    return sendResponse(res, false, CODE.UNAUTHORIZED, 'embed.token.missing');
 
   // Decode without verifying first, just to read the `iss` (app key).
   const decoded = jwt.decode(token, { complete: true }) as any;
-  if (!decoded?.payload?.iss) return sendResponse(res, false, 401, 'embed.token.malformed');
+  if (!decoded?.payload?.iss)
+    return sendResponse(res, false, 401, 'embed.token.malformed');
 
   const app = await EmbedApp.findOne({
     where: { appKey: decoded.payload.iss, status: 1 },
@@ -475,12 +496,23 @@ export default async function verifyEmbedJwt(req, res, next) {
   }
 
   // Replay protection: jti must not have been seen in the last hour.
-  const seen = await redis.set(`embed:jti:${payload.jti}`, '1', 'EX', 3600, 'NX');
-  if (seen === null) return sendResponse(res, false, 401, 'embed.token.replayed');
+  const seen = await redis.set(
+    `embed:jti:${payload.jti}`,
+    '1',
+    'EX',
+    3600,
+    'NX',
+  );
+  if (seen === null)
+    return sendResponse(res, false, 401, 'embed.token.replayed');
 
   // Origin check for iframe context
   const origin = req.headers.origin as string | undefined;
-  if (origin && app.allowedOrigins.length > 0 && !app.allowedOrigins.includes(origin)) {
+  if (
+    origin &&
+    app.allowedOrigins.length > 0 &&
+    !app.allowedOrigins.includes(origin)
+  ) {
     return sendResponse(res, false, 403, 'embed.origin.not_allowed');
   }
 
@@ -510,8 +542,8 @@ Embed context replaces that with the JWT-supplied attrs:
 ```ts
 // src/shared/services/rlsResolver.service.ts — embed-aware change
 async function resolveRlsForCaller(datasetId: string, ctx: AuthCtx) {
-  if (ctx.embedAttrs) return ctx.embedAttrs;           // JWT path
-  if (ctx.userId)     return await loadUserAttrs(ctx.userId);  // DBExec user
+  if (ctx.embedAttrs) return ctx.embedAttrs; // JWT path
+  if (ctx.userId) return await loadUserAttrs(ctx.userId); // DBExec user
   return {};
 }
 ```
@@ -558,48 +590,66 @@ via `window.postMessage`:
 
 ```ts
 // Embed-side (DBExec): notifications about user activity
-window.parent.postMessage({
-  type: 'dbexec.event',
-  event: 'dashboard.ready',
-  data: { dashboardId, tabId, loadDuration },
-}, '*');                 // origin verified host-side
+window.parent.postMessage(
+  {
+    type: 'dbexec.event',
+    event: 'dashboard.ready',
+    data: { dashboardId, tabId, loadDuration },
+  },
+  '*',
+); // origin verified host-side
 
-window.parent.postMessage({
-  type: 'dbexec.event',
-  event: 'filter.changed',
-  data: { filterId, value },
-}, '*');
+window.parent.postMessage(
+  {
+    type: 'dbexec.event',
+    event: 'filter.changed',
+    data: { filterId, value },
+  },
+  '*',
+);
 
-window.parent.postMessage({
-  type: 'dbexec.event',
-  event: 'visual.clicked',
-  data: { visualId, row },
-}, '*');
+window.parent.postMessage(
+  {
+    type: 'dbexec.event',
+    event: 'visual.clicked',
+    data: { visualId, row },
+  },
+  '*',
+);
 
 // Host-side: commands sent into the iframe
-iframe.contentWindow.postMessage({
-  type: 'dbexec.command',
-  command: 'setFilter',
-  data: { filterId, value },
-}, FE_URL);
+iframe.contentWindow.postMessage(
+  {
+    type: 'dbexec.command',
+    command: 'setFilter',
+    data: { filterId, value },
+  },
+  FE_URL,
+);
 
-iframe.contentWindow.postMessage({
-  type: 'dbexec.command',
-  command: 'navigateTab',
-  data: { tabId },
-}, FE_URL);
+iframe.contentWindow.postMessage(
+  {
+    type: 'dbexec.command',
+    command: 'navigateTab',
+    data: { tabId },
+  },
+  FE_URL,
+);
 
-iframe.contentWindow.postMessage({
-  type: 'dbexec.command',
-  command: 'refresh',
-}, FE_URL);
+iframe.contentWindow.postMessage(
+  {
+    type: 'dbexec.command',
+    command: 'refresh',
+  },
+  FE_URL,
+);
 ```
 
 DBExec's iframe code listens with origin validation:
 
 ```ts
-window.addEventListener('message', (e) => {
-  if (e.origin !== EXPECTED_HOST_ORIGIN) return;     // ← critical
+window.addEventListener('message', e => {
+  if (e.origin !== EXPECTED_HOST_ORIGIN) return; // ← critical
   const msg = e.data;
   if (msg?.type !== 'dbexec.command') return;
   handleCommand(msg.command, msg.data);
@@ -619,7 +669,7 @@ const embed = new DBExecEmbed({
   baseUrl: 'https://app.dbexec.com',
   signedToken: '<jwt from your backend>',
   onReady: () => console.log('dashboard loaded'),
-  onError: (e) => console.error(e),
+  onError: e => console.error(e),
   onEvent: (name, data) => analytics.track(`dbexec.${name}`, data),
 });
 
@@ -655,12 +705,14 @@ async function recordView(shareLink: ShareLink, ctx: RenderCtx) {
 
   // Hourly rollup for billing / rate-limit display
   const hour = startOfHour(new Date());
-  await master_db_connection.query(`
+  await master_db_connection.query(
+    `
     INSERT INTO share_link_hourly_count (share_link_id, hour, views)
     VALUES ($1, $2, 1)
     ON CONFLICT (share_link_id, hour)
     DO UPDATE SET views = share_link_hourly_count.views + 1`,
-    [shareLink.id, hour]);
+    [shareLink.id, hour],
+  );
 }
 ```
 
@@ -701,20 +753,26 @@ the captcha.
 // POST /share/:code/verify-captcha
 async function verifyCaptcha(req, res) {
   const { token } = req.body;
-  const verify = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
-    method: 'POST',
-    body: new URLSearchParams({
-      secret: process.env.TURNSTILE_SECRET!,
-      response: token,
-      remoteip: extractClientIp(req).ip!,
-    }),
-  });
+  const verify = await fetch(
+    'https://challenges.cloudflare.com/turnstile/v0/siteverify',
+    {
+      method: 'POST',
+      body: new URLSearchParams({
+        secret: process.env.TURNSTILE_SECRET!,
+        response: token,
+        remoteip: extractClientIp(req).ip!,
+      }),
+    },
+  );
   const result = await verify.json();
-  if (!result.success) return sendResponse(res, false, 400, 'share.captcha.failed');
+  if (!result.success)
+    return sendResponse(res, false, 400, 'share.captcha.failed');
 
   // Set HttpOnly cookie binding this client to this share-link.
   res.cookie('dbexec_share_verified', signCookie(req.params.code), {
-    httpOnly: true, secure: true, sameSite: 'lax',
+    httpOnly: true,
+    secure: true,
+    sameSite: 'lax',
     maxAge: 24 * 3600 * 1000,
   });
   res.json({ ok: true });
@@ -761,24 +819,24 @@ connection closes when the next-frame service token fails).
 ```ts
 // theme_override jsonb shape
 type ThemeOverride = {
-  primaryColor?: string;          // CSS hex
+  primaryColor?: string; // CSS hex
   backgroundColor?: string;
   textColor?: string;
   fontFamily?: string;
   borderRadius?: string;
-  density?: 'compact'|'comfortable'|'spacious';
-  logo?: string;                  // URL or data: URI
+  density?: 'compact' | 'comfortable' | 'spacious';
+  logo?: string; // URL or data: URI
 };
 
 // chrome jsonb shape
 type ChromeSettings = {
-  hideTitle?: boolean;            // strip dashboard.name from page
-  hideFilters?: boolean;          // collapse the filter sidebar
-  hideRefresh?: boolean;          // remove the refresh button
-  hideExport?: boolean;           // remove the export menu
-  hideTabs?: boolean;             // hide tab strip (always show active tab)
-  hideShare?: boolean;            // remove the share button
-  customCss?: string;             // injected after the theme override
+  hideTitle?: boolean; // strip dashboard.name from page
+  hideFilters?: boolean; // collapse the filter sidebar
+  hideRefresh?: boolean; // remove the refresh button
+  hideExport?: boolean; // remove the export menu
+  hideTabs?: boolean; // hide tab strip (always show active tab)
+  hideShare?: boolean; // remove the share button
+  customCss?: string; // injected after the theme override
 };
 ```
 
@@ -787,21 +845,21 @@ become `*ngIf` toggles in the view component.
 
 ## 5. APIs
 
-| Method | Path | Purpose |
-|---|---|---|
-| POST | `/share-links` | Create (any mode) |
-| GET | `/share-links` | List (org-scoped) |
-| GET | `/share-links/:id` | Detail |
-| PUT | `/share-links/:id` | Update non-immutable fields |
-| POST | `/share-links/:id/revoke` | Revoke |
-| GET | `/share-links/:id/views` | Per-view audit |
-| GET | `/share/:shortCode` | Public viewer entry point |
-| POST | `/share/:shortCode/verify-password` | Password challenge |
-| POST | `/share/:shortCode/verify-captcha` | Captcha challenge |
-| POST | `/embed-apps` | Create embed app (admin) |
-| GET | `/embed-apps` | List |
-| POST | `/embed-apps/:id/rotate-secret` | Generate new signing secret |
-| POST | `/embed-apps/:id/revoke` | Disable app + invalidate all its tokens |
+| Method | Path                                | Purpose                                 |
+| ------ | ----------------------------------- | --------------------------------------- |
+| POST   | `/share-links`                      | Create (any mode)                       |
+| GET    | `/share-links`                      | List (org-scoped)                       |
+| GET    | `/share-links/:id`                  | Detail                                  |
+| PUT    | `/share-links/:id`                  | Update non-immutable fields             |
+| POST   | `/share-links/:id/revoke`           | Revoke                                  |
+| GET    | `/share-links/:id/views`            | Per-view audit                          |
+| GET    | `/share/:shortCode`                 | Public viewer entry point               |
+| POST   | `/share/:shortCode/verify-password` | Password challenge                      |
+| POST   | `/share/:shortCode/verify-captcha`  | Captcha challenge                       |
+| POST   | `/embed-apps`                       | Create embed app (admin)                |
+| GET    | `/embed-apps`                       | List                                    |
+| POST   | `/embed-apps/:id/rotate-secret`     | Generate new signing secret             |
+| POST   | `/embed-apps/:id/revoke`            | Disable app + invalidate all its tokens |
 
 ## 6. FE specs
 
@@ -915,8 +973,8 @@ Three tabs, mapped to the modes:
 
 ```ts
 // src/shared/validators/shareLinks.ts
-export const SHARE_MODES = ['internal','public','embed'] as const;
-export const SHARE_TARGETS = ['dashboard','analysis','visual'] as const;
+export const SHARE_MODES = ['internal', 'public', 'embed'] as const;
+export const SHARE_TARGETS = ['dashboard', 'analysis', 'visual'] as const;
 
 export const createShareLinkSchema = z.discriminatedUnion('mode', [
   // Internal
@@ -924,11 +982,15 @@ export const createShareLinkSchema = z.discriminatedUnion('mode', [
     mode: z.literal('internal'),
     targetType: z.enum(SHARE_TARGETS),
     targetId: z.string().uuid(),
-    shareWith: z.array(z.object({
-      kind: z.enum(['user','group']),
-      id: z.string().uuid(),
-      permission: z.enum(['view','edit','admin']),
-    })).min(1),
+    shareWith: z
+      .array(
+        z.object({
+          kind: z.enum(['user', 'group']),
+          id: z.string().uuid(),
+          permission: z.enum(['view', 'edit', 'admin']),
+        }),
+      )
+      .min(1),
   }),
   // Public
   z.object({
@@ -941,14 +1003,16 @@ export const createShareLinkSchema = z.discriminatedUnion('mode', [
     maxViews: z.number().int().min(1).max(1_000_000).optional(),
     visibleVisuals: z.array(z.string().uuid()).optional(),
     themeOverride: z.record(z.string(), z.any()).optional(),
-    chrome: z.object({
-      hideTitle: z.boolean().optional(),
-      hideFilters: z.boolean().optional(),
-      hideRefresh: z.boolean().optional(),
-      hideExport: z.boolean().optional(),
-      hideTabs: z.boolean().optional(),
-      hideShare: z.boolean().optional(),
-    }).optional(),
+    chrome: z
+      .object({
+        hideTitle: z.boolean().optional(),
+        hideFilters: z.boolean().optional(),
+        hideRefresh: z.boolean().optional(),
+        hideExport: z.boolean().optional(),
+        hideTabs: z.boolean().optional(),
+        hideShare: z.boolean().optional(),
+      })
+      .optional(),
     defaultTabId: z.string().uuid().optional(),
     defaultFilters: z.record(z.string(), z.any()).optional(),
   }),

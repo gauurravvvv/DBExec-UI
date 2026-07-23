@@ -147,7 +147,10 @@ export class ThemeService {
 
   /** Type guard: true iff the value matches `#rgb` or `#rrggbb`. */
   private isValidHex(value: unknown): value is string {
-    return typeof value === 'string' && /^#[0-9a-fA-F]{3}([0-9a-fA-F]{3})?$/.test(value);
+    return (
+      typeof value === 'string' &&
+      /^#[0-9a-fA-F]{3}([0-9a-fA-F]{3})?$/.test(value)
+    );
   }
 
   /** Convert a #rgb / #rrggbb hex string into an {r,g,b} triplet. */

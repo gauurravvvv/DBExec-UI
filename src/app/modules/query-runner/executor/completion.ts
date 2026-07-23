@@ -22,9 +22,27 @@ interface TableRef {
 }
 
 const CLAUSE_KEYWORDS = new Set([
-  'on', 'where', 'group', 'order', 'having', 'join', 'inner', 'left',
-  'right', 'full', 'cross', 'using', 'limit', 'offset', 'union', 'select',
-  'set', 'and', 'or', 'as', 'natural',
+  'on',
+  'where',
+  'group',
+  'order',
+  'having',
+  'join',
+  'inner',
+  'left',
+  'right',
+  'full',
+  'cross',
+  'using',
+  'limit',
+  'offset',
+  'union',
+  'select',
+  'set',
+  'and',
+  'or',
+  'as',
+  'natural',
 ]);
 
 const IDENT_OK = /^[a-z_][a-z0-9_$]*$/;
@@ -72,8 +90,16 @@ function governingClause(textBefore: string): string | null {
   const stmt = currentStatement(textBefore).toLowerCase();
   const tokens = stmt.match(/[\w$]+|[(),.*]/g) ?? [];
   const anchors = [
-    'select', 'from', 'join', 'where', 'on', 'group', 'order', 'having',
-    'set', 'values',
+    'select',
+    'from',
+    'join',
+    'where',
+    'on',
+    'group',
+    'order',
+    'having',
+    'set',
+    'values',
   ];
   for (let i = tokens.length - 1; i >= 0; i--) {
     if (anchors.includes(tokens[i])) return tokens[i];
@@ -187,14 +213,19 @@ export function dbexecCompletionSource(
       const opts: Completion[] = [];
       for (const r of refs) {
         const cols = cat.columns(r.schema, r.table);
-        if (!cols.length && !cat.hasColumns(r.schema, r.table) && requestColumns) {
+        if (
+          !cols.length &&
+          !cat.hasColumns(r.schema, r.table) &&
+          requestColumns
+        ) {
           requestColumns(r.schema, r.table);
         }
         const prefix = r.alias ?? (refs.length > 1 ? r.table : undefined);
         for (const c of cols) opts.push(colCompletion(c, prefix));
       }
       for (const r of refs) {
-        if (r.alias) opts.push({ label: r.alias, type: 'table', detail: r.table });
+        if (r.alias)
+          opts.push({ label: r.alias, type: 'table', detail: r.table });
       }
       if (opts.length) {
         return { from, options: opts, validFor: /^[\w$]*$/ };

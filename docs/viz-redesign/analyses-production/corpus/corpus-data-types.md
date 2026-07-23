@@ -2,7 +2,7 @@ The caveman skill isn't available in this subagent environment. I'll proceed wit
 
 ## data-types
 
-*Production-readiness requirements for how the DBExec Analyses module detects, formats, sorts, filters, aggregates, and visually encodes every data type. Benchmarked against Tableau, Power BI, and Looker. Markers: **[table-stakes]** = every serious BI tool does this; **[advanced]** = differentiator.*
+_Production-readiness requirements for how the DBExec Analyses module detects, formats, sorts, filters, aggregates, and visually encodes every data type. Benchmarked against Tableau, Power BI, and Looker. Markers: **[table-stakes]** = every serious BI tool does this; **[advanced]** = differentiator._
 
 ---
 
@@ -21,10 +21,12 @@ Before per-type requirements, the engine must model three orthogonal properties 
 ### 1. Numeric (int / float / decimal / currency / percent / scientific)
 
 **Detection**
+
 - **[table-stakes]** Numeric → Measure by default; int-vs-float inferred from values.
 - **[table-stakes]** Sample-based type inference with a documented row cap; user role override (IDs, ZIPs, year numbers must be demotable to dimension).
 
 **Formatting**
+
 - **[table-stakes]** VBA/Excel placeholder format grammar: `0` `#` `.` `,` `%` `E+/E-` `$/€/literal` and `;`-delimited positive;negative;zero;null sections.
 - **[table-stakes]** Trailing-comma = scale-by-1000; `%` = multiply-by-100-and-append.
 - **[table-stakes]** Named presets: General Number, Currency, Fixed, Standard, Percent, Scientific.
@@ -38,6 +40,7 @@ Before per-type requirements, the engine must model three orthogonal properties 
 **Filtering** — **[table-stakes]** range/slider, ≥/≤/between, top-N, at-least/at-most; continuous→range, bucketed→checklist.
 
 **Aggregation**
+
 - **[table-stakes]** SUM, AVG, MIN, MAX, COUNT, COUNT DISTINCT, MEDIAN, STDEV/STDEVP, VAR/VARP.
 - **[table-stakes]** "Do-not-SUM" flag for ratios/percentages.
 - **[advanced]** PERCENTILE, running sum, moving average, % of total.
@@ -51,6 +54,7 @@ Before per-type requirements, the engine must model three orthogonal properties 
 ### 2. Temporal (date / datetime / time / timezone / relative / fiscal / date-parts)
 
 **The three-way temporal model — [table-stakes], copy exactly**
+
 - **[table-stakes]** Date **truncation/value** (continuous, `DATE_TRUNC`, one point per period, continuous axis).
 - **[table-stakes]** Date **part** (discrete, `EXTRACT`/`DATEPART`, enables seasonality — all Januaries stacked).
 - **[table-stakes]** Exact date (row-level, no truncation).
@@ -108,7 +112,7 @@ Before per-type requirements, the engine must model three orthogonal properties 
 - **[table-stakes]** Filter by region hierarchy Country→State→City. **[advanced]** map lasso/radius/distance filters.
 - **[table-stakes basic / advanced full]** Choropleth (region fill by measure), symbol/point map. **[advanced]** density/heatmap, flow/path, map-layer binding to GeoJSON/TopoJSON.
 
-*(DBExec has no map/geo at all today — flagged as a known gap.)*
+_(DBExec has no map/geo at all today — flagged as a known gap.)_
 
 ---
 
@@ -143,63 +147,63 @@ Before per-type requirements, the engine must model three orthogonal properties 
 
 ### Gap Table
 
-| Requirement | DBExec status | Priority | Effort (BE?) |
-|---|---|---|---|
-| **Foundation: physical-type/role/continuous-discrete tri-axis model** | partial (only dim/measure/aggregate encoding) | P0 | L (BE) |
-| User-overridable dimension/measure role | partial | P0 | M (BE) |
-| Continuous vs. discrete flag | missing | P0 | M (BE) |
-| Default-aggregation + "do-not-SUM" flag per measure | partial (field-metadata is UI-only dead columns per prior audit) | P1 | M (BE) |
-| Semantic-hint layer (geo role / URL / image / barcode) | missing | P1 | M (BE) |
-| **Numeric: core aggregates (SUM/AVG/MIN/MAX/COUNT/CDISTINCT)** | have | — | — |
-| Numeric: MEDIAN/STDEV/VAR | partial (percentile exists) | P1 | S (BE) |
-| VBA/Excel format grammar (`0 # . , % ; E`) | missing | P0 | M (mostly FE) |
-| Named numeric presets (Currency/Percent/Scientific/Fixed) | missing | P0 | S (FE) |
-| Locale-driven separators | missing | P1 | M (FE) |
-| Format live-preview in config | missing (flagged gap) | P1 | S (FE) |
-| Display-unit auto-scale (K/M/B) toggle separate from format | missing | P1 | S (FE) |
-| Dynamic per-value format string | missing | P2 | M (BE) |
-| Numeric binning (fixed size / bin count) | have (histogram) partial as reusable dimension | P1 | M (BE) |
-| Running sum / moving avg / % of total | missing | P2 | M (BE) |
-| **Temporal: three-way value/part/exact model** | missing | P0 | L (BE) |
-| Date-part extraction (year…second, dow, month-name) | partial (likely truncation-only) | P0 | M (BE) |
-| `dimension_group`-style auto-family generation | missing | P2 | L (BE) |
-| Date hierarchy / drill Y→Q→M→D | missing | P1 | M (BE+FE) |
-| VBA date format tokens + named presets | missing | P1 | S (FE) |
-| Chronological (not lexical) date sort | partial (verify) | P0 | S (BE) |
-| Relative-date filters (last-N, YTD, this/prev period) | partial (filters exist; relative semantics unclear) | P0 | M (BE) |
-| Timezone conversion (`convert_tz`) | missing | P2 | M (BE) |
-| Fiscal calendar / FY-start | missing | P2 | M (BE) |
-| **Categorical: group-by + COUNT/CDISTINCT** | have | — | — |
-| Value aliasing / relabel | missing | P1 | M (BE+FE) |
-| Sort-by-measure (descending SUM) | partial (verify) | P0 | S (BE) |
-| Sort-by-column for ordinals (month-name by number) | missing | P0 | M (BE) |
-| Contains/starts-with/wildcard string filters | partial | P1 | S (BE) |
-| High-cardinality lazy/type-ahead filter lists | missing | P1 | M (BE) |
-| Top-N + auto "Other" bucket | missing | P1 | M (BE) |
-| Manual grouping into named groups | missing | P2 | M (BE) |
-| Colorblind-safe palette + swatch UI | missing (flagged gap) | P1 | S (FE) |
-| Cap color channel ~10–12 + roll-to-Other | missing | P2 | S (FE) |
-| **Boolean: native type + Yes/No display** | partial (verify) | P1 | S |
-| Boolean alias (✓/✗, Active/Inactive) | missing | P2 | S (FE) |
-| Boolean single-toggle/segmented filter UI | missing | P1 | S (FE) |
-| Boolean % true measure | missing | P1 | S (BE) |
-| **Geo: geographic roles + auto-geocode** | missing (flagged gap) | P1 | L (BE) |
-| Choropleth + symbol/point map | missing (flagged gap) | P1 | L (BE+FE) |
-| Postal-as-string / lat-long-not-summed guards | missing | P1 | S (BE) |
-| Region-hierarchy / distance / lasso filters | missing | P2 | L (BE) |
-| **JSON: raw JSON as expandable string cell (table)** | missing | P2 | S (FE) |
-| JSON expand-to-columns / explode-to-rows | missing | P2 | L (BE) |
-| JSON path-extractor UI | missing | P2 | L (BE) |
-| **Null: distinct from zero/empty, own bucket** | partial (verify group-by null handling) | P0 | M (BE) |
-| Null as selectable filter member + exclude toggle | partial | P1 | S (BE) |
-| SUM/AVG skip-null (SQL semantics) | likely have (SQL passthrough) | P1 | S (verify BE) |
-| Line-chart null handling (gap/connect/zero) | missing | P1 | S (FE) |
-| Null grey encoding swatch | missing | P2 | S (FE) |
-| Densification / show-missing-values | missing | P2 | L (BE+FE) |
-| Data-quality null/parse-fail count | missing | P2 | M (BE) |
-| **Mixed: sample inference + string fallback** | partial (DB-driven, warehouse types) | P1 | M (BE) |
-| Per-column type override + cast actions | missing | P1 | M (BE) |
-| Mixed parse-fail → null + DQ warning | missing | P2 | M (BE) |
+| Requirement                                                           | DBExec status                                                    | Priority | Effort (BE?)  |
+| --------------------------------------------------------------------- | ---------------------------------------------------------------- | -------- | ------------- |
+| **Foundation: physical-type/role/continuous-discrete tri-axis model** | partial (only dim/measure/aggregate encoding)                    | P0       | L (BE)        |
+| User-overridable dimension/measure role                               | partial                                                          | P0       | M (BE)        |
+| Continuous vs. discrete flag                                          | missing                                                          | P0       | M (BE)        |
+| Default-aggregation + "do-not-SUM" flag per measure                   | partial (field-metadata is UI-only dead columns per prior audit) | P1       | M (BE)        |
+| Semantic-hint layer (geo role / URL / image / barcode)                | missing                                                          | P1       | M (BE)        |
+| **Numeric: core aggregates (SUM/AVG/MIN/MAX/COUNT/CDISTINCT)**        | have                                                             | —        | —             |
+| Numeric: MEDIAN/STDEV/VAR                                             | partial (percentile exists)                                      | P1       | S (BE)        |
+| VBA/Excel format grammar (`0 # . , % ; E`)                            | missing                                                          | P0       | M (mostly FE) |
+| Named numeric presets (Currency/Percent/Scientific/Fixed)             | missing                                                          | P0       | S (FE)        |
+| Locale-driven separators                                              | missing                                                          | P1       | M (FE)        |
+| Format live-preview in config                                         | missing (flagged gap)                                            | P1       | S (FE)        |
+| Display-unit auto-scale (K/M/B) toggle separate from format           | missing                                                          | P1       | S (FE)        |
+| Dynamic per-value format string                                       | missing                                                          | P2       | M (BE)        |
+| Numeric binning (fixed size / bin count)                              | have (histogram) partial as reusable dimension                   | P1       | M (BE)        |
+| Running sum / moving avg / % of total                                 | missing                                                          | P2       | M (BE)        |
+| **Temporal: three-way value/part/exact model**                        | missing                                                          | P0       | L (BE)        |
+| Date-part extraction (year…second, dow, month-name)                   | partial (likely truncation-only)                                 | P0       | M (BE)        |
+| `dimension_group`-style auto-family generation                        | missing                                                          | P2       | L (BE)        |
+| Date hierarchy / drill Y→Q→M→D                                        | missing                                                          | P1       | M (BE+FE)     |
+| VBA date format tokens + named presets                                | missing                                                          | P1       | S (FE)        |
+| Chronological (not lexical) date sort                                 | partial (verify)                                                 | P0       | S (BE)        |
+| Relative-date filters (last-N, YTD, this/prev period)                 | partial (filters exist; relative semantics unclear)              | P0       | M (BE)        |
+| Timezone conversion (`convert_tz`)                                    | missing                                                          | P2       | M (BE)        |
+| Fiscal calendar / FY-start                                            | missing                                                          | P2       | M (BE)        |
+| **Categorical: group-by + COUNT/CDISTINCT**                           | have                                                             | —        | —             |
+| Value aliasing / relabel                                              | missing                                                          | P1       | M (BE+FE)     |
+| Sort-by-measure (descending SUM)                                      | partial (verify)                                                 | P0       | S (BE)        |
+| Sort-by-column for ordinals (month-name by number)                    | missing                                                          | P0       | M (BE)        |
+| Contains/starts-with/wildcard string filters                          | partial                                                          | P1       | S (BE)        |
+| High-cardinality lazy/type-ahead filter lists                         | missing                                                          | P1       | M (BE)        |
+| Top-N + auto "Other" bucket                                           | missing                                                          | P1       | M (BE)        |
+| Manual grouping into named groups                                     | missing                                                          | P2       | M (BE)        |
+| Colorblind-safe palette + swatch UI                                   | missing (flagged gap)                                            | P1       | S (FE)        |
+| Cap color channel ~10–12 + roll-to-Other                              | missing                                                          | P2       | S (FE)        |
+| **Boolean: native type + Yes/No display**                             | partial (verify)                                                 | P1       | S             |
+| Boolean alias (✓/✗, Active/Inactive)                                  | missing                                                          | P2       | S (FE)        |
+| Boolean single-toggle/segmented filter UI                             | missing                                                          | P1       | S (FE)        |
+| Boolean % true measure                                                | missing                                                          | P1       | S (BE)        |
+| **Geo: geographic roles + auto-geocode**                              | missing (flagged gap)                                            | P1       | L (BE)        |
+| Choropleth + symbol/point map                                         | missing (flagged gap)                                            | P1       | L (BE+FE)     |
+| Postal-as-string / lat-long-not-summed guards                         | missing                                                          | P1       | S (BE)        |
+| Region-hierarchy / distance / lasso filters                           | missing                                                          | P2       | L (BE)        |
+| **JSON: raw JSON as expandable string cell (table)**                  | missing                                                          | P2       | S (FE)        |
+| JSON expand-to-columns / explode-to-rows                              | missing                                                          | P2       | L (BE)        |
+| JSON path-extractor UI                                                | missing                                                          | P2       | L (BE)        |
+| **Null: distinct from zero/empty, own bucket**                        | partial (verify group-by null handling)                          | P0       | M (BE)        |
+| Null as selectable filter member + exclude toggle                     | partial                                                          | P1       | S (BE)        |
+| SUM/AVG skip-null (SQL semantics)                                     | likely have (SQL passthrough)                                    | P1       | S (verify BE) |
+| Line-chart null handling (gap/connect/zero)                           | missing                                                          | P1       | S (FE)        |
+| Null grey encoding swatch                                             | missing                                                          | P2       | S (FE)        |
+| Densification / show-missing-values                                   | missing                                                          | P2       | L (BE+FE)     |
+| Data-quality null/parse-fail count                                    | missing                                                          | P2       | M (BE)        |
+| **Mixed: sample inference + string fallback**                         | partial (DB-driven, warehouse types)                             | P1       | M (BE)        |
+| Per-column type override + cast actions                               | missing                                                          | P1       | M (BE)        |
+| Mixed parse-fail → null + DQ warning                                  | missing                                                          | P2       | M (BE)        |
 
 ---
 

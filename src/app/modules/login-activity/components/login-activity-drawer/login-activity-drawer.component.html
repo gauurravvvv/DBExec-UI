@@ -47,7 +47,9 @@
         <dt>{{ 'AUDIT.WHO' | translate }}</dt>
         <dd>
           <span class="actor">
-            <span class="avatar" [attr.aria-hidden]="true">{{ initials(row) }}</span>
+            <span class="avatar" [attr.aria-hidden]="true">{{
+              initials(row)
+            }}</span>
             <span class="em">{{ actorDisplay(row) }}</span>
           </span>
         </dd>
@@ -69,23 +71,38 @@
 
         <dt>{{ 'AUDIT.OUTCOME' | translate }}</dt>
         <dd>
-          <span class="outcome" [class.ok]="row.success" [class.fail]="!row.success">
-            <i class="pi" [ngClass]="row.success ? 'pi-check-circle' : 'pi-times-circle'"></i>
-            {{ row.success ? ('LOGIN_ACTIVITY.SUCCESS' | translate) : ('LOGIN_ACTIVITY.FAILED' | translate) }}
+          <span
+            class="outcome"
+            [class.ok]="row.success"
+            [class.fail]="!row.success"
+          >
+            <i
+              class="pi"
+              [ngClass]="row.success ? 'pi-check-circle' : 'pi-times-circle'"
+            ></i>
+            {{
+              row.success
+                ? ('LOGIN_ACTIVITY.SUCCESS' | translate)
+                : ('LOGIN_ACTIVITY.FAILED' | translate)
+            }}
           </span>
         </dd>
 
         <ng-container *ngIf="row.failureReason">
           <dt>{{ 'LOGIN_ACTIVITY.FAILURE_REASON' | translate }}</dt>
           <dd>
-            <span class="reason">{{ row.failureReason | replaceUnderscores }}</span>
+            <span class="reason">{{
+              row.failureReason | replaceUnderscores
+            }}</span>
           </dd>
         </ng-container>
       </dl>
 
       <!-- Device / session context -->
       <div class="section">
-        <div class="section-label">{{ 'LOGIN_ACTIVITY.DEVICE_CONTEXT' | translate }}</div>
+        <div class="section-label">
+          {{ 'LOGIN_ACTIVITY.DEVICE_CONTEXT' | translate }}
+        </div>
         <dl class="meta-list">
           <dt>{{ 'LOGIN_ACTIVITY.IP_ADDRESS' | translate }}</dt>
           <dd>
@@ -95,13 +112,20 @@
 
           <dt>{{ 'LOGIN_ACTIVITY.USER_AGENT' | translate }}</dt>
           <dd>
-            <span class="mono ua" *ngIf="row.userAgent; else noUa" [title]="row.userAgent">{{ row.userAgent }}</span>
+            <span
+              class="mono ua"
+              *ngIf="row.userAgent; else noUa"
+              [title]="row.userAgent"
+              >{{ row.userAgent }}</span
+            >
             <ng-template #noUa><span class="muted">—</span></ng-template>
           </dd>
 
           <dt>{{ 'LOGIN_ACTIVITY.ORGANISATION' | translate }}</dt>
           <dd>
-            <span *ngIf="row.organisationName; else noOrg">{{ row.organisationName }}</span>
+            <span *ngIf="row.organisationName; else noOrg">{{
+              row.organisationName
+            }}</span>
             <ng-template #noOrg><span class="muted">—</span></ng-template>
           </dd>
         </dl>

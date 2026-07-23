@@ -2,7 +2,7 @@
 
 > Implementation companion to research module 06. Pins how an
 > analyst takes a dataset, picks fields, picks a chart type,
-> tunes the visual, and saves an *analysis* (a reusable named
+> tunes the visual, and saves an _analysis_ (a reusable named
 > visualisation that dashboards embed).
 
 **Status:** 🟡 partial — 70+ chart types render in product;
@@ -157,7 +157,7 @@ export const BarConfig = z.object({
   legendPosition: z.enum(['top', 'right', 'bottom', 'left']).default('top'),
   xAxisLabel: z.string().optional(),
   yAxisLabel: z.string().optional(),
-  yAxisFormat: z.string().optional(),               // d3-format spec
+  yAxisFormat: z.string().optional(), // d3-format spec
   yAxisLog: z.boolean().default(false),
   palette: z.string().default('default'),
   inverse: z.boolean().default(false),
@@ -184,7 +184,7 @@ export function buildOption(
   fields: DatasetField[],
   ctx: { theme: 'light' | 'dark'; palette: Palette },
 ): EChartOption {
-  const builder = builderFor(visual.chartType);     // function per type
+  const builder = builderFor(visual.chartType); // function per type
   return builder(visual.encoding, visual.config, rows, fields, ctx);
 }
 ```
@@ -196,17 +196,25 @@ file:
 - Validates encoding has required roles.
 - Transforms rows (group, pivot, sort) per chart-type needs.
 - Emits a fresh ECharts option object — no merging from a stale
-  one. This is the *merge-leak* fix from earlier bug work.
+  one. This is the _merge-leak_ fix from earlier bug work.
 
 ```typescript
 // src/app/shared/builders/bar.builder.ts
-export const buildBarOption: ChartBuilder = (encoding, config, rows, fields, ctx) => {
+export const buildBarOption: ChartBuilder = (
+  encoding,
+  config,
+  rows,
+  fields,
+  ctx,
+) => {
   if (!encoding.x || !encoding.y) {
     return { series: [], xAxis: {}, yAxis: {}, _empty: true };
   }
   const xField = fields.find(f => f.name === encoding.x)!;
   const yField = fields.find(f => f.name === encoding.y)!;
-  const seriesField = encoding.series ? fields.find(f => f.name === encoding.series) : null;
+  const seriesField = encoding.series
+    ? fields.find(f => f.name === encoding.series)
+    : null;
 
   const groups = groupBy(rows, r => r[encoding.x]);
   const series = seriesField
@@ -214,19 +222,29 @@ export const buildBarOption: ChartBuilder = (encoding, config, rows, fields, ctx
     : [makeSingleSeries(rows, encoding.x, encoding.y, config)];
 
   return {
-    grid: { left: 60, right: config.showLegend && config.legendPosition === 'right' ? 120 : 40,
-            top: 40, bottom: 60, containLabel: true },
+    grid: {
+      left: 60,
+      right: config.showLegend && config.legendPosition === 'right' ? 120 : 40,
+      top: 40,
+      bottom: 60,
+      containLabel: true,
+    },
     xAxis: {
       type: 'category',
       data: Array.from(groups.keys()),
       inverse: !!config.inverse,
       name: config.xAxisLabel ?? xField.displayName,
-      nameLocation: 'middle', nameGap: 30,
+      nameLocation: 'middle',
+      nameGap: 30,
     },
     yAxis: {
       type: config.yAxisLog ? 'log' : 'value',
       name: config.yAxisLabel ?? yField.displayName,
-      axisLabel: { formatter: config.yAxisFormat ? d3Formatter(config.yAxisFormat) : undefined },
+      axisLabel: {
+        formatter: config.yAxisFormat
+          ? d3Formatter(config.yAxisFormat)
+          : undefined,
+      },
     },
     series: series.map(s => ({
       ...s,
@@ -237,9 +255,7 @@ export const buildBarOption: ChartBuilder = (encoding, config, rows, fields, ctx
       animation: !config.reducedMotion,
     })),
     legend: { show: config.showLegend, [config.legendPosition]: 10 },
-    dataZoom: config.dataZoom
-      ? [{ type: 'inside' }, { type: 'slider' }]
-      : [],
+    dataZoom: config.dataZoom ? [{ type: 'inside' }, { type: 'slider' }] : [],
     tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
     color: paletteFor(config.palette, ctx.theme),
   };
@@ -253,46 +269,90 @@ export const buildBarOption: ChartBuilder = (encoding, config, rows, fields, ctx
 ```typescript
 // src/controllers/analysis/addAnalysis.ts
 const addAnalysis = async (req: Request, res: Response) => {
-  const { name, slug, datasetId, semanticModelId, intent, visuals, filters, parameters } = req.body;
+  const {
+    name,
+    slug,
+    datasetId,
+    semanticModelId,
+    intent,
+    visuals,
+    filters,
+    parameters,
+  } = req.body;
   const { loggedInId, orgData, master_db_connection } = res.locals;
   const connection = orgData.connection;
   try {
     // Validate intent if semantic
     if (semanticModelId && intent) {
       const v = await validateIntent(intent, semanticModelId, connection);
-      if (!v.ok) { await master_db_connection.close();
-        return sendResponse(res, false, CODE.BAD_REQUEST, ANALYSIS_MSG.BAD_INTENT, { errors: v.errors }); }
+      if (!v.ok) {
+        await master_db_connection.close();
+        return sendResponse(
+          res,
+          false,
+          CODE.BAD_REQUEST,
+          ANALYSIS_MSG.BAD_INTENT,
+          { errors: v.errors },
+        );
+      }
     }
     // Validate per-visual config
     for (const v of visuals) {
       const schema = configSchemaFor(v.chartType);
       const parsed = schema.safeParse(v.config);
-      if (!parsed.success) { await master_db_connection.close();
-        return sendResponse(res, false, CODE.BAD_REQUEST, ANALYSIS_MSG.BAD_CONFIG); }
+      if (!parsed.success) {
+        await master_db_connection.close();
+        return sendResponse(
+          res,
+          false,
+          CODE.BAD_REQUEST,
+          ANALYSIS_MSG.BAD_CONFIG,
+        );
+      }
     }
     const analysis = await connection.transaction(async (tx: any) => {
       const a = await tx.getRepository('Analysis').save({
-        orgId: orgData.orgId, datasetId, semanticModelId, intent,
-        name, slug, ownerUserId: loggedInId, status: 'draft',
+        orgId: orgData.orgId,
+        datasetId,
+        semanticModelId,
+        intent,
+        name,
+        slug,
+        ownerUserId: loggedInId,
+        status: 'draft',
       });
       for (let i = 0; i < visuals.length; i++) {
         const v = visuals[i];
         await tx.getRepository('AnalysisVisual').save({
-          analysisId: a.id, chartType: v.chartType, encoding: v.encoding,
-          config: v.config ?? {}, displayOrder: i,
+          analysisId: a.id,
+          chartType: v.chartType,
+          encoding: v.encoding,
+          config: v.config ?? {},
+          displayOrder: i,
         });
       }
-      for (const f of filters ?? []) await tx.getRepository('AnalysisFilter').save({ analysisId: a.id, ...f });
-      for (const p of parameters ?? []) await tx.getRepository('AnalysisParameter').save({ analysisId: a.id, ...p });
+      for (const f of filters ?? [])
+        await tx
+          .getRepository('AnalysisFilter')
+          .save({ analysisId: a.id, ...f });
+      for (const p of parameters ?? [])
+        await tx
+          .getRepository('AnalysisParameter')
+          .save({ analysisId: a.id, ...p });
       return a;
     });
     await auditLogger.logAuditToOrg({
-      connection, req, res,
+      connection,
+      req,
+      res,
       module: AUDIT_MODULES.ANALYSIS,
       action: AUDIT_ACTIONS.CREATE,
       entityName: 'Analysis',
       entityId: analysis.id,
-      metadata: { visualCount: visuals.length, source: intent ? 'semantic' : 'dataset' },
+      metadata: {
+        visualCount: visuals.length,
+        source: intent ? 'semantic' : 'dataset',
+      },
     });
     await master_db_connection.close();
     sendResponse(res, true, CODE.SUCCESS, ANALYSIS_MSG.CREATED, analysis);
@@ -355,10 +415,18 @@ interface AnalysisRuntime {
 }
 
 // When building options for a non-source visual, append the cross-filter to its row set
-function rowsForVisual(visualId: string, allRows: DataRow[], runtime: AnalysisRuntime): DataRow[] {
-  if (!runtime.crossFilter || runtime.crossFilter.sourceVisualId === visualId) return allRows;
-  return allRows.filter(row => Object.entries(runtime.crossFilter!.dims)
-    .every(([col, val]) => row[col] === val));
+function rowsForVisual(
+  visualId: string,
+  allRows: DataRow[],
+  runtime: AnalysisRuntime,
+): DataRow[] {
+  if (!runtime.crossFilter || runtime.crossFilter.sourceVisualId === visualId)
+    return allRows;
+  return allRows.filter(row =>
+    Object.entries(runtime.crossFilter!.dims).every(
+      ([col, val]) => row[col] === val,
+    ),
+  );
 }
 ```
 
@@ -369,41 +437,44 @@ chart area → clear.
 
 ## 8. Observability
 
-| Metric | Type | Labels | Purpose |
-|---|---|---|---|
-| `dbexec_analysis_save_ms` | histogram | — | save latency |
-| `dbexec_analysis_render_ms` | histogram | `chart_type` | option-build cost |
-| `dbexec_analysis_chart_type_changes_total` | counter | `from`, `to` | reconciler stress test |
-| `dbexec_analysis_config_validation_fail_total` | counter | `chart_type`, `code` | catch schema drift |
-| `dbexec_analysis_crossfilter_fired_total` | counter | `analysis` | usage |
-| `dbexec_analysis_count` | gauge | `org`, `status` | per-org counts |
+| Metric                                         | Type      | Labels               | Purpose                |
+| ---------------------------------------------- | --------- | -------------------- | ---------------------- |
+| `dbexec_analysis_save_ms`                      | histogram | —                    | save latency           |
+| `dbexec_analysis_render_ms`                    | histogram | `chart_type`         | option-build cost      |
+| `dbexec_analysis_chart_type_changes_total`     | counter   | `from`, `to`         | reconciler stress test |
+| `dbexec_analysis_config_validation_fail_total` | counter   | `chart_type`, `code` | catch schema drift     |
+| `dbexec_analysis_crossfilter_fired_total`      | counter   | `analysis`           | usage                  |
+| `dbexec_analysis_count`                        | gauge     | `org`, `status`      | per-org counts         |
 
 ---
 
 ## 9. Security & threat model
 
-| Threat | Mitigation |
-|---|---|
-| Author writes a malicious dataset_field reference | Encoding fields validated against `dataset_field` on save |
-| XSS via chart title / config text | Angular bindings auto-escape; ECharts `formatter` callbacks sanitised |
-| Cross-analysis filter via URL leaks RLS data | Cross-filter scoped to one analysis only |
-| Stored XSS in `ai_explanation` | Treated as plain text, never as innerHTML |
-| Re-binding to a deleted dataset | ON DELETE RESTRICT on dataset; reassign required |
+| Threat                                            | Mitigation                                                            |
+| ------------------------------------------------- | --------------------------------------------------------------------- |
+| Author writes a malicious dataset_field reference | Encoding fields validated against `dataset_field` on save             |
+| XSS via chart title / config text                 | Angular bindings auto-escape; ECharts `formatter` callbacks sanitised |
+| Cross-analysis filter via URL leaks RLS data      | Cross-filter scoped to one analysis only                              |
+| Stored XSS in `ai_explanation`                    | Treated as plain text, never as innerHTML                             |
+| Re-binding to a deleted dataset                   | ON DELETE RESTRICT on dataset; reassign required                      |
 
 ---
 
 ## 10. Runbook
 
 **Symptom: chart renders blank after type change.**
+
 1. Reconciler dropped required role. Re-add field; future
    prevention via "missing required role" inline warning.
 
 **Symptom: bar stacks wrong.**
+
 1. `config.stack === 'normal'` but encoding has no `series`
    role. The validator should catch this on save; the build
    step degrades to single-series.
 
 **Symptom: cross-filter doesn't clear.**
+
 1. Source visual unmounted before click handler fired.
    Reproduces under SSR; ensure handlers are registered after
    chart `finished` event.
@@ -412,13 +483,13 @@ chart area → clear.
 
 ## 11. Perf budget
 
-| Operation | p50 | p95 | Hard ceiling |
-|---|---|---|---|
-| Save analysis (5 visuals) | 250 ms | 800 ms | 5 s |
-| Render option (1 visual, 1k rows) | 8 ms | 30 ms | 200 ms |
-| Render option (1 visual, 100k rows) | 80 ms | 250 ms | 1 s |
-| Cross-filter apply (re-render 4 visuals) | 50 ms | 200 ms | 1 s |
-| Chart-type change | 100 ms | 300 ms | 1 s |
+| Operation                                | p50    | p95    | Hard ceiling |
+| ---------------------------------------- | ------ | ------ | ------------ |
+| Save analysis (5 visuals)                | 250 ms | 800 ms | 5 s          |
+| Render option (1 visual, 1k rows)        | 8 ms   | 30 ms  | 200 ms       |
+| Render option (1 visual, 100k rows)      | 80 ms  | 250 ms | 1 s          |
+| Cross-filter apply (re-render 4 visuals) | 50 ms  | 200 ms | 1 s          |
+| Chart-type change                        | 100 ms | 300 ms | 1 s          |
 
 ---
 

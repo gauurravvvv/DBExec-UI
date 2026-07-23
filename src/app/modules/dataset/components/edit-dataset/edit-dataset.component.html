@@ -86,10 +86,7 @@
         [attr.aria-label]="'DATASET.RESULT.SAVE_AND_RUN' | translate"
       >
         <i class="pi pi-save" aria-hidden="true"></i>
-        <i
-          class="pi pi-play save-run-play"
-          aria-hidden="true"
-        ></i>
+        <i class="pi pi-play save-run-play" aria-hidden="true"></i>
       </button>
       <!-- Copy SQL — copies the editor content to the clipboard. -->
       <button
@@ -1089,10 +1086,7 @@
       </div>
 
       <ng-container *ngIf="!isComputingDiff">
-        <div
-          class="diff-no-column-info"
-          *ngIf="!columnDelta"
-        >
+        <div class="diff-no-column-info" *ngIf="!columnDelta">
           {{ 'DATASET.DIFF.NO_COLUMN_INFO' | translate }}
         </div>
 
@@ -1116,7 +1110,7 @@
                   | translate
                     : {
                         analyses: diffLineage.analyses,
-                        dashboards: diffLineage.dashboards
+                        dashboards: diffLineage.dashboards,
                       }
               }}
             </span>
@@ -1194,7 +1188,7 @@
             [ngClass]="'diff-line-' + line.kind"
           >
             <span class="diff-gutter">{{
-              line.kind === 'added' ? '' : (line.oldLine === null ? '' : '-')
+              line.kind === 'added' ? '' : line.oldLine === null ? '' : '-'
             }}</span>
             <code>{{ line.oldLine }}</code>
           </div>
@@ -1206,7 +1200,7 @@
             [ngClass]="'diff-line-' + line.kind"
           >
             <span class="diff-gutter">{{
-              line.kind === 'removed' ? '' : (line.newLine === null ? '' : '+')
+              line.kind === 'removed' ? '' : line.newLine === null ? '' : '+'
             }}</span>
             <code>{{ line.newLine }}</code>
           </div>

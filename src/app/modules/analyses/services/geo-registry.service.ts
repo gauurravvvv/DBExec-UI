@@ -54,7 +54,10 @@ export class GeoRegistryService {
   constructor(private http: HttpClientService) {}
 
   /** Delegate to the pure helper so callers have one import surface. */
-  getRequiredMap(chartType: string | null | undefined, config: any): string | null {
+  getRequiredMap(
+    chartType: string | null | undefined,
+    config: any,
+  ): string | null {
     return getRequiredMap(chartType, config);
   }
 

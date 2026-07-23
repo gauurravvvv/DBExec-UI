@@ -35,7 +35,10 @@
           </div>
 
           <!-- Empty state: no connections yet -->
-          <div class="launcher-empty" *ngIf="!connectionsLoading && hasNoConnections">
+          <div
+            class="launcher-empty"
+            *ngIf="!connectionsLoading && hasNoConnections"
+          >
             <i class="pi pi-link"></i>
             <p>{{ 'QUERY_RUNNER.NO_CONNECTIONS_HINT' | translate }}</p>
             <button
@@ -84,9 +87,21 @@
                 appendTo="body"
                 icon="pi-link"
                 [disabled]="!selectedDatasourceId"
-                [placeholder]="(selectedDatasourceId ? 'QUERY_RUNNER.SELECT_CONNECTION' : 'QUERY_RUNNER.SELECT_DATASOURCE_FIRST') | translate"
+                [placeholder]="
+                  (selectedDatasourceId
+                    ? 'QUERY_RUNNER.SELECT_CONNECTION'
+                    : 'QUERY_RUNNER.SELECT_DATASOURCE_FIRST'
+                  ) | translate
+                "
               ></app-custom-dropdown>
-              <small class="form-hint warn" *ngIf="selectedDatasourceId && connectionOptions.length === 0 && !allDisabledForDs">
+              <small
+                class="form-hint warn"
+                *ngIf="
+                  selectedDatasourceId &&
+                  connectionOptions.length === 0 &&
+                  !allDisabledForDs
+                "
+              >
                 {{ 'QUERY_RUNNER.NO_CONNECTIONS_FOR_DS' | translate }}
               </small>
               <small class="form-hint warn" *ngIf="allDisabledForDs">
@@ -99,11 +114,21 @@
               <button
                 pButton
                 type="submit"
-                [label]="(verifying ? 'QUERY_RUNNER.VERIFYING' : 'QUERY_RUNNER.OPEN_EXECUTOR') | translate"
+                [label]="
+                  (verifying
+                    ? 'QUERY_RUNNER.VERIFYING'
+                    : 'QUERY_RUNNER.OPEN_EXECUTOR'
+                  ) | translate
+                "
                 [disabled]="!canOpen"
                 class="p-button-primary btn-save"
               >
-                <i class="pi mr-2" [ngClass]="verifying ? 'pi-spin pi-spinner' : 'pi-external-link'"></i>
+                <i
+                  class="pi mr-2"
+                  [ngClass]="
+                    verifying ? 'pi-spin pi-spinner' : 'pi-external-link'
+                  "
+                ></i>
               </button>
             </div>
           </ng-container>

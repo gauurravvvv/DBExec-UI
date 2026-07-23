@@ -175,9 +175,7 @@ export const analysisJustificationSchema = z.preprocess(
 const idSchema = (msg: string) =>
   z.preprocess(
     trimOrUndefined,
-    z
-      .string({ message: msg })
-      .min(1, { message: msg }),
+    z.string({ message: msg }).min(1, { message: msg }),
   );
 
 export const analysisIdSchema = idSchema('validation.analyses.id.required');
@@ -230,7 +228,9 @@ export const filterScopeSchema = z
 const filterTargetTabIdSchema = z
   .preprocess(
     blankToUndefined,
-    z.string().uuid({ message: 'validation.analyses.filter.targetTabId.invalid' }),
+    z
+      .string()
+      .uuid({ message: 'validation.analyses.filter.targetTabId.invalid' }),
   )
   .nullable()
   .optional();
@@ -262,7 +262,10 @@ const refineFilterScope = (
       });
     }
   } else if (data.scope === 'visual') {
-    if (!Array.isArray(data.targetVisualIds) || data.targetVisualIds.length === 0) {
+    if (
+      !Array.isArray(data.targetVisualIds) ||
+      data.targetVisualIds.length === 0
+    ) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         path: ['targetVisualIds'],
@@ -302,7 +305,9 @@ const filterConfigSchema = z
       })
       .optional(),
     dependsOnFilterId: z
-      .string({ message: 'validation.analyses.filter.dependsOnFilterId.invalid' })
+      .string({
+        message: 'validation.analyses.filter.dependsOnFilterId.invalid',
+      })
       .uuid({ message: 'validation.analyses.filter.dependsOnFilterId.invalid' })
       .optional(),
   })
@@ -550,11 +555,7 @@ const aggregationColumnSchema = z.preprocess(
  * aggregation and on each extraMeasures entry so a multi-measure combo can mix
  * percentiles at different ranks.
  */
-const percentileSchema = z
-  .number()
-  .gt(0)
-  .lt(100)
-  .optional();
+const percentileSchema = z.number().gt(0).lt(100).optional();
 
 export const runAggregationSchema = z.object({
   aggregate: z.enum(AGGREGATE_VALUES, {
@@ -951,9 +952,7 @@ const publishNewSchema = z.object({
 const publishExistingSchema = z.object({
   analysisId: idSchema('validation.analyses.dashboard.analysisId.required'),
   mode: z.literal('existing'),
-  dashboardId: idSchema(
-    'validation.analyses.dashboard.id.required',
-  ),
+  dashboardId: idSchema('validation.analyses.dashboard.id.required'),
   name: z.preprocess(
     blankToUndefined,
     z

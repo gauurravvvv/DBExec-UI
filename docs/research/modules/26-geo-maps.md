@@ -14,31 +14,31 @@
 
 **Depends on:** Analysis (06), Datasource (01), Cache (05)
 **Unblocks:** "Where are my customers?", logistics dashboards,
-  fleet tracking
+fleet tracking
 **Maturity:** 🟡 some chart types exist in the registry; geo
-  isn't wired beyond a basic ECharts world-map demo
+isn't wired beyond a basic ECharts world-map demo
 
 ---
 
 ## 1. Industry baseline
 
-| Tool | Choropleth | Points | Heatmap | Flow | Custom polygon |
-|---|---|---|---|---|---|
-| **Tableau** | ✓ | ✓ | ✓ | ✓ (paths) | ✓ (shapefile) |
-| **Power BI** | ✓ (Azure Maps) | ✓ | ✓ | partial | ✗ |
-| **Looker** | ✓ | ✓ | ✓ | partial | partial |
-| **Metabase** | partial | ✓ | partial | ✗ | ✗ |
-| **Superset** | ✓ | ✓ | ✓ | ✓ (deck.gl) | partial |
-| **Hex** | via Mapbox/deck.gl plugin | ✓ | ✓ | ✓ | ✓ |
-| **Sigma** | ✓ (Mapbox) | ✓ | ✓ | ✗ | ✗ |
+| Tool         | Choropleth                | Points | Heatmap | Flow        | Custom polygon |
+| ------------ | ------------------------- | ------ | ------- | ----------- | -------------- |
+| **Tableau**  | ✓                         | ✓      | ✓       | ✓ (paths)   | ✓ (shapefile)  |
+| **Power BI** | ✓ (Azure Maps)            | ✓      | ✓       | partial     | ✗              |
+| **Looker**   | ✓                         | ✓      | ✓       | partial     | partial        |
+| **Metabase** | partial                   | ✓      | partial | ✗           | ✗              |
+| **Superset** | ✓                         | ✓      | ✓       | ✓ (deck.gl) | partial        |
+| **Hex**      | via Mapbox/deck.gl plugin | ✓      | ✓       | ✓           | ✓              |
+| **Sigma**    | ✓ (Mapbox)                | ✓      | ✓       | ✗           | ✗              |
 
 **The patterns to copy:**
 
 - **Tile provider pluggable**: customers want OSM (free), Mapbox
   (paid), MapTiler, Google. Don't lock in.
 - **Coordinate columns auto-detected**: a column called `latitude`
-  + a column called `longitude` (or `lat`/`lng`/`location`) gets
-  the map suggested in the chart picker.
+  - a column called `longitude` (or `lat`/`lng`/`location`) gets
+    the map suggested in the chart picker.
 - **H3 / S2 spatial bucketing** for heatmaps over millions of
   points; doing it client-side melts the browser.
 - **GeoJSON layer support** for custom shapes (sales territories,
@@ -60,30 +60,30 @@
 
 ## 3. Gap matrix
 
-| ID | Gap | Severity | Effort |
-|---|---|---|---|
-| GEO-G01 | Tile provider configuration per org | P0 | M |
-| GEO-G02 | OSM / Mapbox / MapTiler / Google integrations | P0 | M |
-| GEO-G03 | Choropleth with `region_name → value` mapping | P0 | M |
-| GEO-G04 | Point map with lat/lng auto-detect | P0 | M |
-| GEO-G05 | Cluster markers when zoomed out | P0 | M |
-| GEO-G06 | Heatmap layer with H3 bucketing | P1 | M |
-| GEO-G07 | Flow / arc layer (lat/lng pairs) | P1 | M |
-| GEO-G08 | GeoJSON upload for custom polygons | P1 | M |
-| GEO-G09 | Projection picker (Mercator / Albers / Orthographic) | P1 | S |
-| GEO-G10 | Geocoding service (text address → lat/lng) | P1 | M |
-| GEO-G11 | Reverse geocoding (lat/lng → country / region) | P2 | M |
-| GEO-G12 | "Drill into region" interaction | P2 | M |
-| GEO-G13 | Country code normalisation (ISO 3166) | P0 | S |
-| GEO-G14 | Map zoom level + center as filter state | P1 | S |
-| GEO-G15 | Sankey full-feature wiring | P1 | M |
-| GEO-G16 | Parallel-coordinates full-feature wiring | P1 | M |
-| GEO-G17 | Treemap + sunburst full-feature wiring | P1 | M |
-| GEO-G18 | Radar full-feature wiring | P1 | S |
-| GEO-G19 | Boxplot + violin full-feature wiring | P1 | M |
-| GEO-G20 | Candlestick (financial) full-feature wiring | P2 | M |
-| GEO-G21 | Globe / 3D earth (ECharts-GL) | P2 | M |
-| GEO-G22 | Theme-river / streamgraph | P2 | S |
+| ID      | Gap                                                  | Severity | Effort |
+| ------- | ---------------------------------------------------- | -------- | ------ |
+| GEO-G01 | Tile provider configuration per org                  | P0       | M      |
+| GEO-G02 | OSM / Mapbox / MapTiler / Google integrations        | P0       | M      |
+| GEO-G03 | Choropleth with `region_name → value` mapping        | P0       | M      |
+| GEO-G04 | Point map with lat/lng auto-detect                   | P0       | M      |
+| GEO-G05 | Cluster markers when zoomed out                      | P0       | M      |
+| GEO-G06 | Heatmap layer with H3 bucketing                      | P1       | M      |
+| GEO-G07 | Flow / arc layer (lat/lng pairs)                     | P1       | M      |
+| GEO-G08 | GeoJSON upload for custom polygons                   | P1       | M      |
+| GEO-G09 | Projection picker (Mercator / Albers / Orthographic) | P1       | S      |
+| GEO-G10 | Geocoding service (text address → lat/lng)           | P1       | M      |
+| GEO-G11 | Reverse geocoding (lat/lng → country / region)       | P2       | M      |
+| GEO-G12 | "Drill into region" interaction                      | P2       | M      |
+| GEO-G13 | Country code normalisation (ISO 3166)                | P0       | S      |
+| GEO-G14 | Map zoom level + center as filter state              | P1       | S      |
+| GEO-G15 | Sankey full-feature wiring                           | P1       | M      |
+| GEO-G16 | Parallel-coordinates full-feature wiring             | P1       | M      |
+| GEO-G17 | Treemap + sunburst full-feature wiring               | P1       | M      |
+| GEO-G18 | Radar full-feature wiring                            | P1       | S      |
+| GEO-G19 | Boxplot + violin full-feature wiring                 | P1       | M      |
+| GEO-G20 | Candlestick (financial) full-feature wiring          | P2       | M      |
+| GEO-G21 | Globe / 3D earth (ECharts-GL)                        | P2       | M      |
+| GEO-G22 | Theme-river / streamgraph                            | P2       | S      |
 
 ## 4. Target architecture
 
@@ -118,21 +118,23 @@ export const TILE_PROVIDER_PRESETS = {
   },
   mapbox: {
     name: 'Mapbox',
-    tileUrlTemplate: 'https://api.mapbox.com/styles/v1/mapbox/light-v10/tiles/256/{z}/{x}/{y}?access_token={KEY}',
+    tileUrlTemplate:
+      'https://api.mapbox.com/styles/v1/mapbox/light-v10/tiles/256/{z}/{x}/{y}?access_token={KEY}',
     attribution: '© Mapbox © OpenStreetMap',
     maxZoom: 22,
     requiresKey: true,
   },
   maptiler: {
     name: 'MapTiler',
-    tileUrlTemplate: 'https://api.maptiler.com/maps/streets/{z}/{x}/{y}.png?key={KEY}',
+    tileUrlTemplate:
+      'https://api.maptiler.com/maps/streets/{z}/{x}/{y}.png?key={KEY}',
     attribution: '© MapTiler © OpenStreetMap',
     maxZoom: 22,
     requiresKey: true,
   },
   google: {
     name: 'Google Maps',
-    tileUrlTemplate: '',     // Google requires their JS SDK; tile-only URL doesn't exist
+    tileUrlTemplate: '', // Google requires their JS SDK; tile-only URL doesn't exist
     attribution: '© Google',
     maxZoom: 22,
     requiresKey: true,
@@ -145,21 +147,24 @@ export const TILE_PROVIDER_PRESETS = {
 
 ```ts
 export interface ChoroplethConfig {
-  geoJsonId: string;                   // ID of an uploaded GeoJSON or built-in
-  regionProperty: string;              // e.g. "ISO_A2" — joins on this property
-  valueColumn: string;                 // dataset column with the value
-  joinColumn: string;                  // dataset column with the region key
-  scale: 'linear'|'log'|'quantile';
-  colorRange: [string, string];         // hex endpoints
+  geoJsonId: string; // ID of an uploaded GeoJSON or built-in
+  regionProperty: string; // e.g. "ISO_A2" — joins on this property
+  valueColumn: string; // dataset column with the value
+  joinColumn: string; // dataset column with the region key
+  scale: 'linear' | 'log' | 'quantile';
+  colorRange: [string, string]; // hex endpoints
   nullColor: string;
 }
 
 // Built-in GeoJSON catalogue
 export const BUILTIN_GEOJSONS = {
-  'world-countries':  { url: '/geo/world-countries-110m.json', property: 'ISO_A2' },
-  'us-states':        { url: '/geo/us-states.json',            property: 'STATE_CODE' },
-  'us-counties':      { url: '/geo/us-counties.json',          property: 'FIPS' },
-  'eu-nuts2':         { url: '/geo/eu-nuts2.json',             property: 'NUTS_ID' },
+  'world-countries': {
+    url: '/geo/world-countries-110m.json',
+    property: 'ISO_A2',
+  },
+  'us-states': { url: '/geo/us-states.json', property: 'STATE_CODE' },
+  'us-counties': { url: '/geo/us-counties.json', property: 'FIPS' },
+  'eu-nuts2': { url: '/geo/eu-nuts2.json', property: 'NUTS_ID' },
   // ...
 };
 ```
@@ -191,8 +196,11 @@ async function uploadGeoJson(req, res) {
   const file = req.file;
   const text = file.buffer.toString('utf8');
   let geo: any;
-  try { geo = JSON.parse(text); }
-  catch { return sendResponse(res, false, 400, 'geo.invalid_json'); }
+  try {
+    geo = JSON.parse(text);
+  } catch {
+    return sendResponse(res, false, 400, 'geo.invalid_json');
+  }
   if (geo.type !== 'FeatureCollection') {
     return sendResponse(res, false, 400, 'geo.not_feature_collection');
   }
@@ -210,7 +218,9 @@ async function uploadGeoJson(req, res) {
 
   // Upload + persist
   const key = `geo/${res.locals.orgData.id}/${randomUUID()}.geojson`;
-  await s3.upload({ Bucket: process.env.GEO_BUCKET!, Key: key, Body: file.buffer }).promise();
+  await s3
+    .upload({ Bucket: process.env.GEO_BUCKET!, Key: key, Body: file.buffer })
+    .promise();
 
   const row = await OrgGeoJson.save({
     organisationId: res.locals.orgData.id,
@@ -234,10 +244,12 @@ async function uploadGeoJson(req, res) {
 function autoDetectLatLng(columns: ColumnMeta[]) {
   const latCandidates = ['latitude', 'lat', 'y_coord'];
   const lngCandidates = ['longitude', 'lng', 'long', 'x_coord'];
-  const lat = columns.find(c => latCandidates.includes(c.name.toLowerCase()))
-           ?? columns.find(c => c.type === 'numeric' && /^lat/i.test(c.name));
-  const lng = columns.find(c => lngCandidates.includes(c.name.toLowerCase()))
-           ?? columns.find(c => c.type === 'numeric' && /^(lng|lon|long)/i.test(c.name));
+  const lat =
+    columns.find(c => latCandidates.includes(c.name.toLowerCase())) ??
+    columns.find(c => c.type === 'numeric' && /^lat/i.test(c.name));
+  const lng =
+    columns.find(c => lngCandidates.includes(c.name.toLowerCase())) ??
+    columns.find(c => c.type === 'numeric' && /^(lng|lon|long)/i.test(c.name));
   return { lat: lat?.name, lng: lng?.name };
 }
 ```
@@ -252,7 +264,13 @@ import { latLngToCell, cellToBoundary } from 'h3-js';
 
 // BE: when the chart is configured as heatmap with H3 bucketing,
 // the data fetch is wrapped in an aggregation.
-async function bucketByH3(rows: any[], latCol: string, lngCol: string, resolution: number, valueCol?: string) {
+async function bucketByH3(
+  rows: any[],
+  latCol: string,
+  lngCol: string,
+  resolution: number,
+  valueCol?: string,
+) {
   const buckets = new Map<string, { value: number; count: number }>();
   for (const r of rows) {
     const lat = Number(r[latCol]);
@@ -266,7 +284,7 @@ async function bucketByH3(rows: any[], latCol: string, lngCol: string, resolutio
   }
   return Array.from(buckets.entries()).map(([cell, b]) => ({
     cell,
-    boundary: cellToBoundary(cell, true),    // [lng, lat] pairs forming a hex
+    boundary: cellToBoundary(cell, true), // [lng, lat] pairs forming a hex
     value: b.value,
     count: b.count,
   }));
@@ -318,7 +336,9 @@ countryAlpha.registerLocale(require('i18n-iso-countries/langs/en.json'));
 export function normalizeCountry(input: string): string | null {
   // Accept 'US', 'USA', 'United States', 'us-en', 'États-Unis'
   if (input.length === 2) {
-    return countryAlpha.alpha2ToAlpha3(input.toUpperCase()) ? input.toUpperCase() : null;
+    return countryAlpha.alpha2ToAlpha3(input.toUpperCase())
+      ? input.toUpperCase()
+      : null;
   }
   if (input.length === 3) {
     return countryAlpha.alpha3ToAlpha2(input.toUpperCase());
@@ -338,8 +358,13 @@ For "convert text address → lat/lng" workflows:
 ```ts
 // shared/services/geo/geocoder.ts
 export interface Geocoder {
-  forward(address: string): Promise<{ lat: number; lng: number; confidence: number } | null>;
-  reverse(lat: number, lng: number): Promise<{ country?: string; region?: string; city?: string } | null>;
+  forward(
+    address: string,
+  ): Promise<{ lat: number; lng: number; confidence: number } | null>;
+  reverse(
+    lat: number,
+    lng: number,
+  ): Promise<{ country?: string; region?: string; city?: string } | null>;
 }
 
 class MapboxGeocoder implements Geocoder {
@@ -362,8 +387,12 @@ class MapboxGeocoder implements Geocoder {
   }
 }
 
-class NominatimGeocoder implements Geocoder { /* OSM-based, free, rate-limited */ }
-class GoogleGeocoder implements Geocoder { /* Maps Geocoding API */ }
+class NominatimGeocoder implements Geocoder {
+  /* OSM-based, free, rate-limited */
+}
+class GoogleGeocoder implements Geocoder {
+  /* Maps Geocoding API */
+}
 ```
 
 Endpoint that augments datasets:
@@ -372,7 +401,9 @@ Endpoint that augments datasets:
 // POST /datasets/:id/geocode  body: { addressColumn, latColumn, lngColumn }
 async function geocodeDataset(req, res) {
   const { addressColumn, latColumn, lngColumn } = req.body;
-  const cfg = await OrgGeoConfig.findOne({ where: { organisationId: res.locals.orgData.id } });
+  const cfg = await OrgGeoConfig.findOne({
+    where: { organisationId: res.locals.orgData.id },
+  });
   const geocoder = providerFor(cfg);
 
   // Stream rows, call geocoder, write back lat/lng columns
@@ -409,15 +440,17 @@ function transformForSankey(rows: any[], config: SankeyConfig) {
 // echarts-option-builder.ts excerpt
 function buildSankeyOption(data: SankeyData, options: SankeyOptions) {
   return {
-    series: [{
-      type: 'sankey',
-      data: data.nodes,
-      links: data.links,
-      nodeAlign: options.nodeAlign ?? 'justify',     // left|right|justify
-      orient: options.orient ?? 'horizontal',
-      lineStyle: { color: 'gradient', curveness: 0.5 },
-      label: { show: options.showLabels ?? true },
-    }],
+    series: [
+      {
+        type: 'sankey',
+        data: data.nodes,
+        links: data.links,
+        nodeAlign: options.nodeAlign ?? 'justify', // left|right|justify
+        orient: options.orient ?? 'horizontal',
+        lineStyle: { color: 'gradient', curveness: 0.5 },
+        label: { show: options.showLabels ?? true },
+      },
+    ],
   };
 }
 ```
@@ -440,11 +473,13 @@ function transformForParallel(rows: any[], config: ParallelConfig) {
 function buildParallelOption(data: ParallelData) {
   return {
     parallelAxis: data.axes,
-    series: [{
-      type: 'parallel',
-      data: data.data,
-      lineStyle: { width: 1, opacity: 0.3 },
-    }],
+    series: [
+      {
+        type: 'parallel',
+        data: data.data,
+        lineStyle: { width: 1, opacity: 0.3 },
+      },
+    ],
   };
 }
 ```
@@ -468,32 +503,36 @@ function transformForHierarchy(rows: any[], config: HierarchyConfig) {
     const node = nodeMap.get(r[nameColumn]);
     const parent = r[parentColumn] ? nodeMap.get(r[parentColumn]) : null;
     if (parent) parent.children.push(node);
-    else        roots.push(node);
+    else roots.push(node);
   }
   return roots;
 }
 
 function buildTreemapOption(data: any) {
   return {
-    series: [{
-      type: 'treemap',
-      data,
-      breadcrumb: { show: true },
-      label: { show: true, formatter: '{b}\n{c}' },
-      upperLabel: { show: true },
-    }],
+    series: [
+      {
+        type: 'treemap',
+        data,
+        breadcrumb: { show: true },
+        label: { show: true, formatter: '{b}\n{c}' },
+        upperLabel: { show: true },
+      },
+    ],
   };
 }
 
 function buildSunburstOption(data: any) {
   return {
-    series: [{
-      type: 'sunburst',
-      data,
-      radius: ['10%', '90%'],
-      label: { rotate: 'radial' },
-      emphasis: { focus: 'ancestor' },
-    }],
+    series: [
+      {
+        type: 'sunburst',
+        data,
+        radius: ['10%', '90%'],
+        label: { rotate: 'radial' },
+        emphasis: { focus: 'ancestor' },
+      },
+    ],
   };
 }
 ```
@@ -514,7 +553,7 @@ function transformForBoxplot(rows: any[], config: BoxplotConfig) {
   }
   // Compute the five-number summary per group
   const categories: string[] = [];
-  const boxes: number[][] = [];        // [min, q1, median, q3, max]
+  const boxes: number[][] = []; // [min, q1, median, q3, max]
   const outliers: [number, number][] = [];
   let xIndex = 0;
   for (const [cat, vals] of groups) {
@@ -529,7 +568,9 @@ function transformForBoxplot(rows: any[], config: BoxplotConfig) {
     categories.push(cat);
     boxes.push([
       inliers[0] ?? lower,
-      q1, quantile(vals, 0.5), q3,
+      q1,
+      quantile(vals, 0.5),
+      q3,
       inliers.at(-1) ?? upper,
     ]);
     for (const o of out) outliers.push([xIndex, o]);
@@ -580,29 +621,31 @@ function buildGlobeOption(data: any) {
       },
       viewControl: { autoRotate: false, projection: 'perspective' },
     },
-    series: [{
-      type: 'scatter3D',
-      coordinateSystem: 'globe',
-      data: data.points.map((p: any) => [p.lng, p.lat, p.value]),
-      symbolSize: 8,
-    }],
+    series: [
+      {
+        type: 'scatter3D',
+        coordinateSystem: 'globe',
+        data: data.points.map((p: any) => [p.lng, p.lat, p.value]),
+        symbolSize: 8,
+      },
+    ],
   };
 }
 ```
 
 ## 5. APIs
 
-| Method | Path | Purpose |
-|---|---|---|
-| GET | `/geo/config` | Org's tile provider config |
-| PUT | `/geo/config` | Update |
-| GET | `/geo/providers` | Built-in tile provider presets |
-| GET | `/geo/geojsons` | List org's uploaded GeoJSON |
-| POST | `/geo/geojsons` | Upload |
-| DELETE | `/geo/geojsons/:id` | Remove |
-| POST | `/visuals/:id/heatmap` | H3-bucketed heatmap data |
-| POST | `/datasets/:id/geocode` | Augment with lat/lng |
-| GET | `/geo/builtins` | Built-in geojson catalogue |
+| Method | Path                    | Purpose                        |
+| ------ | ----------------------- | ------------------------------ |
+| GET    | `/geo/config`           | Org's tile provider config     |
+| PUT    | `/geo/config`           | Update                         |
+| GET    | `/geo/providers`        | Built-in tile provider presets |
+| GET    | `/geo/geojsons`         | List org's uploaded GeoJSON    |
+| POST   | `/geo/geojsons`         | Upload                         |
+| DELETE | `/geo/geojsons/:id`     | Remove                         |
+| POST   | `/visuals/:id/heatmap`  | H3-bucketed heatmap data       |
+| POST   | `/datasets/:id/geocode` | Augment with lat/lng           |
+| GET    | `/geo/builtins`         | Built-in geojson catalogue     |
 
 ## 6. FE specs
 
@@ -644,14 +687,17 @@ Map configuration
 
 ```ts
 export const updateGeoConfigSchema = z.object({
-  tileProvider: z.enum(['osm','mapbox','maptiler','google','self']),
+  tileProvider: z.enum(['osm', 'mapbox', 'maptiler', 'google', 'self']),
   tileUrlTemplate: z.string().url().optional(),
   apiKey: z.string().min(8).max(255).optional(),
   attribution: z.string().max(255),
   maxZoom: z.number().int().min(1).max(22).default(18),
   defaultZoom: z.number().int().min(1).max(22).default(4),
-  defaultCenter: z.object({ lat: z.number().min(-90).max(90), lng: z.number().min(-180).max(180) }),
-  geocoderProvider: z.enum(['mapbox','nominatim','google']).optional(),
+  defaultCenter: z.object({
+    lat: z.number().min(-90).max(90),
+    lng: z.number().min(-180).max(180),
+  }),
+  geocoderProvider: z.enum(['mapbox', 'nominatim', 'google']).optional(),
   geocoderKey: z.string().optional(),
 });
 

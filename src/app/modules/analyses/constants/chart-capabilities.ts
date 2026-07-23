@@ -228,7 +228,12 @@ export const CHART_CAPABILITIES: Record<string, ChartCapabilities> = {
   }),
 
   /* ── Statistical ────────────────────────────────────────────────────── */
-  'box-chart': cap({ xAxis: true, yAxis: true, tooltip: true, referenceLines: true }),
+  'box-chart': cap({
+    xAxis: true,
+    yAxis: true,
+    tooltip: true,
+    referenceLines: true,
+  }),
   histogram: cap({
     xAxis: true,
     yAxis: true,
@@ -236,11 +241,23 @@ export const CHART_CAPABILITIES: Record<string, ChartCapabilities> = {
     referenceLines: true,
     tooltip: true,
   }),
-  radar: cap({ legend: true, dataLabels: true, colorByDimension: true, tooltip: true, polar: true }),
+  radar: cap({
+    legend: true,
+    dataLabels: true,
+    colorByDimension: true,
+    tooltip: true,
+    polar: true,
+  }),
   parallel: cap({ legend: true, colorByDimension: true, tooltip: true }),
 
   /* ── Funnel ─────────────────────────────────────────────────────────── */
-  funnel: cap({ legend: true, dataLabels: true, colorByDimension: true, sort: true, tooltip: true }),
+  funnel: cap({
+    legend: true,
+    dataLabels: true,
+    colorByDimension: true,
+    sort: true,
+    tooltip: true,
+  }),
 
   /* ── Hierarchical ───────────────────────────────────────────────────── */
   sunburst: cap({ dataLabels: true, colorByDimension: true, tooltip: true }),
@@ -248,17 +265,46 @@ export const CHART_CAPABILITIES: Record<string, ChartCapabilities> = {
 
   /* ── Flow ───────────────────────────────────────────────────────────── */
   sankey: cap({ dataLabels: true, colorByDimension: true, tooltip: true }),
-  graph: cap({ legend: true, dataLabels: true, colorByDimension: true, tooltip: true }),
+  graph: cap({
+    legend: true,
+    dataLabels: true,
+    colorByDimension: true,
+    tooltip: true,
+  }),
   'flow-lines': cap({ tooltip: true, colorByDimension: true }),
 
   /* ── Bar variants ───────────────────────────────────────────────────── */
-  waterfall: cap({ xAxis: true, yAxis: true, dataLabels: true, referenceLines: true, tooltip: true }),
-  'pictorial-bar': cap({ xAxis: true, yAxis: true, dataLabels: true, tooltip: true, sort: true }),
-  'bar-polar': cap({ legend: true, dataLabels: true, colorByDimension: true, tooltip: true, polar: true }),
+  waterfall: cap({
+    xAxis: true,
+    yAxis: true,
+    dataLabels: true,
+    referenceLines: true,
+    tooltip: true,
+  }),
+  'pictorial-bar': cap({
+    xAxis: true,
+    yAxis: true,
+    dataLabels: true,
+    tooltip: true,
+    sort: true,
+  }),
+  'bar-polar': cap({
+    legend: true,
+    dataLabels: true,
+    colorByDimension: true,
+    tooltip: true,
+    polar: true,
+  }),
 
   /* ── Special / financial ────────────────────────────────────────────── */
   'theme-river': cap({ legend: true, colorByDimension: true, tooltip: true }),
-  candlestick: cap({ xAxis: true, yAxis: true, tooltip: true, referenceLines: true, dataLabels: true }),
+  candlestick: cap({
+    xAxis: true,
+    yAxis: true,
+    tooltip: true,
+    referenceLines: true,
+    dataLabels: true,
+  }),
 
   /* ── 3D (echarts-gl) ────────────────────────────────────────────────── */
   bar3d: THREE_D,
@@ -267,25 +313,63 @@ export const CHART_CAPABILITIES: Record<string, ChartCapabilities> = {
   surface: THREE_D,
   globe: cap({ threeD: true, geo: true, tooltip: true }),
   graphgl: cap({ threeD: true, tooltip: true, colorByDimension: true }),
-  scattergl: cap({ threeD: true, tooltip: true, colorScale: true, sizeEncoding: true }),
+  scattergl: cap({
+    threeD: true,
+    tooltip: true,
+    colorScale: true,
+    sizeEncoding: true,
+  }),
   linesgl: cap({ threeD: true, tooltip: true }),
-  map3d: cap({ threeD: true, geo: true, colorScale: true, requiresRegion: true, tooltip: true }),
+  map3d: cap({
+    threeD: true,
+    geo: true,
+    colorScale: true,
+    requiresRegion: true,
+    tooltip: true,
+  }),
   flowgl: cap({ threeD: true, geo: true, tooltip: true }),
   lines3d: cap({ threeD: true, geo: true, tooltip: true }),
-  polygons3d: cap({ threeD: true, geo: true, colorScale: true, requiresRegion: true, tooltip: true }),
+  polygons3d: cap({
+    threeD: true,
+    geo: true,
+    colorScale: true,
+    requiresRegion: true,
+    tooltip: true,
+  }),
 
   /* ── 2D geo map ─────────────────────────────────────────────────────── */
   // world-map is a data-bound choropleth (Wave 4): region join + colour scale.
-  'world-map': cap({ geo: true, requiresRegion: true, colorScale: true, tooltip: true }),
+  'world-map': cap({
+    geo: true,
+    requiresRegion: true,
+    colorScale: true,
+    tooltip: true,
+  }),
 
   /* ══ Wave 4 new chart types ═════════════════════════════════════════════ */
 
   // Bullet — measure vs target with qualitative bands (single cartesian bar).
-  bullet: cap({ xAxis: true, yAxis: true, dataLabels: true, referenceLines: true, tooltip: true }),
+  bullet: cap({
+    xAxis: true,
+    yAxis: true,
+    dataLabels: true,
+    referenceLines: true,
+    tooltip: true,
+  }),
   // Choropleth — region-shaded map. Needs a region column; colours by measure.
-  choropleth: cap({ geo: true, requiresRegion: true, colorScale: true, tooltip: true }),
+  choropleth: cap({
+    geo: true,
+    requiresRegion: true,
+    colorScale: true,
+    tooltip: true,
+  }),
   // Point map — markers at lat/lon.
-  'point-map': cap({ geo: true, requiresLatLon: true, tooltip: true, colorByDimension: true }),
+  'point-map': cap({
+    geo: true,
+    requiresLatLon: true,
+    tooltip: true,
+    colorByDimension: true,
+  }),
   // Bubble map — lat/lon markers sized by a measure.
   'bubble-map': cap({
     geo: true,
@@ -301,7 +385,12 @@ export const CHART_CAPABILITIES: Record<string, ChartCapabilities> = {
   // Ridgeline — stacked density ridges (needs statistical binning).
   ridgeline: cap({ xAxis: true, yAxis: true, legend: true, tooltip: true }),
   // Streamgraph — themeRiver over time, centre-baseline stacked areas.
-  streamgraph: cap({ legend: true, colorByDimension: true, stacking: true, tooltip: true }),
+  streamgraph: cap({
+    legend: true,
+    colorByDimension: true,
+    stacking: true,
+    tooltip: true,
+  }),
   // Marimekko — variable-width stacked bars (share × share).
   marimekko: cap({
     xAxis: true,
@@ -313,7 +402,11 @@ export const CHART_CAPABILITIES: Record<string, ChartCapabilities> = {
     tooltip: true,
   }),
   // Calendar heatmap — value per day on a calendar grid.
-  'calendar-heatmap': cap({ colorScale: true, tooltip: true, dataLabels: true }),
+  'calendar-heatmap': cap({
+    colorScale: true,
+    tooltip: true,
+    dataLabels: true,
+  }),
   // Lollipop — stems + dots (bar alternative).
   lollipop: cap({
     xAxis: true,
@@ -345,9 +438,21 @@ export const CHART_CAPABILITIES: Record<string, ChartCapabilities> = {
     tooltip: true,
   }),
   // Slope — two-point line per series (rank/value change between two periods).
-  slope: cap({ xAxis: true, yAxis: true, legend: true, dataLabels: true, tooltip: true }),
+  slope: cap({
+    xAxis: true,
+    yAxis: true,
+    legend: true,
+    dataLabels: true,
+    tooltip: true,
+  }),
   // Bump — rank-over-time lines.
-  bump: cap({ xAxis: true, yAxis: true, legend: true, dataLabels: true, tooltip: true }),
+  bump: cap({
+    xAxis: true,
+    yAxis: true,
+    legend: true,
+    dataLabels: true,
+    tooltip: true,
+  }),
   // Pareto — sorted bars + cumulative-% line on a secondary axis.
   pareto: cap({
     xAxis: true,
@@ -364,9 +469,21 @@ export const CHART_CAPABILITIES: Record<string, ChartCapabilities> = {
   // Network — force-directed node/link graph.
   network: cap({ legend: true, colorByDimension: true, tooltip: true }),
   // Cycle plot — seasonal sub-series lines.
-  'cycle-plot': cap({ xAxis: true, yAxis: true, legend: true, tooltip: true, smallMultiples: true }),
+  'cycle-plot': cap({
+    xAxis: true,
+    yAxis: true,
+    legend: true,
+    tooltip: true,
+    smallMultiples: true,
+  }),
   // Wind rose — polar stacked bars by direction.
-  'wind-rose': cap({ legend: true, colorByDimension: true, stacking: true, tooltip: true, polar: true }),
+  'wind-rose': cap({
+    legend: true,
+    colorByDimension: true,
+    stacking: true,
+    tooltip: true,
+    polar: true,
+  }),
   // Radial bar — bars on a polar radius axis.
   'radial-bar': cap({
     legend: true,
@@ -384,7 +501,12 @@ export const CHART_CAPABILITIES: Record<string, ChartCapabilities> = {
   // Hexbin — 2D hex-binned density (needs statistical binning).
   hexbin: cap({ xAxis: true, yAxis: true, colorScale: true, tooltip: true }),
   // Q-Q plot — quantile-quantile scatter (needs statistical pre-processing).
-  'qq-plot': cap({ xAxis: true, yAxis: true, referenceLines: true, tooltip: true }),
+  'qq-plot': cap({
+    xAxis: true,
+    yAxis: true,
+    referenceLines: true,
+    tooltip: true,
+  }),
   // ECDF — empirical cumulative distribution step line (needs pre-processing).
   ecdf: cap({ xAxis: true, yAxis: true, tooltip: true }),
 };

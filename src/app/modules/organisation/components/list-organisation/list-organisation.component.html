@@ -110,7 +110,9 @@
                      button, filters) stays clickable. -->
                 <i
                   class="pi"
-                  [ngClass]="isDeleting(org.id) ? 'pi-spin pi-spinner' : 'pi-trash'"
+                  [ngClass]="
+                    isDeleting(org.id) ? 'pi-spin pi-spinner' : 'pi-trash'
+                  "
                 ></i>
               </button>
             </div>

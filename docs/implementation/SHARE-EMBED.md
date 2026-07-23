@@ -103,31 +103,47 @@ includes it in the iframe URL: `/embed/<linkToken>#jwt=<token>`.
 
 ```jsonc
 {
-  "sub":     "alice@parent-app.com",     // viewer identity
-  "name":    "Alice Smith",
-  "email":   "alice@parent-app.com",
-  "groups":  ["g_customers"],
-  "attrs":   { "region": "APAC" },        // surfaced to RLS (module 09)
-  "params":  { "as_of_date": "2026-06-26" },
-  "iat":     1719360000,
-  "exp":     1719360300,                  // 5-min TTL
-  "jti":     "01HXY...",                  // replay protection
-  "iss":     "customer-saas.com",
-  "aud":     "dbexec.com/embed/<embed_app_id>"
+  "sub": "alice@parent-app.com", // viewer identity
+  "name": "Alice Smith",
+  "email": "alice@parent-app.com",
+  "groups": ["g_customers"],
+  "attrs": { "region": "APAC" }, // surfaced to RLS (module 09)
+  "params": { "as_of_date": "2026-06-26" },
+  "iat": 1719360000,
+  "exp": 1719360300, // 5-min TTL
+  "jti": "01HXY...", // replay protection
+  "iss": "customer-saas.com",
+  "aud": "dbexec.com/embed/<embed_app_id>",
 }
 ```
 
 Verification:
 
 ```typescript
-async function verifyEmbedJwt(token: string, embedApp: EmbedApp): Promise<JwtClaims> {
-  const secret = await decryptSecret(embedApp.signingSecretEnc, embedApp.dekId, embedApp.orgId);
-  const claims = jwt.verify(token, secret, { algorithms: [embedApp.signingAlg] }) as JwtClaims;
+async function verifyEmbedJwt(
+  token: string,
+  embedApp: EmbedApp,
+): Promise<JwtClaims> {
+  const secret = await decryptSecret(
+    embedApp.signingSecretEnc,
+    embedApp.dekId,
+    embedApp.orgId,
+  );
+  const claims = jwt.verify(token, secret, {
+    algorithms: [embedApp.signingAlg],
+  }) as JwtClaims;
 
-  if (claims.aud !== `dbexec.com/embed/${embedApp.id}`) throw new Error('AUD_MISMATCH');
+  if (claims.aud !== `dbexec.com/embed/${embedApp.id}`)
+    throw new Error('AUD_MISMATCH');
 
   // Replay protection: jti seen?
-  const replayed = await redis.set(`embed:jti:${claims.jti}`, '1', 'EX', 600, 'NX');
+  const replayed = await redis.set(
+    `embed:jti:${claims.jti}`,
+    '1',
+    'EX',
+    600,
+    'NX',
+  );
   if (!replayed) throw new Error('REPLAY');
 
   // Hard cap on TTL (don't trust IDP)
@@ -144,8 +160,20 @@ async function verifyEmbedJwt(token: string, embedApp: EmbedApp): Promise<JwtCla
 ```typescript
 // src/controllers/share/createShareLink.ts
 const createShareLink = async (req: Request, res: Response) => {
-  const { targetKind, targetId, mode, grantedUserIds, grantedGroupIds, embedAppId,
-          expiresAt, password, allowCsv, allowPdf, parameterLock, watermark } = req.body;
+  const {
+    targetKind,
+    targetId,
+    mode,
+    grantedUserIds,
+    grantedGroupIds,
+    embedAppId,
+    expiresAt,
+    password,
+    allowCsv,
+    allowPdf,
+    parameterLock,
+    watermark,
+  } = req.body;
   const { loggedInId, orgData, master_db_connection } = res.locals;
   const connection = orgData.connection;
   try {
@@ -153,32 +181,52 @@ const createShareLink = async (req: Request, res: Response) => {
     let tokenPrefix: string | null = null;
     let rawToken: string | null = null;
     if (mode === 'public' || mode === 'embed') {
-      const t = generateOpaqueToken();              // 32 bytes base64url
-      tokenHash = t.hash; tokenPrefix = t.prefix; rawToken = t.raw;
+      const t = generateOpaqueToken(); // 32 bytes base64url
+      tokenHash = t.hash;
+      tokenPrefix = t.prefix;
+      rawToken = t.raw;
     }
 
     if (mode === 'embed') {
-      const app = await connection.getRepository('EmbedApp').findOne({ where: { id: embedAppId } });
-      if (!app) { await master_db_connection.close();
-        return sendResponse(res, false, CODE.NOT_FOUND, SHARE_MSG.EMBED_APP_NOT_FOUND); }
+      const app = await connection
+        .getRepository('EmbedApp')
+        .findOne({ where: { id: embedAppId } });
+      if (!app) {
+        await master_db_connection.close();
+        return sendResponse(
+          res,
+          false,
+          CODE.NOT_FOUND,
+          SHARE_MSG.EMBED_APP_NOT_FOUND,
+        );
+      }
     }
 
     const passwordHash = password ? await argon2.hash(password) : null;
 
     const link = await connection.getRepository('ShareLink').save({
-      orgId: orgData.orgId, targetKind, targetId, mode,
-      tokenHash, tokenPrefix,
-      grantedUserIds: grantedUserIds ?? [], grantedGroupIds: grantedGroupIds ?? [],
+      orgId: orgData.orgId,
+      targetKind,
+      targetId,
+      mode,
+      tokenHash,
+      tokenPrefix,
+      grantedUserIds: grantedUserIds ?? [],
+      grantedGroupIds: grantedGroupIds ?? [],
       embedAppId: embedAppId ?? null,
-      expiresAt, passwordHash,
+      expiresAt,
+      passwordHash,
       watermark: watermark ?? true,
-      allowCsv: !!allowCsv, allowPdf: allowPdf ?? true,
+      allowCsv: !!allowCsv,
+      allowPdf: allowPdf ?? true,
       parameterLock: parameterLock ?? null,
       createdBy: loggedInId,
     });
 
     await auditLogger.logAuditToOrg({
-      connection, req, res,
+      connection,
+      req,
+      res,
       module: AUDIT_MODULES.SHARE_LINK,
       action: AUDIT_ACTIONS.CREATE,
       entityName: 'ShareLink',
@@ -192,7 +240,7 @@ const createShareLink = async (req: Request, res: Response) => {
       url: rawToken
         ? `https://${HOSTNAME}/${mode === 'embed' ? 'embed' : 'view'}/${rawToken}`
         : null,
-      rawToken,                                       // show once, never again
+      rawToken, // show once, never again
     });
   } catch (err: any) {
     Logger.error(`Create share link failed: ${err.message}`);
@@ -213,40 +261,53 @@ const createShareLink = async (req: Request, res: Response) => {
 const viewShareLink = async (req: Request, res: Response) => {
   const { token } = req.params;
   const prefix = token.slice(0, 8);
-  const link = await connection.getRepository('ShareLink')
+  const link = await connection
+    .getRepository('ShareLink')
     .createQueryBuilder('l')
     .where('l.token_prefix = :prefix', { prefix })
     .andWhere('l.revoked_at IS NULL')
     .getOne();
   if (!link) return res.status(404).send('Not found');
 
-  if (sha256(token).compare(link.tokenHash) !== 0) return res.status(404).send('Not found');
-  if (link.expiresAt && link.expiresAt < new Date()) return res.status(410).send('Expired');
+  if (sha256(token).compare(link.tokenHash) !== 0)
+    return res.status(404).send('Not found');
+  if (link.expiresAt && link.expiresAt < new Date())
+    return res.status(410).send('Expired');
 
   if (link.mode === 'public' && link.passwordHash) {
     // Render a password gate first
-    if (!req.query.pw || !(await argon2.verify(link.passwordHash, req.query.pw as string))) {
+    if (
+      !req.query.pw ||
+      !(await argon2.verify(link.passwordHash, req.query.pw as string))
+    ) {
       return res.render('share-password', { token });
     }
   }
 
   if (link.mode === 'embed') {
-    const jwtToken = (req.headers['x-dbexec-embed-jwt'] || extractJwtFromHash(req.url)) as string;
+    const jwtToken = (req.headers['x-dbexec-embed-jwt'] ||
+      extractJwtFromHash(req.url)) as string;
     const app = await loadEmbedApp(link.embedAppId);
     let claims: JwtClaims;
-    try { claims = await verifyEmbedJwt(jwtToken, app); }
-    catch (e: any) { return res.status(401).send(e.message); }
+    try {
+      claims = await verifyEmbedJwt(jwtToken, app);
+    } catch (e: any) {
+      return res.status(401).send(e.message);
+    }
 
     // Set CSP frame-ancestors per allowed_origins
-    res.setHeader('Content-Security-Policy',
-      `frame-ancestors ${app.allowedOrigins.join(' ')}`);
+    res.setHeader(
+      'Content-Security-Policy',
+      `frame-ancestors ${app.allowedOrigins.join(' ')}`,
+    );
   }
 
   // Log view
   await connection.getRepository('ShareLinkView').save({
     shareLinkId: link.id,
     viewerUserId: req.user?.id ?? null,
-    viewerIp: req.ip, viewerUa: req.headers['user-agent'],
+    viewerIp: req.ip,
+    viewerUa: req.headers['user-agent'],
     jwtJti: link.mode === 'embed' ? jwtClaims!.jti : null,
   });
 
@@ -326,55 +387,58 @@ with three tabs:
 │              onload="parentIssueJwt()" ></iframe>             │
 │    [Copy snippet]   [Test in sandbox]                         │
 └─────────────────────────────────────────────────────────────┘
-                                  [Cancel]  [Save share link]   
+                                  [Cancel]  [Save share link]
 ```
 
 ---
 
 ## 7. Observability
 
-| Metric | Type | Labels | Purpose |
-|---|---|---|---|
-| `dbexec_share_link_create_total` | counter | `mode`, `org` | usage |
-| `dbexec_share_view_total` | counter | `mode`, `outcome` | view + bounce by mode |
-| `dbexec_embed_jwt_fail_total` | counter | `reason` (sig, aud, exp, replay) | leading indicator |
-| `dbexec_share_link_revoked_total` | counter | `mode` | hygiene |
-| `dbexec_share_view_unique_24h` | gauge | `link` | per-link uniques |
+| Metric                            | Type    | Labels                           | Purpose               |
+| --------------------------------- | ------- | -------------------------------- | --------------------- |
+| `dbexec_share_link_create_total`  | counter | `mode`, `org`                    | usage                 |
+| `dbexec_share_view_total`         | counter | `mode`, `outcome`                | view + bounce by mode |
+| `dbexec_embed_jwt_fail_total`     | counter | `reason` (sig, aud, exp, replay) | leading indicator     |
+| `dbexec_share_link_revoked_total` | counter | `mode`                           | hygiene               |
+| `dbexec_share_view_unique_24h`    | gauge   | `link`                           | per-link uniques      |
 
 ---
 
 ## 8. Security & threat model
 
-| Threat | Mitigation |
-|---|---|
-| Token guess | 32 random bytes (256 bits); prefix lookup but full-hash verify |
-| Token leak in referrer | Tokens in URL path (referrer policy `no-referrer`) + viewer page sets `Referrer-Policy: no-referrer` |
-| JWT replay | jti tracked in Redis with TTL = JWT remaining lifetime |
-| JWT iss/aud mix-up | iss + aud verified explicitly; aud bound to embed_app.id |
-| Embed clickjacking | CSP frame-ancestors + X-Frame-Options for non-embed routes |
-| CSP bypass via legacy browsers | postMessage origin allowlist as backstop |
-| Public link to a PII-heavy dashboard | Warning shown at create + watermark forced ON for public mode |
-| Password brute-force on public link | argon2 hash + per-IP rate limit (5 attempts/min) |
-| Internal share to a user not in this org | Grants validated against org users at save |
-| Revocation latency | Revoke flips `revoked_at`; in-flight sessions check on next request (no SSE channel; accepted) |
-| CSV exfiltration via public link | `allow_csv` default false; per-org toggle |
-| postMessage injection from rogue parent | All messages validated against allowed_origins; unknown command ignored + logged |
+| Threat                                   | Mitigation                                                                                           |
+| ---------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| Token guess                              | 32 random bytes (256 bits); prefix lookup but full-hash verify                                       |
+| Token leak in referrer                   | Tokens in URL path (referrer policy `no-referrer`) + viewer page sets `Referrer-Policy: no-referrer` |
+| JWT replay                               | jti tracked in Redis with TTL = JWT remaining lifetime                                               |
+| JWT iss/aud mix-up                       | iss + aud verified explicitly; aud bound to embed_app.id                                             |
+| Embed clickjacking                       | CSP frame-ancestors + X-Frame-Options for non-embed routes                                           |
+| CSP bypass via legacy browsers           | postMessage origin allowlist as backstop                                                             |
+| Public link to a PII-heavy dashboard     | Warning shown at create + watermark forced ON for public mode                                        |
+| Password brute-force on public link      | argon2 hash + per-IP rate limit (5 attempts/min)                                                     |
+| Internal share to a user not in this org | Grants validated against org users at save                                                           |
+| Revocation latency                       | Revoke flips `revoked_at`; in-flight sessions check on next request (no SSE channel; accepted)       |
+| CSV exfiltration via public link         | `allow_csv` default false; per-org toggle                                                            |
+| postMessage injection from rogue parent  | All messages validated against allowed_origins; unknown command ignored + logged                     |
 
 ---
 
 ## 9. Runbook
 
 **Symptom: embed shows blank.**
+
 1. Check browser console for CSP violation. Update
    `allowed_origins` on the embed app.
 2. Check JWT validity (paste into jwt.io with the customer's
    shared secret).
 
 **Symptom: public link works locally, fails in production.**
+
 1. Probably HTTPS / cookie issue. Embed requires `SameSite=None;
-   Secure` on session cookies — verify env config.
+Secure` on session cookies — verify env config.
 
 **Symptom: viewer suddenly sees stale data.**
+
 1. Cache TTL not refreshed. Documented behaviour; cache TTL is
    per-org (module 05).
 
@@ -382,12 +446,12 @@ with three tabs:
 
 ## 10. Perf budget
 
-| Operation | p50 | p95 | Hard ceiling |
-|---|---|---|---|
-| Create share link | 60 ms | 200 ms | 1 s |
-| View public link (no password) | 200 ms | 600 ms | 3 s |
-| View embed link (verify JWT + load) | 300 ms | 800 ms | 5 s |
-| Revoke | 30 ms | 100 ms | 500 ms |
+| Operation                           | p50    | p95    | Hard ceiling |
+| ----------------------------------- | ------ | ------ | ------------ |
+| Create share link                   | 60 ms  | 200 ms | 1 s          |
+| View public link (no password)      | 200 ms | 600 ms | 3 s          |
+| View embed link (verify JWT + load) | 300 ms | 800 ms | 5 s          |
+| Revoke                              | 30 ms  | 100 ms | 500 ms       |
 
 ---
 

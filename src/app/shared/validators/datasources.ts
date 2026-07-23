@@ -276,7 +276,10 @@ const snowflakeAddBranch = z.object({
   ...baseConnectionShape,
   type: z.literal('snowflake'),
   host: z.preprocess(blankToUndefined, z.string().optional()),
-  port: z.preprocess(blankToUndefined, z.union([z.string(), z.number()]).optional()),
+  port: z.preprocess(
+    blankToUndefined,
+    z.union([z.string(), z.number()]).optional(),
+  ),
   account: snowflakeAccountSchema,
   warehouse: snowflakeWarehouseSchema,
   role: snowflakeRoleSchema,

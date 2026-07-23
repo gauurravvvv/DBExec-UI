@@ -129,7 +129,10 @@ import {
   getChartCapabilities,
 } from '../../constants/chart-capabilities';
 import { Visual } from '../../models';
-import type { AggregateFn, AggregationMeasure } from '../../models/visual.model';
+import type {
+  AggregateFn,
+  AggregationMeasure,
+} from '../../models/visual.model';
 import {
   ConditionalRule,
   ConditionalOperator,
@@ -153,7 +156,9 @@ import { ReferenceDataService } from 'src/app/core/services/reference-data.servi
   styleUrls: ['./visual-config-sidebar.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class VisualConfigSidebarComponent implements DoCheck, OnInit, OnDestroy {
+export class VisualConfigSidebarComponent
+  implements DoCheck, OnInit, OnDestroy
+{
   private _focusedVisual!: Visual;
 
   /**
@@ -412,11 +417,23 @@ export class VisualConfigSidebarComponent implements DoCheck, OnInit, OnDestroy 
    */
   readonly quickCalcOptionsRaw: { label: string; value: string }[] = [
     { label: 'ANALYSES.ANALYTICS.QUICK_CALC_NONE', value: '' },
-    { label: 'ANALYSES.ANALYTICS.QUICK_CALC_RUNNING_TOTAL', value: 'running_total' },
-    { label: 'ANALYSES.ANALYTICS.QUICK_CALC_PERCENT_OF_TOTAL', value: 'percent_of_total' },
+    {
+      label: 'ANALYSES.ANALYTICS.QUICK_CALC_RUNNING_TOTAL',
+      value: 'running_total',
+    },
+    {
+      label: 'ANALYSES.ANALYTICS.QUICK_CALC_PERCENT_OF_TOTAL',
+      value: 'percent_of_total',
+    },
     { label: 'ANALYSES.ANALYTICS.QUICK_CALC_DIFFERENCE', value: 'difference' },
-    { label: 'ANALYSES.ANALYTICS.QUICK_CALC_PERCENT_DIFFERENCE', value: 'percent_difference' },
-    { label: 'ANALYSES.ANALYTICS.QUICK_CALC_MOVING_AVERAGE', value: 'moving_average' },
+    {
+      label: 'ANALYSES.ANALYTICS.QUICK_CALC_PERCENT_DIFFERENCE',
+      value: 'percent_difference',
+    },
+    {
+      label: 'ANALYSES.ANALYTICS.QUICK_CALC_MOVING_AVERAGE',
+      value: 'moving_average',
+    },
     { label: 'ANALYSES.ANALYTICS.QUICK_CALC_RANK', value: 'rank' },
   ];
   quickCalcOptions: { label: string; value: string }[] = [];
@@ -424,8 +441,14 @@ export class VisualConfigSidebarComponent implements DoCheck, OnInit, OnDestroy 
   /** Period-over-period compare modes (Slice B). */
   readonly compareModeOptionsRaw: { label: string; value: string }[] = [
     { label: 'ANALYSES.ANALYTICS.COMPARE_NONE', value: '' },
-    { label: 'ANALYSES.ANALYTICS.COMPARE_PREVIOUS_PERIOD', value: 'previous_period' },
-    { label: 'ANALYSES.ANALYTICS.COMPARE_SAME_PERIOD_LAST_YEAR', value: 'same_period_last_year' },
+    {
+      label: 'ANALYSES.ANALYTICS.COMPARE_PREVIOUS_PERIOD',
+      value: 'previous_period',
+    },
+    {
+      label: 'ANALYSES.ANALYTICS.COMPARE_SAME_PERIOD_LAST_YEAR',
+      value: 'same_period_last_year',
+    },
   ];
   compareModeOptions: { label: string; value: string }[] = [];
 
@@ -601,9 +624,10 @@ export class VisualConfigSidebarComponent implements DoCheck, OnInit, OnDestroy 
     if (!this.focusedVisual?.config) return;
     const cfg = this.focusedVisual.config;
     if (on) {
-      cfg.dualAxis = cfg.dualAxis && Array.isArray(cfg.dualAxis.series)
-        ? { ...cfg.dualAxis }
-        : { series: [], rightAxisName: '' };
+      cfg.dualAxis =
+        cfg.dualAxis && Array.isArray(cfg.dualAxis.series)
+          ? { ...cfg.dualAxis }
+          : { series: [], rightAxisName: '' };
     } else {
       delete cfg.dualAxis;
     }
@@ -752,7 +776,10 @@ export class VisualConfigSidebarComponent implements DoCheck, OnInit, OnDestroy 
   set compareDateColumn(v: string) {
     if (!this.focusedVisual?.config) return;
     const cfg = this.focusedVisual.config;
-    cfg.compare = { ...(cfg.compare || { mode: 'previous_period' }), dateColumn: v || null };
+    cfg.compare = {
+      ...(cfg.compare || { mode: 'previous_period' }),
+      dateColumn: v || null,
+    };
   }
 
   // ── Per-visual controls (Slice C): sort / limit / stacking / null / format ──
@@ -812,7 +839,8 @@ export class VisualConfigSidebarComponent implements DoCheck, OnInit, OnDestroy 
     return this.focusedVisual?.config?.yAxisScaleType ?? 'linear';
   }
   set yAxisScaleType(v: string) {
-    if (this.focusedVisual?.config) this.focusedVisual.config.yAxisScaleType = v;
+    if (this.focusedVisual?.config)
+      this.focusedVisual.config.yAxisScaleType = v;
   }
 
   get yScaleMin(): number | null {
@@ -848,8 +876,9 @@ export class VisualConfigSidebarComponent implements DoCheck, OnInit, OnDestroy 
     // Seed the localized "Other" label so the pure builder (applySortAndLimit)
     // — which has no TranslateService — renders the trailing bucket in-locale.
     if (v) {
-      this.focusedVisual.config.otherLabel =
-        this.translate.instant('ANALYSES.TOPN.OTHER_LABEL');
+      this.focusedVisual.config.otherLabel = this.translate.instant(
+        'ANALYSES.TOPN.OTHER_LABEL',
+      );
     }
   }
 
@@ -896,7 +925,8 @@ export class VisualConfigSidebarComponent implements DoCheck, OnInit, OnDestroy 
     const cfg = this.focusedVisual?.config;
     if (!cfg) return;
     const hint = cfg.valueFormat;
-    const fmt = (cfg.format && typeof cfg.format === 'object') ? { ...cfg.format } : {};
+    const fmt =
+      cfg.format && typeof cfg.format === 'object' ? { ...cfg.format } : {};
     if (!hint || !hint.kind || hint.kind === 'auto') {
       // Cleared / passthrough — drop both structured slots we own.
       delete fmt.value;
@@ -1049,7 +1079,8 @@ export class VisualConfigSidebarComponent implements DoCheck, OnInit, OnDestroy 
   get crossFilterTargetMode(): string {
     const t = this.focusedVisual?.config?.interaction?.crossFilter?.targets;
     if (t === 'dashboard') return 'dashboard';
-    if (t && typeof t === 'object' && Array.isArray(t.visualIds)) return 'visuals';
+    if (t && typeof t === 'object' && Array.isArray(t.visualIds))
+      return 'visuals';
     return 'same-tab';
   }
   set crossFilterTargetMode(mode: string) {
@@ -1058,7 +1089,11 @@ export class VisualConfigSidebarComponent implements DoCheck, OnInit, OnDestroy 
     let targets: any = 'same-tab';
     if (mode === 'dashboard') targets = 'dashboard';
     else if (mode === 'visuals')
-      targets = { visualIds: Array.isArray(cf.targets?.visualIds) ? cf.targets.visualIds : [] };
+      targets = {
+        visualIds: Array.isArray(cf.targets?.visualIds)
+          ? cf.targets.visualIds
+          : [],
+      };
     this.focusedVisual.config.interaction = {
       ...this.focusedVisual.config.interaction,
       crossFilter: { ...cf, targets },
@@ -1177,11 +1212,10 @@ export class VisualConfigSidebarComponent implements DoCheck, OnInit, OnDestroy 
 
   /** Resolve every i18n-keyed `label` to the active locale. */
   private localizeDropdownOptions(): void {
-    const localize = <T extends { label: string; value: unknown }>(arr: T[]): T[] =>
-      arr.map(
-        (o) =>
-          ({ ...o, label: this.translate.instant(o.label) }) as T,
-      );
+    const localize = <T extends { label: string; value: unknown }>(
+      arr: T[],
+    ): T[] =>
+      arr.map(o => ({ ...o, label: this.translate.instant(o.label) }) as T);
     // Original 24 arrays
     this.lineStepOptions = localize(LINE_STEP_OPTIONS);
     this.funnelSortOptions = localize(FUNNEL_SORT_OPTIONS);
@@ -1245,7 +1279,9 @@ export class VisualConfigSidebarComponent implements DoCheck, OnInit, OnDestroy 
     this.referenceLineTypeOptions = localize(
       VisualConfigSidebarComponent.RAW_REFLINE_TYPES,
     );
-    this.referenceAxisOptions = localize(VisualConfigSidebarComponent.RAW_REF_AXIS);
+    this.referenceAxisOptions = localize(
+      VisualConfigSidebarComponent.RAW_REF_AXIS,
+    );
     this.conditionalAppliesToOptions = localize(
       VisualConfigSidebarComponent.RAW_CF_APPLIES,
     );
@@ -1565,7 +1601,8 @@ export class VisualConfigSidebarComponent implements DoCheck, OnInit, OnDestroy 
   get conditionalRules(): ConditionalRule[] {
     const cfg = this.focusedVisual?.config;
     if (!cfg) return [];
-    if (!Array.isArray(cfg.conditionalFormatting)) cfg.conditionalFormatting = [];
+    if (!Array.isArray(cfg.conditionalFormatting))
+      cfg.conditionalFormatting = [];
     return cfg.conditionalFormatting;
   }
 
@@ -1619,7 +1656,9 @@ export class VisualConfigSidebarComponent implements DoCheck, OnInit, OnDestroy 
   addReferenceLine(): void {
     if (!this.focusedVisual?.config) return;
     const cfg = this.focusedVisual.config;
-    const list = Array.isArray(cfg.referenceLines) ? [...cfg.referenceLines] : [];
+    const list = Array.isArray(cfg.referenceLines)
+      ? [...cfg.referenceLines]
+      : [];
     list.push({
       id: this.genId(),
       type: 'constant',
@@ -1653,7 +1692,9 @@ export class VisualConfigSidebarComponent implements DoCheck, OnInit, OnDestroy 
   addReferenceBand(): void {
     if (!this.focusedVisual?.config) return;
     const cfg = this.focusedVisual.config;
-    const list = Array.isArray(cfg.referenceBands) ? [...cfg.referenceBands] : [];
+    const list = Array.isArray(cfg.referenceBands)
+      ? [...cfg.referenceBands]
+      : [];
     list.push({
       id: this.genId(),
       axis: 'y',
@@ -1792,7 +1833,8 @@ export class VisualConfigSidebarComponent implements DoCheck, OnInit, OnDestroy 
       : [];
     // Keep a stable two-slot tuple so the other endpoint isn't lost when
     // only one swatch has been touched yet.
-    while (colors.length < 2) colors.push(colors.length === 0 ? '#e0f2fe' : '#0369a1');
+    while (colors.length < 2)
+      colors.push(colors.length === 0 ? '#e0f2fe' : '#0369a1');
     colors[index] = color;
     cfg.visualMapColors = colors;
   }

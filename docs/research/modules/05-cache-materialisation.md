@@ -12,14 +12,14 @@
 
 ## 1. Industry baseline
 
-| Tool | Cache | Pre-aggregation |
-|---|---|---|
-| Tableau | Hyper extracts (file-based) | Hyper |
-| Power BI | Vertipaq in-memory column store | Aggregations + composite models |
-| Looker | Persistent Derived Tables (PDTs) | Aggregate awareness |
-| Metabase | "Native cache" sqlite/Postgres | Models with refresh schedules |
-| Superset | Redis result cache + CACHE_CONFIG | Async queries via Celery |
-| Cube | Redis + pre-aggregations | Yes, sophisticated |
+| Tool     | Cache                             | Pre-aggregation                 |
+| -------- | --------------------------------- | ------------------------------- |
+| Tableau  | Hyper extracts (file-based)       | Hyper                           |
+| Power BI | Vertipaq in-memory column store   | Aggregations + composite models |
+| Looker   | Persistent Derived Tables (PDTs)  | Aggregate awareness             |
+| Metabase | "Native cache" sqlite/Postgres    | Models with refresh schedules   |
+| Superset | Redis result cache + CACHE_CONFIG | Async queries via Celery        |
+| Cube     | Redis + pre-aggregations          | Yes, sophisticated              |
 
 DBExec should follow Superset's model: Redis result cache + BullMQ
 async + materialised tables on the managed datasource.
@@ -30,18 +30,18 @@ Nothing.
 
 ## 3. Gaps
 
-| ID | Gap | Severity |
-|---|---|---|
-| CACHE-G01 | Redis result cache | P0 |
-| CACHE-G02 | BullMQ scheduler + worker | P0 |
-| CACHE-G03 | Materialised tables (PDT) | P1 |
-| CACHE-G04 | Aggregate awareness | P1 |
-| CACHE-G05 | Cache invalidation API + UI | P0 |
-| CACHE-G06 | Stampede prevention | P0 |
-| CACHE-G07 | Per-dataset TTL config | P0 |
-| CACHE-G08 | Per-org cache size cap | P1 |
-| CACHE-G09 | Cache hit-rate telemetry | P1 |
-| CACHE-G10 | Cache key versioning (bust on dataset edit) | P0 |
+| ID        | Gap                                         | Severity |
+| --------- | ------------------------------------------- | -------- |
+| CACHE-G01 | Redis result cache                          | P0       |
+| CACHE-G02 | BullMQ scheduler + worker                   | P0       |
+| CACHE-G03 | Materialised tables (PDT)                   | P1       |
+| CACHE-G04 | Aggregate awareness                         | P1       |
+| CACHE-G05 | Cache invalidation API + UI                 | P0       |
+| CACHE-G06 | Stampede prevention                         | P0       |
+| CACHE-G07 | Per-dataset TTL config                      | P0       |
+| CACHE-G08 | Per-org cache size cap                      | P1       |
+| CACHE-G09 | Cache hit-rate telemetry                    | P1       |
+| CACHE-G10 | Cache key versioning (bust on dataset edit) | P0       |
 
 ## 4. Target architecture
 
@@ -74,7 +74,11 @@ DBExec:queue:dbexec-schedule:*                     BullMQ keys
 
 ```ts
 function cacheKeyFor({
-  sql, bindings, datasetVersion, rlsHash, dialect,
+  sql,
+  bindings,
+  datasetVersion,
+  rlsHash,
+  dialect,
 }: KeyParts): string {
   return crypto
     .createHash('sha256')
@@ -111,15 +115,15 @@ Aggregate awareness picks the smallest mv whose dimensions ⊇ request.dims.
 
 ## 5. APIs
 
-| Method | Path | Purpose |
-|---|---|---|
-| GET   | `/cache/stats` | Org-wide hit rate, size |
-| POST  | `/cache/invalidate/dataset/:id` | Bust a dataset's keys |
-| POST  | `/cache/invalidate/org` | Bust everything for the org |
-| POST  | `/cache/warm/dataset/:id` | Pre-compute first-N popular queries |
-| GET   | `/materialised/list` | List PDTs |
-| POST  | `/materialised` | Create PDT |
-| POST  | `/materialised/:id/refresh` | Force refresh now |
+| Method | Path                            | Purpose                             |
+| ------ | ------------------------------- | ----------------------------------- |
+| GET    | `/cache/stats`                  | Org-wide hit rate, size             |
+| POST   | `/cache/invalidate/dataset/:id` | Bust a dataset's keys               |
+| POST   | `/cache/invalidate/org`         | Bust everything for the org         |
+| POST   | `/cache/warm/dataset/:id`       | Pre-compute first-N popular queries |
+| GET    | `/materialised/list`            | List PDTs                           |
+| POST   | `/materialised`                 | Create PDT                          |
+| POST   | `/materialised/:id/refresh`     | Force refresh now                   |
 
 ## 6. Code recipes
 
@@ -162,14 +166,22 @@ const conn = { host: REDIS_HOST, port: REDIS_PORT };
 
 export const Q = new Queue('dbexec-schedule', { connection: conn });
 
-new Worker('dbexec-schedule', async (job) => {
-  switch (job.name) {
-    case 'materialise:refresh': return refreshMv(job.data.id);
-    case 'cache:warm':         return warmCache(job.data.id);
-    case 'subscription:run':   return runSub(job.data.id);
-    case 'alert:check':        return checkAlert(job.data.id);
-  }
-}, { connection: conn, concurrency: 5 });
+new Worker(
+  'dbexec-schedule',
+  async job => {
+    switch (job.name) {
+      case 'materialise:refresh':
+        return refreshMv(job.data.id);
+      case 'cache:warm':
+        return warmCache(job.data.id);
+      case 'subscription:run':
+        return runSub(job.data.id);
+      case 'alert:check':
+        return checkAlert(job.data.id);
+    }
+  },
+  { connection: conn, concurrency: 5 },
+);
 ```
 
 ### 6.3 MV refresh
@@ -187,7 +199,9 @@ async function refreshMv(id: string) {
     await managed.query(`DROP TABLE IF EXISTS ${q(mv.targetTable)}`);
     await managed.query(`ALTER TABLE ${q(tmp)} RENAME TO ${q(mv.targetTable)}`);
     await managed.query(`COMMIT`);
-    const [{ count }] = await managed.query(`SELECT COUNT(*) FROM ${q(mv.targetTable)}`);
+    const [{ count }] = await managed.query(
+      `SELECT COUNT(*) FROM ${q(mv.targetTable)}`,
+    );
     await MaterialisedView.update(id, {
       lastRefreshAt: new Date(),
       lastStatus: 'ok',
@@ -211,9 +225,11 @@ async function refreshMv(id: string) {
 function pickAggregate(req: SemanticQueryRequest, mvs: MaterialisedView[]) {
   const dims = new Set(req.dimensions);
   // Pick the mv whose dimensions ⊇ request dims AND has smallest row_count.
-  const candidates = mvs.filter(mv =>
-    (mv.dimensions as string[]).every(d => dims.has(d) || isSubGrain(mv.grain!, d, req)) &&
-    req.metrics.every(m => (mv.metrics as string[]).includes(m))
+  const candidates = mvs.filter(
+    mv =>
+      (mv.dimensions as string[]).every(
+        d => dims.has(d) || isSubGrain(mv.grain!, d, req),
+      ) && req.metrics.every(m => (mv.metrics as string[]).includes(m)),
   );
   return candidates.sort((a, b) => a.rowCount - b.rowCount)[0] ?? null;
 }

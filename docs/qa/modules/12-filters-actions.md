@@ -1,10 +1,12 @@
 # 12 · Filters / Parameters / Cross-filters / Drill — Deep Test Cases
 
 ## Fixtures
+
 - Analysis with 3 visuals (Bar / Line / Pie) all over `chart_demo`.
 - Time column `sold_at`.
 
 ## Filter bar — happy
+
 - **FLT-H-01** · Category dropdown for region → all visuals re-render. P0
 - **FLT-H-02** · Numeric range slider for sales → drag updates. P0
 - **FLT-H-03** · Time range datepicker with preset chip "Last 7 days". P0
@@ -19,6 +21,7 @@
 - **FLT-H-12** · Delete filter; canvas re-renders without it. P1
 
 ## Filter bar — negative
+
 - **FLT-N-01** · filterType not in enum → 400. P0
 - **FLT-N-02** · controlType not in enum → 400. P0
 - **FLT-N-03** · Column not in dataset → 400. P0
@@ -31,6 +34,7 @@
 - **FLT-N-10** · Update id from another org's analysis → 404. P0
 
 ## Filter bar — edge
+
 - **FLT-E-01** · nullOption=NULLS_ONLY on non-nullable column → empty result. P1
 - **FLT-E-02** · PATCH only `isEnabled` preserves other fields. P1
 - **FLT-E-03** · Two filters on same column with conflicting ranges → intersection. P1
@@ -43,18 +47,21 @@
 - **FLT-E-10** · 50 filters on one analysis → bar scrolls. P2
 
 ## Parameters
+
 - **FLT-PARAM-H-01** · Param value substitutes in SQL. P0
 - **FLT-PARAM-H-02** · Enum default = first allowed value. P1
 - **FLT-PARAM-N-01** · Value outside enum → reject. P1
 - **FLT-PARAM-N-02** · Param name pattern violation → reject. P1
 
 ## Cross-filters
+
 - **FLT-CROSS-H-01** · Click bar A → filter applied to B and C. P0
 - **FLT-CROSS-H-02** · Clear all → cross-filters removed. P0
 - **FLT-CROSS-H-03** · Cross-filter scope: exclude visual D. P1
 - **FLT-CROSS-N-01** · Cross-filter on chart that doesn't support → silent no-op. P2
 
 ## Drill
+
 - **FLT-DRILL-H-01** · Drill region → country. P0
 - **FLT-DRILL-H-02** · Drill-up (breadcrumb click). P1
 - **FLT-DRILL-H-03** · Drill state survives reload (URL). P1
@@ -62,20 +69,25 @@
 - **FLT-DRILL-E-01** · Three-level drill (region → country → city) works. P1
 
 ## Fiscal date filters
+
 - **FLT-FISCAL-H-01** · "This fiscal quarter" with FY start Feb 1 picks right window. P1
 - **FLT-FISCAL-E-01** · Org with default FY=Jan 1 unchanged behaviour. P2
 
 ## URL state
+
 - **FLT-URL-H-01** · Filters + params + drill all encoded; recipient loads same view. P0
 - **FLT-URL-N-01** · Tampered URL ignored. P1
 
 ## Security
+
 - **FLT-S-01** · Filter values parameterised (no SQL injection). P0 🟣
 - **FLT-S-02** · Cross-org cascading values → 404. P0 🟣
 
 ## Performance
+
 - **FLT-P-01** · 20 filters resolve their distinct values in parallel < 2s. P1 ⚡
 
 ## Regression buckets
-- Cross-filter or drill changes → FLT-CROSS-*, FLT-DRILL-*
+
+- Cross-filter or drill changes → FLT-CROSS-_, FLT-DRILL-_
 - URL state service → FLT-URL-H-01

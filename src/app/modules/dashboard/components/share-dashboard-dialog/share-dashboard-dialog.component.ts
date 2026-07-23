@@ -190,9 +190,7 @@ export class ShareDashboardDialogComponent implements OnChanges {
   }
 
   isExpired(tok: ShareToken): boolean {
-    return (
-      !!tok.expiresAt && new Date(tok.expiresAt).getTime() <= Date.now()
-    );
+    return !!tok.expiresAt && new Date(tok.expiresAt).getTime() <= Date.now();
   }
 
   isActive(tok: ShareToken): boolean {

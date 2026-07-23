@@ -21,6 +21,10 @@ const routes: Routes = [
 
 @NgModule({
   declarations: [PrivilegesAccessComponent, SessionsComponent],
-  imports: [DbAccessSharedModule, ScrollingModule, RouterModule.forChild(routes)],
+  imports: [
+    DbAccessSharedModule,
+    ScrollingModule,
+    RouterModule.forChild(routes),
+  ],
 })
 export class DbPrivilegesModule {}

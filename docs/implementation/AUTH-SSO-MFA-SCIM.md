@@ -112,7 +112,10 @@ import sendResponse from '../../../utility/response';
 import { CODE } from '../../../config';
 import { SSO_MSG, GENERIC } from '../../../constants/response.messages';
 import { auditLogger } from '../../../services/auditLogger.service';
-import { AUDIT_MODULES, AUDIT_ACTIONS } from '../../../constants/audit.constants';
+import {
+  AUDIT_MODULES,
+  AUDIT_ACTIONS,
+} from '../../../constants/audit.constants';
 import { verifySamlResponse } from '../../../services/sso/saml';
 import { upsertUserFromClaims } from '../../../services/sso/jit';
 import { issueAuthTokens } from '../../../services/auth/issueTokens';
@@ -121,7 +124,8 @@ import Logger from '../../../utility/logger';
 const samlAcs = async (req: Request, res: Response) => {
   const samlResponse = req.body.SAMLResponse;
   const relayState = req.body.RelayState as string | undefined;
-  const orgId = (relayState && JSON.parse(Buffer.from(relayState, 'base64').toString()).orgId) as string;
+  const orgId = (relayState &&
+    JSON.parse(Buffer.from(relayState, 'base64').toString()).orgId) as string;
 
   try {
     const cfg = await loadSsoConfig(orgId);
@@ -135,17 +139,22 @@ const samlAcs = async (req: Request, res: Response) => {
     const user = await upsertUserFromClaims(orgId, claims, cfg);
 
     await auditLogger.logAuditToOrg({
-      connection: await orgConnection(orgId), req, res,
+      connection: await orgConnection(orgId),
+      req,
+      res,
       module: AUDIT_MODULES.AUTH,
       action: AUDIT_ACTIONS.SSO_LOGIN,
-      entityName: 'User', entityId: user.id,
+      entityName: 'User',
+      entityId: user.id,
       metadata: { protocol: 'saml', nameId: assertion.nameId },
     });
 
     const { token, refreshToken } = await issueAuthTokens(user);
 
     // POST-redirect to the FE handshake page
-    res.redirect(`/auth/handshake?token=${encodeURIComponent(token)}&refresh=${encodeURIComponent(refreshToken)}`);
+    res.redirect(
+      `/auth/handshake?token=${encodeURIComponent(token)}&refresh=${encodeURIComponent(refreshToken)}`,
+    );
   } catch (err: any) {
     Logger.error(`SAML ACS failed: ${err.message}`);
     return sendResponse(res, false, CODE.UNAUTHORIZED, SSO_MSG.AUTH_FAILED);
@@ -206,8 +215,8 @@ CREATE TABLE org_mfa_policy (
 
 - Registration: server generates `PublicKeyCredentialCreationOptions`
   with `attestation: 'none'`, `authenticatorSelection: {
-  authenticatorAttachment: 'platform', userVerification: 'required'
-  }`. Stores credential id + public key.
+authenticatorAttachment: 'platform', userVerification: 'required'
+}`. Stores credential id + public key.
 - Authentication: server generates challenge; client signs;
   server verifies signature + `signCount` monotonically
   increases (clone detection).
@@ -223,7 +232,10 @@ import sendResponse from '../../../utility/response';
 import { CODE } from '../../../config';
 import { MFA_MSG, GENERIC } from '../../../constants/response.messages';
 import { auditLogger } from '../../../services/auditLogger.service';
-import { AUDIT_MODULES, AUDIT_ACTIONS } from '../../../constants/audit.constants';
+import {
+  AUDIT_MODULES,
+  AUDIT_ACTIONS,
+} from '../../../constants/audit.constants';
 import { verifyTotp } from '../../../services/mfa/totp';
 import { redis } from '../../../services/redis';
 import { issueAuthTokens } from '../../../services/auth/issueTokens';
@@ -236,16 +248,26 @@ const totpVerify = async (req: Request, res: Response) => {
   try {
     const session = await redis.get(`mfa:session:${mfaSessionId}`);
     if (!session) {
-      return sendResponse(res, false, CODE.UNAUTHORIZED, MFA_MSG.SESSION_EXPIRED);
+      return sendResponse(
+        res,
+        false,
+        CODE.UNAUTHORIZED,
+        MFA_MSG.SESSION_EXPIRED,
+      );
     }
     const { userId, factorId } = JSON.parse(session);
 
     // Rate-limit
     const attemptsKey = `mfa:attempts:${userId}`;
     const attempts = await redis.incr(attemptsKey);
-    if (attempts === 1) await redis.expire(attemptsKey, 900);  // 15 min window
+    if (attempts === 1) await redis.expire(attemptsKey, 900); // 15 min window
     if (attempts > 5) {
-      return sendResponse(res, false, CODE.UNAUTHORIZED, MFA_MSG.TOO_MANY_ATTEMPTS);
+      return sendResponse(
+        res,
+        false,
+        CODE.UNAUTHORIZED,
+        MFA_MSG.TOO_MANY_ATTEMPTS,
+      );
     }
 
     const ok = await verifyTotp(factorId, code);
@@ -268,10 +290,13 @@ const totpVerify = async (req: Request, res: Response) => {
     }
 
     await auditLogger.logAuditToOrg({
-      connection: await orgConnection(user.orgId), req, res,
+      connection: await orgConnection(user.orgId),
+      req,
+      res,
       module: AUDIT_MODULES.AUTH,
       action: AUDIT_ACTIONS.MFA_SUCCESS,
-      entityName: 'User', entityId: user.id,
+      entityName: 'User',
+      entityId: user.id,
       metadata: { kind: 'totp', verifyMs: Date.now() - startedAt },
     });
 
@@ -396,7 +421,11 @@ CREATE TABLE service_account (
 ```typescript
 import crypto from 'crypto';
 
-export function generateApiToken(): { raw: string; prefix: string; hash: Buffer } {
+export function generateApiToken(): {
+  raw: string;
+  prefix: string;
+  hash: Buffer;
+} {
   // 32 bytes of CSPRNG, base62-encoded, prefixed `dbx_`
   const bytes = crypto.randomBytes(32);
   const raw = `dbx_${bytes.toString('base64url')}`;
@@ -440,15 +469,15 @@ ai:invoke          # cost-bearing
 
 ## 5. Observability
 
-| Metric | Type | Labels | Purpose |
-|---|---|---|---|
-| `dbexec_sso_login_total` | counter | `protocol`, `org`, `outcome` | SSO success / failure |
-| `dbexec_sso_jit_provisioned_total` | counter | `protocol` | new users JIT-created |
-| `dbexec_mfa_enrol_total` | counter | `kind` | TOTP / WebAuthn enrolment |
-| `dbexec_mfa_verify_total` | counter | `kind`, `outcome` | success / fail / timeout |
-| `dbexec_scim_request_total` | counter | `resource`, `method`, `outcome` | SCIM traffic |
-| `dbexec_api_token_request_total` | counter | `org`, `outcome` | token-authenticated request volume |
-| `dbexec_api_token_expired_total` | counter | `org` | expired-on-use; surface in admin |
+| Metric                             | Type    | Labels                          | Purpose                            |
+| ---------------------------------- | ------- | ------------------------------- | ---------------------------------- |
+| `dbexec_sso_login_total`           | counter | `protocol`, `org`, `outcome`    | SSO success / failure              |
+| `dbexec_sso_jit_provisioned_total` | counter | `protocol`                      | new users JIT-created              |
+| `dbexec_mfa_enrol_total`           | counter | `kind`                          | TOTP / WebAuthn enrolment          |
+| `dbexec_mfa_verify_total`          | counter | `kind`, `outcome`               | success / fail / timeout           |
+| `dbexec_scim_request_total`        | counter | `resource`, `method`, `outcome` | SCIM traffic                       |
+| `dbexec_api_token_request_total`   | counter | `org`, `outcome`                | token-authenticated request volume |
+| `dbexec_api_token_expired_total`   | counter | `org`                           | expired-on-use; surface in admin   |
 
 Audit log: every SSO success, MFA enrol/verify, SCIM PATCH, API
 token create/revoke writes a row with the actor + IP + UA.
@@ -458,26 +487,27 @@ These are the most-asked rows during a SOC2 audit.
 
 ## 6. Security & threat model
 
-| Threat | Mitigation |
-|---|---|
-| SAMLResponse replay | Verify `InResponseTo`; nonce in Redis with 5-min TTL; reject already-seen IDs |
-| XML signature wrapping (XSW) | `samlify` mitigates; we additionally enforce `wantAssertionsSigned + wantResponseSigned`; reject if signature wraps an unintended element |
-| OIDC token mix-up (RFC 8417) | Pin `iss`; validate `aud == client_id`; verify nonce |
-| JIT-creation attack (attacker IdP creates admin user) | `jit_default_role` is never admin; admin promotion is manual via console |
-| TOTP brute-force | 5 attempts / 15 min per user; rate-limit per IP; account lock at 20 attempts in 1h |
-| WebAuthn signCount regression | Reject; possible cloned authenticator → revoke factor |
-| API token leak (in CI logs) | Token shown once; hash-stored; revocation invalidates within seconds; prefix lookup helps customers identify "which of my tokens is in this log line" |
-| Token used after user deactivated | Middleware re-checks user.status on every request (fast org-cached lookup) |
-| SCIM token leak | Per-org, rotatable, scoped to SCIM endpoints only — cannot be used to call other APIs |
-| Cross-org token use | `org_id` enforced at middleware; cross-org tokens fail with 404 (not 403, to avoid org-existence leak) |
-| Session fixation | Issue a fresh JWT on every login; old refresh tokens revoked on password change or MFA factor change |
-| Open redirect via SAML RelayState | Allowlist of post-login redirect paths; opaque RelayState mapped to allowlisted entry |
+| Threat                                                | Mitigation                                                                                                                                            |
+| ----------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| SAMLResponse replay                                   | Verify `InResponseTo`; nonce in Redis with 5-min TTL; reject already-seen IDs                                                                         |
+| XML signature wrapping (XSW)                          | `samlify` mitigates; we additionally enforce `wantAssertionsSigned + wantResponseSigned`; reject if signature wraps an unintended element             |
+| OIDC token mix-up (RFC 8417)                          | Pin `iss`; validate `aud == client_id`; verify nonce                                                                                                  |
+| JIT-creation attack (attacker IdP creates admin user) | `jit_default_role` is never admin; admin promotion is manual via console                                                                              |
+| TOTP brute-force                                      | 5 attempts / 15 min per user; rate-limit per IP; account lock at 20 attempts in 1h                                                                    |
+| WebAuthn signCount regression                         | Reject; possible cloned authenticator → revoke factor                                                                                                 |
+| API token leak (in CI logs)                           | Token shown once; hash-stored; revocation invalidates within seconds; prefix lookup helps customers identify "which of my tokens is in this log line" |
+| Token used after user deactivated                     | Middleware re-checks user.status on every request (fast org-cached lookup)                                                                            |
+| SCIM token leak                                       | Per-org, rotatable, scoped to SCIM endpoints only — cannot be used to call other APIs                                                                 |
+| Cross-org token use                                   | `org_id` enforced at middleware; cross-org tokens fail with 404 (not 403, to avoid org-existence leak)                                                |
+| Session fixation                                      | Issue a fresh JWT on every login; old refresh tokens revoked on password change or MFA factor change                                                  |
+| Open redirect via SAML RelayState                     | Allowlist of post-login redirect paths; opaque RelayState mapped to allowlisted entry                                                                 |
 
 ---
 
 ## 7. Operational runbook
 
 **Symptom: SSO login fails for all users.**
+
 1. IdP rotated their cert? Check `saml_x509_cert` matches IdP
    metadata; rotate.
 2. IdP changed entity ID? Update `saml_entity_id` to match.
@@ -485,11 +515,13 @@ These are the most-asked rows during a SOC2 audit.
    default is 60s; large skew rejects all assertions.
 
 **Symptom: MFA prompt loops.**
+
 1. User cleared cookies → "remember device" flag lost. Expected.
 2. Clock drift on user phone for TOTP — server accepts T-1/T+1
    only; counsel user to re-sync.
 
 **Symptom: SCIM provisioning out of sync.**
+
 1. IdP's SCIM job rate-limited? Check
    `dbexec_scim_request_total{outcome="rate_limited"}`. Bump
    per-token rate-limit if customer has 10k+ users.
@@ -498,6 +530,7 @@ These are the most-asked rows during a SOC2 audit.
    SCIM sync" timestamp.
 
 **Symptom: API token works locally, 401 in production.**
+
 1. Token expired? `dbexec_api_token_expired_total` counter spikes.
 2. Org migrated to a different SSO config that revokes
    non-SSO tokens? Check `org.api_tokens_disabled` flag.
@@ -506,15 +539,15 @@ These are the most-asked rows during a SOC2 audit.
 
 ## 8. Performance budget
 
-| Operation | p50 | p95 | Hard ceiling |
-|---|---|---|---|
-| SAML ACS (verify + JIT + token) | 80 ms | 250 ms | 2 s |
-| OIDC callback (exchange + verify + JIT + token) | 200 ms | 500 ms | 3 s |
-| TOTP verify | 5 ms | 20 ms | 100 ms |
-| WebAuthn verify | 15 ms | 50 ms | 200 ms |
-| SCIM GET /Users (page of 100) | 80 ms | 300 ms | 2 s |
-| SCIM PATCH /Users/:id | 30 ms | 100 ms | 1 s |
-| API token middleware (hash lookup) | 2 ms | 8 ms | 50 ms |
+| Operation                                       | p50    | p95    | Hard ceiling |
+| ----------------------------------------------- | ------ | ------ | ------------ |
+| SAML ACS (verify + JIT + token)                 | 80 ms  | 250 ms | 2 s          |
+| OIDC callback (exchange + verify + JIT + token) | 200 ms | 500 ms | 3 s          |
+| TOTP verify                                     | 5 ms   | 20 ms  | 100 ms       |
+| WebAuthn verify                                 | 15 ms  | 50 ms  | 200 ms       |
+| SCIM GET /Users (page of 100)                   | 80 ms  | 300 ms | 2 s          |
+| SCIM PATCH /Users/:id                           | 30 ms  | 100 ms | 1 s          |
+| API token middleware (hash lookup)              | 2 ms   | 8 ms   | 50 ms        |
 
 API token lookup is per-request — keep it sub-10ms via the
 hash index + an LRU cache (5-min TTL) keyed by token hash.

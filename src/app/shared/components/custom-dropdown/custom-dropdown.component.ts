@@ -486,11 +486,7 @@ export class CustomDropdownComponent
     // so relying on `this.value` inside the deferred callback would restore
     // null and leave the label blank. The captured target is authoritative.
     const intended = target !== undefined ? target : this.value;
-    if (
-      intended === null ||
-      intended === undefined ||
-      intended === ''
-    ) {
+    if (intended === null || intended === undefined || intended === '') {
       return;
     }
     // Defer past the current CD pass so the inner dropdown has

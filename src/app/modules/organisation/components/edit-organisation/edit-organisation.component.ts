@@ -169,21 +169,26 @@ export class EditOrganisationComponent
 
     // Reset connection test when DB fields change. Bumping the request id
     // invalidates any in-flight response so it can't apply stale state.
-    ['dbHost', 'dbPort', 'dbName', 'dbSchema', 'dbUsername', 'dbPassword'].forEach(
-      field => {
-        this.orgForm
-          .get(field)
-          ?.valueChanges.pipe(takeUntilDestroyed(this.destroyRef))
-          .subscribe(() => {
-            this.connectionTested = false;
-            this.connectionTestResult = null;
-            this.connectionTestError = null;
-            this.passwordRequiredError = null;
-            this.testRequestId++;
-            this.cdr.markForCheck();
-          });
-      },
-    );
+    [
+      'dbHost',
+      'dbPort',
+      'dbName',
+      'dbSchema',
+      'dbUsername',
+      'dbPassword',
+    ].forEach(field => {
+      this.orgForm
+        .get(field)
+        ?.valueChanges.pipe(takeUntilDestroyed(this.destroyRef))
+        .subscribe(() => {
+          this.connectionTested = false;
+          this.connectionTestResult = null;
+          this.connectionTestError = null;
+          this.passwordRequiredError = null;
+          this.testRequestId++;
+          this.cdr.markForCheck();
+        });
+    });
   }
 
   private async loadOrganisationData() {

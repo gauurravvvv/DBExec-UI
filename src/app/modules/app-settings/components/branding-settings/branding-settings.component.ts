@@ -56,7 +56,9 @@ export class BrandingSettingsComponent
     // tracks the BE's rules without us re-checking on submit.
     this.brandingForm
       .get('showWatermark')!
-      .valueChanges.subscribe(enabled => this.syncDependentValidators(!!enabled));
+      .valueChanges.subscribe(enabled =>
+        this.syncDependentValidators(!!enabled),
+      );
   }
 
   get isFormDirty(): boolean {
@@ -177,10 +179,8 @@ export class BrandingSettingsComponent
     const c = this.brandingForm.get('watermarkText');
     if (!c) return '';
     if (c.errors?.['required']) return 'Watermark text is required';
-    if (c.errors?.['minlength'])
-      return `Minimum ${MIN_TEXT} characters`;
-    if (c.errors?.['maxlength'])
-      return `Maximum ${MAX_TEXT} characters`;
+    if (c.errors?.['minlength']) return `Minimum ${MIN_TEXT} characters`;
+    if (c.errors?.['maxlength']) return `Maximum ${MAX_TEXT} characters`;
     return '';
   }
 }

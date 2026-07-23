@@ -184,15 +184,12 @@ export const configPromptReducer = createReducer(
   ),
 
   // Clear all schemas
-  on(
-    ConfigPromptActions.clearAllSchemas,
-    (state): ConfigPromptState => ({
-      ...state,
-      schemas: {},
-      accessOrder: [],
-      activeSchemaKey: null,
-    }),
-  ),
+  on(ConfigPromptActions.clearAllSchemas, (state): ConfigPromptState => ({
+    ...state,
+    schemas: {},
+    accessOrder: [],
+    activeSchemaKey: null,
+  })),
 
   // Refresh schema data - clear existing and reload
   on(

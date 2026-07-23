@@ -461,6 +461,11 @@
   color: var(--text-muted);
   text-align: center;
 
-  i { font-size: 1.6rem; opacity: 0.6; }
-  span { font-size: var(--fs-body); }
+  i {
+    font-size: 1.6rem;
+    opacity: 0.6;
+  }
+  span {
+    font-size: var(--fs-body);
+  }
 }

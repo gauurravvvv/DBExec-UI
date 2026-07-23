@@ -79,10 +79,9 @@ export class CalculatedFieldsService {
     this._loading.set(true);
     try {
       return await lastValueFrom(
-        this.http.apiGet(
-          CALCULATED_FIELD.LIST_FOR_DATASET_PREFIX + datasetId,
-          { skipLoader: true },
-        ),
+        this.http.apiGet(CALCULATED_FIELD.LIST_FOR_DATASET_PREFIX + datasetId, {
+          skipLoader: true,
+        }),
       );
     } finally {
       this._loading.set(false);

@@ -30,12 +30,22 @@ $auth-bg: rgba(91, 100, 112, 0.12);
 }
 
 @keyframes ad-scrim-in {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 @keyframes ad-panel-in {
-  from { transform: translateX(24px); opacity: 0.4; }
-  to { transform: translateX(0); opacity: 1; }
+  from {
+    transform: translateX(24px);
+    opacity: 0.4;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
 }
 
 .drawer-panel {
@@ -83,13 +93,34 @@ $auth-bg: rgba(91, 100, 112, 0.12);
         font-size: var(--fs-h3, 1rem);
       }
 
-      &.act-create { color: var(--success-color); background: var(--success-bg); }
-      &.act-update { color: var(--primary-color); background: var(--primary-color-transparent); }
-      &.act-delete { color: var(--error-color); background: var(--error-bg); }
-      &.act-egress { color: var(--warning-color); background: var(--warning-bg); }
-      &.act-grant  { color: $grant-color; background: $grant-bg; }
-      &.act-auth   { color: $auth-color; background: $auth-bg; }
-      &.act-warning { color: var(--warning-color); background: var(--warning-bg); }
+      &.act-create {
+        color: var(--success-color);
+        background: var(--success-bg);
+      }
+      &.act-update {
+        color: var(--primary-color);
+        background: var(--primary-color-transparent);
+      }
+      &.act-delete {
+        color: var(--error-color);
+        background: var(--error-bg);
+      }
+      &.act-egress {
+        color: var(--warning-color);
+        background: var(--warning-bg);
+      }
+      &.act-grant {
+        color: $grant-color;
+        background: $grant-bg;
+      }
+      &.act-auth {
+        color: $auth-color;
+        background: $auth-bg;
+      }
+      &.act-warning {
+        color: var(--warning-color);
+        background: var(--warning-bg);
+      }
     }
 
     .head-text {
@@ -113,7 +144,10 @@ $auth-bg: rgba(91, 100, 112, 0.12);
 
         .entity-name {
           font-weight: var(--fw-medium);
-          &.muted { font-weight: var(--fw-regular); opacity: 0.8; }
+          &.muted {
+            font-weight: var(--fw-regular);
+            opacity: 0.8;
+          }
         }
 
         .ver-badge {
@@ -144,8 +178,13 @@ $auth-bg: rgba(91, 100, 112, 0.12);
       flex: none;
       transition: all var(--motion-fast) ease;
 
-      &:hover { background: var(--hover-background); color: var(--text-color); }
-      i { font-size: var(--fs-control); }
+      &:hover {
+        background: var(--hover-background);
+        color: var(--text-color);
+      }
+      i {
+        font-size: var(--fs-control);
+      }
     }
   }
 
@@ -176,11 +215,20 @@ $auth-bg: rgba(91, 100, 112, 0.12);
     text-align: left;
     transition: background 0.15s ease;
 
-    i { font-size: var(--fs-control); }
-    span { flex: 1; }
-    .cta-caret { font-size: var(--fs-label); }
+    i {
+      font-size: var(--fs-control);
+    }
+    span {
+      flex: 1;
+    }
+    .cta-caret {
+      font-size: var(--fs-label);
+    }
 
-    &:hover { background: var(--primary-color); color: var(--primary-text, #fff); }
+    &:hover {
+      background: var(--primary-color);
+      color: var(--primary-text, #fff);
+    }
   }
 
   // six-question grid
@@ -202,7 +250,10 @@ $auth-bg: rgba(91, 100, 112, 0.12);
       color: var(--text-color);
       min-width: 0;
 
-      .rel { color: var(--text-muted); font-size: var(--fs-label); }
+      .rel {
+        color: var(--text-muted);
+        font-size: var(--fs-label);
+      }
       code {
         font-family: var(--font-mono);
         font-size: var(--fs-micro);
@@ -212,7 +263,9 @@ $auth-bg: rgba(91, 100, 112, 0.12);
         color: var(--text-color);
         word-break: break-all;
       }
-      .muted { color: var(--text-muted); }
+      .muted {
+        color: var(--text-muted);
+      }
     }
 
     .actor {
@@ -231,15 +284,22 @@ $auth-bg: rgba(91, 100, 112, 0.12);
         color: var(--primary-text, #fff);
         background: var(--primary-color);
         flex: none;
-        &.sys { background: var(--text-muted); }
+        &.sys {
+          background: var(--text-muted);
+        }
       }
       .actor-text {
         display: flex;
         flex-direction: column;
         line-height: 1.25;
       }
-      .em { font-weight: var(--fw-semibold); }
-      .actor-type { font-size: var(--fs-micro); color: var(--text-muted); }
+      .em {
+        font-weight: var(--fw-semibold);
+      }
+      .actor-type {
+        font-size: var(--fs-micro);
+        color: var(--text-muted);
+      }
     }
 
     .outcome {
@@ -248,9 +308,15 @@ $auth-bg: rgba(91, 100, 112, 0.12);
       gap: var(--space-2);
       font-weight: var(--fw-semibold);
       font-size: var(--fs-control);
-      &.ok { color: var(--success-color); }
-      &.fail { color: var(--error-color); }
-      i { font-size: var(--fs-body); }
+      &.ok {
+        color: var(--success-color);
+      }
+      &.fail {
+        color: var(--error-color);
+      }
+      i {
+        font-size: var(--fs-body);
+      }
     }
   }
 
@@ -303,7 +369,9 @@ $auth-bg: rgba(91, 100, 112, 0.12);
       font-size: var(--fs-label);
       word-break: break-word;
     }
-    .dt-row:last-child > div { border-bottom: none; }
+    .dt-row:last-child > div {
+      border-bottom: none;
+    }
 
     .fld {
       font-weight: var(--fw-semibold);
@@ -339,7 +407,10 @@ $auth-bg: rgba(91, 100, 112, 0.12);
     margin: 0;
     font-size: var(--fs-label);
 
-    dt { color: var(--text-color-secondary); font-weight: var(--fw-medium); }
+    dt {
+      color: var(--text-color-secondary);
+      font-weight: var(--fw-medium);
+    }
     dd {
       margin: 0;
       color: var(--text-color);
@@ -360,7 +431,9 @@ $auth-bg: rgba(91, 100, 112, 0.12);
         white-space: nowrap;
         vertical-align: bottom;
       }
-      .muted { color: var(--text-muted); }
+      .muted {
+        color: var(--text-muted);
+      }
       .corr {
         display: inline-flex;
         align-items: center;

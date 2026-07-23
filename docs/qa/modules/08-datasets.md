@@ -3,11 +3,13 @@
 > SQL + builder + custom fields + upload + duplicate + version.
 
 ## Fixtures
+
 - Datasource `pg_local`
 - Sample dataset SQL-mode: `SELECT * FROM public.chart_demo`
 - Sample dataset upload-mode: `chart_demo.csv` (5040 rows)
 
 ## SQL dataset — happy
+
 - **DST-H-01** · Save `SELECT * FROM chart_demo` → preview renders 1000 capped rows. P0
 - **DST-H-02** · Edit SQL (add WHERE) → re-preview shows fewer rows. P0
 - **DST-H-03** · Save-as duplicate → new dataset; dataset-level fields cloned; analysis-scoped fields excluded. P0
@@ -22,6 +24,7 @@
 - **DST-H-12** · Description exactly 500 chars → accepted. P2
 
 ## SQL dataset — negative
+
 - **DST-N-01** · SQL > 10000 chars → tooLong. P0
 - **DST-N-02** · Empty SQL → required. P0
 - **DST-N-03** · Name pattern violation. P0
@@ -40,6 +43,7 @@
 - **DST-N-16** · Update without justification when audit gate enforces → reject. P1
 
 ## SQL dataset — edge
+
 - **DST-E-01** · Snowflake QUALIFY → accepted on Snowflake. P1
 - **DST-E-02** · MSSQL TOP 100 → accepted on MSSQL. P1
 - **DST-E-03** · 5040-row dataset → preview capped + "truncated" badge. P1
@@ -112,6 +116,7 @@
 - **DST-P-02** · 100 concurrent previews stay within pool budget. P1 ⚡
 
 ## Regression buckets
+
 - Validators changed → DST-N-01..16
 - Custom fields changed → FLD-*
 - Upload flow → DST-UP-*

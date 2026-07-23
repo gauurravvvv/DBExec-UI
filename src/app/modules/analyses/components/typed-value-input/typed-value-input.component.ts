@@ -6,10 +6,7 @@ import {
   inject,
   Input,
 } from '@angular/core';
-import {
-  ControlValueAccessor,
-  NG_VALUE_ACCESSOR,
-} from '@angular/forms';
+import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import type { ValueType } from '../../utils/field-type.util';
 
 /**

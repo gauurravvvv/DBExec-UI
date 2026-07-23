@@ -21,55 +21,55 @@ on schema discovery and aggregate awareness.
 
 ## 1. Industry baseline
 
-| Tool | Concept | Physical / Virtual |
-|---|---|---|
-| Tableau | Data source | Live connection or extract (Hyper) |
-| Power BI | Table | Imported / DirectQuery / Composite |
-| Looker | View | Always physical (sql_table_name) or derived |
-| Metabase | Model / Question | Models can be SQL or GUI-built |
-| Superset | Dataset | Physical OR virtual |
+| Tool     | Concept          | Physical / Virtual                          |
+| -------- | ---------------- | ------------------------------------------- |
+| Tableau  | Data source      | Live connection or extract (Hyper)          |
+| Power BI | Table            | Imported / DirectQuery / Composite          |
+| Looker   | View             | Always physical (sql_table_name) or derived |
+| Metabase | Model / Question | Models can be SQL or GUI-built              |
+| Superset | Dataset          | Physical OR virtual                         |
 
 Superset's physical/virtual split is the cleanest model. Adopt it.
 
 ## 2. DBExec today
 
-| Aspect | Status | Notes |
-|---|---|---|
-| Entity `Dataset` | ✅ | `shared/db/shared_entity/dataset.entity.ts` |
-| Virtual SQL | ✅ | `dataset.sql` |
-| Custom fields | ✅ | `DatasetField` per dataset / per analysis |
-| Preview | ✅ | `/dataset/preview` |
-| Distinct values | ✅ | `/dataset/distinct/:col` |
-| Duplicate | ✅ | `/dataset/duplicate/:id` |
-| Query-builder-backed dataset | ✅ | `/dataset/builder/*` |
-| Physical (point at a table) | ❌ | — |
-| CSV / XLSX / JSON upload | ❌ | — |
-| Google Sheets | ❌ | — |
-| Lineage | ❌ | — |
-| Usage stats | ❌ | — |
-| Freshness badge | ❌ | — |
-| Versioning | ❌ | — |
-| Compare-with-previous | ❌ | — |
+| Aspect                       | Status | Notes                                       |
+| ---------------------------- | ------ | ------------------------------------------- |
+| Entity `Dataset`             | ✅     | `shared/db/shared_entity/dataset.entity.ts` |
+| Virtual SQL                  | ✅     | `dataset.sql`                               |
+| Custom fields                | ✅     | `DatasetField` per dataset / per analysis   |
+| Preview                      | ✅     | `/dataset/preview`                          |
+| Distinct values              | ✅     | `/dataset/distinct/:col`                    |
+| Duplicate                    | ✅     | `/dataset/duplicate/:id`                    |
+| Query-builder-backed dataset | ✅     | `/dataset/builder/*`                        |
+| Physical (point at a table)  | ❌     | —                                           |
+| CSV / XLSX / JSON upload     | ❌     | —                                           |
+| Google Sheets                | ❌     | —                                           |
+| Lineage                      | ❌     | —                                           |
+| Usage stats                  | ❌     | —                                           |
+| Freshness badge              | ❌     | —                                           |
+| Versioning                   | ❌     | —                                           |
+| Compare-with-previous        | ❌     | —                                           |
 
 ## 3. Gaps
 
-| ID | Gap | Severity |
-|---|---|---|
-| DST-G01 | Physical dataset (target_table + target_schema) | P1 |
-| DST-G02 | CSV upload → managed datasource → dataset | P0 |
-| DST-G03 | XLSX upload | P0 |
-| DST-G04 | JSON / NDJSON upload | P1 |
-| DST-G05 | Parquet upload | P2 |
-| DST-G06 | Google Sheets connector | P1 |
-| DST-G07 | Lineage graph endpoint | P1 |
-| DST-G08 | Usage stats per dataset (queries, p95, error rate) | P1 |
-| DST-G09 | Freshness badge (last-refresh + SLA) | P1 |
-| DST-G10 | Dataset version history | P2 |
-| DST-G11 | Sample-data preview (anonymous read) | P2 |
-| DST-G12 | Column-level statistics (min/max/null %) | P2 |
-| DST-G13 | Reusable filters (segments) lift from analysis to dataset | P1 |
-| DST-G14 | Dataset folders / hierarchical organisation | P1 |
-| DST-G15 | Tagging + collections (covered in 17) | — |
+| ID      | Gap                                                       | Severity |
+| ------- | --------------------------------------------------------- | -------- |
+| DST-G01 | Physical dataset (target_table + target_schema)           | P1       |
+| DST-G02 | CSV upload → managed datasource → dataset                 | P0       |
+| DST-G03 | XLSX upload                                               | P0       |
+| DST-G04 | JSON / NDJSON upload                                      | P1       |
+| DST-G05 | Parquet upload                                            | P2       |
+| DST-G06 | Google Sheets connector                                   | P1       |
+| DST-G07 | Lineage graph endpoint                                    | P1       |
+| DST-G08 | Usage stats per dataset (queries, p95, error rate)        | P1       |
+| DST-G09 | Freshness badge (last-refresh + SLA)                      | P1       |
+| DST-G10 | Dataset version history                                   | P2       |
+| DST-G11 | Sample-data preview (anonymous read)                      | P2       |
+| DST-G12 | Column-level statistics (min/max/null %)                  | P2       |
+| DST-G13 | Reusable filters (segments) lift from analysis to dataset | P1       |
+| DST-G14 | Dataset folders / hierarchical organisation               | P1       |
+| DST-G15 | Tagging + collections (covered in 17)                     | —        |
 
 ## 4. Target architecture
 
@@ -169,21 +169,21 @@ Save creates a new row; revert sets the dataset back to that version.
 
 ## 5. APIs
 
-| Method | Path | Purpose |
-|---|---|---|
-| POST   | `/dataset` | Create virtual |
-| POST   | `/dataset/physical` | Create physical |
-| POST   | `/dataset/upload/csv` | Upload CSV (multipart) |
-| POST   | `/dataset/upload/xlsx` | Upload XLSX |
-| POST   | `/dataset/upload/json` | Upload JSON/NDJSON |
-| POST   | `/dataset/sheet` | Connect Google Sheet |
-| POST   | `/dataset/sheet/:id/refresh` | Re-pull from sheet |
-| POST   | `/dataset/:id/refresh` | Re-materialise (upload-backed) |
-| GET    | `/dataset/:id/lineage` | Graph (downstream consumers) |
-| GET    | `/dataset/:id/usage` | Stats (last 30d) |
-| GET    | `/dataset/:id/columns/stats` | Per-column min/max/null% |
-| GET    | `/dataset/:id/versions` | List versions |
-| POST   | `/dataset/:id/versions/:v/revert` | Revert |
+| Method | Path                              | Purpose                        |
+| ------ | --------------------------------- | ------------------------------ |
+| POST   | `/dataset`                        | Create virtual                 |
+| POST   | `/dataset/physical`               | Create physical                |
+| POST   | `/dataset/upload/csv`             | Upload CSV (multipart)         |
+| POST   | `/dataset/upload/xlsx`            | Upload XLSX                    |
+| POST   | `/dataset/upload/json`            | Upload JSON/NDJSON             |
+| POST   | `/dataset/sheet`                  | Connect Google Sheet           |
+| POST   | `/dataset/sheet/:id/refresh`      | Re-pull from sheet             |
+| POST   | `/dataset/:id/refresh`            | Re-materialise (upload-backed) |
+| GET    | `/dataset/:id/lineage`            | Graph (downstream consumers)   |
+| GET    | `/dataset/:id/usage`              | Stats (last 30d)               |
+| GET    | `/dataset/:id/columns/stats`      | Per-column min/max/null%       |
+| GET    | `/dataset/:id/versions`           | List versions                  |
+| POST   | `/dataset/:id/versions/:v/revert` | Revert                         |
 
 ## 6. UI specs
 
@@ -271,7 +271,8 @@ export default async function uploadDatasetCsv(req: Request, res: Response) {
   // 3. Create table
   const tableName = `up_${shortOrgId(orgData.id)}_${Date.now()}`;
   const columnDdl = columns
-    .map(c => `${q(c.name)} ${pgType(c.type)}`).join(', ');
+    .map(c => `${q(c.name)} ${pgType(c.type)}`)
+    .join(', ');
   await managed.query(`CREATE TABLE ${q(tableName)} (${columnDdl})`);
 
   // 4. Bulk insert
@@ -280,13 +281,13 @@ export default async function uploadDatasetCsv(req: Request, res: Response) {
   // 5. Persist dataset + dataset_fields
   const ds = new Dataset();
   ds.organisationId = orgData.id;
-  ds.datasourceId  = managed.datasourceId;
-  ds.name          = req.body.name || file.originalname;
-  ds.description   = req.body.description || '';
-  ds.kind          = 'upload';
-  ds.targetSchema  = 'public';
-  ds.targetTable   = tableName;
-  ds.sql           = `SELECT * FROM ${q(tableName)}`;
+  ds.datasourceId = managed.datasourceId;
+  ds.name = req.body.name || file.originalname;
+  ds.description = req.body.description || '';
+  ds.kind = 'upload';
+  ds.targetSchema = 'public';
+  ds.targetTable = tableName;
+  ds.sql = `SELECT * FROM ${q(tableName)}`;
   ds.uploadSourceMeta = {
     originalName: file.originalname,
     sizeBytes: file.size,
@@ -301,17 +302,21 @@ export default async function uploadDatasetCsv(req: Request, res: Response) {
 
   for (const c of columns) {
     const f = new DatasetField();
-    f.datasetId  = ds.id;
-    f.name       = c.name;
-    f.dataType   = c.type;
+    f.datasetId = ds.id;
+    f.name = c.name;
+    f.dataType = c.type;
     await master_db_connection.getRepository(DatasetField).save(f);
   }
 
   // Audit
   await auditLogger.logAuditToOrg({
-    connection: master_db_connection, req, res,
-    module: AUDIT_MODULES.DATASET, action: AUDIT_ACTIONS.CREATE,
-    entityName: 'Dataset (upload)', entityId: ds.id,
+    connection: master_db_connection,
+    req,
+    res,
+    module: AUDIT_MODULES.DATASET,
+    action: AUDIT_ACTIONS.CREATE,
+    entityName: 'Dataset (upload)',
+    entityId: ds.id,
     metadata: { rowCount: rows.length, format: 'csv' },
   });
 
@@ -324,7 +329,10 @@ async function parseCsv(buf: Buffer): Promise<ParseResult> {
     Papa.parse(buf.toString('utf8'), {
       header: true,
       skipEmptyLines: true,
-      complete: r => { rows.push(...(r.data as any[])); resolve(); },
+      complete: r => {
+        rows.push(...(r.data as any[]));
+        resolve();
+      },
       error: e => reject(e),
     });
   });
@@ -334,7 +342,10 @@ async function parseCsv(buf: Buffer): Promise<ParseResult> {
 
 function inferColumns(rows: any[]) {
   const sample = rows.slice(0, 100);
-  const cols: { name: string; type: 'bool' | 'numeric' | 'timestamp' | 'text' }[] = [];
+  const cols: {
+    name: string;
+    type: 'bool' | 'numeric' | 'timestamp' | 'text';
+  }[] = [];
   if (sample.length === 0) return cols;
   for (const name of Object.keys(sample[0])) {
     const types = sample.map(r => detect(r[name]));
@@ -354,9 +365,13 @@ function dominant(arr: string[]) {
   for (const t of arr) cnt[t] = (cnt[t] || 0) + 1;
   return Object.entries(cnt).sort((a, b) => b[1] - a[1])[0][0] as any;
 }
-const pgType = (t: string) => ({
-  bool: 'boolean', numeric: 'numeric', timestamp: 'timestamptz', text: 'text',
-}[t] || 'text');
+const pgType = (t: string) =>
+  ({
+    bool: 'boolean',
+    numeric: 'numeric',
+    timestamp: 'timestamptz',
+    text: 'text',
+  })[t] || 'text';
 const q = (n: string) => `"${n.replace(/"/g, '""')}"`;
 const shortOrgId = (uuid: string) => uuid.replace(/-/g, '').slice(0, 8);
 ```
@@ -380,9 +395,9 @@ async function batchInsertCopy(
     const stream = client.query(
       copyFrom(`COPY ${q(table)} (${colList}) FROM STDIN WITH (FORMAT csv)`),
     );
-    const csv = rows.map(r =>
-      columns.map(c => escapeCsvCell(r[c.name])).join(',')
-    ).join('\n');
+    const csv = rows
+      .map(r => columns.map(c => escapeCsvCell(r[c.name])).join(','))
+      .join('\n');
     stream.write(csv);
     stream.end();
     await new Promise<void>((resolve, reject) => {
@@ -409,35 +424,47 @@ export default async function datasetLineage(req: Request, res: Response) {
   const { master_db_connection } = res.locals;
 
   const analyses = await master_db_connection.query(
-    `SELECT id, name FROM analyses WHERE dataset_id = $1`, [id],
+    `SELECT id, name FROM analyses WHERE dataset_id = $1`,
+    [id],
   );
   const analysisIds = analyses.map((a: any) => a.id);
-  const dashboards = analysisIds.length === 0 ? [] :
-    await master_db_connection.query(
-      `SELECT id, name FROM dashboard
+  const dashboards =
+    analysisIds.length === 0
+      ? []
+      : await master_db_connection.query(
+          `SELECT id, name FROM dashboard
         WHERE snapshot->>'analyses' && $1::text[]`, // approximate
-      [analysisIds],
-    );
+          [analysisIds],
+        );
   const rls = await master_db_connection.query(
-    `SELECT id, name FROM rls_rule WHERE dataset_id = $1`, [id],
+    `SELECT id, name FROM rls_rule WHERE dataset_id = $1`,
+    [id],
   );
-  const subs = dashboards.length === 0 ? [] :
-    await master_db_connection.query(
-      `SELECT id, recipients, cron FROM subscription
+  const subs =
+    dashboards.length === 0
+      ? []
+      : await master_db_connection.query(
+          `SELECT id, recipients, cron FROM subscription
         WHERE target_type = 'dashboard' AND target_id = ANY($1::uuid[])`,
-      [dashboards.map((d: any) => d.id)],
-    );
+          [dashboards.map((d: any) => d.id)],
+        );
   const alerts = await master_db_connection.query(
-    `SELECT id, name FROM alert WHERE dataset_id = $1`, [id],
+    `SELECT id, name FROM alert WHERE dataset_id = $1`,
+    [id],
   );
   const semModels = await master_db_connection.query(
-    `SELECT id, name FROM semantic_model WHERE dataset_id = $1`, [id],
+    `SELECT id, name FROM semantic_model WHERE dataset_id = $1`,
+    [id],
   );
 
   return sendResponse(res, true, CODE.SUCCESS, 'ok', {
     dataset: id,
     nodes: {
-      analyses, dashboards, rls, subscriptions: subs, alerts,
+      analyses,
+      dashboards,
+      rls,
+      subscriptions: subs,
+      alerts,
       semanticModels: semModels,
     },
   });
@@ -453,7 +480,8 @@ export default async function datasetUsage(req: Request, res: Response) {
   const { master_db_connection } = res.locals;
   const since = new Date(Date.now() - 30 * 24 * 3600 * 1000);
 
-  const summary = await master_db_connection.query(`
+  const summary = await master_db_connection.query(
+    `
     SELECT
       COUNT(*)::int                              AS runs,
       SUM(CASE WHEN cache_hit THEN 1 ELSE 0 END)::int AS cache_hits,
@@ -463,18 +491,26 @@ export default async function datasetUsage(req: Request, res: Response) {
       PERCENTILE_CONT(0.99) WITHIN GROUP (ORDER BY duration_ms) AS p99
     FROM dataset_run
     WHERE dataset_id = $1 AND occurred_at > $2
-  `, [id, since]);
+  `,
+    [id, since],
+  );
 
-  const daily = await master_db_connection.query(`
+  const daily = await master_db_connection.query(
+    `
     SELECT
       DATE_TRUNC('day', occurred_at) AS day,
       COUNT(*)::int AS runs
     FROM dataset_run
     WHERE dataset_id = $1 AND occurred_at > $2
     GROUP BY 1 ORDER BY 1
-  `, [id, since]);
+  `,
+    [id, since],
+  );
 
-  return sendResponse(res, true, CODE.SUCCESS, 'ok', { summary: summary[0], daily });
+  return sendResponse(res, true, CODE.SUCCESS, 'ok', {
+    summary: summary[0],
+    daily,
+  });
 }
 ```
 

@@ -8,12 +8,7 @@ export type WidgetType = 'text' | 'kpi';
 
 /** KPI aggregate functions (mirror of WIDGET_AGGREGATE_VALUES). */
 export type WidgetAggregate =
-  | 'sum'
-  | 'avg'
-  | 'min'
-  | 'max'
-  | 'count'
-  | 'count_distinct';
+  'sum' | 'avg' | 'min' | 'max' | 'count' | 'count_distinct';
 
 /** text widget config → a single markdown blob. */
 export interface TextWidgetConfig {

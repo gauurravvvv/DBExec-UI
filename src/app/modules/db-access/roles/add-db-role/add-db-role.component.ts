@@ -91,7 +91,10 @@ export class AddDbRoleComponent implements OnInit, HasUnsavedChanges {
 
   private buildForm(): FormGroup {
     return this.fb.group({
-      name: ['', [Validators.required, Validators.pattern(/^[A-Za-z_][A-Za-z0-9_$]*$/)]],
+      name: [
+        '',
+        [Validators.required, Validators.pattern(/^[A-Za-z_][A-Za-z0-9_$]*$/)],
+      ],
       canLogin: [this.defaultCanLogin],
       // login-only
       password: [''],
@@ -171,8 +174,10 @@ export class AddDbRoleComponent implements OnInit, HasUnsavedChanges {
 
   getErrorMessage(fieldName: string): string {
     const control = this.roleForm.get(fieldName);
-    if (control?.errors?.['required']) return this.translate.instant('COMMON.REQUIRED');
-    if (control?.errors?.['pattern']) return this.translate.instant('DB_ACCESS.ROLE_NAME_INVALID');
+    if (control?.errors?.['required'])
+      return this.translate.instant('COMMON.REQUIRED');
+    if (control?.errors?.['pattern'])
+      return this.translate.instant('DB_ACCESS.ROLE_NAME_INVALID');
     return '';
   }
 
@@ -194,7 +199,8 @@ export class AddDbRoleComponent implements OnInit, HasUnsavedChanges {
       attributes.bypassrls = v.bypassrls;
       if (v.connectionLimit !== null && v.connectionLimit !== undefined)
         attributes.connectionLimit = v.connectionLimit;
-      if (v.validUntil) attributes.validUntil = new Date(v.validUntil).toISOString();
+      if (v.validUntil)
+        attributes.validUntil = new Date(v.validUntil).toISOString();
       if (v.password) attributes.password = v.password;
     }
     return attributes;
@@ -204,10 +210,13 @@ export class AddDbRoleComponent implements OnInit, HasUnsavedChanges {
     if (this.roleForm.invalid) return;
     const v = this.roleForm.getRawValue();
     const attributes = this.buildAttributes(!!v.canLogin);
-    const needsSuperuserConfirm = !!(attributes.superuser || attributes.bypassrls);
+    const needsSuperuserConfirm = !!(
+      attributes.superuser || attributes.bypassrls
+    );
 
     const body: any = { name: v.name, attributes };
-    if (this.createMode === 'clone' && v.cloneFrom) body.cloneFrom = v.cloneFrom;
+    if (this.createMode === 'clone' && v.cloneFrom)
+      body.cloneFrom = v.cloneFrom;
     if (needsSuperuserConfirm) body.confirm = true;
 
     this.dbAccess

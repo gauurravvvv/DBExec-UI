@@ -295,7 +295,7 @@ export class ViewDatasetComponent implements OnInit, OnDestroy {
       field.referencedColumns ?? field.usedFieldColumns ?? field.dependsOn;
     if (Array.isArray(explicit) && explicit.length) {
       return explicit.map((c: any) =>
-        typeof c === 'string' ? c : c?.columnToView ?? c?.name ?? String(c),
+        typeof c === 'string' ? c : (c?.columnToView ?? c?.name ?? String(c)),
       );
     }
 

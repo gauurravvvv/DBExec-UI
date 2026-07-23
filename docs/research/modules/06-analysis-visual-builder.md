@@ -23,36 +23,36 @@ All converge on: chart type registry + slot mapping + property panel.
 
 ## 2. DBExec today
 
-| Surface | Status | File |
-|---|---|---|
-| Edit page | ✅ | `src/app/modules/analyses/components/edit-analyses/` |
-| Chart picker | ✅ | `visuals-chart-sidebar/` |
-| Field tray | ✅ | role-based slots |
-| Property panel | 🟡 procedural | `visual-config-sidebar/` |
-| ECharts builder | 🟡 imperative | `shared/helpers/echarts-option-builder.ts` |
-| Filter bar | ✅ | `analysis-filters/` |
-| Parameters | ❌ | — |
-| Drill | ❌ | — |
-| Cross-filters | ❌ | — |
-| Action bus | ❌ | — |
+| Surface         | Status        | File                                                 |
+| --------------- | ------------- | ---------------------------------------------------- |
+| Edit page       | ✅            | `src/app/modules/analyses/components/edit-analyses/` |
+| Chart picker    | ✅            | `visuals-chart-sidebar/`                             |
+| Field tray      | ✅            | role-based slots                                     |
+| Property panel  | 🟡 procedural | `visual-config-sidebar/`                             |
+| ECharts builder | 🟡 imperative | `shared/helpers/echarts-option-builder.ts`           |
+| Filter bar      | ✅            | `analysis-filters/`                                  |
+| Parameters      | ❌            | —                                                    |
+| Drill           | ❌            | —                                                    |
+| Cross-filters   | ❌            | —                                                    |
+| Action bus      | ❌            | —                                                    |
 
 ## 3. Gaps
 
-| ID | Gap | Severity |
-|---|---|---|
-| ANL-G01 | Declarative `VisualSpec` registry | P1 |
-| ANL-G02 | Property panel auto-rendered from descriptors | P1 |
-| ANL-G03 | Parameters (named variables) | P0 |
-| ANL-G04 | Cross-filter action bus | P0 |
-| ANL-G05 | Drill-down stack with breadcrumb | P0 |
-| ANL-G06 | Custom-viz plugin loader | P1 |
-| ANL-G07 | Multi-visual stories (Tableau-Stories pattern) | P2 |
-| ANL-G08 | Conditional formatting (red/green by threshold) | P1 |
-| ANL-G09 | Annotations (per-visual notes) | P2 |
-| ANL-G10 | Reference lines / bands | P1 |
-| ANL-G11 | Forecast / trend overlay | P2 |
-| ANL-G12 | Visual title + caption + footnote | P1 |
-| ANL-G13 | Visual options "Apply to all" | P2 |
+| ID      | Gap                                             | Severity |
+| ------- | ----------------------------------------------- | -------- |
+| ANL-G01 | Declarative `VisualSpec` registry               | P1       |
+| ANL-G02 | Property panel auto-rendered from descriptors   | P1       |
+| ANL-G03 | Parameters (named variables)                    | P0       |
+| ANL-G04 | Cross-filter action bus                         | P0       |
+| ANL-G05 | Drill-down stack with breadcrumb                | P0       |
+| ANL-G06 | Custom-viz plugin loader                        | P1       |
+| ANL-G07 | Multi-visual stories (Tableau-Stories pattern)  | P2       |
+| ANL-G08 | Conditional formatting (red/green by threshold) | P1       |
+| ANL-G09 | Annotations (per-visual notes)                  | P2       |
+| ANL-G10 | Reference lines / bands                         | P1       |
+| ANL-G11 | Forecast / trend overlay                        | P2       |
+| ANL-G12 | Visual title + caption + footnote               | P1       |
+| ANL-G13 | Visual options "Apply to all"                   | P2       |
 
 ## 4. Target architecture
 
@@ -64,7 +64,7 @@ export interface VisualSpec {
   chartType: string;
   family: ChartFamily;
   description: string;
-  roles: Role[];                    // required + optional field slots
+  roles: Role[]; // required + optional field slots
   defaultOptions(ctx: VisualCtx): EChartsOption;
   properties: PropertyDescriptor[];
   supportsCrossFilter: boolean;
@@ -75,7 +75,7 @@ export interface VisualSpec {
 }
 
 export type Role = {
-  id: string;                       // 'xAxis', 'yAxis', 'series', 'lng', 'lat'
+  id: string; // 'xAxis', 'yAxis', 'series', 'lng', 'lat'
   label: string;
   type: 'dim' | 'metric' | 'either';
   multiple: boolean;
@@ -83,14 +83,25 @@ export type Role = {
 };
 
 export type PropertyDescriptor = {
-  key: string;                      // 'legend.show' (option path)
+  key: string; // 'legend.show' (option path)
   label: string;
-  group: 'general' | 'axes' | 'series' | 'legend' | 'tooltip' | 'animation' | 'misc';
-  control: 'toggle' | 'select' | 'color' | 'colorScheme' | 'number' | 'slider' | 'text' | 'expression';
+  group:
+    'general' | 'axes' | 'series' | 'legend' | 'tooltip' | 'animation' | 'misc';
+  control:
+    | 'toggle'
+    | 'select'
+    | 'color'
+    | 'colorScheme'
+    | 'number'
+    | 'slider'
+    | 'text'
+    | 'expression';
   default: unknown;
-  optionPath: string;               // dot path to set in EChartsOption
+  optionPath: string; // dot path to set in EChartsOption
   enum?: { value: unknown; label: string }[];
-  min?: number; max?: number; step?: number;
+  min?: number;
+  max?: number;
+  step?: number;
   appliesWhen?: (ctx: VisualCtx) => boolean;
 };
 ```
@@ -157,14 +168,21 @@ at compile time.
 @Injectable({ providedIn: 'root' })
 export class ActionBus {
   private subject = new Subject<DashboardAction>();
-  emit(a: DashboardAction) { this.subject.next(a); }
+  emit(a: DashboardAction) {
+    this.subject.next(a);
+  }
   on(predicate: (a: DashboardAction) => boolean) {
     return this.subject.pipe(filter(predicate));
   }
 }
 
 export type DashboardAction =
-  | { type: 'cross-filter'; sourceVisualId: string; field: string; value: unknown }
+  | {
+      type: 'cross-filter';
+      sourceVisualId: string;
+      field: string;
+      value: unknown;
+    }
   | { type: 'drill-down'; sourceVisualId: string; dim: string; value: unknown }
   | { type: 'drill-up'; sourceVisualId: string; dim: string }
   | { type: 'param-change'; name: string; value: unknown };
@@ -176,8 +194,8 @@ Visuals subscribe + rebuild query with extra predicates.
 
 ```ts
 interface DrillState {
-  hierarchy: string[];               // ['region', 'country', 'city']
-  pinned: { dim: string; value: unknown }[];  // ['region=APAC', 'country=Japan']
+  hierarchy: string[]; // ['region', 'country', 'city']
+  pinned: { dim: string; value: unknown }[]; // ['region=APAC', 'country=Japan']
 }
 ```
 
@@ -185,14 +203,14 @@ Rendered as breadcrumb above the visual.
 
 ## 5. APIs
 
-| Method | Path | Purpose |
-|---|---|---|
-| GET   | `/visualisations/registry` | List specs (used by FE picker) |
-| POST  | `/analyses/:id/parameters` | Add parameter |
-| GET   | `/analyses/:id/parameters` | List |
-| PUT   | `/analyses/:id/parameters/:pid` | Update |
-| DELETE | `/analyses/:id/parameters/:pid` | Delete |
-| POST  | `/analyses/:id/drill` | Push a drill action (server-side validation) |
+| Method | Path                            | Purpose                                      |
+| ------ | ------------------------------- | -------------------------------------------- |
+| GET    | `/visualisations/registry`      | List specs (used by FE picker)               |
+| POST   | `/analyses/:id/parameters`      | Add parameter                                |
+| GET    | `/analyses/:id/parameters`      | List                                         |
+| PUT    | `/analyses/:id/parameters/:pid` | Update                                       |
+| DELETE | `/analyses/:id/parameters/:pid` | Delete                                       |
+| POST   | `/analyses/:id/drill`           | Push a drill action (server-side validation) |
 
 ## 6. UI specs
 
@@ -223,15 +241,33 @@ export const barSpec: VisualSpec = {
   family: 'bar',
   description: 'Compare categorical values',
   roles: [
-    { id: 'xAxis', label: 'X axis', type: 'dim', multiple: false, required: true },
-    { id: 'yAxis', label: 'Y axis', type: 'metric', multiple: true, required: true },
-    { id: 'series', label: 'Series', type: 'dim', multiple: false, required: false },
+    {
+      id: 'xAxis',
+      label: 'X axis',
+      type: 'dim',
+      multiple: false,
+      required: true,
+    },
+    {
+      id: 'yAxis',
+      label: 'Y axis',
+      type: 'metric',
+      multiple: true,
+      required: true,
+    },
+    {
+      id: 'series',
+      label: 'Series',
+      type: 'dim',
+      multiple: false,
+      required: false,
+    },
   ],
   supportsCrossFilter: true,
   supportsDrill: true,
   supportsTime: true,
   minSeries: 1,
-  defaultOptions: (ctx) => ({
+  defaultOptions: ctx => ({
     xAxis: { type: 'category' },
     yAxis: { type: 'value' },
     grid: { left: 60, right: 20, top: 40, bottom: 40 },
@@ -243,33 +279,59 @@ export const barSpec: VisualSpec = {
   }),
   properties: [
     {
-      key: 'legend.show', label: 'Show legend', group: 'legend',
-      control: 'toggle', default: true, optionPath: 'legend.show',
+      key: 'legend.show',
+      label: 'Show legend',
+      group: 'legend',
+      control: 'toggle',
+      default: true,
+      optionPath: 'legend.show',
     },
     {
-      key: 'legend.position', label: 'Legend position', group: 'legend',
-      control: 'select', default: 'top', optionPath: 'legend.position',
+      key: 'legend.position',
+      label: 'Legend position',
+      group: 'legend',
+      control: 'select',
+      default: 'top',
+      optionPath: 'legend.position',
       enum: [
-        { value: 'top', label: 'Top' }, { value: 'right', label: 'Right' },
-        { value: 'bottom', label: 'Bottom' }, { value: 'left', label: 'Left' },
+        { value: 'top', label: 'Top' },
+        { value: 'right', label: 'Right' },
+        { value: 'bottom', label: 'Bottom' },
+        { value: 'left', label: 'Left' },
       ],
       appliesWhen: ctx => ctx.options?.legend?.show !== false,
     },
     {
-      key: 'tooltip.show', label: 'Show tooltip', group: 'tooltip',
-      control: 'toggle', default: true, optionPath: 'tooltip.show',
+      key: 'tooltip.show',
+      label: 'Show tooltip',
+      group: 'tooltip',
+      control: 'toggle',
+      default: true,
+      optionPath: 'tooltip.show',
     },
     {
-      key: 'dataZoom.inside', label: 'Inside zoom', group: 'misc',
-      control: 'toggle', default: false, optionPath: 'dataZoom[0].type',
+      key: 'dataZoom.inside',
+      label: 'Inside zoom',
+      group: 'misc',
+      control: 'toggle',
+      default: false,
+      optionPath: 'dataZoom[0].type',
     },
     {
-      key: 'animation', label: 'Animation', group: 'animation',
-      control: 'toggle', default: true, optionPath: 'animation',
+      key: 'animation',
+      label: 'Animation',
+      group: 'animation',
+      control: 'toggle',
+      default: true,
+      optionPath: 'animation',
     },
     {
-      key: 'series.stack', label: 'Stack series', group: 'series',
-      control: 'toggle', default: false, optionPath: 'series.*.stack',
+      key: 'series.stack',
+      label: 'Stack series',
+      group: 'series',
+      control: 'toggle',
+      default: false,
+      optionPath: 'series.*.stack',
     },
   ],
 };

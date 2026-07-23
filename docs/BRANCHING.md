@@ -46,19 +46,19 @@ Either mode works; pick per-phase, not globally.
 
 ## Long-lived branches
 
-| Branch | Purpose | Who pushes | Force-push? |
-|---|---|---|---|
-| `master` | what's in prod | release process only | never |
-| `develop` | integration | maintainers, after PR | never |
-| `phase-0-hardening` | hardening container | phase owner | never |
-| `phase-1-foundations` | Phase 1 container ([BUILD-PLAN](BUILD-PLAN.md#phase-1--foundations-security-exec-data-shape)) | phase owner | never |
-| `phase-2-semantic-layer` | Phase 2 container | phase owner | never |
-| `phase-3-compliance` | Phase 3 container | phase owner | never |
-| `phase-4-authoring` | Phase 4 container | phase owner | never |
-| `phase-5-distribution` | Phase 5 container | phase owner | never |
-| `phase-6-discovery` | Phase 6 container | phase owner | never |
-| `phase-7-enterprise` | Phase 7 container | phase owner | never |
-| `phase-8-intelligence` | Phase 8 container | phase owner | never |
+| Branch                   | Purpose                                                                                       | Who pushes            | Force-push? |
+| ------------------------ | --------------------------------------------------------------------------------------------- | --------------------- | ----------- |
+| `master`                 | what's in prod                                                                                | release process only  | never       |
+| `develop`                | integration                                                                                   | maintainers, after PR | never       |
+| `phase-0-hardening`      | hardening container                                                                           | phase owner           | never       |
+| `phase-1-foundations`    | Phase 1 container ([BUILD-PLAN](BUILD-PLAN.md#phase-1--foundations-security-exec-data-shape)) | phase owner           | never       |
+| `phase-2-semantic-layer` | Phase 2 container                                                                             | phase owner           | never       |
+| `phase-3-compliance`     | Phase 3 container                                                                             | phase owner           | never       |
+| `phase-4-authoring`      | Phase 4 container                                                                             | phase owner           | never       |
+| `phase-5-distribution`   | Phase 5 container                                                                             | phase owner           | never       |
+| `phase-6-discovery`      | Phase 6 container                                                                             | phase owner           | never       |
+| `phase-7-enterprise`     | Phase 7 container                                                                             | phase owner           | never       |
+| `phase-8-intelligence`   | Phase 8 container                                                                             | phase owner           | never       |
 
 All nine `phase-*` branches are already created (off `develop`,
 which is off `master`). They start identical to `develop` and
@@ -68,13 +68,13 @@ diverge as features land.
 
 ## Short-lived branches
 
-| Type | Pattern | Example |
-|---|---|---|
-| Feature | `feature/<module>-<short-desc>` | `feature/m10-api-tokens`, `feature/m04-dialect-bigquery` |
-| Bug fix | `bugfix/<area>-<short-desc>` | `bugfix/dataset-preview-pagination`, `bugfix/cache-stampede-lock` |
-| Hardening | `harden/<area>-<short-desc>` | `harden/dataset-sql-validation` |
-| Hotfix off prod | `hotfix/<short-desc>` | `hotfix/audit-chain-lock-deadlock` |
-| Spike (throwaway) | `spike/<short-desc>` | `spike/snowflake-dry-run` |
+| Type              | Pattern                         | Example                                                           |
+| ----------------- | ------------------------------- | ----------------------------------------------------------------- |
+| Feature           | `feature/<module>-<short-desc>` | `feature/m10-api-tokens`, `feature/m04-dialect-bigquery`          |
+| Bug fix           | `bugfix/<area>-<short-desc>`    | `bugfix/dataset-preview-pagination`, `bugfix/cache-stampede-lock` |
+| Hardening         | `harden/<area>-<short-desc>`    | `harden/dataset-sql-validation`                                   |
+| Hotfix off prod   | `hotfix/<short-desc>`           | `hotfix/audit-chain-lock-deadlock`                                |
+| Spike (throwaway) | `spike/<short-desc>`            | `spike/snowflake-dry-run`                                         |
 
 **Naming rules:**
 
@@ -95,17 +95,17 @@ diverge as features land.
 Direct mapping from [`BUILD-PLAN.md`](BUILD-PLAN.md) phases to
 the branch where their feature branches land.
 
-| Phase | Branch | Modules | Companion docs (impl) |
-|---|---|---|---|
-| 0 | `phase-0-hardening` | hardening backlog | [`hardening/`](hardening/) |
-| 1 | `phase-1-foundations` | 10 Auth, 04 Query, 09 RLS | [`AUTH-SSO-MFA-SCIM`](implementation/AUTH-SSO-MFA-SCIM.md), [`QUERY-PROCESSOR`](implementation/QUERY-PROCESSOR.md), [`RLS-COLUMN-SECURITY`](implementation/RLS-COLUMN-SECURITY.md) |
-| 2 | `phase-2-semantic-layer` | 02 Semantic, 11 Metrics, 03 Dataset | [`SEMANTIC-LAYER`](implementation/SEMANTIC-LAYER.md), [`AGGREGATION-METRICS`](implementation/AGGREGATION-METRICS.md), [`DATASET`](implementation/DATASET.md) |
-| 3 | `phase-3-compliance` | 19 Audit, 28 Backup, 01 Datasource | [`AUDIT-OBSERVABILITY`](implementation/AUDIT-OBSERVABILITY.md), [`BACKUP-RESTORE`](implementation/BACKUP-RESTORE.md), [`DATASOURCE-CONNECTION`](implementation/DATASOURCE-CONNECTION.md) |
-| 4 | `phase-4-authoring` | 06 Analysis, 07 Filters, 08 Dashboard, 05 Cache, 13 Export | [`ANALYSIS-VISUAL-BUILDER`](implementation/ANALYSIS-VISUAL-BUILDER.md), [`CROSS-TAB-DRILL-THROUGH`](implementation/CROSS-TAB-DRILL-THROUGH.md), [`MULTI-TAB-DASHBOARD`](implementation/MULTI-TAB-DASHBOARD.md), [`CACHE-MATERIALISATION`](implementation/CACHE-MATERIALISATION.md), [`PER-TAB-SCHEDULED-EXPORTS`](implementation/PER-TAB-SCHEDULED-EXPORTS.md) |
-| 5 | `phase-5-distribution` | 15 Scheduling, 16 Notifications, 14 Share/Embed | [`PER-TAB-SCHEDULED-EXPORTS`](implementation/PER-TAB-SCHEDULED-EXPORTS.md), [`NOTIFICATIONS`](implementation/NOTIFICATIONS.md), [`SHARE-EMBED`](implementation/SHARE-EMBED.md) |
-| 6 | `phase-6-discovery` | 17 Search, 18 Versioning, 12 Upload | [`SEARCH-CATALOGUE`](implementation/SEARCH-CATALOGUE.md), [`VERSIONING-LINEAGE`](implementation/VERSIONING-LINEAGE.md), [`IMPORT-UPLOAD`](implementation/IMPORT-UPLOAD.md) |
-| 7 | `phase-7-enterprise` | 24 Admin, 20 Branding, 23 i18n, 22 API, 27 Cost | [`ADMIN-CONSOLE`](implementation/ADMIN-CONSOLE.md), [`BRANDING`](implementation/BRANDING.md), [`I18N-A11Y`](implementation/I18N-A11Y.md), [`API-SDK-PLUGINS`](implementation/API-SDK-PLUGINS.md), [`COST-OBSERVABILITY`](implementation/COST-OBSERVABILITY.md) |
-| 8 | `phase-8-intelligence` | 21 Mobile, 26 Geo, 25 AI | [`MOBILE-PWA`](implementation/MOBILE-PWA.md), [`GEO-MAPS`](implementation/GEO-MAPS.md), [`AI-DASHBOARD-GENERATION`](implementation/AI-DASHBOARD-GENERATION.md) |
+| Phase | Branch                   | Modules                                                    | Companion docs (impl)                                                                                                                                                                                                                                                                                                                                          |
+| ----- | ------------------------ | ---------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 0     | `phase-0-hardening`      | hardening backlog                                          | [`hardening/`](hardening/)                                                                                                                                                                                                                                                                                                                                     |
+| 1     | `phase-1-foundations`    | 10 Auth, 04 Query, 09 RLS                                  | [`AUTH-SSO-MFA-SCIM`](implementation/AUTH-SSO-MFA-SCIM.md), [`QUERY-PROCESSOR`](implementation/QUERY-PROCESSOR.md), [`RLS-COLUMN-SECURITY`](implementation/RLS-COLUMN-SECURITY.md)                                                                                                                                                                             |
+| 2     | `phase-2-semantic-layer` | 02 Semantic, 11 Metrics, 03 Dataset                        | [`SEMANTIC-LAYER`](implementation/SEMANTIC-LAYER.md), [`AGGREGATION-METRICS`](implementation/AGGREGATION-METRICS.md), [`DATASET`](implementation/DATASET.md)                                                                                                                                                                                                   |
+| 3     | `phase-3-compliance`     | 19 Audit, 28 Backup, 01 Datasource                         | [`AUDIT-OBSERVABILITY`](implementation/AUDIT-OBSERVABILITY.md), [`BACKUP-RESTORE`](implementation/BACKUP-RESTORE.md), [`DATASOURCE-CONNECTION`](implementation/DATASOURCE-CONNECTION.md)                                                                                                                                                                       |
+| 4     | `phase-4-authoring`      | 06 Analysis, 07 Filters, 08 Dashboard, 05 Cache, 13 Export | [`ANALYSIS-VISUAL-BUILDER`](implementation/ANALYSIS-VISUAL-BUILDER.md), [`CROSS-TAB-DRILL-THROUGH`](implementation/CROSS-TAB-DRILL-THROUGH.md), [`MULTI-TAB-DASHBOARD`](implementation/MULTI-TAB-DASHBOARD.md), [`CACHE-MATERIALISATION`](implementation/CACHE-MATERIALISATION.md), [`PER-TAB-SCHEDULED-EXPORTS`](implementation/PER-TAB-SCHEDULED-EXPORTS.md) |
+| 5     | `phase-5-distribution`   | 15 Scheduling, 16 Notifications, 14 Share/Embed            | [`PER-TAB-SCHEDULED-EXPORTS`](implementation/PER-TAB-SCHEDULED-EXPORTS.md), [`NOTIFICATIONS`](implementation/NOTIFICATIONS.md), [`SHARE-EMBED`](implementation/SHARE-EMBED.md)                                                                                                                                                                                 |
+| 6     | `phase-6-discovery`      | 17 Search, 18 Versioning, 12 Upload                        | [`SEARCH-CATALOGUE`](implementation/SEARCH-CATALOGUE.md), [`VERSIONING-LINEAGE`](implementation/VERSIONING-LINEAGE.md), [`IMPORT-UPLOAD`](implementation/IMPORT-UPLOAD.md)                                                                                                                                                                                     |
+| 7     | `phase-7-enterprise`     | 24 Admin, 20 Branding, 23 i18n, 22 API, 27 Cost            | [`ADMIN-CONSOLE`](implementation/ADMIN-CONSOLE.md), [`BRANDING`](implementation/BRANDING.md), [`I18N-A11Y`](implementation/I18N-A11Y.md), [`API-SDK-PLUGINS`](implementation/API-SDK-PLUGINS.md), [`COST-OBSERVABILITY`](implementation/COST-OBSERVABILITY.md)                                                                                                 |
+| 8     | `phase-8-intelligence`   | 21 Mobile, 26 Geo, 25 AI                                   | [`MOBILE-PWA`](implementation/MOBILE-PWA.md), [`GEO-MAPS`](implementation/GEO-MAPS.md), [`AI-DASHBOARD-GENERATION`](implementation/AI-DASHBOARD-GENERATION.md)                                                                                                                                                                                                 |
 
 ---
 
@@ -186,12 +186,12 @@ the hotfix — skip it and the bug walks back in on next release.
 
 ## Branch protection rules (recommended GH config)
 
-| Branch | Rules |
-|---|---|
-| `master` | require PR · require status checks · no force-push · no direct push · require linear history |
-| `develop` | require PR · require status checks · no force-push · no direct push |
-| `phase-*` | require PR (when team grows past 1) · status checks · no force-push |
-| `feature/*`, `bugfix/*` | no protection; force-push allowed (it's your branch) |
+| Branch                  | Rules                                                                                        |
+| ----------------------- | -------------------------------------------------------------------------------------------- |
+| `master`                | require PR · require status checks · no force-push · no direct push · require linear history |
+| `develop`               | require PR · require status checks · no force-push · no direct push                          |
+| `phase-*`               | require PR (when team grows past 1) · status checks · no force-push                          |
+| `feature/*`, `bugfix/*` | no protection; force-push allowed (it's your branch)                                         |
 
 Set via `gh api -X PUT repos/<owner>/<repo>/branches/<branch>/protection` or
 the GitHub UI.

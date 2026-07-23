@@ -116,7 +116,10 @@ export class CustomInputComponent implements ControlValueAccessor {
 
   /** Cached validation context so language changes re-translate the
    *  visible error without re-running validateLength/validateDimension. */
-  private lastErrorContext: { key: string; params: Record<string, any> } | null = null;
+  private lastErrorContext: {
+    key: string;
+    params: Record<string, any>;
+  } | null = null;
 
   constructor(
     private cdr: ChangeDetectorRef,
@@ -133,7 +136,10 @@ export class CustomInputComponent implements ControlValueAccessor {
     });
   }
 
-  private translateError(key: string, params: Record<string, any> = {}): string {
+  private translateError(
+    key: string,
+    params: Record<string, any> = {},
+  ): string {
     this.lastErrorContext = { key, params };
     return this.translate.instant(`VALIDATION.${key}`, params);
   }

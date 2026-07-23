@@ -13,13 +13,13 @@
 > `visual-box-mockup` artifact for the proposed redesign visual.
 
 ## Contents
+
 1. [Config Panel UX](#config-panel-ux)
 2. [Chart Visual Polish & Card Chrome](#chart-visual-polish--card-chrome)
 3. [Chart Types & Per-Chart Features](#chart-types--per-chart-features)
 4. [Interaction Model](#interaction-model)
 
 ---
-
 
 ## Config Panel UX
 
@@ -30,22 +30,26 @@ DBExec's visualization config panel is a single monolithic sidebar (`visual-conf
 ### 1. What DBExec has today
 
 **Structure & layout primitives**
+
 - Single vertical-scroll sidebar; no top-level tabs, no Data-vs-Format split.
 - Layout CSS vocabulary: `config-section` (67), `config-group` (236 — label + control vertical stack), `config-row` (110 — label + right-aligned compact control), `config-subsection` (5 — nested conditional container), `config-card` (2 — repeating-row container), `sidebar-divider` (1), `section-title` (per-section h3-like heading).
 - Sections gated by `*ngIf` on `focusedVisual.chartType` and `config` keys. Hidden controls are removed from the DOM, not disabled.
 - No accordion / collapse. No search box. No section anchor nav. Everything applicable is always expanded.
 
 **Data / encoding controls (Data section, D4 server aggregation)**
+
 - Dimension dropdown, Measure dropdown (numeric-filtered), Aggregate dropdown (DB-driven reference data + `NONE` pseudo-entry), Percentile input (1–99, conditional on `aggregate='percentile'`).
 - Combo extra-measures CRUD: per-measure `config-card` (column dropdown + aggregate dropdown + alias input + delete); `addComboMeasure()` / `updateComboMeasure()` / `removeComboMeasure()`.
 
 **Field-to-encoding assignment (separate `visuals-chart-sidebar`)**
+
 - NOT drag-drop shelves. Role-slot + field-tree-click model.
 - `getRoleSlots()` → chart-specific role set from `getChartRoles(chartType)`; required slots first, optional after; each slot carries `key`, `label` (i18n), `required`, `multi`.
 - Slot row shows label + bound-column chip(s) + clear ✕. Click slot toggles `activeAxisSelection`; parent's field-tree click calls `setRoleOnVisual(visual, role, columnName)`. Multi roles (indicators/dimensions/valueColumns) append/splice chips.
 - Field tree lives in a physically separate sidebar from the role slots.
 
 **Analytics section (E1, cartesian families only)**
+
 - Dual-axis toggle → right-axis-name input + series editor (`config-card` per series: name / type bar|line / yAxisIndex 0|1 / delete).
 - Trend dropdown (none/linear/log/poly/movingAverage/forecast) with conditional window / forecastPeriods / degree sliders.
 - Quick Calc dropdown (running_total / percent_of_total / difference / percent_difference / moving_average / rank) + conditional window slider.
@@ -53,15 +57,18 @@ DBExec's visualization config panel is a single monolithic sidebar (`visual-conf
 - Small Multiples toggle → facet-column dropdown + max-cols slider (1–6).
 
 **Data & Format section (Slice C, cartesian)**
+
 - Sort (by none/dimension/measure/value + direction), Limit (top/bottom + count slider 1–1000), Stacking (none/total/percent), Null handling (gap/connect/zero).
 - Value format object: kind (auto/number/currency/percent/date), target (value/label), decimals (0–6), currency code (3-char), date pattern, thousands toggle.
 - Axis scale: type (linear/log) + Y min/max nullable inputs.
 
 **Presentation sections (chart-capability gated)**
+
 - Histogram (bins, show counts); Interaction / cross-filter (E2: enable + target mode same-tab/dashboard/visuals + sibling multiselect); Table options (compact / striped / row numbers); Table columns (per-column visibility toggle, humanized label); Axis (show X/Y, grid, labels + text, X rotation, autoscale, min/max, boundary gap, inverse X/Y); Data labels (show, position, font size, content); Legend (show + position + type, dynamic title); Tooltip (enable inverted, trigger, axis pointer); Gradient (fill toggle); Animation (enable, duration, easing); Interactive (data zoom, toolbox).
 - Chart-type-specific blocks (60+): Bar, Line/Area, Pie, Radar/Polar, Gauge, Card, Scatter/Effect-scatter, plus Funnel/Sankey/Tree/Treemap/Sunburst/Graph. Each an `*ngIf` island of sliders/toggles/dropdowns.
 
 **Architecture & state**
+
 - `ChangeDetectionStrategy.OnPush` + `ngDoCheck` JSON-snapshot diffing to catch PrimeNG synthetic events; emits `configChanged` via microtask defer.
 - Config is an untyped blob on `focusedVisual.config`; 40+ getter/setter pairs normalize null/undefined boundaries; lists immutably swapped.
 - No formal schema, no state machine, no undo/redo, no per-section reset, no defaults restore. Chart-type switch does not remap dimension/measure fields.
@@ -74,68 +81,51 @@ DBExec's visualization config panel is a single monolithic sidebar (`visual-conf
 Each item tagged **[table-stakes]** (a mature BI config panel is judged broken without it) or **[nice-to-have]** (differentiator / polish).
 
 **Structure**
+
 1. Split into **Data/Encoding vs Format/Style** regions (top tabs or clearly divided), Data first. **[table-stakes]**
 2. Sort every control by the **re-query test** — changes the query → Data; only repaints → Format. **[table-stakes]**
 3. **Collapsible accordion sections** with headers inside each tab; most **collapsed by default**. **[table-stakes]**
 4. **Section names identical across all chart types** — same control, same place, every time. **[table-stakes]**
 5. Separate **chart-intrinsic** formatting from **container/chrome** formatting (title, background, border, padding). **[nice-to-have]**
 
-**Field assignment**
-6. **Named wells/dropzones** labelling the encoding role (Axis, Value, Color, Size, Detail, Tooltip). **[table-stakes]**
-7. Accept **both drag-and-drop and click-to-pick**; allow dropping onto the empty chart directly. **[nice-to-have]** (drag) / click-to-pick **[table-stakes]**
-8. Dropped fields render as **interactive pills** — click to change aggregate / date-trunc / sort / label / remove; drag to reorder. **[table-stakes]** for aggregate-on-pill, **[nice-to-have]** for reorder-drag.
-9. **Enforce channel cardinality** (single vs multi-field wells) in the UI. **[table-stakes]**
-10. **Wells change per chart type**; selecting a chart reveals only valid encodings. **[table-stakes]**
+**Field assignment** 6. **Named wells/dropzones** labelling the encoding role (Axis, Value, Color, Size, Detail, Tooltip). **[table-stakes]** 7. Accept **both drag-and-drop and click-to-pick**; allow dropping onto the empty chart directly. **[nice-to-have]** (drag) / click-to-pick **[table-stakes]** 8. Dropped fields render as **interactive pills** — click to change aggregate / date-trunc / sort / label / remove; drag to reorder. **[table-stakes]** for aggregate-on-pill, **[nice-to-have]** for reorder-drag. 9. **Enforce channel cardinality** (single vs multi-field wells) in the UI. **[table-stakes]** 10. **Wells change per chart type**; selecting a chart reveals only valid encodings. **[table-stakes]**
 
-**Progressive disclosure**
-11. **Reveal-when-relevant**, preferring **disabled-with-tooltip over hidden** for context-dependent controls. **[nice-to-have]**
-12. A guided **chart-type picker** indicating which types are valid for current fields (Show-Me). **[nice-to-have]**
-13. **Search box** over sections/controls once the panel exceeds ~15 sections. **[table-stakes at DBExec's scale]** (67 sections).
-14. An **escape hatch to raw config** (ECharts option JSON / advanced editor). **[nice-to-have]**
+**Progressive disclosure** 11. **Reveal-when-relevant**, preferring **disabled-with-tooltip over hidden** for context-dependent controls. **[nice-to-have]** 12. A guided **chart-type picker** indicating which types are valid for current fields (Show-Me). **[nice-to-have]** 13. **Search box** over sections/controls once the panel exceeds ~15 sections. **[table-stakes at DBExec's scale]** (67 sections). 14. An **escape hatch to raw config** (ECharts option JSON / advanced editor). **[nice-to-have]**
 
-**Format quality**
-15. **Number & date format editors** with live preview (precision, separators, currency/percent, prefix/suffix, truncation). **[table-stakes]**
-16. **Axis controls**: title toggle+text, scale type, min/max, label rotation, dual-axis. **[table-stakes]**
-17. **Color**: named + custom palettes, per-series override, conditional/data-driven color. **[table-stakes]** for palettes+per-series, **[nice-to-have]** for data-driven.
-18. **Per-column table config**: hide (eye), drag-reorder, per-column format sub-panel, conditional-format rules. **[table-stakes]** for hide+format, **[nice-to-have]** for reorder.
-19. **Labels/legend/tooltip** toggles, positioning, customizable tooltip fields. **[table-stakes]** toggles/position, **[nice-to-have]** custom tooltip fields.
+**Format quality** 15. **Number & date format editors** with live preview (precision, separators, currency/percent, prefix/suffix, truncation). **[table-stakes]** 16. **Axis controls**: title toggle+text, scale type, min/max, label rotation, dual-axis. **[table-stakes]** 17. **Color**: named + custom palettes, per-series override, conditional/data-driven color. **[table-stakes]** for palettes+per-series, **[nice-to-have]** for data-driven. 18. **Per-column table config**: hide (eye), drag-reorder, per-column format sub-panel, conditional-format rules. **[table-stakes]** for hide+format, **[nice-to-have]** for reorder. 19. **Labels/legend/tooltip** toggles, positioning, customizable tooltip fields. **[table-stakes]** toggles/position, **[nice-to-have]** custom tooltip fields.
 
-**Behaviour & feel**
-20. **Format changes repaint instantly, never re-query** (debounced, client-side). **[table-stakes]**
-21. **Reset-to-default per section** and a **clear-all fields+formatting** action. **[table-stakes]** for reset, **[nice-to-have]** for clear-all.
-22. Config maps **1:1 to a serializable schema object** → free undo/redo, templating, copy-between-charts. **[nice-to-have]** (foundational; unlocks 23+).
-23. **On-object / in-context editing** so config lives next to the chart. **[nice-to-have]**
+**Behaviour & feel** 20. **Format changes repaint instantly, never re-query** (debounced, client-side). **[table-stakes]** 21. **Reset-to-default per section** and a **clear-all fields+formatting** action. **[table-stakes]** for reset, **[nice-to-have]** for clear-all. 22. Config maps **1:1 to a serializable schema object** → free undo/redo, templating, copy-between-charts. **[nice-to-have]** (foundational; unlocks 23+). 23. **On-object / in-context editing** so config lives next to the chart. **[nice-to-have]**
 
 ---
 
 ### 3. Gap table
 
-| Capability | DBExec status | Priority |
-|---|---|---|
-| Data-vs-Format top-level split (checklist #1) | **missing** — one flat scroll, presentation and query controls interleaved | **P0** |
-| Re-query sorting rule for controls (#2) | **missing** — no `renderTrigger`-style classification; aggregation sits near styling | **P0** |
-| Collapsible accordion sections, collapsed-by-default (#3) | **missing** — 67 always-expanded `config-section`s | **P0** |
-| Section names consistent across chart types (#4) | **partial** — shared sections (Axis/Legend/Tooltip) are consistent, but 60+ chart-specific islands each define their own local ordering/naming | **P1** |
-| Chart-intrinsic vs container/chrome formatting split (#5) | **missing** — no "General/Container" grouping; title/background/border scattered or absent | **P1** |
-| Named encoding wells (#6) | **partial** — role slots exist (`getRoleSlots`) and are labelled, but read as a settings list, not as wells/dropzones | **P1** |
-| Drag-and-drop + click-to-pick assignment (#7) | **partial** — click-to-pick via slot→tree works; no drag-drop; field tree is in a separate sidebar (poor adjacency) | **P1** (drag P2) |
-| Interactive pills with inline aggregate/sort/trunc (#8) | **partial** — bound columns render as chips with clear ✕, but chip is not clickable for aggregate/date-trunc; aggregate lives in a far-away Data dropdown | **P0** |
-| Channel cardinality enforcement (#9) | **have** — `multi` flag on slots drives append vs replace | **P2** (already covered) |
-| Wells change per chart type (#10) | **have** — `getChartRoles(chartType)` returns per-type slots | **P2** (already covered) |
-| Reveal-when-relevant, disabled-with-tooltip (#11) | **partial** — reveal-when-relevant via `*ngIf` yes; disabled-with-tooltip no (controls vanish, no explanation) | **P1** |
-| Guided chart-type picker / Show-Me (#12) | **missing** — chart picker exists but does not validate against current field roles | **P2** |
-| Search across panel (#13) | **missing** — no filter box over 67 sections | **P0** (scale makes this mandatory) |
-| Escape hatch to raw ECharts option JSON (#14) | **missing** — no advanced editor; GUI is a hard ceiling | **P2** |
-| Number/date format editor w/ live preview (#15) | **partial** — `valueFormat` object has kind/decimals/currency/date/thousands, but no live sample preview, no prefix/suffix | **P1** |
-| Axis controls (#16) | **have** — title text, scale type, min/max, rotation, dual-axis all present | **P2** (polish only) |
-| Color palettes + per-series override + conditional (#17) | **partial** — `colorScheme` default exists; conditional-formatting rules exist (`addConditionalRule`); no visible palette swatches, no per-series color picker preview | **P1** |
-| Per-column table config (#18) | **partial** — visibility toggle + humanized label present; no drag-reorder, no per-column format sub-panel (ties to task #1027) | **P1** |
-| Labels / legend / tooltip controls (#19) | **have** — full toggle+position+type coverage | **P2** (polish) |
-| Format repaint never re-queries (#20) | **partial** — `configChanged` fires uniformly; parent cannot distinguish repaint-only from re-query mutations, so styling changes may trigger avoidable work | **P0** |
-| Reset-to-default per section / clear-all (#21) | **missing** — no reset anywhere | **P1** |
-| Config as serializable schema (#22) | **missing** — untyped `config` blob, 40+ hand-written getter/setters, no undo/redo | **P1** (foundational) |
-| On-object / in-context editing (#23) | **missing** — config only in the distant rail | **P2** |
-| Header / separator / sectioning visual quality (user-flagged) | **partial/below-standard** — lone `sidebar-divider`, plain `section-title` h3s, no sticky header, no group affordance; reads as an unstyled property dump | **P0** |
+| Capability                                                    | DBExec status                                                                                                                                                          | Priority                            |
+| ------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------- |
+| Data-vs-Format top-level split (checklist #1)                 | **missing** — one flat scroll, presentation and query controls interleaved                                                                                             | **P0**                              |
+| Re-query sorting rule for controls (#2)                       | **missing** — no `renderTrigger`-style classification; aggregation sits near styling                                                                                   | **P0**                              |
+| Collapsible accordion sections, collapsed-by-default (#3)     | **missing** — 67 always-expanded `config-section`s                                                                                                                     | **P0**                              |
+| Section names consistent across chart types (#4)              | **partial** — shared sections (Axis/Legend/Tooltip) are consistent, but 60+ chart-specific islands each define their own local ordering/naming                         | **P1**                              |
+| Chart-intrinsic vs container/chrome formatting split (#5)     | **missing** — no "General/Container" grouping; title/background/border scattered or absent                                                                             | **P1**                              |
+| Named encoding wells (#6)                                     | **partial** — role slots exist (`getRoleSlots`) and are labelled, but read as a settings list, not as wells/dropzones                                                  | **P1**                              |
+| Drag-and-drop + click-to-pick assignment (#7)                 | **partial** — click-to-pick via slot→tree works; no drag-drop; field tree is in a separate sidebar (poor adjacency)                                                    | **P1** (drag P2)                    |
+| Interactive pills with inline aggregate/sort/trunc (#8)       | **partial** — bound columns render as chips with clear ✕, but chip is not clickable for aggregate/date-trunc; aggregate lives in a far-away Data dropdown              | **P0**                              |
+| Channel cardinality enforcement (#9)                          | **have** — `multi` flag on slots drives append vs replace                                                                                                              | **P2** (already covered)            |
+| Wells change per chart type (#10)                             | **have** — `getChartRoles(chartType)` returns per-type slots                                                                                                           | **P2** (already covered)            |
+| Reveal-when-relevant, disabled-with-tooltip (#11)             | **partial** — reveal-when-relevant via `*ngIf` yes; disabled-with-tooltip no (controls vanish, no explanation)                                                         | **P1**                              |
+| Guided chart-type picker / Show-Me (#12)                      | **missing** — chart picker exists but does not validate against current field roles                                                                                    | **P2**                              |
+| Search across panel (#13)                                     | **missing** — no filter box over 67 sections                                                                                                                           | **P0** (scale makes this mandatory) |
+| Escape hatch to raw ECharts option JSON (#14)                 | **missing** — no advanced editor; GUI is a hard ceiling                                                                                                                | **P2**                              |
+| Number/date format editor w/ live preview (#15)               | **partial** — `valueFormat` object has kind/decimals/currency/date/thousands, but no live sample preview, no prefix/suffix                                             | **P1**                              |
+| Axis controls (#16)                                           | **have** — title text, scale type, min/max, rotation, dual-axis all present                                                                                            | **P2** (polish only)                |
+| Color palettes + per-series override + conditional (#17)      | **partial** — `colorScheme` default exists; conditional-formatting rules exist (`addConditionalRule`); no visible palette swatches, no per-series color picker preview | **P1**                              |
+| Per-column table config (#18)                                 | **partial** — visibility toggle + humanized label present; no drag-reorder, no per-column format sub-panel (ties to task #1027)                                        | **P1**                              |
+| Labels / legend / tooltip controls (#19)                      | **have** — full toggle+position+type coverage                                                                                                                          | **P2** (polish)                     |
+| Format repaint never re-queries (#20)                         | **partial** — `configChanged` fires uniformly; parent cannot distinguish repaint-only from re-query mutations, so styling changes may trigger avoidable work           | **P0**                              |
+| Reset-to-default per section / clear-all (#21)                | **missing** — no reset anywhere                                                                                                                                        | **P1**                              |
+| Config as serializable schema (#22)                           | **missing** — untyped `config` blob, 40+ hand-written getter/setters, no undo/redo                                                                                     | **P1** (foundational)               |
+| On-object / in-context editing (#23)                          | **missing** — config only in the distant rail                                                                                                                          | **P2**                              |
+| Header / separator / sectioning visual quality (user-flagged) | **partial/below-standard** — lone `sidebar-divider`, plain `section-title` h3s, no sticky header, no group affordance; reads as an unstyled property dump              | **P0**                              |
 
 ---
 
@@ -167,7 +157,7 @@ At 67 sections, blind scrolling is the dominant complaint. Add a `p-iconfield` s
 
 The role-slot chip should become the control surface for its own aggregate, not a passive tag:
 
-- Wrap each bound column in a `p-chip` (or the shared `app-chip`) that, on click, opens a `p-popover` sub-editor: **column ▸ aggregate ▸ (percentile value | date-truncation) ▸ alias ▸ remove**. This pulls the Data-section aggregate dropdown *onto the field it applies to* and makes combo/extra-measure CRUD feel native rather than a detached `config-card` list.
+- Wrap each bound column in a `p-chip` (or the shared `app-chip`) that, on click, opens a `p-popover` sub-editor: **column ▸ aggregate ▸ (percentile value | date-truncation) ▸ alias ▸ remove**. This pulls the Data-section aggregate dropdown _onto the field it applies to_ and makes combo/extra-measure CRUD feel native rather than a detached `config-card` list.
 - Show the aggregate inline on the chip label: `SUM(Revenue)`, `AVG(Latency)`, `P95(Duration)`. This is the "aggregation pill" the audit found missing and is the biggest single discoverability win.
 - Reuse existing setters (`updateComboMeasure`, `setRoleOnVisual`, `percentileValue`) as the popover's write path — no new state model required for a first cut.
 
@@ -194,9 +184,7 @@ The role-slot chip should become the control surface for its own aggregate, not 
 
 **Sequencing.** Ship 4.1 (header/separator/sectioning) and 4.3 (search) first — they are pure presentation over the existing DOM and directly answer the user's "below standard" flag with the least risk. Then 4.2 + 4.4 (tabs + pills) for the structural leap, 4.5–4.7 for parity, 4.8 for polish.
 
-
 ---
-
 
 ## Chart Visual Polish & Card Chrome
 
@@ -207,29 +195,36 @@ DBExec renders every dashboard/analysis visual inside a `.visual-box` card that 
 ### 1. What DBExec has today
 
 **Card container (`.visual-box`)**
+
 - Real card frame: `var(--card-background)` fill, `1.5px solid var(--border-color)` border, `var(--radius-lg)` corners, `0 1px 4px var(--shadow-color)` resting shadow escalating to `0 4px 16px` on hover.
 - Rich interaction states already wired: `.focused` (primary border + double-ring shadow + z elevation), `.resizing` (primary border, z-index 50), `.dragging` (opacity 0.4 + scale 0.97), `.disabled` (opacity 0.35 + grayscale), `.drop-target` (dashed primary border + tinted bg).
 - Fixed 36px header (`.visual-inline-title`): `0 10px` padding, `var(--space-3)` gap, `card-background` fill, `1px` bottom border, `grab`/`grabbing` cursor doubling as the drag handle for reordering.
 - Body (`.visual-body`) with a `.chart-click-guard` event wrapper and `padding: var(--space-0)` (0px) — chart is flush to the frame edges.
 
 **Header actions (`.visual-action-buttons`, 7+ icon buttons crammed into the 36px bar)**
+
 - Cross-filter toggle (`pi pi-filter`, `.active` state), legacy maximize (`pi pi-window-maximize`), focus/expand overlay (`pi pi-expand`), duplicate (`pi pi-copy` with loading spinner), export PNG (`pi pi-image`, ECharts only, 2× pixelRatio via `getPngDataUrl()`), export CSV (`pi pi-file-export`, always available), move-to-tab (`pi pi-arrow-right-arrow-left` + `.move-tab-menu` overlay, multi-tab only), delete (`pi pi-times`). All `app-button size="sm" variant="icon"` with `tooltipPosition="top"`.
 
 **Render dispatch (`app-chart-renderer`)**
+
 - Three-branch `*ngIf` on `isTableChartType` / `isCardChartType` / ECharts-with-`hasRequiredChartFields`. Inputs `configVersion`/`dataVersion` drive shallow-clone vs data re-read; `chartSelect` output for cross-filter.
 
 **ECharts render (`app-echart-visual`)**
+
 - `renderReady` gate: `glReady` (dynamic `echarts-gl` import for GL types) + `mapReady` (world.json GeoJSON + `registerMap()`); spinner via `#glLoading` template.
 - `initOpts { renderer:'canvas', useDirtyRect:true }`, full-replace `[options]` vs incremental `[merge]`, size = inputs − 10px, `chartInit`/`chartClick` events.
 - **All legend / tooltip / axis / color styling is ECharts default** — no DBExec theme registered.
 
 **Card chart (`app-configurable-card-chart`)**
+
 - CSS Grid `repeat(auto-fill, minmax(140px,1fr))`, `.card-item` (80px min, `radius-md`, hover `translateY(-2px)`), 4px top `.card-band` (opacity 0.7), `.card-value` (`fs-h1`, semibold), `.card-label` (`fs-label`, ellipsis, opacity 0.85), `cardFadeIn` keyframe when `.animated`. Config surface: `cardColor / bandColor / textColor / emptyColor / innerPadding / animations / colorScheme`.
 
 **Table visual (`app-table-visual`)**
+
 - PrimeNG `p-table.modern-table`, virtual scroll >100 rows, flat + pivot/crosstab modes, auto column derivation + numeric inference + humanized labels, density (`.is-compact` 32px) + `.is-striped`, per-cell conditional formatting (`resolveConditionalStyle()`), server-side subtotal/grand-total footer rows, distinct empty/no-columns/no-match states, `tabular-nums` on numerics, em-dash for null.
 
 **States**
+
 - Table has all four states. But card-level (`.visual-content-placeholder`, `.visual-loading-placeholder`, `.visual-error-placeholder`, `--missing-field` variant) are text + generic `pi-spinner` only: no skeleton/shimmer, no retry button, no error-detail expander, no CTA button.
 
 ---
@@ -239,6 +234,7 @@ DBExec renders every dashboard/analysis visual inside a `.visual-box` card that 
 Each item marked **[table-stakes]** (every benchmark tool ships it; users will read its absence as "unfinished") or **[nice-to-have]** (differentiator; 2–3 tools ship it).
 
 **A. Card chrome / anatomy**
+
 - Header with insight-led **title** (≤8 words) **[table-stakes]** + optional **subtitle** for source/timeframe/units as a separately styled block **[table-stakes]**.
 - Single **kebab `⋮` overflow menu** consolidating secondary actions instead of a row of raw icons **[table-stakes]**.
 - Optional **divider** between header and plot with independent spacing control **[nice-to-have]** (Power BI ships it explicitly).
@@ -248,37 +244,44 @@ Each item marked **[table-stakes]** (every benchmark tool ships it; users will r
 - **Footer/caption** slot (notes, last-updated) **[nice-to-have]**.
 
 **B. Card-local typography scale**
+
 - Title 16/600, subtitle 13/400 muted, axis 12, tick/legend 11–12, tooltip headline 13–14 bold + secondary 11–12 muted; never <11px **[table-stakes]**.
 - **Tabular figures** everywhere numbers align **[table-stakes]**.
 
 **C. Legend**
+
 - Present, near the chart, position configurable **[table-stakes]**.
 - **Click-to-toggle** series with de-emphasized hidden state **[table-stakes]**.
 - Auto-hide + **direct labeling** for single series / ≤4 points **[nice-to-have]**.
 - 8-position + font-size control (Sigma-level) **[nice-to-have]**.
 
 **D. Tooltip**
+
 - On hover **and keyboard focus**, consistent placement, never blocks the mark **[table-stakes]** (keyboard = a11y table-stakes).
 - Dimension context + exact value, ≤2–3 metrics, bold headline + muted secondary, right-aligned numbers, full precision **[table-stakes]**.
 - Custom tooltip fields / viz-in-tooltip **[nice-to-have]**.
 
 **E. Axis & gridlines**
+
 - Gridlines gray-200, 1px, horizontal-only default, per-axis toggle **[table-stakes]**.
 - Axis labels with **units**, auto-skip crowded ticks, no forced rotation on narrow cards **[table-stakes]**.
 - Data marks ≥3:1, data text ≥4.5:1 contrast **[table-stakes]**.
 
 **F. Color**
+
 - Dashboard-level **palette token inherited by all cards** **[table-stakes]**.
 - Categorical ≤7 colors, ordered by lightness, avoid red-green, sequential single-hue / diverging orange-blue defaults **[table-stakes]**.
 - Meaning never by color alone — line style / pattern / shape / label **[table-stakes]** (a11y).
 
 **G. Formatting defaults**
+
 - Locale-aware numbers/currency/dates **[table-stakes]**.
 - Compact notation on axes (1.2k / 3.4M), full in tooltip **[table-stakes]**.
 - Per-field format override that doesn't mutate the dataset **[nice-to-have]**.
 - Time-series granularity label + switch **[nice-to-have]**.
 
 **H. State coverage (all four, inside the card frame)**
+
 - **Loading:** skeleton/shimmer >300ms, never a bare axis/blank box **[table-stakes]**.
 - **No-data:** "No data" + guidance, chrome preserved **[table-stakes]**.
 - **Empty/unconfigured:** prompt to pick metric/fields **[table-stakes]**.
@@ -286,6 +289,7 @@ Each item marked **[table-stakes]** (every benchmark tool ships it; users will r
 - Entrance animation respects `prefers-reduced-motion` **[table-stakes]** (a11y).
 
 **I. Accessibility backstop**
+
 - Interactive marks keyboard-navigable, ≥44px tap area **[table-stakes]**.
 - Per-chart aria-label / text summary + table alternative **[nice-to-have]** (aria-label table-stakes, table-alt nice).
 - CSV + image export for data-heavy charts **[table-stakes]** (DBExec already has this).
@@ -294,43 +298,43 @@ Each item marked **[table-stakes]** (every benchmark tool ships it; users will r
 
 ### 3. Gap table
 
-| Capability | DBExec status | Priority |
-|---|---|---|
-| Card frame (bg / border / radius / shadow) | **Have** — `.visual-box` is solid, with more states than most tools | — |
-| Interaction states (hover/focus/resize/drag/drop) | **Have** — genuinely strong, keep | — |
-| Insight-led title | **Partial** — title renders but no explicit size (inherits `.visual-inline-title`), no `fs-label`, no descriptive guidance | P1 |
-| Subtitle (source / timeframe / units) block | **Missing** — no subtitle slot anywhere | P1 |
-| Kebab `⋮` overflow menu | **Missing** — 7+ raw icons crammed in 36px bar instead of a menu | **P0** |
-| Header→plot divider + spacing control | **Partial** — 1px border exists, no spacing token/control | P2 |
-| Per-side card padding | **Partial** — body is `space-0` (0px), chart flush to edges | **P0** |
-| Resize handles (corner + edge) | **Partial** — invisible hit areas, corner-only, shows only on hover/focus | P1 |
-| Footer / caption slot | **Missing** | P2 |
-| Card-local type scale | **Partial** — placeholder text uses `fs-label` (too small), icon sizing inconsistent across states, no title size | P1 |
-| Tabular figures | **Have** (tables) / **Missing** (ECharts labels & tooltips) | P1 |
-| Legend present + near chart | **Partial** — ECharts default position, not DBExec-tuned | P1 |
-| Legend click-to-toggle | **Partial** — ECharts default `legend.selectedMode` on, but unstyled/unverified | P1 |
-| Direct labeling for single series | **Missing** | P2 |
-| Tooltip themed (hierarchy, right-align, ≤3 metrics) | **Missing** — raw ECharts default tooltip | **P0** |
-| Tooltip keyboard-reachable | **Missing** — hover-only | P1 (a11y) |
-| Gridlines subtle / horizontal-only | **Missing** — ECharts default (both axes, default gray) | **P0** |
-| Axis units + auto-skip + no forced rotation | **Partial** — ECharts auto-skips; units/rotation not governed | P1 |
-| Contrast (marks ≥3:1, text ≥4.5:1) | **Missing** — depends on unmanaged ECharts palette | P1 (a11y) |
-| Dashboard palette token inherited by charts | **Missing** — no ECharts theme registered; `colorScheme` on cards only | **P0** |
-| Categorical ≤7 / lightness order / no red-green | **Missing** — ECharts default 9-color palette | **P0** |
-| Meaning not by color alone (pattern/shape) | **Missing** | P1 (a11y) |
-| Locale-aware number/date formatting | **Partial** — tables format; ECharts axis/label/tooltip do not | P1 |
-| Compact axis notation (1.2k / 3.4M) | **Missing** for ECharts axes | P1 |
-| Per-field format override (non-mutating) | **Missing** | P2 |
-| Loading = skeleton/shimmer | **Missing** — generic `pi-spinner` only | P1 |
-| No-data state (card charts) | **Partial** — card has empty color; ECharts branch shows nothing when fields present but rows empty | **P0** |
-| Empty/unconfigured prompt | **Have** — `.visual-content-placeholder` (but under-styled) | P1 (polish) |
-| Error + retry + detail expander | **Partial** — text-only, no retry, no expander | **P0** |
-| `prefers-reduced-motion` respect | **Missing** — `cardFadeIn` + ECharts animation unconditional | P1 (a11y) |
-| Marks keyboard-navigable / 44px tap | **Missing** | P2 (a11y) |
-| Per-chart aria-label / text summary | **Missing** | P1 (a11y) |
-| CSV + PNG export | **Have** | — |
+| Capability                                          | DBExec status                                                                                                              | Priority    |
+| --------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- | ----------- |
+| Card frame (bg / border / radius / shadow)          | **Have** — `.visual-box` is solid, with more states than most tools                                                        | —           |
+| Interaction states (hover/focus/resize/drag/drop)   | **Have** — genuinely strong, keep                                                                                          | —           |
+| Insight-led title                                   | **Partial** — title renders but no explicit size (inherits `.visual-inline-title`), no `fs-label`, no descriptive guidance | P1          |
+| Subtitle (source / timeframe / units) block         | **Missing** — no subtitle slot anywhere                                                                                    | P1          |
+| Kebab `⋮` overflow menu                             | **Missing** — 7+ raw icons crammed in 36px bar instead of a menu                                                           | **P0**      |
+| Header→plot divider + spacing control               | **Partial** — 1px border exists, no spacing token/control                                                                  | P2          |
+| Per-side card padding                               | **Partial** — body is `space-0` (0px), chart flush to edges                                                                | **P0**      |
+| Resize handles (corner + edge)                      | **Partial** — invisible hit areas, corner-only, shows only on hover/focus                                                  | P1          |
+| Footer / caption slot                               | **Missing**                                                                                                                | P2          |
+| Card-local type scale                               | **Partial** — placeholder text uses `fs-label` (too small), icon sizing inconsistent across states, no title size          | P1          |
+| Tabular figures                                     | **Have** (tables) / **Missing** (ECharts labels & tooltips)                                                                | P1          |
+| Legend present + near chart                         | **Partial** — ECharts default position, not DBExec-tuned                                                                   | P1          |
+| Legend click-to-toggle                              | **Partial** — ECharts default `legend.selectedMode` on, but unstyled/unverified                                            | P1          |
+| Direct labeling for single series                   | **Missing**                                                                                                                | P2          |
+| Tooltip themed (hierarchy, right-align, ≤3 metrics) | **Missing** — raw ECharts default tooltip                                                                                  | **P0**      |
+| Tooltip keyboard-reachable                          | **Missing** — hover-only                                                                                                   | P1 (a11y)   |
+| Gridlines subtle / horizontal-only                  | **Missing** — ECharts default (both axes, default gray)                                                                    | **P0**      |
+| Axis units + auto-skip + no forced rotation         | **Partial** — ECharts auto-skips; units/rotation not governed                                                              | P1          |
+| Contrast (marks ≥3:1, text ≥4.5:1)                  | **Missing** — depends on unmanaged ECharts palette                                                                         | P1 (a11y)   |
+| Dashboard palette token inherited by charts         | **Missing** — no ECharts theme registered; `colorScheme` on cards only                                                     | **P0**      |
+| Categorical ≤7 / lightness order / no red-green     | **Missing** — ECharts default 9-color palette                                                                              | **P0**      |
+| Meaning not by color alone (pattern/shape)          | **Missing**                                                                                                                | P1 (a11y)   |
+| Locale-aware number/date formatting                 | **Partial** — tables format; ECharts axis/label/tooltip do not                                                             | P1          |
+| Compact axis notation (1.2k / 3.4M)                 | **Missing** for ECharts axes                                                                                               | P1          |
+| Per-field format override (non-mutating)            | **Missing**                                                                                                                | P2          |
+| Loading = skeleton/shimmer                          | **Missing** — generic `pi-spinner` only                                                                                    | P1          |
+| No-data state (card charts)                         | **Partial** — card has empty color; ECharts branch shows nothing when fields present but rows empty                        | **P0**      |
+| Empty/unconfigured prompt                           | **Have** — `.visual-content-placeholder` (but under-styled)                                                                | P1 (polish) |
+| Error + retry + detail expander                     | **Partial** — text-only, no retry, no expander                                                                             | **P0**      |
+| `prefers-reduced-motion` respect                    | **Missing** — `cardFadeIn` + ECharts animation unconditional                                                               | P1 (a11y)   |
+| Marks keyboard-navigable / 44px tap                 | **Missing**                                                                                                                | P2 (a11y)   |
+| Per-chart aria-label / text summary                 | **Missing**                                                                                                                | P1 (a11y)   |
+| CSV + PNG export                                    | **Have**                                                                                                                   | —           |
 
-**Honest headline:** the *card shell* is above average (states + drag/resize/focus are better than Metabase or Superset out of the box). The **render layer is the weak spot** — everything downstream of `echarts` directive is stock ECharts defaults: palette, legend, tooltip, gridlines, axis formatting. That is where DBExec reads as "below standard," compounded by the **0px body padding** (charts touch the border), the **icon-soup header** (no kebab), and **missing error-retry / loading-skeleton**.
+**Honest headline:** the _card shell_ is above average (states + drag/resize/focus are better than Metabase or Superset out of the box). The **render layer is the weak spot** — everything downstream of `echarts` directive is stock ECharts defaults: palette, legend, tooltip, gridlines, axis formatting. That is where DBExec reads as "below standard," compounded by the **0px body padding** (charts touch the border), the **icon-soup header** (no kebab), and **missing error-retry / loading-skeleton**.
 
 ---
 
@@ -346,37 +350,60 @@ Everything in §3 marked "ECharts default" collapses into one root cause: no the
 // dbexec-theme.ts — registered via echarts.registerTheme('dbexec', dbexecTheme)
 export const dbexecTheme = {
   // ≤7 categorical, lightness-ordered, no red-green (Tableau-10-style)
-  color: ['#4C78A8','#F58518','#54A24B','#B279A2','#72B7B2','#EECA3B','#9D755D'],
+  color: [
+    '#4C78A8',
+    '#F58518',
+    '#54A24B',
+    '#B279A2',
+    '#72B7B2',
+    '#EECA3B',
+    '#9D755D',
+  ],
   textStyle: { fontFamily: 'Inter, sans-serif' },
   grid: { top: 32, right: 16, bottom: 32, left: 48, containLabel: true },
   categoryAxis: {
-    axisLine:  { show: true, lineStyle: { color: 'var(--border-color)' } },
-    axisTick:  { show: false },
-    splitLine: { show: false },                    // no vertical gridlines
-    axisLabel: { color: 'var(--secondary-color)', fontSize: 12, hideOverlap: true },
+    axisLine: { show: true, lineStyle: { color: 'var(--border-color)' } },
+    axisTick: { show: false },
+    splitLine: { show: false }, // no vertical gridlines
+    axisLabel: {
+      color: 'var(--secondary-color)',
+      fontSize: 12,
+      hideOverlap: true,
+    },
   },
   valueAxis: {
-    axisLine:  { show: false },
-    splitLine: { show: true, lineStyle: { color: 'var(--border-color)', width: 1, opacity: 0.5 } }, // gray-200 horizontal only
-    axisLabel: { color: 'var(--secondary-color)', fontSize: 12,
-                 formatter: (v: number) => compactNumber(v) },   // 1.2k / 3.4M on axes
+    axisLine: { show: false },
+    splitLine: {
+      show: true,
+      lineStyle: { color: 'var(--border-color)', width: 1, opacity: 0.5 },
+    }, // gray-200 horizontal only
+    axisLabel: {
+      color: 'var(--secondary-color)',
+      fontSize: 12,
+      formatter: (v: number) => compactNumber(v),
+    }, // 1.2k / 3.4M on axes
   },
   legend: {
-    top: 4, type: 'scroll', icon: 'roundRect',
+    top: 4,
+    type: 'scroll',
+    icon: 'roundRect',
     textStyle: { color: 'var(--text-color)', fontSize: 12 },
-    selectedMode: true,                             // click-to-toggle (verify styling)
+    selectedMode: true, // click-to-toggle (verify styling)
   },
   tooltip: {
     backgroundColor: 'var(--card-background)',
-    borderColor: 'var(--border-color)', borderWidth: 1,
+    borderColor: 'var(--border-color)',
+    borderWidth: 1,
     textStyle: { color: 'var(--text-color)', fontSize: 12 },
-    extraCssText: 'border-radius:8px; box-shadow:0 4px 16px var(--shadow-color); padding:8px 10px;',
+    extraCssText:
+      'border-radius:8px; box-shadow:0 4px 16px var(--shadow-color); padding:8px 10px;',
     // valueFormatter → full precision + tabular via CSS on the tooltip host
   },
 };
 ```
 
 Specifics this closes:
+
 - **Palette (P0):** cap at 7, lightness-ordered, red-green avoided. Feed the dashboard-level palette in so all cards inherit one source of truth — expose it as a dashboard setting and merge into the theme's `color` before register, matching Superset/Looker's "inherit from dashboard" model.
 - **Gridlines (P0):** `valueAxis.splitLine` on at 1px/opacity 0.5, `categoryAxis.splitLine` off — horizontal-only, subtle.
 - **Tooltip (P0):** themed background/border/radius/shadow that matches the card. Add a `valueFormatter` for locale + full precision; use a monospaced/`tabular-nums` `extraCssText` font-feature so digits align. Keep to ≤3 series rows.
@@ -433,13 +460,11 @@ Create card-local type tokens and apply across all state placeholders and header
 
 **Sequencing:** ship §4.1 (theme) + §4.2 (padding) + §4.3 (kebab) + §4.4 error/no-data first — these are the four P0s that account for essentially all of the "below standard" perception with the least code (one theme file, one padding token, one header refactor, three state components). §4.6 config-panel restructure is the second wave and is what the user specifically flagged. Everything else is P1/P2 polish layered on the same structures.
 
-
 ---
-
 
 ## Chart Types & Per-Chart Features
 
-DBExec already ships an unusually broad chart catalogue — the gap is not *coverage*, it is *config-surface polish*, *feature parity on the P0/P1 per-chart controls*, and the *visual quality of the config panel itself*. This section separates those honestly.
+DBExec already ships an unusually broad chart catalogue — the gap is not _coverage_, it is _config-surface polish_, _feature parity on the P0/P1 per-chart controls_, and the _visual quality of the config panel itself_. This section separates those honestly.
 
 ---
 
@@ -534,87 +559,87 @@ Benchmarked across Tableau, Power BI, Metabase, Superset, Looker, Sigma, Hex, Ob
 
 ### 3. Gap table
 
-Honest read: DBExec **exceeds** the market on raw chart-type breadth and on several P1/P2 analytics (trend, forecast, reference bands, small multiples, conditional formatting). The real deficits cluster in **table/pivot depth**, **axis/tooltip config exposure**, and **Top-N/"Others" + abbreviation** — plus the config-panel *presentation* itself.
+Honest read: DBExec **exceeds** the market on raw chart-type breadth and on several P1/P2 analytics (trend, forecast, reference bands, small multiples, conditional formatting). The real deficits cluster in **table/pivot depth**, **axis/tooltip config exposure**, and **Top-N/"Others" + abbreviation** — plus the config-panel _presentation_ itself.
 
-| Capability | DBExec status | Priority |
-|---|---|---|
-| **CHART TYPES** | | |
-| Bar/column (grouped, stacked, 100%) | Have | P0 must |
-| Line, multi-series, stacked | Have | P0 must |
-| Area / stacked / 100% area | Have | P0 must |
-| Pie / donut / half-donut / rose / nested | Have | P0 must |
-| Scatter / bubble / effect-scatter | Have | P0 must |
-| KPI / single-value card (`number-card`) | Have (basic) | P0 must |
-| KPI with target + delta-vs-prior + inline sparkline | **Missing** (card shows value only) | P1 should |
-| Plain data table | Have | P0 must |
-| Pivot / crosstab | Have (flat-array render, client-side) | P0 must |
-| Pivot **subtotals + grand totals** | **Partial / unverified** (no SQL aggregation; flat render) | P0 must |
-| Highlight (heat-colored) table | Have (conditional formatting on cells) | P1 should |
-| In-cell data bars / mini-sparklines in table | **Missing** | P1 should |
-| Histogram | Have | P0 must |
-| Combo (bar + line, dual-axis) | Have | P0 must |
-| Filled-region map (choropleth) | Have (world-map / map3d) | P0 must |
-| Point/symbol + bubble map | Have (GL scatter/geo) | P1 should |
-| Custom GeoJSON boundaries (org-specific regions) | **Missing / unverified** | P1 should |
-| Treemap, funnel, waterfall, box, heatmap, gauge | Have | P1 should |
-| Sparkline (standalone inline mini-trend visual) | **Missing** (line exists, no compact sparkline variant) | P1 should |
-| Sankey, sunburst, radar, network/graph, candlestick, parallel | Have | P2 nice |
-| Bullet chart | **Missing** (linear-gauge is closest) | P2 nice |
-| Timeline / Gantt | **Missing** | P2 nice |
-| **PER-CHART FEATURES** | | |
-| Data labels + number-format control | Have | P0 must |
-| Label position (inside/outside/auto) | Partial (pie yes; cartesian limited) | P1 should |
-| Show total-of-stack label | **Missing / unverified** | P1 should |
-| Text annotations / callouts on canvas | **Missing** (only ref-line labels) | P1 should |
-| Dual / secondary axis | Partial (**combo only**; not on generic bar/line) | P0 must |
-| Manual axis min/max + tick interval | Partial (min/max yes; **explicit tick interval missing**) | P0 must |
-| Axis title / unit override | Have | P0 must |
-| Log scale | Have | P1 should |
-| Reversed axis / categorical-continuous toggle | **Missing / unverified** | P1 should |
-| Constant reference line | Have | P0 must |
-| Computed reference line (avg/median/percentile) | Have | P1 should |
-| Reference band / shaded region | Have | P1 should |
-| Trend line (linear/poly/log/MA) | Have (cartesian only) | P1 should |
-| Forecast (with confidence interval) | Partial (forecast yes; **CI band unverified**) | P2 nice |
-| Anomaly / outlier detection | **Missing** | P2 nice |
-| Error bars | **Missing** | P2 nice |
-| Per-series color | Have | P0 must |
-| Per-series chart type | Have (combo) | P1 should |
-| Per-series axis assignment → secondary | Partial (combo only) | P0 must |
-| Stacking none/stacked/100% | Have | P0 must |
-| Series display order / reorder | **Missing / unverified** | P1 should |
-| Line style / width / marker toggle | **Partial / unverified** | P1 should |
-| Custom brand palette / diverging-sequential scales | Have (12 schemes) | P1 should |
-| Chart conditional formatting (color by rule/threshold) | Have | P1 should |
-| Table cell background/font color rules | Have | P0 must |
-| Icon sets / status indicators (tables) | **Missing** | P2 nice |
-| Sort by dimension / by measure | Have | P0 must |
-| Top-N / Bottom-N | Have | P0 must |
-| **"Others" bucket for Top-N remainder** | **Missing** | P1 should |
-| Chart-level (viz) filters | Have | P0 must |
-| Interactive legend show/hide series | Have | P1 should |
-| Hover tooltip | Have | P0 must |
-| **Customizable tooltip (fields/format/template)** | Partial (follows data format; **not templatable**) | P1 should |
-| Drill-down hierarchy | Partial (via cross-filter, not true level-expand) | P1 should |
-| Drill-through to detail | Have | P1 should |
-| Cross-filter (click → filter others) | Have (**single-select only**) | P1 should |
-| Cross-filter multi-select | **Missing** | P2 nice |
-| Small multiples / facet grid | Have (cartesian only) | P2 nice |
-| Small multiples independent scales | **Missing / unverified** | P2 nice |
-| Decimals / separators / currency / % / date tokens | Have | P0 must |
-| **Number abbreviation (1.2K / 3.4M / 1.1B)** | **Missing / unverified** | P1 should |
-| Prefix / suffix / custom format string | Partial | P1 should |
-| Negative-number style (parens/red) | **Missing / unverified** | P1 should |
-| Locale-aware formatting | Have (10 locales) | P1 should |
-| Line null handling (gap/connect/zero) | Have | P0 must |
-| Treat-null-as-zero toggle | Have | P1 should |
-| Show/hide empty categories | **Missing / unverified** | P1 should |
-| Null placeholder text in tables | **Partial / unverified** | P1 should |
-| Date densification (fill time gaps) | **Missing** | P2 nice |
-| **3D view-angle config (alpha/beta/distance)** | **Partial — engine supports it, sidebar does NOT expose it** | P1 should |
-| Export to SVG | **Missing** (PNG only) | P2 nice |
-| Table column reorder | **Missing** | P1 should |
-| Table multi-column sort | **Missing** (single column) | P1 should |
+| Capability                                                    | DBExec status                                                | Priority  |
+| ------------------------------------------------------------- | ------------------------------------------------------------ | --------- |
+| **CHART TYPES**                                               |                                                              |           |
+| Bar/column (grouped, stacked, 100%)                           | Have                                                         | P0 must   |
+| Line, multi-series, stacked                                   | Have                                                         | P0 must   |
+| Area / stacked / 100% area                                    | Have                                                         | P0 must   |
+| Pie / donut / half-donut / rose / nested                      | Have                                                         | P0 must   |
+| Scatter / bubble / effect-scatter                             | Have                                                         | P0 must   |
+| KPI / single-value card (`number-card`)                       | Have (basic)                                                 | P0 must   |
+| KPI with target + delta-vs-prior + inline sparkline           | **Missing** (card shows value only)                          | P1 should |
+| Plain data table                                              | Have                                                         | P0 must   |
+| Pivot / crosstab                                              | Have (flat-array render, client-side)                        | P0 must   |
+| Pivot **subtotals + grand totals**                            | **Partial / unverified** (no SQL aggregation; flat render)   | P0 must   |
+| Highlight (heat-colored) table                                | Have (conditional formatting on cells)                       | P1 should |
+| In-cell data bars / mini-sparklines in table                  | **Missing**                                                  | P1 should |
+| Histogram                                                     | Have                                                         | P0 must   |
+| Combo (bar + line, dual-axis)                                 | Have                                                         | P0 must   |
+| Filled-region map (choropleth)                                | Have (world-map / map3d)                                     | P0 must   |
+| Point/symbol + bubble map                                     | Have (GL scatter/geo)                                        | P1 should |
+| Custom GeoJSON boundaries (org-specific regions)              | **Missing / unverified**                                     | P1 should |
+| Treemap, funnel, waterfall, box, heatmap, gauge               | Have                                                         | P1 should |
+| Sparkline (standalone inline mini-trend visual)               | **Missing** (line exists, no compact sparkline variant)      | P1 should |
+| Sankey, sunburst, radar, network/graph, candlestick, parallel | Have                                                         | P2 nice   |
+| Bullet chart                                                  | **Missing** (linear-gauge is closest)                        | P2 nice   |
+| Timeline / Gantt                                              | **Missing**                                                  | P2 nice   |
+| **PER-CHART FEATURES**                                        |                                                              |           |
+| Data labels + number-format control                           | Have                                                         | P0 must   |
+| Label position (inside/outside/auto)                          | Partial (pie yes; cartesian limited)                         | P1 should |
+| Show total-of-stack label                                     | **Missing / unverified**                                     | P1 should |
+| Text annotations / callouts on canvas                         | **Missing** (only ref-line labels)                           | P1 should |
+| Dual / secondary axis                                         | Partial (**combo only**; not on generic bar/line)            | P0 must   |
+| Manual axis min/max + tick interval                           | Partial (min/max yes; **explicit tick interval missing**)    | P0 must   |
+| Axis title / unit override                                    | Have                                                         | P0 must   |
+| Log scale                                                     | Have                                                         | P1 should |
+| Reversed axis / categorical-continuous toggle                 | **Missing / unverified**                                     | P1 should |
+| Constant reference line                                       | Have                                                         | P0 must   |
+| Computed reference line (avg/median/percentile)               | Have                                                         | P1 should |
+| Reference band / shaded region                                | Have                                                         | P1 should |
+| Trend line (linear/poly/log/MA)                               | Have (cartesian only)                                        | P1 should |
+| Forecast (with confidence interval)                           | Partial (forecast yes; **CI band unverified**)               | P2 nice   |
+| Anomaly / outlier detection                                   | **Missing**                                                  | P2 nice   |
+| Error bars                                                    | **Missing**                                                  | P2 nice   |
+| Per-series color                                              | Have                                                         | P0 must   |
+| Per-series chart type                                         | Have (combo)                                                 | P1 should |
+| Per-series axis assignment → secondary                        | Partial (combo only)                                         | P0 must   |
+| Stacking none/stacked/100%                                    | Have                                                         | P0 must   |
+| Series display order / reorder                                | **Missing / unverified**                                     | P1 should |
+| Line style / width / marker toggle                            | **Partial / unverified**                                     | P1 should |
+| Custom brand palette / diverging-sequential scales            | Have (12 schemes)                                            | P1 should |
+| Chart conditional formatting (color by rule/threshold)        | Have                                                         | P1 should |
+| Table cell background/font color rules                        | Have                                                         | P0 must   |
+| Icon sets / status indicators (tables)                        | **Missing**                                                  | P2 nice   |
+| Sort by dimension / by measure                                | Have                                                         | P0 must   |
+| Top-N / Bottom-N                                              | Have                                                         | P0 must   |
+| **"Others" bucket for Top-N remainder**                       | **Missing**                                                  | P1 should |
+| Chart-level (viz) filters                                     | Have                                                         | P0 must   |
+| Interactive legend show/hide series                           | Have                                                         | P1 should |
+| Hover tooltip                                                 | Have                                                         | P0 must   |
+| **Customizable tooltip (fields/format/template)**             | Partial (follows data format; **not templatable**)           | P1 should |
+| Drill-down hierarchy                                          | Partial (via cross-filter, not true level-expand)            | P1 should |
+| Drill-through to detail                                       | Have                                                         | P1 should |
+| Cross-filter (click → filter others)                          | Have (**single-select only**)                                | P1 should |
+| Cross-filter multi-select                                     | **Missing**                                                  | P2 nice   |
+| Small multiples / facet grid                                  | Have (cartesian only)                                        | P2 nice   |
+| Small multiples independent scales                            | **Missing / unverified**                                     | P2 nice   |
+| Decimals / separators / currency / % / date tokens            | Have                                                         | P0 must   |
+| **Number abbreviation (1.2K / 3.4M / 1.1B)**                  | **Missing / unverified**                                     | P1 should |
+| Prefix / suffix / custom format string                        | Partial                                                      | P1 should |
+| Negative-number style (parens/red)                            | **Missing / unverified**                                     | P1 should |
+| Locale-aware formatting                                       | Have (10 locales)                                            | P1 should |
+| Line null handling (gap/connect/zero)                         | Have                                                         | P0 must   |
+| Treat-null-as-zero toggle                                     | Have                                                         | P1 should |
+| Show/hide empty categories                                    | **Missing / unverified**                                     | P1 should |
+| Null placeholder text in tables                               | **Partial / unverified**                                     | P1 should |
+| Date densification (fill time gaps)                           | **Missing**                                                  | P2 nice   |
+| **3D view-angle config (alpha/beta/distance)**                | **Partial — engine supports it, sidebar does NOT expose it** | P1 should |
+| Export to SVG                                                 | **Missing** (PNG only)                                       | P2 nice   |
+| Table column reorder                                          | **Missing**                                                  | P1 should |
+| Table multi-column sort                                       | **Missing** (single column)                                  | P1 should |
 
 **Bottom-line verdict:** DBExec passes almost the entire **P0 must-have gate** — the only genuine P0 risks are (a) **dual/secondary axis being confined to `combo`** rather than available as a per-series toggle on any bar/line chart, (b) **pivot subtotals/grand-totals not being provably computed** (flat-array table render), and (c) **manual tick interval**. Everything else failing is P1/P2. The bigger practical problem the user is feeling is not the feature list — it is that **the config panel that exposes all this looks below standard**, and several already-built engine capabilities (3D angles, abbreviation, per-series controls) are **not surfaced in the UI**.
 
@@ -646,7 +671,7 @@ Specific to the Angular 18 + PrimeNG + ECharts stack and the existing `config-se
 
 #### 4.4 Config-panel redesign (the "looks below standard" problem)
 
-This is where the user's pain is sharpest. The current `config-section` / `config-group` / `sidebar-divider` scheme reads as an undifferentiated stack of controls with weak hierarchy. Fix the *information architecture and chrome*, not just spacing:
+This is where the user's pain is sharpest. The current `config-section` / `config-group` / `sidebar-divider` scheme reads as an undifferentiated stack of controls with weak hierarchy. Fix the _information architecture and chrome_, not just spacing:
 
 - **Replace flat `sidebar-divider` rules with collapsible section headers.** Use PrimeNG `p-accordion` (or `p-panel` with `toggleable`) so each `config-section` becomes a titled, collapsible group: **Data**, **Series & Colors**, **Axes**, **Labels & Tooltip**, **Analytics** (ref lines/trend/forecast), **Formatting**, **Conditional Formatting**, **Interactions**. A hairline `<hr>` between raw controls is the thing that reads as amateur; a titled collapsible header with a chevron and a count/summary reads as a product.
 - **Give each section header a left accent + icon + one-line summary.** e.g. "Axes · Linear, 0–100, dual" as muted secondary text under the title so the panel is scannable when collapsed. This is the highest-leverage single change.
@@ -666,9 +691,7 @@ This is where the user's pain is sharpest. The current `config-section` / `confi
 
 **Priority order for the redesign work:** (1) config-panel accordion/section-header + type-filtering rework — highest perceived-quality gain for least code; (2) surface already-built engine capabilities (§4.2); (3) P0 engine gaps (dual-axis generalization, pivot totals, tick interval); (4) P1 feature builds (Others bucket, templatable tooltip, KPI upgrade, table reorder/multi-sort); (5) card-chrome states + SVG export; (6) P2 differentiators.
 
-
 ---
-
 
 ## Interaction Model
 
@@ -679,6 +702,7 @@ The interaction model is where a BI tool either feels like a live, explorable su
 ### 1. What DBExec has today
 
 **Cross-filter (click a mark → filter siblings)**
+
 - Two separate implementations with different semantics:
   - **Dashboard** — `DashboardCrossFilter` (`/dashboard/services/dashboard-interaction.ts`). Single active cross-filter, last-click-wins. Configurable targets (`'same-tab' | 'dashboard' | {visualIds[]}`). Applies as a category `EQUALS` predicate on the clicked column/value. State object `DashboardCrossFilterState { sourceVisualId, sourceTabId, columnName, value, targets }`. Cleared manually or on tab switch.
   - **Analyses** — `AnalysisInteractionService` (signal-based bus). Multi-filter model (one per source visual, replace-on-repeat), accumulates across different sources, auto-applies to all sibling visuals, converts to run-query filters via `toRunQueryFilters()`.
@@ -687,36 +711,45 @@ The interaction model is where a BI tool either feels like a live, explorable su
 - Toolbar shows a cross-filter badge + a manual "clear" chip.
 
 **Drill-down / drill-through**
+
 - Ordered `DrillLevel[]` stack (`{columnName, parentColumn, value, label}`) with breadcrumb UI; click any ancestor to ascend (`drillUpTo(index)` / `drillUpOne()`).
 - Driven by `visual.drillDimensions`; `drillDown()` pops the next dimension and scopes the parent column by the clicked value.
 - Treemap has native ECharts drill-through (`treemapNodeClick: 'zoomToNode'`, `leafDepth`, optional `treemapBreadcrumb`).
 - Model is largely **Analyses-only** and only fully realized for a subset of chart types.
 
 **Hover & tooltip**
+
 - Tooltips on by default, all chart types. Config: `tooltipDisabled`, `tooltipTrigger ('item'|'axis'|'none')`, `tooltipPrecision (0–6)`. Rendered `appendToBody` to avoid card clipping. Axis crosshair on line/bar/scatter.
 - No hover-sync across siblings; no per-chart-type custom tooltip formatters.
 
 **Zoom & pan**
+
 - Data zoom: `dataZoom`, `dataZoomType ('slider'|'inside'|'both')`, `dataZoomThrottle (100ms)`, `dataZoomFilterMode ('filter'|'weakFilter'|'empty')`. Re-queries to visible range. Zoom-reset in the interactive legend toolbar.
 - Pan: 3D charts rotate/zoom via mouse; 2D charts do not pan. No brush/lasso selection (ECharts supports it; not exposed).
 
 **Legend**
+
 - `legend` toggle (default on), position (`top|bottom|left|right`), type (`scroll` default `| plain`), optional `legendTitle` + `legendPosition`. Native click-to-toggle series visibility. Scroll arrows on overflow. No isolate/focus-on-click.
 
 **Emphasis**
+
 - `emphasisScale` (grow hovered element); `emphasis` focus mode defaults per type (`'series'` for bar/line, `'self'` for pie/treemap).
 
 **Table-specific**
+
 - Single-column click-to-sort; row click emits `chartSelect`; virtual scroll >100 rows; conditional cell formatting (`conditionalFormatting[]`); density toggle (`tableCompact`); column visibility (`tableHiddenColumns[]`); striped rows; row numbers.
 - No multi-sort, no column reorder/resize, no in-header filter inputs, no subtotals (grand totals only).
 
 **Cards (KPI)**
+
 - Static big-number; client-aggregated from post-filter rows; optional target comparison arrow. No interactivity.
 
 **Auto-refresh**
+
 - `autoRefreshSeconds` from render response; pauses behind the blocking pre-load gate; countdown in toolbar; stops on destroy, restarts on filter/gate change.
 
 **Export & formatting**
+
 - Per-visual PNG; dashboard PDF/PNG/CSV; conditional formatting (cell rules + reference lines); ECharts default animation via merge-mode `setOption`.
 
 ---
@@ -726,20 +759,23 @@ The interaction model is where a BI tool either feels like a live, explorable su
 Each item is tagged **[table-stakes]** (a dashboard without it reads as broken/dated) or **[nice-to-have]** (differentiator; design for it now, ship later).
 
 **Selection & filtering**
+
 - Click-to-cross-filter, including click-again-to-clear and modifier-click (ctrl/cmd/shift) multi-select. **[table-stakes]**
 - Visible active-filter chip bar (each chip shows origin + value, individually removable) and a clear-all affordance. **[table-stakes]**
 - Dashboard-level filter/parameter bar (dropdowns, date range, search) with explicit scope over which visuals it targets. **[table-stakes]**
 - Predictable, visible composition between in-chart cross-filters and the dashboard filter bar (AND-combined, combined state shown). **[table-stakes]**
-- Explicit **cross-filter vs cross-highlight** choice, per source→target pair (the Power BI "Edit Interactions" model: Filter / Highlight / None). **[table-stakes for the *concept*; highlight itself nice-to-have]**
+- Explicit **cross-filter vs cross-highlight** choice, per source→target pair (the Power BI "Edit Interactions" model: Filter / Highlight / None). **[table-stakes for the _concept_; highlight itself nice-to-have]**
 - Author-facing "edit interactions" matrix deciding which visual affects which. **[nice-to-have]**
 
 **Hierarchy & detail**
+
 - Drill-down on author-defined hierarchies within the same chart, with breadcrumb + drill-up, visually distinct from drill-through. **[table-stakes]**
 - Drill-to-detail ("see the rows") via right-click/menu on any mark. **[table-stakes]** — cheapest high-value feature.
 - Drill-through to another view/page that receives the clicked context as its filters, with a back affordance. **[nice-to-have]**
 - Custom click destination (internal view or URL) with clicked values templated in; per-column for tables. **[nice-to-have]**
 
 **Direct manipulation & hover**
+
 - Hover tooltips with correct number/date formatting on every mark. **[table-stakes]**
 - Legend click to toggle/isolate a series. **[table-stakes]**
 - Brush/zoom/pan on continuous axes and maps, with reset-zoom; drag-select emits a range cross-filter. **[table-stakes for zoom/reset; brush-to-filter nice-to-have]**
@@ -747,6 +783,7 @@ Each item is tagged **[table-stakes]** (a dashboard without it reads as broken/d
 - Rich hover (viz-in-tooltip / tooltip-as-page). **[nice-to-have]**
 
 **State, chrome & trust**
+
 - Per-chart loading state on re-query and an explicit "no data for this selection" empty state. **[table-stakes]**
 - Active-state visibility: selected marks stay selected, source is indicated. **[table-stakes]**
 - Keyboard + a11y baseline: tab to charts/legend/filters, Enter/Space activate, Esc clears, arrow-key mark traversal, visible focus ring, ARIA roles + screen-reader data-table fallback, `prefers-reduced-motion`. **[table-stakes as a bar; genuine differentiator in practice]**
@@ -756,39 +793,39 @@ Each item is tagged **[table-stakes]** (a dashboard without it reads as broken/d
 
 ### 3. Gap table
 
-| Capability | DBExec status | Priority |
-|---|---|---|
-| Click-to-cross-filter (basic) | **Have** (both surfaces, but two divergent engines) | P0 — unify |
-| Click-again-to-clear a cross-filter | **Partial** (manual clear chip; not click-source-again) | P1 |
-| Modifier-click multi-select (ctrl/shift) | **Missing** (Analyses accumulates only across *different* sources; no additive select within one chart) | P1 |
-| Active-filter chip bar (origin + value, removable) | **Partial** (single badge + one clear chip; not a full per-constraint chip bar) | P0 |
-| Clear-all affordance | **Have** (manual clear) | — |
-| Dashboard-level filter/parameter bar | **Missing from this layer** (no unified in-dashboard filter chrome described) | P0 |
-| Cross-filter ↔ dashboard-filter composition, visible combined state | **Missing** (no combined-state surface) | P0 |
-| Cross-filter vs cross-highlight (the concept + config) | **Missing** (only destructive filter; no highlight, no author toggle) | P0 (design surface) / P1 (highlight impl) |
-| Edit-interactions matrix (which visual affects which) | **Partial** (dashboard has `targets` in data; no author UI) | P1 |
-| Drill-down on hierarchies (in-chart, breadcrumb) | **Partial** (`DrillLevel[]` model + breadcrumb exist; Analyses-only, subset of chart types, treemap native) | P1 |
-| Drill-to-detail ("see these rows") | **Missing** (row-level raw view on a mark not wired) | P0 — cheapest win |
-| Drill-through to another view w/ carried context | **Missing** | P2 |
-| Custom click destination (URL / internal / per-column) | **Missing** | P2 |
-| Hover tooltips (formatted) | **Have** (precision + trigger configurable) | — |
-| Hover-sync across time-series | **Missing** | P2 |
-| Rich hover (viz-in-tooltip) | **Missing** | P2 |
-| Legend click → toggle series | **Have** (native) | — |
-| Legend click → isolate/focus | **Missing** | P2 |
-| Zoom (data slider + inside) + reset | **Have** | — |
-| Pan on 2D charts | **Missing** (3D only) | P2 |
-| Brush/lasso → range cross-filter | **Missing** (ECharts capable; unexposed) | P1 |
-| Per-chart loading state on re-query | **Partial** (auto-refresh gate exists; per-visual re-query spinner not confirmed) | P1 |
-| "No data for this selection" empty state | **Missing / unconfirmed** | P0 |
-| Active-selection persistence + source indication | **Partial** (source badge on dashboard; selected marks not held) | P1 |
-| Keyboard + a11y baseline | **Missing** | P1 (differentiator lane) |
-| Table: multi-sort / reorder / resize / header filters / subtotals | **Missing** | P2 |
-| Bookmarks / saved view state | **Missing** (ties to existing snapshot + saved-query models) | P2 |
-| Parameter/set actions, action chaining, write-back | **Missing** | P2 |
-| Export (PNG/PDF/CSV) | **Have** | — |
+| Capability                                                          | DBExec status                                                                                               | Priority                                  |
+| ------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- | ----------------------------------------- |
+| Click-to-cross-filter (basic)                                       | **Have** (both surfaces, but two divergent engines)                                                         | P0 — unify                                |
+| Click-again-to-clear a cross-filter                                 | **Partial** (manual clear chip; not click-source-again)                                                     | P1                                        |
+| Modifier-click multi-select (ctrl/shift)                            | **Missing** (Analyses accumulates only across _different_ sources; no additive select within one chart)     | P1                                        |
+| Active-filter chip bar (origin + value, removable)                  | **Partial** (single badge + one clear chip; not a full per-constraint chip bar)                             | P0                                        |
+| Clear-all affordance                                                | **Have** (manual clear)                                                                                     | —                                         |
+| Dashboard-level filter/parameter bar                                | **Missing from this layer** (no unified in-dashboard filter chrome described)                               | P0                                        |
+| Cross-filter ↔ dashboard-filter composition, visible combined state | **Missing** (no combined-state surface)                                                                     | P0                                        |
+| Cross-filter vs cross-highlight (the concept + config)              | **Missing** (only destructive filter; no highlight, no author toggle)                                       | P0 (design surface) / P1 (highlight impl) |
+| Edit-interactions matrix (which visual affects which)               | **Partial** (dashboard has `targets` in data; no author UI)                                                 | P1                                        |
+| Drill-down on hierarchies (in-chart, breadcrumb)                    | **Partial** (`DrillLevel[]` model + breadcrumb exist; Analyses-only, subset of chart types, treemap native) | P1                                        |
+| Drill-to-detail ("see these rows")                                  | **Missing** (row-level raw view on a mark not wired)                                                        | P0 — cheapest win                         |
+| Drill-through to another view w/ carried context                    | **Missing**                                                                                                 | P2                                        |
+| Custom click destination (URL / internal / per-column)              | **Missing**                                                                                                 | P2                                        |
+| Hover tooltips (formatted)                                          | **Have** (precision + trigger configurable)                                                                 | —                                         |
+| Hover-sync across time-series                                       | **Missing**                                                                                                 | P2                                        |
+| Rich hover (viz-in-tooltip)                                         | **Missing**                                                                                                 | P2                                        |
+| Legend click → toggle series                                        | **Have** (native)                                                                                           | —                                         |
+| Legend click → isolate/focus                                        | **Missing**                                                                                                 | P2                                        |
+| Zoom (data slider + inside) + reset                                 | **Have**                                                                                                    | —                                         |
+| Pan on 2D charts                                                    | **Missing** (3D only)                                                                                       | P2                                        |
+| Brush/lasso → range cross-filter                                    | **Missing** (ECharts capable; unexposed)                                                                    | P1                                        |
+| Per-chart loading state on re-query                                 | **Partial** (auto-refresh gate exists; per-visual re-query spinner not confirmed)                           | P1                                        |
+| "No data for this selection" empty state                            | **Missing / unconfirmed**                                                                                   | P0                                        |
+| Active-selection persistence + source indication                    | **Partial** (source badge on dashboard; selected marks not held)                                            | P1                                        |
+| Keyboard + a11y baseline                                            | **Missing**                                                                                                 | P1 (differentiator lane)                  |
+| Table: multi-sort / reorder / resize / header filters / subtotals   | **Missing**                                                                                                 | P2                                        |
+| Bookmarks / saved view state                                        | **Missing** (ties to existing snapshot + saved-query models)                                                | P2                                        |
+| Parameter/set actions, action chaining, write-back                  | **Missing**                                                                                                 | P2                                        |
+| Export (PNG/PDF/CSV)                                                | **Have**                                                                                                    | —                                         |
 
-**Honest read:** DBExec is *ahead* of most home-grown dashboards on the mechanical primitives (cross-filter, zoom, drill model, export) but *behind* on the three things that make interactions feel finished: (a) a single, visible **active-state surface** (chip bar + combined filter state + selection persistence), (b) the **author-facing governance** layer (edit-interactions, highlight-vs-filter, hierarchy definition UI), and (c) the **cheap, expected escape hatches** (drill-to-detail, empty states). The two-engine split (Dashboard `DashboardCrossFilter` vs Analyses `AnalysisInteractionService`) is the highest-leverage structural debt: it doubles the surface area for every capability below and guarantees behavior drift.
+**Honest read:** DBExec is _ahead_ of most home-grown dashboards on the mechanical primitives (cross-filter, zoom, drill model, export) but _behind_ on the three things that make interactions feel finished: (a) a single, visible **active-state surface** (chip bar + combined filter state + selection persistence), (b) the **author-facing governance** layer (edit-interactions, highlight-vs-filter, hierarchy definition UI), and (c) the **cheap, expected escape hatches** (drill-to-detail, empty states). The two-engine split (Dashboard `DashboardCrossFilter` vs Analyses `AnalysisInteractionService`) is the highest-leverage structural debt: it doubles the surface area for every capability below and guarantees behavior drift.
 
 ---
 
@@ -807,8 +844,8 @@ interface VisualAction {
     | { kind: 'same-tab' }
     | { kind: 'dashboard' }
     | { kind: 'visuals'; visualIds: string[] }
-    | { kind: 'view'; ref: string }          // drill-through
-    | { kind: 'url'; template: string };      // {{column}} interpolation
+    | { kind: 'view'; ref: string } // drill-through
+    | { kind: 'url'; template: string }; // {{column}} interpolation
   fieldMapping?: { sourceColumn: string; targetColumn: string }[];
   onClear: 'show-all' | 'leave-filtered' | 'exclude-all';
 }
@@ -850,6 +887,4 @@ The current `config-section` / `config-group` / `sidebar-divider` structure read
 6. **Brush-to-filter**, then **highlight mode** (lifecycle branch), then **drill-through-to-view** (reuses snapshot + saved-query context parameter-passing).
 7. **a11y baseline** — the open competitive lane: keyboard-navigable marks, ARIA data-table fallback per chart, focus management, `prefers-reduced-motion`. Cheaper to build in during this pass than to bolt on later.
 
-
 ---
-

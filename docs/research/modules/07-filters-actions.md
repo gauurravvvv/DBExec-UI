@@ -13,13 +13,13 @@
 
 ## 1. Industry baseline
 
-| Concept | Tableau | Power BI | Looker | Superset |
-|---|---|---|---|---|
-| Filter | Filter shelf | Filter pane | `filters:` | Filter box |
-| Parameter | Parameter | What-if param | Filter or template var | Native filter param |
-| Cross-filter | Action filter | Visual interactions | n/a (filter scope) | Native filter scope |
-| Drill | Hierarchical drill | Drill-through | Linked Explore | Drill to detail |
-| URL filter | Dashboard URL params | URL parameters | URL parameters | URL state |
+| Concept      | Tableau              | Power BI            | Looker                 | Superset            |
+| ------------ | -------------------- | ------------------- | ---------------------- | ------------------- |
+| Filter       | Filter shelf         | Filter pane         | `filters:`             | Filter box          |
+| Parameter    | Parameter            | What-if param       | Filter or template var | Native filter param |
+| Cross-filter | Action filter        | Visual interactions | n/a (filter scope)     | Native filter scope |
+| Drill        | Hierarchical drill   | Drill-through       | Linked Explore         | Drill to detail     |
+| URL filter   | Dashboard URL params | URL parameters      | URL parameters         | URL state           |
 
 ## 2. DBExec today
 
@@ -34,21 +34,21 @@
 
 ## 3. Gaps
 
-| ID | Gap | Severity |
-|---|---|---|
-| FLT-G01 | Cross-filter (click visual A → filter visual B) | P0 |
-| FLT-G02 | Drill-down + drill-up hierarchy | P0 |
-| FLT-G03 | Parameters (named variables) | P0 |
-| FLT-G04 | Dashboard filter bar (separate from analysis filters) | P0 |
-| FLT-G05 | URL-state for filters / params / drill | P0 |
-| FLT-G06 | Cascading filters (A narrows B's options) | P1 |
-| FLT-G07 | "All time" / "Last 7d" / "MTD" preset chips on date filter | P0 |
-| FLT-G08 | "Apply" button mode (vs auto-apply) | P1 |
-| FLT-G09 | Filter highlight on visual (vs filter out) | P1 |
-| FLT-G10 | Filter scope (which visuals this filter affects) | P1 |
-| FLT-G11 | Top-N filter | P1 |
-| FLT-G12 | Wildcard / regex filter on strings | P2 |
-| FLT-G13 | Relative date filter ("last 30 days" follows wall clock) | P0 |
+| ID      | Gap                                                        | Severity |
+| ------- | ---------------------------------------------------------- | -------- |
+| FLT-G01 | Cross-filter (click visual A → filter visual B)            | P0       |
+| FLT-G02 | Drill-down + drill-up hierarchy                            | P0       |
+| FLT-G03 | Parameters (named variables)                               | P0       |
+| FLT-G04 | Dashboard filter bar (separate from analysis filters)      | P0       |
+| FLT-G05 | URL-state for filters / params / drill                     | P0       |
+| FLT-G06 | Cascading filters (A narrows B's options)                  | P1       |
+| FLT-G07 | "All time" / "Last 7d" / "MTD" preset chips on date filter | P0       |
+| FLT-G08 | "Apply" button mode (vs auto-apply)                        | P1       |
+| FLT-G09 | Filter highlight on visual (vs filter out)                 | P1       |
+| FLT-G10 | Filter scope (which visuals this filter affects)           | P1       |
+| FLT-G11 | Top-N filter                                               | P1       |
+| FLT-G12 | Wildcard / regex filter on strings                         | P2       |
+| FLT-G13 | Relative date filter ("last 30 days" follows wall clock)   | P0       |
 
 ## 4. Target architecture
 
@@ -99,7 +99,11 @@ change via `Router.navigate([...], { queryParams, queryParamsHandling: 'merge' }
 A filter on `region` narrows the candidate values for `country`:
 
 ```ts
-async function dependentValues(analysisId: string, targetField: string, scope: FilterClause[]) {
+async function dependentValues(
+  analysisId: string,
+  targetField: string,
+  scope: FilterClause[],
+) {
   // SELECT DISTINCT <targetField> FROM <dataset> WHERE <scope predicates>
 }
 ```
@@ -109,13 +113,13 @@ balloons).
 
 ## 5. APIs
 
-| Method | Path | Purpose |
-|---|---|---|
-| POST | `/analyses/:id/parameters` | Add param |
-| POST | `/dashboards/:id/filters` | Add dashboard-level filter |
-| POST | `/dashboards/:id/filters/values` | Resolve filter dependent values |
-| POST | `/analyses/:id/drill/paths` | Save drill paths |
-| POST | `/analyses/:id/drill/action` | Server-side validation of a drill action |
+| Method | Path                             | Purpose                                  |
+| ------ | -------------------------------- | ---------------------------------------- |
+| POST   | `/analyses/:id/parameters`       | Add param                                |
+| POST   | `/dashboards/:id/filters`        | Add dashboard-level filter               |
+| POST   | `/dashboards/:id/filters/values` | Resolve filter dependent values          |
+| POST   | `/analyses/:id/drill/paths`      | Save drill paths                         |
+| POST   | `/analyses/:id/drill/action`     | Server-side validation of a drill action |
 
 ## 6. UI specs
 
@@ -140,14 +144,23 @@ the dashboard. Default: all. Power BI calls this "Sync slicers".
 ### 7.1 Resolving relative dates
 
 ```ts
-export function resolveRelativeDate(token: string, now = new Date()): { from: Date; to: Date } {
+export function resolveRelativeDate(
+  token: string,
+  now = new Date(),
+): { from: Date; to: Date } {
   switch (token) {
-    case 'today':       return { from: startOfDay(now), to: endOfDay(now) };
-    case 'last_7d':     return { from: addDays(now, -7), to: now };
-    case 'last_30d':    return { from: addDays(now, -30), to: now };
-    case 'mtd':         return { from: startOfMonth(now), to: now };
-    case 'ytd':         return { from: startOfYear(now), to: now };
-    default:            return { from: parseDate(token), to: now };
+    case 'today':
+      return { from: startOfDay(now), to: endOfDay(now) };
+    case 'last_7d':
+      return { from: addDays(now, -7), to: now };
+    case 'last_30d':
+      return { from: addDays(now, -30), to: now };
+    case 'mtd':
+      return { from: startOfMonth(now), to: now };
+    case 'ytd':
+      return { from: startOfYear(now), to: now };
+    default:
+      return { from: parseDate(token), to: now };
   }
 }
 ```

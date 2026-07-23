@@ -71,7 +71,10 @@ export async function appendAudit(
 ): Promise<void> {
   await connection.transaction(async (tx: any) => {
     // Serialise per-org so the chain is well-defined
-    await tx.query(`SELECT pg_advisory_xact_lock(hashtext('audit_chain:' || $1))`, [row.orgId]);
+    await tx.query(
+      `SELECT pg_advisory_xact_lock(hashtext('audit_chain:' || $1))`,
+      [row.orgId],
+    );
     const last = await tx.query(
       `SELECT row_hash FROM audit_log WHERE org_id = $1 ORDER BY id DESC LIMIT 1 FOR UPDATE`,
       [row.orgId],
@@ -81,15 +84,33 @@ export async function appendAudit(
     const canonical = canonicalise({ ...row, at: new Date(), prevHash });
     const rowHash = createHash('sha256').update(canonical).digest();
 
-    await tx.query(`
+    await tx.query(
+      `
       INSERT INTO audit_log (org_id, actor_user_id, actor_kind, actor_token_id,
                              impersonator_user_id, action, module, entity_name, entity_id,
                              metadata, ip, user_agent, correlation_id, request_id,
                              prev_hash, row_hash)
       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16)
-    `, [row.orgId, row.actorUserId, row.actorKind, row.actorTokenId, row.impersonatorUserId,
-        row.action, row.module, row.entityName, row.entityId, row.metadata, row.ip, row.userAgent,
-        row.correlationId, row.requestId, prevHash, rowHash]);
+    `,
+      [
+        row.orgId,
+        row.actorUserId,
+        row.actorKind,
+        row.actorTokenId,
+        row.impersonatorUserId,
+        row.action,
+        row.module,
+        row.entityName,
+        row.entityId,
+        row.metadata,
+        row.ip,
+        row.userAgent,
+        row.correlationId,
+        row.requestId,
+        prevHash,
+        rowHash,
+      ],
+    );
   });
 }
 
@@ -102,19 +123,28 @@ Verification (admin endpoint):
 
 ```typescript
 // POST /admin/audit/verify  { orgId, fromDate, toDate }
-export async function verifyChain(orgId: string, from: Date, to: Date): Promise<VerifyResult> {
-  const rows = await connection.query(`
+export async function verifyChain(
+  orgId: string,
+  from: Date,
+  to: Date,
+): Promise<VerifyResult> {
+  const rows = await connection.query(
+    `
     SELECT * FROM audit_log
     WHERE org_id = $1 AND at BETWEEN $2 AND $3
     ORDER BY id ASC
-  `, [orgId, from, to]);
+  `,
+    [orgId, from, to],
+  );
 
   let prev: Buffer | null = null;
   for (const r of rows) {
     if ((r.prev_hash ?? null)?.toString('hex') !== prev?.toString('hex')) {
       return { ok: false, brokenAt: r.id };
     }
-    const expected = createHash('sha256').update(canonicalise({ ...r, rowHash: undefined })).digest();
+    const expected = createHash('sha256')
+      .update(canonicalise({ ...r, rowHash: undefined }))
+      .digest();
     if (Buffer.compare(expected, r.row_hash) !== 0) {
       return { ok: false, brokenAt: r.id };
     }
@@ -135,7 +165,11 @@ Every API request gets a correlation ID at the edge:
 import { v4 as uuidv4 } from 'uuid';
 import { als } from '../services/als';
 
-export function correlationIdMiddleware(req: Request, res: Response, next: NextFunction) {
+export function correlationIdMiddleware(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
   const incoming = req.headers['x-correlation-id'] as string | undefined;
   const correlationId = incoming ?? `req_${uuidv4()}`;
   res.setHeader('x-correlation-id', correlationId);
@@ -172,7 +206,9 @@ export const otelSdk = new NodeSDK({
   instrumentations: [
     getNodeAutoInstrumentations({
       '@opentelemetry/instrumentation-fs': { enabled: false },
-      '@opentelemetry/instrumentation-express': { ignoreLayers: [/healthz$/, /readyz$/] },
+      '@opentelemetry/instrumentation-express': {
+        ignoreLayers: [/healthz$/, /readyz$/],
+      },
       '@opentelemetry/instrumentation-pg': { enhancedDatabaseReporting: true },
       '@opentelemetry/instrumentation-redis-4': {},
       '@opentelemetry/instrumentation-http': {},
@@ -249,11 +285,11 @@ instead when needed.
 
 Split into three concerns:
 
-| Endpoint | Status | What it checks |
-|---|---|---|
-| `GET /healthz` | always 200 if process alive | k8s liveness probe |
-| `GET /readyz` | 200 if upstream deps reachable | k8s readiness probe |
-| `GET /statusz` | always 200 with JSON body | UI/ops dashboard |
+| Endpoint       | Status                         | What it checks      |
+| -------------- | ------------------------------ | ------------------- |
+| `GET /healthz` | always 200 if process alive    | k8s liveness probe  |
+| `GET /readyz`  | 200 if upstream deps reachable | k8s readiness probe |
+| `GET /statusz` | always 200 with JSON body      | UI/ops dashboard    |
 
 ```typescript
 app.get('/healthz', (_req, res) => res.json({ ok: true }));
@@ -289,17 +325,25 @@ Every query execution emits a log when above threshold:
 ```typescript
 const SLOW_QUERY_THRESHOLD_MS = 1500;
 
-export function logSlowQuery(args: { sql: string; params: any[]; ms: number; org: string; user: string }) {
+export function logSlowQuery(args: {
+  sql: string;
+  params: any[];
+  ms: number;
+  org: string;
+  user: string;
+}) {
   if (args.ms < SLOW_QUERY_THRESHOLD_MS) return;
-  Logger.warn(JSON.stringify({
-    evt: 'slow_query',
-    sql_hash: sha256(args.sql).slice(0, 16),
-    sql_excerpt: args.sql.slice(0, 200),
-    ms: args.ms,
-    org_id: args.org,
-    user_id: args.user,
-    correlation_id: als.getStore()?.correlationId,
-  }));
+  Logger.warn(
+    JSON.stringify({
+      evt: 'slow_query',
+      sql_hash: sha256(args.sql).slice(0, 16),
+      sql_excerpt: args.sql.slice(0, 200),
+      ms: args.ms,
+      org_id: args.org,
+      user_id: args.user,
+      correlation_id: als.getStore()?.correlationId,
+    }),
+  );
   slowQueriesTotal.inc({ org: args.org });
 }
 ```
@@ -318,25 +362,36 @@ noise:
 export function fingerprintError(err: Error, ctx: { route?: string }): string {
   // Strip ID/UUID/path-specific bits from the message
   const norm = (err.message || '')
-    .replace(/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/gi, '<uuid>')
+    .replace(
+      /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/gi,
+      '<uuid>',
+    )
     .replace(/\b\d+\b/g, '<n>')
     .slice(0, 200);
-  const stackTopFrame = (err.stack || '').split('\n')[1]?.trim().replace(/:\d+:\d+/g, '') ?? '';
-  return sha256(`${err.name}|${norm}|${stackTopFrame}|${ctx.route ?? ''}`).slice(0, 16);
+  const stackTopFrame =
+    (err.stack || '')
+      .split('\n')[1]
+      ?.trim()
+      .replace(/:\d+:\d+/g, '') ?? '';
+  return sha256(
+    `${err.name}|${norm}|${stackTopFrame}|${ctx.route ?? ''}`,
+  ).slice(0, 16);
 }
 
 export function reportError(err: Error, req: Request) {
   const fp = fingerprintError(err, { route: req.path });
   errorTotal.inc({ fingerprint: fp });
-  Logger.error(JSON.stringify({
-    evt: 'error',
-    fingerprint: fp,
-    name: err.name,
-    msg: err.message,
-    stack: err.stack,
-    route: req.path,
-    correlation_id: als.getStore()?.correlationId,
-  }));
+  Logger.error(
+    JSON.stringify({
+      evt: 'error',
+      fingerprint: fp,
+      name: err.name,
+      msg: err.message,
+      stack: err.stack,
+      route: req.path,
+      correlation_id: als.getStore()?.correlationId,
+    }),
+  );
 }
 ```
 
@@ -350,12 +405,22 @@ seen + sample correlation IDs.
 ```typescript
 // src/controllers/audit/list.ts
 const listAudit = async (req: Request, res: Response) => {
-  const { fromDate, toDate, actorUserId, action, module, entityId, correlationId,
-          page = 1, limit = 50 } = req.query as any;
+  const {
+    fromDate,
+    toDate,
+    actorUserId,
+    action,
+    module,
+    entityId,
+    correlationId,
+    page = 1,
+    limit = 50,
+  } = req.query as any;
   const { orgData, master_db_connection } = res.locals;
   const connection = orgData.connection;
   try {
-    const qb = connection.createQueryBuilder('AuditLog', 'a')
+    const qb = connection
+      .createQueryBuilder('AuditLog', 'a')
       .where('a.org_id = :org', { org: orgData.orgId });
     if (fromDate) qb.andWhere('a.at >= :from', { from: fromDate });
     if (toDate) qb.andWhere('a.at < :to', { to: toDate });
@@ -363,10 +428,12 @@ const listAudit = async (req: Request, res: Response) => {
     if (action) qb.andWhere('a.action = :a', { a: action });
     if (module) qb.andWhere('a.module = :m', { m: module });
     if (entityId) qb.andWhere('a.entity_id = :e', { e: entityId });
-    if (correlationId) qb.andWhere('a.correlation_id = :c', { c: correlationId });
+    if (correlationId)
+      qb.andWhere('a.correlation_id = :c', { c: correlationId });
 
     const [rows, total] = await Promise.all([
-      qb.orderBy('a.at', 'DESC')
+      qb
+        .orderBy('a.at', 'DESC')
         .offset((Number(page) - 1) * Number(limit))
         .limit(Math.min(Number(limit), 200))
         .getMany(),
@@ -399,33 +466,34 @@ Existing admin console gains four panels (module 24 ties it together):
 
 ## 11. Observability of observability
 
-| Metric | Type | Purpose |
-|---|---|---|
-| `dbexec_audit_append_ms` | histogram | chain append latency (lock+insert) |
-| `dbexec_audit_verify_ms` | histogram | verify-chain endpoint cost |
-| `dbexec_audit_verify_broken_total` | counter | tampering attempt counter |
-| `dbexec_otel_span_dropped_total` | counter | exporter pressure |
-| `dbexec_metrics_high_cardinality_label_total` | counter | cardinality discipline alarm |
+| Metric                                        | Type      | Purpose                            |
+| --------------------------------------------- | --------- | ---------------------------------- |
+| `dbexec_audit_append_ms`                      | histogram | chain append latency (lock+insert) |
+| `dbexec_audit_verify_ms`                      | histogram | verify-chain endpoint cost         |
+| `dbexec_audit_verify_broken_total`            | counter   | tampering attempt counter          |
+| `dbexec_otel_span_dropped_total`              | counter   | exporter pressure                  |
+| `dbexec_metrics_high_cardinality_label_total` | counter   | cardinality discipline alarm       |
 
 ---
 
 ## 12. Security & threat model
 
-| Threat | Mitigation |
-|---|---|
-| Audit log tampering | Hash chain; verify-chain endpoint; admin alert on broken chain |
-| Audit metadata leak (e.g. password) | Whitelist of fields per module's `AUDIT_FIELDS`; everything else dropped |
-| Replay of correlation ID | Correlation IDs are informational; tied to ULIDs which are time-sortable but not secret |
-| Log volume DoS | Per-IP rate limit on `error` events emitted to telemetry sink |
-| Metrics scraping unauth | `/metrics` behind basic auth + IP allowlist |
-| Trace payload leaks secret | Auto-instrumentation sanitised: `Authorization` headers stripped; SQL parameters off by default |
-| Slow-query log SQL leak | `sql_excerpt` capped at 200 chars; full SQL only in trace span (which has auth) |
+| Threat                              | Mitigation                                                                                      |
+| ----------------------------------- | ----------------------------------------------------------------------------------------------- |
+| Audit log tampering                 | Hash chain; verify-chain endpoint; admin alert on broken chain                                  |
+| Audit metadata leak (e.g. password) | Whitelist of fields per module's `AUDIT_FIELDS`; everything else dropped                        |
+| Replay of correlation ID            | Correlation IDs are informational; tied to ULIDs which are time-sortable but not secret         |
+| Log volume DoS                      | Per-IP rate limit on `error` events emitted to telemetry sink                                   |
+| Metrics scraping unauth             | `/metrics` behind basic auth + IP allowlist                                                     |
+| Trace payload leaks secret          | Auto-instrumentation sanitised: `Authorization` headers stripped; SQL parameters off by default |
+| Slow-query log SQL leak             | `sql_excerpt` capped at 200 chars; full SQL only in trace span (which has auth)                 |
 
 ---
 
 ## 13. Runbook
 
 **Symptom: chain broken.**
+
 1. `POST /admin/audit/verify` returns `brokenAt`. Pull that
    row + its neighbours.
 2. Almost always: a code bug wrote a row outside the appender
@@ -434,10 +502,12 @@ Existing admin console gains four panels (module 24 ties it together):
    from that point.
 
 **Symptom: traces missing.**
+
 1. `dbexec_otel_span_dropped_total` rising = exporter back
    pressure. Increase batch processor max size.
 
 **Symptom: high-cardinality metric label.**
+
 1. Spike on `dbexec_metrics_high_cardinality_label_total`. Grep
    recent metric defs for `userId` / `orgId` labels.
 
@@ -445,14 +515,14 @@ Existing admin console gains four panels (module 24 ties it together):
 
 ## 14. Perf budget
 
-| Operation | p50 | p95 | Hard ceiling |
-|---|---|---|---|
-| audit append (hash chain) | 5 ms | 20 ms | 200 ms |
-| audit list page (50 rows) | 40 ms | 150 ms | 1 s |
-| chain verify (10k rows) | 200 ms | 800 ms | 5 s |
-| chain verify (1M rows) | 30 s | 90 s | 5 min |
-| trace span overhead | < 0.5 ms | 2 ms | 10 ms |
-| metrics endpoint scrape | 10 ms | 50 ms | 500 ms |
+| Operation                 | p50      | p95    | Hard ceiling |
+| ------------------------- | -------- | ------ | ------------ |
+| audit append (hash chain) | 5 ms     | 20 ms  | 200 ms       |
+| audit list page (50 rows) | 40 ms    | 150 ms | 1 s          |
+| chain verify (10k rows)   | 200 ms   | 800 ms | 5 s          |
+| chain verify (1M rows)    | 30 s     | 90 s   | 5 min        |
+| trace span overhead       | < 0.5 ms | 2 ms   | 10 ms        |
+| metrics endpoint scrape   | 10 ms    | 50 ms  | 500 ms       |
 
 ---
 

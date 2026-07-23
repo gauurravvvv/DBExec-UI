@@ -31,11 +31,17 @@
           </div>
 
           <ng-template usGridCell="name" let-q>
-            <span class="dataset-name-link" (click)="onView(q)">{{ q.name }}</span>
+            <span class="dataset-name-link" (click)="onView(q)">{{
+              q.name
+            }}</span>
           </ng-template>
 
           <ng-template usGridCell="description" let-q>
-            <span class="desc-text" [pTooltip]="q.description || ''" tooltipPosition="top">
+            <span
+              class="desc-text"
+              [pTooltip]="q.description || ''"
+              tooltipPosition="top"
+            >
               {{ q.description || '—' }}
             </span>
           </ng-template>
@@ -67,23 +73,32 @@
           <ng-template usGridCell="updated" let-q>
             <span
               class="date-text"
-              [pTooltip]="((q.updatedOn || q.createdOn) | date: 'dd MMM yyyy, HH:mm:ss') || ''"
+              [pTooltip]="
+                (q.updatedOn || q.createdOn | date: 'dd MMM yyyy, HH:mm:ss') ||
+                ''
+              "
               tooltipPosition="top"
             >
-              {{ (q.updatedOn || q.createdOn) | relativeTime }}
+              {{ q.updatedOn || q.createdOn | relativeTime }}
             </span>
           </ng-template>
 
           <ng-template usGridCell="actions" let-q>
             <div class="row-actions">
-              <button class="icon-btn edit-btn"
+              <button
+                class="icon-btn edit-btn"
                 (click)="onEdit(q)"
-                [pTooltip]="'QUERY_RUNNER.OPEN_EXECUTOR' | translate" tooltipPosition="bottom">
+                [pTooltip]="'QUERY_RUNNER.OPEN_EXECUTOR' | translate"
+                tooltipPosition="bottom"
+              >
                 <i class="pi pi-pencil"></i>
               </button>
-              <button class="icon-btn delete-btn"
+              <button
+                class="icon-btn delete-btn"
                 (click)="confirmDelete(q)"
-                [pTooltip]="'COMMON.DELETE' | translate" tooltipPosition="bottom">
+                [pTooltip]="'COMMON.DELETE' | translate"
+                tooltipPosition="bottom"
+              >
                 <i class="pi pi-trash"></i>
               </button>
             </div>
@@ -111,7 +126,10 @@
 
     <div class="standard-delete-section">
       <p class="delete-intro">
-        {{ 'QUERY_RUNNER.DELETE_SAVED_QUERY_CONFIRM' | translate: { name: toDelete?.name } }}
+        {{
+          'QUERY_RUNNER.DELETE_SAVED_QUERY_CONFIRM'
+            | translate: { name: toDelete?.name }
+        }}
       </p>
 
       <ul class="delete-info-list">
@@ -142,9 +160,15 @@
       <button class="btn-cancel" (click)="cancelDelete()">
         <i class="pi pi-times"></i>{{ 'COMMON.CANCEL' | translate }}
       </button>
-      <button class="btn-confirm" (click)="proceedDelete()"
-        [disabled]="deleting || !deleteJustification.trim()">
-        <i class="pi" [ngClass]="deleting ? 'pi-spin pi-spinner' : 'pi-trash'"></i>
+      <button
+        class="btn-confirm"
+        (click)="proceedDelete()"
+        [disabled]="deleting || !deleteJustification.trim()"
+      >
+        <i
+          class="pi"
+          [ngClass]="deleting ? 'pi-spin pi-spinner' : 'pi-trash'"
+        ></i>
         {{ 'COMMON.DELETE' | translate }}
       </button>
     </div>

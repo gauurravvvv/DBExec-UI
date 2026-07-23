@@ -463,10 +463,7 @@
         border-left-color: var(--error-color);
 
         .p-toast-message-content {
-          background-image: linear-gradient(
-            var(--error-bg),
-            var(--error-bg)
-          );
+          background-image: linear-gradient(var(--error-bg), var(--error-bg));
           border-left-color: var(--error-color);
 
           .p-toast-message-icon {
@@ -495,10 +492,7 @@
         border-left-color: var(--info-color);
 
         .p-toast-message-content {
-          background-image: linear-gradient(
-            var(--info-bg),
-            var(--info-bg)
-          );
+          background-image: linear-gradient(var(--info-bg), var(--info-bg));
           border-left-color: var(--info-color);
 
           .p-toast-message-icon {

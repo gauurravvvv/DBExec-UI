@@ -39,9 +39,22 @@ const manifest = async (req: Request, res: Response) => {
     theme_color: branding.tokens['color-primary'].light,
     background_color: branding.tokens['color-bg'].light,
     icons: [
-      { src: branding.faviconUrl_192 ?? '/icon-192.png', sizes: '192x192', type: 'image/png' },
-      { src: branding.faviconUrl_512 ?? '/icon-512.png', sizes: '512x512', type: 'image/png' },
-      { src: branding.faviconUrl_maskable ?? '/icon-maskable.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
+      {
+        src: branding.faviconUrl_192 ?? '/icon-192.png',
+        sizes: '192x192',
+        type: 'image/png',
+      },
+      {
+        src: branding.faviconUrl_512 ?? '/icon-512.png',
+        sizes: '512x512',
+        type: 'image/png',
+      },
+      {
+        src: branding.faviconUrl_maskable ?? '/icon-maskable.png',
+        sizes: '512x512',
+        type: 'image/png',
+        purpose: 'maskable',
+      },
     ],
     orientation: 'any',
     categories: ['business', 'productivity'],
@@ -63,14 +76,19 @@ Workbox-based. Per-route cache strategy:
 // src/sw/service-worker.ts
 import { precacheAndRoute } from 'workbox-precaching';
 import { registerRoute } from 'workbox-routing';
-import { NetworkFirst, CacheFirst, StaleWhileRevalidate } from 'workbox-strategies';
+import {
+  NetworkFirst,
+  CacheFirst,
+  StaleWhileRevalidate,
+} from 'workbox-strategies';
 import { ExpirationPlugin } from 'workbox-expiration';
 
 precacheAndRoute(self.__WB_MANIFEST);
 
 // JS/CSS: long cache + revalidate
 registerRoute(
-  ({ request }) => request.destination === 'script' || request.destination === 'style',
+  ({ request }) =>
+    request.destination === 'script' || request.destination === 'style',
   new StaleWhileRevalidate({ cacheName: 'static-resources' }),
 );
 
@@ -88,7 +106,10 @@ registerRoute(
 // Images: cache-first (1 day)
 registerRoute(
   ({ request }) => request.destination === 'image',
-  new CacheFirst({ cacheName: 'images', plugins: [new ExpirationPlugin({ maxAgeSeconds: 86_400 })] }),
+  new CacheFirst({
+    cacheName: 'images',
+    plugins: [new ExpirationPlugin({ maxAgeSeconds: 86_400 })],
+  }),
 );
 
 // HTML shell: network-first with fallback to /offline.html
@@ -97,9 +118,11 @@ registerRoute(
   new NetworkFirst({
     cacheName: 'navigation',
     networkTimeoutSeconds: 3,
-    plugins: [{
-      handlerDidError: async () => caches.match('/offline.html'),
-    }],
+    plugins: [
+      {
+        handlerDidError: async () => caches.match('/offline.html'),
+      },
+    ],
   }),
 );
 ```
@@ -141,12 +164,16 @@ export class InstallPromptService {
   }
 
   isIos() {
-    return /iPhone|iPad|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
+    return (
+      /iPhone|iPad|iPod/.test(navigator.userAgent) && !(window as any).MSStream
+    );
   }
 
   isStandalone() {
-    return window.matchMedia('(display-mode: standalone)').matches
-        || (window.navigator as any).standalone === true;
+    return (
+      window.matchMedia('(display-mode: standalone)').matches ||
+      (window.navigator as any).standalone === true
+    );
   }
 }
 ```
@@ -202,7 +229,9 @@ self.addEventListener('periodicsync', (ev: any) => {
 async function refreshKpiData() {
   const dashboards = await getFavouriteDashboards();
   for (const d of dashboards) {
-    try { await fetch(`/api/dashboard/${d.id}/kpi-summary`); } catch {}
+    try {
+      await fetch(`/api/dashboard/${d.id}/kpi-summary`);
+    } catch {}
   }
 }
 ```
@@ -213,7 +242,9 @@ Registered from the page:
 if ('periodicSync' in navigator.serviceWorker) {
   const reg = await navigator.serviceWorker.ready;
   try {
-    await (reg as any).periodicSync.register('kpi-refresh', { minInterval: 24 * 60 * 60 * 1000 });
+    await (reg as any).periodicSync.register('kpi-refresh', {
+      minInterval: 24 * 60 * 60 * 1000,
+    });
   } catch (e) {
     // user denied or feature absent
   }
@@ -235,8 +266,14 @@ const credential = await navigator.credentials.create({
     rp: { name: 'DBExec', id: location.hostname },
     user: { id: encode(userId), name: email, displayName: name },
     challenge: await fetchChallenge(),
-    pubKeyCredParams: [{ alg: -7, type: 'public-key' }, { alg: -257, type: 'public-key' }],
-    authenticatorSelection: { authenticatorAttachment: 'platform', userVerification: 'required' },
+    pubKeyCredParams: [
+      { alg: -7, type: 'public-key' },
+      { alg: -257, type: 'public-key' },
+    ],
+    authenticatorSelection: {
+      authenticatorAttachment: 'platform',
+      userVerification: 'required',
+    },
     timeout: 60_000,
   },
 });
@@ -266,43 +303,46 @@ NetworkFirst.
 
 ## 8. Observability
 
-| Metric | Type | Labels | Purpose |
-|---|---|---|---|
-| `dbexec_pwa_install_total` | counter | `platform` | install rate |
-| `dbexec_pwa_offline_session_total` | counter | — | how often offline kicks in |
-| `dbexec_pwa_periodic_sync_total` | counter | `outcome` | bg-sync reliability |
-| `dbexec_pwa_sw_cache_hit_rate` | gauge | — | sampled on the client |
-| `dbexec_pwa_install_prompt_outcome` | counter | `outcome` | accepted/dismissed |
-| `dbexec_pwa_webauthn_unlock_total` | counter | `outcome` | biometric usage |
+| Metric                              | Type    | Labels     | Purpose                    |
+| ----------------------------------- | ------- | ---------- | -------------------------- |
+| `dbexec_pwa_install_total`          | counter | `platform` | install rate               |
+| `dbexec_pwa_offline_session_total`  | counter | —          | how often offline kicks in |
+| `dbexec_pwa_periodic_sync_total`    | counter | `outcome`  | bg-sync reliability        |
+| `dbexec_pwa_sw_cache_hit_rate`      | gauge   | —          | sampled on the client      |
+| `dbexec_pwa_install_prompt_outcome` | counter | `outcome`  | accepted/dismissed         |
+| `dbexec_pwa_webauthn_unlock_total`  | counter | `outcome`  | biometric usage            |
 
 ---
 
 ## 9. Security & threat model
 
-| Threat | Mitigation |
-|---|---|
+| Threat                                      | Mitigation                                                                                            |
+| ------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
 | Stale cached data displayed without warning | Per-tile "last updated" + offline banner; cache-age threshold makes "data may be stale" warning at 1h |
-| Service worker hijacked via XSS | HTTPS only; CSP `script-src 'self'`; SW served with strict cache headers |
-| Manifest spoof (other org's branding) | Manifest endpoint resolves by hostname; cross-org request returns 404 |
-| Sensitive data in long-lived cache | API GETs only kept 1 hour; sensitive routes (exports) bypass SW with `no-store` directive |
-| Bookmark-leak via shared cache | Per-user cache key includes user ID; admin bash command `caches.delete()` on logout |
-| ACME / custom-domain SW conflict | Each origin has its own SW; verified across both default and custom-domain hostnames |
+| Service worker hijacked via XSS             | HTTPS only; CSP `script-src 'self'`; SW served with strict cache headers                              |
+| Manifest spoof (other org's branding)       | Manifest endpoint resolves by hostname; cross-org request returns 404                                 |
+| Sensitive data in long-lived cache          | API GETs only kept 1 hour; sensitive routes (exports) bypass SW with `no-store` directive             |
+| Bookmark-leak via shared cache              | Per-user cache key includes user ID; admin bash command `caches.delete()` on logout                   |
+| ACME / custom-domain SW conflict            | Each origin has its own SW; verified across both default and custom-domain hostnames                  |
 
 ---
 
 ## 10. Runbook
 
 **Symptom: PWA stuck on old version.**
+
 1. SW skip-waiting: bump SW version → SW recognises new, calls
    `self.skipWaiting()` after `controllerchange`, app reloads.
 
 **Symptom: install prompt doesn't appear.**
+
 1. Manifest invalid? `chrome://flags#manifest-installable`
    has criteria; check console.
 2. iOS Safari: prompt is the manual share-add-to-home flow.
    Our banner explains.
 
 **Symptom: offline page blank.**
+
 1. `/offline.html` not in precache. Add to Workbox precache
    manifest.
 
@@ -310,13 +350,13 @@ NetworkFirst.
 
 ## 11. Perf budget
 
-| Operation | p50 | p95 | Hard ceiling |
-|---|---|---|---|
-| SW activation | 50 ms | 200 ms | 1 s |
-| Cold launch (cached) | 600 ms | 1.5 s | 5 s |
-| Cold launch (network) | 1.5 s | 4 s | 15 s |
-| Biometric unlock | 1 s | 3 s | 30 s (timeout) |
-| Periodic sync per dashboard | 500 ms | 2 s | 30 s |
+| Operation                   | p50    | p95    | Hard ceiling   |
+| --------------------------- | ------ | ------ | -------------- |
+| SW activation               | 50 ms  | 200 ms | 1 s            |
+| Cold launch (cached)        | 600 ms | 1.5 s  | 5 s            |
+| Cold launch (network)       | 1.5 s  | 4 s    | 15 s           |
+| Biometric unlock            | 1 s    | 3 s    | 30 s (timeout) |
+| Periodic sync per dashboard | 500 ms | 2 s    | 30 s           |
 
 ---
 

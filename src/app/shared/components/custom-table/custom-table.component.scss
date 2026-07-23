@@ -78,7 +78,10 @@
 .ct-search {
   width: 15rem;
   max-width: 40vw;
-  ::ng-deep app-custom-input { display: block; width: 100%; }
+  ::ng-deep app-custom-input {
+    display: block;
+    width: 100%;
+  }
 }
 
 /* Secondary actions — flat/ghost icon buttons (calm; matches the app). */
@@ -95,9 +98,17 @@
   cursor: pointer;
   transition: all var(--motion-base) ease;
 
-  .pi { font-size: var(--icon-md); }
-  &:hover { background: var(--hover-background); color: var(--primary-color); }
-  &.active { background: var(--primary-color-transparent); color: var(--primary-color); }
+  .pi {
+    font-size: var(--icon-md);
+  }
+  &:hover {
+    background: var(--hover-background);
+    color: var(--primary-color);
+  }
+  &.active {
+    background: var(--primary-color-transparent);
+    color: var(--primary-color);
+  }
 }
 
 /* ── p-table skin ─────────────────────────────────────────────────────── */
@@ -136,8 +147,12 @@
       align-items: center;
       gap: var(--space-2);
     }
-    &.ct-right .ct-th { justify-content: flex-end; }
-    &.ct-center .ct-th { justify-content: center; }
+    &.ct-right .ct-th {
+      justify-content: flex-end;
+    }
+    &.ct-center .ct-th {
+      justify-content: center;
+    }
   }
   /* Sticky-header rows must stay shaded too (global sets these to
      card-background !important with higher specificity).
@@ -148,19 +163,28 @@
      header — the overlap in the screenshot. Lift every sticky label-row cell
      above the frozen body cell (3 > 2); the frozen header corner stays on top
      at z-index 5 below. */
-  &.modern-table.p-datatable-flex-scrollable .p-datatable-thead > tr:first-child > th,
+  &.modern-table.p-datatable-flex-scrollable
+    .p-datatable-thead
+    > tr:first-child
+    > th,
   .p-datatable-thead > tr:first-child > th {
     background: var(--table-header-bg) !important;
     z-index: 3;
   }
   /* The filter (2nd) row is also sticky and must clear the frozen body cell. */
-  &.modern-table.p-datatable-flex-scrollable .p-datatable-thead > tr:nth-child(2) > th,
+  &.modern-table.p-datatable-flex-scrollable
+    .p-datatable-thead
+    > tr:nth-child(2)
+    > th,
   .p-datatable-thead > tr:nth-child(2) > th {
     z-index: 3;
   }
   /* The filter row (2nd thead) is a form surface, not a header — keep it on the
      card background so its inputs read as inputs, not part of the shaded head. */
-  &.modern-table.p-datatable-flex-scrollable .p-datatable-thead > tr:nth-child(2) > th {
+  &.modern-table.p-datatable-flex-scrollable
+    .p-datatable-thead
+    > tr:nth-child(2)
+    > th {
     background: var(--card-background) !important;
   }
   /* CRITICAL: the global rule pins the FILTER row (2nd thead row) at
@@ -169,7 +193,10 @@
      between header and filter inputs. Pin the filter row flush to the label
      row's real height instead. `--ct-header-h` (2rem ≈ our 0.5rem×2 padding +
      label line-height) matches, with !important to beat the global 40px. */
-  &.modern-table.p-datatable-flex-scrollable .p-datatable-thead > tr:nth-child(2) > th,
+  &.modern-table.p-datatable-flex-scrollable
+    .p-datatable-thead
+    > tr:nth-child(2)
+    > th,
   .p-datatable-thead > tr:nth-child(2) > th {
     top: 2rem !important;
   }
@@ -183,8 +210,13 @@
   .p-sortable-column.p-highlight .p-sorticon {
     color: var(--primary-color);
   }
-  .p-sortable-column:focus { box-shadow: none; outline: none; }
-  .p-sortable-column:hover { background: var(--table-row-hover); }
+  .p-sortable-column:focus {
+    box-shadow: none;
+    outline: none;
+  }
+  .p-sortable-column:hover {
+    background: var(--table-row-hover);
+  }
 
   /* Body cells — canonical density (1px divider, zebra striping, hover
      highlight). `!important` on padding/font so no residual global/page rule
@@ -207,16 +239,26 @@
       vertical-align: middle;
       height: auto !important;
 
-      &.ct-right { text-align: right; }
-      &.ct-center { text-align: center; }
-      &.ct-mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+      &.ct-right {
+        text-align: right;
+      }
+      &.ct-center {
+        text-align: center;
+      }
+      &.ct-mono {
+        font-family: var(--font-mono);
+        font-variant-numeric: tabular-nums;
+      }
     }
   }
   /* Zebra striping — alternate rows get a subtle tint (same on every table).
      Written after the base row rule + chained `.modern-table` with !important
      so it beats the global `.modern-table` row background. Hover wins over
      zebra (defined last, also !important). Empty-state row excluded. */
-  &.modern-table .p-datatable-tbody > tr:nth-child(even):not(.ct-empty-row) > td,
+  &.modern-table
+    .p-datatable-tbody
+    > tr:nth-child(even):not(.ct-empty-row)
+    > td,
   .p-datatable-tbody > tr:nth-child(even):not(.ct-empty-row) > td {
     background: var(--table-stripe, rgba(0, 0, 0, 0.025)) !important;
   }
@@ -239,7 +281,9 @@
     font-weight: var(--fw-semibold);
     cursor: pointer;
     text-decoration: none;
-    &:hover { text-decoration: underline; }
+    &:hover {
+      text-decoration: underline;
+    }
   }
 
   .description-text {
@@ -290,16 +334,38 @@
         background-color var(--motion-fast) ease,
         color var(--motion-fast) ease;
 
-      i { font-size: var(--icon-md); }
+      i {
+        font-size: var(--icon-md);
+      }
 
-      &:hover { background: var(--hover-background); color: var(--text-color); }
-      &.view-btn:hover { color: var(--primary-color); }
-      &.edit-btn:hover { color: var(--primary-color); }
-      &.delete-btn:hover { color: var(--error-color); }
-      &.unlock-btn { color: var(--warning-color); &:hover { color: var(--warning-hover); } }
+      &:hover {
+        background: var(--hover-background);
+        color: var(--text-color);
+      }
+      &.view-btn:hover {
+        color: var(--primary-color);
+      }
+      &.edit-btn:hover {
+        color: var(--primary-color);
+      }
+      &.delete-btn:hover {
+        color: var(--error-color);
+      }
+      &.unlock-btn {
+        color: var(--warning-color);
+        &:hover {
+          color: var(--warning-hover);
+        }
+      }
 
-      &:disabled { opacity: 0.35; cursor: not-allowed; }
-      &:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 1px; }
+      &:disabled {
+        opacity: 0.35;
+        cursor: not-allowed;
+      }
+      &:focus-visible {
+        outline: 2px solid var(--primary-color);
+        outline-offset: 1px;
+      }
     }
   }
 
@@ -311,7 +377,10 @@
     background: var(--card-background) !important;
     border-bottom: 1px solid var(--border-color);
     padding: var(--space-3) 0.5rem !important;
-    app-custom-input { display: block; width: 100%; }
+    app-custom-input {
+      display: block;
+      width: 100%;
+    }
   }
 
   /* Frozen first column.
@@ -334,10 +403,16 @@
     border-right: 1px solid var(--border-color);
   }
   /* Zebra (even rows) — layer the stripe token over the opaque card base. */
-  &.modern-table .p-datatable-tbody > tr:nth-child(even):not(.ct-empty-row) > td.ct-frozen,
+  &.modern-table
+    .p-datatable-tbody
+    > tr:nth-child(even):not(.ct-empty-row)
+    > td.ct-frozen,
   .p-datatable-tbody > tr:nth-child(even):not(.ct-empty-row) > td.ct-frozen {
     background:
-      linear-gradient(var(--table-stripe, rgba(0, 0, 0, 0.025)), var(--table-stripe, rgba(0, 0, 0, 0.025))),
+      linear-gradient(
+        var(--table-stripe, rgba(0, 0, 0, 0.025)),
+        var(--table-stripe, rgba(0, 0, 0, 0.025))
+      ),
       var(--card-background) !important;
   }
   /* Hover — layer the hover token over the opaque base; wins over zebra. */
@@ -355,7 +430,10 @@
      it. Match that scope + add the .ct-frozen class so this wins, and force
      both z-index and an opaque fill. Covers BOTH the label row and the filter
      row's frozen cell so the whole pinned header column stays solid. */
-  &.modern-table.p-datatable-flex-scrollable .p-datatable-thead > tr > th.ct-frozen,
+  &.modern-table.p-datatable-flex-scrollable
+    .p-datatable-thead
+    > tr
+    > th.ct-frozen,
   &.modern-table .p-datatable-thead > tr > th.ct-frozen,
   .p-datatable-thead > tr > th.ct-frozen {
     z-index: 5 !important;
@@ -364,7 +442,10 @@
   }
   /* The frozen cell of the filter (2nd) row sits on the card surface like the
      rest of that row, but must stay opaque + pinned. */
-  &.modern-table.p-datatable-flex-scrollable .p-datatable-thead > tr:nth-child(2) > th.ct-frozen,
+  &.modern-table.p-datatable-flex-scrollable
+    .p-datatable-thead
+    > tr:nth-child(2)
+    > th.ct-frozen,
   .p-datatable-thead > tr:nth-child(2) > th.ct-frozen {
     background: var(--card-background) !important;
   }
@@ -413,7 +494,11 @@
     align-items: center;
     justify-content: center;
     min-height: 200px;
-    i { font-size: var(--icon-lg); margin-bottom: var(--space-4); opacity: 0.6; }
+    i {
+      font-size: var(--icon-lg);
+      margin-bottom: var(--space-4);
+      opacity: 0.6;
+    }
   }
 
   /* Loading mask — quiet. */
@@ -425,8 +510,14 @@
   .p-datatable-wrapper {
     scrollbar-width: thin;
     scrollbar-color: var(--border-strong) transparent;
-    &::-webkit-scrollbar { width: 8px; height: 8px; }
-    &::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 999px; }
+    &::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    &::-webkit-scrollbar-thumb {
+      background: var(--border-strong);
+      border-radius: 999px;
+    }
   }
 
   /* Opt-in selection column (config.selectable) — compact, centred. The
@@ -438,17 +529,24 @@
     min-width: 44px;
     text-align: center;
 
-    ::ng-deep .form-field { gap: 0; }
+    ::ng-deep .form-field {
+      gap: 0;
+    }
     ::ng-deep .form-field .checkbox-row {
       gap: 0;
       justify-content: center;
     }
-    ::ng-deep .p-checkbox { margin-top: 0; }
+    ::ng-deep .p-checkbox {
+      margin-top: 0;
+    }
   }
 
   /* Selected-row tint — beats the zebra stripe (written after, !important). */
   .p-datatable-tbody > tr.ct-row-selected > td {
-    background: var(--primary-color-transparent, rgba(0, 0, 0, 0.04)) !important;
+    background: var(
+      --primary-color-transparent,
+      rgba(0, 0, 0, 0.04)
+    ) !important;
   }
 }
 
@@ -467,7 +565,8 @@
     display: inline-flex;
     align-items: center;
     gap: var(--space-3);
-    &.loading { color: var(--primary-color); }
+    &.loading {
+      color: var(--primary-color);
+    }
   }
 }
-

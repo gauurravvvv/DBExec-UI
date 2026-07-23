@@ -69,7 +69,11 @@
     <div class="assignments-list-section">
       <div class="section-label">
         {{ 'RLS.CURRENT_ASSIGNMENTS' | translate }}
-        <app-chip variant="count" size="sm" [count]="assignments().length"></app-chip>
+        <app-chip
+          variant="count"
+          size="sm"
+          [count]="assignments().length"
+        ></app-chip>
       </div>
 
       <div class="loading-state" *ngIf="isLoadingAssignments">

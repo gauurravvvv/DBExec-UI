@@ -38,7 +38,8 @@ export class SystemSettingsHubComponent implements OnInit {
   @ViewChild(SsoSettingsComponent) private sso?: SsoSettingsComponent;
   @ViewChild(EmailConfigurationComponent)
   private email?: EmailConfigurationComponent;
-  @ViewChild(SecurityPolicyComponent) private security?: SecurityPolicyComponent;
+  @ViewChild(SecurityPolicyComponent)
+  private security?: SecurityPolicyComponent;
   @ViewChild(AiFeaturesComponent) private ai?: AiFeaturesComponent;
 
   constructor(

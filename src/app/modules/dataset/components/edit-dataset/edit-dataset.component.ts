@@ -1691,10 +1691,7 @@ export class EditDatasetComponent
     const key = this.columnStateStorageKey();
     if (!key) return;
     try {
-      localStorage.setItem(
-        key,
-        JSON.stringify({ widths: this.columnWidths }),
-      );
+      localStorage.setItem(key, JSON.stringify({ widths: this.columnWidths }));
     } catch (_) {
       /* localStorage may be unavailable */
     }
@@ -1831,8 +1828,7 @@ export class EditDatasetComponent
       .then((response: any) => {
         // Accept both an envelope ({ data: { columns } }) and a bare
         // ({ columns }) shape so we don't depend on the wrapper.
-        const cols =
-          response?.data?.columns ?? response?.columns ?? [];
+        const cols = response?.data?.columns ?? response?.columns ?? [];
         const next: SimpleColumn[] = (Array.isArray(cols) ? cols : []).map(
           (c: any) => ({
             name: (c?.name ?? '').toString(),

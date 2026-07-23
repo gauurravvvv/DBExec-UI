@@ -34,7 +34,8 @@ export interface ChangeIntent {
   adminOption?: boolean;
   // grant / revoke (privilege statements)
   privileges?: string[];
-  objectType?: 'table' | 'column' | 'schema' | 'sequence' | 'function' | 'database';
+  objectType?:
+    'table' | 'column' | 'schema' | 'sequence' | 'function' | 'database';
   schema?: string;
   tables?: string[];
   columns?: string[];
@@ -54,21 +55,31 @@ function list(arr?: string[] | string): string {
  * Keys live under DB_ACCESS.SUMMARY.* in en.json. Falls back to a terse
  * generic description if a specific key is missing.
  */
-export function describeChange(intent: ChangeIntent, t: TranslateService): string {
+export function describeChange(
+  intent: ChangeIntent,
+  t: TranslateService,
+): string {
   switch (intent.kind) {
     case 'createRole': {
       const isLogin = intent.attributes?.login;
       const parts: string[] = [];
       if (intent.attributes?.validUntil) {
-        parts.push(t.instant('DB_ACCESS.SUMMARY.EXPIRING', {
-          date: new Date(intent.attributes.validUntil).toLocaleDateString(),
-        }));
+        parts.push(
+          t.instant('DB_ACCESS.SUMMARY.EXPIRING', {
+            date: new Date(intent.attributes.validUntil).toLocaleDateString(),
+          }),
+        );
       }
       const suffix = parts.length ? ' ' + parts.join('; ') : '';
       return (
-        t.instant(isLogin ? 'DB_ACCESS.SUMMARY.CREATE_USER' : 'DB_ACCESS.SUMMARY.CREATE_ROLE', {
-          name: intent.name,
-        }) + suffix
+        t.instant(
+          isLogin
+            ? 'DB_ACCESS.SUMMARY.CREATE_USER'
+            : 'DB_ACCESS.SUMMARY.CREATE_ROLE',
+          {
+            name: intent.name,
+          },
+        ) + suffix
       );
     }
     case 'alterRole':
@@ -76,16 +87,23 @@ export function describeChange(intent: ChangeIntent, t: TranslateService): strin
     case 'deactivate':
       return t.instant('DB_ACCESS.SUMMARY.DEACTIVATE', { name: intent.name });
     case 'renameRole':
-      return t.instant('DB_ACCESS.SUMMARY.RENAME', { name: intent.name, newName: intent.newName });
+      return t.instant('DB_ACCESS.SUMMARY.RENAME', {
+        name: intent.name,
+        newName: intent.newName,
+      });
     case 'deleteRole':
       if (intent.dropOwned)
-        return t.instant('DB_ACCESS.SUMMARY.DELETE_DROP', { name: intent.name });
+        return t.instant('DB_ACCESS.SUMMARY.DELETE_DROP', {
+          name: intent.name,
+        });
       if (intent.reassignTo)
         return t.instant('DB_ACCESS.SUMMARY.DELETE_REASSIGN', {
           name: intent.name,
           target: intent.reassignTo,
         });
-      return t.instant('DB_ACCESS.SUMMARY.DELETE_SIMPLE', { name: intent.name });
+      return t.instant('DB_ACCESS.SUMMARY.DELETE_SIMPLE', {
+        name: intent.name,
+      });
     case 'grantMembership':
       return t.instant('DB_ACCESS.SUMMARY.GRANT_MEMBERSHIP', {
         role: list(intent.role),
@@ -98,11 +116,16 @@ export function describeChange(intent: ChangeIntent, t: TranslateService): strin
       });
     case 'grant': {
       const scope = describeScope(intent, t);
-      return t.instant('DB_ACCESS.SUMMARY.GRANT', {
-        privileges: list(intent.privileges),
-        scope,
-        grantee: intent.grantee,
-      }) + (intent.withGrantOption ? ' ' + t.instant('DB_ACCESS.SUMMARY.WITH_GRANT') : '');
+      return (
+        t.instant('DB_ACCESS.SUMMARY.GRANT', {
+          privileges: list(intent.privileges),
+          scope,
+          grantee: intent.grantee,
+        }) +
+        (intent.withGrantOption
+          ? ' ' + t.instant('DB_ACCESS.SUMMARY.WITH_GRANT')
+          : '')
+      );
     }
     case 'revoke': {
       const scope = describeScope(intent, t);
@@ -137,7 +160,9 @@ export function describeChange(intent: ChangeIntent, t: TranslateService): strin
 function describeScope(intent: ChangeIntent, t: TranslateService): string {
   switch (intent.objectType) {
     case 'schema':
-      return t.instant('DB_ACCESS.SUMMARY.SCOPE_SCHEMA', { schema: intent.schema });
+      return t.instant('DB_ACCESS.SUMMARY.SCOPE_SCHEMA', {
+        schema: intent.schema,
+      });
     case 'column':
       return t.instant('DB_ACCESS.SUMMARY.SCOPE_COLUMNS', {
         columns: list(intent.columns),
@@ -145,16 +170,22 @@ function describeScope(intent: ChangeIntent, t: TranslateService): string {
         table: (intent.tables && intent.tables[0]) || '',
       });
     case 'sequence':
-      return t.instant('DB_ACCESS.SUMMARY.SCOPE_SEQUENCES', { schema: intent.schema });
+      return t.instant('DB_ACCESS.SUMMARY.SCOPE_SEQUENCES', {
+        schema: intent.schema,
+      });
     case 'function':
-      return t.instant('DB_ACCESS.SUMMARY.SCOPE_FUNCTIONS', { schema: intent.schema });
+      return t.instant('DB_ACCESS.SUMMARY.SCOPE_FUNCTIONS', {
+        schema: intent.schema,
+      });
     case 'database':
       return t.instant('DB_ACCESS.SUMMARY.SCOPE_DATABASE');
     case 'table':
     default: {
       const count = intent.tables?.length ?? 0;
       if (count === 0)
-        return t.instant('DB_ACCESS.SUMMARY.SCOPE_ALL_TABLES', { schema: intent.schema });
+        return t.instant('DB_ACCESS.SUMMARY.SCOPE_ALL_TABLES', {
+          schema: intent.schema,
+        });
       return t.instant('DB_ACCESS.SUMMARY.SCOPE_TABLES', {
         count,
         schema: intent.schema,

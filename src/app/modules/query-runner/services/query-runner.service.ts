@@ -67,18 +67,21 @@ export class QueryRunnerService {
   }
 
   getConnection(id: string): Promise<any> {
-    return lastValueFrom(
-      this.http.apiGet(this.base(id), { skipLoader: true }),
-    );
+    return lastValueFrom(this.http.apiGet(this.base(id), { skipLoader: true }));
   }
 
   addConnection(payload: ConnectionPayload): Promise<any> {
     return lastValueFrom(
-      this.http.apiPost(QUERY_RUNNER.CONNECTIONS, payload, { skipLoader: true }),
+      this.http.apiPost(QUERY_RUNNER.CONNECTIONS, payload, {
+        skipLoader: true,
+      }),
     );
   }
 
-  updateConnection(id: string, payload: Partial<ConnectionPayload>): Promise<any> {
+  updateConnection(
+    id: string,
+    payload: Partial<ConnectionPayload>,
+  ): Promise<any> {
     return lastValueFrom(
       this.http.apiPut(this.base(id), payload, { skipLoader: true }),
     );

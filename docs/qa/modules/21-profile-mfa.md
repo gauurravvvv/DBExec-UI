@@ -3,6 +3,7 @@
 ## Profile
 
 ### Happy
+
 - **PRF-H-01** · Profile shows current identity (name, email, role, org, groups). P0
 - **PRF-H-02** · Change first name → header avatar updates without reload. P1
 - **PRF-H-03** · Change locale → UI reflows; persists in JWT post-relogin. P0
@@ -10,6 +11,7 @@
 - **PRF-H-05** · Upload avatar (jpg/png ≤ 1MB) → displayed. P1
 
 ### Negative
+
 - **PRF-N-01** · Wrong current password → reject (no enumeration). P0
 - **PRF-N-02** · New password missing digit → password.digit. P0
 - **PRF-N-03** · Missing uppercase. P0
@@ -27,6 +29,7 @@
 - **PRF-N-15** · Email change attempt (read-only field) → no-op. P1
 
 ### Edge
+
 - **PRF-E-01** · Locale switch mid-form → labels translate without losing typed values. P1
 - **PRF-E-02** · Password change while another tab open → other tab gets 440. P0
 - **PRF-E-03** · Avatar SVG with embedded script → sanitised or rejected. P0 🟣
@@ -67,6 +70,7 @@
 - **PRF-S-03** · Avatar upload virus-scanned. P0 🟣
 
 ## Regression buckets
+
 - Password policy → PRF-N-02..10
 - Session lifecycle → PRF-SESS-*
 - MFA enrolment + auth flow → MFA-*

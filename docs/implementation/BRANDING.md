@@ -12,7 +12,7 @@
 
 ## 0. Problem statement
 
-White-label customers want DBExec to look like *their*
+White-label customers want DBExec to look like _their_
 product. The shopping list:
 
 - Custom logo (light + dark variants).
@@ -23,7 +23,7 @@ product. The shopping list:
 - Login screen branded (per-domain).
 
 The hard part is making it all driven from a small set of
-*tokens* so adding a new component doesn't require touching
+_tokens_ so adding a new component doesn't require touching
 brand config.
 
 ---
@@ -133,7 +133,8 @@ export class BrandingService {
     for (const [token, pair] of Object.entries(branding.tokens)) {
       root.style.setProperty(`--${token}`, pair[theme]);
     }
-    if (branding.fontFamily) root.style.setProperty('--font-family-base', branding.fontFamily);
+    if (branding.fontFamily)
+      root.style.setProperty('--font-family-base', branding.fontFamily);
     document.title = branding.brandName ?? 'DBExec';
     if (branding.faviconUrl) this.setFavicon(branding.faviconUrl);
   }
@@ -210,7 +211,9 @@ export async function provisionCert(domain: OrgCustomDomain): Promise<void> {
     accountKey: await loadOrCreateAccountKey(),
   });
 
-  const [key, csr] = await acme.crypto.createCsr({ commonName: domain.hostname });
+  const [key, csr] = await acme.crypto.createCsr({
+    commonName: domain.hostname,
+  });
 
   const cert = await client.auto({
     csr,
@@ -220,17 +223,22 @@ export async function provisionCert(domain: OrgCustomDomain): Promise<void> {
       // HTTP-01: respond with the key authorization at /.well-known/acme-challenge/<token>
       await redis.set(`acme:${ch.token}`, key, 'EX', 600);
     },
-    challengeRemoveFn: async (_a, ch) => { await redis.del(`acme:${ch.token}`); },
+    challengeRemoveFn: async (_a, ch) => {
+      await redis.del(`acme:${ch.token}`);
+    },
   });
 
   const { enc } = await encryptSecret(key.toString(), domain.orgId);
-  await connection.getRepository('OrgCustomDomain').update({ id: domain.id }, {
-    status: 'issued',
-    tlsIssuedAt: new Date(),
-    tlsExpiresAt: addDays(new Date(), 90),
-    tlsCertPem: cert,
-    tlsKeyPemEnc: enc,
-  });
+  await connection.getRepository('OrgCustomDomain').update(
+    { id: domain.id },
+    {
+      status: 'issued',
+      tlsIssuedAt: new Date(),
+      tlsExpiresAt: addDays(new Date(), 90),
+      tlsCertPem: cert,
+      tlsKeyPemEnc: enc,
+    },
+  );
 }
 ```
 
@@ -247,15 +255,23 @@ The HTTPS endpoint hot-loads certs by SNI:
 import https from 'https';
 import tls from 'tls';
 
-const server = https.createServer({
-  SNICallback: async (servername: string, cb: any) => {
-    const domain = await loadDomainByHostname(servername);
-    if (!domain || domain.status !== 'issued') return cb(new Error('Unknown SNI'));
-    const cert = domain.tlsCertPem;
-    const key = await decryptSecret(domain.tlsKeyPemEnc, domain.tlsKeyDekId, domain.orgId);
-    cb(null, tls.createSecureContext({ cert, key }));
+const server = https.createServer(
+  {
+    SNICallback: async (servername: string, cb: any) => {
+      const domain = await loadDomainByHostname(servername);
+      if (!domain || domain.status !== 'issued')
+        return cb(new Error('Unknown SNI'));
+      const cert = domain.tlsCertPem;
+      const key = await decryptSecret(
+        domain.tlsKeyPemEnc,
+        domain.tlsKeyDekId,
+        domain.orgId,
+      );
+      cb(null, tls.createSecureContext({ cert, key }));
+    },
   },
-}, app);
+  app,
+);
 ```
 
 In practice we usually front this with a TLS-terminating
@@ -272,7 +288,11 @@ At render time:
 ```typescript
 import mjml2html from 'mjml';
 
-export function renderEmail(template: string, branding: OrgBranding, ctx: any): string {
+export function renderEmail(
+  template: string,
+  branding: OrgBranding,
+  ctx: any,
+): string {
   const mjml = template
     .replace(/{{logoUrl}}/g, branding.logoLightUrl ?? DEFAULT_LOGO)
     .replace(/{{primary}}/g, branding.tokens['color-primary'].light)
@@ -292,8 +312,17 @@ Puppeteer (module 13 export pipeline).
 ```typescript
 // src/controllers/branding/save.ts
 const saveBranding = async (req: Request, res: Response) => {
-  const { brandName, tokens, fontFamily, emailFromName, emailReplyTo, emailFooter,
-          pdfCoverTemplate, pdfFooterText, acceptContrastIssues } = req.body;
+  const {
+    brandName,
+    tokens,
+    fontFamily,
+    emailFromName,
+    emailReplyTo,
+    emailFooter,
+    pdfCoverTemplate,
+    pdfFooterText,
+    acceptContrastIssues,
+  } = req.body;
   const { loggedInId, orgData, master_db_connection } = res.locals;
   const connection = orgData.connection;
   try {
@@ -302,29 +331,56 @@ const saveBranding = async (req: Request, res: Response) => {
       const report = validateBrandingContrast(tokens);
       if (!report.ok && !acceptContrastIssues) {
         await master_db_connection.close();
-        return sendResponse(res, false, CODE.BAD_REQUEST, BRAND_MSG.CONTRAST, { issues: report.issues });
+        return sendResponse(res, false, CODE.BAD_REQUEST, BRAND_MSG.CONTRAST, {
+          issues: report.issues,
+        });
       }
     }
     // Sanitise PDF template
     const safePdfCover = pdfCoverTemplate
-      ? sanitiseHtml(pdfCoverTemplate, { allowedTags: ['div','span','p','h1','h2','h3','img','strong','em','br'],
-                                          allowedSchemes: ['https'], allowedAttributes: { img: ['src','alt','width','height'] } })
+      ? sanitiseHtml(pdfCoverTemplate, {
+          allowedTags: [
+            'div',
+            'span',
+            'p',
+            'h1',
+            'h2',
+            'h3',
+            'img',
+            'strong',
+            'em',
+            'br',
+          ],
+          allowedSchemes: ['https'],
+          allowedAttributes: { img: ['src', 'alt', 'width', 'height'] },
+        })
       : null;
 
-    const existing = await connection.getRepository('OrgBranding').findOne({ where: { orgId: orgData.orgId } });
+    const existing = await connection
+      .getRepository('OrgBranding')
+      .findOne({ where: { orgId: orgData.orgId } });
     const next = await connection.getRepository('OrgBranding').save({
       ...existing,
       orgId: orgData.orgId,
-      brandName, tokens, fontFamily,
-      emailFromName, emailReplyTo, emailFooter,
-      pdfCoverTemplate: safePdfCover, pdfFooterText,
+      brandName,
+      tokens,
+      fontFamily,
+      emailFromName,
+      emailReplyTo,
+      emailFooter,
+      pdfCoverTemplate: safePdfCover,
+      pdfFooterText,
       updatedBy: loggedInId,
     });
 
     await auditLogger.logAuditToOrg({
-      connection, req, res,
-      module: AUDIT_MODULES.BRANDING, action: AUDIT_ACTIONS.UPDATE,
-      entityName: 'OrgBranding', entityId: orgData.orgId,
+      connection,
+      req,
+      res,
+      module: AUDIT_MODULES.BRANDING,
+      action: AUDIT_ACTIONS.UPDATE,
+      entityName: 'OrgBranding',
+      entityId: orgData.orgId,
       metadata: { acceptContrastIssues: !!acceptContrastIssues },
     });
 
@@ -370,44 +426,47 @@ Tokens:
 
 ## 10. Observability
 
-| Metric | Type | Labels | Purpose |
-|---|---|---|---|
-| `dbexec_branding_save_total` | counter | `org` | usage |
-| `dbexec_branding_contrast_override_total` | counter | — | quality canary |
-| `dbexec_custom_domain_status` | gauge | `domain`, `status` | per-domain state |
-| `dbexec_custom_domain_renewal_attempt_total` | counter | `outcome` | renewal health |
-| `dbexec_custom_domain_renewal_ms` | histogram | — | ACME latency |
-| `dbexec_brand_asset_bytes` | gauge | `org` | quota tracking |
+| Metric                                       | Type      | Labels             | Purpose          |
+| -------------------------------------------- | --------- | ------------------ | ---------------- |
+| `dbexec_branding_save_total`                 | counter   | `org`              | usage            |
+| `dbexec_branding_contrast_override_total`    | counter   | —                  | quality canary   |
+| `dbexec_custom_domain_status`                | gauge     | `domain`, `status` | per-domain state |
+| `dbexec_custom_domain_renewal_attempt_total` | counter   | `outcome`          | renewal health   |
+| `dbexec_custom_domain_renewal_ms`            | histogram | —                  | ACME latency     |
+| `dbexec_brand_asset_bytes`                   | gauge     | `org`              | quota tracking   |
 
 ---
 
 ## 11. Security & threat model
 
-| Threat | Mitigation |
-|---|---|
+| Threat                                            | Mitigation                                                                                                                                                      |
+| ------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Logo upload as malicious SVG with embedded script | SVG sanitised at upload (strip `<script>`, `on*` attrs); served with `Content-Type: image/svg+xml`; `Content-Security-Policy` blocks inline JS in served images |
-| XSS via PDF cover template | sanitise-html allowlist; no scripts, no inline event handlers |
-| Custom domain takeover (DNS dangling) | Verify TXT before cert provision; periodic re-check on renewal |
-| ACME rate-limit lockout | Let's Encrypt: 50 certs/domain/week; per-org rate limit at our layer |
-| Cert key leak | Keys KMS-wrapped at rest; only decrypted into HTTPS process memory |
-| Branding bypass (user-supplied URL replaces logo) | Logos served from our CDN only; signed URLs |
-| Insufficient contrast = a11y regression | Validator default-rejects below WCAG AA |
+| XSS via PDF cover template                        | sanitise-html allowlist; no scripts, no inline event handlers                                                                                                   |
+| Custom domain takeover (DNS dangling)             | Verify TXT before cert provision; periodic re-check on renewal                                                                                                  |
+| ACME rate-limit lockout                           | Let's Encrypt: 50 certs/domain/week; per-org rate limit at our layer                                                                                            |
+| Cert key leak                                     | Keys KMS-wrapped at rest; only decrypted into HTTPS process memory                                                                                              |
+| Branding bypass (user-supplied URL replaces logo) | Logos served from our CDN only; signed URLs                                                                                                                     |
+| Insufficient contrast = a11y regression           | Validator default-rejects below WCAG AA                                                                                                                         |
 
 ---
 
 ## 12. Runbook
 
 **Symptom: custom domain stuck verifying.**
+
 1. DNS TXT record correct? Lookup directly:
    `dig +short TXT _dbexec.<host>`.
 2. CNAME for the hostname pointing at us? Some customers
    forget.
 
 **Symptom: cert renewal fails.**
+
 1. `last_error` populated. Common: ACME rate limit; wait 24h.
 2. If domain expired (registrar lapse) — alert customer.
 
 **Symptom: dark mode looks wrong.**
+
 1. Tokens may have light-only values. Validator should have
    caught — check whether `acceptContrastIssues` was set.
 
@@ -415,14 +474,14 @@ Tokens:
 
 ## 13. Perf budget
 
-| Operation | p50 | p95 | Hard ceiling |
-|---|---|---|---|
-| Apply branding (FE bootstrap) | 5 ms | 20 ms | 100 ms |
-| Save branding | 80 ms | 250 ms | 2 s |
-| Validate contrast | 5 ms | 15 ms | 50 ms |
-| Custom domain verify | 200 ms | 1 s | 5 s |
-| Cert provision (ACME) | 30 s | 90 s | 5 min |
-| SNI cert lookup | 1 ms | 5 ms | 50 ms |
+| Operation                     | p50    | p95    | Hard ceiling |
+| ----------------------------- | ------ | ------ | ------------ |
+| Apply branding (FE bootstrap) | 5 ms   | 20 ms  | 100 ms       |
+| Save branding                 | 80 ms  | 250 ms | 2 s          |
+| Validate contrast             | 5 ms   | 15 ms  | 50 ms        |
+| Custom domain verify          | 200 ms | 1 s    | 5 s          |
+| Cert provision (ACME)         | 30 s   | 90 s   | 5 min        |
+| SNI cert lookup               | 1 ms   | 5 ms   | 50 ms        |
 
 ---
 

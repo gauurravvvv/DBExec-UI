@@ -59,7 +59,10 @@ export const RELATIVE_DATE_PRESETS: RelativePresetOption[] = [
   },
   { value: 'year_to_date', labelKey: 'ANALYSES.FILTER.PRESET_YEAR_TO_DATE' },
   { value: 'previous_week', labelKey: 'ANALYSES.FILTER.PRESET_PREVIOUS_WEEK' },
-  { value: 'previous_month', labelKey: 'ANALYSES.FILTER.PRESET_PREVIOUS_MONTH' },
+  {
+    value: 'previous_month',
+    labelKey: 'ANALYSES.FILTER.PRESET_PREVIOUS_MONTH',
+  },
   {
     value: 'previous_quarter',
     labelKey: 'ANALYSES.FILTER.PRESET_PREVIOUS_QUARTER',

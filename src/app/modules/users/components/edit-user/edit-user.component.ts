@@ -29,9 +29,7 @@ import { UserService } from '../../services/user.service';
   styleUrls: ['./edit-user.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class EditUserComponent
-  implements OnInit, OnDestroy, HasUnsavedChanges
-{
+export class EditUserComponent implements OnInit, OnDestroy, HasUnsavedChanges {
   ngOnDestroy() {
     // Abort in-flight reads if the user navigates away.
     this.userService.cancelReads();

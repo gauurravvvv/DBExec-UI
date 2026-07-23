@@ -184,15 +184,12 @@ export const addAnalysesReducer = createReducer(
   ),
 
   // Clear all datasets
-  on(
-    AddAnalysesActions.clearAllDatasets,
-    (state): AddAnalysesState => ({
-      ...state,
-      datasets: {},
-      accessOrder: [],
-      activeDatasetKey: null,
-    }),
-  ),
+  on(AddAnalysesActions.clearAllDatasets, (state): AddAnalysesState => ({
+    ...state,
+    datasets: {},
+    accessOrder: [],
+    activeDatasetKey: null,
+  })),
 
   // Apply runtime filters
   on(
@@ -204,11 +201,8 @@ export const addAnalysesReducer = createReducer(
   ),
 
   // Clear all applied filters
-  on(
-    AddAnalysesActions.clearAllFilters,
-    (state): AddAnalysesState => ({
-      ...state,
-      appliedFilters: [],
-    }),
-  ),
+  on(AddAnalysesActions.clearAllFilters, (state): AddAnalysesState => ({
+    ...state,
+    appliedFilters: [],
+  })),
 );

@@ -11,10 +11,7 @@ import {
   forwardRef,
   inject,
 } from '@angular/core';
-import {
-  ControlValueAccessor,
-  NG_VALUE_ACCESSOR,
-} from '@angular/forms';
+import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { TranslateModule } from '@ngx-translate/core';
 import { ChipComponent } from 'src/app/shared/components/chip/chip.component';
 

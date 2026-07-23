@@ -25,7 +25,7 @@ gold standard. Three surfaces are in scope (confirmed):
 
 **Out of scope:** the result-grid toolbar (tabs/quick-filter/export) — user
 excluded it. No editor-engine swap (executor stays CodeMirror; dataset uses
-Monaco — that engine difference is *why* the find UIs differ, and swapping is a
+Monaco — that engine difference is _why_ the find UIs differ, and swapping is a
 non-goal). No behavior/logic changes — presentation only.
 
 Branch: `version_261` (FE only).
@@ -50,7 +50,7 @@ Branch: `version_261` (FE only).
     hover → `--hover-background` bg + primary border/text.
 - Global CM theme already exists at `src/assets/sass/_codemirror-theme.scss`
   (tokenised `.cm-editor`, `.cm-panel.cm-search`, autocomplete). The executor
-  inherits it; the default-panel *layout* is what still reads generic.
+  inherits it; the default-panel _layout_ is what still reads generic.
 
 ## Design
 
@@ -83,7 +83,8 @@ mixin — invents an abstraction neither screen has (YAGNI).
   per-button borders are gone.
 
 Result: toolbar goes from ~8 outlined boxes → flat icon row + one gradient Run
-+ subtle dividers.
+
+- subtle dividers.
 
 ### Section 2 — Find/replace floating widget
 
@@ -138,7 +139,7 @@ No BE change. No HTML restructure of the toolbar.
 ## Verification
 
 - `npx tsc --noEmit -p tsconfig.app.json` clean; `ng build --configuration
-  production` green.
+production` green.
 - Live on :4210 (BE :3010), executor at `/query-runner/exec?conn=<id>`:
   - Toolbar reads flat: borderless icon buttons, one gradient Run, dividers
     between groups; hover/active/disabled states correct; Read-only↔Write still

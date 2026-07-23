@@ -43,11 +43,7 @@
   ></app-dashboard-preload-gate>
 
   <!-- Canvas -->
-  <div
-    class="embed-canvas"
-    #canvas
-    *ngIf="!loading && !error && !gateOpen"
-  >
+  <div class="embed-canvas" #canvas *ngIf="!loading && !error && !gateOpen">
     <!-- Tab strip (embed parity) — only when >1 tab. -->
     <div class="embed-tab-strip" *ngIf="showTabStrip" role="tablist">
       <button
@@ -104,9 +100,7 @@
                 <thead>
                   <tr>
                     <th
-                      *ngFor="
-                        let col of getDisplayData(visual)[0] | keyvalue
-                      "
+                      *ngFor="let col of getDisplayData(visual)[0] | keyvalue"
                     >
                       {{ col.key }}
                     </th>

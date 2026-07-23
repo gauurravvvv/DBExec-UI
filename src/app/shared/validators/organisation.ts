@@ -57,7 +57,8 @@ export const EMAIL_PATTERN =
  * Rejects schemes (`https://`), ports inside host, spaces, anything
  * with `:` or `/`.
  */
-export const HOST_PATTERN = /^[A-Za-z0-9]([A-Za-z0-9-]*[A-Za-z0-9])?(\.[A-Za-z0-9]([A-Za-z0-9-]*[A-Za-z0-9])?)*$/;
+export const HOST_PATTERN =
+  /^[A-Za-z0-9]([A-Za-z0-9-]*[A-Za-z0-9])?(\.[A-Za-z0-9]([A-Za-z0-9-]*[A-Za-z0-9])?)*$/;
 
 /**
  * Postgres-style identifier (database name, table name). Letters,
@@ -138,7 +139,7 @@ export const dbHostSchema = z.preprocess(
  * else has to pass int + range checks.
  */
 export const dbPortSchema = z.preprocess(
-  (v) => {
+  v => {
     if (v === '' || v === null || v === undefined) return undefined;
     if (typeof v === 'string') {
       const trimmed = v.trim();
@@ -192,7 +193,7 @@ export const dbUsernameSchema = z.preprocess(
  * length only.
  */
 export const dbPasswordSchema = z.preprocess(
-  (v) => (v === '' || v === null ? undefined : v),
+  v => (v === '' || v === null ? undefined : v),
   z
     .string({ message: 'validation.organisation.dbPassword.required' })
     .min(1, { message: 'validation.organisation.dbPassword.required' })

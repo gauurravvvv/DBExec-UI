@@ -29,9 +29,13 @@
     <span
       *ngIf="step.status === 'running'"
       class="ai-step__timer"
-      [title]="'AI_WORKSPACE.SUBAGENTS.ELAPSED' | translate: { s: elapsedSeconds() }"
+      [title]="
+        'AI_WORKSPACE.SUBAGENTS.ELAPSED' | translate: { s: elapsedSeconds() }
+      "
     >
-      {{ 'AI_WORKSPACE.SUBAGENTS.ELAPSED' | translate: { s: elapsedSeconds() } }}
+      {{
+        'AI_WORKSPACE.SUBAGENTS.ELAPSED' | translate: { s: elapsedSeconds() }
+      }}
     </span>
     <span
       *ngIf="step.status !== 'running' && durationLabel()"
@@ -41,10 +45,7 @@
     </span>
 
     <!-- The muted {} JSON snippet (collapsed preview) + copy affordance. -->
-    <span
-      *ngIf="!isExpanded() && step.resultPreview"
-      class="ai-step__preview"
-    >
+    <span *ngIf="!isExpanded() && step.resultPreview" class="ai-step__preview">
       <code class="ai-step__preview-code">{{ step.resultPreview }}</code>
       <span
         class="ai-step__copy"
@@ -92,7 +93,10 @@
 
       <!-- Confirm — write proposal (read-only view here; action lives in the
            thread's confirm card so the write gate stays in one place). -->
-      <div class="ai-step-card ai-step-card--confirm" *ngIf="c.kind === 'confirm'">
+      <div
+        class="ai-step-card ai-step-card--confirm"
+        *ngIf="c.kind === 'confirm'"
+      >
         <p class="ai-step-card__summary">{{ $any(c).summary }}</p>
         <p class="ai-step-card__endpoint">
           {{ $any(c).method }} {{ $any(c).endpoint }}

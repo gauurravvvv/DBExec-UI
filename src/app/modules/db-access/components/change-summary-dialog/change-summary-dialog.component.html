@@ -3,7 +3,12 @@
     <!-- Header -->
     <div class="popup-header" [class.destructive]="destructive">
       <div class="popup-icon" [class.destructive]="destructive">
-        <i class="pi" [ngClass]="destructive ? 'pi-exclamation-triangle' : 'pi-check-circle'"></i>
+        <i
+          class="pi"
+          [ngClass]="
+            destructive ? 'pi-exclamation-triangle' : 'pi-check-circle'
+          "
+        ></i>
       </div>
       <h3>{{ title || ('DB_ACCESS.CONFIRM_CHANGES' | translate) }}</h3>
       <p class="popup-subtitle">{{ 'DB_ACCESS.CONFIRM_HINT' | translate }}</p>
@@ -18,12 +23,17 @@
 
       <ng-container *ngIf="!loading">
         <div class="summary-count">
-          {{ 'DB_ACCESS.CHANGE_COUNT' | translate: { count: summaries.length } }}
+          {{
+            'DB_ACCESS.CHANGE_COUNT' | translate: { count: summaries.length }
+          }}
         </div>
 
         <ul class="summary-list" *ngIf="summaries.length">
           <li *ngFor="let s of summaries">
-            <i class="pi" [ngClass]="destructive ? 'pi-minus-circle' : 'pi-angle-right'"></i>
+            <i
+              class="pi"
+              [ngClass]="destructive ? 'pi-minus-circle' : 'pi-angle-right'"
+            ></i>
             <span>{{ s }}</span>
           </li>
         </ul>
@@ -34,7 +44,10 @@
         </div>
 
         <!-- Destructive acknowledgement -->
-        <div class="ack-section" *ngIf="destructive && !readOnly && !confirmPhrase">
+        <div
+          class="ack-section"
+          *ngIf="destructive && !readOnly && !confirmPhrase"
+        >
           <app-custom-binary-checkbox
             class="ack-check"
             [(ngModel)]="ackChecked"
@@ -45,7 +58,9 @@
         <!-- Type-to-confirm -->
         <div class="ack-section" *ngIf="confirmPhrase && !readOnly">
           <label class="ack-label">
-            {{ 'DB_ACCESS.TYPE_TO_CONFIRM' | translate: { phrase: confirmPhrase } }}
+            {{
+              'DB_ACCESS.TYPE_TO_CONFIRM' | translate: { phrase: confirmPhrase }
+            }}
           </label>
           <input
             type="text"
@@ -71,7 +86,10 @@
         [disabled]="!canConfirm"
         (click)="onConfirm()"
       >
-        <i class="pi" [ngClass]="executing ? 'pi-spin pi-spinner' : 'pi-check'"></i>
+        <i
+          class="pi"
+          [ngClass]="executing ? 'pi-spin pi-spinner' : 'pi-check'"
+        ></i>
         {{ confirmLabel || ('DB_ACCESS.APPLY_CHANGES' | translate) }}
       </button>
     </div>

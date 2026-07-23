@@ -193,11 +193,15 @@ export class ViewDatasourceComponent implements OnInit, OnDestroy {
     this.testInFlight.set(true);
     this.health.set('testing');
     try {
-      const res = await this.datasourceService.testConnectionForExisting(this.dbId);
+      const res = await this.datasourceService.testConnectionForExisting(
+        this.dbId,
+      );
       if (res?.status && res.data) {
         const next = res.data.isConnected ? 'ok' : 'failed';
         this.health.set(next);
-        this.lastTestedAt.set(res.data.lastTestedAt ?? new Date().toISOString());
+        this.lastTestedAt.set(
+          res.data.lastTestedAt ?? new Date().toISOString(),
+        );
       } else {
         this.health.set('failed');
         this.lastTestedAt.set(new Date().toISOString());

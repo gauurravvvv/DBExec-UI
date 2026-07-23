@@ -14,22 +14,22 @@
 **Depends on:** Org (admin module), CSS / Angular Material theming
 **Unblocks:** White-label customers, multi-product deployments
 **Maturity:** 🟡 partial — branding entity exists, but a tight
-  variable set; no custom domain, no email-template branding
+variable set; no custom domain, no email-template branding
 
 ---
 
 ## 1. Industry baseline
 
-| Tool | Tokens | Custom logo | Custom domain | Email branding | Dark/Light |
-|---|---|---|---|---|---|
-| **Tableau Server** | colour + fonts | ✓ | ✓ | partial | manual |
-| **Power BI** | colour theme JSON | ✓ | only via app token | ✗ | ✓ |
-| **Looker** | tokens via Embed SDK | ✓ | ✓ (custom domain on Embed) | ✓ | ✓ |
-| **Hex** | tokens | ✓ | ✓ (enterprise) | ✓ | ✓ |
-| **Metabase** | enterprise white-label | ✓ | ✓ (paid) | ✓ | ✓ |
-| **Superset** | CSS variables override | ✓ | ✓ (self-host) | manual | ✓ |
-| **Sigma** | extensive theme tokens | ✓ | ✓ | ✓ | ✓ |
-| **Linear** | accent + grayscale | ✓ | n/a | ✓ | ✓ |
+| Tool               | Tokens                 | Custom logo | Custom domain              | Email branding | Dark/Light |
+| ------------------ | ---------------------- | ----------- | -------------------------- | -------------- | ---------- |
+| **Tableau Server** | colour + fonts         | ✓           | ✓                          | partial        | manual     |
+| **Power BI**       | colour theme JSON      | ✓           | only via app token         | ✗              | ✓          |
+| **Looker**         | tokens via Embed SDK   | ✓           | ✓ (custom domain on Embed) | ✓              | ✓          |
+| **Hex**            | tokens                 | ✓           | ✓ (enterprise)             | ✓              | ✓          |
+| **Metabase**       | enterprise white-label | ✓           | ✓ (paid)                   | ✓              | ✓          |
+| **Superset**       | CSS variables override | ✓           | ✓ (self-host)              | manual         | ✓          |
+| **Sigma**          | extensive theme tokens | ✓           | ✓                          | ✓              | ✓          |
+| **Linear**         | accent + grayscale     | ✓           | n/a                        | ✓              | ✓          |
 
 **The patterns to copy:**
 
@@ -59,24 +59,24 @@
 
 ## 3. Gap matrix
 
-| ID | Gap | Severity | Effort |
-|---|---|---|---|
-| BR-G01 | Token-driven theme (15+ semantic tokens) | P0 | M |
-| BR-G02 | Light + dark variants in one save | P0 | S |
-| BR-G03 | Logo in 3 sizes (mark, lockup, favicon) | P0 | S |
-| BR-G04 | Cover background / hero image | P1 | S |
-| BR-G05 | Custom domain with auto-TLS | P0 | L |
-| BR-G06 | Email template branding (header + footer) | P0 | M |
-| BR-G07 | PDF template branding (header + watermark) | P0 | M |
-| BR-G08 | Sidebar / topbar layout density choice | P2 | S |
-| BR-G09 | Font family override (Google Fonts + custom) | P1 | M |
-| BR-G10 | Border-radius / shape tokens | P1 | S |
-| BR-G11 | Custom CSS power-user override | P2 | S |
-| BR-G12 | WCAG contrast validation at save | P1 | M |
-| BR-G13 | Per-team / per-collection brand override | P2 | M |
-| BR-G14 | "Login page" branding (when SSO chooses dbexec.com) | P1 | S |
-| BR-G15 | Brand audit history (who changed colour when) | P2 | S |
-| BR-G16 | Brand preset gallery (recommended palettes) | P2 | S |
+| ID     | Gap                                                 | Severity | Effort |
+| ------ | --------------------------------------------------- | -------- | ------ |
+| BR-G01 | Token-driven theme (15+ semantic tokens)            | P0       | M      |
+| BR-G02 | Light + dark variants in one save                   | P0       | S      |
+| BR-G03 | Logo in 3 sizes (mark, lockup, favicon)             | P0       | S      |
+| BR-G04 | Cover background / hero image                       | P1       | S      |
+| BR-G05 | Custom domain with auto-TLS                         | P0       | L      |
+| BR-G06 | Email template branding (header + footer)           | P0       | M      |
+| BR-G07 | PDF template branding (header + watermark)          | P0       | M      |
+| BR-G08 | Sidebar / topbar layout density choice              | P2       | S      |
+| BR-G09 | Font family override (Google Fonts + custom)        | P1       | M      |
+| BR-G10 | Border-radius / shape tokens                        | P1       | S      |
+| BR-G11 | Custom CSS power-user override                      | P2       | S      |
+| BR-G12 | WCAG contrast validation at save                    | P1       | M      |
+| BR-G13 | Per-team / per-collection brand override            | P2       | M      |
+| BR-G14 | "Login page" branding (when SSO chooses dbexec.com) | P1       | S      |
+| BR-G15 | Brand audit history (who changed colour when)       | P2       | S      |
+| BR-G16 | Brand preset gallery (recommended palettes)         | P2       | S      |
 
 ## 4. Target architecture
 
@@ -87,17 +87,17 @@
 export interface BrandTokens {
   // Identity
   organisationDisplayName: string;
-  logoUrl: string;              // mark — square, ~512×512
-  logoLockupUrl?: string;       // horizontal lockup with text
-  faviconUrl?: string;          // 32×32 / 64×64
-  coverImageUrl?: string;       // login / share landing background
+  logoUrl: string; // mark — square, ~512×512
+  logoLockupUrl?: string; // horizontal lockup with text
+  faviconUrl?: string; // 32×32 / 64×64
+  coverImageUrl?: string; // login / share landing background
 
   // Colours (light)
   light: {
-    primary: string;            // brand accent
-    primaryContrast: string;    // text on primary
+    primary: string; // brand accent
+    primaryContrast: string; // text on primary
     background: string;
-    surface: string;            // cards / panels
+    surface: string; // cards / panels
     surfaceVariant: string;
     onBackground: string;
     onSurface: string;
@@ -109,15 +109,15 @@ export interface BrandTokens {
     info: string;
   };
   // Colours (dark)
-  dark: { /* same shape */ };
+  dark: {/* same shape */};
 
   // Type
-  fontFamilyBody?: string;      // e.g. "Inter, sans-serif"
+  fontFamilyBody?: string; // e.g. "Inter, sans-serif"
   fontFamilyMono?: string;
-  fontUrl?: string;             // for self-hosted custom fonts
+  fontUrl?: string; // for self-hosted custom fonts
 
   // Shape
-  borderRadius: 'sharp' | 'rounded' | 'pill';     // → 0, 6, 12
+  borderRadius: 'sharp' | 'rounded' | 'pill'; // → 0, 6, 12
 
   // Density
   density: 'compact' | 'comfortable' | 'spacious';
@@ -130,12 +130,12 @@ export interface BrandTokens {
     backgroundColor: string;
     textColor: string;
     logoVariant: 'mark' | 'lockup';
-    footerHtml?: string;        // legal text / unsubscribe
+    footerHtml?: string; // legal text / unsubscribe
   };
   pdfHeader?: {
     showLogo: boolean;
     headerText?: string;
-    footerText?: string;        // can include {page}/{total}
+    footerText?: string; // can include {page}/{total}
     backgroundColor?: string;
   };
 }
@@ -192,22 +192,36 @@ CREATE TABLE brand_asset (
 
 ```ts
 // src/app/shared/services/theme/applyTokens.ts
-export function applyTokens(tokens: BrandTokens, mode: 'light'|'dark' = 'light') {
+export function applyTokens(
+  tokens: BrandTokens,
+  mode: 'light' | 'dark' = 'light',
+) {
   const root = document.documentElement;
   const palette = tokens[mode];
-  const setVar = (k: string, v: string) => root.style.setProperty(`--ds-${k}`, v);
+  const setVar = (k: string, v: string) =>
+    root.style.setProperty(`--ds-${k}`, v);
 
   for (const [name, value] of Object.entries(palette)) {
     setVar(`color-${kebab(name)}`, value);
   }
 
-  setVar('radius-base',
-    tokens.borderRadius === 'sharp' ? '0' :
-    tokens.borderRadius === 'pill'  ? '999px' : '6px');
+  setVar(
+    'radius-base',
+    tokens.borderRadius === 'sharp'
+      ? '0'
+      : tokens.borderRadius === 'pill'
+        ? '999px'
+        : '6px',
+  );
 
-  setVar('density-row',
-    tokens.density === 'compact'    ? '32px' :
-    tokens.density === 'spacious'   ? '56px' : '44px');
+  setVar(
+    'density-row',
+    tokens.density === 'compact'
+      ? '32px'
+      : tokens.density === 'spacious'
+        ? '56px'
+        : '44px',
+  );
 
   if (tokens.fontFamilyBody) setVar('font-body', tokens.fontFamilyBody);
   if (tokens.fontFamilyMono) setVar('font-mono', tokens.fontFamilyMono);
@@ -237,7 +251,8 @@ export function applyTokens(tokens: BrandTokens, mode: 'light'|'dark' = 'light')
   sentinel.textContent = tokens.customCss ?? '';
 }
 
-const kebab = (s: string) => s.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase();
+const kebab = (s: string) =>
+  s.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase();
 ```
 
 ### 4.4 Dark / light selection
@@ -250,7 +265,8 @@ const kebab = (s: string) => s.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase()
 
 function resolveMode(user, org): 'light' | 'dark' {
   if (user.theme === 'light' || user.theme === 'dark') return user.theme;
-  if (org.preferredMode === 'light' || org.preferredMode === 'dark') return org.preferredMode;
+  if (org.preferredMode === 'light' || org.preferredMode === 'dark')
+    return org.preferredMode;
   return matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
 }
 
@@ -263,17 +279,19 @@ matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
 ### 4.5 WCAG contrast validation
 
 ```ts
-import { hex, contrast } from 'wcag-contrast';   // or compute manually
+import { hex, contrast } from 'wcag-contrast'; // or compute manually
 
 function relativeLuminance(hex: string): number {
-  const r = parseInt(hex.slice(1,3), 16) / 255;
-  const g = parseInt(hex.slice(3,5), 16) / 255;
-  const b = parseInt(hex.slice(5,7), 16) / 255;
-  const toLin = (c: number) => c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+  const r = parseInt(hex.slice(1, 3), 16) / 255;
+  const g = parseInt(hex.slice(3, 5), 16) / 255;
+  const b = parseInt(hex.slice(5, 7), 16) / 255;
+  const toLin = (c: number) =>
+    c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
   return 0.2126 * toLin(r) + 0.7152 * toLin(g) + 0.0722 * toLin(b);
 }
 function contrastRatio(a: string, b: string): number {
-  const la = relativeLuminance(a), lb = relativeLuminance(b);
+  const la = relativeLuminance(a),
+    lb = relativeLuminance(b);
   return (Math.max(la, lb) + 0.05) / (Math.min(la, lb) + 0.05);
 }
 
@@ -284,23 +302,53 @@ interface ContrastIssue {
   severity: 'fail' | 'warn';
 }
 
-export function checkContrast(tokens: BrandTokens, mode: 'light'|'dark'): ContrastIssue[] {
+export function checkContrast(
+  tokens: BrandTokens,
+  mode: 'light' | 'dark',
+): ContrastIssue[] {
   const p = tokens[mode];
   const checks = [
-    { pair: 'onBackground on background', fg: p.onBackground,        bg: p.background, required: 4.5 },
-    { pair: 'onSurface on surface',       fg: p.onSurface,           bg: p.surface,    required: 4.5 },
-    { pair: 'primaryContrast on primary', fg: p.primaryContrast,     bg: p.primary,    required: 4.5 },
-    { pair: 'onSurfaceVariant on surface',fg: p.onSurfaceVariant,    bg: p.surface,    required: 3.0 },
-    { pair: 'border vs background',       fg: p.border,              bg: p.background, required: 3.0 },
+    {
+      pair: 'onBackground on background',
+      fg: p.onBackground,
+      bg: p.background,
+      required: 4.5,
+    },
+    {
+      pair: 'onSurface on surface',
+      fg: p.onSurface,
+      bg: p.surface,
+      required: 4.5,
+    },
+    {
+      pair: 'primaryContrast on primary',
+      fg: p.primaryContrast,
+      bg: p.primary,
+      required: 4.5,
+    },
+    {
+      pair: 'onSurfaceVariant on surface',
+      fg: p.onSurfaceVariant,
+      bg: p.surface,
+      required: 3.0,
+    },
+    {
+      pair: 'border vs background',
+      fg: p.border,
+      bg: p.background,
+      required: 3.0,
+    },
   ];
   const issues: ContrastIssue[] = [];
   for (const c of checks) {
     const ratio = contrastRatio(c.fg, c.bg);
-    if (ratio < c.required) issues.push({
-      pair: c.pair, ratio: Math.round(ratio * 100) / 100,
-      required: c.required,
-      severity: ratio < (c.required - 1) ? 'fail' : 'warn',
-    });
+    if (ratio < c.required)
+      issues.push({
+        pair: c.pair,
+        ratio: Math.round(ratio * 100) / 100,
+        required: c.required,
+        severity: ratio < c.required - 1 ? 'fail' : 'warn',
+      });
   }
   return issues;
 }
@@ -311,21 +359,32 @@ async function updateBranding(req, res) {
   const force = req.query.force === 'true';
 
   const lightIssues = checkContrast(tokens, 'light');
-  const darkIssues  = checkContrast(tokens, 'dark');
-  const fails = [...lightIssues, ...darkIssues].filter(i => i.severity === 'fail');
+  const darkIssues = checkContrast(tokens, 'dark');
+  const fails = [...lightIssues, ...darkIssues].filter(
+    i => i.severity === 'fail',
+  );
   if (fails.length > 0 && !force) {
-    return sendResponse(res, false, 400, 'branding.contrast.failed',
-      { issues: [...lightIssues, ...darkIssues] });
+    return sendResponse(res, false, 400, 'branding.contrast.failed', {
+      issues: [...lightIssues, ...darkIssues],
+    });
   }
   // Save + history row
-  await master_db_connection.transaction(async (tx) => {
-    const prev = await tx.getRepository(OrgBranding).findOne({ where: { organisationId: res.locals.orgData.id } });
-    await tx.getRepository(OrgBranding).upsert({
-      organisationId: res.locals.orgData.id, tokens, updatedOn: new Date(),
-    }, ['organisationId']);
+  await master_db_connection.transaction(async tx => {
+    const prev = await tx
+      .getRepository(OrgBranding)
+      .findOne({ where: { organisationId: res.locals.orgData.id } });
+    await tx.getRepository(OrgBranding).upsert(
+      {
+        organisationId: res.locals.orgData.id,
+        tokens,
+        updatedOn: new Date(),
+      },
+      ['organisationId'],
+    );
     await tx.getRepository(OrgBrandingHistory).save({
       organisationId: res.locals.orgData.id,
-      tokensBefore: prev?.tokens, tokensAfter: tokens,
+      tokensBefore: prev?.tokens,
+      tokensAfter: tokens,
       changedBy: res.locals.loggedInId,
     });
   });
@@ -356,7 +415,9 @@ export async function verifyDomain(domainId: string) {
   const cd = await OrgCustomDomain.findOne({ where: { id: domainId } });
   if (!cd) throw new Error('not found');
 
-  const records = await dns.resolveTxt(`_dbexec-verify.${cd.domain}`).catch(() => []);
+  const records = await dns
+    .resolveTxt(`_dbexec-verify.${cd.domain}`)
+    .catch(() => []);
   const flat = records.flat();
   if (!flat.includes(cd.verificationToken)) {
     throw new BadRequest('DNS verification record not found');
@@ -430,12 +491,12 @@ covered by the worker abstraction.
 // shared/middleware/resolveOrgByHost.middleware.ts
 export default async function resolveOrgByHost(req, res, next) {
   const host = req.hostname;
-  if (host === DEFAULT_HOST) return next();   // app.dbexec.com
+  if (host === DEFAULT_HOST) return next(); // app.dbexec.com
 
   const cd = await OrgCustomDomain.findOne({
     where: { domain: host, tlsStatus: 'active' },
   });
-  if (!cd) return next();    // fall through — login screen shows generic
+  if (!cd) return next(); // fall through — login screen shows generic
 
   res.locals.brandHostOrgId = cd.organisationId;
   // Note: this only sets the brand context. Auth + per-request orgId
@@ -455,14 +516,20 @@ export async function getBrandingFor(orgId: string): Promise<BrandTokens> {
 }
 
 // Email template (Handlebars)
-export async function renderEmail(orgId: string, templateName: string, data: any) {
+export async function renderEmail(
+  orgId: string,
+  templateName: string,
+  data: any,
+) {
   const tokens = await getBrandingFor(orgId);
   const tpl = templates[templateName];
   return tpl({
     ...data,
     brand: {
-      logo: tokens.emailHeader?.logoVariant === 'lockup'
-              ? tokens.logoLockupUrl : tokens.logoUrl,
+      logo:
+        tokens.emailHeader?.logoVariant === 'lockup'
+          ? tokens.logoLockupUrl
+          : tokens.logoUrl,
       primaryColor: tokens.light.primary,
       headerBg: tokens.emailHeader?.backgroundColor ?? tokens.light.surface,
       headerText: tokens.emailHeader?.textColor ?? tokens.light.onSurface,
@@ -492,9 +559,11 @@ return await page.pdf({
     <div style="font-size:9px; padding:8px 16px; width:100%;
                 background:${tokens.pdfHeader?.backgroundColor ?? '#fff'};
                 color:${tokens.light.onSurface};">
-      ${tokens.pdfHeader?.showLogo
-         ? `<img src="${tokens.logoLockupUrl ?? tokens.logoUrl}" style="height:18px"/>`
-         : ''}
+      ${
+        tokens.pdfHeader?.showLogo
+          ? `<img src="${tokens.logoLockupUrl ?? tokens.logoUrl}" style="height:18px"/>`
+          : ''
+      }
       ${tokens.pdfHeader?.headerText ?? ''}
     </div>`,
   footerTemplate: `
@@ -514,11 +583,11 @@ A handful of curated palettes shipped in code:
 
 ```ts
 export const BRAND_PRESETS: Record<string, Partial<BrandTokens>> = {
-  classic: { light: { primary: '#2563eb', /* ... */ }, dark: { /* ... */ } },
-  emerald: { light: { primary: '#059669', /* ... */ }, dark: { /* ... */ } },
-  rose:    { light: { primary: '#e11d48', /* ... */ }, dark: { /* ... */ } },
-  slate:   { light: { primary: '#475569', /* ... */ }, dark: { /* ... */ } },
-  amber:   { light: { primary: '#d97706', /* ... */ }, dark: { /* ... */ } },
+  classic: { light: { primary: '#2563eb' /* ... */ }, dark: {/* ... */} },
+  emerald: { light: { primary: '#059669' /* ... */ }, dark: {/* ... */} },
+  rose: { light: { primary: '#e11d48' /* ... */ }, dark: {/* ... */} },
+  slate: { light: { primary: '#475569' /* ... */ }, dark: {/* ... */} },
+  amber: { light: { primary: '#d97706' /* ... */ }, dark: {/* ... */} },
 };
 ```
 
@@ -540,16 +609,25 @@ async function uploadBrandAsset(req, res) {
     return sendResponse(res, false, 400, 'favicon.too_large');
   if (kind === 'logo' && file.size > 1024 * 1024)
     return sendResponse(res, false, 400, 'logo.too_large');
-  if (kind === 'logo' && !['image/png','image/svg+xml'].includes(file.mimetype))
+  if (
+    kind === 'logo' &&
+    !['image/png', 'image/svg+xml'].includes(file.mimetype)
+  )
     return sendResponse(res, false, 400, 'logo.format');
 
   const key = `branding/${orgId}/${kind}/${randomUUID()}/${file.originalname}`;
-  await s3.upload({ Bucket: process.env.BRAND_BUCKET!, Key: key, Body: file.buffer }).promise();
+  await s3
+    .upload({ Bucket: process.env.BRAND_BUCKET!, Key: key, Body: file.buffer })
+    .promise();
   const url = `${process.env.BRAND_CDN_URL}/${key}`;
 
   await BrandAsset.save({
-    organisationId: orgId, kind, url, sizeBytes: file.size,
-    mimeType: file.mimetype, uploadedBy: res.locals.loggedInId,
+    organisationId: orgId,
+    kind,
+    url,
+    sizeBytes: file.size,
+    mimeType: file.mimetype,
+    uploadedBy: res.locals.loggedInId,
   });
 
   return sendResponse(res, true, 200, '', { url });
@@ -558,21 +636,21 @@ async function uploadBrandAsset(req, res) {
 
 ## 5. APIs
 
-| Method | Path | Purpose |
-|---|---|---|
-| GET | `/branding` | Current tokens for my org |
-| PUT | `/branding` | Update tokens |
-| POST | `/branding/contrast-check` | Dry-run validation |
-| GET | `/branding/history` | History of changes |
-| POST | `/branding/assets` | Upload logo / favicon / cover |
-| DELETE | `/branding/assets/:id` | Remove |
-| POST | `/branding/domains` | Register custom domain |
-| GET | `/branding/domains` | List my domains |
-| POST | `/branding/domains/:id/verify` | DNS verification step |
-| POST | `/branding/domains/:id/renew-tls` | Force renewal |
-| DELETE | `/branding/domains/:id` | Remove |
-| GET | `/branding/presets` | Preset gallery |
-| GET | `/branding/effective` | Tokens including org / user mode resolution |
+| Method | Path                              | Purpose                                     |
+| ------ | --------------------------------- | ------------------------------------------- |
+| GET    | `/branding`                       | Current tokens for my org                   |
+| PUT    | `/branding`                       | Update tokens                               |
+| POST   | `/branding/contrast-check`        | Dry-run validation                          |
+| GET    | `/branding/history`               | History of changes                          |
+| POST   | `/branding/assets`                | Upload logo / favicon / cover               |
+| DELETE | `/branding/assets/:id`            | Remove                                      |
+| POST   | `/branding/domains`               | Register custom domain                      |
+| GET    | `/branding/domains`               | List my domains                             |
+| POST   | `/branding/domains/:id/verify`    | DNS verification step                       |
+| POST   | `/branding/domains/:id/renew-tls` | Force renewal                               |
+| DELETE | `/branding/domains/:id`           | Remove                                      |
+| GET    | `/branding/presets`               | Preset gallery                              |
+| GET    | `/branding/effective`             | Tokens including org / user mode resolution |
 
 ## 6. FE specs
 
@@ -663,7 +741,7 @@ middleware sets `brandHostOrgId`; the login UI reads tokens from
 that org. Result: the login page already shows Acme's logo and
 palette before the user enters anything.
 
-If they enter an email that matches a *different* org, the page
+If they enter an email that matches a _different_ org, the page
 quickly reverts to dbexec.com branding — that's a deliberate
 signal that they're about to sign in elsewhere.
 
@@ -699,26 +777,32 @@ export const brandTokensSchema = z.object({
   fontFamilyBody: z.string().max(128).optional(),
   fontFamilyMono: z.string().max(128).optional(),
   fontUrl: z.string().url().optional(),
-  borderRadius: z.enum(['sharp','rounded','pill']),
-  density: z.enum(['compact','comfortable','spacious']),
+  borderRadius: z.enum(['sharp', 'rounded', 'pill']),
+  density: z.enum(['compact', 'comfortable', 'spacious']),
   customCss: z.string().max(20_000).optional(),
-  emailHeader: z.object({
-    backgroundColor: colorSchema,
-    textColor: colorSchema,
-    logoVariant: z.enum(['mark','lockup']),
-    footerHtml: z.string().max(5000).optional(),
-  }).optional(),
-  pdfHeader: z.object({
-    showLogo: z.boolean(),
-    headerText: z.string().max(255).optional(),
-    footerText: z.string().max(255).optional(),
-    backgroundColor: colorSchema.optional(),
-  }).optional(),
+  emailHeader: z
+    .object({
+      backgroundColor: colorSchema,
+      textColor: colorSchema,
+      logoVariant: z.enum(['mark', 'lockup']),
+      footerHtml: z.string().max(5000).optional(),
+    })
+    .optional(),
+  pdfHeader: z
+    .object({
+      showLogo: z.boolean(),
+      headerText: z.string().max(255).optional(),
+      footerText: z.string().max(255).optional(),
+      backgroundColor: colorSchema.optional(),
+    })
+    .optional(),
 });
 
 export const customDomainSchema = z.object({
-  domain: z.string()
-    .min(4).max(255)
+  domain: z
+    .string()
+    .min(4)
+    .max(255)
     .regex(/^[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)+$/),
 });
 ```
@@ -781,7 +865,7 @@ BR-DARK-N-01   dark palette failing AA → blocked unless forced
 ## 10. Open questions
 
 - **Font licensing** — customers upload commercial fonts; we host
-  + serve. License is theirs. Document responsibility.
+  - serve. License is theirs. Document responsibility.
 - **CSS injection safety** — `customCss` is a power-user feature.
   Sanitise with `cssnano`+`postcss` to strip `@import`, `expression()`,
   `behaviour:`, etc. Doc the threat model.

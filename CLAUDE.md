@@ -108,8 +108,8 @@ New feature services hold state in signals and expose readonly views:
 @Injectable({ providedIn: 'root' })
 export class UserService {
   private _users = signal<any[]>([]);
-  private _loading = signal(false);   // reads
-  private _saving = signal(false);    // writes
+  private _loading = signal(false); // reads
+  private _saving = signal(false); // writes
   private _deleting = signal<Record<string, boolean>>({}); // per-id spinners
   readonly users = this._users.asReadonly();
   readonly loading = this._loading.asReadonly();
@@ -121,8 +121,9 @@ Loading-state convention: `loading` for reads, `saving` for writes,
 per-id record maps (`_deleting`, `_unlocking`) so each table row's action
 button spins independently. Signal-based calls pass `{ skipLoader: true }`
 to bypass the legacy global blocker — templates render skeleton placeholders
-+ button-level spinners instead. Reads pipe through a cancel `Subject` so a
-component's `ngOnDestroy` can abort in-flight GETs.
+
+- button-level spinners instead. Reads pipe through a cancel `Subject` so a
+  component's `ngOnDestroy` can abort in-flight GETs.
 
 ### API endpoint constants
 
@@ -163,17 +164,17 @@ BE `VerifyPermissionMiddleware`.
 `src/app/shared/components/` is the single source of styled controls. Prefer
 them over raw HTML / raw PrimeNG so the whole app stays consistent:
 
-| Component | Use for |
-|---|---|
-| `app-custom-table` | **The** list table — infinite scroll, no bulk-select, `UsServerListAdapter` for server paging (limit 50, `createdOn DESC`). Every list screen uses this. |
-| `app-custom-input` | text inputs (handles `autocomplete` via `effectiveAutocomplete`) |
-| `app-custom-textarea` / `app-custom-number` | multiline / numeric |
-| `app-custom-dropdown` | single-select; `serverMode` + `fetcher` for lazy-loaded options; always `appendTo="body"` on overlays |
-| `app-custom-multiselect` / `app-custom-checkbox` / `app-custom-radio` / `app-custom-toggle` / `app-custom-binary-checkbox` | selections |
-| `app-custom-calendar` / `app-custom-daterange` | dates |
-| `app-chip` / `email-chips-input` | tags / Gmail-style editable recipient chips |
-| `app-button` | buttons (variant system) |
-| `echart-visual` / `configurable-card-chart` | charts (ECharts) |
+| Component                                                                                                                  | Use for                                                                                                                                                  |
+| -------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `app-custom-table`                                                                                                         | **The** list table — infinite scroll, no bulk-select, `UsServerListAdapter` for server paging (limit 50, `createdOn DESC`). Every list screen uses this. |
+| `app-custom-input`                                                                                                         | text inputs (handles `autocomplete` via `effectiveAutocomplete`)                                                                                         |
+| `app-custom-textarea` / `app-custom-number`                                                                                | multiline / numeric                                                                                                                                      |
+| `app-custom-dropdown`                                                                                                      | single-select; `serverMode` + `fetcher` for lazy-loaded options; always `appendTo="body"` on overlays                                                    |
+| `app-custom-multiselect` / `app-custom-checkbox` / `app-custom-radio` / `app-custom-toggle` / `app-custom-binary-checkbox` | selections                                                                                                                                               |
+| `app-custom-calendar` / `app-custom-daterange`                                                                             | dates                                                                                                                                                    |
+| `app-chip` / `email-chips-input`                                                                                           | tags / Gmail-style editable recipient chips                                                                                                              |
+| `app-button`                                                                                                               | buttons (variant system)                                                                                                                                 |
+| `echart-visual` / `configurable-card-chart`                                                                                | charts (ECharts)                                                                                                                                         |
 
 Legacy `us-data-grid` / AG Grid are **retired** for lists (replaced by
 `app-custom-table`); AG Grid remains only inside the Query Executor result
@@ -213,7 +214,7 @@ CodeMirror has its own token-driven theme in `assets/sass/codemirror-theme`.
   ignore `'off'` there).
 - i18n: every user-facing string is a translate key in
   `src/assets/i18n/*.json` across **10 locales** (`en, de, es, fr, it, ja,
-  ko, nl, pt-BR, zh-CN`). No raw strings in templates. When adding a key,
+ko, nl, pt-BR, zh-CN`). No raw strings in templates. When adding a key,
   fill all 10 locales (reuse an existing key if the wording already exists —
   e.g. `QUERY_RUNNER.NEW_CONNECTION`).
 
@@ -221,6 +222,7 @@ CodeMirror has its own token-driven theme in `assets/sass/codemirror-theme`.
 
 The most complex FE module. Standalone executor tab at
 `/query-runner/exec?conn=<id>&query=<savedId>`:
+
 - **CodeMirror 6** editor (`@codemirror/*`) with SQL language, minimap,
   find/replace, fold, autosave draft, IntelliSense from a client-side
   `SchemaCatalog` (lazy schema/table/column fetch, keyed `${schema}.${table}`).

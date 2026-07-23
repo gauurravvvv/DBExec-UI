@@ -85,7 +85,7 @@ export const emailSchema = z.preprocess(
  * a malformed huge body is rejected at the edge.
  */
 export const loginPasswordSchema = z.preprocess(
-  (v) => (v === '' || v === null ? undefined : v),
+  v => (v === '' || v === null ? undefined : v),
   z
     .string({ message: 'validation.auth.password.required' })
     .min(1, { message: 'validation.auth.password.required' })
@@ -97,22 +97,22 @@ export const loginPasswordSchema = z.preprocess(
  * reset-password and set-password (welcome / setup-link) flows.
  */
 export const newPasswordSchema = z.preprocess(
-  (v) => (v === '' || v === null ? undefined : v),
+  v => (v === '' || v === null ? undefined : v),
   z
     .string({ message: 'validation.auth.password.required' })
     .min(8, { message: 'validation.auth.password.tooShort' })
     .max(128, { message: 'validation.auth.password.tooLong' })
-    .refine((v) => !/\s/.test(v), {
+    .refine(v => !/\s/.test(v), {
       message: 'validation.auth.password.noSpaces',
     })
-    .refine((v) => /[a-z]/.test(v), {
+    .refine(v => /[a-z]/.test(v), {
       message: 'validation.auth.password.lowercase',
     })
-    .refine((v) => /[A-Z]/.test(v), {
+    .refine(v => /[A-Z]/.test(v), {
       message: 'validation.auth.password.uppercase',
     })
-    .refine((v) => /\d/.test(v), { message: 'validation.auth.password.digit' })
-    .refine((v) => /[@$!%*?&]/.test(v), {
+    .refine(v => /\d/.test(v), { message: 'validation.auth.password.digit' })
+    .refine(v => /[@$!%*?&]/.test(v), {
       message: 'validation.auth.password.special',
     }),
 );

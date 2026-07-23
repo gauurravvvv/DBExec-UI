@@ -22,7 +22,6 @@
         [options]="cronPresets"
         optionLabel="label"
         optionValue="value"
-        
         [filter]="false"
       ></app-custom-dropdown>
 
@@ -44,7 +43,6 @@
         [options]="formatOptions"
         optionLabel="label"
         optionValue="value"
-        
         [filter]="false"
       ></app-custom-dropdown>
     </div>
@@ -88,7 +86,10 @@
         <i class="pi pi-spin pi-spinner"></i>
       </div>
 
-      <div class="schedule-empty" *ngIf="!loading && subscriptions.length === 0">
+      <div
+        class="schedule-empty"
+        *ngIf="!loading && subscriptions.length === 0"
+      >
         {{ 'DASHBOARD.SCHEDULE.NONE' | translate }}
       </div>
 
@@ -160,11 +161,7 @@
   </form>
 
   <ng-template pTemplate="footer">
-    <button
-      type="button"
-      class="dialog-btn secondary"
-      (click)="close()"
-    >
+    <button type="button" class="dialog-btn secondary" (click)="close()">
       {{ 'COMMON.CLOSE' | translate }}
     </button>
     <button
@@ -173,7 +170,10 @@
       [disabled]="!canSave"
       (click)="save()"
     >
-      <i class="pi" [ngClass]="saving ? 'pi-spin pi-spinner' : 'pi-calendar-plus'"></i>
+      <i
+        class="pi"
+        [ngClass]="saving ? 'pi-spin pi-spinner' : 'pi-calendar-plus'"
+      ></i>
       <span>{{ 'DASHBOARD.SCHEDULE.CREATE' | translate }}</span>
     </button>
   </ng-template>

@@ -71,7 +71,8 @@ export class AuditDetailDrawerComponent {
   }
 
   moduleLabel(module: string | null | undefined): string {
-    const key = (module && MODULE_META[module]?.labelKey) || MODULE_FALLBACK.labelKey;
+    const key =
+      (module && MODULE_META[module]?.labelKey) || MODULE_FALLBACK.labelKey;
     return this.translate.instant(key);
   }
 
@@ -173,7 +174,8 @@ export class AuditDetailDrawerComponent {
   /** Render a from/to value — arrays joined, objects JSON-ified, null → ''. */
   displayValue(value: unknown): string {
     if (value === null || value === undefined || value === '') return '';
-    if (Array.isArray(value)) return value.map(v => this.displayValue(v)).join(', ');
+    if (Array.isArray(value))
+      return value.map(v => this.displayValue(v)).join(', ');
     if (typeof value === 'object') {
       try {
         return JSON.stringify(value);

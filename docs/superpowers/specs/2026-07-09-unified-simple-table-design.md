@@ -31,6 +31,7 @@ then rolled to the other 13 lists in a later pass.
 From Pencil & Paper's enterprise data-table pattern analysis + corroborating
 sources ([pencilandpaper.io](https://www.pencilandpaper.io/articles/ux-pattern-analysis-enterprise-data-tables),
 [uiprep.com](https://www.uiprep.com/blog/the-ultimate-guide-to-designing-data-tables)):
+
 - **Density:** condensed 40px / regular 48px / relaxed 56px rows; default
   comfortable, let the user switch.
 - **Alignment/type:** left-align text, right-align numbers, monospace for
@@ -51,8 +52,12 @@ A thin, opinionated p-table wrapper. **Mirrors the `us-data-grid` call-site API*
 so migration is minimal:
 
 ```html
-<us-table [columns]="cols" [serverAdapter]="adapter" [config]="tableConfig"
-          (refresh)="refreshList()">
+<us-table
+  [columns]="cols"
+  [serverAdapter]="adapter"
+  [config]="tableConfig"
+  (refresh)="refreshList()"
+>
   <ng-template usGridCell="name" let-row> … </ng-template>
   <ng-template usGridCell="actions" let-row> … </ng-template>
 </us-table>
@@ -75,15 +80,15 @@ Consumers stop importing AG Grid's `ColDef`. A small own type:
 
 ```ts
 interface UsTableColumn {
-  colId: string;          // matches usGridCell key + adapter sortFieldMap key
-  field?: string;         // row property for default rendering + default sort field
-  header: string;         // column header label (already translated by caller)
-  sortable?: boolean;     // default true (false for actions)
-  filter?: 'text' | 'numeric' | false;  // per-column filter type; default false
-  align?: 'left' | 'right' | 'center';  // default left; numbers → right
-  width?: string;         // optional fixed/min width
-  frozen?: boolean;       // pin left (first column typically)
-  numeric?: boolean;      // monospace + right-align convenience
+  colId: string; // matches usGridCell key + adapter sortFieldMap key
+  field?: string; // row property for default rendering + default sort field
+  header: string; // column header label (already translated by caller)
+  sortable?: boolean; // default true (false for actions)
+  filter?: 'text' | 'numeric' | false; // per-column filter type; default false
+  align?: 'left' | 'right' | 'center'; // default left; numbers → right
+  width?: string; // optional fixed/min width
+  frozen?: boolean; // pin left (first column typically)
+  numeric?: boolean; // monospace + right-align convenience
 }
 ```
 
@@ -93,27 +98,27 @@ Only the knobs a simple table needs (vs. 26):
 
 ```ts
 interface UsTableConfig {
-  title?: string;                 // optional caption
-  pageSize?: number;              // default 10
-  pageSizeOptions?: number[];     // default [10, 25, 50, 100]
-  globalSearch?: boolean;         // default true — the one search box
+  title?: string; // optional caption
+  pageSize?: number; // default 10
+  pageSizeOptions?: number[]; // default [10, 25, 50, 100]
+  globalSearch?: boolean; // default true — the one search box
   globalSearchPlaceholder?: string;
-  showColumnFilters?: boolean;    // default false — the on-demand Filter toggle
-  enableExport?: boolean;         // default false — CSV/Excel action
-  enableDensity?: boolean;        // default true — compact/comfortable switch
-  enableColumnToggle?: boolean;   // default false — column show/hide
-  density?: 'compact' | 'comfortable';  // default comfortable
-  rowIdField?: string;            // default 'id'
+  showColumnFilters?: boolean; // default false — the on-demand Filter toggle
+  enableExport?: boolean; // default false — CSV/Excel action
+  enableDensity?: boolean; // default true — compact/comfortable switch
+  enableColumnToggle?: boolean; // default false — column show/hide
+  density?: 'compact' | 'comfortable'; // default comfortable
+  rowIdField?: string; // default 'id'
   emptyMessage?: string;
-  height?: string;                // scroll height; default calc(100vh - 260px)
-  gridKey?: string;               // localStorage key for density/columns prefs
+  height?: string; // scroll height; default calc(100vh - 260px)
+  gridKey?: string; // localStorage key for density/columns prefs
 }
 ```
 
 ### Layout & chrome (the "simple" part)
 
 - **Toolbar (single slim row):** left = optional title; right = the global
-  search box, then a compact cluster of icon buttons for the *enabled*
+  search box, then a compact cluster of icon buttons for the _enabled_
   secondary actions only — Filter (toggles the per-column filter row), Export,
   Density, Columns. Anything disabled in config renders nothing. No chips rows,
   no always-on floating filters, no Views. A projected `toolbarActions` slot
@@ -136,7 +141,7 @@ interface UsTableConfig {
 ### Migration shape (pilot: list-db-roles)
 
 - Swap `<us-data-grid …>` → `<us-table …>`; keep every `<ng-template
-  usGridCell>` as-is.
+usGridCell>` as-is.
 - Replace `cols: ColDef[]` (AG Grid) with `cols: UsTableColumn[]` (same colIds:
   name/type/status/validUntil/connectionLimit/flags/memberOf/actions).
 - Replace `gridConfig: UsDataGridConfig` with `tableConfig: UsTableConfig`

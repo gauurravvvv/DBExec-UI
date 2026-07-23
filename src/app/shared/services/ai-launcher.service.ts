@@ -33,7 +33,7 @@ export class AiLauncherService {
   }
 
   toggle(): void {
-    this._isOpen.update((v) => !v);
+    this._isOpen.update(v => !v);
   }
 
   setMode(mode: AiLauncherMode): void {

@@ -77,7 +77,8 @@ export class ChartRendererComponent implements OnChanges {
    * "Export PNG" action to reach the live ECharts instance for getDataURL().
    * Undefined for table/card visuals — the caller falls back gracefully.
    */
-  @ViewChild(EchartVisualComponent) private echartVisual?: EchartVisualComponent;
+  @ViewChild(EchartVisualComponent)
+  private echartVisual?: EchartVisualComponent;
 
   isCardChartType = isCardChartType;
   isTableChartType = isTableChartType;

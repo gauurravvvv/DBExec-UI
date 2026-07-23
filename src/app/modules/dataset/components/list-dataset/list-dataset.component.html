@@ -101,10 +101,8 @@
               [class.on]="isFavourite(dataset.id)"
               (click)="toggleFavourite(dataset.id)"
               [pTooltip]="
-                (isFavourite(dataset.id)
-                  ? 'FAVOURITE.REMOVE'
-                  : 'FAVOURITE.ADD'
-                ) | translate
+                (isFavourite(dataset.id) ? 'FAVOURITE.REMOVE' : 'FAVOURITE.ADD')
+                  | translate
               "
               tooltipPosition="bottom"
             >
@@ -132,7 +130,9 @@
             >
               {{ dataset.datasource.name }}
             </app-chip>
-            <span class="ds-badge muted" *ngIf="!dataset.datasource?.name">—</span>
+            <span class="ds-badge muted" *ngIf="!dataset.datasource?.name"
+              >—</span
+            >
           </ng-template>
 
           <ng-template usGridCell="description" let-dataset>
@@ -167,7 +167,9 @@
           <ng-template usGridCell="createdOn" let-dataset>
             <span
               class="date-text"
-              [pTooltip]="(dataset.createdOn | date: 'dd MMM yyyy, HH:mm:ss') || ''"
+              [pTooltip]="
+                (dataset.createdOn | date: 'dd MMM yyyy, HH:mm:ss') || ''
+              "
               tooltipPosition="top"
             >
               {{ dataset.createdOn | relativeTime }}

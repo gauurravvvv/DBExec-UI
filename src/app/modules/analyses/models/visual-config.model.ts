@@ -185,21 +185,11 @@ export interface RatioMeasureConfig {
 
 /** Format families. `formatString` (below) can override for advanced cases. */
 export type FormatKind =
-  | 'auto'
-  | 'number'
-  | 'currency'
-  | 'percent'
-  | 'scientific'
-  | 'date';
+  'auto' | 'number' | 'currency' | 'percent' | 'scientific' | 'date';
 
 /** Order-of-magnitude scaling applied before formatting (K / M / B …). */
 export type DisplayUnit =
-  | 'auto'
-  | 'none'
-  | 'thousands'
-  | 'millions'
-  | 'billions'
-  | 'trillions';
+  'auto' | 'none' | 'thousands' | 'millions' | 'billions' | 'trillions';
 
 /**
  * A reusable format spec. Applied per value (measure) and per label
@@ -303,16 +293,11 @@ export type StackingMode = 'none' | 'total' | 'percent';
 
 /** Where a data label sits relative to its mark. */
 export type DataLabelPosition =
-  | 'inside'
-  | 'outside'
-  | 'top'
-  | 'bottom'
-  | 'left'
-  | 'right'
-  | 'center';
+  'inside' | 'outside' | 'top' | 'bottom' | 'left' | 'right' | 'center';
 
 /** What a data label shows. */
-export type DataLabelContent = 'value' | 'percent' | 'category' | 'value_percent';
+export type DataLabelContent =
+  'value' | 'percent' | 'category' | 'value_percent';
 
 /** Data-label display options. */
 export interface DataLabelsConfig {
@@ -387,12 +372,7 @@ export interface ColorConfig {
 
 /** How a reference line's position is derived. */
 export type ReferenceLineKind =
-  | 'constant'
-  | 'avg'
-  | 'median'
-  | 'min'
-  | 'max'
-  | 'percentile';
+  'constant' | 'avg' | 'median' | 'min' | 'max' | 'percentile';
 
 /** One reference line (optionally a band via `band`). */
 export interface ReferenceLineConfig {

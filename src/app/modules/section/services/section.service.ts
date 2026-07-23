@@ -49,9 +49,7 @@ export class SectionService {
     this._loading.set(true);
     try {
       const res: any = await lastValueFrom(
-        this.http
-          .apiGet(SECTION.GET + id)
-          .pipe(takeUntil(this._cancelReads$)),
+        this.http.apiGet(SECTION.GET + id).pipe(takeUntil(this._cancelReads$)),
       );
       if (res?.status) this._current.set(res.data);
     } catch (err) {

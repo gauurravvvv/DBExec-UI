@@ -4,7 +4,11 @@
     <div class="page-header-section">
       <div class="header-content">
         <div class="title-row">
-          <h2>{{ (isScoped ? 'AUDIT.ACTIVITY_TITLE' : 'AUDIT.TITLE') | translate }}</h2>
+          <h2>
+            {{
+              (isScoped ? 'AUDIT.ACTIVITY_TITLE' : 'AUDIT.TITLE') | translate
+            }}
+          </h2>
           <app-chip variant="tag" tone="info" *ngIf="isScoped">
             {{ 'AUDIT.SCOPE_USER_MGMT' | translate }}
           </app-chip>
@@ -16,7 +20,8 @@
             tone="neutral"
             icon="pi pi-spin pi-spinner"
             [title]="'AUDIT.INTEGRITY_CHECKING' | translate"
-          >{{ 'AUDIT.INTEGRITY_CHECKING' | translate }}</app-chip>
+            >{{ 'AUDIT.INTEGRITY_CHECKING' | translate }}</app-chip
+          >
           <app-chip
             *ngIf="!integrityChecking && integrity?.ok"
             variant="status"
@@ -25,7 +30,8 @@
             [clickable]="true"
             (clicked)="verifyIntegrity()"
             [title]="'AUDIT.INTEGRITY_VERIFIED_HINT' | translate"
-          >{{ 'AUDIT.INTEGRITY_VERIFIED' | translate }}</app-chip>
+            >{{ 'AUDIT.INTEGRITY_VERIFIED' | translate }}</app-chip
+          >
           <app-chip
             *ngIf="!integrityChecking && integrity && !integrity.ok"
             variant="status"
@@ -34,7 +40,8 @@
             [clickable]="true"
             (clicked)="verifyIntegrity()"
             [title]="'AUDIT.INTEGRITY_BROKEN_HINT' | translate"
-          >{{ 'AUDIT.INTEGRITY_BROKEN' | translate }}</app-chip>
+            >{{ 'AUDIT.INTEGRITY_BROKEN' | translate }}</app-chip
+          >
         </div>
       </div>
 
@@ -58,7 +65,9 @@
       <span class="scope-text">
         {{ 'AUDIT.HISTORY_OF' | translate }}
         <strong [title]="rootScopeLabel()">{{ rootScopeLabel() }}</strong>
-        <span class="scope-hint">{{ 'AUDIT.HISTORY_SCOPE_HINT' | translate }}</span>
+        <span class="scope-hint">{{
+          'AUDIT.HISTORY_SCOPE_HINT' | translate
+        }}</span>
       </span>
       <app-chip
         variant="tag"
@@ -66,7 +75,8 @@
         [removable]="true"
         (removed)="clearRootScope()"
         [title]="'AUDIT.CLEAR_HISTORY_SCOPE' | translate"
-      >{{ 'AUDIT.SHOWING_FULL_HISTORY' | translate }}</app-chip>
+        >{{ 'AUDIT.SHOWING_FULL_HISTORY' | translate }}</app-chip
+      >
     </div>
 
     <!-- Content card -->
@@ -174,7 +184,9 @@
               </span>
               <span class="mod-text">
                 <span class="mod-name">{{ moduleLabel(log.module) }}</span>
-                <span class="mod-sub" [title]="entityLabel(log)">{{ entityLabel(log) }}</span>
+                <span class="mod-sub" [title]="entityLabel(log)">{{
+                  entityLabel(log)
+                }}</span>
               </span>
             </button>
           </ng-template>
@@ -189,7 +201,10 @@
           <!-- Version badge (assetVersion) — makes the sequence visible; the
                timeline reads v1→vN once scoped to one asset. -->
           <ng-template usGridCell="version" let-log>
-            <span class="ver-badge" *ngIf="log.assetVersion != null; else noVer">
+            <span
+              class="ver-badge"
+              *ngIf="log.assetVersion != null; else noVer"
+            >
               {{ versionLabel(log) }}
             </span>
             <ng-template #noVer><span class="muted">—</span></ng-template>
@@ -197,14 +212,20 @@
 
           <!-- Entity -->
           <ng-template usGridCell="entity" let-log>
-            <span class="description-text" [title]="entityLabel(log)">{{ entityLabel(log) }}</span>
+            <span class="description-text" [title]="entityLabel(log)">{{
+              entityLabel(log)
+            }}</span>
           </ng-template>
 
           <!-- Performed by (avatar + name; never a uuid) -->
           <ng-template usGridCell="actor" let-log>
             <span class="actor-cell">
-              <span class="avatar" [class.sys]="isSystemActor(log)">{{ initials(log) }}</span>
-              <span class="actor-name" [title]="actorDisplay(log)">{{ actorDisplay(log) }}</span>
+              <span class="avatar" [class.sys]="isSystemActor(log)">{{
+                initials(log)
+              }}</span>
+              <span class="actor-name" [title]="actorDisplay(log)">{{
+                actorDisplay(log)
+              }}</span>
             </span>
           </ng-template>
 
@@ -226,9 +247,22 @@
 
           <!-- Outcome -->
           <ng-template usGridCell="outcome" let-log>
-            <span class="outcome-cell" [class.ok]="log.responseSuccess" [class.fail]="!log.responseSuccess">
-              <i class="pi" [ngClass]="log.responseSuccess ? 'pi-check-circle' : 'pi-times-circle'"></i>
-              {{ log.responseSuccess ? ('AUDIT.SUCCESS' | translate) : ('AUDIT.FAILED' | translate) }}
+            <span
+              class="outcome-cell"
+              [class.ok]="log.responseSuccess"
+              [class.fail]="!log.responseSuccess"
+            >
+              <i
+                class="pi"
+                [ngClass]="
+                  log.responseSuccess ? 'pi-check-circle' : 'pi-times-circle'
+                "
+              ></i>
+              {{
+                log.responseSuccess
+                  ? ('AUDIT.SUCCESS' | translate)
+                  : ('AUDIT.FAILED' | translate)
+              }}
             </span>
           </ng-template>
 

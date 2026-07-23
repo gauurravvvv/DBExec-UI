@@ -24,12 +24,20 @@
           (click)="onSubmit()"
           [disabled]="roleForm.invalid || saving() || loadingRole"
         >
-          <i class="pi mr-2" [ngClass]="saving() ? 'pi-spin pi-spinner' : 'pi-save'"></i>
+          <i
+            class="pi mr-2"
+            [ngClass]="saving() ? 'pi-spin pi-spinner' : 'pi-save'"
+          ></i>
         </button>
       </div>
     </div>
 
-    <form autocomplete="off" [formGroup]="roleForm" class="admin-form" *ngIf="!loadingRole">
+    <form
+      autocomplete="off"
+      [formGroup]="roleForm"
+      class="admin-form"
+      *ngIf="!loadingRole"
+    >
       <div class="left-section">
         <div class="form-grid">
           <app-custom-input
@@ -42,8 +50,12 @@
           <!-- Can log in — promote a group role to a login user, or demote -->
           <div class="attr-toggle can-login">
             <span class="attr-meta">
-              <span class="attr-name">{{ 'DB_ACCESS.CAN_LOGIN' | translate }}</span>
-              <span class="attr-desc">{{ 'DB_ACCESS.CAN_LOGIN_DESC' | translate }}</span>
+              <span class="attr-name">{{
+                'DB_ACCESS.CAN_LOGIN' | translate
+              }}</span>
+              <span class="attr-desc">{{
+                'DB_ACCESS.CAN_LOGIN_DESC' | translate
+              }}</span>
             </span>
             <app-custom-toggle
               formControlName="canLogin"
@@ -60,7 +72,9 @@
               type="password"
               icon="pi-lock"
               [showPasswordToggle]="true"
-              [placeholder]="'DB_ACCESS.PASSWORD_UNCHANGED_PLACEHOLDER' | translate"
+              [placeholder]="
+                'DB_ACCESS.PASSWORD_UNCHANGED_PLACEHOLDER' | translate
+              "
             ></app-custom-input>
 
             <div class="form-row">
@@ -81,51 +95,83 @@
             </div>
           </ng-container>
 
-          <h3 class="form-section-title">{{ 'DB_ACCESS.ATTRIBUTES' | translate }}</h3>
+          <h3 class="form-section-title">
+            {{ 'DB_ACCESS.ATTRIBUTES' | translate }}
+          </h3>
           <div class="attr-toggles">
             <div class="attr-toggle">
               <span class="attr-meta">
                 <span class="attr-name">INHERIT</span>
-                <span class="attr-desc">{{ 'DB_ACCESS.ATTR_INHERIT' | translate }}</span>
+                <span class="attr-desc">{{
+                  'DB_ACCESS.ATTR_INHERIT' | translate
+                }}</span>
               </span>
-              <app-custom-toggle formControlName="inherit" [showStatusLabel]="false"></app-custom-toggle>
+              <app-custom-toggle
+                formControlName="inherit"
+                [showStatusLabel]="false"
+              ></app-custom-toggle>
             </div>
             <div class="attr-toggle">
               <span class="attr-meta">
                 <span class="attr-name">CREATEDB</span>
-                <span class="attr-desc">{{ 'DB_ACCESS.ATTR_CREATEDB' | translate }}</span>
+                <span class="attr-desc">{{
+                  'DB_ACCESS.ATTR_CREATEDB' | translate
+                }}</span>
               </span>
-              <app-custom-toggle formControlName="createdb" [showStatusLabel]="false"></app-custom-toggle>
+              <app-custom-toggle
+                formControlName="createdb"
+                [showStatusLabel]="false"
+              ></app-custom-toggle>
             </div>
             <div class="attr-toggle">
               <span class="attr-meta">
                 <span class="attr-name">CREATEROLE</span>
-                <span class="attr-desc">{{ 'DB_ACCESS.ATTR_CREATEROLE' | translate }}</span>
+                <span class="attr-desc">{{
+                  'DB_ACCESS.ATTR_CREATEROLE' | translate
+                }}</span>
               </span>
-              <app-custom-toggle formControlName="createrole" [showStatusLabel]="false"></app-custom-toggle>
+              <app-custom-toggle
+                formControlName="createrole"
+                [showStatusLabel]="false"
+              ></app-custom-toggle>
             </div>
             <!-- Login-only attributes -->
             <ng-container *ngIf="canLogin">
               <div class="attr-toggle">
                 <span class="attr-meta">
                   <span class="attr-name">REPLICATION</span>
-                  <span class="attr-desc">{{ 'DB_ACCESS.ATTR_REPLICATION' | translate }}</span>
+                  <span class="attr-desc">{{
+                    'DB_ACCESS.ATTR_REPLICATION' | translate
+                  }}</span>
                 </span>
-                <app-custom-toggle formControlName="replication" [showStatusLabel]="false"></app-custom-toggle>
+                <app-custom-toggle
+                  formControlName="replication"
+                  [showStatusLabel]="false"
+                ></app-custom-toggle>
               </div>
               <div class="attr-toggle danger">
                 <span class="attr-meta">
                   <span class="attr-name">SUPERUSER</span>
-                  <span class="attr-desc">{{ 'DB_ACCESS.ATTR_SUPERUSER' | translate }}</span>
+                  <span class="attr-desc">{{
+                    'DB_ACCESS.ATTR_SUPERUSER' | translate
+                  }}</span>
                 </span>
-                <app-custom-toggle formControlName="superuser" [showStatusLabel]="false"></app-custom-toggle>
+                <app-custom-toggle
+                  formControlName="superuser"
+                  [showStatusLabel]="false"
+                ></app-custom-toggle>
               </div>
               <div class="attr-toggle danger">
                 <span class="attr-meta">
                   <span class="attr-name">BYPASSRLS</span>
-                  <span class="attr-desc">{{ 'DB_ACCESS.ATTR_BYPASSRLS' | translate }}</span>
+                  <span class="attr-desc">{{
+                    'DB_ACCESS.ATTR_BYPASSRLS' | translate
+                  }}</span>
                 </span>
-                <app-custom-toggle formControlName="bypassrls" [showStatusLabel]="false"></app-custom-toggle>
+                <app-custom-toggle
+                  formControlName="bypassrls"
+                  [showStatusLabel]="false"
+                ></app-custom-toggle>
               </div>
             </ng-container>
           </div>

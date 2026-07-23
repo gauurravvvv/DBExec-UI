@@ -69,7 +69,10 @@
             (click)="add()"
             [disabled]="!canAdd"
           >
-            <i class="pi" [ngClass]="adding ? 'pi-spin pi-spinner' : 'pi-plus'"></i>
+            <i
+              class="pi"
+              [ngClass]="adding ? 'pi-spin pi-spinner' : 'pi-plus'"
+            ></i>
             {{ 'SHARE.ADD' | translate }}
           </button>
         </div>
@@ -77,7 +80,9 @@
 
       <!-- Who has access -->
       <div class="share-list">
-        <div class="share-list-head">{{ 'SHARE.WHO_HAS_ACCESS' | translate }}</div>
+        <div class="share-list-head">
+          {{ 'SHARE.WHO_HAS_ACCESS' | translate }}
+        </div>
 
         <!-- Owner (pinned) -->
         <div class="share-row owner-row" *ngIf="shareService.owner() as owner">
@@ -85,7 +90,9 @@
             <i class="pi pi-user"></i>
             <div class="share-grantee-text">
               <span class="share-grantee-name">{{ owner.name }}</span>
-              <span class="share-grantee-sub" *ngIf="owner.email">{{ owner.email }}</span>
+              <span class="share-grantee-sub" *ngIf="owner.email">{{
+                owner.email
+              }}</span>
             </div>
           </div>
           <span class="share-owner-badge">{{ 'SHARE.OWNER' | translate }}</span>
@@ -105,11 +112,19 @@
         <!-- Grants -->
         <div class="share-row" *ngFor="let grant of shareService.shares()">
           <div class="share-grantee">
-            <i class="pi" [ngClass]="grant.granteeType === 'group' ? 'pi-users' : 'pi-user'"></i>
+            <i
+              class="pi"
+              [ngClass]="grant.granteeType === 'group' ? 'pi-users' : 'pi-user'"
+            ></i>
             <div class="share-grantee-text">
               <span class="share-grantee-name">{{ grant.granteeName }}</span>
-              <span class="share-grantee-sub" *ngIf="grant.granteeEmail">{{ grant.granteeEmail }}</span>
-              <span class="share-grantee-sub" *ngIf="grant.granteeType === 'group'">
+              <span class="share-grantee-sub" *ngIf="grant.granteeEmail">{{
+                grant.granteeEmail
+              }}</span>
+              <span
+                class="share-grantee-sub"
+                *ngIf="grant.granteeType === 'group'"
+              >
                 {{ 'SHARE.GROUP' | translate }}
               </span>
             </div>
@@ -117,7 +132,9 @@
 
           <div class="share-row-actions">
             <!-- View-only model: a static badge, not a level picker. -->
-            <span class="share-view-badge">{{ 'SHARE.PERMISSION_VIEW' | translate }}</span>
+            <span class="share-view-badge">{{
+              'SHARE.PERMISSION_VIEW' | translate
+            }}</span>
 
             <ng-container *ngIf="!isRevokeArmed(grant.id)">
               <button
@@ -129,16 +146,30 @@
               >
                 <i
                   class="pi"
-                  [ngClass]="shareService.isDeleting(grant.id) ? 'pi-spin pi-spinner' : 'pi-times'"
+                  [ngClass]="
+                    shareService.isDeleting(grant.id)
+                      ? 'pi-spin pi-spinner'
+                      : 'pi-times'
+                  "
                 ></i>
               </button>
             </ng-container>
             <ng-container *ngIf="isRevokeArmed(grant.id)">
-              <span class="confirm-text">{{ 'SHARE.REVOKE_CONFIRM' | translate }}</span>
-              <button type="button" class="btn-danger-text" (click)="confirmRevoke(grant.id)">
+              <span class="confirm-text">{{
+                'SHARE.REVOKE_CONFIRM' | translate
+              }}</span>
+              <button
+                type="button"
+                class="btn-danger-text"
+                (click)="confirmRevoke(grant.id)"
+              >
                 {{ 'COMMON.YES' | translate }}
               </button>
-              <button type="button" class="btn-plain-text" (click)="cancelRevoke()">
+              <button
+                type="button"
+                class="btn-plain-text"
+                (click)="cancelRevoke()"
+              >
                 {{ 'COMMON.NO' | translate }}
               </button>
             </ng-container>

@@ -10,7 +10,10 @@
     </ng-container>
 
     <ng-container *ngIf="state() === 'error'">
-      <i class="pi pi-times-circle sso-relay__error-icon" aria-hidden="true"></i>
+      <i
+        class="pi pi-times-circle sso-relay__error-icon"
+        aria-hidden="true"
+      ></i>
       <p class="sso-relay__error" role="alert">
         {{ errorMessage() | translate }}
       </p>

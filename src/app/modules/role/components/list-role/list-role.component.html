@@ -84,7 +84,9 @@
           <ng-template usGridCell="createdOn" let-role>
             <span
               class="date-text"
-              [pTooltip]="(role.createdOn | date: 'dd MMM yyyy, HH:mm:ss') || ''"
+              [pTooltip]="
+                (role.createdOn | date: 'dd MMM yyyy, HH:mm:ss') || ''
+              "
               tooltipPosition="top"
             >
               {{ role.createdOn | relativeTime }}
@@ -150,7 +152,9 @@
       <div class="popup-icon">
         <i class="pi pi-trash"></i>
       </div>
-      <h3 id="listRoleDeleteTitle">{{ 'COMMON.CONFIRM_DELETE' | translate }}</h3>
+      <h3 id="listRoleDeleteTitle">
+        {{ 'COMMON.CONFIRM_DELETE' | translate }}
+      </h3>
     </div>
 
     <!-- Delete Info Section -->

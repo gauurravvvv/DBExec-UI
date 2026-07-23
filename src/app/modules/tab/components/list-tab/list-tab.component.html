@@ -70,10 +70,7 @@
           </div>
 
           <ng-template usGridCell="name" let-tab>
-            <a
-              class="dataset-name-link"
-              [routerLink]="['/app/tabs', tab.id]"
-            >
+            <a class="dataset-name-link" [routerLink]="['/app/tabs', tab.id]">
               {{ tab.name }}
             </a>
           </ng-template>
@@ -87,7 +84,10 @@
           <ng-template usGridCell="sections" let-tab>
             <span class="pill">
               <i class="pi pi-list"></i>
-              {{ 'TAB.SECTIONS_COUNT' | translate: { count: tab.sections?.length || 0 } }}
+              {{
+                'TAB.SECTIONS_COUNT'
+                  | translate: { count: tab.sections?.length || 0 }
+              }}
             </span>
           </ng-template>
 

@@ -107,17 +107,27 @@ execute. Cost computed from the latest pricing profile:
 
 ```typescript
 export async function logQueryExecution(args: {
-  orgId: string; userId?: string; datasourceId: string; engine: string;
-  sourceKind: string; sourceId?: string; queryHash: string;
-  bytesScanned?: number; bytesReturned?: number; durationMs: number;
-  creditsUsed?: number; cache: boolean; rlsRulesApplied: number;
+  orgId: string;
+  userId?: string;
+  datasourceId: string;
+  engine: string;
+  sourceKind: string;
+  sourceId?: string;
+  queryHash: string;
+  bytesScanned?: number;
+  bytesReturned?: number;
+  durationMs: number;
+  creditsUsed?: number;
+  cache: boolean;
+  rlsRulesApplied: number;
   correlationId?: string;
 }): Promise<void> {
   const profile = await loadPricingProfile(args.orgId, args.engine);
   const cost = computeCost(args, profile);
 
   await connection.getRepository('QueryExecutionLog').save({
-    ...args, costUsd: cost,
+    ...args,
+    costUsd: cost,
   });
 
   // Increment budgets
@@ -127,7 +137,7 @@ export async function logQueryExecution(args: {
 function computeCost(args: any, profile: PricingProfile | null): number {
   if (!profile) return 0;
   if (profile.unit === 'tb_scanned') {
-    return (args.bytesScanned ?? 0) / 1024 ** 4 * profile.unitCostUsd;
+    return ((args.bytesScanned ?? 0) / 1024 ** 4) * profile.unitCostUsd;
   }
   if (profile.unit === 'credit') {
     return (args.creditsUsed ?? 0) * profile.unitCostUsd;
@@ -146,11 +156,20 @@ Before execute, optionally call BigQuery's dry-run to learn
 ```typescript
 import { BigQuery } from '@google-cloud/bigquery';
 
-export async function bqDryRun(sql: string, params: any[], ds: Datasource): Promise<number> {
-  const client = new BigQuery({ projectId: ds.config.projectId, credentials: ds.config.credentials });
+export async function bqDryRun(
+  sql: string,
+  params: any[],
+  ds: Datasource,
+): Promise<number> {
+  const client = new BigQuery({
+    projectId: ds.config.projectId,
+    credentials: ds.config.credentials,
+  });
   const [job] = await client.createQueryJob({
-    query: sql, params,
-    dryRun: true, useLegacySql: false,
+    query: sql,
+    params,
+    dryRun: true,
+    useLegacySql: false,
   });
   const stats = job.metadata.statistics;
   return Number(stats.totalBytesProcessed ?? 0);
@@ -162,10 +181,12 @@ per query" threshold and refuses if exceeded:
 
 ```typescript
 const bytes = await bqDryRun(sql, params, ds);
-const cost = bytes / 1024 ** 4 * profile.unitCostUsd;
+const cost = (bytes / 1024 ** 4) * profile.unitCostUsd;
 
 if (cost > org.maxQueryCostUsd) {
-  throw new Error(`COST_THRESHOLD_EXCEEDED: ${cost.toFixed(2)} > ${org.maxQueryCostUsd}`);
+  throw new Error(
+    `COST_THRESHOLD_EXCEEDED: ${cost.toFixed(2)} > ${org.maxQueryCostUsd}`,
+  );
 }
 ```
 
@@ -178,7 +199,10 @@ Snowflake has no built-in dry-run; we estimate from
 
 ```typescript
 export async function incrementBudgets(
-  orgId: string, userId: string | undefined, datasourceId: string, costUsd: number,
+  orgId: string,
+  userId: string | undefined,
+  datasourceId: string,
+  costUsd: number,
 ): Promise<void> {
   if (costUsd <= 0) return;
 
@@ -191,7 +215,10 @@ export async function incrementBudgets(
 
     if (usagePct >= b.alertThresholdPct && !state.lastAlertAt) {
       await notify({
-        orgId, userId: b.createdBy, category: 'admin', severity: 'warning',
+        orgId,
+        userId: b.createdBy,
+        category: 'admin',
+        severity: 'warning',
         title: `Budget ${b.id} at ${Math.round(usagePct)}%`,
         body: `$${state.spentUsd.toFixed(2)} of $${b.amountUsd} (${b.period})`,
         link: `/admin/quota#budget-${b.id}`,
@@ -202,7 +229,10 @@ export async function incrementBudgets(
     if (b.hardLimit && usagePct >= 100 && !state.isPaused) {
       await pauseBudget(b);
       await notify({
-        orgId, userId: b.createdBy, category: 'admin', severity: 'critical',
+        orgId,
+        userId: b.createdBy,
+        category: 'admin',
+        severity: 'critical',
         title: `Budget ${b.id} hard limit hit`,
         body: 'Queries paused. Adjust budget to resume.',
       });
@@ -211,9 +241,12 @@ export async function incrementBudgets(
 }
 
 async function pauseBudget(b: Budget): Promise<void> {
-  await connection.getRepository('BudgetState').update(
-    { budgetId: b.id, periodStart: startOfPeriod(b.period, new Date()) },
-    { isPaused: true });
+  await connection
+    .getRepository('BudgetState')
+    .update(
+      { budgetId: b.id, periodStart: startOfPeriod(b.period, new Date()) },
+      { isPaused: true },
+    );
   if (b.autoPauseWarehouse && b.scopeKind === 'datasource') {
     await pauseSnowflakeWarehouse(b.scopeId!);
   }
@@ -233,7 +266,9 @@ if (paused) throw new Error('BUDGET_PAUSED');
 
 ```typescript
 // src/services/cost/snowflakePause.ts
-export async function pauseSnowflakeWarehouse(datasourceId: string): Promise<void> {
+export async function pauseSnowflakeWarehouse(
+  datasourceId: string,
+): Promise<void> {
   const ds = await loadDatasourceWithConn(datasourceId);
   const pool = await getPool(ds.orgId, ds.connectionId);
   const wh = ds.config.warehouse;
@@ -252,7 +287,8 @@ Cron at 02:00 UTC per region:
 
 ```typescript
 export async function rollupCostDaily(date: Date): Promise<void> {
-  await connection.query(`
+  await connection.query(
+    `
     INSERT INTO cost_daily (org_id, datasource_id, date, query_count, bytes_scanned, credits_used, cost_usd)
     SELECT org_id, datasource_id, $1::date,
            COUNT(*), SUM(bytes_scanned), SUM(credits_used), SUM(cost_usd)
@@ -262,7 +298,9 @@ export async function rollupCostDaily(date: Date): Promise<void> {
     ON CONFLICT (org_id, datasource_id, date) DO UPDATE
       SET query_count=EXCLUDED.query_count, bytes_scanned=EXCLUDED.bytes_scanned,
           credits_used=EXCLUDED.credits_used, cost_usd=EXCLUDED.cost_usd;
-  `, [date.toISOString().slice(0, 10)]);
+  `,
+    [date.toISOString().slice(0, 10)],
+  );
 }
 ```
 
@@ -297,24 +335,47 @@ Query joins `query_execution_log` filtered by
 ```typescript
 // src/controllers/cost/createBudget.ts
 const createBudget = async (req: Request, res: Response) => {
-  const { scopeKind, scopeId, period, amountUsd, alertThresholdPct, hardLimit, autoPauseWarehouse } = req.body;
+  const {
+    scopeKind,
+    scopeId,
+    period,
+    amountUsd,
+    alertThresholdPct,
+    hardLimit,
+    autoPauseWarehouse,
+  } = req.body;
   const { loggedInId, orgData, master_db_connection } = res.locals;
   const connection = orgData.connection;
   try {
     if (autoPauseWarehouse && scopeKind !== 'datasource') {
       await master_db_connection.close();
-      return sendResponse(res, false, CODE.BAD_REQUEST, COST_MSG.AUTO_PAUSE_DS_ONLY);
+      return sendResponse(
+        res,
+        false,
+        CODE.BAD_REQUEST,
+        COST_MSG.AUTO_PAUSE_DS_ONLY,
+      );
     }
     const b = await connection.getRepository('Budget').save({
-      orgId: orgData.orgId, scopeKind, scopeId, period,
-      amountUsd, alertThresholdPct: alertThresholdPct ?? 80,
-      hardLimit: !!hardLimit, autoPauseWarehouse: !!autoPauseWarehouse,
-      isEnabled: true, createdBy: loggedInId,
+      orgId: orgData.orgId,
+      scopeKind,
+      scopeId,
+      period,
+      amountUsd,
+      alertThresholdPct: alertThresholdPct ?? 80,
+      hardLimit: !!hardLimit,
+      autoPauseWarehouse: !!autoPauseWarehouse,
+      isEnabled: true,
+      createdBy: loggedInId,
     });
     await auditLogger.logAuditToOrg({
-      connection, req, res,
-      module: AUDIT_MODULES.BUDGET, action: AUDIT_ACTIONS.CREATE,
-      entityName: 'Budget', entityId: b.id,
+      connection,
+      req,
+      res,
+      module: AUDIT_MODULES.BUDGET,
+      action: AUDIT_ACTIONS.CREATE,
+      entityName: 'Budget',
+      entityId: b.id,
       metadata: { scopeKind, period, amountUsd, hardLimit, autoPauseWarehouse },
     });
     await master_db_connection.close();
@@ -331,49 +392,53 @@ const createBudget = async (req: Request, res: Response) => {
 
 ## 9. Observability (of the cost system itself)
 
-| Metric | Type | Labels | Purpose |
-|---|---|---|---|
-| `dbexec_query_cost_usd_total` | counter | `org`, `engine` | running cost |
-| `dbexec_query_bytes_scanned_total` | counter | `org`, `engine` | byte burn |
-| `dbexec_budget_alert_total` | counter | `org`, `severity` | alerts |
-| `dbexec_budget_paused_total` | counter | `org` | hard-limit fires |
-| `dbexec_warehouse_paused_total` | counter | `org`, `datasource` | auto-pause |
-| `dbexec_cost_dry_run_total` | counter | `engine`, `outcome` | dry-run reliability |
-| `dbexec_cost_threshold_rejected_total` | counter | `engine` | pre-execute rejections |
+| Metric                                 | Type    | Labels              | Purpose                |
+| -------------------------------------- | ------- | ------------------- | ---------------------- |
+| `dbexec_query_cost_usd_total`          | counter | `org`, `engine`     | running cost           |
+| `dbexec_query_bytes_scanned_total`     | counter | `org`, `engine`     | byte burn              |
+| `dbexec_budget_alert_total`            | counter | `org`, `severity`   | alerts                 |
+| `dbexec_budget_paused_total`           | counter | `org`               | hard-limit fires       |
+| `dbexec_warehouse_paused_total`        | counter | `org`, `datasource` | auto-pause             |
+| `dbexec_cost_dry_run_total`            | counter | `engine`, `outcome` | dry-run reliability    |
+| `dbexec_cost_threshold_rejected_total` | counter | `engine`            | pre-execute rejections |
 
 ---
 
 ## 10. Security & threat model
 
-| Threat | Mitigation |
-|---|---|
-| User runs many small queries to evade per-query threshold | Budget aggregates over period; threshold checked together |
-| Adversarial dashboard to bankrupt org | Cap per dashboard tiles' frequency (refresh interval ≥ 30s); per-user concurrent-query cap |
-| Manipulated pricing profile | Pricing profile edits audit-logged; super-admin only for global; org-admin only for org-level |
-| Cost panel reveals query-text via hash | Hash is not reversible; details require entity-read perm |
-| Auto-pause race | Two concurrent over-limit queries can both fire pause; idempotent (`SUSPEND` on already-suspended warehouse no-ops) |
-| Snowflake account-level admin needed to pause | Service-account roles documented; orgs without granted role get a warning |
+| Threat                                                    | Mitigation                                                                                                          |
+| --------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| User runs many small queries to evade per-query threshold | Budget aggregates over period; threshold checked together                                                           |
+| Adversarial dashboard to bankrupt org                     | Cap per dashboard tiles' frequency (refresh interval ≥ 30s); per-user concurrent-query cap                          |
+| Manipulated pricing profile                               | Pricing profile edits audit-logged; super-admin only for global; org-admin only for org-level                       |
+| Cost panel reveals query-text via hash                    | Hash is not reversible; details require entity-read perm                                                            |
+| Auto-pause race                                           | Two concurrent over-limit queries can both fire pause; idempotent (`SUSPEND` on already-suspended warehouse no-ops) |
+| Snowflake account-level admin needed to pause             | Service-account roles documented; orgs without granted role get a warning                                           |
 
 ---
 
 ## 11. Runbook
 
 **Symptom: budget keeps hitting.**
+
 1. `cost_daily` shows which datasource. Look at top-cost
    dashboards/tiles via the per-dashboard panel.
 2. Often: a stuck dashboard polling every 10s. Bump
    minimum refresh interval.
 
 **Symptom: BigQuery dry-run estimates wildly off.**
+
 1. Dry-run gives `totalBytesProcessed`; actual scan can be
    smaller (BQ optimisations). Treat as upper bound.
 
 **Symptom: pause didn't fire.**
+
 1. Permission missing on Snowflake service role:
    `GRANT OPERATE ON WAREHOUSE <wh> TO ROLE dbexec`. Document
    prerequisite at onboarding.
 
 **Symptom: forecast looks crazy.**
+
 1. Spike in one day skews linear regression. Filter outliers
    (drop top/bottom 5%); P50 forecast instead of linear.
 
@@ -381,14 +446,14 @@ const createBudget = async (req: Request, res: Response) => {
 
 ## 12. Perf budget
 
-| Operation | p50 | p95 | Hard ceiling |
-|---|---|---|---|
-| logQueryExecution (write) | 5 ms | 20 ms | 100 ms |
-| BudgetEnforcement (read + increment) | 3 ms | 15 ms | 50 ms |
-| BigQuery dry-run | 200 ms | 1 s | 10 s |
-| Daily rollup (1M rows) | 5 s | 30 s | 5 min |
-| Cost panel render (1 dashboard) | 80 ms | 250 ms | 1 s |
-| Forecast (per org) | 30 ms | 100 ms | 500 ms |
+| Operation                            | p50    | p95    | Hard ceiling |
+| ------------------------------------ | ------ | ------ | ------------ |
+| logQueryExecution (write)            | 5 ms   | 20 ms  | 100 ms       |
+| BudgetEnforcement (read + increment) | 3 ms   | 15 ms  | 50 ms        |
+| BigQuery dry-run                     | 200 ms | 1 s    | 10 s         |
+| Daily rollup (1M rows)               | 5 s    | 30 s   | 5 min        |
+| Cost panel render (1 dashboard)      | 80 ms  | 250 ms | 1 s          |
+| Forecast (per org)                   | 30 ms  | 100 ms | 500 ms       |
 
 ---
 

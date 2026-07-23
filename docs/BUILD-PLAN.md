@@ -46,9 +46,9 @@ charts, role-based UI. The audit pass identified a stack of
 correctness bugs (`docs/hardening/`). Fix those before stacking
 new features on top.
 
-| Module | Research | Implementation | Effort |
-|---|---|---|---|
-| existing modules (focus on Dataset / Analysis / Dashboard / RLS) | — | [`hardening/PLAN-FOUR-MODULES-HARDENING.md`](hardening/PLAN-FOUR-MODULES-HARDENING.md), [`hardening/CODE-READ-FINDINGS.md`](hardening/CODE-READ-FINDINGS.md) | M |
+| Module                                                           | Research | Implementation                                                                                                                                               | Effort |
+| ---------------------------------------------------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------ |
+| existing modules (focus on Dataset / Analysis / Dashboard / RLS) | —        | [`hardening/PLAN-FOUR-MODULES-HARDENING.md`](hardening/PLAN-FOUR-MODULES-HARDENING.md), [`hardening/CODE-READ-FINDINGS.md`](hardening/CODE-READ-FINDINGS.md) | M      |
 
 **Why now:** every later phase trusts these to behave. Don't
 build a semantic layer on top of a buggy dataset editor.
@@ -66,11 +66,11 @@ suite passes on master.
 **Goal:** the trust + correctness substrate every later phase
 sits on. Three modules, all P0.
 
-| # | Module | Research | Implementation | Effort |
-|---|---|---|---|---|
-| 10 | Auth / SSO / MFA / SCIM / API tokens | [`research/modules/10-auth-rbac-sso.md`](research/modules/10-auth-rbac-sso.md) | [`implementation/AUTH-SSO-MFA-SCIM.md`](implementation/AUTH-SSO-MFA-SCIM.md) | L |
-| 04 | Query processor / dialect compiler | [`research/modules/04-query-processor.md`](research/modules/04-query-processor.md) | [`implementation/QUERY-PROCESSOR.md`](implementation/QUERY-PROCESSOR.md) | L |
-| 09 | RLS & column security | [`research/modules/09-rls-column-security.md`](research/modules/09-rls-column-security.md) | [`implementation/RLS-COLUMN-SECURITY.md`](implementation/RLS-COLUMN-SECURITY.md) | L |
+| #   | Module                               | Research                                                                                   | Implementation                                                                   | Effort |
+| --- | ------------------------------------ | ------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------- | ------ |
+| 10  | Auth / SSO / MFA / SCIM / API tokens | [`research/modules/10-auth-rbac-sso.md`](research/modules/10-auth-rbac-sso.md)             | [`implementation/AUTH-SSO-MFA-SCIM.md`](implementation/AUTH-SSO-MFA-SCIM.md)     | L      |
+| 04  | Query processor / dialect compiler   | [`research/modules/04-query-processor.md`](research/modules/04-query-processor.md)         | [`implementation/QUERY-PROCESSOR.md`](implementation/QUERY-PROCESSOR.md)         | L      |
+| 09  | RLS & column security                | [`research/modules/09-rls-column-security.md`](research/modules/09-rls-column-security.md) | [`implementation/RLS-COLUMN-SECURITY.md`](implementation/RLS-COLUMN-SECURITY.md) | L      |
 
 **Why this order within the phase:**
 
@@ -92,6 +92,7 @@ data is filtered by your territory. Your warehouse is BigQuery
 or Snowflake or Postgres and it just works."
 
 **Exit criteria:**
+
 - SSO works for at least SAML + one IdP (Okta).
 - TOTP MFA opt-in.
 - At least 3 dialect adapters live (PG, BQ, SF).
@@ -108,11 +109,11 @@ or Snowflake or Postgres and it just works."
 **Goal:** authors define metrics + dimensions once, in one place,
 used by every analysis / dashboard / AI tool.
 
-| # | Module | Research | Implementation | Effort |
-|---|---|---|---|---|
-| 02 | Semantic layer | [`research/modules/02-semantic-layer.md`](research/modules/02-semantic-layer.md) | [`implementation/SEMANTIC-LAYER.md`](implementation/SEMANTIC-LAYER.md) | L |
-| 11 | Aggregation & metrics | [`research/modules/11-aggregation-metrics.md`](research/modules/11-aggregation-metrics.md) | [`implementation/AGGREGATION-METRICS.md`](implementation/AGGREGATION-METRICS.md) | M-L |
-| 03 | Dataset (v2) | [`research/modules/03-dataset.md`](research/modules/03-dataset.md) | [`implementation/DATASET.md`](implementation/DATASET.md) | M |
+| #   | Module                | Research                                                                                   | Implementation                                                                   | Effort |
+| --- | --------------------- | ------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------- | ------ |
+| 02  | Semantic layer        | [`research/modules/02-semantic-layer.md`](research/modules/02-semantic-layer.md)           | [`implementation/SEMANTIC-LAYER.md`](implementation/SEMANTIC-LAYER.md)           | L      |
+| 11  | Aggregation & metrics | [`research/modules/11-aggregation-metrics.md`](research/modules/11-aggregation-metrics.md) | [`implementation/AGGREGATION-METRICS.md`](implementation/AGGREGATION-METRICS.md) | M-L    |
+| 03  | Dataset (v2)          | [`research/modules/03-dataset.md`](research/modules/03-dataset.md)                         | [`implementation/DATASET.md`](implementation/DATASET.md)                         | M      |
 
 **Why this order:**
 
@@ -133,6 +134,7 @@ once. Every dashboard, every alert, every AI query uses the
 same definition. We catch non-additive misuse at lint time."
 
 **Exit criteria:**
+
 - An org can publish at least one semantic model.
 - A dashboard tile uses a semantic intent (not raw SQL).
 - Lint catches the eight rules listed in
@@ -148,11 +150,11 @@ same definition. We catch non-additive misuse at lint time."
 **Goal:** SOC2 / GDPR / enterprise security questionnaire
 answers ship in product, not in a sales deck. Three modules.
 
-| # | Module | Research | Implementation | Effort |
-|---|---|---|---|---|
-| 19 | Audit & observability | [`research/modules/19-audit-observability.md`](research/modules/19-audit-observability.md) | [`implementation/AUDIT-OBSERVABILITY.md`](implementation/AUDIT-OBSERVABILITY.md) | M |
-| 28 | Backup & restore | [`research/modules/28-backup-restore.md`](research/modules/28-backup-restore.md) | [`implementation/BACKUP-RESTORE.md`](implementation/BACKUP-RESTORE.md) | L |
-| 01 | Datasource & connection (v2) | [`research/modules/01-datasource-connection.md`](research/modules/01-datasource-connection.md) | [`implementation/DATASOURCE-CONNECTION.md`](implementation/DATASOURCE-CONNECTION.md) | M |
+| #   | Module                       | Research                                                                                       | Implementation                                                                       | Effort |
+| --- | ---------------------------- | ---------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ | ------ |
+| 19  | Audit & observability        | [`research/modules/19-audit-observability.md`](research/modules/19-audit-observability.md)     | [`implementation/AUDIT-OBSERVABILITY.md`](implementation/AUDIT-OBSERVABILITY.md)     | M      |
+| 28  | Backup & restore             | [`research/modules/28-backup-restore.md`](research/modules/28-backup-restore.md)               | [`implementation/BACKUP-RESTORE.md`](implementation/BACKUP-RESTORE.md)               | L      |
+| 01  | Datasource & connection (v2) | [`research/modules/01-datasource-connection.md`](research/modules/01-datasource-connection.md) | [`implementation/DATASOURCE-CONNECTION.md`](implementation/DATASOURCE-CONNECTION.md) | M      |
 
 **Why this order within the phase:**
 
@@ -171,6 +173,7 @@ verify the backups restore, and we encrypt with your KMS key
 if you bring one."
 
 **Exit criteria:**
+
 - Hash-chain verify-endpoint returns OK over a 30-day window.
 - `/healthz` / `/readyz` / `/statusz` split live.
 - Nightly verify-restore is green for at least 2 weeks.
@@ -183,13 +186,13 @@ if you bring one."
 **Goal:** the authoring loop is fast, predictable, and full
 of the right affordances. Five modules.
 
-| # | Module | Research | Implementation | Effort |
-|---|---|---|---|---|
-| 06 | Analysis & visual builder | [`research/modules/06-analysis-visual-builder.md`](research/modules/06-analysis-visual-builder.md) | [`implementation/ANALYSIS-VISUAL-BUILDER.md`](implementation/ANALYSIS-VISUAL-BUILDER.md) | L |
-| 07 | Filters / parameters / cross-filters / drill | [`research/modules/07-filters-actions.md`](research/modules/07-filters-actions.md) | [`implementation/CROSS-TAB-DRILL-THROUGH.md`](implementation/CROSS-TAB-DRILL-THROUGH.md) | M |
-| 08 | Dashboard (multi-tab) | [`research/modules/08-dashboard.md`](research/modules/08-dashboard.md) | [`implementation/MULTI-TAB-DASHBOARD.md`](implementation/MULTI-TAB-DASHBOARD.md) | L |
-| 05 | Cache & materialisation | [`research/modules/05-cache-materialisation.md`](research/modules/05-cache-materialisation.md) | [`implementation/CACHE-MATERIALISATION.md`](implementation/CACHE-MATERIALISATION.md) | M |
-| 13 | Export & download | [`research/modules/13-export-download.md`](research/modules/13-export-download.md) | [`implementation/PER-TAB-SCHEDULED-EXPORTS.md`](implementation/PER-TAB-SCHEDULED-EXPORTS.md) | M |
+| #   | Module                                       | Research                                                                                           | Implementation                                                                               | Effort |
+| --- | -------------------------------------------- | -------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- | ------ |
+| 06  | Analysis & visual builder                    | [`research/modules/06-analysis-visual-builder.md`](research/modules/06-analysis-visual-builder.md) | [`implementation/ANALYSIS-VISUAL-BUILDER.md`](implementation/ANALYSIS-VISUAL-BUILDER.md)     | L      |
+| 07  | Filters / parameters / cross-filters / drill | [`research/modules/07-filters-actions.md`](research/modules/07-filters-actions.md)                 | [`implementation/CROSS-TAB-DRILL-THROUGH.md`](implementation/CROSS-TAB-DRILL-THROUGH.md)     | M      |
+| 08  | Dashboard (multi-tab)                        | [`research/modules/08-dashboard.md`](research/modules/08-dashboard.md)                             | [`implementation/MULTI-TAB-DASHBOARD.md`](implementation/MULTI-TAB-DASHBOARD.md)             | L      |
+| 05  | Cache & materialisation                      | [`research/modules/05-cache-materialisation.md`](research/modules/05-cache-materialisation.md)     | [`implementation/CACHE-MATERIALISATION.md`](implementation/CACHE-MATERIALISATION.md)         | M      |
+| 13  | Export & download                            | [`research/modules/13-export-download.md`](research/modules/13-export-download.md)                 | [`implementation/PER-TAB-SCHEDULED-EXPORTS.md`](implementation/PER-TAB-SCHEDULED-EXPORTS.md) | M      |
 
 **Why this order:**
 
@@ -209,6 +212,7 @@ multi-tab dashboard with cross-filter and drill-through.
 Opens fast (cache). Exports as PDF, watermarked, on schedule."
 
 **Exit criteria:**
+
 - Cross-filter works on at least bar/line/heatmap.
 - Multi-tab dashboard URL state is browser-back / shareable.
 - Cache hit rate on a busy dashboard ≥ 60%.
@@ -222,11 +226,11 @@ Opens fast (cache). Exports as PDF, watermarked, on schedule."
 **Goal:** customers don't just consume DBExec inside DBExec.
 They subscribe, share, embed.
 
-| # | Module | Research | Implementation | Effort |
-|---|---|---|---|---|
-| 15 | Scheduling, subscriptions, alerts | [`research/modules/15-scheduling-alerts.md`](research/modules/15-scheduling-alerts.md) | [`implementation/PER-TAB-SCHEDULED-EXPORTS.md`](implementation/PER-TAB-SCHEDULED-EXPORTS.md) | M |
-| 16 | Notifications | [`research/modules/16-notifications.md`](research/modules/16-notifications.md) | [`implementation/NOTIFICATIONS.md`](implementation/NOTIFICATIONS.md) | M |
-| 14 | Sharing & embedding | [`research/modules/14-share-embed.md`](research/modules/14-share-embed.md) | [`implementation/SHARE-EMBED.md`](implementation/SHARE-EMBED.md) | L |
+| #   | Module                            | Research                                                                               | Implementation                                                                               | Effort |
+| --- | --------------------------------- | -------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- | ------ |
+| 15  | Scheduling, subscriptions, alerts | [`research/modules/15-scheduling-alerts.md`](research/modules/15-scheduling-alerts.md) | [`implementation/PER-TAB-SCHEDULED-EXPORTS.md`](implementation/PER-TAB-SCHEDULED-EXPORTS.md) | M      |
+| 16  | Notifications                     | [`research/modules/16-notifications.md`](research/modules/16-notifications.md)         | [`implementation/NOTIFICATIONS.md`](implementation/NOTIFICATIONS.md)                         | M      |
+| 14  | Sharing & embedding               | [`research/modules/14-share-embed.md`](research/modules/14-share-embed.md)             | [`implementation/SHARE-EMBED.md`](implementation/SHARE-EMBED.md)                             | L      |
 
 **Why this order:**
 
@@ -243,6 +247,7 @@ notification when their pipeline crosses threshold. Customer-
 facing dashboard embedded in the customer's portal."
 
 **Exit criteria:**
+
 - Three channels live: email, Slack, webhook.
 - DND + critical-override paths tested.
 - Public-link mode + embed mode both have a design partner.
@@ -254,11 +259,11 @@ facing dashboard embedded in the customer's portal."
 **Goal:** as the org grows past 50 dashboards, people can find
 things, see history, and pick up each other's work.
 
-| # | Module | Research | Implementation | Effort |
-|---|---|---|---|---|
-| 17 | Search / tags / collections / favourites | [`research/modules/17-search-catalogue.md`](research/modules/17-search-catalogue.md) | [`implementation/SEARCH-CATALOGUE.md`](implementation/SEARCH-CATALOGUE.md) | M-L |
-| 18 | Versioning & lineage | [`research/modules/18-versioning-lineage.md`](research/modules/18-versioning-lineage.md) | [`implementation/VERSIONING-LINEAGE.md`](implementation/VERSIONING-LINEAGE.md) | L |
-| 12 | Import & upload | [`research/modules/12-import-upload.md`](research/modules/12-import-upload.md) | [`implementation/IMPORT-UPLOAD.md`](implementation/IMPORT-UPLOAD.md) | L |
+| #   | Module                                   | Research                                                                                 | Implementation                                                                 | Effort |
+| --- | ---------------------------------------- | ---------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------ | ------ |
+| 17  | Search / tags / collections / favourites | [`research/modules/17-search-catalogue.md`](research/modules/17-search-catalogue.md)     | [`implementation/SEARCH-CATALOGUE.md`](implementation/SEARCH-CATALOGUE.md)     | M-L    |
+| 18  | Versioning & lineage                     | [`research/modules/18-versioning-lineage.md`](research/modules/18-versioning-lineage.md) | [`implementation/VERSIONING-LINEAGE.md`](implementation/VERSIONING-LINEAGE.md) | L      |
+| 12  | Import & upload                          | [`research/modules/12-import-upload.md`](research/modules/12-import-upload.md)           | [`implementation/IMPORT-UPLOAD.md`](implementation/IMPORT-UPLOAD.md)           | L      |
 
 **Why this order:**
 
@@ -277,6 +282,7 @@ dataset and see what breaks before confirming. Upload a CSV
 and chart it in a minute."
 
 **Exit criteria:**
+
 - Cmd-K p95 < 250 ms.
 - Rollback works on dataset, analysis, dashboard.
 - A 100 MB CSV upload + first chart in < 60 s end-to-end.
@@ -287,13 +293,13 @@ and chart it in a minute."
 
 **Goal:** the answers an enterprise procurement team needs.
 
-| # | Module | Research | Implementation | Effort |
-|---|---|---|---|---|
-| 24 | Admin console & org settings | [`research/modules/24-admin-console.md`](research/modules/24-admin-console.md) | [`implementation/ADMIN-CONSOLE.md`](implementation/ADMIN-CONSOLE.md) | L |
-| 20 | Branding & white-label | [`research/modules/20-branding.md`](research/modules/20-branding.md) | [`implementation/BRANDING.md`](implementation/BRANDING.md) | M-L |
-| 23 | i18n & a11y | [`research/modules/23-i18n-a11y.md`](research/modules/23-i18n-a11y.md) | [`implementation/I18N-A11Y.md`](implementation/I18N-A11Y.md) | L |
-| 22 | API / SDK / plugins | [`research/modules/22-api-sdk-plugins.md`](research/modules/22-api-sdk-plugins.md) | [`implementation/API-SDK-PLUGINS.md`](implementation/API-SDK-PLUGINS.md) | L |
-| 27 | Cost observability | [`research/modules/27-cost-observability.md`](research/modules/27-cost-observability.md) | [`implementation/COST-OBSERVABILITY.md`](implementation/COST-OBSERVABILITY.md) | M |
+| #   | Module                       | Research                                                                                 | Implementation                                                                 | Effort |
+| --- | ---------------------------- | ---------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------ | ------ |
+| 24  | Admin console & org settings | [`research/modules/24-admin-console.md`](research/modules/24-admin-console.md)           | [`implementation/ADMIN-CONSOLE.md`](implementation/ADMIN-CONSOLE.md)           | L      |
+| 20  | Branding & white-label       | [`research/modules/20-branding.md`](research/modules/20-branding.md)                     | [`implementation/BRANDING.md`](implementation/BRANDING.md)                     | M-L    |
+| 23  | i18n & a11y                  | [`research/modules/23-i18n-a11y.md`](research/modules/23-i18n-a11y.md)                   | [`implementation/I18N-A11Y.md`](implementation/I18N-A11Y.md)                   | L      |
+| 22  | API / SDK / plugins          | [`research/modules/22-api-sdk-plugins.md`](research/modules/22-api-sdk-plugins.md)       | [`implementation/API-SDK-PLUGINS.md`](implementation/API-SDK-PLUGINS.md)       | L      |
+| 27  | Cost observability           | [`research/modules/27-cost-observability.md`](research/modules/27-cost-observability.md) | [`implementation/COST-OBSERVABILITY.md`](implementation/COST-OBSERVABILITY.md) | M      |
 
 **Why this order:**
 
@@ -316,6 +322,7 @@ language, with their MSP's API integration, with budgets that
 auto-pause the warehouse."
 
 **Exit criteria:**
+
 - Admin shell replaces all scattered admin pages.
 - One white-label design partner live on custom domain.
 - Spanish + French + German bundles GA.
@@ -329,11 +336,11 @@ auto-pause the warehouse."
 **Goal:** the things that take DBExec from "another BI" to
 "the BI". Three modules.
 
-| # | Module | Research | Implementation | Effort |
-|---|---|---|---|---|
-| 21 | Mobile / PWA | [`research/modules/21-mobile-pwa.md`](research/modules/21-mobile-pwa.md) | [`implementation/MOBILE-PWA.md`](implementation/MOBILE-PWA.md) | M |
-| 26 | Geo, maps, specialty charts | [`research/modules/26-geo-maps.md`](research/modules/26-geo-maps.md) | [`implementation/GEO-MAPS.md`](implementation/GEO-MAPS.md) | M |
-| 25 | AI insights & dashboard generation | [`research/modules/25-ai-insights.md`](research/modules/25-ai-insights.md) + [`implementation/AI-DASHBOARD-GENERATION.md`](implementation/AI-DASHBOARD-GENERATION.md) | L |
+| #   | Module                             | Research                                                                                                                                                              | Implementation                                                 | Effort |
+| --- | ---------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------- | ------ |
+| 21  | Mobile / PWA                       | [`research/modules/21-mobile-pwa.md`](research/modules/21-mobile-pwa.md)                                                                                              | [`implementation/MOBILE-PWA.md`](implementation/MOBILE-PWA.md) | M      |
+| 26  | Geo, maps, specialty charts        | [`research/modules/26-geo-maps.md`](research/modules/26-geo-maps.md)                                                                                                  | [`implementation/GEO-MAPS.md`](implementation/GEO-MAPS.md)     | M      |
+| 25  | AI insights & dashboard generation | [`research/modules/25-ai-insights.md`](research/modules/25-ai-insights.md) + [`implementation/AI-DASHBOARD-GENERATION.md`](implementation/AI-DASHBOARD-GENERATION.md) | L                                                              |
 
 **Why this order:**
 
@@ -353,6 +360,7 @@ team sees million-point GPS heatmap. Analyst types 'sales by
 region for Q2' and a dashboard appears."
 
 **Exit criteria:**
+
 - PWA installable + offline read works on iOS + Android.
 - H3 heatmap handles 1M points in < 2 s.
 - AI generation produces working dashboards on three demo
@@ -397,24 +405,24 @@ A few alternative orderings I considered and rejected:
   feature.
 - **"Ship cost obs in Phase 1 — finance asked."** Cost telemetry
   matters only when you have customers on usage-priced
-  warehouses *and* there's a budget to enforce. Both are Phase
+  warehouses _and_ there's a budget to enforce. Both are Phase
   4 / 5 problems.
 
 ---
 
 ## Per-phase risk register
 
-| Phase | Top risk | Mitigation |
-|---|---|---|
-| 0 | Hardening backlog drift | timebox to 3 weeks; cut what doesn't move customer outcomes |
-| 1 | SSO IdP variance | start with Okta only; document allowed SAML/OIDC quirks |
-| 2 | Semantic layer scope creep | ship only the 9 metric kinds we picked; defer derived chains, time-grain shift |
-| 3 | Audit hash-chain perf at scale | per-org `pg_advisory_xact_lock` benchmarked at 1M rows before GA |
-| 4 | Cache invalidation correctness | versioned invalidation + every test runs with cache OFF + cache ON |
-| 5 | Embed JWT replay across regions | jti TTL == JWT TTL; tested across two regions in soak |
-| 6 | Search drift on rapid edits | indexer lag SLO + alert; nightly reconciliation cron |
-| 7 | i18n CI flakiness | enforce as warning for 2 weeks before blocking; on-ramp existing English |
-| 8 | AI provider outage | provider abstraction + circuit-breaker + fallback model |
+| Phase | Top risk                        | Mitigation                                                                     |
+| ----- | ------------------------------- | ------------------------------------------------------------------------------ |
+| 0     | Hardening backlog drift         | timebox to 3 weeks; cut what doesn't move customer outcomes                    |
+| 1     | SSO IdP variance                | start with Okta only; document allowed SAML/OIDC quirks                        |
+| 2     | Semantic layer scope creep      | ship only the 9 metric kinds we picked; defer derived chains, time-grain shift |
+| 3     | Audit hash-chain perf at scale  | per-org `pg_advisory_xact_lock` benchmarked at 1M rows before GA               |
+| 4     | Cache invalidation correctness  | versioned invalidation + every test runs with cache OFF + cache ON             |
+| 5     | Embed JWT replay across regions | jti TTL == JWT TTL; tested across two regions in soak                          |
+| 6     | Search drift on rapid edits     | indexer lag SLO + alert; nightly reconciliation cron                           |
+| 7     | i18n CI flakiness               | enforce as warning for 2 weeks before blocking; on-ramp existing English       |
+| 8     | AI provider outage              | provider abstraction + circuit-breaker + fallback model                        |
 
 ---
 
@@ -422,17 +430,17 @@ A few alternative orderings I considered and rejected:
 
 Single full-stack engineer, no parallelism:
 
-| Phase | Wall time |
-|---|---|
-| 0 | 3 weeks |
-| 1 | 8 weeks |
-| 2 | 6 weeks |
-| 3 | 6 weeks |
-| 4 | 10 weeks |
-| 5 | 6 weeks |
-| 6 | 7 weeks |
-| 7 | 10 weeks |
-| 8 | 7 weeks |
+| Phase     | Wall time     |
+| --------- | ------------- |
+| 0         | 3 weeks       |
+| 1         | 8 weeks       |
+| 2         | 6 weeks       |
+| 3         | 6 weeks       |
+| 4         | 10 weeks      |
+| 5         | 6 weeks       |
+| 6         | 7 weeks       |
+| 7         | 10 weeks      |
+| 8         | 7 weeks       |
 | **Total** | **~63 weeks** |
 
 With two engineers running independent tracks, drop to

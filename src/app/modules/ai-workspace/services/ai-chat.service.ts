@@ -64,7 +64,12 @@ type AgentEvent =
       total: number;
       startedAt: number;
     }
-  | { type: 'subagent_event'; toolCallId: string; agent: string; event: SubAgentEvent }
+  | {
+      type: 'subagent_event';
+      toolCallId: string;
+      agent: string;
+      event: SubAgentEvent;
+    }
   | {
       type: 'delegate_end';
       toolCallId: string;
@@ -197,7 +202,7 @@ export class AiChatService {
    */
   noteAssistant(text: string): void {
     if (!text) return;
-    this._messages.update((m) => [
+    this._messages.update(m => [
       ...m,
       { role: 'assistant', text, cards: [], steps: [] },
     ]);
@@ -209,7 +214,7 @@ export class AiChatService {
     if (!text || this._streaming()) return;
 
     // Append the user message + an empty assistant bubble to fill in.
-    this._messages.update((m) => [
+    this._messages.update(m => [
       ...m,
       { role: 'user', text, cards: [], steps: [] },
       { role: 'assistant', text: '', cards: [], steps: [], progress: [] },
@@ -255,7 +260,11 @@ export class AiChatService {
   // ── Socket lifecycle ───────────────────────────────────────────────
 
   private connect(): void {
-    if (this.ws && (this.ws.readyState === WebSocket.OPEN || this.ws.readyState === WebSocket.CONNECTING)) {
+    if (
+      this.ws &&
+      (this.ws.readyState === WebSocket.OPEN ||
+        this.ws.readyState === WebSocket.CONNECTING)
+    ) {
       return;
     }
     this.closingIntentionally = false;
@@ -303,7 +312,7 @@ export class AiChatService {
       this._socketState.set('closed');
       // If a turn was mid-flight, surface a connection error on it.
       if (this._streaming() && this.streamingIdx >= 0) {
-        this.patchAssistant(this.streamingIdx, (msg) => {
+        this.patchAssistant(this.streamingIdx, msg => {
           msg.progress = [];
           msg.cards.push({ kind: 'error', message: 'Connection lost.' });
         });
@@ -336,8 +345,11 @@ export class AiChatService {
         }),
       );
     } catch {
-      this.patchAssistant(this.streamingIdx, (msg) => {
-        msg.cards.push({ kind: 'error', message: 'Could not send the message.' });
+      this.patchAssistant(this.streamingIdx, msg => {
+        msg.cards.push({
+          kind: 'error',
+          message: 'Could not send the message.',
+        });
       });
       this._streaming.set(false);
     }
@@ -353,14 +365,14 @@ export class AiChatService {
         break; // socket authenticated; nothing to render
       case 'routing':
         this._routedAgent.set(event.agent);
-        this.patchAssistant(idx, (m) => (m.routedAgent = event.agent));
+        this.patchAssistant(idx, m => (m.routedAgent = event.agent));
         break;
       case 'message_delta':
         // Top-level supervisor text.
-        this.patchAssistant(idx, (m) => (m.text += event.text));
+        this.patchAssistant(idx, m => (m.text += event.text));
         break;
       case 'tool_start':
-        this.patchAssistant(idx, (m) => {
+        this.patchAssistant(idx, m => {
           m.progress = [...(m.progress ?? []), event.label];
           m.steps.push({
             toolCallId: event.toolCallId,
@@ -372,19 +384,20 @@ export class AiChatService {
         });
         break;
       case 'tool_end':
-        this.patchAssistant(idx, (m) => {
+        this.patchAssistant(idx, m => {
           const step = this.findStep(m.steps, event.toolCallId);
           if (step) {
             step.status = event.isError ? 'error' : 'done';
             step.endedAt = event.endedAt;
-            if (event.resultPreview !== undefined) step.resultPreview = event.resultPreview;
+            if (event.resultPreview !== undefined)
+              step.resultPreview = event.resultPreview;
             if (event.card) step.card = event.card;
           }
           if (event.card) m.cards.push(event.card);
         });
         break;
       case 'delegate_start':
-        this.patchAssistant(idx, (m) => {
+        this.patchAssistant(idx, m => {
           m.progress = [...(m.progress ?? []), event.label];
           m.steps.push({
             toolCallId: event.toolCallId,
@@ -408,14 +421,14 @@ export class AiChatService {
         });
         break;
       case 'subagent_event':
-        this.patchAssistant(idx, (m) => {
+        this.patchAssistant(idx, m => {
           const parent = this.findStep(m.steps, event.toolCallId);
           const sub = parent?.subAgents?.[0];
           if (sub) this.applySubEvent(sub, event.event);
         });
         break;
       case 'delegate_end':
-        this.patchAssistant(idx, (m) => {
+        this.patchAssistant(idx, m => {
           const parent = this.findStep(m.steps, event.toolCallId);
           if (!parent) return;
           const status: AiStepStatus = event.isError ? 'error' : 'done';
@@ -429,15 +442,15 @@ export class AiChatService {
         });
         break;
       case 'card':
-        this.patchAssistant(idx, (m) => m.cards.push(event.card));
+        this.patchAssistant(idx, m => m.cards.push(event.card));
         break;
       case 'done':
         this._conversationId.set(event.conversationId);
-        this.patchAssistant(idx, (m) => (m.progress = []));
+        this.patchAssistant(idx, m => (m.progress = []));
         this._streaming.set(false);
         break;
       case 'error':
-        this.patchAssistant(idx, (m) => {
+        this.patchAssistant(idx, m => {
           m.progress = [];
           m.cards.push({ kind: 'error', message: event.message });
         });
@@ -466,7 +479,8 @@ export class AiChatService {
         if (step) {
           step.status = ev.isError ? 'error' : 'done';
           step.endedAt = Date.now();
-          if (ev.resultPreview !== undefined) step.resultPreview = ev.resultPreview;
+          if (ev.resultPreview !== undefined)
+            step.resultPreview = ev.resultPreview;
           if (ev.card) step.card = ev.card;
         }
         break;
@@ -482,8 +496,11 @@ export class AiChatService {
   }
 
   /** Find a step by toolCallId within a step list (one shallow level). */
-  private findStep(steps: ToolStep[], toolCallId: string): ToolStep | undefined {
-    return steps.find((s) => s.toolCallId === toolCallId);
+  private findStep(
+    steps: ToolStep[],
+    toolCallId: string,
+  ): ToolStep | undefined {
+    return steps.find(s => s.toolCallId === toolCallId);
   }
 
   /**
@@ -494,7 +511,7 @@ export class AiChatService {
    */
   private patchAssistant(idx: number, fn: (m: AiThreadMessage) => void): void {
     if (idx < 0) return;
-    this._messages.update((list) => {
+    this._messages.update(list => {
       if (idx >= list.length) return list;
       const next = list.slice();
       const msg = {
@@ -510,9 +527,9 @@ export class AiChatService {
 
   /** Deep-clone the step tree so in-place reducer mutation stays OnPush-safe. */
   private cloneSteps(steps: ToolStep[]): ToolStep[] {
-    return steps.map((s) => ({
+    return steps.map(s => ({
       ...s,
-      subAgents: s.subAgents?.map((sa) => ({
+      subAgents: s.subAgents?.map(sa => ({
         ...sa,
         steps: this.cloneSteps(sa.steps),
       })),
@@ -528,7 +545,7 @@ export class AiChatService {
         { skipLoader: true },
       )
       .subscribe({
-        next: (res) => this._conversations.set(res?.data?.items ?? []),
+        next: res => this._conversations.set(res?.data?.items ?? []),
         error: () => this._conversations.set([]),
       });
   }
@@ -548,12 +565,12 @@ export class AiChatService {
         };
       }>(`${AI_WORKSPACE.CONVERSATION}${id}`, { skipLoader: true })
       .subscribe({
-        next: (res) => {
+        next: res => {
           const msgs = res?.data?.messages ?? [];
           this._messages.set(
             msgs
-              .filter((m) => m.role === 'user' || m.role === 'assistant')
-              .map((m) => ({
+              .filter(m => m.role === 'user' || m.role === 'assistant')
+              .map(m => ({
                 role: m.role as 'user' | 'assistant',
                 text: m.content ?? '',
                 cards: m.cards ?? [],

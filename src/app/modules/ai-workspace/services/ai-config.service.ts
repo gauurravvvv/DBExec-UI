@@ -43,7 +43,7 @@ export class AiConfigService {
     this.http
       .apiGet<{ data?: AiConfig }>(AI_WORKSPACE.CONFIG, { skipLoader: true })
       .subscribe({
-        next: (res) => this._config.set(res?.data ?? null),
+        next: res => this._config.set(res?.data ?? null),
         error: () => this._config.set(null),
       });
   }
@@ -77,14 +77,13 @@ export class AiConfigService {
    */
   refreshHealth(): void {
     if (this._health() === null) {
-      const seeded =
-        StorageService.get(StorageType.AI_CONFIGURED) === 'true';
+      const seeded = StorageService.get(StorageType.AI_CONFIGURED) === 'true';
       this._health.set({ enabled: seeded, configured: seeded });
     }
     this.http
       .apiGet<{ data?: AiHealth }>(AI_WORKSPACE.HEALTH, { skipLoader: true })
       .subscribe({
-        next: (res) =>
+        next: res =>
           this._health.set(res?.data ?? { enabled: false, configured: false }),
         error: () => {
           // Keep the seeded value on a probe failure rather than forcing

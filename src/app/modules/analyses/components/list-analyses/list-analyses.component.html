@@ -98,13 +98,18 @@
             >
               <i
                 class="pi"
-                [ngClass]="isFavourite(analysis.id) ? 'pi-star-fill' : 'pi-star'"
+                [ngClass]="
+                  isFavourite(analysis.id) ? 'pi-star-fill' : 'pi-star'
+                "
               ></i>
             </button>
           </ng-template>
 
           <ng-template usGridCell="name" let-analysis>
-            <a class="dataset-name-link" [routerLink]="['/app/analyses', analysis.id]">
+            <a
+              class="dataset-name-link"
+              [routerLink]="['/app/analyses', analysis.id]"
+            >
               {{ analysis.name }}
             </a>
           </ng-template>
@@ -128,7 +133,9 @@
             >
               {{ analysis.dataset.name }}
             </app-chip>
-            <span class="ds-badge muted" *ngIf="!analysis.dataset?.name">—</span>
+            <span class="ds-badge muted" *ngIf="!analysis.dataset?.name"
+              >—</span
+            >
           </ng-template>
 
           <!-- Visuals-count column (module-specific). -->
@@ -163,7 +170,9 @@
           <ng-template usGridCell="createdOn" let-analysis>
             <span
               class="date-text"
-              [pTooltip]="(analysis.createdOn | date: 'dd MMM yyyy, HH:mm:ss') || ''"
+              [pTooltip]="
+                (analysis.createdOn | date: 'dd MMM yyyy, HH:mm:ss') || ''
+              "
               tooltipPosition="top"
             >
               {{ analysis.createdOn | relativeTime }}

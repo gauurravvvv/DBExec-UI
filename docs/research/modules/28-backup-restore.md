@@ -14,22 +14,22 @@
 
 **Depends on:** Admin (24), Audit (19), Auth (10)
 **Unblocks:** SOC2 BCDR controls, customer "give us our data back",
-  regional data residency
+regional data residency
 **Maturity:** 🔴 not in product today
 
 ---
 
 ## 1. Industry baseline
 
-| Tool | Logical backup | PITR | Verify-restore | Multi-region | Legal hold |
-|---|---|---|---|---|---|
-| **Tableau Server** | ✓ (`tsm maintenance backup`) | partial | manual | partial | ✗ |
-| **Power BI** | n/a (cloud) | n/a | n/a | ✓ | ✓ |
-| **Looker** | ✓ (`looker backup`) | n/a | manual | ✓ | partial |
-| **Metabase** | partial | ✗ | ✗ | ✗ | ✗ |
-| **Hex** | n/a (cloud) | n/a | n/a | ✓ | ✓ |
-| **GitHub** | ✓ (account migration) | ✓ | ✓ | ✓ | ✓ |
-| **AWS RDS** | ✓ | ✓ | ✗ (need to test) | ✓ (read replicas) | n/a |
+| Tool               | Logical backup               | PITR    | Verify-restore   | Multi-region      | Legal hold |
+| ------------------ | ---------------------------- | ------- | ---------------- | ----------------- | ---------- |
+| **Tableau Server** | ✓ (`tsm maintenance backup`) | partial | manual           | partial           | ✗          |
+| **Power BI**       | n/a (cloud)                  | n/a     | n/a              | ✓                 | ✓          |
+| **Looker**         | ✓ (`looker backup`)          | n/a     | manual           | ✓                 | partial    |
+| **Metabase**       | partial                      | ✗       | ✗                | ✗                 | ✗          |
+| **Hex**            | n/a (cloud)                  | n/a     | n/a              | ✓                 | ✓          |
+| **GitHub**         | ✓ (account migration)        | ✓       | ✓                | ✓                 | ✓          |
+| **AWS RDS**        | ✓                            | ✓       | ✗ (need to test) | ✓ (read replicas) | n/a        |
 
 **The patterns to copy:**
 
@@ -60,26 +60,26 @@
 
 ## 3. Gap matrix
 
-| ID | Gap | Severity | Effort |
-|---|---|---|---|
-| BU-G01 | Logical backup job (per org, on demand) | P0 | M |
-| BU-G02 | Logical backup schedule (daily / weekly) | P0 | S |
-| BU-G03 | Backup artifact table + S3 storage | P0 | M |
-| BU-G04 | KMS encryption of backup artifacts | P0 | S |
-| BU-G05 | Customer-managed KMS keys (BYOK) | P1 | M |
-| BU-G06 | Self-serve restore (full org) | P1 | L |
-| BU-G07 | Self-serve restore (per entity: rolled-back dataset, etc.) | P1 | M |
-| BU-G08 | Sandbox restore for verification | P0 | M |
-| BU-G09 | Verify-restore weekly job + alert on failure | P0 | M |
-| BU-G10 | PITR via WAL (Postgres) | P1 | L |
-| BU-G11 | Multi-region replication | P2 | L |
-| BU-G12 | Cross-region failover playbook | P2 | M |
-| BU-G13 | Legal hold flag with retention bypass | P1 | S |
-| BU-G14 | Backup retention policy per org | P0 | S |
-| BU-G15 | Audit log of every backup + restore action | P0 | S |
-| BU-G16 | Webhook event `backup.completed` / `restore.completed` | P1 | S |
-| BU-G17 | Backup browser (admin UI) — list + filter + download | P0 | M |
-| BU-G18 | Restore dry-run with diff against current state | P1 | M |
+| ID     | Gap                                                        | Severity | Effort |
+| ------ | ---------------------------------------------------------- | -------- | ------ |
+| BU-G01 | Logical backup job (per org, on demand)                    | P0       | M      |
+| BU-G02 | Logical backup schedule (daily / weekly)                   | P0       | S      |
+| BU-G03 | Backup artifact table + S3 storage                         | P0       | M      |
+| BU-G04 | KMS encryption of backup artifacts                         | P0       | S      |
+| BU-G05 | Customer-managed KMS keys (BYOK)                           | P1       | M      |
+| BU-G06 | Self-serve restore (full org)                              | P1       | L      |
+| BU-G07 | Self-serve restore (per entity: rolled-back dataset, etc.) | P1       | M      |
+| BU-G08 | Sandbox restore for verification                           | P0       | M      |
+| BU-G09 | Verify-restore weekly job + alert on failure               | P0       | M      |
+| BU-G10 | PITR via WAL (Postgres)                                    | P1       | L      |
+| BU-G11 | Multi-region replication                                   | P2       | L      |
+| BU-G12 | Cross-region failover playbook                             | P2       | M      |
+| BU-G13 | Legal hold flag with retention bypass                      | P1       | S      |
+| BU-G14 | Backup retention policy per org                            | P0       | S      |
+| BU-G15 | Audit log of every backup + restore action                 | P0       | S      |
+| BU-G16 | Webhook event `backup.completed` / `restore.completed`     | P1       | S      |
+| BU-G17 | Backup browser (admin UI) — list + filter + download       | P0       | M      |
+| BU-G18 | Restore dry-run with diff against current state            | P1       | M      |
 
 ## 4. Target architecture
 
@@ -143,7 +143,7 @@ import { KMSClient, EncryptCommand } from '@aws-sdk/client-kms';
 
 export default async function backupOrgJob(jobData: {
   organisationId: string;
-  trigger: 'manual'|'scheduled'|'gdpr'|'clone';
+  trigger: 'manual' | 'scheduled' | 'gdpr' | 'clone';
   triggeredBy?: string;
 }) {
   const orgId = jobData.organisationId;
@@ -158,7 +158,9 @@ export default async function backupOrgJob(jobData: {
 
   for (const t of tables) {
     // Cursor-based scan to keep memory bounded
-    const cursor = await conn.query(`DECLARE c CURSOR FOR SELECT * FROM "${t}"`);
+    const cursor = await conn.query(
+      `DECLARE c CURSOR FOR SELECT * FROM "${t}"`,
+    );
     while (true) {
       const batch = await conn.query('FETCH 1000 FROM c');
       if (batch.rows.length === 0) break;
@@ -189,20 +191,25 @@ export default async function backupOrgJob(jobData: {
   const gzipped = await gzipBuffer(Buffer.from(body, 'utf8'));
 
   // 5. Encrypt (KMS or per-org DEK)
-  const { encrypted, encryptedBy, kmsKeyArn } = await encryptBackup(gzipped, orgId);
+  const { encrypted, encryptedBy, kmsKeyArn } = await encryptBackup(
+    gzipped,
+    orgId,
+  );
 
   // 6. Upload to S3
   const key = `backups/${orgId}/${meta.createdAt}.json.gz.enc`;
-  await s3.upload({
-    Bucket: process.env.BACKUP_BUCKET!,
-    Key: key,
-    Body: encrypted,
-    Metadata: {
-      'x-dbexec-checksum': checksum,
-      'x-dbexec-org': orgId,
-      'x-dbexec-trigger': jobData.trigger,
-    },
-  }).promise();
+  await s3
+    .upload({
+      Bucket: process.env.BACKUP_BUCKET!,
+      Key: key,
+      Body: encrypted,
+      Metadata: {
+        'x-dbexec-checksum': checksum,
+        'x-dbexec-org': orgId,
+        'x-dbexec-trigger': jobData.trigger,
+      },
+    })
+    .promise();
 
   // 7. Record artifact
   const retentionDays = await loadRetentionDays(orgId);
@@ -219,13 +226,17 @@ export default async function backupOrgJob(jobData: {
     kmsKeyArn,
     createdBy: jobData.triggeredBy,
     trigger: jobData.trigger,
-    expiresAt: retentionDays ? new Date(Date.now() + retentionDays * 86400_000) : null,
+    expiresAt: retentionDays
+      ? new Date(Date.now() + retentionDays * 86400_000)
+      : null,
   });
 
   // 8. Audit + webhook
   await auditLogger.logAuditToMaster({
-    module: 'backup', action: 'CREATE',
-    entityName: 'BackupArtifact', entityId: artifact.id,
+    module: 'backup',
+    action: 'CREATE',
+    entityName: 'BackupArtifact',
+    entityId: artifact.id,
     organisationId: orgId,
     metadata: {
       sizeBytes: encrypted.length,
@@ -238,8 +249,10 @@ export default async function backupOrgJob(jobData: {
     type: 'backup.completed',
     organisationId: orgId,
     payload: {
-      backupId: artifact.id, sizeBytes: encrypted.length,
-      checksum, trigger: jobData.trigger,
+      backupId: artifact.id,
+      sizeBytes: encrypted.length,
+      checksum,
+      trigger: jobData.trigger,
     },
     actor: { type: 'service', id: 'backup-worker' },
   });
@@ -260,21 +273,28 @@ async function gzipBuffer(buf: Buffer): Promise<Buffer> {
 ### 4.3 Encryption (KMS + BYOK)
 
 ```ts
-async function encryptBackup(plaintext: Buffer, orgId: string): Promise<{
+async function encryptBackup(
+  plaintext: Buffer,
+  orgId: string,
+): Promise<{
   encrypted: Buffer;
   encryptedBy: 'kms' | 'platform' | 'byok';
   kmsKeyArn?: string;
 }> {
-  const byok = await OrgByokKey.findOne({ where: { organisationId: orgId, status: 1 } });
+  const byok = await OrgByokKey.findOne({
+    where: { organisationId: orgId, status: 1 },
+  });
 
   if (byok) {
     // Customer-managed KMS — encrypt with their CMK
     const kms = new KMSClient({ region: byok.region });
-    const resp = await kms.send(new EncryptCommand({
-      KeyId: byok.keyArn,
-      Plaintext: plaintext,
-      EncryptionContext: { orgId, purpose: 'backup' },
-    }));
+    const resp = await kms.send(
+      new EncryptCommand({
+        KeyId: byok.keyArn,
+        Plaintext: plaintext,
+        EncryptionContext: { orgId, purpose: 'backup' },
+      }),
+    );
     return {
       encrypted: Buffer.from(resp.CiphertextBlob!),
       encryptedBy: 'byok',
@@ -284,11 +304,13 @@ async function encryptBackup(plaintext: Buffer, orgId: string): Promise<{
 
   // Platform-managed KMS
   const platformKms = new KMSClient({ region: process.env.AWS_REGION! });
-  const resp = await platformKms.send(new EncryptCommand({
-    KeyId: process.env.PLATFORM_KMS_KEY_ID!,
-    Plaintext: plaintext,
-    EncryptionContext: { orgId, purpose: 'backup' },
-  }));
+  const resp = await platformKms.send(
+    new EncryptCommand({
+      KeyId: process.env.PLATFORM_KMS_KEY_ID!,
+      Plaintext: plaintext,
+      EncryptionContext: { orgId, purpose: 'backup' },
+    }),
+  );
   return {
     encrypted: Buffer.from(resp.CiphertextBlob!),
     encryptedBy: 'kms',
@@ -332,7 +354,7 @@ export default async function restoreOrgJob(jobData: {
   backupId: string;
   targetOrgId: string;
   mode: 'full' | 'merge' | 'selective';
-  selective?: string[];          // table names when mode=selective
+  selective?: string[]; // table names when mode=selective
   triggeredBy: string;
   dryRun: boolean;
 }) {
@@ -342,7 +364,9 @@ export default async function restoreOrgJob(jobData: {
   if (!artifact) throw new Error('backup not found or not for this org');
 
   // 1. Download from S3
-  const obj = await s3.getObject({ Bucket: artifact.bucket, Key: artifact.key }).promise();
+  const obj = await s3
+    .getObject({ Bucket: artifact.bucket, Key: artifact.key })
+    .promise();
   const encrypted = Buffer.from(obj.Body as Buffer);
 
   // 2. Decrypt
@@ -360,7 +384,9 @@ export default async function restoreOrgJob(jobData: {
   const lineList = body.split('\n');
   const meta = JSON.parse(lineList[0]);
   if (meta.organisationId !== jobData.targetOrgId && jobData.mode !== 'full') {
-    throw new Error('org id mismatch — cross-org restore requires mode=full and explicit consent');
+    throw new Error(
+      'org id mismatch — cross-org restore requires mode=full and explicit consent',
+    );
   }
 
   // 5. Bucket rows by table
@@ -381,10 +407,11 @@ export default async function restoreOrgJob(jobData: {
 
   // 7. Apply
   const conn = await openOrgConnection(jobData.targetOrgId);
-  await conn.transaction(async (tx) => {
-    const tables = jobData.mode === 'selective'
-      ? jobData.selective ?? []
-      : Array.from(rowsByTable.keys());
+  await conn.transaction(async tx => {
+    const tables =
+      jobData.mode === 'selective'
+        ? (jobData.selective ?? [])
+        : Array.from(rowsByTable.keys());
 
     for (const t of tables) {
       const rows = rowsByTable.get(t) ?? [];
@@ -474,14 +501,22 @@ async function verifyOne(artifact: BackupArtifact) {
 
   try {
     // 1. Download + decrypt + checksum
-    const obj = await s3.getObject({
-      Bucket: artifact.bucket, Key: artifact.key,
-    }).promise();
-    const decrypted = await decryptBackup(Buffer.from(obj.Body as any), artifact);
+    const obj = await s3
+      .getObject({
+        Bucket: artifact.bucket,
+        Key: artifact.key,
+      })
+      .promise();
+    const decrypted = await decryptBackup(
+      Buffer.from(obj.Body as any),
+      artifact,
+    );
     const gunzipped = await gunzipBuffer(decrypted);
     const checksum = createHash('sha256').update(gunzipped).digest('hex');
     if (checksum !== artifact.checksumSha256) {
-      throw new Error(`checksum mismatch: ${checksum} vs ${artifact.checksumSha256}`);
+      throw new Error(
+        `checksum mismatch: ${checksum} vs ${artifact.checksumSha256}`,
+      );
     }
     const body = gunzipped.toString('utf8');
     const lineList = body.split('\n');
@@ -494,7 +529,9 @@ async function verifyOne(artifact: BackupArtifact) {
     // 3. Apply a representative subset (don't restore the full backup —
     //    too expensive in CI cost). Restore the schema DDL + 10% of rows.
     const rowsByTable = new Map<string, any[]>();
-    for (const line of lineList.slice(1).slice(0, Math.max(1000, lineList.length * 0.1))) {
+    for (const line of lineList
+      .slice(1)
+      .slice(0, Math.max(1000, lineList.length * 0.1))) {
       if (!line) continue;
       const { table, row } = JSON.parse(line);
       if (!rowsByTable.has(table)) rowsByTable.set(table, []);
@@ -509,7 +546,9 @@ async function verifyOne(artifact: BackupArtifact) {
       const cnt = await sandboxConn.query(`
         SELECT COUNT(*) AS c FROM "${sandboxSchema}"."${t}"`);
       if (cnt[0].c === 0 && meta.tableCounts[t] > 0) {
-        throw new Error(`table ${t} restored empty but backup had ${meta.tableCounts[t]} rows`);
+        throw new Error(
+          `table ${t} restored empty but backup had ${meta.tableCounts[t]} rows`,
+        );
       }
     }
 
@@ -527,7 +566,10 @@ async function verifyOne(artifact: BackupArtifact) {
     });
     if (!ok) {
       // Alert ops
-      await notifyOpsTeam('backup.verify_failed', { artifactId: artifact.id, notes });
+      await notifyOpsTeam('backup.verify_failed', {
+        artifactId: artifact.id,
+        notes,
+      });
     }
   }
 }
@@ -641,7 +683,8 @@ GDPR erasure (module 24) explicitly checks for legal hold:
 ```ts
 if (await hasActiveLegalHold(userId)) {
   await GdprRequest.update(requestId, {
-    status: 'failed', error: 'legal_hold_active',
+    status: 'failed',
+    error: 'legal_hold_active',
   });
   await notifyDpo('gdpr.erasure_blocked_by_legal_hold', { userId, requestId });
   return;
@@ -768,22 +811,22 @@ Dry-run result
 
 ## 5. APIs
 
-| Method | Path | Purpose |
-|---|---|---|
-| POST | `/admin/backups` | Create backup now (manual trigger) |
-| GET | `/admin/backups` | List for current org |
-| GET | `/admin/backups/:id` | Detail |
-| GET | `/admin/backups/:id/download` | Download (admin) |
-| POST | `/admin/backups/:id/verify` | Force verify now |
-| POST | `/admin/backups/:id/legal-hold` | Apply hold |
-| DELETE | `/admin/backups/:id/legal-hold` | Release hold |
-| POST | `/admin/backups/:id/restore` | Start restore (dryRun default true) |
-| POST | `/admin/restore-jobs/:id/apply` | Apply after dry-run review |
-| GET | `/admin/restore-jobs/:id` | Status + diff |
-| GET | `/admin/backup-retention` | Retention policy |
-| PUT | `/admin/backup-retention` | Update policy |
-| POST | `/admin/byok` | Register customer-managed KMS key |
-| GET | `/admin/byok` | Show config |
+| Method | Path                            | Purpose                             |
+| ------ | ------------------------------- | ----------------------------------- |
+| POST   | `/admin/backups`                | Create backup now (manual trigger)  |
+| GET    | `/admin/backups`                | List for current org                |
+| GET    | `/admin/backups/:id`            | Detail                              |
+| GET    | `/admin/backups/:id/download`   | Download (admin)                    |
+| POST   | `/admin/backups/:id/verify`     | Force verify now                    |
+| POST   | `/admin/backups/:id/legal-hold` | Apply hold                          |
+| DELETE | `/admin/backups/:id/legal-hold` | Release hold                        |
+| POST   | `/admin/backups/:id/restore`    | Start restore (dryRun default true) |
+| POST   | `/admin/restore-jobs/:id/apply` | Apply after dry-run review          |
+| GET    | `/admin/restore-jobs/:id`       | Status + diff                       |
+| GET    | `/admin/backup-retention`       | Retention policy                    |
+| PUT    | `/admin/backup-retention`       | Update policy                       |
+| POST   | `/admin/byok`                   | Register customer-managed KMS key   |
+| GET    | `/admin/byok`                   | Show config                         |
 
 ## 6. FE specs
 
@@ -796,25 +839,33 @@ export const triggerBackupSchema = z.object({
   // No body; auth + org context suffices
 });
 
-export const restoreSchema = z.object({
-  backupId: z.string().uuid(),
-  mode: z.enum(['full','merge','selective']).default('full'),
-  selective: z.array(z.string()).optional(),
-  dryRun: z.boolean().default(true),
-  confirmation: z.string().min(1),    // user must type org short_name
-}).superRefine((data, ctx) => {
-  if (data.mode === 'selective' && (!data.selective || data.selective.length === 0)) {
-    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['selective'],
-      message: 'restore.selective.empty' });
-  }
-});
+export const restoreSchema = z
+  .object({
+    backupId: z.string().uuid(),
+    mode: z.enum(['full', 'merge', 'selective']).default('full'),
+    selective: z.array(z.string()).optional(),
+    dryRun: z.boolean().default(true),
+    confirmation: z.string().min(1), // user must type org short_name
+  })
+  .superRefine((data, ctx) => {
+    if (
+      data.mode === 'selective' &&
+      (!data.selective || data.selective.length === 0)
+    ) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['selective'],
+        message: 'restore.selective.empty',
+      });
+    }
+  });
 
 export const updateRetentionSchema = z.object({
-  dailyKeepDays:    z.number().int().min(1).max(90).default(7),
-  weeklyKeepWeeks:  z.number().int().min(1).max(52).default(4),
-  monthlyKeepMonths:z.number().int().min(1).max(120).default(12),
-  yearlyKeepYears:  z.number().int().min(1).max(50).default(7),
-  enabled:          z.boolean().default(true),
+  dailyKeepDays: z.number().int().min(1).max(90).default(7),
+  weeklyKeepWeeks: z.number().int().min(1).max(52).default(4),
+  monthlyKeepMonths: z.number().int().min(1).max(120).default(12),
+  yearlyKeepYears: z.number().int().min(1).max(50).default(7),
+  enabled: z.boolean().default(true),
 });
 
 export const legalHoldSchema = z.object({
@@ -823,7 +874,7 @@ export const legalHoldSchema = z.object({
 });
 
 export const byokKeySchema = z.object({
-  provider: z.enum(['aws','gcp','azure']),
+  provider: z.enum(['aws', 'gcp', 'azure']),
   region: z.string().min(1).max(32),
   keyArn: z.string().min(1).max(255),
 });

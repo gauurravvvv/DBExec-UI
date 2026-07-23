@@ -14,7 +14,7 @@ discussion.
 
 A metric where the value of the whole equals the sum of the parts.
 `SUM(revenue)` is additive — `SUM` over the union equals the union
-of `SUM`s. `COUNT_DISTINCT(user_id)` is *not* additive; you cannot
+of `SUM`s. `COUNT_DISTINCT(user_id)` is _not_ additive; you cannot
 add the distinct counts of two partitions to get the distinct count
 of the union.
 
@@ -83,7 +83,7 @@ product concept; relevant only to how this assistant communicates.
 
 ## Compiled query
 
-See *Canonical SQL*.
+See _Canonical SQL_.
 
 ## Connection (in DBExec sense)
 
@@ -105,7 +105,7 @@ you reconstruct an entire flow across services. Defined in
 
 When clicking a value on one visual filters every other visual on
 the same dashboard tab (and optionally sibling tabs). Distinct from
-*drill-through* (which navigates to a different analysis with
+_drill-through_ (which navigates to a different analysis with
 context). Defined in [07-filters-actions §4](modules/07-filters-actions.md).
 
 ## CSP frame-ancestors
@@ -118,8 +118,7 @@ customer's allowed origin. See [14-share-embed §4](modules/14-share-embed.md).
 ## Datasource (`datasource_s`)
 
 The org-DB row that describes a logical analytic database — name,
-engine type, default connection, schemas exposed. Owned by module
-01.
+engine type, default connection, schemas exposed. Owned by module 01.
 
 ## Dataset (`dataset`)
 
@@ -138,14 +137,14 @@ for backups (module 28), brand assets (20), and any signed export.
 
 A specific SQL flavour (Postgres / MySQL / MSSQL / Oracle / Snowflake
 / BigQuery / Redshift / Athena / Databricks). The query processor
-has one *dialect adapter* per dialect. Defined in
+has one _dialect adapter_ per dialect. Defined in
 [04-query-processor §4](modules/04-query-processor.md).
 
 ## Drill-through
 
 Click-through from a visual cell to a pre-configured target —
 another analysis with the clicked dimension prefilled, a URL with
-templated params, or a raw row preview. Distinct from *cross-filter*.
+templated params, or a raw row preview. Distinct from _cross-filter_.
 Defined in [07-filters-actions §4](modules/07-filters-actions.md).
 
 ## Embed App
@@ -207,7 +206,7 @@ every audit row written during the session has
 
 Dashboard view where every visual re-queries against current data
 on each open and on a configurable poll interval. Contrast with
-*snapshot mode* where the dashboard renders a captured point-in-time
+_snapshot mode_ where the dashboard renders a captured point-in-time
 result set. Defined in [08-dashboard §4](modules/08-dashboard.md).
 
 ## Managed datasource
@@ -219,9 +218,9 @@ own warehouse. Defined in [12-import-upload §4](modules/12-import-upload.md).
 
 ## Master DB vs Shared / Org DB
 
-DBExec is multi-tenant. The *master DB* holds org records,
+DBExec is multi-tenant. The _master DB_ holds org records,
 super-admin users, billing, feature flags, and pointers to each
-org's *shared / org DB*. The *shared / org DB* (one per org) holds
+org's _shared / org DB_. The _shared / org DB_ (one per org) holds
 that org's datasets, analyses, dashboards, users, audit log, etc.
 Almost every entity in these docs is in the shared DB; master
 entities are the exception.
@@ -238,7 +237,7 @@ operation. Enforced by `VerifyResourceMiddleware` +
 A user-supplied or context-supplied value that the query processor
 binds into the compiled SQL. Modelled as `analysis_parameter` rows
 with type, default, allowed-values rule, and a name. Distinct from
-*filter* (which constrains the result set without changing the
+_filter_ (which constrains the result set without changing the
 shape). Defined in [06-analysis-visual-builder §4](modules/06-analysis-visual-builder.md)
 and [07-filters-actions §4](modules/07-filters-actions.md).
 
@@ -306,7 +305,7 @@ A reusable, declarative description of a business model:
 entities (= tables with primary keys), joins between them,
 dimensions (= attributes that can be grouped), and metrics (=
 aggregations with additivity rules). The query processor compiles
-a semantic *intent* to canonical SQL using the model. Defined in
+a semantic _intent_ to canonical SQL using the model. Defined in
 [02-semantic-layer.md](modules/02-semantic-layer.md).
 
 ## Semi-additive metric

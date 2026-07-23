@@ -18,7 +18,9 @@
           >
             <i class="pi pi-arrow-left"></i>
           </button>
-          <div class="role-badge"><i class="pi" [ngClass]="isLogin ? 'pi-user' : 'pi-users'"></i></div>
+          <div class="role-badge">
+            <i class="pi" [ngClass]="isLogin ? 'pi-user' : 'pi-users'"></i>
+          </div>
           <div class="hero-meta">
             <h1 class="hero-name">{{ role.name }}</h1>
             <div class="hero-sub">
@@ -27,7 +29,10 @@
                 [tone]="isLogin ? 'primary' : 'neutral'"
                 [icon]="isLogin ? 'pi pi-user' : 'pi pi-users'"
               >
-                {{ (isLogin ? 'DB_ACCESS.TYPE_LOGIN' : 'DB_ACCESS.TYPE_GROUP') | translate }}
+                {{
+                  (isLogin ? 'DB_ACCESS.TYPE_LOGIN' : 'DB_ACCESS.TYPE_GROUP')
+                    | translate
+                }}
               </app-chip>
               <span class="dot">·</span>
               <app-chip
@@ -39,7 +44,9 @@
                 {{ 'DB_ACCESS.STATUS_' + (status() | uppercase) | translate }}
               </app-chip>
               <span class="dot" *ngIf="isLogin">·</span>
-              <app-chip variant="count" icon="pi pi-users">{{ memberCount }}</app-chip>
+              <app-chip variant="count" icon="pi pi-users">{{
+                memberCount
+              }}</app-chip>
             </div>
           </div>
         </div>
@@ -52,7 +59,10 @@
             [pTooltip]="'DB_ACCESS.EXPORT_ACCESS_HINT' | translate"
             tooltipPosition="bottom"
           >
-            <i class="pi" [ngClass]="exporting ? 'pi-spin pi-spinner' : 'pi-download'"></i>
+            <i
+              class="pi"
+              [ngClass]="exporting ? 'pi-spin pi-spinner' : 'pi-download'"
+            ></i>
             {{ 'DB_ACCESS.EXPORT_JSON' | translate }}
           </button>
           <button
@@ -79,7 +89,10 @@
       <!-- Login details — only for login users -->
       <div class="info-card" *ngIf="isLogin">
         <div class="card-header">
-          <h3><i class="pi pi-user"></i>{{ 'DB_ACCESS.LOGIN_DETAILS' | translate }}</h3>
+          <h3>
+            <i class="pi pi-user"></i
+            >{{ 'DB_ACCESS.LOGIN_DETAILS' | translate }}
+          </h3>
         </div>
         <div class="config-grid">
           <div class="config-item">
@@ -96,7 +109,9 @@
           </div>
           <div class="config-item">
             <label>{{ 'DB_ACCESS.EXPIRY' | translate }}</label>
-            <p *ngIf="validUntil; else noExp">{{ validUntil | date: 'dd MMM yyyy' }}</p>
+            <p *ngIf="validUntil; else noExp">
+              {{ validUntil | date: 'dd MMM yyyy' }}
+            </p>
             <ng-template #noExp><p>—</p></ng-template>
           </div>
           <div class="config-item">
@@ -109,10 +124,15 @@
       <!-- Attributes -->
       <div class="info-card">
         <div class="card-header">
-          <h3><i class="pi pi-sliders-h"></i>{{ 'DB_ACCESS.ATTRIBUTES' | translate }}</h3>
+          <h3>
+            <i class="pi pi-sliders-h"></i
+            >{{ 'DB_ACCESS.ATTRIBUTES' | translate }}
+          </h3>
         </div>
         <div class="chip-row">
-          <app-chip variant="tag" tone="primary" *ngFor="let f of flags()">{{ f }}</app-chip>
+          <app-chip variant="tag" tone="primary" *ngFor="let f of flags()">{{
+            f
+          }}</app-chip>
           <span class="empty-inline" *ngIf="!flags().length">—</span>
         </div>
       </div>
@@ -120,43 +140,92 @@
       <!-- Member of -->
       <div class="info-card">
         <div class="card-header">
-          <h3><i class="pi pi-sitemap"></i>{{ 'DB_ACCESS.MEMBER_OF' | translate }}</h3>
+          <h3>
+            <i class="pi pi-sitemap"></i>{{ 'DB_ACCESS.MEMBER_OF' | translate }}
+          </h3>
         </div>
         <div class="chip-row">
-          <app-chip variant="tag" *ngFor="let m of (role.memberOf ?? [])">{{ m }}</app-chip>
-          <span class="empty-inline" *ngIf="!(role.memberOf ?? []).length">—</span>
+          <app-chip variant="tag" *ngFor="let m of role.memberOf ?? []">{{
+            m
+          }}</app-chip>
+          <span class="empty-inline" *ngIf="!(role.memberOf ?? []).length"
+            >—</span
+          >
         </div>
       </div>
 
       <!-- Effective privileges summary -->
       <div class="info-card">
         <div class="card-header">
-          <h3><i class="pi pi-shield"></i>{{ 'DB_ACCESS.TAB_EFFECTIVE' | translate }}</h3>
+          <h3>
+            <i class="pi pi-shield"></i
+            >{{ 'DB_ACCESS.TAB_EFFECTIVE' | translate }}
+          </h3>
         </div>
         <div class="empty-inline" *ngIf="effectiveLoading">
-          <i class="pi pi-spin pi-spinner"></i>{{ 'COMMON.LOADING' | translate }}
+          <i class="pi pi-spin pi-spinner"></i
+          >{{ 'COMMON.LOADING' | translate }}
         </div>
-        <div class="table-wrapper" *ngIf="!effectiveLoading && effective.length">
-          <p-table [value]="effective" [rows]="10" [paginator]="effective.length > 10" styleClass="p-datatable-sm modern-table">
+        <div
+          class="table-wrapper"
+          *ngIf="!effectiveLoading && effective.length"
+        >
+          <p-table
+            [value]="effective"
+            [rows]="10"
+            [paginator]="effective.length > 10"
+            styleClass="p-datatable-sm modern-table"
+          >
             <ng-template pTemplate="header">
               <tr>
-                <th><div class="th-content">{{ 'DB_ACCESS.OBJECT' | translate }}</div></th>
-                <th style="width: 8rem"><div class="th-content">{{ 'DB_ACCESS.OBJECT_TYPE' | translate }}</div></th>
-                <th style="width: 10rem"><div class="th-content">{{ 'DB_ACCESS.PRIVILEGE' | translate }}</div></th>
-                <th style="width: 10rem"><div class="th-content">{{ 'DB_ACCESS.VIA' | translate }}</div></th>
+                <th>
+                  <div class="th-content">
+                    {{ 'DB_ACCESS.OBJECT' | translate }}
+                  </div>
+                </th>
+                <th style="width: 8rem">
+                  <div class="th-content">
+                    {{ 'DB_ACCESS.OBJECT_TYPE' | translate }}
+                  </div>
+                </th>
+                <th style="width: 10rem">
+                  <div class="th-content">
+                    {{ 'DB_ACCESS.PRIVILEGE' | translate }}
+                  </div>
+                </th>
+                <th style="width: 10rem">
+                  <div class="th-content">
+                    {{ 'DB_ACCESS.VIA' | translate }}
+                  </div>
+                </th>
               </tr>
             </ng-template>
             <ng-template pTemplate="body" let-row>
               <tr>
                 <td>{{ row.object || row.objectName || '—' }}</td>
-                <td><app-chip variant="tag" size="sm">{{ row.objectType || '—' }}</app-chip></td>
-                <td><app-chip variant="tag" tone="primary" size="sm">{{ row.privilege }}</app-chip></td>
-                <td><span class="description-text">{{ row.via || ('DB_ACCESS.DIRECT' | translate) }}</span></td>
+                <td>
+                  <app-chip variant="tag" size="sm">{{
+                    row.objectType || '—'
+                  }}</app-chip>
+                </td>
+                <td>
+                  <app-chip variant="tag" tone="primary" size="sm">{{
+                    row.privilege
+                  }}</app-chip>
+                </td>
+                <td>
+                  <span class="description-text">{{
+                    row.via || ('DB_ACCESS.DIRECT' | translate)
+                  }}</span>
+                </td>
               </tr>
             </ng-template>
           </p-table>
         </div>
-        <div class="empty-inline" *ngIf="!effectiveLoading && !effective.length">
+        <div
+          class="empty-inline"
+          *ngIf="!effectiveLoading && !effective.length"
+        >
           {{ 'DB_ACCESS.NO_EFFECTIVE' | translate }}
         </div>
       </div>

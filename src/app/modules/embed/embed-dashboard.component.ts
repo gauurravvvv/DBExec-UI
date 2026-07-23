@@ -58,7 +58,9 @@ import {
   styleUrls: ['./embed-dashboard.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class EmbedDashboardComponent implements OnInit, AfterViewInit, OnDestroy {
+export class EmbedDashboardComponent
+  implements OnInit, AfterViewInit, OnDestroy
+{
   @ViewChild('canvas') canvas!: ElementRef<HTMLDivElement>;
 
   token = '';

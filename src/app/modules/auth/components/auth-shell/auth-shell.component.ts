@@ -1,4 +1,9 @@
-import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  Input,
+  OnInit,
+} from '@angular/core';
 import { LOGIN_PAGE_OPTIONS } from 'src/app/core/constants/global.constant';
 import { BrandingService } from 'src/app/core/services/branding.service';
 import { ThemeService } from 'src/app/core/services/theme.service';

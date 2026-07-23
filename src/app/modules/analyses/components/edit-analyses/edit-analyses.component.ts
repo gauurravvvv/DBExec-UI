@@ -15,10 +15,7 @@ import {
   ViewChildren,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import {
-  CdkDragDrop,
-  moveItemInArray,
-} from '@angular/cdk/drag-drop';
+import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { TranslateService } from '@ngx-translate/core';
@@ -412,17 +409,19 @@ export class EditAnalysesComponent
     }
 
     const firstId = this.firstTabId;
-    return this.tabs
-      .map(tab => {
-        const vis = this.visuals.filter(v => {
-          const owning = v.tabId ?? firstId;
-          return owning === tab.id && match(v);
-        });
-        return { tab, visuals: vis };
-      })
-      // While searching, hide tabs with no hits; otherwise keep every tab
-      // (an empty tab still shows its header so the structure is visible).
-      .filter(g => (q ? g.visuals.length > 0 : true));
+    return (
+      this.tabs
+        .map(tab => {
+          const vis = this.visuals.filter(v => {
+            const owning = v.tabId ?? firstId;
+            return owning === tab.id && match(v);
+          });
+          return { tab, visuals: vis };
+        })
+        // While searching, hide tabs with no hits; otherwise keep every tab
+        // (an empty tab still shows its header so the structure is visible).
+        .filter(g => (q ? g.visuals.length > 0 : true))
+    );
   }
 
   getDataTypeIcon(dataType: string): string {
@@ -1530,9 +1529,7 @@ export class EditAnalysesComponent
               visualConfig.crossFilterEnabled ??
               false,
             drillDimensions:
-              visualData.drillDimensions ??
-              visualConfig.drillDimensions ??
-              [],
+              visualData.drillDimensions ?? visualConfig.drillDimensions ?? [],
             chartData: [],
             // No two-phase skeleton anymore — everything we need is
             // already in the response. Mark loaded immediately so
@@ -2587,9 +2584,7 @@ export class EditAnalysesComponent
   get widgetsInActiveTab(): AnalysisWidget[] {
     if (this.tabs.length === 0) return this.widgets;
     const first = this.tabs.length > 0 ? this.tabs[0].id : null;
-    return this.widgets.filter(
-      w => (w.tabId ?? first) === this.activeTabId,
-    );
+    return this.widgets.filter(w => (w.tabId ?? first) === this.activeTabId);
   }
 
   /** Numeric-ish field options for the KPI measure picker. */
@@ -2780,9 +2775,7 @@ export class EditAnalysesComponent
       // Deep-clone the config blob so the copy owns its own object graph —
       // otherwise later edits to one would bleed into the other in memory
       // before the next reload.
-      config: source.config
-        ? JSON.parse(JSON.stringify(source.config))
-        : null,
+      config: source.config ? JSON.parse(JSON.stringify(source.config)) : null,
       crossFilterEnabled: !!source.crossFilterEnabled,
       drillDimensions: Array.isArray(source.drillDimensions)
         ? [...source.drillDimensions]
@@ -2897,9 +2890,7 @@ export class EditAnalysesComponent
     visualId: string,
   ): ChartRendererComponent | undefined {
     if (!this.chartRenderers) return undefined;
-    return this.chartRenderers.find(
-      r => (r.visual?.id ?? null) === visualId,
-    );
+    return this.chartRenderers.find(r => (r.visual?.id ?? null) === visualId);
   }
 
   /**
@@ -3017,18 +3008,14 @@ export class EditAnalysesComponent
   get visualsInPresentTab(): Visual[] {
     if (this.tabs.length === 0) return this.visuals;
     const first = this.firstTabId;
-    return this.visuals.filter(
-      v => (v.tabId ?? first) === this.presentTabId,
-    );
+    return this.visuals.filter(v => (v.tabId ?? first) === this.presentTabId);
   }
 
   /** Widgets shown in present mode for the presented tab. */
   get widgetsInPresentTab(): AnalysisWidget[] {
     if (this.tabs.length === 0) return this.widgets;
     const first = this.firstTabId;
-    return this.widgets.filter(
-      w => (w.tabId ?? first) === this.presentTabId,
-    );
+    return this.widgets.filter(w => (w.tabId ?? first) === this.presentTabId);
   }
 
   trackById(index: number, item: any): any {
@@ -3420,10 +3407,7 @@ export class EditAnalysesComponent
     // false when the visual is not cross-filter-enabled OR when the same mark
     // was clicked again (toggle-off): re-run targets either way so they either
     // pick up the new scope or recover to the base dataset.
-    if (
-      columnName &&
-      AnalysisInteractionService.isCrossFilterEnabled(visual)
-    ) {
+    if (columnName && AnalysisInteractionService.isCrossFilterEnabled(visual)) {
       this.interaction.applyScopedCrossFilter(visual, columnName, value);
       this.reRunCrossFilterTargets();
       this.cdr.markForCheck();
@@ -3473,14 +3457,19 @@ export class EditAnalysesComponent
     const mapping = this.chartDataTransformer.buildMapping(visual);
     // Drill re-points the category to the current drill column; match that.
     const col =
-      (visual.__drillColumn as string) || mapping.xAxisColumn || visual.xAxisColumn;
+      (visual.__drillColumn as string) ||
+      mapping.xAxisColumn ||
+      visual.xAxisColumn;
     if (!col) return label;
-    const rows: any[] = (visual.__interactionRows as any[]) ?? this.rawGraphData;
+    const rows: any[] =
+      (visual.__interactionRows as any[]) ?? this.rawGraphData;
     if (!Array.isArray(rows) || rows.length === 0) return label;
     const target = String(label);
     for (const row of rows) {
       const raw = row?.[col];
-      if (this.chartDataTransformer.formatCategoryValue(raw, mapping) === target) {
+      if (
+        this.chartDataTransformer.formatCategoryValue(raw, mapping) === target
+      ) {
         // A genuine null-category (null-as-member) has no raw scalar to bind
         // an EQUALS filter against, so keep the label — the downstream filter
         // path treats it as the member value. Otherwise bind the raw scalar.
@@ -3586,7 +3575,8 @@ export class EditAnalysesComponent
 
   /** Clear a single visual's transient interaction override + re-transform. */
   private clearVisualInteractionOverride(visual: Visual): void {
-    if (visual.__interactionRows == null && visual.__drillColumn == null) return;
+    if (visual.__interactionRows == null && visual.__drillColumn == null)
+      return;
     visual.__interactionRows = null;
     visual.__drillColumn = null;
     if (visual.loaded) this.transformSingleVisualChartData(visual);
@@ -3759,7 +3749,8 @@ export class EditAnalysesComponent
       clickedValue,
     );
     this.detailPanelTitle =
-      visual.title || this.translate.instant('ANALYSES.V2.INTERACTION.DRILL_TO_DETAIL');
+      visual.title ||
+      this.translate.instant('ANALYSES.V2.INTERACTION.DRILL_TO_DETAIL');
     this.detailPanelOpen = true;
     this.detailPanelLoading = true;
     this.detailPanelRows = [];
@@ -3767,8 +3758,7 @@ export class EditAnalysesComponent
     this.cdr.markForCheck();
     this.fetchScopedRows(filters).then(rows => {
       this.detailPanelRows = rows;
-      this.detailPanelColumns =
-        rows.length > 0 ? Object.keys(rows[0]) : [];
+      this.detailPanelColumns = rows.length > 0 ? Object.keys(rows[0]) : [];
       this.detailPanelLoading = false;
       this.cdr.markForCheck();
     });

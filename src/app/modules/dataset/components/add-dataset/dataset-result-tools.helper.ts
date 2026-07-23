@@ -116,7 +116,10 @@ function isNullish(v: unknown): boolean {
  * (for all-numeric columns) min/max/avg. Distinct is computed from a
  * stringified key so objects/dates collapse sensibly.
  */
-export function profileColumn(column: string, rows: ResultRow[]): ColumnProfile {
+export function profileColumn(
+  column: string,
+  rows: ResultRow[],
+): ColumnProfile {
   const total = rows.length;
   let nulls = 0;
   const seen = new Set<string>();
@@ -272,7 +275,9 @@ export function diffColumns(
   const nextByName = new Map(next.map(c => [c.name, c]));
 
   const rawAdded: SimpleColumn[] = next.filter(c => !curByName.has(c.name));
-  const rawRemoved: SimpleColumn[] = current.filter(c => !nextByName.has(c.name));
+  const rawRemoved: SimpleColumn[] = current.filter(
+    c => !nextByName.has(c.name),
+  );
 
   const typeChanged: ColumnDelta['typeChanged'] = [];
   for (const c of current) {

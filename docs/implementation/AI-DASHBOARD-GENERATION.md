@@ -20,14 +20,16 @@ dashboard in seconds:
 > "Build me a sales dashboard for Q2 with revenue by region, top
 > 10 products, and a daily-revenue trend."
 
-What we will *not* do:
+What we will _not_ do:
+
 - Let the LLM emit SQL strings.
 - Let the LLM see raw row data.
 - Let the LLM bypass RLS.
 - Generate dashboards faster than we can guarantee correctness.
 
-What we *will* do:
-- Have the LLM emit a structured *plan* (JSON) of analyses to
+What we _will_ do:
+
+- Have the LLM emit a structured _plan_ (JSON) of analyses to
   build, each one a semantic-layer query intent.
 - Compile each intent ourselves using our trusted query
   processor (module 04). That's how the rules of the platform
@@ -113,57 +115,112 @@ contract.** Everything downstream depends on it being correct.
 
 ```ts
 const DashboardPlan = z.object({
-  name:       z.string().min(1).max(100),
+  name: z.string().min(1).max(100),
   description: z.string().max(500).optional(),
-  tabs: z.array(z.object({
-    label:    z.string().min(1).max(40),
-    visuals:  z.array(z.object({
-      title:        z.string().min(1).max(120),
-      chartType:    z.enum([
-                      'bar', 'line', 'area', 'pie',
-                      'kpi', 'table', 'heatmap', 'scatter',
-                      'sankey', 'treemap', 'sunburst',
-                      'choropleth', 'gauge',
-                    ]),
-      intent:       SemanticIntent,           // ↓ defined next
-      layoutHint:   z.enum(['full', 'half', 'third', 'quarter']),
-      sortHint:     z.enum(['asc', 'desc', 'none']).default('none'),
-      explanation:  z.string().max(300),      // for the "Why this chart?" hint
-    })).min(1).max(8),
-    layout:   z.enum(['stacked', 'grid', 'masonry']).default('grid'),
-  })).min(1).max(5),
-  defaultFilters: z.array(z.object({
-    dimension: z.string(),
-    values:    z.array(z.union([z.string(), z.number()])).optional(),
-    relative:  z.enum(['this_quarter', 'last_quarter', 'last_30d', 'last_7d', 'ytd']).optional(),
-  })).default([]),
+  tabs: z
+    .array(
+      z.object({
+        label: z.string().min(1).max(40),
+        visuals: z
+          .array(
+            z.object({
+              title: z.string().min(1).max(120),
+              chartType: z.enum([
+                'bar',
+                'line',
+                'area',
+                'pie',
+                'kpi',
+                'table',
+                'heatmap',
+                'scatter',
+                'sankey',
+                'treemap',
+                'sunburst',
+                'choropleth',
+                'gauge',
+              ]),
+              intent: SemanticIntent, // ↓ defined next
+              layoutHint: z.enum(['full', 'half', 'third', 'quarter']),
+              sortHint: z.enum(['asc', 'desc', 'none']).default('none'),
+              explanation: z.string().max(300), // for the "Why this chart?" hint
+            }),
+          )
+          .min(1)
+          .max(8),
+        layout: z.enum(['stacked', 'grid', 'masonry']).default('grid'),
+      }),
+    )
+    .min(1)
+    .max(5),
+  defaultFilters: z
+    .array(
+      z.object({
+        dimension: z.string(),
+        values: z.array(z.union([z.string(), z.number()])).optional(),
+        relative: z
+          .enum(['this_quarter', 'last_quarter', 'last_30d', 'last_7d', 'ytd'])
+          .optional(),
+      }),
+    )
+    .default([]),
 });
 
 const SemanticIntent = z.object({
   semanticModelId: z.string().uuid(),
-  metrics: z.array(z.object({
-    metricId: z.string().uuid(),               // sem_metric.id
-    alias:    z.string().optional(),
-  })).min(1).max(5),
-  dimensions: z.array(z.object({
-    dimensionId: z.string().uuid(),            // sem_dimension.id
-    bucket:      z.enum(['none', 'day', 'week', 'month', 'quarter', 'year']).optional(),
-  })).max(4),
-  filters: z.array(z.object({
-    dimensionId: z.string().uuid(),
-    op:          z.enum(['eq', 'in', 'gt', 'gte', 'lt', 'lte', 'between', 'relative']),
-    value:       z.unknown(),                   // shape depends on op; refined separately
-  })).max(10),
-  limit:    z.number().int().min(1).max(10_000).default(1000),
-  orderBy:  z.array(z.object({
-    field:    z.string(),                       // metric alias or dimension name
-    dir:      z.enum(['asc', 'desc']),
-  })).max(3).default([]),
+  metrics: z
+    .array(
+      z.object({
+        metricId: z.string().uuid(), // sem_metric.id
+        alias: z.string().optional(),
+      }),
+    )
+    .min(1)
+    .max(5),
+  dimensions: z
+    .array(
+      z.object({
+        dimensionId: z.string().uuid(), // sem_dimension.id
+        bucket: z
+          .enum(['none', 'day', 'week', 'month', 'quarter', 'year'])
+          .optional(),
+      }),
+    )
+    .max(4),
+  filters: z
+    .array(
+      z.object({
+        dimensionId: z.string().uuid(),
+        op: z.enum([
+          'eq',
+          'in',
+          'gt',
+          'gte',
+          'lt',
+          'lte',
+          'between',
+          'relative',
+        ]),
+        value: z.unknown(), // shape depends on op; refined separately
+      }),
+    )
+    .max(10),
+  limit: z.number().int().min(1).max(10_000).default(1000),
+  orderBy: z
+    .array(
+      z.object({
+        field: z.string(), // metric alias or dimension name
+        dir: z.enum(['asc', 'desc']),
+      }),
+    )
+    .max(3)
+    .default([]),
 });
 ```
 
 The intent uses **IDs only**, never raw column or table names.
 That means:
+
 - The LLM must call `describe_semantic_model` first to learn the
   IDs and what they mean.
 - Validation can resolve every ID against the actual model and
@@ -176,15 +233,15 @@ That means:
 (All defined in detail in research module 25. The dashboard
 generator adds two new ones.)
 
-| Tool | Purpose |
-|---|---|
-| `describe_semantic_model(modelId)` | Returns the sanitised model: entities, dimensions (with descriptions), metrics (with descriptions + units). |
+| Tool                                           | Purpose                                                                                                                               |
+| ---------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| `describe_semantic_model(modelId)`             | Returns the sanitised model: entities, dimensions (with descriptions), metrics (with descriptions + units).                           |
 | `fetch_dimension_values(dimensionId, search?)` | Returns up to 50 sample values for a dimension. Used by the LLM to confirm "APAC" is a real value of `region` before filtering on it. |
-| `propose_dashboard_plan(plan)` | Submits a plan. Server validates and either echoes the plan back or returns a list of validation errors for the LLM to fix. |
-| `revise_dashboard_plan(plan)` | Like propose but for a follow-up correction turn. Resets validation state. |
-| `explain_visual_choice(visualSpec)` | Returns the platform's own recommendation for a chart type given the (metrics, dimensions) shape, so the LLM can sanity-check. |
+| `propose_dashboard_plan(plan)`                 | Submits a plan. Server validates and either echoes the plan back or returns a list of validation errors for the LLM to fix.           |
+| `revise_dashboard_plan(plan)`                  | Like propose but for a follow-up correction turn. Resets validation state.                                                            |
+| `explain_visual_choice(visualSpec)`            | Returns the platform's own recommendation for a chart type given the (metrics, dimensions) shape, so the LLM can sanity-check.        |
 
-The LLM is *forbidden* from emitting tool calls other than these.
+The LLM is _forbidden_ from emitting tool calls other than these.
 The provider abstraction enforces this — any other tool name in
 the model's response is dropped with a logged warning.
 
@@ -214,7 +271,7 @@ The plan endpoint runs these checks in order, all server-side:
    apply?"
 6. **Dry-run compile** — for each intent, the query processor
    compiles it to SQL with the user's RLS context applied and
-   `LIMIT 1`. We don't *run* the query yet; we want to catch
+   `LIMIT 1`. We don't _run_ the query yet; we want to catch
    "RLS hides everything for this user, this visual will be
    empty" before showing them an empty dashboard. We log a
    warning per-visual.
@@ -223,7 +280,7 @@ The plan endpoint runs these checks in order, all server-side:
    (default 5); model usage allowed.
 
 Validation runs as a tool result for the LLM. If it fails, we
-*return the errors to the LLM* and let it `revise_dashboard_plan`.
+_return the errors to the LLM_ and let it `revise_dashboard_plan`.
 We cap at 3 revisions per session to prevent infinite loops.
 
 ---
@@ -233,7 +290,7 @@ We cap at 3 revisions per session to prevent infinite loops.
 When validation passes, materialise the plan in one transaction:
 
 ```ts
-await ctx.tx.transaction(async (tx) => {
+await ctx.tx.transaction(async tx => {
   const dashboard = await tx.repo(Dashboard).create({
     name: plan.name,
     description: plan.description,
@@ -252,30 +309,33 @@ await ctx.tx.transaction(async (tx) => {
       layout: tabSpec.layout,
     });
 
-    const slots = layoutSlots(tabSpec.layout, tabSpec.visuals.map(v => v.layoutHint));
+    const slots = layoutSlots(
+      tabSpec.layout,
+      tabSpec.visuals.map(v => v.layoutHint),
+    );
     for (let vi = 0; vi < tabSpec.visuals.length; vi++) {
       const v = tabSpec.visuals[vi];
       const analysis = await tx.repo(Analysis).create({
-        name:        v.title,
-        datasetId:   resolveDatasetForModel(v.intent.semanticModelId),
-        intent:      v.intent,                // stored, not compiled
-        createdBy:   ctx.user.id,
-        sourceKind:  'ai_generated',
+        name: v.title,
+        datasetId: resolveDatasetForModel(v.intent.semanticModelId),
+        intent: v.intent, // stored, not compiled
+        createdBy: ctx.user.id,
+        sourceKind: 'ai_generated',
         sourceAiSessionId: ctx.aiSessionId,
       });
 
       await tx.repo(AnalysisVisual).create({
-        analysisId:  analysis.id,
-        chartType:   v.chartType,
-        config:      defaultVisualConfig(v.chartType, v.intent),
+        analysisId: analysis.id,
+        chartType: v.chartType,
+        config: defaultVisualConfig(v.chartType, v.intent),
       });
 
       await tx.repo(DashboardVisual).create({
         dashboardTabId: tab.id,
-        analysisId:     analysis.id,
-        position:       slots[vi],
-        sortHint:       v.sortHint,
-        aiExplanation:  v.explanation,        // surfaced as "?" tooltip
+        analysisId: analysis.id,
+        position: slots[vi],
+        sortHint: v.sortHint,
+        aiExplanation: v.explanation, // surfaced as "?" tooltip
       });
     }
   }
@@ -300,18 +360,18 @@ key + same body = same dashboard returned without re-creating.
 
 The endpoint is SSE. Events emitted, in order:
 
-| Event | Payload | Notes |
-|---|---|---|
-| `session.started` | `{ aiSessionId }` | Returned immediately. |
-| `tool.call` | `{ tool, args }` | One per LLM tool invocation; lets FE show "Looking up region values…" |
-| `tool.result` | `{ tool, ok, summary }` | Truncated server-side; never includes raw rows. |
-| `plan.proposed` | `{ plan, warnings }` | First valid plan. |
-| `dashboard.created` | `{ dashboardId }` | After tx commits. |
-| `tab.created` | `{ tabId, label, order }` | Per tab. |
-| `visual.created` | `{ visualId, tabId, title, chartType, position }` | Per visual. |
-| `visual.ready` | `{ visualId, runtimeMs, rowCount }` | After first dry-run query completes. |
-| `dashboard.ready` | `{ dashboardId, viewUrl }` | Final event; FE redirects. |
-| `error` | `{ code, message, retryable }` | Terminal except on validation errors during revision. |
+| Event               | Payload                                           | Notes                                                                 |
+| ------------------- | ------------------------------------------------- | --------------------------------------------------------------------- |
+| `session.started`   | `{ aiSessionId }`                                 | Returned immediately.                                                 |
+| `tool.call`         | `{ tool, args }`                                  | One per LLM tool invocation; lets FE show "Looking up region values…" |
+| `tool.result`       | `{ tool, ok, summary }`                           | Truncated server-side; never includes raw rows.                       |
+| `plan.proposed`     | `{ plan, warnings }`                              | First valid plan.                                                     |
+| `dashboard.created` | `{ dashboardId }`                                 | After tx commits.                                                     |
+| `tab.created`       | `{ tabId, label, order }`                         | Per tab.                                                              |
+| `visual.created`    | `{ visualId, tabId, title, chartType, position }` | Per visual.                                                           |
+| `visual.ready`      | `{ visualId, runtimeMs, rowCount }`               | After first dry-run query completes.                                  |
+| `dashboard.ready`   | `{ dashboardId, viewUrl }`                        | Final event; FE redirects.                                            |
+| `error`             | `{ code, message, retryable }`                    | Terminal except on validation errors during revision.                 |
 
 The FE shows a wizard with three panes:
 
@@ -361,9 +421,9 @@ a generated dashboard see predictable geometry.
 
 ## 8. RLS, masking, and the safety net
 
-Every materialised analysis stores the semantic *intent*. When a
+Every materialised analysis stores the semantic _intent_. When a
 user opens the dashboard, the query processor compiles the intent
-*for that user's RLS context*. So the same generated dashboard
+_for that user's RLS context_. So the same generated dashboard
 shows different rows to different users — which is exactly what
 a real dashboard does.
 
@@ -421,24 +481,24 @@ three-pane preview (§6), then redirects to the dashboard.
 
 ## 10. Edge cases
 
-| # | Scenario | Expected |
-|---|---|---|
-| A1 | Ask references a metric not in any visible semantic model | LLM tool-result says "no matching metric"; plan refuses; surface "Couldn't find a matching dataset" to user |
-| A2 | Ask is ambiguous ("sales") | LLM uses `describe_semantic_model` to enumerate models; asks user a one-question clarification via a `clarify` event |
-| A3 | Plan validation fails 3 times | Stop; show last LLM message + errors; offer "Edit prompt and try again" |
-| A4 | RLS empties every visual at dry-run | Surface warning at top of generated dashboard: "Some visuals may be empty for users with limited row access." |
-| A5 | Org disables pie charts | Plan validation downgrades to bar; LLM is informed via revision turn |
-| A6 | Idempotency replay | Same key returns existing dashboard ID, doesn't re-create |
-| A7 | LLM emits raw SQL string | Provider abstraction strips it before reaching us; logged as a violation |
-| A8 | Plan exceeds max visuals | Reject 400 `PLAN_TOO_LARGE`; LLM revises |
-| A9 | Slow LLM (> 30s for first plan) | Stream a `still_working` heartbeat every 5s so the FE doesn't timeout the SSE |
-| A10 | User closes the wizard mid-stream | Server cancels the LLM stream, rolls back any pending tx, audits as `ai.cancel` |
+| #   | Scenario                                                  | Expected                                                                                                             |
+| --- | --------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| A1  | Ask references a metric not in any visible semantic model | LLM tool-result says "no matching metric"; plan refuses; surface "Couldn't find a matching dataset" to user          |
+| A2  | Ask is ambiguous ("sales")                                | LLM uses `describe_semantic_model` to enumerate models; asks user a one-question clarification via a `clarify` event |
+| A3  | Plan validation fails 3 times                             | Stop; show last LLM message + errors; offer "Edit prompt and try again"                                              |
+| A4  | RLS empties every visual at dry-run                       | Surface warning at top of generated dashboard: "Some visuals may be empty for users with limited row access."        |
+| A5  | Org disables pie charts                                   | Plan validation downgrades to bar; LLM is informed via revision turn                                                 |
+| A6  | Idempotency replay                                        | Same key returns existing dashboard ID, doesn't re-create                                                            |
+| A7  | LLM emits raw SQL string                                  | Provider abstraction strips it before reaching us; logged as a violation                                             |
+| A8  | Plan exceeds max visuals                                  | Reject 400 `PLAN_TOO_LARGE`; LLM revises                                                                             |
+| A9  | Slow LLM (> 30s for first plan)                           | Stream a `still_working` heartbeat every 5s so the FE doesn't timeout the SSE                                        |
+| A10 | User closes the wizard mid-stream                         | Server cancels the LLM stream, rolls back any pending tx, audits as `ai.cancel`                                      |
 
 ---
 
 ## 11. Cost & rate-limit
 
-- Each generation counts as one *AI session*; sessions are
+- Each generation counts as one _AI session_; sessions are
   rate-limited per user per hour (default 10/hr) and per org per
   day (default 200/day).
 - Token budget per session is capped (default 60k input + 8k
@@ -491,8 +551,8 @@ three-pane preview (§6), then redirects to the dashboard.
 ## 14. Open questions
 
 1. **"Edit my dashboard with AI"**: a follow-up that takes the
-   *existing* dashboard plus a prompt ("add a YoY column") and
-   emits a *diff* the user can approve. Big feature in its own
+   _existing_ dashboard plus a prompt ("add a YoY column") and
+   emits a _diff_ the user can approve. Big feature in its own
    right; out of scope here.
 2. **Conversational refinement**: the wizard could be a chat
    instead of single-prompt. Defer; one-shot generation is
@@ -502,7 +562,7 @@ three-pane preview (§6), then redirects to the dashboard.
    yes; cheap and improves provenance. Add as part of GA.
 4. **Multi-language prompts**: with module 23 (i18n), prompts
    in non-English work as-is (the LLM is multilingual); but the
-   generated dashboard *names* should localise. Use the user's
+   generated dashboard _names_ should localise. Use the user's
    preferred locale for the LLM's system message.
 
 ---
@@ -592,7 +652,8 @@ export async function validateDashboardPlan(
   const parsed = DashboardPlanSchema.safeParse(raw);
   if (!parsed.success) {
     return {
-      ok: false, warnings: [],
+      ok: false,
+      warnings: [],
       errors: parsed.error.issues.map(zodIssueToError),
     };
   }
@@ -604,32 +665,42 @@ export async function validateDashboardPlan(
   const modelIds = new Set<string>();
   const metricIds = new Set<string>();
   const dimensionIds = new Set<string>();
-  plan.tabs.forEach((tab, ti) => tab.visuals.forEach((v, vi) => {
-    modelIds.add(v.intent.semanticModelId);
-    v.intent.metrics.forEach(m => metricIds.add(m.metricId));
-    v.intent.dimensions.forEach(d => dimensionIds.add(d.dimensionId));
-    v.intent.filters.forEach(f => dimensionIds.add(f.dimensionId));
-  }));
+  plan.tabs.forEach((tab, ti) =>
+    tab.visuals.forEach((v, vi) => {
+      modelIds.add(v.intent.semanticModelId);
+      v.intent.metrics.forEach(m => metricIds.add(m.metricId));
+      v.intent.dimensions.forEach(d => dimensionIds.add(d.dimensionId));
+      v.intent.filters.forEach(f => dimensionIds.add(f.dimensionId));
+    }),
+  );
 
   // 2. Model resolution
   const models = await resolveSemanticModel(ctx, Array.from(modelIds));
   const knownMetric = new Map<string, any>();
   const knownDim = new Map<string, any>();
   for (const m of models) {
-    m.metrics.forEach(metric => knownMetric.set(metric.id, { metric, model: m }));
+    m.metrics.forEach(metric =>
+      knownMetric.set(metric.id, { metric, model: m }),
+    );
     m.dimensions.forEach(dim => knownDim.set(dim.id, { dim, model: m }));
   }
 
   for (const id of metricIds) {
     if (!knownMetric.has(id)) {
-      errors.push({ path: `metric.${id}`, code: 'METRIC_NOT_FOUND',
-                    message: `Metric ${id} not visible in any accessible model` });
+      errors.push({
+        path: `metric.${id}`,
+        code: 'METRIC_NOT_FOUND',
+        message: `Metric ${id} not visible in any accessible model`,
+      });
     }
   }
   for (const id of dimensionIds) {
     if (!knownDim.has(id)) {
-      errors.push({ path: `dimension.${id}`, code: 'DIMENSION_NOT_FOUND',
-                    message: `Dimension ${id} not visible in any accessible model` });
+      errors.push({
+        path: `dimension.${id}`,
+        code: 'DIMENSION_NOT_FOUND',
+        message: `Dimension ${id} not visible in any accessible model`,
+      });
     }
   }
   if (errors.length) return { ok: false, errors, warnings };
@@ -665,11 +736,12 @@ export async function validateDashboardPlan(
       const v = tab.visuals[vi];
       v.intent.filters.forEach((f, fi) => {
         const ok = checkFilterShape(f);
-        if (!ok) errors.push({
-          path: `tabs[${ti}].visuals[${vi}].intent.filters[${fi}]`,
-          code: 'BAD_FILTER_SHAPE',
-          message: `Filter op '${f.op}' requires value shape '${expectedShape(f.op)}'`,
-        });
+        if (!ok)
+          errors.push({
+            path: `tabs[${ti}].visuals[${vi}].intent.filters[${fi}]`,
+            code: 'BAD_FILTER_SHAPE',
+            message: `Filter op '${f.op}' requires value shape '${expectedShape(f.op)}'`,
+          });
       });
     }
   }
@@ -697,7 +769,10 @@ export async function validateDashboardPlan(
     for (let vi = 0; vi < tab.visuals.length; vi++) {
       const v = tab.visuals[vi];
       try {
-        const dry = await compileIntentDryRun(v.intent, { user: ctx.user, limit: 1 });
+        const dry = await compileIntentDryRun(v.intent, {
+          user: ctx.user,
+          limit: 1,
+        });
         if (dry.willBeEmpty) {
           warnings.push({
             path: `tabs[${ti}].visuals[${vi}]`,
@@ -721,8 +796,11 @@ export async function validateDashboardPlan(
   for (let ti = 0; ti < plan.tabs.length; ti++) {
     const tab = plan.tabs[ti];
     if (tab.visuals.length > policy.maxVisualsPerTab) {
-      errors.push({ path: `tabs[${ti}]`, code: 'TAB_TOO_MANY_VISUALS',
-                    message: `Tab has ${tab.visuals.length} visuals; org max is ${policy.maxVisualsPerTab}` });
+      errors.push({
+        path: `tabs[${ti}]`,
+        code: 'TAB_TOO_MANY_VISUALS',
+        message: `Tab has ${tab.visuals.length} visuals; org max is ${policy.maxVisualsPerTab}`,
+      });
     }
     for (let vi = 0; vi < tab.visuals.length; vi++) {
       if (policy.disabledChartTypes.includes(tab.visuals[vi].chartType)) {
@@ -735,8 +813,11 @@ export async function validateDashboardPlan(
     }
   }
   if (plan.tabs.length > policy.maxTabs) {
-    errors.push({ path: 'tabs', code: 'TOO_MANY_TABS',
-                  message: `Plan has ${plan.tabs.length} tabs; org max is ${policy.maxTabs}` });
+    errors.push({
+      path: 'tabs',
+      code: 'TOO_MANY_TABS',
+      message: `Plan has ${plan.tabs.length} tabs; org max is ${policy.maxTabs}`,
+    });
   }
   if (errors.length) return { ok: false, errors, warnings };
 
@@ -753,13 +834,13 @@ tool result; it iterates by issuing a `revise_dashboard_plan` call.
 
 ## 17. Observability
 
-| Metric | Type | Labels | Purpose |
-|---|---|---|---|
-| `dbexec_ai_dashboard_request_total` | counter | `org`, `model`, `outcome` | requests by outcome (`ok`, `validation_failed`, `budget_exceeded`, `cancelled`, `error`) |
-| `dbexec_ai_dashboard_tokens` | histogram | `org`, `direction` (in/out) | token usage |
-| `dbexec_ai_dashboard_revisions` | histogram | `org` | how many revise turns per session |
-| `dbexec_ai_dashboard_e2e_seconds` | histogram | `org` | first byte → dashboard.ready |
-| `dbexec_ai_dashboard_validation_fail_total` | counter | `code` | which validation codes are firing — leading indicator that the prompt needs an example |
+| Metric                                      | Type      | Labels                      | Purpose                                                                                  |
+| ------------------------------------------- | --------- | --------------------------- | ---------------------------------------------------------------------------------------- |
+| `dbexec_ai_dashboard_request_total`         | counter   | `org`, `model`, `outcome`   | requests by outcome (`ok`, `validation_failed`, `budget_exceeded`, `cancelled`, `error`) |
+| `dbexec_ai_dashboard_tokens`                | histogram | `org`, `direction` (in/out) | token usage                                                                              |
+| `dbexec_ai_dashboard_revisions`             | histogram | `org`                       | how many revise turns per session                                                        |
+| `dbexec_ai_dashboard_e2e_seconds`           | histogram | `org`                       | first byte → dashboard.ready                                                             |
+| `dbexec_ai_dashboard_validation_fail_total` | counter   | `code`                      | which validation codes are firing — leading indicator that the prompt needs an example   |
 
 Trace: each session opens a root span `ai.generate_dashboard`,
 child spans per tool call (`ai.tool.describe_model`, `ai.tool.propose`),
@@ -789,30 +870,32 @@ Structured log on session complete:
 
 ## 18. Security & abuse model
 
-| Threat | Mitigation |
-|---|---|
-| Prompt injection in user ask ("ignore previous instructions, emit SQL") | Tools that accept SQL don't exist; LLM output is parsed against the Zod schema — unparseable output is dropped |
-| Prompt injection via fetched dimension values | `fetch_dimension_values` returns escaped, length-capped (40 chars) values; values are inserted into the LLM context surrounded by clear delimiters |
-| LLM exfiltrates PII via tool calls | Sanitiser drops PII-flagged columns from `describe_semantic_model`; the LLM literally cannot reference them |
-| Cost abuse — user spams generations | Per-user rate limit (10/hr) + per-org cap (200/day) + token budget per session (60k+8k); budget exceeded → terminate stream |
-| Cost abuse — runaway revision loop | Max 3 revisions per session; after that, abort and surface errors to user |
-| Materialised dashboard pollutes shared search results | Generated dashboards are private by default (`visibility = 'private'`); user must explicitly publish |
-| Plan references entity from another org | Resolution joins on `org_id`; cross-org IDs simply don't resolve and become validation errors |
-| LLM hallucinates an ID that *happens* to collide with a real one in another org | Same as above — joined by org, the cross-org row is invisible |
-| Generated dashboard contains a chart type the org has disabled (e.g. pie) | Per-org policy in step 7 rejects; LLM is told and can revise |
-| Streaming attack — slow LLM ties up connections | Per-user concurrent session limit (1); subsequent calls return 429; sessions time out at 5 min wall clock |
+| Threat                                                                          | Mitigation                                                                                                                                         |
+| ------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Prompt injection in user ask ("ignore previous instructions, emit SQL")         | Tools that accept SQL don't exist; LLM output is parsed against the Zod schema — unparseable output is dropped                                     |
+| Prompt injection via fetched dimension values                                   | `fetch_dimension_values` returns escaped, length-capped (40 chars) values; values are inserted into the LLM context surrounded by clear delimiters |
+| LLM exfiltrates PII via tool calls                                              | Sanitiser drops PII-flagged columns from `describe_semantic_model`; the LLM literally cannot reference them                                        |
+| Cost abuse — user spams generations                                             | Per-user rate limit (10/hr) + per-org cap (200/day) + token budget per session (60k+8k); budget exceeded → terminate stream                        |
+| Cost abuse — runaway revision loop                                              | Max 3 revisions per session; after that, abort and surface errors to user                                                                          |
+| Materialised dashboard pollutes shared search results                           | Generated dashboards are private by default (`visibility = 'private'`); user must explicitly publish                                               |
+| Plan references entity from another org                                         | Resolution joins on `org_id`; cross-org IDs simply don't resolve and become validation errors                                                      |
+| LLM hallucinates an ID that _happens_ to collide with a real one in another org | Same as above — joined by org, the cross-org row is invisible                                                                                      |
+| Generated dashboard contains a chart type the org has disabled (e.g. pie)       | Per-org policy in step 7 rejects; LLM is told and can revise                                                                                       |
+| Streaming attack — slow LLM ties up connections                                 | Per-user concurrent session limit (1); subsequent calls return 429; sessions time out at 5 min wall clock                                          |
 
 ## 19. Operational runbook
 
 **Symptom: validation fails 3× and user is unhappy.**
+
 1. Look at `dbexec_ai_dashboard_validation_fail_total` by code.
    The top-firing code is usually a missing-example in the
    prompt; add one and bump prompt version.
 2. If specific to one user — they may be asking for a model
-   they can see *some* of but not enough metrics in. Surface
+   they can see _some_ of but not enough metrics in. Surface
    "metrics you have access to" alongside the error.
 
 **Symptom: LLM picks a chart type the heuristic disagrees with.**
+
 1. Warning fires, FE offers swap — that's by design.
 2. If the same swap appears > 50% of the time across a model,
    the heuristic is probably right and the prompt needs an
@@ -820,18 +903,21 @@ Structured log on session complete:
    bar over pie").
 
 **Symptom: dashboards are empty after RLS.**
+
 1. The validator's `EMPTY_AFTER_RLS` warning fires; the FE
    already surfaces a banner. If users complain, gather the
    intent + RLS context and verify by hand — usually the RLS
    resolver is correctly hiding data the user shouldn't see.
 
 **Symptom: tokens explode for one org.**
+
 1. Their semantic model is probably huge.
    `describe_semantic_model` may be returning all metrics +
    dimensions in one call. Add a `category` filter argument so
    the LLM fetches by category and re-soak.
 
 **Symptom: provider outage (Anthropic / OpenAI).**
+
 1. The provider abstraction has a circuit breaker. On 5xx burst,
    switch to the configured fallback model.
 2. If fallback also fails, return a clean error to the FE —
@@ -840,14 +926,14 @@ Structured log on session complete:
 
 ## 20. Performance budget
 
-| Operation | Target | Hard ceiling |
-|---|---|---|
-| First SSE byte | < 2 s | 5 s |
-| First `tool.call` event | < 4 s | 8 s |
-| `plan.proposed` | p50 < 12 s, p95 < 30 s | 90 s |
-| `dashboard.ready` | p50 < 25 s, p95 < 60 s | 180 s |
-| Validation step alone | p50 < 200 ms | 2 s |
-| Materialisation tx (10 visuals) | p50 < 500 ms | 5 s |
+| Operation                       | Target                 | Hard ceiling |
+| ------------------------------- | ---------------------- | ------------ |
+| First SSE byte                  | < 2 s                  | 5 s          |
+| First `tool.call` event         | < 4 s                  | 8 s          |
+| `plan.proposed`                 | p50 < 12 s, p95 < 30 s | 90 s         |
+| `dashboard.ready`               | p50 < 25 s, p95 < 60 s | 180 s        |
+| Validation step alone           | p50 < 200 ms           | 2 s          |
+| Materialisation tx (10 visuals) | p50 < 500 ms           | 5 s          |
 
 Wall-clock generation time is dominated by LLM latency, not by
 DBExec code. Track it but don't optimise it — pick a faster

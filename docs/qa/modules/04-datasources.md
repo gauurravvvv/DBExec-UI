@@ -1,10 +1,12 @@
 # 04 · Datasources — Deep Test Cases
 
 ## Scope
+
 Add / edit / delete / validate / schema explore / activity for all
 supported engines.
 
 ## Fixtures
+
 - Postgres `pg_local`
 - MySQL `mysql_local` (optional)
 - Snowflake `sf_test` (skip if not configured)
@@ -13,6 +15,7 @@ supported engines.
 ## Add
 
 ### Happy
+
 - **DS-H-01** · Postgres add with valid creds; test-connection green; row in list. P0
 - **DS-H-02** · Snowflake add reveals account+warehouse; submit accepted. P0
 - **DS-H-03** · MySQL default port 3306 auto-fills on type change. P1
@@ -23,6 +26,7 @@ supported engines.
 - **DS-H-08** · Unicode in description accepted. P2
 
 ### Negative
+
 - **DS-N-01** · Name leading space → reject. P0
 - **DS-N-02** · Port = 0 → reject. P0
 - **DS-N-03** · Port > 65535 → reject. P0
@@ -46,6 +50,7 @@ supported engines.
 - **DS-N-21** · SSRF host = `localhost:22` → fail cleanly, no port-scan oracle. P0 🟣
 
 ### Edge
+
 - **DS-E-01** · Two users add same name in race → first wins, second 409. P1
 - **DS-E-02** · Password contains `;` → driver escapes; works. P1
 - **DS-E-03** · IPv4 (`127.0.0.1`) → accepted. P1
@@ -107,5 +112,6 @@ supported engines.
 - **DS-P-02** · 50 concurrent test-connects → no pool starvation. P1
 
 ## Regression buckets
+
 - Driver layer changed → DS-H-01..06, DS-N-30..31, DS-E-30..32
 - SSL / IAM added → DS-S-03, DS-H-20..21, DS-N-20..21

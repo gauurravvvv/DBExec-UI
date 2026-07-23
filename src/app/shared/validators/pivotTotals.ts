@@ -65,9 +65,6 @@ export const pivotTotalsConfigSchema = z.object({
     .max(64, { message: 'validation.pivotTotals.measures.tooMany' }),
   grandTotalLabel: z.string().max(64).optional(),
   subtotalLabel: z.string().max(64).optional(),
-  rowTypeKey: z
-    .string()
-    .max(64)
-    .optional(),
+  rowTypeKey: z.string().max(64).optional(),
 });
 export type PivotTotalsConfigInput = z.infer<typeof pivotTotalsConfigSchema>;

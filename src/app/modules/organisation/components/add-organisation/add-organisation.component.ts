@@ -116,19 +116,24 @@ export class AddOrganisationComponent implements OnInit, HasUnsavedChanges {
 
     // Reset connection test when DB fields change. Bumping the request id
     // invalidates any in-flight response so it can't apply stale state.
-    ['dbHost', 'dbPort', 'dbName', 'dbSchema', 'dbUsername', 'dbPassword'].forEach(
-      field => {
-        this.orgForm
-          .get(field)
-          ?.valueChanges.pipe(takeUntilDestroyed(this.destroyRef))
-          .subscribe(() => {
-            this.connectionTested.set(false);
-            this.connectionTestResult.set(null);
-            this.connectionTestError.set(null);
-            this.testRequestId++;
-          });
-      },
-    );
+    [
+      'dbHost',
+      'dbPort',
+      'dbName',
+      'dbSchema',
+      'dbUsername',
+      'dbPassword',
+    ].forEach(field => {
+      this.orgForm
+        .get(field)
+        ?.valueChanges.pipe(takeUntilDestroyed(this.destroyRef))
+        .subscribe(() => {
+          this.connectionTested.set(false);
+          this.connectionTestResult.set(null);
+          this.connectionTestError.set(null);
+          this.testRequestId++;
+        });
+    });
   }
 
   isStep1Valid(): boolean {

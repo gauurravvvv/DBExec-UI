@@ -37,8 +37,7 @@
           [required]="form.get('aiEnabled')?.value === true"
           [showError]="
             !!(
-              form.get('aiProvider')?.invalid &&
-              form.get('aiProvider')?.touched
+              form.get('aiProvider')?.invalid && form.get('aiProvider')?.touched
             )
           "
           [errorMessage]="'APP_SETTINGS.AI_FEATURES.REQUIRED' | translate"
@@ -54,11 +53,11 @@
           icon="pi-link"
           [required]="form.get('aiEnabled')?.value === true"
           [showError]="
-            !!(
-              form.get('aiBaseUrl')?.invalid && form.get('aiBaseUrl')?.touched
-            )
+            !!(form.get('aiBaseUrl')?.invalid && form.get('aiBaseUrl')?.touched)
           "
-          [errorMessage]="'APP_SETTINGS.AI_FEATURES.BASE_URL_INVALID' | translate"
+          [errorMessage]="
+            'APP_SETTINGS.AI_FEATURES.BASE_URL_INVALID' | translate
+          "
           [placeholder]="
             'APP_SETTINGS.AI_FEATURES.BASE_URL_PLACEHOLDER' | translate
           "
@@ -70,9 +69,7 @@
           icon="pi-sparkles"
           [required]="form.get('aiEnabled')?.value === true"
           [showError]="
-            !!(
-              form.get('aiModelId')?.invalid && form.get('aiModelId')?.touched
-            )
+            !!(form.get('aiModelId')?.invalid && form.get('aiModelId')?.touched)
           "
           [errorMessage]="'APP_SETTINGS.AI_FEATURES.REQUIRED' | translate"
           [placeholder]="
@@ -97,7 +94,9 @@
               form.get('aiTemperature')?.touched
             )
           "
-          [errorMessage]="'APP_SETTINGS.AI_FEATURES.ACCURACY_INVALID' | translate"
+          [errorMessage]="
+            'APP_SETTINGS.AI_FEATURES.ACCURACY_INVALID' | translate
+          "
         ></app-custom-number>
         <p class="field-hint">
           {{ 'APP_SETTINGS.AI_FEATURES.ACCURACY_HINT' | translate }}
@@ -112,9 +111,7 @@
             [showPasswordToggle]="true"
             [required]="form.get('aiEnabled')?.value === true"
             [showError]="
-              !!(
-                form.get('aiApiKey')?.invalid && form.get('aiApiKey')?.touched
-              )
+              !!(form.get('aiApiKey')?.invalid && form.get('aiApiKey')?.touched)
             "
             [errorMessage]="'APP_SETTINGS.AI_FEATURES.REQUIRED' | translate"
             [placeholder]="

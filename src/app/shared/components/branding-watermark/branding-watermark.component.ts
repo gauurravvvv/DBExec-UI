@@ -58,7 +58,7 @@ export class BrandingWatermarkComponent {
   readonly bg = computed<string | undefined>(() => {
     const branding = this.brandingService.branding();
     return branding?.showWatermark
-      ? branding.watermarkBgColor ?? undefined
+      ? (branding.watermarkBgColor ?? undefined)
       : undefined;
   });
 
@@ -66,7 +66,7 @@ export class BrandingWatermarkComponent {
   readonly color = computed<string | undefined>(() => {
     const branding = this.brandingService.branding();
     return branding?.showWatermark
-      ? branding.watermarkTextColor ?? undefined
+      ? (branding.watermarkTextColor ?? undefined)
       : undefined;
   });
 }

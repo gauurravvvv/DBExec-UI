@@ -122,7 +122,10 @@ export class DbAccessContextService {
    * pick the field that actually distinguishes its objects (e.g. 'table' for
    * the table list, 'column' for columns) before the generic fallback.
    */
-  private toOptions(values: any[], preferKey?: 'name' | 'schema' | 'table' | 'column'): Option[] {
+  private toOptions(
+    values: any[],
+    preferKey?: 'name' | 'schema' | 'table' | 'column',
+  ): Option[] {
     const names = values.map(v => {
       if (typeof v === 'string') return v;
       const preferred = preferKey ? v?.[preferKey] : undefined;
@@ -138,7 +141,8 @@ export class DbAccessContextService {
   loadSchemas(datasourceId: string): Promise<Option[]> {
     if (!datasourceId) return Promise.resolve([]);
     const key = datasourceId;
-    if (this.schemaCache.has(key)) return Promise.resolve(this.schemaCache.get(key)!);
+    if (this.schemaCache.has(key))
+      return Promise.resolve(this.schemaCache.get(key)!);
     if (this.schemaInflight.has(key)) return this.schemaInflight.get(key)!;
     const gen = this.generation;
     const p = this.dbAccess
@@ -158,13 +162,17 @@ export class DbAccessContextService {
   loadTables(datasourceId: string, schema: string): Promise<Option[]> {
     if (!datasourceId || !schema) return Promise.resolve([]);
     const key = `${datasourceId}:${schema}`;
-    if (this.tableCache.has(key)) return Promise.resolve(this.tableCache.get(key)!);
+    if (this.tableCache.has(key))
+      return Promise.resolve(this.tableCache.get(key)!);
     if (this.tableInflight.has(key)) return this.tableInflight.get(key)!;
     const gen = this.generation;
     const p = this.dbAccess
       .loadTableGrants(datasourceId, schema)
       .then((res: any) => {
-        const opts = this.toOptions(res?.status ? (res.data ?? []) : [], 'table');
+        const opts = this.toOptions(
+          res?.status ? (res.data ?? []) : [],
+          'table',
+        );
         if (gen === this.generation) this.tableCache.set(key, opts);
         return opts;
       })
@@ -175,16 +183,24 @@ export class DbAccessContextService {
   }
 
   /** Columns for (datasource, schema, table) — one fetch per tuple. */
-  loadColumns(datasourceId: string, schema: string, table: string): Promise<Option[]> {
+  loadColumns(
+    datasourceId: string,
+    schema: string,
+    table: string,
+  ): Promise<Option[]> {
     if (!datasourceId || !schema || !table) return Promise.resolve([]);
     const key = `${datasourceId}:${schema}:${table}`;
-    if (this.columnCache.has(key)) return Promise.resolve(this.columnCache.get(key)!);
+    if (this.columnCache.has(key))
+      return Promise.resolve(this.columnCache.get(key)!);
     if (this.columnInflight.has(key)) return this.columnInflight.get(key)!;
     const gen = this.generation;
     const p = this.dbAccess
       .loadColumnGrants(datasourceId, schema, table)
       .then((res: any) => {
-        const opts = this.toOptions(res?.status ? (res.data ?? []) : [], 'column');
+        const opts = this.toOptions(
+          res?.status ? (res.data ?? []) : [],
+          'column',
+        );
         if (gen === this.generation) this.columnCache.set(key, opts);
         return opts;
       })
@@ -198,7 +214,8 @@ export class DbAccessContextService {
   loadSequences(datasourceId: string, schema: string): Promise<Option[]> {
     if (!datasourceId || !schema) return Promise.resolve([]);
     const key = `${datasourceId}:${schema}`;
-    if (this.sequenceCache.has(key)) return Promise.resolve(this.sequenceCache.get(key)!);
+    if (this.sequenceCache.has(key))
+      return Promise.resolve(this.sequenceCache.get(key)!);
     if (this.sequenceInflight.has(key)) return this.sequenceInflight.get(key)!;
     const gen = this.generation;
     const p = this.dbAccess
@@ -218,7 +235,8 @@ export class DbAccessContextService {
   loadFunctions(datasourceId: string, schema: string): Promise<Option[]> {
     if (!datasourceId || !schema) return Promise.resolve([]);
     const key = `${datasourceId}:${schema}`;
-    if (this.functionCache.has(key)) return Promise.resolve(this.functionCache.get(key)!);
+    if (this.functionCache.has(key))
+      return Promise.resolve(this.functionCache.get(key)!);
     if (this.functionInflight.has(key)) return this.functionInflight.get(key)!;
     const gen = this.generation;
     const p = this.dbAccess
@@ -250,7 +268,11 @@ export class DbAccessContextService {
     level: 'sequence' | 'function',
   ): Option[] {
     const key = `${datasourceId}:${schema}`;
-    return (level === 'sequence' ? this.sequenceCache : this.functionCache).get(key) ?? [];
+    return (
+      (level === 'sequence' ? this.sequenceCache : this.functionCache).get(
+        key,
+      ) ?? []
+    );
   }
 
   /** Drop the cached tables + columns for a schema (used when a rule's schema clears). */

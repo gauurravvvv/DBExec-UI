@@ -123,14 +123,19 @@ export class ListDbRolesComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.deleteModeOptions = [
-      { label: this.translate.instant('DB_ACCESS.REASSIGN_TO'), value: 'reassign' },
+      {
+        label: this.translate.instant('DB_ACCESS.REASSIGN_TO'),
+        value: 'reassign',
+      },
       { label: this.translate.instant('DB_ACCESS.DROP_OWNED'), value: 'drop' },
     ];
     this.cols = this.buildColumns();
     // Field-specific search placeholder so the user knows what the box matches.
     this.tableConfig = {
       ...this.tableConfig,
-      globalSearchPlaceholder: this.translate.instant('DB_ACCESS.SEARCH_ROLES_PLACEHOLDER'),
+      globalSearchPlaceholder: this.translate.instant(
+        'DB_ACCESS.SEARCH_ROLES_PLACEHOLDER',
+      ),
     };
     this.buildAdapter();
   }
@@ -146,14 +151,61 @@ export class ListDbRolesComponent implements OnInit, OnDestroy {
   private buildColumns(): CustomTableColumn[] {
     const t = (k: string) => this.translate.instant(k);
     return [
-      { colId: 'name', field: 'name', header: t('COMMON.NAME'), width: '224px', frozen: true, filter: 'text' },
-      { colId: 'type', field: 'type', header: t('DB_ACCESS.TYPE'), width: '130px' },
-      { colId: 'status', field: 'status', header: t('COMMON.STATUS'), width: '130px', sortable: false },
-      { colId: 'validUntil', field: 'validUntil', header: t('DB_ACCESS.EXPIRY'), width: '150px', sortable: false },
-      { colId: 'connectionLimit', field: 'connectionLimit', header: t('DB_ACCESS.CONN_LIMIT'), width: '150px', sortable: false },
-      { colId: 'flags', field: 'flags', header: t('DB_ACCESS.FLAGS'), width: '190px', sortable: false },
-      { colId: 'memberOf', field: 'memberOf', header: t('DB_ACCESS.MEMBER_OF'), width: '190px', sortable: false },
-      { colId: 'actions', header: t('COMMON.ACTIONS'), width: '190px', sortable: false },
+      {
+        colId: 'name',
+        field: 'name',
+        header: t('COMMON.NAME'),
+        width: '224px',
+        frozen: true,
+        filter: 'text',
+      },
+      {
+        colId: 'type',
+        field: 'type',
+        header: t('DB_ACCESS.TYPE'),
+        width: '130px',
+      },
+      {
+        colId: 'status',
+        field: 'status',
+        header: t('COMMON.STATUS'),
+        width: '130px',
+        sortable: false,
+      },
+      {
+        colId: 'validUntil',
+        field: 'validUntil',
+        header: t('DB_ACCESS.EXPIRY'),
+        width: '150px',
+        sortable: false,
+      },
+      {
+        colId: 'connectionLimit',
+        field: 'connectionLimit',
+        header: t('DB_ACCESS.CONN_LIMIT'),
+        width: '150px',
+        sortable: false,
+      },
+      {
+        colId: 'flags',
+        field: 'flags',
+        header: t('DB_ACCESS.FLAGS'),
+        width: '190px',
+        sortable: false,
+      },
+      {
+        colId: 'memberOf',
+        field: 'memberOf',
+        header: t('DB_ACCESS.MEMBER_OF'),
+        width: '190px',
+        sortable: false,
+      },
+      {
+        colId: 'actions',
+        header: t('COMMON.ACTIONS'),
+        width: '190px',
+        sortable: false,
+      },
     ];
   }
 
@@ -268,7 +320,8 @@ export class ListDbRolesComponent implements OnInit, OnDestroy {
     const a = role.attributes ?? role;
     if (!this.isLogin(role)) return 'no-login';
     const validUntil = a.validUntil ?? role.validUntil;
-    if (validUntil && new Date(validUntil).getTime() < Date.now()) return 'expired';
+    if (validUntil && new Date(validUntil).getTime() < Date.now())
+      return 'expired';
     return 'active';
   }
 
@@ -287,7 +340,8 @@ export class ListDbRolesComponent implements OnInit, OnDestroy {
   connLimitOf(role: any): string {
     const a = role.attributes ?? role;
     const cl = a.connectionLimit ?? role.connectionLimit;
-    if (cl === -1 || cl == null) return this.translate.instant('DB_ACCESS.UNLIMITED');
+    if (cl === -1 || cl == null)
+      return this.translate.instant('DB_ACCESS.UNLIMITED');
     return String(cl);
   }
 
@@ -297,7 +351,10 @@ export class ListDbRolesComponent implements OnInit, OnDestroy {
 
   /** All roles for grantee pickers (any target may receive membership). */
   get allRoleOptions(): { label: string; value: string }[] {
-    return (this.dbAccess.roles() ?? []).map(r => ({ label: r.name, value: r.name }));
+    return (this.dbAccess.roles() ?? []).map(r => ({
+      label: r.name,
+      value: r.name,
+    }));
   }
 
   /** Group roles only — the valid reassign target when dropping a role. */
@@ -331,7 +388,11 @@ export class ListDbRolesComponent implements OnInit, OnDestroy {
     const intent: ChangeIntent = { kind: 'deactivate', name: role.name };
     this.runPreviewAndArm(
       [intent],
-      () => this.dbAccess.updateRole(this.datasourceId, role.name, { ...body, previewOnly: true }),
+      () =>
+        this.dbAccess.updateRole(this.datasourceId, role.name, {
+          ...body,
+          previewOnly: true,
+        }),
       () => this.dbAccess.updateRole(this.datasourceId, role.name, body),
     );
   }
@@ -348,7 +409,9 @@ export class ListDbRolesComponent implements OnInit, OnDestroy {
   submitMembership(): void {
     if (!this.membershipRoles.length || !this.membershipTarget) return;
     const roleArg =
-      this.membershipRoles.length === 1 ? this.membershipRoles[0] : this.membershipRoles;
+      this.membershipRoles.length === 1
+        ? this.membershipRoles[0]
+        : this.membershipRoles;
     this.confirmPhrase = null;
 
     if (this.membershipMode === 'attach') {
@@ -357,24 +420,48 @@ export class ListDbRolesComponent implements OnInit, OnDestroy {
         toRole: this.membershipTarget,
         adminOption: this.membershipAdminOption,
       };
-      this.previewTitle = this.translate.instant('DB_ACCESS.PREVIEW_GRANT_MEMBERSHIP');
+      this.previewTitle = this.translate.instant(
+        'DB_ACCESS.PREVIEW_GRANT_MEMBERSHIP',
+      );
       this.previewDestructive = false;
       this.showMembership = false;
-      const intent: ChangeIntent = { kind: 'grantMembership', role: roleArg, toRole: this.membershipTarget };
+      const intent: ChangeIntent = {
+        kind: 'grantMembership',
+        role: roleArg,
+        toRole: this.membershipTarget,
+      };
       this.runPreviewAndArm(
         [intent],
-        () => this.dbAccess.attachRole(this.datasourceId, { ...body, previewOnly: true }),
+        () =>
+          this.dbAccess.attachRole(this.datasourceId, {
+            ...body,
+            previewOnly: true,
+          }),
         () => this.dbAccess.attachRole(this.datasourceId, body),
       );
     } else {
-      const body: any = { role: roleArg, toRole: this.membershipTarget, confirm: true };
-      this.previewTitle = this.translate.instant('DB_ACCESS.PREVIEW_REVOKE_MEMBERSHIP');
+      const body: any = {
+        role: roleArg,
+        toRole: this.membershipTarget,
+        confirm: true,
+      };
+      this.previewTitle = this.translate.instant(
+        'DB_ACCESS.PREVIEW_REVOKE_MEMBERSHIP',
+      );
       this.previewDestructive = true;
       this.showMembership = false;
-      const intent: ChangeIntent = { kind: 'revokeMembership', role: roleArg, toRole: this.membershipTarget };
+      const intent: ChangeIntent = {
+        kind: 'revokeMembership',
+        role: roleArg,
+        toRole: this.membershipTarget,
+      };
       this.runPreviewAndArm(
         [intent],
-        () => this.dbAccess.detachRole(this.datasourceId, { ...body, previewOnly: true }),
+        () =>
+          this.dbAccess.detachRole(this.datasourceId, {
+            ...body,
+            previewOnly: true,
+          }),
         () => this.dbAccess.detachRole(this.datasourceId, body),
       );
     }
@@ -418,7 +505,8 @@ export class ListDbRolesComponent implements OnInit, OnDestroy {
     if (!this.deleteTarget) return;
     const name = this.deleteTarget.name;
     const base: any = { confirm: true };
-    if (this.deleteMode === 'reassign' && this.reassignTo) base.reassignTo = this.reassignTo;
+    if (this.deleteMode === 'reassign' && this.reassignTo)
+      base.reassignTo = this.reassignTo;
     if (this.deleteMode === 'drop') base.dropOwned = true;
 
     // Title reflects what the target actually is.
@@ -438,7 +526,11 @@ export class ListDbRolesComponent implements OnInit, OnDestroy {
     };
     this.runPreviewAndArm(
       [intent],
-      () => this.dbAccess.deleteRole(this.datasourceId, name, { ...base, previewOnly: true }),
+      () =>
+        this.dbAccess.deleteRole(this.datasourceId, name, {
+          ...base,
+          previewOnly: true,
+        }),
       () => this.dbAccess.deleteRole(this.datasourceId, name, base),
     );
   }

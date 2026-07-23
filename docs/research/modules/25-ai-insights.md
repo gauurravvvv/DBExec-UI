@@ -16,29 +16,29 @@
 
 **Depends on:** Semantic Layer (02), RLS (09), Search (17), Auth (10), Audit (19)
 **Unblocks:** Self-serve "ask the data anything", anomaly
-  detection, dashboard auto-narration
+detection, dashboard auto-narration
 **Maturity:** 🔴 not in product today
 
 ---
 
 ## 1. Industry baseline
 
-| Tool | NL → query | Anomaly | Auto-narrate | Model | PII handling |
-|---|---|---|---|---|---|
-| **Tableau Ask Data** | yes (semantic) | yes | yes | proprietary | column-tagged |
-| **Power BI Q&A** | yes (semantic) | yes | yes | OpenAI + Azure ML | enterprise tier |
-| **ThoughtSpot** | first-class — entire UX | yes | yes | proprietary | tag-based |
-| **Looker GenAI** | yes | yes | yes | Vertex AI | data not sent for tuning |
-| **Hex Magic** | yes (notebook context) | partial | yes | OpenAI | per-org config |
-| **Snowflake Cortex** | yes (SQL gen) | yes | yes | Mistral / Llama / native | runs in Snowflake |
-| **Sigma AI** | yes | yes | yes | OpenAI | enterprise tier |
+| Tool                 | NL → query              | Anomaly | Auto-narrate | Model                    | PII handling             |
+| -------------------- | ----------------------- | ------- | ------------ | ------------------------ | ------------------------ |
+| **Tableau Ask Data** | yes (semantic)          | yes     | yes          | proprietary              | column-tagged            |
+| **Power BI Q&A**     | yes (semantic)          | yes     | yes          | OpenAI + Azure ML        | enterprise tier          |
+| **ThoughtSpot**      | first-class — entire UX | yes     | yes          | proprietary              | tag-based                |
+| **Looker GenAI**     | yes                     | yes     | yes          | Vertex AI                | data not sent for tuning |
+| **Hex Magic**        | yes (notebook context)  | partial | yes          | OpenAI                   | per-org config           |
+| **Snowflake Cortex** | yes (SQL gen)           | yes     | yes          | Mistral / Llama / native | runs in Snowflake        |
+| **Sigma AI**         | yes                     | yes     | yes          | OpenAI                   | enterprise tier          |
 
 **The patterns to copy:**
 
 - **Tool-calling architecture**, not "LLM writes SQL". The LLM
   selects from a curated set of typed tools (run-metric-query,
   fetch-dimension-values, explain-visual). The tools translate
-  to *validated* semantic-layer calls. SQL is composed by the
+  to _validated_ semantic-layer calls. SQL is composed by the
   semantic compiler we trust, not the model.
 - **Schema sanitisation before LLM**: never send PII column
   values or PII column **names** to a third-party model. The
@@ -57,28 +57,28 @@
 
 ## 3. Gap matrix
 
-| ID | Gap | Severity | Effort |
-|---|---|---|---|
-| AI-G01 | Provider abstraction (OpenAI / Anthropic / Azure / self-hosted) | P0 | M |
-| AI-G02 | Per-org AI config (model, temperature, budget) | P0 | S |
-| AI-G03 | Tool-calling for semantic queries | P0 | L |
-| AI-G04 | AI session + turn entities | P0 | M |
-| AI-G05 | Schema sanitiser (drop PII columns) | P0 | M |
-| AI-G06 | Embedding-based retrieval over docs / metric defs | P0 | M |
-| AI-G07 | Conversation memory | P0 | S |
-| AI-G08 | Visual suggestion (NL → chart type + role mapping) | P0 | M |
-| AI-G09 | "Explain this chart" → narrative auto-summary | P1 | M |
-| AI-G10 | "Why is X changing?" → factor analysis | P1 | L |
-| AI-G11 | Anomaly detection (statistical baseline) | P1 | L |
-| AI-G12 | Prompt-injection defence | P0 | S |
-| AI-G13 | Token budget cap per org per month | P0 | S |
-| AI-G14 | Citation rendering (which rows grounded the answer) | P0 | S |
-| AI-G15 | Audit log of every AI request (full prompt + response) | P0 | S |
-| AI-G16 | Feedback (thumbs up / down + reason) → fine-tune set | P1 | S |
-| AI-G17 | Streaming response (SSE) | P1 | M |
-| AI-G18 | Cost telemetry (tokens in / out per request) | P1 | S |
-| AI-G19 | "Get a chart from this" — semantic query templates | P1 | S |
-| AI-G20 | Multi-step reasoning ("compare A and B, find drivers") | P2 | L |
+| ID     | Gap                                                             | Severity | Effort |
+| ------ | --------------------------------------------------------------- | -------- | ------ |
+| AI-G01 | Provider abstraction (OpenAI / Anthropic / Azure / self-hosted) | P0       | M      |
+| AI-G02 | Per-org AI config (model, temperature, budget)                  | P0       | S      |
+| AI-G03 | Tool-calling for semantic queries                               | P0       | L      |
+| AI-G04 | AI session + turn entities                                      | P0       | M      |
+| AI-G05 | Schema sanitiser (drop PII columns)                             | P0       | M      |
+| AI-G06 | Embedding-based retrieval over docs / metric defs               | P0       | M      |
+| AI-G07 | Conversation memory                                             | P0       | S      |
+| AI-G08 | Visual suggestion (NL → chart type + role mapping)              | P0       | M      |
+| AI-G09 | "Explain this chart" → narrative auto-summary                   | P1       | M      |
+| AI-G10 | "Why is X changing?" → factor analysis                          | P1       | L      |
+| AI-G11 | Anomaly detection (statistical baseline)                        | P1       | L      |
+| AI-G12 | Prompt-injection defence                                        | P0       | S      |
+| AI-G13 | Token budget cap per org per month                              | P0       | S      |
+| AI-G14 | Citation rendering (which rows grounded the answer)             | P0       | S      |
+| AI-G15 | Audit log of every AI request (full prompt + response)          | P0       | S      |
+| AI-G16 | Feedback (thumbs up / down + reason) → fine-tune set            | P1       | S      |
+| AI-G17 | Streaming response (SSE)                                        | P1       | M      |
+| AI-G18 | Cost telemetry (tokens in / out per request)                    | P1       | S      |
+| AI-G19 | "Get a chart from this" — semantic query templates              | P1       | S      |
+| AI-G20 | Multi-step reasoning ("compare A and B, find drivers")          | P2       | L      |
 
 ## 4. Target architecture
 
@@ -92,14 +92,22 @@ export interface AiProvider {
   readonly contextWindow: number;
   generate(opts: GenerateOpts): Promise<GenerateResult>;
   embed(text: string): Promise<number[]>;
-  streamGenerate?(opts: GenerateOpts, onChunk: (chunk: string) => void): Promise<GenerateResult>;
+  streamGenerate?(
+    opts: GenerateOpts,
+    onChunk: (chunk: string) => void,
+  ): Promise<GenerateResult>;
 }
 
 export interface GenerateOpts {
   system: string;
-  messages: Array<{ role: 'user'|'assistant'|'tool'; content: string; toolCalls?: ToolCall[]; toolCallId?: string }>;
+  messages: Array<{
+    role: 'user' | 'assistant' | 'tool';
+    content: string;
+    toolCalls?: ToolCall[];
+    toolCallId?: string;
+  }>;
   tools: ToolDef[];
-  toolChoice?: 'auto'|'required'|{ name: string };
+  toolChoice?: 'auto' | 'required' | { name: string };
   temperature?: number;
   maxTokens?: number;
 }
@@ -111,20 +119,32 @@ export interface GenerateResult {
 }
 
 // Implementations
-class OpenAiProvider implements AiProvider { /* uses openai npm */ }
-class AnthropicProvider implements AiProvider { /* uses @anthropic-ai/sdk */ }
-class AzureOpenAiProvider implements AiProvider { /* same shape, Azure endpoint */ }
-class OllamaProvider implements AiProvider { /* self-hosted Llama / Mistral */ }
+class OpenAiProvider implements AiProvider {
+  /* uses openai npm */
+}
+class AnthropicProvider implements AiProvider {
+  /* uses @anthropic-ai/sdk */
+}
+class AzureOpenAiProvider implements AiProvider {
+  /* same shape, Azure endpoint */
+}
+class OllamaProvider implements AiProvider {
+  /* self-hosted Llama / Mistral */
+}
 
 // Picked per-org
 async function providerFor(orgId: string): Promise<AiProvider> {
   const cfg = await OrgAiConfig.findOne({ where: { organisationId: orgId } });
   if (!cfg) throw new Error('AI not configured for org');
   switch (cfg.provider) {
-    case 'openai':    return new OpenAiProvider(cfg);
-    case 'anthropic': return new AnthropicProvider(cfg);
-    case 'azure':     return new AzureOpenAiProvider(cfg);
-    case 'ollama':    return new OllamaProvider(cfg);
+    case 'openai':
+      return new OpenAiProvider(cfg);
+    case 'anthropic':
+      return new AnthropicProvider(cfg);
+    case 'azure':
+      return new AzureOpenAiProvider(cfg);
+    case 'ollama':
+      return new OllamaProvider(cfg);
   }
 }
 ```
@@ -191,22 +211,39 @@ export const AI_TOOLS = {
     parameters: {
       type: 'object',
       properties: {
-        semanticModelId: { type: 'string', description: 'The id of the semantic model.' },
-        metrics:    { type: 'array', items: { type: 'string' }, description: 'Metric names.' },
-        dimensions: { type: 'array', items: { type: 'string' }, description: 'Dimension names.' },
+        semanticModelId: {
+          type: 'string',
+          description: 'The id of the semantic model.',
+        },
+        metrics: {
+          type: 'array',
+          items: { type: 'string' },
+          description: 'Metric names.',
+        },
+        dimensions: {
+          type: 'array',
+          items: { type: 'string' },
+          description: 'Dimension names.',
+        },
         filters: {
           type: 'array',
           items: {
             type: 'object',
             properties: {
-              field:    { type: 'string' },
-              operator: { type: 'string', enum: ['EQUALS','IN','BETWEEN','GREATER_THAN','LESS_THAN'] },
-              values:   { type: 'array' },
+              field: { type: 'string' },
+              operator: {
+                type: 'string',
+                enum: ['EQUALS', 'IN', 'BETWEEN', 'GREATER_THAN', 'LESS_THAN'],
+              },
+              values: { type: 'array' },
             },
           },
         },
-        timeGrain: { type: 'string', enum: ['day','week','month','quarter','year'] },
-        limit:     { type: 'integer', minimum: 1, maximum: 1000 },
+        timeGrain: {
+          type: 'string',
+          enum: ['day', 'week', 'month', 'quarter', 'year'],
+        },
+        limit: { type: 'integer', minimum: 1, maximum: 1000 },
       },
       required: ['semanticModelId'],
     },
@@ -220,7 +257,8 @@ export const AI_TOOLS = {
 
   describe_semantic_model: {
     name: 'describe_semantic_model',
-    description: 'Get the schema of a semantic model — metrics, dimensions, joins.',
+    description:
+      'Get the schema of a semantic model — metrics, dimensions, joins.',
     parameters: {
       type: 'object',
       properties: { semanticModelId: { type: 'string' } },
@@ -230,7 +268,8 @@ export const AI_TOOLS = {
 
   fetch_dimension_values: {
     name: 'fetch_dimension_values',
-    description: 'Get distinct values of a dimension (for "what regions exist?" style questions).',
+    description:
+      'Get distinct values of a dimension (for "what regions exist?" style questions).',
     parameters: {
       type: 'object',
       properties: {
@@ -239,18 +278,21 @@ export const AI_TOOLS = {
         search: { type: 'string', description: 'Optional substring filter.' },
         limit: { type: 'integer', maximum: 100, default: 20 },
       },
-      required: ['semanticModelId','dimension'],
+      required: ['semanticModelId', 'dimension'],
     },
   },
 
   explain_visual: {
     name: 'explain_visual',
-    description: 'Generate a narrative summary of a chart\'s data.',
+    description: "Generate a narrative summary of a chart's data.",
     parameters: {
       type: 'object',
       properties: {
         visualId: { type: 'string' },
-        focus: { type: 'string', enum: ['trend','outliers','comparison','summary'] },
+        focus: {
+          type: 'string',
+          enum: ['trend', 'outliers', 'comparison', 'summary'],
+        },
       },
       required: ['visualId'],
     },
@@ -278,9 +320,13 @@ export const AI_TOOLS = {
         semanticModelId: { type: 'string' },
         metric: { type: 'string' },
         timeColumn: { type: 'string' },
-        method: { type: 'string', enum: ['zscore','iqr','seasonal_naive'], default: 'zscore' },
+        method: {
+          type: 'string',
+          enum: ['zscore', 'iqr', 'seasonal_naive'],
+          default: 'zscore',
+        },
       },
-      required: ['semanticModelId','metric'],
+      required: ['semanticModelId', 'metric'],
     },
   },
 };
@@ -312,25 +358,35 @@ const TOOL_HANDLERS = {
       limit: args.limit ?? 100,
     };
     const result = await semanticQueryService.run(req, {
-      userId: ctx.userId, organisationId: ctx.orgId,
+      userId: ctx.userId,
+      organisationId: ctx.orgId,
     });
     return {
       columns: result.columns,
-      rows: result.rows.slice(0, 100),                // truncate for token budget
+      rows: result.rows.slice(0, 100), // truncate for token budget
       truncated: result.rows.length > 100,
-      sql_executed: result.compiledSql,                // for "show me the SQL" UX
+      sql_executed: result.compiledSql, // for "show me the SQL" UX
     };
   },
 
   list_semantic_models: async (args, ctx) => {
-    const models = await SemanticModel.find({ where: { organisationId: ctx.orgId } });
-    return models.map(m => ({ id: m.id, name: m.name, description: m.description }));
+    const models = await SemanticModel.find({
+      where: { organisationId: ctx.orgId },
+    });
+    return models.map(m => ({
+      id: m.id,
+      name: m.name,
+      description: m.description,
+    }));
   },
 
   describe_semantic_model: async (args, ctx) => {
-    const model = await loadSemanticModelWithMembers(args.semanticModelId, ctx.orgId);
+    const model = await loadSemanticModelWithMembers(
+      args.semanticModelId,
+      ctx.orgId,
+    );
     if (!model) throw new BadRequest('not found');
-    return sanitiseModelForLlm(model);   // §4.4
+    return sanitiseModelForLlm(model); // §4.4
   },
 
   // ... others ...
@@ -395,18 +451,23 @@ export default async function aiChat(req: Request, res: Response) {
   // 1. Load or create session
   let session: AiSession;
   if (sessionId) {
-    session = await AiSession.findOne({ where: { id: sessionId, userId: loggedInId } });
+    session = await AiSession.findOne({
+      where: { id: sessionId, userId: loggedInId },
+    });
     if (!session) return sendResponse(res, false, 404, 'ai.session.not_found');
   } else {
     session = await AiSession.save({
       organisationId: orgData.id,
       userId: loggedInId,
-      contextKind, contextId,
+      contextKind,
+      contextId,
     });
   }
 
   // 2. Budget check
-  const cfg = await OrgAiConfig.findOne({ where: { organisationId: orgData.id } });
+  const cfg = await OrgAiConfig.findOne({
+    where: { organisationId: orgData.id },
+  });
   if (!cfg) return sendResponse(res, false, 400, 'ai.not_configured');
   if (cfg.monthlyTokensUsed > cfg.monthlyTokenBudget) {
     return sendResponse(res, false, 429, 'ai.budget.exhausted');
@@ -427,12 +488,18 @@ export default async function aiChat(req: Request, res: Response) {
 
   // 5. Save user turn
   await AiTurn.save({
-    sessionId: session.id, role: 'user', content: message,
+    sessionId: session.id,
+    role: 'user',
+    content: message,
   });
 
   // 6. Provider call with tools
   const provider = await providerFor(orgData.id);
-  const systemPrompt = await buildSystemPrompt(orgData.id, contextKind, contextId);
+  const systemPrompt = await buildSystemPrompt(
+    orgData.id,
+    contextKind,
+    contextId,
+  );
 
   let toolCallCount = 0;
   let final: any;
@@ -450,8 +517,10 @@ export default async function aiChat(req: Request, res: Response) {
 
     // Update budget
     await OrgAiConfig.update(orgData.id, {
-      monthlyTokensUsed: cfg.monthlyTokensUsed
-        + result.usage.promptTokens + result.usage.completionTokens,
+      monthlyTokensUsed:
+        cfg.monthlyTokensUsed +
+        result.usage.promptTokens +
+        result.usage.completionTokens,
     });
 
     if (result.toolCalls && result.toolCalls.length > 0) {
@@ -473,7 +542,11 @@ export default async function aiChat(req: Request, res: Response) {
         await AiTurn.save({
           sessionId: session.id,
           role: 'tool',
-          tool_call: { name: call.name, arguments: call.arguments, result: toolResult },
+          tool_call: {
+            name: call.name,
+            arguments: call.arguments,
+            result: toolResult,
+          },
           tokens_in: result.usage.promptTokens,
           tokens_out: result.usage.completionTokens,
           duration_ms: Date.now() - t0,
@@ -491,7 +564,7 @@ export default async function aiChat(req: Request, res: Response) {
         });
       }
       toolCallCount++;
-      continue;     // let the model respond to the tool result
+      continue; // let the model respond to the tool result
     }
 
     // No more tool calls — model produced a final answer
@@ -502,7 +575,8 @@ export default async function aiChat(req: Request, res: Response) {
   // 7. Save the assistant turn
   if (final) {
     await AiTurn.save({
-      sessionId: session.id, role: 'assistant',
+      sessionId: session.id,
+      role: 'assistant',
       content: final.text ?? '',
       tokens_in: final.usage.promptTokens,
       tokens_out: final.usage.completionTokens,
@@ -514,15 +588,19 @@ export default async function aiChat(req: Request, res: Response) {
 
   // 9. Audit (high-volume — fire and forget into a queue)
   await scheduleQueue.add('audit:ai', {
-    organisationId: orgData.id, userId: loggedInId,
-    sessionId: session.id, message, response: final?.text,
-    tokensIn: final?.usage.promptTokens, tokensOut: final?.usage.completionTokens,
+    organisationId: orgData.id,
+    userId: loggedInId,
+    sessionId: session.id,
+    message,
+    response: final?.text,
+    tokensIn: final?.usage.promptTokens,
+    tokensOut: final?.usage.completionTokens,
   });
 
   return sendResponse(res, true, 200, '', {
     sessionId: session.id,
     response: final?.text,
-    citations: extractCitations(messages),    // §4.7
+    citations: extractCitations(messages), // §4.7
   });
 }
 ```
@@ -530,7 +608,11 @@ export default async function aiChat(req: Request, res: Response) {
 ### 4.6 System prompt
 
 ```ts
-async function buildSystemPrompt(orgId: string, contextKind?: string, contextId?: string) {
+async function buildSystemPrompt(
+  orgId: string,
+  contextKind?: string,
+  contextId?: string,
+) {
   let prompt = `You are a data analyst assistant for the DBExec platform.
 
 You have tools to query semantic models, look up dimension values, generate
@@ -553,7 +635,9 @@ The user's organisation has these semantic models available:
 `;
 
   const models = await SemanticModel.find({ where: { organisationId: orgId } });
-  prompt += models.map(m => `- ${m.name}: ${m.description ?? '(no description)'}`).join('\n');
+  prompt += models
+    .map(m => `- ${m.name}: ${m.description ?? '(no description)'}`)
+    .join('\n');
 
   if (contextKind === 'dashboard' && contextId) {
     const dashboard = await Dashboard.findOne({ where: { id: contextId } });
@@ -625,9 +709,11 @@ async function detectAnomalies(args: any, ctx: any) {
 
   if (args.method === 'zscore') {
     const mean = values.reduce((s, v) => s + v, 0) / values.length;
-    const std = Math.sqrt(values.reduce((s, v) => s + Math.pow(v - mean, 2), 0) / values.length);
+    const std = Math.sqrt(
+      values.reduce((s, v) => s + Math.pow(v - mean, 2), 0) / values.length,
+    );
     anomalies = values
-      .map((v, i) => Math.abs((v - mean) / std) > 3 ? i : -1)
+      .map((v, i) => (Math.abs((v - mean) / std) > 3 ? i : -1))
       .filter(i => i >= 0);
   } else if (args.method === 'iqr') {
     const sorted = [...values].sort((a, b) => a - b);
@@ -635,7 +721,7 @@ async function detectAnomalies(args: any, ctx: any) {
     const q3 = sorted[Math.floor(sorted.length * 0.75)];
     const iqr = q3 - q1;
     anomalies = values
-      .map((v, i) => v < q1 - 1.5*iqr || v > q3 + 1.5*iqr ? i : -1)
+      .map((v, i) => (v < q1 - 1.5 * iqr || v > q3 + 1.5 * iqr ? i : -1))
       .filter(i => i >= 0);
   } else if (args.method === 'seasonal_naive') {
     // Compare each point to the same day-of-week 4 weeks ago
@@ -651,7 +737,8 @@ async function detectAnomalies(args: any, ctx: any) {
   return {
     method: args.method,
     timeSeries: result.rows.map((r: any, i: number) => ({
-      time: r[args.timeColumn], value: r[args.metric],
+      time: r[args.timeColumn],
+      value: r[args.metric],
       isAnomaly: anomalies.includes(i),
     })),
     anomalyCount: anomalies.length,
@@ -672,7 +759,9 @@ And calls run_semantic_query with breakdowns.
 
 ```ts
 async function explainVisualHandler(args: any, ctx: any) {
-  const visual = await DashboardVisual.findOne({ where: { id: args.visualId } });
+  const visual = await DashboardVisual.findOne({
+    where: { id: args.visualId },
+  });
   // Get the visual's current data (using the existing dashboard run path)
   const data = await runDashboardVisual(visual, ctx);
 
@@ -712,8 +801,8 @@ function containsSuspiciousMarkup(input: string): boolean {
     /you\s+are\s+now\s+/i,
     /<\|(system|user|assistant)\|>/i,
     /\[\[SYSTEM\]\]/i,
-    /​{5,}/,                       // many zero-width spaces
-    /‮/,                            // RTL override
+    /​{5,}/, // many zero-width spaces
+    /‮/, // RTL override
   ];
   return patterns.some(p => p.test(input));
 }
@@ -765,11 +854,13 @@ async function aiChatStream(req, res) {
 
   const provider = await providerFor(orgData.id);
   if (!provider.streamGenerate) {
-    res.write(`event: error\ndata: streaming not supported by this provider\n\n`);
+    res.write(
+      `event: error\ndata: streaming not supported by this provider\n\n`,
+    );
     return res.end();
   }
 
-  await provider.streamGenerate({ /* ... */ }, (chunk) => {
+  await provider.streamGenerate({/* ... */}, chunk => {
     res.write(`event: chunk\ndata: ${JSON.stringify({ text: chunk })}\n\n`);
   });
 
@@ -837,22 +928,22 @@ Rollup cron at midnight UTC. Admin dashboard shows monthly spend.
 
 ## 5. APIs
 
-| Method | Path | Purpose |
-|---|---|---|
-| POST | `/ai/chat` | One conversation turn |
-| GET | `/ai/chat/stream` | SSE stream of turn |
-| GET | `/ai/sessions` | Past sessions for current user |
-| GET | `/ai/sessions/:id` | Single session with all turns |
-| POST | `/ai/sessions/:id/title` | Auto-generate title |
-| DELETE | `/ai/sessions/:id` | Delete session (cascade turns) |
-| POST | `/ai/turns/:id/feedback` | Thumbs / reason |
-| GET | `/admin/ai/config` | Org's AI configuration |
-| PUT | `/admin/ai/config` | Update model, budget, etc. |
-| GET | `/admin/ai/usage` | Cost + token telemetry |
-| GET | `/admin/ai/feedback-summary` | Quality dashboard |
-| POST | `/ai/explain/visual/:visualId` | Narrate a visual |
-| POST | `/ai/anomalies` | Run anomaly detection |
-| POST | `/ai/suggest-visual` | NL → chart suggestion |
+| Method | Path                           | Purpose                        |
+| ------ | ------------------------------ | ------------------------------ |
+| POST   | `/ai/chat`                     | One conversation turn          |
+| GET    | `/ai/chat/stream`              | SSE stream of turn             |
+| GET    | `/ai/sessions`                 | Past sessions for current user |
+| GET    | `/ai/sessions/:id`             | Single session with all turns  |
+| POST   | `/ai/sessions/:id/title`       | Auto-generate title            |
+| DELETE | `/ai/sessions/:id`             | Delete session (cascade turns) |
+| POST   | `/ai/turns/:id/feedback`       | Thumbs / reason                |
+| GET    | `/admin/ai/config`             | Org's AI configuration         |
+| PUT    | `/admin/ai/config`             | Update model, budget, etc.     |
+| GET    | `/admin/ai/usage`              | Cost + token telemetry         |
+| GET    | `/admin/ai/feedback-summary`   | Quality dashboard              |
+| POST   | `/ai/explain/visual/:visualId` | Narrate a visual               |
+| POST   | `/ai/anomalies`                | Run anomaly detection          |
+| POST   | `/ai/suggest-visual`           | NL → chart suggestion          |
 
 ## 6. FE specs
 
@@ -931,26 +1022,33 @@ AI configuration
 ```ts
 export const aiChatSchema = z.object({
   sessionId: z.string().uuid().optional(),
-  contextKind: z.enum(['adhoc','dashboard','analysis','dataset']).optional(),
+  contextKind: z.enum(['adhoc', 'dashboard', 'analysis', 'dataset']).optional(),
   contextId: z.string().uuid().optional(),
   message: z.string().min(1).max(4000),
 });
 
 export const aiFeedbackSchema = z.object({
-  rating: z.enum(['up','down']),
-  reason: z.enum(['factual_error','wrong_data','unclear','other']).optional(),
+  rating: z.enum(['up', 'down']),
+  reason: z
+    .enum(['factual_error', 'wrong_data', 'unclear', 'other'])
+    .optional(),
   text: z.string().max(1000).optional(),
 });
 
 export const updateAiConfigSchema = z.object({
-  provider: z.enum(['openai','anthropic','azure','ollama']),
+  provider: z.enum(['openai', 'anthropic', 'azure', 'ollama']),
   model: z.string().min(1).max(64),
   embeddingModel: z.string().max(64).optional(),
   endpointUrl: z.string().url().optional(),
-  apiKey: z.string().min(8).max(255).optional(),    // optional on update
+  apiKey: z.string().min(8).max(255).optional(), // optional on update
   temperature: z.number().min(0).max(2).default(0.2),
   maxTokens: z.number().int().min(64).max(8192).default(2048),
-  monthlyTokenBudget: z.number().int().min(1000).max(100_000_000).default(1_000_000),
+  monthlyTokenBudget: z
+    .number()
+    .int()
+    .min(1000)
+    .max(100_000_000)
+    .default(1_000_000),
   dataRetentionOff: z.boolean().default(true),
 });
 ```

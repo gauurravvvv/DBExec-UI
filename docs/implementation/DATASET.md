@@ -108,12 +108,12 @@ CREATE TABLE dataset_relation (
 
 ## 2. Source kinds — what's actually stored
 
-| `source_kind` | What's stored | When to use |
-|---|---|---|
-| `sql` | `source_sql` (raw SELECT) | Power user; max flexibility |
-| `table` | `source_table` ('schema.table') | Direct table mirror; no transformation |
-| `builder` | `builder_state` (JSON tree of joins/filters) | Self-serve; the dataset wizard |
-| `uploaded` | `source_table` pointing to managed-datasource schema | CSV/XLSX upload (module 12) |
+| `source_kind` | What's stored                                        | When to use                            |
+| ------------- | ---------------------------------------------------- | -------------------------------------- |
+| `sql`         | `source_sql` (raw SELECT)                            | Power user; max flexibility            |
+| `table`       | `source_table` ('schema.table')                      | Direct table mirror; no transformation |
+| `builder`     | `builder_state` (JSON tree of joins/filters)         | Self-serve; the dataset wizard         |
+| `uploaded`    | `source_table` pointing to managed-datasource schema | CSV/XLSX upload (module 12)            |
 
 Compilation: builder JSON compiles to SQL at save time; SQL is
 re-validated on each save. Table mirror is just `SELECT * FROM <table>`.
@@ -130,18 +130,27 @@ export async function inferFields(
   pool: Pool,
   adapter: DialectAdapter,
 ): Promise<DatasetField[]> {
-  const sample = await pool.query(dataset.source_sql ?? `SELECT * FROM ${dataset.source_table}`,
-                                  [], { maxRows: 100, timeoutMs: 30_000 });
+  const sample = await pool.query(
+    dataset.source_sql ?? `SELECT * FROM ${dataset.source_table}`,
+    [],
+    { maxRows: 100, timeoutMs: 30_000 },
+  );
 
   const fields: DatasetField[] = sample.fields.map((col, i) => ({
     name: normaliseName(col.name),
     displayName: humanise(col.name),
-    dataType: pgTypeToDataType(col.dataTypeID),  // adapter-specific
-    semanticType: inferSemanticType(col.name, sample.rows.map(r => r[i])),
+    dataType: pgTypeToDataType(col.dataTypeID), // adapter-specific
+    semanticType: inferSemanticType(
+      col.name,
+      sample.rows.map(r => r[i]),
+    ),
     isPii: looksLikePii(col.name),
     isHidden: false,
     isDisplayOnly: false,
-    cardinalityHint: Math.min(sample.rows.length, distinctCount(sample.rows.map(r => r[i]))),
+    cardinalityHint: Math.min(
+      sample.rows.length,
+      distinctCount(sample.rows.map(r => r[i])),
+    ),
     displayOrder: i,
   }));
   return fields;
@@ -160,7 +169,9 @@ function inferSemanticType(name: string, values: any[]): string | null {
 }
 
 function looksLikePii(name: string): boolean {
-  return /(ssn|email|phone|address|first_name|last_name|dob|birthdate|passport)/i.test(name);
+  return /(ssn|email|phone|address|first_name|last_name|dob|birthdate|passport)/i.test(
+    name,
+  );
 }
 ```
 
@@ -195,12 +206,17 @@ export async function refreshDataset(datasetId: string): Promise<void> {
   if (dataset.refreshCadence !== 'materialised') return;
 
   const adapter = engineFor(dataset.datasource.type);
-  const pool = await getPool(dataset.orgId, dataset.datasource.defaultConnectionId);
+  const pool = await getPool(
+    dataset.orgId,
+    dataset.datasource.defaultConnectionId,
+  );
 
   const targetSchema = `dbexec_mat_${dataset.orgId.replace(/-/g, '_')}`;
   const targetTable = `mat_${dataset.slug}_${Date.now()}`;
   await pool.query(`CREATE SCHEMA IF NOT EXISTS ${targetSchema}`);
-  await pool.query(`CREATE TABLE ${targetSchema}.${targetTable} AS ${dataset.sourceSql}`);
+  await pool.query(
+    `CREATE TABLE ${targetSchema}.${targetTable} AS ${dataset.sourceSql}`,
+  );
 
   // Atomic swap via view
   await pool.query(`
@@ -282,6 +298,7 @@ Three panes: schema browser (left), SQL/builder editor
 pagination (server-side, cursor-based) and refresh schedule.
 
 `src/app/modules/datasets/`:
+
 - `dataset-editor/` — shell
 - `sql-editor/` — monaco-based, with autocomplete from
   introspection cache
@@ -296,43 +313,46 @@ pagination (server-side, cursor-based) and refresh schedule.
 
 ## 8. Observability
 
-| Metric | Type | Labels | Purpose |
-|---|---|---|---|
-| `dbexec_dataset_save_ms` | histogram | `source_kind` | save latency |
-| `dbexec_dataset_infer_ms` | histogram | — | inference cost |
-| `dbexec_dataset_preview_ms` | histogram | `dataset` | preview latency |
-| `dbexec_dataset_materialise_ms` | histogram | `dataset` | refresh cost |
-| `dbexec_dataset_materialise_failed_total` | counter | `dataset`, `reason` | failures |
-| `dbexec_dataset_count` | gauge | `org`, `status` | per-org counts |
+| Metric                                    | Type      | Labels              | Purpose         |
+| ----------------------------------------- | --------- | ------------------- | --------------- |
+| `dbexec_dataset_save_ms`                  | histogram | `source_kind`       | save latency    |
+| `dbexec_dataset_infer_ms`                 | histogram | —                   | inference cost  |
+| `dbexec_dataset_preview_ms`               | histogram | `dataset`           | preview latency |
+| `dbexec_dataset_materialise_ms`           | histogram | `dataset`           | refresh cost    |
+| `dbexec_dataset_materialise_failed_total` | counter   | `dataset`, `reason` | failures        |
+| `dbexec_dataset_count`                    | gauge     | `org`, `status`     | per-org counts  |
 
 ---
 
 ## 9. Security & threat model
 
-| Threat | Mitigation |
-|---|---|
-| Author injects DDL via `source_sql` | SQL parser whitelists SELECT only; reject on save |
-| Builder JSON includes raw SQL fragments | Builder compiler escapes via parameterised IR; no raw fragments allowed |
-| PII auto-detection misses | Author can manually flag; admin audit shows un-flagged fields containing common PII patterns |
-| Cross-org datasource reference | Datasource lookup joined by org_id |
-| Materialised view bloat / cleanup miss | 24h cleanup cron; admin alert on `dbexec_dataset_materialise_failed_total` > 0 |
-| Slow preview DoSes the warehouse | Preview wrapped in `LIMIT n`; 30 s timeout; per-user concurrent preview limit (3) |
-| Param injection (`:param_name`) | Binding only — names mapped to dialect placeholders; never string-interpolated |
+| Threat                                  | Mitigation                                                                                   |
+| --------------------------------------- | -------------------------------------------------------------------------------------------- |
+| Author injects DDL via `source_sql`     | SQL parser whitelists SELECT only; reject on save                                            |
+| Builder JSON includes raw SQL fragments | Builder compiler escapes via parameterised IR; no raw fragments allowed                      |
+| PII auto-detection misses               | Author can manually flag; admin audit shows un-flagged fields containing common PII patterns |
+| Cross-org datasource reference          | Datasource lookup joined by org_id                                                           |
+| Materialised view bloat / cleanup miss  | 24h cleanup cron; admin alert on `dbexec_dataset_materialise_failed_total` > 0               |
+| Slow preview DoSes the warehouse        | Preview wrapped in `LIMIT n`; 30 s timeout; per-user concurrent preview limit (3)            |
+| Param injection (`:param_name`)         | Binding only — names mapped to dialect placeholders; never string-interpolated               |
 
 ---
 
 ## 10. Runbook
 
 **Symptom: save fails with "field count mismatch".**
+
 1. Source SELECT changed columns; inference picks up new
    columns but old `dataset_field` rows still exist. Re-save
    forces reconciliation.
 
 **Symptom: materialisation takes hours.**
+
 1. Source query is too big. Suggest a `WHERE` filter or
    convert to incremental refresh (v2).
 
 **Symptom: preview empty but warehouse has data.**
+
 1. RLS (module 09) emptying it — `Preview as another user`
    in the toolbar swaps context.
 
@@ -340,12 +360,12 @@ pagination (server-side, cursor-based) and refresh schedule.
 
 ## 11. Perf budget
 
-| Operation | p50 | p95 | Hard ceiling |
-|---|---|---|---|
-| Save (with infer) | 400 ms | 1.5 s | 10 s |
-| Preview (100 rows) | 200 ms | 800 ms | 30 s |
-| Materialise (10M-row table) | — | — | depends on warehouse |
-| Schema browser render | 50 ms | 200 ms | 1 s |
+| Operation                   | p50    | p95    | Hard ceiling         |
+| --------------------------- | ------ | ------ | -------------------- |
+| Save (with infer)           | 400 ms | 1.5 s  | 10 s                 |
+| Preview (100 rows)          | 200 ms | 800 ms | 30 s                 |
+| Materialise (10M-row table) | —      | —      | depends on warehouse |
+| Schema browser render       | 50 ms  | 200 ms | 1 s                  |
 
 ---
 

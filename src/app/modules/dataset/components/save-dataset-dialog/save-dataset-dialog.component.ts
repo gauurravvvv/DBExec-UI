@@ -121,10 +121,7 @@ export class SaveDatasetDialogComponent implements OnInit, OnChanges {
       // validated against the SAME shared schema the BE uses so an
       // out-of-range value is caught here first.
       cacheEnabled: [false],
-      cacheTtlSeconds: [
-        null,
-        [zodValidator(datasetCacheTtlSecondsSchema)],
-      ],
+      cacheTtlSeconds: [null, [zodValidator(datasetCacheTtlSecondsSchema)]],
     });
   }
 
@@ -158,7 +155,10 @@ export class SaveDatasetDialogComponent implements OnInit, OnChanges {
         // Only send a TTL when caching is on AND a value was entered;
         // otherwise null so the server uses its default.
         cacheTtlSeconds:
-          cacheEnabled && rawTtl !== null && rawTtl !== '' && rawTtl !== undefined
+          cacheEnabled &&
+          rawTtl !== null &&
+          rawTtl !== '' &&
+          rawTtl !== undefined
             ? Number(rawTtl)
             : null,
       };

@@ -3,7 +3,7 @@
 > The in-app bell. Persistent per-user message store with delivery
 > across in-app, email, push, and SMS channels. Where modules 15
 > (subscriptions/alerts) and 14 (share-link views) emit signals,
-> this module is where users actually *see* them.
+> this module is where users actually _see_ them.
 >
 > Sister modules:
 > [15 · Scheduling](15-scheduling-alerts.md) (the emitter),
@@ -18,15 +18,15 @@
 
 ## 1. Industry baseline
 
-| Tool | In-app | Email | Web Push | Mobile Push | Per-user prefs | Bundling |
-|---|---|---|---|---|---|---|
-| **Notion** | ✓ bell | ✓ digest by default | ✓ | ✓ | rich (per-doc) | ✓ daily |
-| **Slack** | ✓ unread badge | optional digest | ✓ | ✓ | per-workspace + per-channel | ✓ "you missed" |
-| **Linear** | ✓ inbox | ✓ digest | ✓ | ✓ | per-team + per-project | ✓ |
-| **Figma** | ✓ | digest | ✓ | ✓ | per-file | ✓ |
-| **GitHub** | ✓ inbox | ✓ per-thread | ✓ | ✓ | per-repo + per-thread | ✓ |
-| **Looker** | basic bell | per-alert | ✗ | ✗ | minimal | ✗ |
-| **Metabase** | bell | per-pulse | ✗ | ✗ | minimal | ✗ |
+| Tool         | In-app         | Email               | Web Push | Mobile Push | Per-user prefs              | Bundling       |
+| ------------ | -------------- | ------------------- | -------- | ----------- | --------------------------- | -------------- |
+| **Notion**   | ✓ bell         | ✓ digest by default | ✓        | ✓           | rich (per-doc)              | ✓ daily        |
+| **Slack**    | ✓ unread badge | optional digest     | ✓        | ✓           | per-workspace + per-channel | ✓ "you missed" |
+| **Linear**   | ✓ inbox        | ✓ digest            | ✓        | ✓           | per-team + per-project      | ✓              |
+| **Figma**    | ✓              | digest              | ✓        | ✓           | per-file                    | ✓              |
+| **GitHub**   | ✓ inbox        | ✓ per-thread        | ✓        | ✓           | per-repo + per-thread       | ✓              |
+| **Looker**   | basic bell     | per-alert           | ✗        | ✗           | minimal                     | ✗              |
+| **Metabase** | bell           | per-pulse           | ✗        | ✗           | minimal                     | ✗              |
 
 **The patterns to copy:**
 
@@ -54,25 +54,25 @@
 
 ## 3. Gap matrix
 
-| ID | Gap | Severity | Effort |
-|---|---|---|---|
-| NTF-G01 | Category enum (`dataset.refreshed`, `alert.fired`, etc.) | P0 | S |
-| NTF-G02 | Per-user-per-category preference rows | P0 | M |
-| NTF-G03 | Email channel from notification | P0 | S |
-| NTF-G04 | Web Push API integration | P1 | M |
-| NTF-G05 | Mobile Push (FCM / APNS) | P2 | L |
-| NTF-G06 | Bundling by source + time window | P1 | M |
-| NTF-G07 | DND / quiet hours per user | P1 | S |
-| NTF-G08 | Daily digest (combine missed) | P1 | M |
-| NTF-G09 | Real-time delivery (WebSocket or SSE) | P0 | M |
-| NTF-G10 | Bell badge unread count (live) | P0 | S |
-| NTF-G11 | Per-notification CTA URL | P0 | S |
-| NTF-G12 | Snooze / mute by source | P1 | S |
-| NTF-G13 | Mark-all-read action | P0 | S |
-| NTF-G14 | Archive / clear-old jobs | P1 | S |
-| NTF-G15 | Notification preferences UI | P0 | M |
-| NTF-G16 | i18n notification templates | P1 | S |
-| NTF-G17 | "Notify me about X" subscribable surfaces | P2 | M |
+| ID      | Gap                                                      | Severity | Effort |
+| ------- | -------------------------------------------------------- | -------- | ------ |
+| NTF-G01 | Category enum (`dataset.refreshed`, `alert.fired`, etc.) | P0       | S      |
+| NTF-G02 | Per-user-per-category preference rows                    | P0       | M      |
+| NTF-G03 | Email channel from notification                          | P0       | S      |
+| NTF-G04 | Web Push API integration                                 | P1       | M      |
+| NTF-G05 | Mobile Push (FCM / APNS)                                 | P2       | L      |
+| NTF-G06 | Bundling by source + time window                         | P1       | M      |
+| NTF-G07 | DND / quiet hours per user                               | P1       | S      |
+| NTF-G08 | Daily digest (combine missed)                            | P1       | M      |
+| NTF-G09 | Real-time delivery (WebSocket or SSE)                    | P0       | M      |
+| NTF-G10 | Bell badge unread count (live)                           | P0       | S      |
+| NTF-G11 | Per-notification CTA URL                                 | P0       | S      |
+| NTF-G12 | Snooze / mute by source                                  | P1       | S      |
+| NTF-G13 | Mark-all-read action                                     | P0       | S      |
+| NTF-G14 | Archive / clear-old jobs                                 | P1       | S      |
+| NTF-G15 | Notification preferences UI                              | P0       | M      |
+| NTF-G16 | i18n notification templates                              | P1       | S      |
+| NTF-G17 | "Notify me about X" subscribable surfaces                | P2       | M      |
 
 ## 4. Target architecture
 
@@ -186,7 +186,7 @@ export const NOTIFICATION_CATEGORIES = [
   'subscription.failed',
 
   // Sharing
-  'share.public_link_viewed',          // notify owner of public-link views
+  'share.public_link_viewed', // notify owner of public-link views
   'share.embed_token_revoked',
 
   // Auth / security
@@ -226,8 +226,8 @@ export interface NotifyArgs {
   userId: string;
   category: NotificationCategory;
   payload: Record<string, unknown>;
-  bundleKey?: string;        // groups in-window deliveries
-  url?: string;              // CTA link
+  bundleKey?: string; // groups in-window deliveries
+  url?: string; // CTA link
   severity?: 'info' | 'warning' | 'critical';
   sourceType?: string;
   sourceId?: string;
@@ -240,7 +240,8 @@ export async function notify(args: NotifyArgs) {
   // 2. Resolve DND
   const dnd = await loadDnd(args.userId);
   const inDnd = dnd?.enabled && isInQuietWindow(dnd);
-  const criticalOverride = args.severity === 'critical' && dnd?.overrideForCritical;
+  const criticalOverride =
+    args.severity === 'critical' && dnd?.overrideForCritical;
   const dndBlocks = inDnd && !criticalOverride;
 
   // 3. Bundle? If a recent unread notification has the same
@@ -248,7 +249,8 @@ export async function notify(args: NotifyArgs) {
   //    create a new row.
   let notification: Notification;
   if (args.bundleKey) {
-    const recent = await master_db_connection.getRepository(Notification)
+    const recent = await master_db_connection
+      .getRepository(Notification)
       .findOne({
         where: {
           userId: args.userId,
@@ -274,12 +276,24 @@ export async function notify(args: NotifyArgs) {
   const deliveredVia: string[] = ['in_app'];
 
   if (!dndBlocks) {
-    if (pref.email)  { await sendEmail(notification);  deliveredVia.push('email'); }
-    if (pref.push)   { await sendWebPush(notification); deliveredVia.push('push'); }
-    if (pref.sms)    { await sendSms(notification);     deliveredVia.push('sms'); }
+    if (pref.email) {
+      await sendEmail(notification);
+      deliveredVia.push('email');
+    }
+    if (pref.push) {
+      await sendWebPush(notification);
+      deliveredVia.push('push');
+    }
+    if (pref.sms) {
+      await sendSms(notification);
+      deliveredVia.push('sms');
+    }
   } else {
     // Queue for daily digest
-    await DigestQueue.insert({ userId: args.userId, notificationId: notification.id });
+    await DigestQueue.insert({
+      userId: args.userId,
+      notificationId: notification.id,
+    });
   }
 
   await Notification.update(notification.id, { deliveredVia });
@@ -305,7 +319,7 @@ function mergePayload(existing: any, incoming: any): any {
     instances: [
       ...(existing.instances ?? [existing.latestPayload].filter(Boolean)),
       incoming,
-    ].slice(-10),               // cap memory; keep last 10
+    ].slice(-10), // cap memory; keep last 10
     latestAt: new Date().toISOString(),
   };
 }
@@ -336,7 +350,7 @@ function isInQuietWindow(dnd: UserDnd): boolean {
   const now = new Date();
   // Get the local clock time in the user's tz
   const local = new Date(now.toLocaleString('en-US', { timeZone: tz }));
-  const dayOfWeek = local.getDay();     // 0..6
+  const dayOfWeek = local.getDay(); // 0..6
   if (!dnd.quietDays.includes(dayOfWeek)) return false;
 
   const [sh, sm] = dnd.quietHoursStart.split(':').map(Number);
@@ -360,7 +374,7 @@ function isInQuietWindow(dnd: UserDnd): boolean {
 import webpush from 'web-push';
 
 webpush.setVapidDetails(
-  process.env.VAPID_SUBJECT!,         // "mailto:ops@dbexec.com"
+  process.env.VAPID_SUBJECT!, // "mailto:ops@dbexec.com"
   process.env.VAPID_PUBLIC_KEY!,
   process.env.VAPID_PRIVATE_KEY!,
 );
@@ -369,7 +383,9 @@ export { webpush };
 
 // Sending:
 async function sendWebPush(notification: Notification) {
-  const subs = await PushSubscription.find({ where: { userId: notification.userId } });
+  const subs = await PushSubscription.find({
+    where: { userId: notification.userId },
+  });
   const payload = JSON.stringify({
     title: renderTitle(notification),
     body: renderBody(notification),
@@ -403,7 +419,9 @@ async function subscribePush(req, res) {
   const { endpoint, keys, userAgent } = req.body;
   await PushSubscription.save({
     userId: res.locals.loggedInId,
-    endpoint, keys, userAgent,
+    endpoint,
+    keys,
+    userAgent,
   });
   res.json({ ok: true });
 }
@@ -417,11 +435,11 @@ async function streamNotifications(req: Request, res: Response) {
   res.setHeader('Content-Type', 'text/event-stream');
   res.setHeader('Cache-Control', 'no-cache');
   res.setHeader('Connection', 'keep-alive');
-  res.setHeader('X-Accel-Buffering', 'no');     // nginx
+  res.setHeader('X-Accel-Buffering', 'no'); // nginx
   res.flushHeaders();
 
   const userId = res.locals.loggedInId;
-  const subscriber = sse.subscribe(userId, (event) => {
+  const subscriber = sse.subscribe(userId, event => {
     res.write(`data: ${JSON.stringify(event)}\n\n`);
   });
 
@@ -447,7 +465,11 @@ class SSEHub {
     this.handlers.get(userId)?.delete(h);
   }
   publish(userId: string, event: any) {
-    this.handlers.get(userId)?.forEach(h => { try { h(event); } catch {} });
+    this.handlers.get(userId)?.forEach(h => {
+      try {
+        h(event);
+      } catch {}
+    });
   }
 }
 export const sse = new SSEHub();
@@ -477,7 +499,7 @@ async function sendEmail(notification: Notification) {
   const cfg = await OrgEmailConfig.findOne({
     where: { organisationId: user.organisationId },
   });
-  if (!cfg) return;     // org has no email; bell-only delivery
+  if (!cfg) return; // org has no email; bell-only delivery
 
   const transport = await buildTransport(cfg);
   await transport.sendMail({
@@ -513,7 +535,9 @@ async function runDailyDigest(userId: string) {
 
   const user = await User.findOne({ where: { id: userId } });
   if (!user?.email) return;
-  const cfg = await OrgEmailConfig.findOne({ where: { organisationId: user.organisationId } });
+  const cfg = await OrgEmailConfig.findOne({
+    where: { organisationId: user.organisationId },
+  });
   if (!cfg) return;
   const transport = await buildTransport(cfg);
 
@@ -524,7 +548,10 @@ async function runDailyDigest(userId: string) {
     html: renderDigestTemplate(notifications, user.locale ?? 'en'),
   });
 
-  await DigestQueue.update({ userId, sentAt: IsNull() }, { sentAt: new Date() });
+  await DigestQueue.update(
+    { userId, sentAt: IsNull() },
+    { sentAt: new Date() },
+  );
 }
 ```
 
@@ -535,11 +562,15 @@ async function runDailyDigest(userId: string) {
 // POST /notifications/mute  body: { sourceType, sourceId, duration }
 async function muteSource(req, res) {
   const { sourceType, sourceId, durationMinutes } = req.body;
-  await NotificationMute.upsert({
-    userId: res.locals.loggedInId,
-    sourceType, sourceId,
-    mutedUntil: new Date(Date.now() + durationMinutes * 60_000),
-  }, ['userId', 'sourceType', 'sourceId']);
+  await NotificationMute.upsert(
+    {
+      userId: res.locals.loggedInId,
+      sourceType,
+      sourceId,
+      mutedUntil: new Date(Date.now() + durationMinutes * 60_000),
+    },
+    ['userId', 'sourceType', 'sourceId'],
+  );
 }
 
 // notify() consults this before persisting:
@@ -554,23 +585,23 @@ async function isMuted(userId: string, sourceType?: string, sourceId?: string) {
 
 ## 5. APIs
 
-| Method | Path | Purpose |
-|---|---|---|
-| GET | `/notifications` | Recent (paginated, defaults to unread) |
-| GET | `/notifications/unread-count` | Bell badge number |
-| POST | `/notifications/:id/read` | Mark single as read |
-| POST | `/notifications/mark-all-read` | Mark all unread for me as read |
-| POST | `/notifications/:id/archive` | Archive single |
-| GET | `/notifications/stream` | SSE event stream (long-lived) |
-| GET | `/notifications/preferences` | My preferences |
-| PUT | `/notifications/preferences` | Update mine |
-| GET | `/notifications/dnd` | My DND config |
-| PUT | `/notifications/dnd` | Update mine |
-| POST | `/notifications/dnd/snooze` | Quick "snooze 1h" |
-| POST | `/notifications/push/subscribe` | Register web push endpoint |
-| DELETE | `/notifications/push/subscribe/:id` | Unsubscribe device |
-| POST | `/notifications/mute` | Mute by source |
-| DELETE | `/notifications/mute/:id` | Unmute |
+| Method | Path                                | Purpose                                |
+| ------ | ----------------------------------- | -------------------------------------- |
+| GET    | `/notifications`                    | Recent (paginated, defaults to unread) |
+| GET    | `/notifications/unread-count`       | Bell badge number                      |
+| POST   | `/notifications/:id/read`           | Mark single as read                    |
+| POST   | `/notifications/mark-all-read`      | Mark all unread for me as read         |
+| POST   | `/notifications/:id/archive`        | Archive single                         |
+| GET    | `/notifications/stream`             | SSE event stream (long-lived)          |
+| GET    | `/notifications/preferences`        | My preferences                         |
+| PUT    | `/notifications/preferences`        | Update mine                            |
+| GET    | `/notifications/dnd`                | My DND config                          |
+| PUT    | `/notifications/dnd`                | Update mine                            |
+| POST   | `/notifications/dnd/snooze`         | Quick "snooze 1h"                      |
+| POST   | `/notifications/push/subscribe`     | Register web push endpoint             |
+| DELETE | `/notifications/push/subscribe/:id` | Unsubscribe device                     |
+| POST   | `/notifications/mute`               | Mute by source                         |
+| DELETE | `/notifications/mute/:id`           | Unmute                                 |
 
 ## 6. FE specs
 
@@ -594,6 +625,7 @@ async function isMuted(userId: string, sourceType?: string, sourceId?: string) {
 ```
 
 Bundled rows show a count:
+
 ```
 ●  Alert fired (8×)              5m ago
    Sales Q3 dashboard
@@ -663,11 +695,15 @@ export class NotificationStreamService {
 
   connect() {
     if (this.eventSource) return;
-    this.eventSource = new EventSource('/api/v1/notifications/stream',
-      { withCredentials: true });
-    this.eventSource.addEventListener('message', (e) => {
-      try { this.subject.next(JSON.parse(e.data)); }
-      catch { /* ignore */ }
+    this.eventSource = new EventSource('/api/v1/notifications/stream', {
+      withCredentials: true,
+    });
+    this.eventSource.addEventListener('message', e => {
+      try {
+        this.subject.next(JSON.parse(e.data));
+      } catch {
+        /* ignore */
+      }
     });
     this.eventSource.addEventListener('error', () => {
       // Browser auto-reconnects with backoff; we just observe.
@@ -685,29 +721,44 @@ export class NotificationStreamService {
 
 ```ts
 export const updatePreferencesSchema = z.object({
-  preferences: z.array(z.object({
-    category: z.enum(NOTIFICATION_CATEGORIES),
-    inApp: z.boolean().optional(),
-    email: z.boolean().optional(),
-    push:  z.boolean().optional(),
-    sms:   z.boolean().optional(),
-  })).max(NOTIFICATION_CATEGORIES.length),
+  preferences: z
+    .array(
+      z.object({
+        category: z.enum(NOTIFICATION_CATEGORIES),
+        inApp: z.boolean().optional(),
+        email: z.boolean().optional(),
+        push: z.boolean().optional(),
+        sms: z.boolean().optional(),
+      }),
+    )
+    .max(NOTIFICATION_CATEGORIES.length),
 });
 
-export const updateDndSchema = z.object({
-  enabled: z.boolean(),
-  quietHoursStart: z.string().regex(/^\d{2}:\d{2}$/).optional(),
-  quietHoursEnd:   z.string().regex(/^\d{2}:\d{2}$/).optional(),
-  quietDays: z.array(z.number().int().min(0).max(6)).optional(),
-  timezone: z.string().max(64),
-  fullDndUntil: z.string().datetime().optional(),
-  overrideForCritical: z.boolean().optional(),
-}).superRefine((d, ctx) => {
-  if (d.enabled && (!d.quietHoursStart || !d.quietHoursEnd)) {
-    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['quietHoursStart'],
-      message: 'validation.dnd.window.required' });
-  }
-});
+export const updateDndSchema = z
+  .object({
+    enabled: z.boolean(),
+    quietHoursStart: z
+      .string()
+      .regex(/^\d{2}:\d{2}$/)
+      .optional(),
+    quietHoursEnd: z
+      .string()
+      .regex(/^\d{2}:\d{2}$/)
+      .optional(),
+    quietDays: z.array(z.number().int().min(0).max(6)).optional(),
+    timezone: z.string().max(64),
+    fullDndUntil: z.string().datetime().optional(),
+    overrideForCritical: z.boolean().optional(),
+  })
+  .superRefine((d, ctx) => {
+    if (d.enabled && (!d.quietHoursStart || !d.quietHoursEnd)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['quietHoursStart'],
+        message: 'validation.dnd.window.required',
+      });
+    }
+  });
 
 export const subscribePushSchema = z.object({
   endpoint: z.string().url().max(2048),

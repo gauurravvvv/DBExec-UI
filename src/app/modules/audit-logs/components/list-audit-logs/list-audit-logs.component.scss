@@ -116,12 +116,25 @@ $auth-bg: rgba(91, 100, 112, 0.12);
     }
   }
 
-  .f-module ::ng-deep { width: 13rem; max-width: 32vw; }
-  .f-action ::ng-deep { width: 11rem; }
-  .f-entity ::ng-deep { width: 12rem; }
-  .f-actor ::ng-deep { width: 12rem; }
-  .f-date ::ng-deep { width: 14rem; }
-  .f-failures { flex: none; }
+  .f-module ::ng-deep {
+    width: 13rem;
+    max-width: 32vw;
+  }
+  .f-action ::ng-deep {
+    width: 11rem;
+  }
+  .f-entity ::ng-deep {
+    width: 12rem;
+  }
+  .f-actor ::ng-deep {
+    width: 12rem;
+  }
+  .f-date ::ng-deep {
+    width: 14rem;
+  }
+  .f-failures {
+    flex: none;
+  }
 }
 
 /* ── asset-history scope banner ──────────────────────────────────────────── */
@@ -145,7 +158,9 @@ $auth-bg: rgba(91, 100, 112, 0.12);
     flex: none;
     background: var(--primary-color);
     color: var(--primary-text, #fff);
-    i { font-size: var(--fs-control); }
+    i {
+      font-size: var(--fs-control);
+    }
   }
 
   .scope-text {
@@ -170,7 +185,9 @@ $auth-bg: rgba(91, 100, 112, 0.12);
     }
   }
 
-  app-chip { margin-left: auto; }
+  app-chip {
+    margin-left: auto;
+  }
 }
 
 /* ── bespoke audit cells (reach into projected cell markup) ──────────────── */
@@ -202,15 +219,38 @@ $auth-bg: rgba(91, 100, 112, 0.12);
       background: var(--hover-background);
       color: var(--text-color-secondary);
 
-      i { font-size: var(--fs-control); }
+      i {
+        font-size: var(--fs-control);
+      }
 
-      &.act-create { color: var(--success-color); background: var(--success-bg); }
-      &.act-update { color: var(--primary-color); background: var(--primary-color-transparent); }
-      &.act-delete { color: var(--error-color); background: var(--error-bg); }
-      &.act-egress { color: var(--warning-color); background: var(--warning-bg); }
-      &.act-grant  { color: $grant-color; background: $grant-bg; }
-      &.act-auth   { color: $auth-color; background: $auth-bg; }
-      &.act-warning { color: var(--warning-color); background: var(--warning-bg); }
+      &.act-create {
+        color: var(--success-color);
+        background: var(--success-bg);
+      }
+      &.act-update {
+        color: var(--primary-color);
+        background: var(--primary-color-transparent);
+      }
+      &.act-delete {
+        color: var(--error-color);
+        background: var(--error-bg);
+      }
+      &.act-egress {
+        color: var(--warning-color);
+        background: var(--warning-bg);
+      }
+      &.act-grant {
+        color: $grant-color;
+        background: $grant-bg;
+      }
+      &.act-auth {
+        color: $auth-color;
+        background: $auth-bg;
+      }
+      &.act-warning {
+        color: var(--warning-color);
+        background: var(--warning-bg);
+      }
     }
 
     .mod-text {
@@ -233,7 +273,9 @@ $auth-bg: rgba(91, 100, 112, 0.12);
       overflow: hidden;
       text-overflow: ellipsis;
     }
-    &:hover .mod-name { color: var(--primary-color); }
+    &:hover .mod-name {
+      color: var(--primary-color);
+    }
   }
 
   // Action badge — semantic tint + coloured dot.
@@ -257,14 +299,38 @@ $auth-bg: rgba(91, 100, 112, 0.12);
       flex: none;
     }
 
-    &.act-create { color: var(--success-color); background: var(--success-bg); }
-    &.act-update { color: var(--primary-color); background: var(--primary-color-transparent); }
-    &.act-delete { color: var(--error-color); background: var(--error-bg); }
-    &.act-egress { color: var(--warning-color); background: var(--warning-bg); }
-    &.act-grant  { color: $grant-color; background: $grant-bg; }
-    &.act-auth   { color: $auth-color; background: $auth-bg; }
-    &.act-warning { color: var(--warning-color); background: var(--warning-bg); }
-    &.act-default { color: var(--text-color-secondary); background: var(--hover-background); }
+    &.act-create {
+      color: var(--success-color);
+      background: var(--success-bg);
+    }
+    &.act-update {
+      color: var(--primary-color);
+      background: var(--primary-color-transparent);
+    }
+    &.act-delete {
+      color: var(--error-color);
+      background: var(--error-bg);
+    }
+    &.act-egress {
+      color: var(--warning-color);
+      background: var(--warning-bg);
+    }
+    &.act-grant {
+      color: $grant-color;
+      background: $grant-bg;
+    }
+    &.act-auth {
+      color: $auth-color;
+      background: $auth-bg;
+    }
+    &.act-warning {
+      color: var(--warning-color);
+      background: var(--warning-bg);
+    }
+    &.act-default {
+      color: var(--text-color-secondary);
+      background: var(--hover-background);
+    }
   }
 
   // Performed-by cell — avatar initials + name (never a uuid).
@@ -285,7 +351,9 @@ $auth-bg: rgba(91, 100, 112, 0.12);
       color: var(--primary-text, #fff);
       background: var(--primary-color);
       flex: none;
-      &.sys { background: var(--text-muted); }
+      &.sys {
+        background: var(--text-muted);
+      }
     }
     .actor-name {
       color: var(--text-color);
@@ -295,7 +363,10 @@ $auth-bg: rgba(91, 100, 112, 0.12);
     }
   }
 
-  .ts { white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .ts {
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+  }
 
   // Version badge — monospace, tabular, so v-numbers align down the column.
   .ver-badge {
@@ -328,7 +399,9 @@ $auth-bg: rgba(91, 100, 112, 0.12);
       color 0.15s ease,
       background 0.15s ease;
 
-    i { font-size: var(--fs-control); }
+    i {
+      font-size: var(--fs-control);
+    }
 
     &:hover {
       color: var(--primary-color);
@@ -351,9 +424,15 @@ $auth-bg: rgba(91, 100, 112, 0.12);
     font-weight: var(--fw-semibold);
     white-space: nowrap;
 
-    &.ok { color: var(--success-color); }
-    &.fail { color: var(--error-color); }
-    i { font-size: var(--fs-control); }
+    &.ok {
+      color: var(--success-color);
+    }
+    &.fail {
+      color: var(--error-color);
+    }
+    i {
+      font-size: var(--fs-control);
+    }
   }
 }
 
@@ -368,6 +447,11 @@ $auth-bg: rgba(91, 100, 112, 0.12);
   color: var(--text-muted);
   text-align: center;
 
-  i { font-size: 1.6rem; opacity: 0.6; }
-  span { font-size: var(--fs-body); }
+  i {
+    font-size: 1.6rem;
+    opacity: 0.6;
+  }
+  span {
+    font-size: var(--fs-body);
+  }
 }

@@ -76,7 +76,7 @@ export const emailSchema = z.preprocess(
     // "A@x.com" and "a@x.com" coexisting in one org and prevents a case
     // mismatch from breaking the forgot-password lookup. (Username stays
     // case-sensitive by design — see user.entity.ts.)
-    .transform((v) => v.toLowerCase()),
+    .transform(v => v.toLowerCase()),
 );
 
 export const usernameSchema = z.preprocess(

@@ -109,7 +109,9 @@ export class ListUserComponent implements OnInit, OnDestroy {
     // Field-specific search placeholder so the user knows what's matched.
     this.tableConfig = {
       ...this.tableConfig,
-      globalSearchPlaceholder: this.translate.instant('USER.SEARCH_PLACEHOLDER'),
+      globalSearchPlaceholder: this.translate.instant(
+        'USER.SEARCH_PLACEHOLDER',
+      ),
     };
     this.loadGroupOptions();
     this.bindAdapter();
@@ -128,15 +130,69 @@ export class ListUserComponent implements OnInit, OnDestroy {
   private buildColumns(): CustomTableColumn[] {
     const t = (k: string) => this.translate.instant(k);
     return [
-      { colId: 'username', field: 'username', header: t('COMMON.USERNAME'), width: '192px', frozen: true, filter: 'text' },
-      { colId: 'firstName', field: 'firstName', header: t('COMMON.FIRST_NAME'), width: '160px', filter: 'text' },
-      { colId: 'lastName', field: 'lastName', header: t('COMMON.LAST_NAME'), width: '160px', filter: 'text' },
-      { colId: 'email', field: 'email', header: t('COMMON.EMAIL'), width: '288px', filter: 'text' },
-      { colId: 'groups', field: 'groupNames', header: t('USER.GROUPS'), width: '192px', sortable: false },
-      { colId: 'status', field: 'status', header: t('COMMON.STATUS'), width: '144px', sortable: false },
-      { colId: 'lastLogin', field: 'lastLogin', header: t('COMMON.LAST_LOGIN'), width: '192px', sortable: false },
-      { colId: 'createdOn', field: 'createdOn', header: t('COMMON.CREATED_ON'), width: '192px', sortable: false },
-      { colId: 'actions', header: t('COMMON.ACTIONS'), width: '144px', sortable: false },
+      {
+        colId: 'username',
+        field: 'username',
+        header: t('COMMON.USERNAME'),
+        width: '192px',
+        frozen: true,
+        filter: 'text',
+      },
+      {
+        colId: 'firstName',
+        field: 'firstName',
+        header: t('COMMON.FIRST_NAME'),
+        width: '160px',
+        filter: 'text',
+      },
+      {
+        colId: 'lastName',
+        field: 'lastName',
+        header: t('COMMON.LAST_NAME'),
+        width: '160px',
+        filter: 'text',
+      },
+      {
+        colId: 'email',
+        field: 'email',
+        header: t('COMMON.EMAIL'),
+        width: '288px',
+        filter: 'text',
+      },
+      {
+        colId: 'groups',
+        field: 'groupNames',
+        header: t('USER.GROUPS'),
+        width: '192px',
+        sortable: false,
+      },
+      {
+        colId: 'status',
+        field: 'status',
+        header: t('COMMON.STATUS'),
+        width: '144px',
+        sortable: false,
+      },
+      {
+        colId: 'lastLogin',
+        field: 'lastLogin',
+        header: t('COMMON.LAST_LOGIN'),
+        width: '192px',
+        sortable: false,
+      },
+      {
+        colId: 'createdOn',
+        field: 'createdOn',
+        header: t('COMMON.CREATED_ON'),
+        width: '192px',
+        sortable: false,
+      },
+      {
+        colId: 'actions',
+        header: t('COMMON.ACTIONS'),
+        width: '144px',
+        sortable: false,
+      },
     ];
   }
 

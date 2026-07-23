@@ -120,7 +120,11 @@ export function buildSearchPanel(labels: SearchPanelLabels) {
 
     const toggles = document.createElement('div');
     toggles.className = 'qx-find-toggles';
-    const mkToggle = (glyph: string, title: string, on: boolean): HTMLButtonElement => {
+    const mkToggle = (
+      glyph: string,
+      title: string,
+      on: boolean,
+    ): HTMLButtonElement => {
       const b = document.createElement('button');
       b.type = 'button';
       b.className = 'qx-find-toggle' + (on ? ' on' : '');
@@ -143,7 +147,11 @@ export function buildSearchPanel(labels: SearchPanelLabels) {
 
     const nav = document.createElement('div');
     nav.className = 'qx-find-nav';
-    const mkIconBtn = (glyph: string, title: string, onClick: () => void): HTMLButtonElement => {
+    const mkIconBtn = (
+      glyph: string,
+      title: string,
+      onClick: () => void,
+    ): HTMLButtonElement => {
       const b = document.createElement('button');
       b.type = 'button';
       b.className = 'qx-find-iconbtn';
@@ -152,9 +160,15 @@ export function buildSearchPanel(labels: SearchPanelLabels) {
       b.onclick = onClick;
       return b;
     };
-    const prevBtn = mkIconBtn('pi-chevron-up', labels.prev, () => findPrevious(view));
-    const nextBtn = mkIconBtn('pi-chevron-down', labels.next, () => findNext(view));
-    const closeBtn = mkIconBtn('pi-times', labels.close, () => closeSearchPanel(view));
+    const prevBtn = mkIconBtn('pi-chevron-up', labels.prev, () =>
+      findPrevious(view),
+    );
+    const nextBtn = mkIconBtn('pi-chevron-down', labels.next, () =>
+      findNext(view),
+    );
+    const closeBtn = mkIconBtn('pi-times', labels.close, () =>
+      closeSearchPanel(view),
+    );
     closeBtn.classList.add('qx-find-close');
     nav.append(prevBtn, nextBtn, closeBtn);
 
@@ -215,7 +229,9 @@ export function buildSearchPanel(labels: SearchPanelLabels) {
         if (
           update.docChanged ||
           update.selectionSet ||
-          update.transactions.some(tr => tr.effects.some(e => e.is(setSearchQuery)))
+          update.transactions.some(tr =>
+            tr.effects.some(e => e.is(setSearchQuery)),
+          )
         ) {
           renderCount();
         }

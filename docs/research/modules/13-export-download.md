@@ -20,17 +20,17 @@
 
 ## 1. Industry baseline
 
-Every BI tool offers export. The interesting question is *what*
-exactly comes out and *how* it gets generated.
+Every BI tool offers export. The interesting question is _what_
+exactly comes out and _how_ it gets generated.
 
-| Tool | Visual PNG | Dashboard PDF | Dataset CSV | Native (.tableau, .pbix) |
-|---|---|---|---|---|
-| **Tableau** | screenshot via Tableau Server worker | headless print pipeline, multi-page | CSV / Excel | `.twbx` (workbook + extract) |
-| **Power BI** | "Export to image" | "Export to PDF" — uses Power BI service render | CSV (max 30k rows free, 150k Pro) | `.pbix` |
-| **Looker** | per-tile PNG via headless | dashboard PDF, scheduled | CSV / Excel / JSON | n/a |
-| **Metabase** | per-question PNG | dashboard PDF | CSV / XLSX / JSON | n/a |
-| **Superset** | per-chart PNG / SVG | dashboard PDF via Selenium | CSV / Excel | n/a |
-| **Mode** | per-chart PNG | report PDF (notebook export) | CSV / Excel | n/a |
+| Tool         | Visual PNG                           | Dashboard PDF                                  | Dataset CSV                       | Native (.tableau, .pbix)     |
+| ------------ | ------------------------------------ | ---------------------------------------------- | --------------------------------- | ---------------------------- |
+| **Tableau**  | screenshot via Tableau Server worker | headless print pipeline, multi-page            | CSV / Excel                       | `.twbx` (workbook + extract) |
+| **Power BI** | "Export to image"                    | "Export to PDF" — uses Power BI service render | CSV (max 30k rows free, 150k Pro) | `.pbix`                      |
+| **Looker**   | per-tile PNG via headless            | dashboard PDF, scheduled                       | CSV / Excel / JSON                | n/a                          |
+| **Metabase** | per-question PNG                     | dashboard PDF                                  | CSV / XLSX / JSON                 | n/a                          |
+| **Superset** | per-chart PNG / SVG                  | dashboard PDF via Selenium                     | CSV / Excel                       | n/a                          |
+| **Mode**     | per-chart PNG                        | report PDF (notebook export)                   | CSV / Excel                       | n/a                          |
 
 **Common patterns to copy:**
 
@@ -63,42 +63,42 @@ auditable.
 
 ## 3. Gap matrix
 
-| ID | Gap | Severity | Effort |
-|---|---|---|---|
-| EXP-G01 | Dataset CSV export (streaming, all rows) | P0 | M |
-| EXP-G02 | Dataset XLSX export | P0 | M |
-| EXP-G03 | Dataset Parquet export | P1 | M |
-| EXP-G04 | Dataset JSON / JSONL export | P1 | S |
-| EXP-G05 | Visual PNG export (one chart) | P0 | M |
-| EXP-G06 | Visual SVG export | P1 | S |
-| EXP-G07 | Visual CSV export (data behind) | P0 | S |
-| EXP-G08 | Analysis PDF (multi-page if needed) | P1 | M |
-| EXP-G09 | Dashboard PDF (full board, tabs handled) | P0 | L |
-| EXP-G10 | Dashboard PNG (full board image) | P1 | M |
-| EXP-G11 | Dashboard XLSX (one sheet per visual) | P1 | M |
-| EXP-G12 | Per-tab PDF / PNG export | P1 | S |
-| EXP-G13 | Parameter sweep export (one PDF per filter value) | P2 | L |
-| EXP-G14 | Watermark (text overlay, optional) | P1 | S |
-| EXP-G15 | Password-protected PDF | P2 | S |
-| EXP-G16 | Async pipeline for large exports + download URL | P0 | M |
-| EXP-G17 | Audit log every export with size + format + recipient | P0 | S |
-| EXP-G18 | Per-format size cap + row cap | P0 | S |
-| EXP-G19 | Webhook event `export.completed` | P1 | S |
-| EXP-G20 | "Schedule this export" handoff into module 15 | P1 | S |
-| EXP-G21 | Recently-exported queue per user | P2 | S |
-| EXP-G22 | Print stylesheet (browser native Cmd+P fallback) | P2 | S |
+| ID      | Gap                                                   | Severity | Effort |
+| ------- | ----------------------------------------------------- | -------- | ------ |
+| EXP-G01 | Dataset CSV export (streaming, all rows)              | P0       | M      |
+| EXP-G02 | Dataset XLSX export                                   | P0       | M      |
+| EXP-G03 | Dataset Parquet export                                | P1       | M      |
+| EXP-G04 | Dataset JSON / JSONL export                           | P1       | S      |
+| EXP-G05 | Visual PNG export (one chart)                         | P0       | M      |
+| EXP-G06 | Visual SVG export                                     | P1       | S      |
+| EXP-G07 | Visual CSV export (data behind)                       | P0       | S      |
+| EXP-G08 | Analysis PDF (multi-page if needed)                   | P1       | M      |
+| EXP-G09 | Dashboard PDF (full board, tabs handled)              | P0       | L      |
+| EXP-G10 | Dashboard PNG (full board image)                      | P1       | M      |
+| EXP-G11 | Dashboard XLSX (one sheet per visual)                 | P1       | M      |
+| EXP-G12 | Per-tab PDF / PNG export                              | P1       | S      |
+| EXP-G13 | Parameter sweep export (one PDF per filter value)     | P2       | L      |
+| EXP-G14 | Watermark (text overlay, optional)                    | P1       | S      |
+| EXP-G15 | Password-protected PDF                                | P2       | S      |
+| EXP-G16 | Async pipeline for large exports + download URL       | P0       | M      |
+| EXP-G17 | Audit log every export with size + format + recipient | P0       | S      |
+| EXP-G18 | Per-format size cap + row cap                         | P0       | S      |
+| EXP-G19 | Webhook event `export.completed`                      | P1       | S      |
+| EXP-G20 | "Schedule this export" handoff into module 15         | P1       | S      |
+| EXP-G21 | Recently-exported queue per user                      | P2       | S      |
+| EXP-G22 | Print stylesheet (browser native Cmd+P fallback)      | P2       | S      |
 
 ## 4. Target architecture
 
 ### 4.1 Surface matrix
 
-| Surface | Sync formats | Async formats |
-|---|---|---|
-| **Dataset (rows)** | CSV ≤50k, JSONL ≤50k | CSV/XLSX/Parquet any size |
-| **Visual (one chart)** | PNG, SVG, CSV-data | — |
-| **Analysis** | PDF (1 visual), PNG | PDF (multi-visual, multi-page) |
-| **Dashboard** | per-tab PNG | full PDF, full PNG, full XLSX |
-| **Tab (one tab of a dashboard)** | PNG | PDF, XLSX |
+| Surface                          | Sync formats         | Async formats                  |
+| -------------------------------- | -------------------- | ------------------------------ |
+| **Dataset (rows)**               | CSV ≤50k, JSONL ≤50k | CSV/XLSX/Parquet any size      |
+| **Visual (one chart)**           | PNG, SVG, CSV-data   | —                              |
+| **Analysis**                     | PDF (1 visual), PNG  | PDF (multi-visual, multi-page) |
+| **Dashboard**                    | per-tab PNG          | full PDF, full PNG, full XLSX  |
+| **Tab (one tab of a dashboard)** | PNG                  | PDF, XLSX                      |
 
 "Sync" = the user clicks → wait 2-10 seconds → browser downloads.
 "Async" = the user clicks → "We'll email you a link" → background
@@ -108,10 +108,10 @@ The boundary is `EXPORT_SYNC_ROW_CAP = 50_000`. Above that, async.
 
 ### 4.2 Two render paths
 
-| Render type | Tooling | Use cases |
-|---|---|---|
-| **Data render** | streaming SQL → CSV/JSON/Parquet/XLSX serializer | Dataset export, visual-data export, XLSX-per-visual on dashboard |
-| **Pixel render** | Puppeteer (or Playwright) → headless Chromium hits a special print URL → page.pdf() / page.screenshot() | Visual PNG, analysis PDF, dashboard PDF/PNG |
+| Render type      | Tooling                                                                                                 | Use cases                                                        |
+| ---------------- | ------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------- |
+| **Data render**  | streaming SQL → CSV/JSON/Parquet/XLSX serializer                                                        | Dataset export, visual-data export, XLSX-per-visual on dashboard |
+| **Pixel render** | Puppeteer (or Playwright) → headless Chromium hits a special print URL → page.pdf() / page.screenshot() | Visual PNG, analysis PDF, dashboard PDF/PNG                      |
 
 Two render paths, two queues, two workers. Mixing them in one
 process is how you get a Node worker that's both CPU-bound (PDF
@@ -134,8 +134,7 @@ export class ExportJob {
   @Column('uuid') surfaceId!: string;
   @Column('uuid', { nullable: true }) tabId?: string;
   @Column({ length: 16 }) format!:
-    'csv' | 'xlsx' | 'parquet' | 'json' | 'jsonl'
-    | 'pdf' | 'png' | 'svg';
+    'csv' | 'xlsx' | 'parquet' | 'json' | 'jsonl' | 'pdf' | 'png' | 'svg';
   @Column({ length: 16 }) renderType!: 'data' | 'pixel';
   @Column('jsonb', { nullable: true }) options?: {
     filters?: any;
@@ -199,19 +198,30 @@ import { auditLogger } from '../../../shared/services/auditLogger.service';
 
 export default async function exportDatasetCsv(req: Request, res: Response) {
   const { id } = req.params;
-  const limit = Math.min(Number(req.query.limit) || 50_000, EXPORT_SYNC_ROW_CAP);
+  const limit = Math.min(
+    Number(req.query.limit) || 50_000,
+    EXPORT_SYNC_ROW_CAP,
+  );
   const { orgData, loggedInId, master_db_connection } = res.locals;
 
   const dataset = await loadDataset(id, orgData.id);
-  if (!dataset) return sendResponse(res, false, CODE.NOT_FOUND, 'dataset.not_found');
+  if (!dataset)
+    return sendResponse(res, false, CODE.NOT_FOUND, 'dataset.not_found');
 
   // RLS still applies — re-use the resolver.
-  const rls = await resolveRlsFilters(master_db_connection, loggedInId, dataset.id);
+  const rls = await resolveRlsFilters(
+    master_db_connection,
+    loggedInId,
+    dataset.id,
+  );
   if (rls.denyAll) {
     // Return an empty CSV with just the header so the user knows the
     // request succeeded but they have no rows.
     res.setHeader('Content-Type', 'text/csv; charset=utf-8');
-    res.setHeader('Content-Disposition', `attachment; filename="${slug(dataset.name)}.csv"`);
+    res.setHeader(
+      'Content-Disposition',
+      `attachment; filename="${slug(dataset.name)}.csv"`,
+    );
     res.write('\n');
     res.end();
     return;
@@ -221,24 +231,32 @@ export default async function exportDatasetCsv(req: Request, res: Response) {
   const pool = await acquire(cfg);
 
   res.setHeader('Content-Type', 'text/csv; charset=utf-8');
-  res.setHeader('Content-Disposition',
-    `attachment; filename="${slug(dataset.name)}-${Date.now()}.csv"`);
+  res.setHeader(
+    'Content-Disposition',
+    `attachment; filename="${slug(dataset.name)}-${Date.now()}.csv"`,
+  );
 
   const stringifier = stringify({ header: true });
   stringifier.pipe(res);
 
   let wrote = 0;
-  const onEnd = (status: 'ok'|'failed', err?: string) => recordExportJob({
-    organisationId: orgData.id, userId: loggedInId,
-    surface: 'dataset', surfaceId: dataset.id,
-    format: 'csv', renderType: 'data',
-    status, sizeBytes: res.socket?.bytesWritten ?? 0, error: err,
-  });
+  const onEnd = (status: 'ok' | 'failed', err?: string) =>
+    recordExportJob({
+      organisationId: orgData.id,
+      userId: loggedInId,
+      surface: 'dataset',
+      surfaceId: dataset.id,
+      format: 'csv',
+      renderType: 'data',
+      status,
+      sizeBytes: res.socket?.bytesWritten ?? 0,
+      error: err,
+    });
 
   try {
     // Cursor-based stream so we don't hold 50k rows in memory.
     for await (const batch of pool.cursor(
-      composeRlsSql(dataset.sql, rls.filters, limit)
+      composeRlsSql(dataset.sql, rls.filters, limit),
     )) {
       for (const row of batch.rows) {
         stringifier.write(row);
@@ -274,10 +292,14 @@ import ExcelJS from 'exceljs';
 export default async function exportDatasetXlsx(req: Request, res: Response) {
   const dataset = await loadDataset(req.params.id, res.locals.orgData.id);
 
-  res.setHeader('Content-Type',
-    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-  res.setHeader('Content-Disposition',
-    `attachment; filename="${slug(dataset.name)}.xlsx"`);
+  res.setHeader(
+    'Content-Type',
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+  );
+  res.setHeader(
+    'Content-Disposition',
+    `attachment; filename="${slug(dataset.name)}.xlsx"`,
+  );
 
   const wb = new ExcelJS.stream.xlsx.WorkbookWriter({ stream: res });
   const sheet = wb.addWorksheet(slug(dataset.name).slice(0, 31));
@@ -334,21 +356,36 @@ async function renderDashboardXlsx(jobId: string) {
 
   // Upload to S3, build signed URL with 7-day expiry.
   const key = `exports/${job.organisationId}/${jobId}.xlsx`;
-  await s3.upload({ Bucket: process.env.EXPORT_BUCKET!, Key: key,
-                    Body: fs.createReadStream(tempPath) }).promise();
+  await s3
+    .upload({
+      Bucket: process.env.EXPORT_BUCKET!,
+      Key: key,
+      Body: fs.createReadStream(tempPath),
+    })
+    .promise();
   const url = await s3.getSignedUrlPromise('getObject', {
-    Bucket: process.env.EXPORT_BUCKET, Key: key, Expires: 7 * 24 * 3600,
+    Bucket: process.env.EXPORT_BUCKET,
+    Key: key,
+    Expires: 7 * 24 * 3600,
   });
   await fs.promises.unlink(tempPath);
 
   await ExportJob.update(jobId, {
-    status: 'ok', downloadUrl: url, storageKey: key,
-    expiresAt: addDays(new Date(), 7), finishedOn: new Date(),
-    sizeBytes: (await fs.promises.stat(tempPath).catch(()=>({size:0}))).size,
+    status: 'ok',
+    downloadUrl: url,
+    storageKey: key,
+    expiresAt: addDays(new Date(), 7),
+    finishedOn: new Date(),
+    sizeBytes: (await fs.promises.stat(tempPath).catch(() => ({ size: 0 })))
+      .size,
   });
 
-  await notifyUser(job.userId, 'export.ready', { jobId, surface: 'dashboard',
-                                                  format: 'xlsx', url });
+  await notifyUser(job.userId, 'export.ready', {
+    jobId,
+    surface: 'dashboard',
+    format: 'xlsx',
+    url,
+  });
 }
 ```
 
@@ -357,7 +394,12 @@ Sheet names have weird Excel rules:
 ```ts
 function sanitiseSheetName(s: string): string {
   // Excel sheet names: ≤31 chars, no \ / * ? : [ ]
-  return s.replace(/[\\/*?:\[\]]/g, '_').slice(0, 31).trim() || 'Sheet';
+  return (
+    s
+      .replace(/[\\/*?:\[\]]/g, '_')
+      .slice(0, 31)
+      .trim() || 'Sheet'
+  );
 }
 ```
 
@@ -386,12 +428,19 @@ class BrowserPool {
 
   private async acquire(): Promise<Browser> {
     for (const b of this.browsers) {
-      if (!this.inUse.has(b)) { this.inUse.add(b); return b; }
+      if (!this.inUse.has(b)) {
+        this.inUse.add(b);
+        return b;
+      }
     }
     if (this.browsers.length < this.capacity) {
       const b = await puppeteer.launch({
         headless: 'new',
-        args: ['--no-sandbox', '--disable-dev-shm-usage', '--font-render-hinting=none'],
+        args: [
+          '--no-sandbox',
+          '--disable-dev-shm-usage',
+          '--font-render-hinting=none',
+        ],
       });
       this.browsers.push(b);
       this.inUse.add(b);
@@ -402,7 +451,9 @@ class BrowserPool {
     return this.acquire();
   }
 
-  private release(b: Browser) { this.inUse.delete(b); }
+  private release(b: Browser) {
+    this.inUse.delete(b);
+  }
 
   async destroy() {
     await Promise.all(this.browsers.map(b => b.close()));
@@ -414,11 +465,17 @@ const pool = new BrowserPool();
 
 export async function renderDashboardPdf(
   dashboardId: string,
-  options: { filters?: any; watermark?: string; password?: string;
-              pageSize?: string; landscape?: boolean; userId: string;
-              organisationId: string },
+  options: {
+    filters?: any;
+    watermark?: string;
+    password?: string;
+    pageSize?: string;
+    landscape?: boolean;
+    userId: string;
+    organisationId: string;
+  },
 ): Promise<Buffer> {
-  return pool.use(async (page) => {
+  return pool.use(async page => {
     const token = await signServiceToken({
       userId: options.userId,
       organisationId: options.organisationId,
@@ -449,7 +506,7 @@ export async function renderDashboardPdf(
         d.innerHTML = `<div style="
           opacity:.06; font-size:120px; transform:rotate(-30deg);
           font-family:Inter,sans-serif; color:#000;
-        ">${wm.replace(/</g,'&lt;')}</div>`;
+        ">${wm.replace(/</g, '&lt;')}</div>`;
         document.body.appendChild(d);
       }, options.watermark);
     }
@@ -498,7 +555,7 @@ Three render strategies, picked by what's available:
 
 1. **Puppeteer** (most reliable). Same browser-pool path as PDF.
    URL: `/embed/visual/:id?png=true`. After ready, `page.screenshot({
-   clip: { x, y, width, height } })`.
+clip: { x, y, width, height } })`.
 2. **Server-side ECharts** (faster). Use `echarts` + `canvas` (node-
    canvas) to render the same option object the FE built. Saves a
    browser round-trip. ~10x faster for simple chart types.
@@ -572,18 +629,30 @@ PDF encryption can't be done in pure JS easily. Two paths:
 Recommended: shell out to qpdf. Documented as a host requirement.
 
 ```ts
-async function encryptPdf(pdfBuffer: Buffer, password: string): Promise<Buffer> {
+async function encryptPdf(
+  pdfBuffer: Buffer,
+  password: string,
+): Promise<Buffer> {
   const tmp = path.join(os.tmpdir(), `${randomUUID()}.pdf`);
   const out = `${tmp}.enc.pdf`;
   try {
     await fs.promises.writeFile(tmp, pdfBuffer);
     await new Promise<void>((resolve, reject) => {
       const child = spawn('qpdf', [
-        '--encrypt', password, password, '256',
-        '--print=full', '--modify=none', '--copy=none',
-        '--', tmp, out,
+        '--encrypt',
+        password,
+        password,
+        '256',
+        '--print=full',
+        '--modify=none',
+        '--copy=none',
+        '--',
+        tmp,
+        out,
       ]);
-      child.on('exit', c => c === 0 ? resolve() : reject(new Error('qpdf failed')));
+      child.on('exit', c =>
+        c === 0 ? resolve() : reject(new Error('qpdf failed')),
+      );
       child.on('error', reject);
     });
     return await fs.promises.readFile(out);
@@ -605,17 +674,24 @@ produces its own PDF, all collected into a ZIP at the end.
 async function processParameterSweep(parentJobId: string) {
   const parent = await ExportJob.findOne({ where: { id: parentJobId } });
   const sweep = parent.options!.parameterSweep!;
-  const childJobs = await Promise.all(sweep.values.map(v =>
-    ExportJob.save({
-      organisationId: parent.organisationId,
-      userId: parent.userId,
-      surface: parent.surface, surfaceId: parent.surfaceId,
-      format: 'pdf', renderType: 'pixel',
-      options: { ...parent.options,
-                 filters: { ...parent.options?.filters, [sweep.paramId]: v },
-                 parameterSweep: undefined },
-      status: 'queued',
-    })));
+  const childJobs = await Promise.all(
+    sweep.values.map(v =>
+      ExportJob.save({
+        organisationId: parent.organisationId,
+        userId: parent.userId,
+        surface: parent.surface,
+        surfaceId: parent.surfaceId,
+        format: 'pdf',
+        renderType: 'pixel',
+        options: {
+          ...parent.options,
+          filters: { ...parent.options?.filters, [sweep.paramId]: v },
+          parameterSweep: undefined,
+        },
+        status: 'queued',
+      }),
+    ),
+  );
   // Process serially to avoid puppeteer pool exhaustion
   const buffers: { value: any; pdf: Buffer }[] = [];
   for (let i = 0; i < childJobs.length; i++) {
@@ -627,7 +703,8 @@ async function processParameterSweep(parentJobId: string) {
     });
     buffers.push({ value: sweep.values[i], pdf });
     await ExportJob.update(childJobs[i].id, {
-      status: 'ok', sizeBytes: pdf.length,
+      status: 'ok',
+      sizeBytes: pdf.length,
     });
   }
   // Bundle into ZIP
@@ -642,61 +719,90 @@ async function processParameterSweep(parentJobId: string) {
 
 ### 4.15 Format-specific gotchas
 
-| Format | Watch out for |
-|---|---|
-| **CSV** | Excel will mangle BOM-less UTF-8 with non-ASCII headers. Always write BOM (`﻿`) before the header row. |
-| **CSV** | Excel auto-parses "01/02/2026" as date in user's locale. Numeric IDs that look like dates (e.g. SKU "01-02-2026") get reformatted. Workaround: prepend `=` for text-mode in Excel, or use XLSX instead. |
-| **XLSX** | Sheet name ≤ 31 chars, no `\ / * ? : [ ]`. Sanitise. |
-| **XLSX** | Big numbers (>15 digits) lose precision when Excel opens. Snowflake bigint user IDs are a classic victim. Force string format for any column where this matters. |
-| **PDF** | `pdf-lib` and `qpdf` disagree on encryption flags. Test both. |
-| **PNG** | Puppeteer's default viewport is 800×600 — way too small for a dashboard. Use 1920×1080 and `deviceScaleFactor: 2` for retina. |
-| **JSON** | Default `JSON.stringify` mangles bigint and Date. Use a custom replacer. |
-| **Parquet** | Schema must be declared upfront (no streaming inference like CSV). Run a dry pass to infer types, then write. |
+| Format      | Watch out for                                                                                                                                                                                           |
+| ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **CSV**     | Excel will mangle BOM-less UTF-8 with non-ASCII headers. Always write BOM (`﻿`) before the header row.                                                                                                  |
+| **CSV**     | Excel auto-parses "01/02/2026" as date in user's locale. Numeric IDs that look like dates (e.g. SKU "01-02-2026") get reformatted. Workaround: prepend `=` for text-mode in Excel, or use XLSX instead. |
+| **XLSX**    | Sheet name ≤ 31 chars, no `\ / * ? : [ ]`. Sanitise.                                                                                                                                                    |
+| **XLSX**    | Big numbers (>15 digits) lose precision when Excel opens. Snowflake bigint user IDs are a classic victim. Force string format for any column where this matters.                                        |
+| **PDF**     | `pdf-lib` and `qpdf` disagree on encryption flags. Test both.                                                                                                                                           |
+| **PNG**     | Puppeteer's default viewport is 800×600 — way too small for a dashboard. Use 1920×1080 and `deviceScaleFactor: 2` for retina.                                                                           |
+| **JSON**    | Default `JSON.stringify` mangles bigint and Date. Use a custom replacer.                                                                                                                                |
+| **Parquet** | Schema must be declared upfront (no streaming inference like CSV). Run a dry pass to infer types, then write.                                                                                           |
 
 ## 5. Validators (Zod)
 
 ```ts
 // src/shared/validators/exports.ts
 export const EXPORT_FORMATS = [
-  'csv','xlsx','parquet','json','jsonl','pdf','png','svg',
+  'csv',
+  'xlsx',
+  'parquet',
+  'json',
+  'jsonl',
+  'pdf',
+  'png',
+  'svg',
 ] as const;
 export const EXPORT_SURFACES = [
-  'dataset','visual','analysis','dashboard','tab',
+  'dataset',
+  'visual',
+  'analysis',
+  'dashboard',
+  'tab',
 ] as const;
-export const PAGE_SIZES = ['A4','A3','Letter','Legal'] as const;
+export const PAGE_SIZES = ['A4', 'A3', 'Letter', 'Legal'] as const;
 
-export const createExportJobSchema = z.object({
-  surface: z.enum(EXPORT_SURFACES),
-  surfaceId: z.string().uuid(),
-  tabId: z.string().uuid().optional(),
-  format: z.enum(EXPORT_FORMATS),
-  options: z.object({
-    filters: z.record(z.string(), z.any()).optional(),
-    watermark: z.string().max(64).optional(),
-    password: z.string().min(8).max(64).optional(),
-    pageSize: z.enum(PAGE_SIZES).optional(),
-    landscape: z.boolean().optional(),
-    parameterSweep: z.object({
-      paramId: z.string().uuid(),
-      values: z.array(z.any()).min(1).max(100),
-    }).optional(),
-  }).optional(),
-}).superRefine((data, ctx) => {
-  // PDF/PNG/SVG only make sense for visual/analysis/dashboard/tab
-  if (['pdf','png','svg'].includes(data.format) && data.surface === 'dataset') {
-    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['format'],
-      message: 'validation.export.format.invalidForSurface' });
-  }
-  // tabId is only meaningful when surface === 'tab' or 'dashboard'
-  if (data.tabId && !['dashboard','tab'].includes(data.surface)) {
-    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['tabId'],
-      message: 'validation.export.tabId.notApplicable' });
-  }
-  if (data.surface === 'tab' && !data.tabId) {
-    ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['tabId'],
-      message: 'validation.export.tabId.required' });
-  }
-});
+export const createExportJobSchema = z
+  .object({
+    surface: z.enum(EXPORT_SURFACES),
+    surfaceId: z.string().uuid(),
+    tabId: z.string().uuid().optional(),
+    format: z.enum(EXPORT_FORMATS),
+    options: z
+      .object({
+        filters: z.record(z.string(), z.any()).optional(),
+        watermark: z.string().max(64).optional(),
+        password: z.string().min(8).max(64).optional(),
+        pageSize: z.enum(PAGE_SIZES).optional(),
+        landscape: z.boolean().optional(),
+        parameterSweep: z
+          .object({
+            paramId: z.string().uuid(),
+            values: z.array(z.any()).min(1).max(100),
+          })
+          .optional(),
+      })
+      .optional(),
+  })
+  .superRefine((data, ctx) => {
+    // PDF/PNG/SVG only make sense for visual/analysis/dashboard/tab
+    if (
+      ['pdf', 'png', 'svg'].includes(data.format) &&
+      data.surface === 'dataset'
+    ) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['format'],
+        message: 'validation.export.format.invalidForSurface',
+      });
+    }
+    // tabId is only meaningful when surface === 'tab' or 'dashboard'
+    if (data.tabId && !['dashboard', 'tab'].includes(data.surface)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['tabId'],
+        message: 'validation.export.tabId.notApplicable',
+      });
+    }
+    if (data.surface === 'tab' && !data.tabId) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['tabId'],
+        message: 'validation.export.tabId.required',
+      });
+    }
+  });
 ```
 
 ## 6. FE specs

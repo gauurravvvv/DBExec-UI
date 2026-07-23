@@ -153,7 +153,10 @@ const refineEnumAllowedValues = (
         message: 'validation.parameters.allowedValues.enumRequired',
       });
     }
-  } else if (data.allowedValues !== undefined && data.allowedValues.length > 0) {
+  } else if (
+    data.allowedValues !== undefined &&
+    data.allowedValues.length > 0
+  ) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
       path: ['allowedValues'],

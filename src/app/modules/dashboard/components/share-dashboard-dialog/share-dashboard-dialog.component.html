@@ -69,7 +69,9 @@
           [placeholder]="'DASHBOARD.SHARE.EXPIRY_PH' | translate"
           styleClass="w-full"
         ></p-calendar>
-        <small class="hint">{{ 'DASHBOARD.SHARE.EXPIRY_HINT' | translate }}</small>
+        <small class="hint">{{
+          'DASHBOARD.SHARE.EXPIRY_HINT' | translate
+        }}</small>
       </div>
       <button
         type="button"
@@ -77,7 +79,10 @@
         (click)="createLink()"
         [disabled]="creating"
       >
-        <i class="pi" [ngClass]="creating ? 'pi-spin pi-spinner' : 'pi-plus'"></i>
+        <i
+          class="pi"
+          [ngClass]="creating ? 'pi-spin pi-spinner' : 'pi-plus'"
+        ></i>
         {{ 'DASHBOARD.SHARE.CREATE' | translate }}
       </button>
     </div>
@@ -127,7 +132,9 @@
             >
               <i
                 class="pi"
-                [ngClass]="revokingId === tok.id ? 'pi-spin pi-spinner' : 'pi-ban'"
+                [ngClass]="
+                  revokingId === tok.id ? 'pi-spin pi-spinner' : 'pi-ban'
+                "
               ></i>
               {{ 'DASHBOARD.SHARE.REVOKE' | translate }}
             </button>
@@ -143,7 +150,11 @@
             >
               {{ 'COMMON.YES' | translate }}
             </button>
-            <button type="button" class="btn-plain-text" (click)="cancelRevoke()">
+            <button
+              type="button"
+              class="btn-plain-text"
+              (click)="cancelRevoke()"
+            >
               {{ 'COMMON.NO' | translate }}
             </button>
           </ng-container>

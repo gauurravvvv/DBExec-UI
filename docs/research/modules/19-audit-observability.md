@@ -19,14 +19,14 @@
 
 ## 1. Industry baseline
 
-| Tool | Audit | Tracing | Metrics | SIEM export |
-|---|---|---|---|---|
-| **Looker** | Audit + system activity Explore | none | system metrics dashboard | log forwarder |
-| **Tableau** | Postgres-based audit log | none | OS-level | TSM logs |
-| **Power BI** | Activity log (M365 audit) | none | Azure Monitor | Log Analytics |
-| **Hex** | App-level audit | OpenTelemetry | DataDog | API |
-| **Notion** | per-page activity | none | none | SCIM |
-| **GitHub** | audit log API | none | none | streaming export |
+| Tool         | Audit                           | Tracing       | Metrics                  | SIEM export      |
+| ------------ | ------------------------------- | ------------- | ------------------------ | ---------------- |
+| **Looker**   | Audit + system activity Explore | none          | system metrics dashboard | log forwarder    |
+| **Tableau**  | Postgres-based audit log        | none          | OS-level                 | TSM logs         |
+| **Power BI** | Activity log (M365 audit)       | none          | Azure Monitor            | Log Analytics    |
+| **Hex**      | App-level audit                 | OpenTelemetry | DataDog                  | API              |
+| **Notion**   | per-page activity               | none          | none                     | SCIM             |
+| **GitHub**   | audit log API                   | none          | none                     | streaming export |
 
 **The patterns to copy:**
 
@@ -49,32 +49,32 @@
 
 - `audit_log` (master) + `audit_log_s` (per-org) tables. Each row
   carries `userId, action, entityName, entityId, metadata, ip,
-  occurredAt`. Snapshot of the entity dump in `metadata.entity`.
+occurredAt`. Snapshot of the entity dump in `metadata.entity`.
 - Logging via `winston` to stdout. No correlation ID. No spans.
   No metrics endpoint.
 - `/healthz` returns hardcoded 200; no actual checks.
 
 ## 3. Gap matrix
 
-| ID | Gap | Severity | Effort |
-|---|---|---|---|
-| AUD-G01 | Hash-chained audit log (tamper-evident) | P0 | S |
-| AUD-G02 | Correlation ID middleware + propagation to logs | P0 | S |
-| AUD-G03 | OpenTelemetry traces (per-request span) | P0 | M |
-| AUD-G04 | Metrics counters / histograms (Prom) | P0 | M |
-| AUD-G05 | Health `/healthz/live` + `/healthz/ready` | P0 | S |
-| AUD-G06 | Error grouping (Sentry-style) | P1 | M |
-| AUD-G07 | Audit log SSE live stream (admin UI) | P1 | M |
-| AUD-G08 | Audit search by user / action / entity / time | P0 | M |
-| AUD-G09 | Audit export (CSV / JSON / SIEM webhook) | P1 | M |
-| AUD-G10 | Tamper-detection endpoint (verify chain) | P1 | S |
-| AUD-G11 | PII redaction in audit metadata | P0 | S |
-| AUD-G12 | Structured log JSON (one event = one line) | P0 | S |
-| AUD-G13 | Slow-query log table | P1 | M |
-| AUD-G14 | Rate-limited login activity (anti-enumeration) | P1 | S |
-| AUD-G15 | Per-org "you may export this audit log" admin permission | P1 | S |
-| AUD-G16 | Customer-controlled retention window | P1 | M |
-| AUD-G17 | Anomaly detection on audit stream (impossible-travel etc.) | P2 | L |
+| ID      | Gap                                                        | Severity | Effort |
+| ------- | ---------------------------------------------------------- | -------- | ------ |
+| AUD-G01 | Hash-chained audit log (tamper-evident)                    | P0       | S      |
+| AUD-G02 | Correlation ID middleware + propagation to logs            | P0       | S      |
+| AUD-G03 | OpenTelemetry traces (per-request span)                    | P0       | M      |
+| AUD-G04 | Metrics counters / histograms (Prom)                       | P0       | M      |
+| AUD-G05 | Health `/healthz/live` + `/healthz/ready`                  | P0       | S      |
+| AUD-G06 | Error grouping (Sentry-style)                              | P1       | M      |
+| AUD-G07 | Audit log SSE live stream (admin UI)                       | P1       | M      |
+| AUD-G08 | Audit search by user / action / entity / time              | P0       | M      |
+| AUD-G09 | Audit export (CSV / JSON / SIEM webhook)                   | P1       | M      |
+| AUD-G10 | Tamper-detection endpoint (verify chain)                   | P1       | S      |
+| AUD-G11 | PII redaction in audit metadata                            | P0       | S      |
+| AUD-G12 | Structured log JSON (one event = one line)                 | P0       | S      |
+| AUD-G13 | Slow-query log table                                       | P1       | M      |
+| AUD-G14 | Rate-limited login activity (anti-enumeration)             | P1       | S      |
+| AUD-G15 | Per-org "you may export this audit log" admin permission   | P1       | S      |
+| AUD-G16 | Customer-controlled retention window                       | P1       | M      |
+| AUD-G17 | Anomaly detection on audit stream (impossible-travel etc.) | P2       | L      |
 
 ## 4. Target architecture
 
@@ -135,42 +135,70 @@ function canonicalJson(row: any): string {
 
 export function computeRowHash(prevHash: string | null, row: any): string {
   return createHash('sha256')
-    .update((prevHash ?? '') + canonicalJson({
-      userId: row.userId, module: row.module, action: row.action,
-      entityName: row.entityName, entityId: row.entityId,
-      requestMethod: row.requestMethod, requestPath: row.requestPath,
-      responseCode: row.responseCode, metadata: row.metadata,
-      ipAddress: row.ipAddress,
-      occurredAt: row.occurredAt instanceof Date
-        ? row.occurredAt.toISOString()
-        : row.occurredAt,
-    }))
+    .update(
+      (prevHash ?? '') +
+        canonicalJson({
+          userId: row.userId,
+          module: row.module,
+          action: row.action,
+          entityName: row.entityName,
+          entityId: row.entityId,
+          requestMethod: row.requestMethod,
+          requestPath: row.requestPath,
+          responseCode: row.responseCode,
+          metadata: row.metadata,
+          ipAddress: row.ipAddress,
+          occurredAt:
+            row.occurredAt instanceof Date
+              ? row.occurredAt.toISOString()
+              : row.occurredAt,
+        }),
+    )
     .digest('hex');
 }
 
 async function appendAuditWithChain(conn: DataSource, table: string, row: any) {
-  await conn.transaction(async (tx) => {
-    const prev = await tx.query(`
+  await conn.transaction(async tx => {
+    const prev = await tx.query(
+      `
       SELECT row_hash FROM ${table}
       WHERE organisation_id = $1
       ORDER BY occurred_at DESC, id DESC
-      LIMIT 1 FOR UPDATE`, [row.organisationId]);
+      LIMIT 1 FOR UPDATE`,
+      [row.organisationId],
+    );
 
     const prevHash = prev[0]?.row_hash ?? null;
     const ts = new Date();
     const filled = { ...row, occurredAt: ts };
     const rowHash = computeRowHash(prevHash, filled);
 
-    await tx.query(`
+    await tx.query(
+      `
       INSERT INTO ${table} (
         user_id, organisation_id, module, action, entity_name, entity_id,
         request_method, request_path, response_code, metadata,
         ip_address, user_agent, correlation_id, prev_row_hash, row_hash, occurred_at
       ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16)`,
-      [filled.userId, filled.organisationId, filled.module, filled.action,
-       filled.entityName, filled.entityId, filled.requestMethod, filled.requestPath,
-       filled.responseCode, filled.metadata, filled.ipAddress, filled.userAgent,
-       filled.correlationId, prevHash, rowHash, ts]);
+      [
+        filled.userId,
+        filled.organisationId,
+        filled.module,
+        filled.action,
+        filled.entityName,
+        filled.entityId,
+        filled.requestMethod,
+        filled.requestPath,
+        filled.responseCode,
+        filled.metadata,
+        filled.ipAddress,
+        filled.userAgent,
+        filled.correlationId,
+        prevHash,
+        rowHash,
+        ts,
+      ],
+    );
   });
 }
 ```
@@ -181,13 +209,16 @@ async function appendAuditWithChain(conn: DataSource, table: string, row: any) {
 // GET /admin/audit/verify-chain?from=&to=
 async function verifyAuditChain(req, res) {
   const orgId = res.locals.orgData.id;
-  const rows = await master_db_connection.query(`
+  const rows = await master_db_connection.query(
+    `
     SELECT id, prev_row_hash, row_hash, user_id, module, action,
            entity_name, entity_id, request_method, request_path,
            response_code, metadata, ip_address, occurred_at
     FROM audit_log_s
     WHERE organisation_id = $1
-    ORDER BY occurred_at ASC, id ASC`, [orgId]);
+    ORDER BY occurred_at ASC, id ASC`,
+    [orgId],
+  );
 
   let prevHash: string | null = null;
   let firstBad: any = null;
@@ -198,11 +229,17 @@ async function verifyAuditChain(req, res) {
       break;
     }
     const expected = computeRowHash(prevHash, {
-      userId: r.user_id, module: r.module, action: r.action,
-      entityName: r.entity_name, entityId: r.entity_id,
-      requestMethod: r.request_method, requestPath: r.request_path,
-      responseCode: r.response_code, metadata: r.metadata,
-      ipAddress: r.ip_address, occurredAt: r.occurred_at,
+      userId: r.user_id,
+      module: r.module,
+      action: r.action,
+      entityName: r.entity_name,
+      entityId: r.entity_id,
+      requestMethod: r.request_method,
+      requestPath: r.request_path,
+      responseCode: r.response_code,
+      metadata: r.metadata,
+      ipAddress: r.ip_address,
+      occurredAt: r.occurred_at,
     });
     if (expected !== r.row_hash) {
       firstBad = { id: r.id, expected, actual: r.row_hash };
@@ -212,8 +249,10 @@ async function verifyAuditChain(req, res) {
     n++;
   }
   return sendResponse(res, true, 200, '', {
-    verifiedRowCount: n, totalRowCount: rows.length,
-    firstBadRow: firstBad, ok: firstBad === null,
+    verifiedRowCount: n,
+    totalRowCount: rows.length,
+    firstBadRow: firstBad,
+    ok: firstBad === null,
   });
 }
 ```
@@ -241,7 +280,7 @@ export function currentCorrelationId(): string | null {
 const Logger = winston.createLogger({
   format: winston.format.combine(
     winston.format.timestamp(),
-    winston.format((info) => {
+    winston.format(info => {
       info.correlationId = currentCorrelationId();
       return info;
     })(),
@@ -271,7 +310,9 @@ export function startTelemetry() {
       [SRA.DEPLOYMENT_ENVIRONMENT]: process.env.NODE_ENV ?? 'development',
     }),
     traceExporter: new OTLPTraceExporter({
-      url: process.env.OTEL_EXPORTER_OTLP_ENDPOINT ?? 'http://localhost:4318/v1/traces',
+      url:
+        process.env.OTEL_EXPORTER_OTLP_ENDPOINT ??
+        'http://localhost:4318/v1/traces',
     }),
     instrumentations: [
       new HttpInstrumentation(),
@@ -287,14 +328,17 @@ export function startTelemetry() {
 // Custom spans
 import { trace } from '@opentelemetry/api';
 const tracer = trace.getTracer('dbexec-api');
-await tracer.startActiveSpan('runAnalysisQuery', async (span) => {
+await tracer.startActiveSpan('runAnalysisQuery', async span => {
   span.setAttributes({ 'analysis.id': id, 'org.id': orgId });
-  try { /* ... */ }
-  catch (e) {
+  try {
+    /* ... */
+  } catch (e) {
     span.recordException(e as Error);
     span.setStatus({ code: 2, message: (e as Error).message });
     throw e;
-  } finally { span.end(); }
+  } finally {
+    span.end();
+  }
 });
 ```
 
@@ -370,15 +414,20 @@ app.get('/healthz/ready', async (_, res) => {
   res.status(ok ? 200 : 503).json({ ok, checks: results });
 });
 
-app.get('/healthz/status', AuthMiddleware, requirePerm('systemAdmin'), async (_, res) => {
-  res.json({
-    version: process.env.SERVICE_VERSION ?? 'dev',
-    uptime_s: process.uptime(),
-    memory: process.memoryUsage(),
-    eventLoopLag_ms: await measureEventLoopLag(),
-    activeConnections: pool.totalCount,
-  });
-});
+app.get(
+  '/healthz/status',
+  AuthMiddleware,
+  requirePerm('systemAdmin'),
+  async (_, res) => {
+    res.json({
+      version: process.env.SERVICE_VERSION ?? 'dev',
+      uptime_s: process.uptime(),
+      memory: process.memoryUsage(),
+      eventLoopLag_ms: await measureEventLoopLag(),
+      activeConnections: pool.totalCount,
+    });
+  },
+);
 ```
 
 ### 4.8 Slow query log
@@ -406,13 +455,20 @@ CREATE INDEX slow_query_log_org ON slow_query_log (organisation_id, occurred_at 
 const SLOW_THRESHOLD_MS = 5_000;
 
 export async function instrumentedQuery<T = any>(
-  pool: any, sql: string, params: any[],
-  ctx: { orgId: string; userId?: string; datasourceId: string;
-         surface: string; surfaceId?: string },
+  pool: any,
+  sql: string,
+  params: any[],
+  ctx: {
+    orgId: string;
+    userId?: string;
+    datasourceId: string;
+    surface: string;
+    surfaceId?: string;
+  },
 ): Promise<T> {
   const t0 = Date.now();
   let rows: T;
-  let status: 'ok'|'timeout'|'error' = 'ok';
+  let status: 'ok' | 'timeout' | 'error' = 'ok';
   let error: string | undefined;
   try {
     rows = await pool.query(sql, params);
@@ -453,25 +509,43 @@ async function searchAudit(req, res) {
   const where: string[] = ['organisation_id = $1'];
   const params: any[] = [orgId];
   let i = 1;
-  if (user)   { params.push(user);   where.push(`user_id = $${++i}`); }
-  if (action) { params.push(action); where.push(`action = $${++i}`); }
-  if (module) { params.push(module); where.push(`module = $${++i}`); }
-  if (from)   { params.push(new Date(from as string)); where.push(`occurred_at >= $${++i}`); }
-  if (to)     { params.push(new Date(to as string));   where.push(`occurred_at <= $${++i}`); }
+  if (user) {
+    params.push(user);
+    where.push(`user_id = $${++i}`);
+  }
+  if (action) {
+    params.push(action);
+    where.push(`action = $${++i}`);
+  }
+  if (module) {
+    params.push(module);
+    where.push(`module = $${++i}`);
+  }
+  if (from) {
+    params.push(new Date(from as string));
+    where.push(`occurred_at >= $${++i}`);
+  }
+  if (to) {
+    params.push(new Date(to as string));
+    where.push(`occurred_at <= $${++i}`);
+  }
   if (q) {
     params.push(`%${q}%`);
     where.push(`(entity_name ILIKE $${++i} OR action ILIKE $${i})`);
   }
   params.push(limit, (page - 1) * limit);
 
-  const rows = await master_db_connection.query(`
+  const rows = await master_db_connection.query(
+    `
     SELECT id, user_id, action, module, entity_name, entity_id,
            request_method, request_path, response_code,
            metadata, ip_address, correlation_id, occurred_at
     FROM audit_log_s
     WHERE ${where.join(' AND ')}
     ORDER BY occurred_at DESC
-    LIMIT $${i + 1} OFFSET $${i + 2}`, params);
+    LIMIT $${i + 1} OFFSET $${i + 2}`,
+    params,
+  );
 
   return sendResponse(res, true, 200, '', { rows });
 }
@@ -481,7 +555,7 @@ async function auditStream(req, res) {
   res.setHeader('Content-Type', 'text/event-stream');
   res.flushHeaders();
   const orgId = res.locals.orgData.id;
-  const sub = sse.subscribe(`audit:${orgId}`, (row) => {
+  const sub = sse.subscribe(`audit:${orgId}`, row => {
     res.write(`data: ${JSON.stringify(row)}\n\n`);
   });
   req.on('close', () => sse.unsubscribe(`audit:${orgId}`, sub));
@@ -493,9 +567,17 @@ async function auditStream(req, res) {
 ```ts
 // src/shared/utility/auditMetadata.ts
 export const AUDIT_FIELDS = {
-  USER: ['id','username','email','firstName','lastName','status','isFirstLogin'],
+  USER: [
+    'id',
+    'username',
+    'email',
+    'firstName',
+    'lastName',
+    'status',
+    'isFirstLogin',
+  ],
   // NOT: password, otp, refreshToken, setupToken, anything *_enc
-  DATASET: ['id','name','description','datasourceId','type','status'],
+  DATASET: ['id', 'name', 'description', 'datasourceId', 'type', 'status'],
   // …
 };
 
@@ -588,15 +670,18 @@ app.use((err, req, res, next) => {
   const fp = createHash('sha256')
     .update(`${err.name}:${moduleFromStack(err)}:${topFrame(err)}`)
     .digest('hex');
-  ErrorGroup.upsert({
-    fingerprint: fp,
-    firstSeen: new Date(),
-    lastSeen: new Date(),
-    errorType: err.name,
-    messageSample: err.message?.slice(0, 1000),
-    stackTop: err.stack?.split('\n').slice(0,3).join('\n'),
-    module: moduleFromStack(err),
-  }, ['fingerprint']);
+  ErrorGroup.upsert(
+    {
+      fingerprint: fp,
+      firstSeen: new Date(),
+      lastSeen: new Date(),
+      errorType: err.name,
+      messageSample: err.message?.slice(0, 1000),
+      stackTop: err.stack?.split('\n').slice(0, 3).join('\n'),
+      module: moduleFromStack(err),
+    },
+    ['fingerprint'],
+  );
   ErrorOccurrence.insert({
     fingerprint: fp,
     userId: res.locals.loggedInId,
@@ -611,23 +696,23 @@ app.use((err, req, res, next) => {
 
 ## 5. APIs
 
-| Method | Path | Purpose |
-|---|---|---|
-| GET | `/admin/audit` | Search audit log |
-| GET | `/admin/audit/:id` | Detail |
-| GET | `/admin/audit/stream` | SSE tail |
-| GET | `/admin/audit/verify-chain` | Integrity check |
-| POST | `/admin/audit/export` | CSV / JSON / CEF export (async) |
-| GET | `/admin/errors` | Error group list |
-| POST | `/admin/errors/:fp/ack` | Acknowledge |
-| POST | `/admin/errors/:fp/resolve` | Mark resolved |
-| GET | `/admin/slow-queries` | Recent slow queries |
-| GET | `/healthz/live` | Liveness |
-| GET | `/healthz/ready` | Readiness |
-| GET | `/healthz/status` | Detailed (admin only) |
-| GET | `/metrics` | Prom scrape |
-| POST | `/admin/audit-forwarders` | Register SIEM forwarder |
-| POST | `/admin/audit-forwarders/:id/test` | Send test event |
+| Method | Path                               | Purpose                         |
+| ------ | ---------------------------------- | ------------------------------- |
+| GET    | `/admin/audit`                     | Search audit log                |
+| GET    | `/admin/audit/:id`                 | Detail                          |
+| GET    | `/admin/audit/stream`              | SSE tail                        |
+| GET    | `/admin/audit/verify-chain`        | Integrity check                 |
+| POST   | `/admin/audit/export`              | CSV / JSON / CEF export (async) |
+| GET    | `/admin/errors`                    | Error group list                |
+| POST   | `/admin/errors/:fp/ack`            | Acknowledge                     |
+| POST   | `/admin/errors/:fp/resolve`        | Mark resolved                   |
+| GET    | `/admin/slow-queries`              | Recent slow queries             |
+| GET    | `/healthz/live`                    | Liveness                        |
+| GET    | `/healthz/ready`                   | Readiness                       |
+| GET    | `/healthz/status`                  | Detailed (admin only)           |
+| GET    | `/metrics`                         | Prom scrape                     |
+| POST   | `/admin/audit-forwarders`          | Register SIEM forwarder         |
+| POST   | `/admin/audit-forwarders/:id/test` | Send test event                 |
 
 ## 6. FE specs
 
@@ -674,7 +759,7 @@ export const auditSearchSchema = z.object({
   action: z.string().max(32).optional(),
   module: z.string().max(64).optional(),
   from: z.string().datetime().optional(),
-  to:   z.string().datetime().optional(),
+  to: z.string().datetime().optional(),
   page: z.coerce.number().int().min(1).max(10000).optional(),
   limit: z.coerce.number().int().min(1).max(100).optional(),
 });
@@ -682,9 +767,9 @@ export const auditSearchSchema = z.object({
 export const forwarderSchema = z.object({
   name: z.string().min(1).max(100),
   url: z.string().url(),
-  format: z.enum(['json','cef','leef']).default('json'),
+  format: z.enum(['json', 'cef', 'leef']).default('json'),
   filterModules: z.array(z.string().max(64)).optional(),
-  filterMinSeverity: z.enum(['info','warning','critical']).optional(),
+  filterMinSeverity: z.enum(['info', 'warning', 'critical']).optional(),
   signingSecret: z.string().min(32).max(128),
 });
 ```

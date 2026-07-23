@@ -99,8 +99,7 @@ export class DashboardWidgetComponent implements OnChanges {
     this.kpiValue = raw === null ? '—' : this.formatValue(raw, cfg.format);
 
     // Optional comparison vs a fixed target value.
-    const target =
-      typeof cfg.targetValue === 'number' ? cfg.targetValue : null;
+    const target = typeof cfg.targetValue === 'number' ? cfg.targetValue : null;
     if (raw !== null && target !== null) {
       if (raw > target) this.compareState = 'up';
       else if (raw < target) this.compareState = 'down';

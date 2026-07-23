@@ -63,7 +63,13 @@ interface FetchedOption {
 @Component({
   selector: 'app-dataset-params-panel',
   standalone: true,
-  imports: [CommonModule, FormsModule, TranslateModule, AppPrimeNGModule, SharedModule],
+  imports: [
+    CommonModule,
+    FormsModule,
+    TranslateModule,
+    AppPrimeNGModule,
+    SharedModule,
+  ],
   templateUrl: './dataset-params-panel.component.html',
   styleUrls: ['./dataset-params-panel.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -255,7 +261,11 @@ export class DatasetParamsPanelComponent implements OnChanges {
   onSourceChange(param: DatasetParamConfig, source: 'static' | 'query'): void {
     param.options =
       source === 'query'
-        ? ({ datasetId: '', valueColumn: '', labelColumn: '' } as DatasetParamQueryOptions)
+        ? ({
+            datasetId: '',
+            valueColumn: '',
+            labelColumn: '',
+          } as DatasetParamQueryOptions)
         : ({ static: [] } as DatasetParamStaticOptions);
     delete this.fetchedOptions[param.name];
     this.ensureDatasetsLoaded();
@@ -275,7 +285,10 @@ export class DatasetParamsPanelComponent implements OnChanges {
     return (param.options as DatasetParamQueryOptions) ?? {};
   }
 
-  onQuerySourceDatasetChange(param: DatasetParamConfig, datasetId: string): void {
+  onQuerySourceDatasetChange(
+    param: DatasetParamConfig,
+    datasetId: string,
+  ): void {
     const opts = this.queryOptions(param);
     param.options = { ...opts, datasetId };
     delete this.fetchedOptions[param.name];

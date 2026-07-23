@@ -101,14 +101,7 @@ export class DatasourceService {
    * and avoids the BE silently dropping unknown fields.
    */
   private buildEnginePayload(payload: any): any {
-    const {
-      name,
-      description,
-      type,
-      database,
-      username,
-      password,
-    } = payload;
+    const { name, description, type, database, username, password } = payload;
     const body: any = { name, description, type, database, username, password };
     if (type === 'snowflake') {
       body.account = payload.account;
@@ -181,11 +174,7 @@ export class DatasourceService {
    */
   async testConnectionForExisting(id: string): Promise<any> {
     return await lastValueFrom(
-      this.http.apiPost(
-        DATASOURCE.VALIDATE,
-        { id },
-        { skipLoader: true },
-      ),
+      this.http.apiPost(DATASOURCE.VALIDATE, { id }, { skipLoader: true }),
     );
   }
 
@@ -248,7 +237,6 @@ export class DatasourceService {
       ids.forEach(id => this.setDeleting(id, false));
     }
   }
-
 
   resetCurrent() {
     this._current.set(null);

@@ -96,12 +96,46 @@ export class ListConnectionsComponent implements OnInit, OnDestroy {
   private buildColumns(): CustomTableColumn[] {
     const t = (k: string) => this.translate.instant(k);
     return [
-      { colId: 'name', field: 'name', header: t('COMMON.NAME'), width: '224px', frozen: true, filter: 'text' },
-      { colId: 'datasource', field: 'datasourceName', header: t('COMMON.DATASOURCE'), width: '192px' },
-      { colId: 'login', field: 'username', header: t('QUERY_RUNNER.LOGIN'), width: '160px' },
-      { colId: 'health', field: 'lastTestStatus', header: t('QUERY_RUNNER.HEALTH'), width: '128px', sortable: false },
-      { colId: 'state', field: 'enabled', header: t('QUERY_RUNNER.STATE'), width: '112px', sortable: false },
-      { colId: 'actions', header: t('COMMON.ACTIONS'), width: '144px', sortable: false },
+      {
+        colId: 'name',
+        field: 'name',
+        header: t('COMMON.NAME'),
+        width: '224px',
+        frozen: true,
+        filter: 'text',
+      },
+      {
+        colId: 'datasource',
+        field: 'datasourceName',
+        header: t('COMMON.DATASOURCE'),
+        width: '192px',
+      },
+      {
+        colId: 'login',
+        field: 'username',
+        header: t('QUERY_RUNNER.LOGIN'),
+        width: '160px',
+      },
+      {
+        colId: 'health',
+        field: 'lastTestStatus',
+        header: t('QUERY_RUNNER.HEALTH'),
+        width: '128px',
+        sortable: false,
+      },
+      {
+        colId: 'state',
+        field: 'enabled',
+        header: t('QUERY_RUNNER.STATE'),
+        width: '112px',
+        sortable: false,
+      },
+      {
+        colId: 'actions',
+        header: t('COMMON.ACTIONS'),
+        width: '144px',
+        sortable: false,
+      },
     ];
   }
 
@@ -127,7 +161,10 @@ export class ListConnectionsComponent implements OnInit, OnDestroy {
           .then(res => {
             const rows = res?.status ? (res.data?.connections ?? []) : [];
             this.connections = rows; // keep for any template refs
-            return { rows, total: res?.data?.count ?? res?.data?.total ?? rows.length };
+            return {
+              rows,
+              total: res?.data?.count ?? res?.data?.total ?? rows.length,
+            };
           }),
       unwrap: (res: any) => ({ rows: res.rows, total: res.total }),
       sortFieldMap: {

@@ -2,7 +2,6 @@
 // rest of the settings module. Only the in-page bits unique to the
 // theme form live here.
 
-
 .default-badge {
   display: inline-flex;
   align-items: center;
@@ -55,7 +54,9 @@
   color: var(--text-muted);
   font-size: var(--fs-control);
   border-radius: 0 var(--radius-xs) var(--radius-xs) 0;
-  i { color: var(--primary-color); }
+  i {
+    color: var(--primary-color);
+  }
 
   @media (max-width: 768px) {
     width: 100%;
@@ -239,15 +240,22 @@
       background: transparent;
       border: 1px solid var(--border-color);
       color: var(--text-color);
-      &:hover { background: var(--hover-background); }
+      &:hover {
+        background: var(--hover-background);
+      }
     }
 
     .btn-confirm {
       background: var(--primary-color);
       border: 1px solid var(--primary-color);
       color: var(--primary-text);
-      &:hover:not(:disabled) { background: var(--primary-hover); }
-      &:disabled { opacity: 0.6; cursor: not-allowed; }
+      &:hover:not(:disabled) {
+        background: var(--primary-hover);
+      }
+      &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
     }
   }
 }

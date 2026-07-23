@@ -28,12 +28,7 @@ export interface GridGeom {
 }
 
 export type AlignEdge =
-  | 'left'
-  | 'center'
-  | 'right'
-  | 'top'
-  | 'middle'
-  | 'bottom';
+  'left' | 'center' | 'right' | 'top' | 'middle' | 'bottom';
 
 export type DistributeAxis = 'horizontal' | 'vertical';
 
@@ -182,8 +177,7 @@ export function distributeGeoms(
     const first = sorted[0];
     const last = sorted[sorted.length - 1];
     const spanTotal = sorted.reduce((s, i) => s + i.colSpan, 0);
-    const extent =
-      last.gridCol + last.colSpan - first.gridCol; // full occupied width
+    const extent = last.gridCol + last.colSpan - first.gridCol; // full occupied width
     const gaps = sorted.length - 1;
     const freeGap = Math.max(0, extent - spanTotal);
     const per = freeGap / gaps;

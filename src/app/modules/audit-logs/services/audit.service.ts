@@ -1,5 +1,11 @@
 import { Injectable, signal } from '@angular/core';
-import { EmptyError, Observable, Subject, lastValueFrom, takeUntil } from 'rxjs';
+import {
+  EmptyError,
+  Observable,
+  Subject,
+  lastValueFrom,
+  takeUntil,
+} from 'rxjs';
 import { AUDIT } from 'src/app/core/constants/api.constant';
 import { HttpClientService } from 'src/app/core/services/http-client.service';
 import { AuditLog, ChainVerifyResult } from '../models/audit-log.model';

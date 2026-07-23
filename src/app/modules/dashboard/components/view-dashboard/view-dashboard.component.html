@@ -17,13 +17,17 @@
         </button>
         <div class="title-block">
           <div class="title-row">
-            <h2>{{ dashboard?.name || ('DASHBOARD.DASHBOARD' | translate) }}</h2>
+            <h2>
+              {{ dashboard?.name || ('DASHBOARD.DASHBOARD' | translate) }}
+            </h2>
             <app-chip
               *ngIf="dashboard"
               variant="status"
               [tone]="dashboard.status === 1 ? 'success' : 'neutral'"
               [icon]="
-                dashboard.status === 1 ? 'pi pi-check-circle' : 'pi pi-times-circle'
+                dashboard.status === 1
+                  ? 'pi pi-check-circle'
+                  : 'pi pi-times-circle'
               "
             >
               {{
@@ -51,7 +55,9 @@
                   | translate: { dataset: meta.datasetName }
               }}
             </span>
-            <span class="dot-sep" *ngIf="meta.datasetName && meta.snapshotVersion"
+            <span
+              class="dot-sep"
+              *ngIf="meta.datasetName && meta.snapshotVersion"
               >&middot;</span
             >
             <span *ngIf="meta.snapshotVersion">
@@ -75,7 +81,10 @@
           "
           tooltipPosition="bottom"
         >
-          <i class="pi" [ngClass]="isFavourite() ? 'pi-star-fill' : 'pi-star'"></i>
+          <i
+            class="pi"
+            [ngClass]="isFavourite() ? 'pi-star-fill' : 'pi-star'"
+          ></i>
         </button>
         <!--
           Auto-refresh indicator — shows the interval + live countdown.
@@ -168,7 +177,12 @@
             [ngClass]="exporting ? 'pi-spin pi-spinner' : 'pi-download'"
           ></i>
         </button>
-        <p-menu #exportMenu [popup]="true" [model]="exportItems" appendTo="body"></p-menu>
+        <p-menu
+          #exportMenu
+          [popup]="true"
+          [model]="exportItems"
+          appendTo="body"
+        ></p-menu>
 
         <!-- Share (public embed links). -->
         <button
@@ -245,7 +259,9 @@
     -->
     <div
       class="missing-field-banner"
-      *ngIf="!loading() && !rendering() && dashboard && !gateOpen && hasFieldWarnings"
+      *ngIf="
+        !loading() && !rendering() && dashboard && !gateOpen && hasFieldWarnings
+      "
       role="status"
     >
       <div class="banner-summary" (click)="toggleWarnings()">
@@ -256,7 +272,7 @@
               | translate
                 : {
                     count: missingFieldCount,
-                    refs: serverWarnings.length
+                    refs: serverWarnings.length,
                   }
           }}
         </span>
@@ -279,7 +295,9 @@
           *ngFor="let w of serverWarnings; trackBy: trackByWarning"
           class="banner-detail-row"
         >
-          <app-chip variant="tag" size="sm">{{ scopeLabelKey(w.scope) | translate }}</app-chip>
+          <app-chip variant="tag" size="sm">{{
+            scopeLabelKey(w.scope) | translate
+          }}</app-chip>
           <span class="ref-label">{{ w.label }}</span>
           <span class="missing-cols">{{ w.missingColumns.join(', ') }}</span>
         </li>
@@ -380,72 +398,74 @@
 
         <!-- Canvas Container -->
         <div class="canvas-container" #canvasContainer>
-        <!-- Empty State -->
-        <div class="empty-state" *ngIf="activeTabEmpty">
-          <i class="pi pi-chart-bar"></i>
-          <h3>{{ 'DASHBOARD.NO_VISUALS' | translate }}</h3>
-          <p>
-            {{ 'DASHBOARD.NO_VISUALS_DESCRIPTION' | translate }}
-          </p>
-        </div>
-
-        <!-- Canvas Area -->
-        <div class="canvas-area" *ngIf="!activeTabEmpty">
-          <!-- Widgets (text / KPI) share the grid with visuals. -->
-          <div
-            class="widget-box"
-            *ngFor="let widget of visibleWidgets; trackBy: trackByWidgetId"
-            [style.grid-column]="'span ' + widgetColSpan(widget)"
-            [style.grid-row]="'span ' + widgetRowSpan(widget)"
-          >
-            <app-dashboard-widget
-              [widget]="widget"
-              [data]="rawData"
-            ></app-dashboard-widget>
+          <!-- Empty State -->
+          <div class="empty-state" *ngIf="activeTabEmpty">
+            <i class="pi pi-chart-bar"></i>
+            <h3>{{ 'DASHBOARD.NO_VISUALS' | translate }}</h3>
+            <p>
+              {{ 'DASHBOARD.NO_VISUALS_DESCRIPTION' | translate }}
+            </p>
           </div>
 
-          <div
-            class="visual-box"
-            *ngFor="let visual of visibleVisuals; trackBy: trackByVisualId"
-            [style.grid-column]="
-              visual.gridCol + 1 + ' / span ' + visual.colSpan
-            "
-            [style.grid-row]="visual.gridRow + 1 + ' / span ' + visual.rowSpan"
-            [class.cross-filter-source]="isCrossFilterSource(visual)"
-          >
-            <!-- Inline Title -->
-            <div class="visual-inline-title">
-              <span class="inline-title-text">{{
-                visual.title || ('DASHBOARD.UNTITLED_VISUAL' | translate)
-              }}</span>
+          <!-- Canvas Area -->
+          <div class="canvas-area" *ngIf="!activeTabEmpty">
+            <!-- Widgets (text / KPI) share the grid with visuals. -->
+            <div
+              class="widget-box"
+              *ngFor="let widget of visibleWidgets; trackBy: trackByWidgetId"
+              [style.grid-column]="'span ' + widgetColSpan(widget)"
+              [style.grid-row]="'span ' + widgetRowSpan(widget)"
+            >
+              <app-dashboard-widget
+                [widget]="widget"
+                [data]="rawData"
+              ></app-dashboard-widget>
             </div>
 
-            <!-- Visual Body -->
-            <div class="visual-body">
-              <!-- Loading State -->
-              <div class="visual-loading-placeholder" *ngIf="visual.loading">
-                <div class="loading-content">
-                  <i class="pi pi-spin pi-spinner loading-spinner"></i>
-                  <span class="loading-text">{{
-                    'DASHBOARD.LOADING_VISUALIZATION' | translate
-                  }}</span>
-                </div>
+            <div
+              class="visual-box"
+              *ngFor="let visual of visibleVisuals; trackBy: trackByVisualId"
+              [style.grid-column]="
+                visual.gridCol + 1 + ' / span ' + visual.colSpan
+              "
+              [style.grid-row]="
+                visual.gridRow + 1 + ' / span ' + visual.rowSpan
+              "
+              [class.cross-filter-source]="isCrossFilterSource(visual)"
+            >
+              <!-- Inline Title -->
+              <div class="visual-inline-title">
+                <span class="inline-title-text">{{
+                  visual.title || ('DASHBOARD.UNTITLED_VISUAL' | translate)
+                }}</span>
               </div>
 
-              <!-- Error State -->
-              <div
-                class="visual-error-placeholder"
-                *ngIf="visual.error && !visual.loading"
-              >
-                <div class="error-content">
-                  <i class="pi pi-exclamation-triangle error-icon"></i>
-                  <span class="error-text">{{
-                    'DASHBOARD.FAILED_TO_LOAD_DATA' | translate
-                  }}</span>
+              <!-- Visual Body -->
+              <div class="visual-body">
+                <!-- Loading State -->
+                <div class="visual-loading-placeholder" *ngIf="visual.loading">
+                  <div class="loading-content">
+                    <i class="pi pi-spin pi-spinner loading-spinner"></i>
+                    <span class="loading-text">{{
+                      'DASHBOARD.LOADING_VISUALIZATION' | translate
+                    }}</span>
+                  </div>
                 </div>
-              </div>
 
-              <!--
+                <!-- Error State -->
+                <div
+                  class="visual-error-placeholder"
+                  *ngIf="visual.error && !visual.loading"
+                >
+                  <div class="error-content">
+                    <i class="pi pi-exclamation-triangle error-icon"></i>
+                    <span class="error-text">{{
+                      'DASHBOARD.FAILED_TO_LOAD_DATA' | translate
+                    }}</span>
+                  </div>
+                </div>
+
+                <!--
                 Missing-field placeholder — viewer-facing variant.
                 Shown when a saved visual references a column that no
                 longer exists (custom field deleted, dataset SQL
@@ -455,91 +475,90 @@
                 offering a re-map button (the edit-analyses surface
                 has that button).
               -->
-              <div
-                class="visual-content-placeholder visual-content-placeholder--missing-field"
-                *ngIf="
-                  !visual.loading &&
-                  !visual.error &&
-                  visual.loaded &&
-                  visual.chartType &&
-                  getMissingFields(visual).length > 0
-                "
-              >
-                <div class="placeholder-icon-wrap">
-                  <i class="pi pi-exclamation-triangle"></i>
-                </div>
-                <p>{{ 'DASHBOARD.VISUAL_FIELD_MISSING' | translate }}</p>
-                <small>
-                  {{
-                    'DASHBOARD.VISUAL_FIELD_MISSING_DESC_VIEWER'
-                      | translate
-                        : { fields: getMissingFields(visual).join(', ') }
-                  }}
-                </small>
-              </div>
-
-              <!-- No Config -->
-              <div
-                class="visual-content-placeholder"
-                *ngIf="
-                  !visual.loading &&
-                  !visual.error &&
-                  visual.loaded &&
-                  getMissingFields(visual).length === 0 &&
-                  (!visual.chartType || !hasRequiredChartFields(visual))
-                "
-              >
-                <div class="placeholder-icon-wrap">
-                  <i class="pi pi-info-circle"></i>
-                </div>
-                <p>{{ 'DASHBOARD.NO_CHART_CONFIGURED' | translate }}</p>
-              </div>
-
-              <!-- Chart Components -->
-              <ng-container
-                *ngIf="
-                  !visual.loading &&
-                  !visual.error &&
-                  visual.chartType &&
-                  hasRequiredChartFields(visual)
-                "
-              >
-                <!-- Card chart (non-ECharts) -->
-                <app-configurable-card-chart
+                <div
+                  class="visual-content-placeholder visual-content-placeholder--missing-field"
                   *ngIf="
-                    isCardChartType(visual.chartType);
-                    else dashEchartBlock
+                    !visual.loading &&
+                    !visual.error &&
+                    visual.loaded &&
+                    visual.chartType &&
+                    getMissingFields(visual).length > 0
                   "
-                  [showConfigPanel]="false"
-                  [chartWidth]="visual.width"
-                  [chartHeight]="visual.height - 35"
-                  [chartConfig]="visual.config"
-                  [data]="visual.chartData"
-                ></app-configurable-card-chart>
+                >
+                  <div class="placeholder-icon-wrap">
+                    <i class="pi pi-exclamation-triangle"></i>
+                  </div>
+                  <p>{{ 'DASHBOARD.VISUAL_FIELD_MISSING' | translate }}</p>
+                  <small>
+                    {{
+                      'DASHBOARD.VISUAL_FIELD_MISSING_DESC_VIEWER'
+                        | translate
+                          : { fields: getMissingFields(visual).join(', ') }
+                    }}
+                  </small>
+                </div>
 
-                <ng-template #dashEchartBlock>
-                  <app-echart-visual
-                    [chartType]="visual.chartType!"
-                    [chartConfig]="visual.config"
+                <!-- No Config -->
+                <div
+                  class="visual-content-placeholder"
+                  *ngIf="
+                    !visual.loading &&
+                    !visual.error &&
+                    visual.loaded &&
+                    getMissingFields(visual).length === 0 &&
+                    (!visual.chartType || !hasRequiredChartFields(visual))
+                  "
+                >
+                  <div class="placeholder-icon-wrap">
+                    <i class="pi pi-info-circle"></i>
+                  </div>
+                  <p>{{ 'DASHBOARD.NO_CHART_CONFIGURED' | translate }}</p>
+                </div>
+
+                <!-- Chart Components -->
+                <ng-container
+                  *ngIf="
+                    !visual.loading &&
+                    !visual.error &&
+                    visual.chartType &&
+                    hasRequiredChartFields(visual)
+                  "
+                >
+                  <!-- Card chart (non-ECharts) -->
+                  <app-configurable-card-chart
+                    *ngIf="
+                      isCardChartType(visual.chartType);
+                      else dashEchartBlock
+                    "
+                    [showConfigPanel]="false"
                     [chartWidth]="visual.width"
                     [chartHeight]="visual.height - 35"
-                    [data]="getDisplayData(visual)"
-                    (chartSelect)="onVisualChartSelect(visual, $event)"
-                  ></app-echart-visual>
-                </ng-template>
-              </ng-container>
+                    [chartConfig]="visual.config"
+                    [data]="visual.chartData"
+                  ></app-configurable-card-chart>
 
-              <!--
+                  <ng-template #dashEchartBlock>
+                    <app-echart-visual
+                      [chartType]="visual.chartType!"
+                      [chartConfig]="visual.config"
+                      [chartWidth]="visual.width"
+                      [chartHeight]="visual.height - 35"
+                      [data]="getDisplayData(visual)"
+                      (chartSelect)="onVisualChartSelect(visual, $event)"
+                    ></app-echart-visual>
+                  </ng-template>
+                </ng-container>
+
+                <!--
                 Globe / 3D-line charts previously had a special path to
                 render with dummy data when no field mapping existed.
                 Removed because the dummy rows triggered tooltips on
                 phantom values. These charts now follow the same
                 "no axes mapped → empty state" rule as everything
                 else; the placeholder branches above handle the UX.
-              -->
+              --></div>
             </div>
           </div>
-        </div>
         </div>
       </div>
     </div>

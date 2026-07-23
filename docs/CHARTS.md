@@ -20,127 +20,127 @@ chart is added, update both.
 
 Roles map to columns on `Visual`:
 
-| Role | Visual field |
-|---|---|
-| `xAxis` | `xAxisColumn` |
-| `yAxis` | `yAxisColumn` |
-| `zAxis` | `zAxisColumn` |
+| Role                  | Visual field                                              |
+| --------------------- | --------------------------------------------------------- |
+| `xAxis`               | `xAxisColumn`                                             |
+| `yAxis`               | `yAxisColumn`                                             |
+| `zAxis`               | `zAxisColumn`                                             |
 | `open/high/low/close` | `openColumn` / `highColumn` / `lowColumn` / `closeColumn` |
-| `sample` | `sampleColumn` |
-| `parent` | `parentColumn` |
-| `indicators` | `indicatorColumns[]` |
-| `dimensions` | `dimensionColumns[]` |
-| `valueColumns` | `valueColumns[]` |
-| `lng` / `lat` | `lngColumn` / `latColumn` |
-| `time` | `timeColumn` |
+| `sample`              | `sampleColumn`                                            |
+| `parent`              | `parentColumn`                                            |
+| `indicators`          | `indicatorColumns[]`                                      |
+| `dimensions`          | `dimensionColumns[]`                                      |
+| `valueColumns`        | `valueColumns[]`                                          |
+| `lng` / `lat`         | `lngColumn` / `latColumn`                                 |
+| `time`                | `timeColumn`                                              |
 
 ## Reference table
 
 ### Bar family
 
-| Chart id | ECharts type | Required | Optional | Data shape |
-|---|---|---|---|---|
-| `bar-vertical`, `bar-horizontal` | `bar` | `xAxis`, `yAxis` | — | `[{name, value}]` |
-| `bar-vertical-2d`, `bar-horizontal-2d` | `bar` (multi) | `xAxis`, `yAxis` | `valueColumns` | `[{name: series, series: [{name, value}]}]` |
-| `bar-vertical-stacked`, `bar-horizontal-stacked` | `bar` + `stack: 'total'` | `xAxis`, `yAxis` | `valueColumns` | same as 2D |
-| `bar-vertical-normalized`, `bar-horizontal-normalized` | `bar` stacked, max=100 | `xAxis`, `yAxis` | `valueColumns` | same, rescaled |
-| `bar-polar` | `bar` on `polar` coord | `xAxis`, `yAxis` | — | `[{name, value}]` |
-| `pictorial-bar` | `pictorialBar` | `xAxis`, `yAxis` | — | `number[]` |
-| `waterfall` | three stacked `bar` series | `xAxis`, `yAxis` | — | `(number|'-')[]` per series |
+| Chart id                                               | ECharts type               | Required         | Optional       | Data shape                                  |
+| ------------------------------------------------------ | -------------------------- | ---------------- | -------------- | ------------------------------------------- |
+| `bar-vertical`, `bar-horizontal`                       | `bar`                      | `xAxis`, `yAxis` | —              | `[{name, value}]`                           |
+| `bar-vertical-2d`, `bar-horizontal-2d`                 | `bar` (multi)              | `xAxis`, `yAxis` | `valueColumns` | `[{name: series, series: [{name, value}]}]` |
+| `bar-vertical-stacked`, `bar-horizontal-stacked`       | `bar` + `stack: 'total'`   | `xAxis`, `yAxis` | `valueColumns` | same as 2D                                  |
+| `bar-vertical-normalized`, `bar-horizontal-normalized` | `bar` stacked, max=100     | `xAxis`, `yAxis` | `valueColumns` | same, rescaled                              |
+| `bar-polar`                                            | `bar` on `polar` coord     | `xAxis`, `yAxis` | —              | `[{name, value}]`                           |
+| `pictorial-bar`                                        | `pictorialBar`             | `xAxis`, `yAxis` | —              | `number[]`                                  |
+| `waterfall`                                            | three stacked `bar` series | `xAxis`, `yAxis` | —              | `(number                                    | '-')[]` per series |
 
 ### Line / area
 
-| Chart id | ECharts type | Required | Optional | Data shape |
-|---|---|---|---|---|
-| `line`, `line-stacked`, `line-step` | `line` | `xAxis`, `yAxis` | `valueColumns` | `number[]` or multi-series |
-| `area`, `area-stacked`, `area-normalized` | `line` + `areaStyle` | `xAxis`, `yAxis` | `valueColumns` | same |
-| `polar` | `radar` (radial coord) | `xAxis`, `yAxis` | — | multi-series wrapped |
+| Chart id                                  | ECharts type           | Required         | Optional       | Data shape                 |
+| ----------------------------------------- | ---------------------- | ---------------- | -------------- | -------------------------- |
+| `line`, `line-stacked`, `line-step`       | `line`                 | `xAxis`, `yAxis` | `valueColumns` | `number[]` or multi-series |
+| `area`, `area-stacked`, `area-normalized` | `line` + `areaStyle`   | `xAxis`, `yAxis` | `valueColumns` | same                       |
+| `polar`                                   | `radar` (radial coord) | `xAxis`, `yAxis` | —              | multi-series wrapped       |
 
 ### Pie / donut
 
-| Chart id | ECharts type | Required | Optional |
-|---|---|---|---|
-| `pie`, `pie-advanced`, `pie-grid` | `pie` | `xAxis`, `yAxis` | — |
-| `donut`, `half-donut`, `nested-pie`, `rose` | `pie` | `xAxis`, `yAxis` | — |
+| Chart id                                    | ECharts type | Required         | Optional |
+| ------------------------------------------- | ------------ | ---------------- | -------- |
+| `pie`, `pie-advanced`, `pie-grid`           | `pie`        | `xAxis`, `yAxis` | —        |
+| `donut`, `half-donut`, `nested-pie`, `rose` | `pie`        | `xAxis`, `yAxis` | —        |
 
 Data shape: `[{name, value}]`.
 
 ### Scatter / bubble / heatmap
 
-| Chart id | ECharts type | Required | Optional | Data shape |
-|---|---|---|---|---|
-| `scatter` | `scatter` | `xAxis`, `yAxis` | — | `[{name, value:[name, value]}]` |
-| `effect-scatter` | `effectScatter` | `xAxis`, `yAxis` | — | same as scatter |
-| `bubble` | `scatter` with size | `xAxis`, `yAxis` | `zAxis` (size) | `[{name, x, y, r}]` |
-| `heat-map` | `heatmap` | `xAxis`, `yAxis`, `zAxis` | — | `[[colIdx, rowIdx, value]]` |
+| Chart id         | ECharts type        | Required                  | Optional       | Data shape                      |
+| ---------------- | ------------------- | ------------------------- | -------------- | ------------------------------- |
+| `scatter`        | `scatter`           | `xAxis`, `yAxis`          | —              | `[{name, value:[name, value]}]` |
+| `effect-scatter` | `effectScatter`     | `xAxis`, `yAxis`          | —              | same as scatter                 |
+| `bubble`         | `scatter` with size | `xAxis`, `yAxis`          | `zAxis` (size) | `[{name, x, y, r}]`             |
+| `heat-map`       | `heatmap`           | `xAxis`, `yAxis`, `zAxis` | —              | `[[colIdx, rowIdx, value]]`     |
 
 ### Statistical
 
-| Chart id | ECharts type | Required | Optional | Data shape |
-|---|---|---|---|---|
-| `box-chart` | `boxplot` | `xAxis`, `sample` | — | `[{name, value: [min, q1, median, q3, max]}]` |
-| `candlestick` | `candlestick` | `xAxis`, `open`, `high`, `low`, `close` | — | `{categories: string[], values: [[o, c, l, h]]}` |
+| Chart id      | ECharts type  | Required                                | Optional | Data shape                                       |
+| ------------- | ------------- | --------------------------------------- | -------- | ------------------------------------------------ |
+| `box-chart`   | `boxplot`     | `xAxis`, `sample`                       | —        | `[{name, value: [min, q1, median, q3, max]}]`    |
+| `candlestick` | `candlestick` | `xAxis`, `open`, `high`, `low`, `close` | —        | `{categories: string[], values: [[o, c, l, h]]}` |
 
 ### Hierarchical
 
-| Chart id | ECharts type | Required | Optional | Data shape |
-|---|---|---|---|---|
-| `sunburst` | `sunburst` | `xAxis` (name), `yAxis` (value) | `parent` | `[{name, value, children?}]` |
-| `tree-map` | `treemap` | `xAxis`, `yAxis` | `parent` | `[{name, value, children?}]` |
-| `tree` | `tree` | `xAxis` | `yAxis`, `parent` | `{name, children: [...]}` (single root) |
+| Chart id   | ECharts type | Required                        | Optional          | Data shape                              |
+| ---------- | ------------ | ------------------------------- | ----------------- | --------------------------------------- |
+| `sunburst` | `sunburst`   | `xAxis` (name), `yAxis` (value) | `parent`          | `[{name, value, children?}]`            |
+| `tree-map` | `treemap`    | `xAxis`, `yAxis`                | `parent`          | `[{name, value, children?}]`            |
+| `tree`     | `tree`       | `xAxis`                         | `yAxis`, `parent` | `{name, children: [...]}` (single root) |
 
 Without `parent`, hierarchy charts render flat siblings of an implicit root.
 
 ### Multi-dimensional
 
-| Chart id | ECharts type | Required | Optional | Data shape |
-|---|---|---|---|---|
-| `radar` | `radar` | `xAxis` (series name), `indicators` | — | `{indicators: [{name, max}], series: [{name, value: number[]}]}` |
-| `parallel` | `parallel` | `dimensions` | `xAxis` (line name) | `{axes: [{dim, name, type}], data: [[v0, v1, ...vN]]}` |
+| Chart id   | ECharts type | Required                            | Optional            | Data shape                                                       |
+| ---------- | ------------ | ----------------------------------- | ------------------- | ---------------------------------------------------------------- |
+| `radar`    | `radar`      | `xAxis` (series name), `indicators` | —                   | `{indicators: [{name, max}], series: [{name, value: number[]}]}` |
+| `parallel` | `parallel`   | `dimensions`                        | `xAxis` (line name) | `{axes: [{dim, name, type}], data: [[v0, v1, ...vN]]}`           |
 
 ### Flow / relationship
 
-| Chart id | ECharts type | Required | Optional | Data shape |
-|---|---|---|---|---|
-| `sankey` | `sankey` | `xAxis` (source), `yAxis` (target) | `zAxis` (value) | `{nodes: [{name}], links: [{source, target, value}]}` |
-| `graph` | `graph` | `xAxis`, `yAxis` | `zAxis` | same as sankey |
-| `flow-lines` | `lines` + `scatter` | `xAxis`, `yAxis` | `zAxis` | same as sankey, builder auto-layouts |
-| `theme-river` | `themeRiver` | `xAxis` (category), `yAxis` (value) | `time` | `[[time, value, category]]` |
+| Chart id      | ECharts type        | Required                            | Optional        | Data shape                                            |
+| ------------- | ------------------- | ----------------------------------- | --------------- | ----------------------------------------------------- |
+| `sankey`      | `sankey`            | `xAxis` (source), `yAxis` (target)  | `zAxis` (value) | `{nodes: [{name}], links: [{source, target, value}]}` |
+| `graph`       | `graph`             | `xAxis`, `yAxis`                    | `zAxis`         | same as sankey                                        |
+| `flow-lines`  | `lines` + `scatter` | `xAxis`, `yAxis`                    | `zAxis`         | same as sankey, builder auto-layouts                  |
+| `theme-river` | `themeRiver`        | `xAxis` (category), `yAxis` (value) | `time`          | `[[time, value, category]]`                           |
 
 ### Geo / map
 
-| Chart id | ECharts type | Required | Optional | Data shape |
-|---|---|---|---|---|
-| `world-map` | `map` with registered `'world'` map | `xAxis` (region), `yAxis` (value) | — | `[{name, value}]` |
-| `globe` | `globe` (GL coord) | `lng`, `lat` | `yAxis` (value) | `[{value: [lng, lat, value]}]` |
-| `lines3d` | `lines3D` on globe | `lng`, `lat` | — | `[lng, lat, h][]` pair-wise |
-| `polygons3d` | `polygons3D` | `xAxis` (name), `lng`, `lat` | — | `[{name, coords: [[lng, lat]]}]` |
+| Chart id     | ECharts type                        | Required                          | Optional        | Data shape                       |
+| ------------ | ----------------------------------- | --------------------------------- | --------------- | -------------------------------- |
+| `world-map`  | `map` with registered `'world'` map | `xAxis` (region), `yAxis` (value) | —               | `[{name, value}]`                |
+| `globe`      | `globe` (GL coord)                  | `lng`, `lat`                      | `yAxis` (value) | `[{value: [lng, lat, value]}]`   |
+| `lines3d`    | `lines3D` on globe                  | `lng`, `lat`                      | —               | `[lng, lat, h][]` pair-wise      |
+| `polygons3d` | `polygons3D`                        | `xAxis` (name), `lng`, `lat`      | —               | `[{name, coords: [[lng, lat]]}]` |
 
 ### 3D cartesian (echarts-gl)
 
-| Chart id | ECharts type | Required | Optional |
-|---|---|---|---|
-| `bar3d`, `line3d`, `scatter3d` | `bar3D`/`line3D`/`scatter3D` on `grid3D` | `xAxis`, `yAxis`, `zAxis` | — |
-| `surface` | `surface` on `grid3D` | `xAxis`, `yAxis`, `zAxis` | — |
-| `map3d` | `map3D` | `xAxis`, `yAxis` | `zAxis` |
+| Chart id                       | ECharts type                             | Required                  | Optional |
+| ------------------------------ | ---------------------------------------- | ------------------------- | -------- |
+| `bar3d`, `line3d`, `scatter3d` | `bar3D`/`line3D`/`scatter3D` on `grid3D` | `xAxis`, `yAxis`, `zAxis` | —        |
+| `surface`                      | `surface` on `grid3D`                    | `xAxis`, `yAxis`, `zAxis` | —        |
+| `map3d`                        | `map3D`                                  | `xAxis`, `yAxis`          | `zAxis`  |
 
 Data shape: `[[x, y, z]]` (or `[{value: [x, y, z]}]`).
 
 ### GL
 
-| Chart id | ECharts type | Required | Optional |
-|---|---|---|---|
-| `scattergl` | `scatterGL` | `xAxis`, `yAxis` | — |
-| `graphgl` | `graphGL` | `xAxis`, `yAxis` | `zAxis` |
-| `linesgl` | `linesGL` | `lng`, `lat` | — |
-| `flowgl` | `flowGL` (vector field) | `lng`, `lat` | — |
+| Chart id    | ECharts type            | Required         | Optional |
+| ----------- | ----------------------- | ---------------- | -------- |
+| `scattergl` | `scatterGL`             | `xAxis`, `yAxis` | —        |
+| `graphgl`   | `graphGL`               | `xAxis`, `yAxis` | `zAxis`  |
+| `linesgl`   | `linesGL`               | `lng`, `lat`     | —        |
+| `flowgl`    | `flowGL` (vector field) | `lng`, `lat`     | —        |
 
 ### Non-ECharts
 
-| Chart id | Component | Required | Optional |
-|---|---|---|---|
-| `number-card` | `<app-configurable-card-chart>` | `yAxis` | `xAxis` |
-| `table` | `<app-table-visual>` | — | — |
+| Chart id      | Component                       | Required | Optional |
+| ------------- | ------------------------------- | -------- | -------- |
+| `number-card` | `<app-configurable-card-chart>` | `yAxis`  | `xAxis`  |
+| `table`       | `<app-table-visual>`            | —        | —        |
 
 ## Adding a new chart type
 

@@ -72,10 +72,12 @@ export class RelativeTimePipe implements PipeTransform, OnDestroy {
   transform(value: string | Date | number | null | undefined): string {
     if (value == null || value === '') return '';
 
-    const ts = value instanceof Date ? value.getTime() : new Date(value).getTime();
+    const ts =
+      value instanceof Date ? value.getTime() : new Date(value).getTime();
     if (!isFinite(ts)) return '';
 
-    const lang = this.translate.currentLang || this.translate.defaultLang || 'en';
+    const lang =
+      this.translate.currentLang || this.translate.defaultLang || 'en';
     const now = Date.now();
     const diffMs = now - ts;
     // Cache key includes the *bucket*, not the raw millisecond delta —
@@ -184,7 +186,10 @@ export class RelativeTimePipe implements PipeTransform, OnDestroy {
    * relatively expensive on first call; reusing across pipe instances
    * matters when a listing renders 100+ rows on locale switch.
    */
-  private static readonly intlCache = new Map<string, Intl.RelativeTimeFormat>();
+  private static readonly intlCache = new Map<
+    string,
+    Intl.RelativeTimeFormat
+  >();
   private intl(lang: string): Intl.RelativeTimeFormat {
     let inst = RelativeTimePipe.intlCache.get(lang);
     if (!inst) {

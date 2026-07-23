@@ -64,15 +64,16 @@ export class SavedQueriesService {
       if (paging.filter) params['filter'] = paging.filter;
     }
     return lastValueFrom(
-      this.http.apiGet(QUERY_RUNNER.SAVED_QUERIES, { params, skipLoader: true }),
+      this.http.apiGet(QUERY_RUNNER.SAVED_QUERIES, {
+        params,
+        skipLoader: true,
+      }),
     );
   }
 
   /** One saved query — enriched with datasourceName + connectionName. */
   getSavedQuery(id: string): Promise<any> {
-    return lastValueFrom(
-      this.http.apiGet(this.base(id), { skipLoader: true }),
-    );
+    return lastValueFrom(this.http.apiGet(this.base(id), { skipLoader: true }));
   }
 
   addSavedQuery(payload: SavedQueryPayload): Promise<any> {
@@ -83,10 +84,7 @@ export class SavedQueriesService {
     );
   }
 
-  updateSavedQuery(
-    id: string,
-    payload: SavedQueryPayload,
-  ): Promise<any> {
+  updateSavedQuery(id: string, payload: SavedQueryPayload): Promise<any> {
     return lastValueFrom(
       this.http.apiPut(this.base(id), payload, { skipLoader: true }),
     );

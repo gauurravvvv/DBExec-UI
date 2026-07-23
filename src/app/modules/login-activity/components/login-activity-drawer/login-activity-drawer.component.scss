@@ -19,12 +19,22 @@
 }
 
 @keyframes la-scrim-in {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 @keyframes la-panel-in {
-  from { transform: translateX(24px); opacity: 0.4; }
-  to { transform: translateX(0); opacity: 1; }
+  from {
+    transform: translateX(24px);
+    opacity: 0.4;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
 }
 
 .drawer-panel {
@@ -66,13 +76,30 @@
       flex: none;
       background: var(--hover-background);
       color: var(--text-color-secondary);
-      i { font-size: var(--fs-h3, 1rem); }
+      i {
+        font-size: var(--fs-h3, 1rem);
+      }
 
-      &.ev-success { color: var(--success-color); background: var(--success-bg); }
-      &.ev-failed { color: var(--error-color); background: var(--error-bg); }
-      &.ev-warning { color: var(--warning-color); background: var(--warning-bg); }
-      &.ev-logout { color: var(--text-color-secondary); background: var(--hover-background); }
-      &.ev-refresh { color: var(--primary-color); background: var(--primary-color-transparent); }
+      &.ev-success {
+        color: var(--success-color);
+        background: var(--success-bg);
+      }
+      &.ev-failed {
+        color: var(--error-color);
+        background: var(--error-bg);
+      }
+      &.ev-warning {
+        color: var(--warning-color);
+        background: var(--warning-bg);
+      }
+      &.ev-logout {
+        color: var(--text-color-secondary);
+        background: var(--hover-background);
+      }
+      &.ev-refresh {
+        color: var(--primary-color);
+        background: var(--primary-color-transparent);
+      }
     }
 
     .head-text {
@@ -87,7 +114,9 @@
       .head-sub {
         font-size: var(--fs-label);
         color: var(--text-color-secondary);
-        .actor-name { font-weight: var(--fw-medium); }
+        .actor-name {
+          font-weight: var(--fw-medium);
+        }
       }
     }
 
@@ -103,8 +132,13 @@
       cursor: pointer;
       flex: none;
       transition: all var(--motion-fast) ease;
-      &:hover { background: var(--hover-background); color: var(--text-color); }
-      i { font-size: var(--fs-control); }
+      &:hover {
+        background: var(--hover-background);
+        color: var(--text-color);
+      }
+      i {
+        font-size: var(--fs-control);
+      }
     }
   }
 
@@ -123,13 +157,20 @@
     gap: var(--space-4) var(--space-5);
     margin: 0;
 
-    dt { font-size: var(--fs-label); color: var(--text-color-secondary); font-weight: var(--fw-medium); }
+    dt {
+      font-size: var(--fs-label);
+      color: var(--text-color-secondary);
+      font-weight: var(--fw-medium);
+    }
     dd {
       margin: 0;
       font-size: var(--fs-body);
       color: var(--text-color);
       min-width: 0;
-      .rel { color: var(--text-muted); font-size: var(--fs-label); }
+      .rel {
+        color: var(--text-muted);
+        font-size: var(--fs-label);
+      }
       code {
         font-family: var(--font-mono);
         font-size: var(--fs-micro);
@@ -139,8 +180,13 @@
         color: var(--text-color);
         word-break: break-all;
       }
-      .muted { color: var(--text-muted); }
-      .reason { color: var(--error-color); font-weight: var(--fw-medium); }
+      .muted {
+        color: var(--text-muted);
+      }
+      .reason {
+        color: var(--error-color);
+        font-weight: var(--fw-medium);
+      }
     }
 
     .actor {
@@ -159,7 +205,9 @@
         background: var(--primary-color);
         flex: none;
       }
-      .em { font-weight: var(--fw-semibold); }
+      .em {
+        font-weight: var(--fw-semibold);
+      }
     }
 
     .outcome {
@@ -168,9 +216,15 @@
       gap: var(--space-2);
       font-weight: var(--fw-semibold);
       font-size: var(--fs-control);
-      &.ok { color: var(--success-color); }
-      &.fail { color: var(--error-color); }
-      i { font-size: var(--fs-body); }
+      &.ok {
+        color: var(--success-color);
+      }
+      &.fail {
+        color: var(--error-color);
+      }
+      i {
+        font-size: var(--fs-body);
+      }
     }
   }
 
@@ -184,7 +238,12 @@
     align-items: center;
     gap: var(--space-3);
     margin-bottom: var(--space-4);
-    &::after { content: ''; flex: 1; height: 1px; background: var(--border-color); }
+    &::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border-color);
+    }
   }
 
   .meta-list {
@@ -194,7 +253,10 @@
     margin: 0;
     font-size: var(--fs-label);
 
-    dt { color: var(--text-color-secondary); font-weight: var(--fw-medium); }
+    dt {
+      color: var(--text-color-secondary);
+      font-weight: var(--fw-medium);
+    }
     dd {
       margin: 0;
       color: var(--text-color);
@@ -214,7 +276,9 @@
         white-space: nowrap;
         vertical-align: bottom;
       }
-      .muted { color: var(--text-muted); }
+      .muted {
+        color: var(--text-muted);
+      }
     }
   }
 }

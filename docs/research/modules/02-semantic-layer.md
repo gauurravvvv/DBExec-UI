@@ -45,14 +45,14 @@ fixes this with a semantic layer.
 
 ## 1. Industry baseline
 
-| Tool | Schema language | Primitives | Storage |
-|---|---|---|---|
-| Looker | LookML | view, dimension, measure, explore | Git repo |
+| Tool     | Schema language   | Primitives                                | Storage     |
+| -------- | ----------------- | ----------------------------------------- | ----------- |
+| Looker   | LookML            | view, dimension, measure, explore         | Git repo    |
 | dbt Labs | YAML (MetricFlow) | semantic_model, entity, dimension, metric | dbt project |
-| Cube | JavaScript / YAML | cube, dimension, measure, segment | code |
-| Metabase | JSON | model, field, metric, segment | DB |
-| Superset | Python objects | SqlaTable, SqlMetric, TableColumn | DB |
-| Power BI | DAX | tables, columns, measures, relationships | model files |
+| Cube     | JavaScript / YAML | cube, dimension, measure, segment         | code        |
+| Metabase | JSON              | model, field, metric, segment             | DB          |
+| Superset | Python objects    | SqlaTable, SqlMetric, TableColumn         | DB          |
+| Power BI | DAX               | tables, columns, measures, relationships  | model files |
 
 **Common ground**:
 
@@ -67,30 +67,30 @@ DBExec should adopt the same vocabulary.
 
 ## 2. DBExec today
 
-| Concept | DBExec | File |
-|---|---|---|
-| Logical table | `Dataset` (single SQL) | `shared/db/shared_entity/dataset.entity.ts` |
-| Field metadata | `DatasetField` (calc fields only) | `shared_entity/dataset_field.entity.ts` |
-| Metric / measure | ❌ | — |
-| Dimension typing | ❌ (everything is "column") | — |
-| Entity / join keys | ❌ | — |
-| Time grain | ❌ | — |
-| Reusable filter / segment | 🟡 (per analysis only) | `analysis_filter` |
-| Join declarations | ❌ (must inline in SQL) | — |
+| Concept                   | DBExec                            | File                                        |
+| ------------------------- | --------------------------------- | ------------------------------------------- |
+| Logical table             | `Dataset` (single SQL)            | `shared/db/shared_entity/dataset.entity.ts` |
+| Field metadata            | `DatasetField` (calc fields only) | `shared_entity/dataset_field.entity.ts`     |
+| Metric / measure          | ❌                                | —                                           |
+| Dimension typing          | ❌ (everything is "column")       | —                                           |
+| Entity / join keys        | ❌                                | —                                           |
+| Time grain                | ❌                                | —                                           |
+| Reusable filter / segment | 🟡 (per analysis only)            | `analysis_filter`                           |
+| Join declarations         | ❌ (must inline in SQL)           | —                                           |
 
 ## 3. Gaps
 
-| ID | Gap | Severity |
-|---|---|---|
-| SEM-G01 | Schema for `semantic_model`, `entity`, `dimension`, `metric` | P0 |
-| SEM-G02 | TypeScript compiler that consumes the schema | P0 |
-| SEM-G03 | UI editor for semantic models (visual, not YAML) | P0 |
-| SEM-G04 | Filter/segment reuse across analyses | P1 |
-| SEM-G05 | Joins between datasets | P1 |
-| SEM-G06 | Derived/ratio/cumulative/conversion metric types | P1 |
-| SEM-G07 | Aggregate-aware metric routing (see cache 05) | P1 |
-| SEM-G08 | Optional YAML export for git-friendly review | P2 |
-| SEM-G09 | dbt MetricFlow import (one-shot adapter) | P2 |
+| ID      | Gap                                                          | Severity |
+| ------- | ------------------------------------------------------------ | -------- |
+| SEM-G01 | Schema for `semantic_model`, `entity`, `dimension`, `metric` | P0       |
+| SEM-G02 | TypeScript compiler that consumes the schema                 | P0       |
+| SEM-G03 | UI editor for semantic models (visual, not YAML)             | P0       |
+| SEM-G04 | Filter/segment reuse across analyses                         | P1       |
+| SEM-G05 | Joins between datasets                                       | P1       |
+| SEM-G06 | Derived/ratio/cumulative/conversion metric types             | P1       |
+| SEM-G07 | Aggregate-aware metric routing (see cache 05)                | P1       |
+| SEM-G08 | Optional YAML export for git-friendly review                 | P2       |
+| SEM-G09 | dbt MetricFlow import (one-shot adapter)                     | P2       |
 
 ## 4. Target architecture
 
@@ -234,23 +234,23 @@ COMMIT;
 
 ### 6.1 CRUD endpoints
 
-| Method | Path | Purpose |
-|---|---|---|
-| POST | `/semantic-model` | Create |
-| GET  | `/semantic-model/list/:datasetId` | List for dataset |
-| GET  | `/semantic-model/:id` | Get with all children |
-| PUT  | `/semantic-model/:id` | Update model metadata |
-| DELETE | `/semantic-model/:id` | Delete |
-| POST | `/semantic-model/:id/dimension` | Add dimension |
-| PUT  | `/semantic-model/:id/dimension/:dimId` | Update |
-| DELETE | `/semantic-model/:id/dimension/:dimId` | Delete |
-| POST | `/semantic-model/:id/metric` | Add metric |
-| PUT  | `/semantic-model/:id/metric/:metricId` | Update |
-| DELETE | `/semantic-model/:id/metric/:metricId` | Delete |
-| POST | `/semantic-model/:id/validate` | Static validation |
-| POST | `/semantic/query` | Run a semantic query (separate from CRUD) |
-| POST | `/semantic-model/import-dbt` | Import dbt MetricFlow YAML |
-| GET  | `/semantic-model/:id/export-yaml` | YAML export |
+| Method | Path                                   | Purpose                                   |
+| ------ | -------------------------------------- | ----------------------------------------- |
+| POST   | `/semantic-model`                      | Create                                    |
+| GET    | `/semantic-model/list/:datasetId`      | List for dataset                          |
+| GET    | `/semantic-model/:id`                  | Get with all children                     |
+| PUT    | `/semantic-model/:id`                  | Update model metadata                     |
+| DELETE | `/semantic-model/:id`                  | Delete                                    |
+| POST   | `/semantic-model/:id/dimension`        | Add dimension                             |
+| PUT    | `/semantic-model/:id/dimension/:dimId` | Update                                    |
+| DELETE | `/semantic-model/:id/dimension/:dimId` | Delete                                    |
+| POST   | `/semantic-model/:id/metric`           | Add metric                                |
+| PUT    | `/semantic-model/:id/metric/:metricId` | Update                                    |
+| DELETE | `/semantic-model/:id/metric/:metricId` | Delete                                    |
+| POST   | `/semantic-model/:id/validate`         | Static validation                         |
+| POST   | `/semantic/query`                      | Run a semantic query (separate from CRUD) |
+| POST   | `/semantic-model/import-dbt`           | Import dbt MetricFlow YAML                |
+| GET    | `/semantic-model/:id/export-yaml`      | YAML export                               |
 
 ### 6.2 Semantic-query endpoint
 
@@ -258,26 +258,26 @@ COMMIT;
 // POST /semantic/query
 interface SemanticQueryRequest {
   semanticModelId: string;
-  metrics:     string[];        // metric names
-  dimensions:  string[];        // dimension names
-  filters:     FilterClause[];
-  segments?:   string[];        // segment names to apply
-  orderBy?:    { field: string; dir: 'asc' | 'desc' }[];
-  limit?:      number;
-  offset?:     number;
-  timeRange?:  { dim: string; from: string; to: string };
+  metrics: string[]; // metric names
+  dimensions: string[]; // dimension names
+  filters: FilterClause[];
+  segments?: string[]; // segment names to apply
+  orderBy?: { field: string; dir: 'asc' | 'desc' }[];
+  limit?: number;
+  offset?: number;
+  timeRange?: { dim: string; from: string; to: string };
 }
 
 interface SemanticQueryResponse {
   columns: { name: string; type: string; format?: string }[];
-  rows:    Record<string, unknown>[];
+  rows: Record<string, unknown>[];
   meta: {
-    cacheHit:    boolean;
-    sqlCompiled: string;       // for "show SQL" UI
-    cacheKey:    string;
-    durationMs:  number;
-    rowCount:    number;
-    truncated:   boolean;
+    cacheHit: boolean;
+    sqlCompiled: string; // for "show SQL" UI
+    cacheKey: string;
+    durationMs: number;
+    rowCount: number;
+    truncated: boolean;
   };
 }
 ```
@@ -363,11 +363,17 @@ export class SemanticCompiler {
       throw new NotFoundError('semantic model');
 
     const ast = this.buildAst(req, model);
-    const rls = await this.rlsService.predicatesFor(model.datasetId, ctx.caller);
+    const rls = await this.rlsService.predicatesFor(
+      model.datasetId,
+      ctx.caller,
+    );
     return this.dialectAdapter.print(ast, { ...ctx, rls, model });
   }
 
-  private buildAst(req: SemanticQueryRequest, model: SemanticModelFull): QueryAst {
+  private buildAst(
+    req: SemanticQueryRequest,
+    model: SemanticModelFull,
+  ): QueryAst {
     const select: SelectAst[] = [];
     const groupBy: number[] = [];
 
@@ -411,28 +417,37 @@ export class PostgresDialect implements DialectAdapter {
     if (ctx.rls.length) whereParts.push(...ctx.rls);
     const where = whereParts.length ? `WHERE ${whereParts.join(' AND ')}` : '';
 
-    const groupBy = ast.groupBy.length ? `GROUP BY ${ast.groupBy.join(', ')}` : '';
+    const groupBy = ast.groupBy.length
+      ? `GROUP BY ${ast.groupBy.join(', ')}`
+      : '';
     const orderBy = ast.orderBy?.length
       ? `ORDER BY ${ast.orderBy.map(o => `${q(o.field)} ${o.dir.toUpperCase()}`).join(', ')}`
       : '';
-    const limit  = ast.limit  ? `LIMIT ${ast.limit}`   : '';
+    const limit = ast.limit ? `LIMIT ${ast.limit}` : '';
     const offset = ast.offset ? `OFFSET ${ast.offset}` : '';
 
     const sql = [
       `WITH base AS (${fromSql})`,
       `SELECT ${selectParts.join(', ')}`,
       `FROM base`,
-      where, groupBy, orderBy, limit, offset,
-    ].filter(Boolean).join('\n');
+      where,
+      groupBy,
+      orderBy,
+      limit,
+      offset,
+    ]
+      .filter(Boolean)
+      .join('\n');
 
     return { sql, bindings, cacheKey: hash({ ast, rls: ctx.rls }) };
   }
 
   private renderSelect(s: SelectAst, b: unknown[]): string {
     if (s.kind === 'dim') {
-      const expr = s.dim.type === 'time'
-        ? `DATE_TRUNC('${s.dim.timeGrain || 'day'}', ${s.dim.expression})`
-        : s.dim.expression;
+      const expr =
+        s.dim.type === 'time'
+          ? `DATE_TRUNC('${s.dim.timeGrain || 'day'}', ${s.dim.expression})`
+          : s.dim.expression;
       return `${expr} AS ${q(s.dim.name)}`;
     }
     // metric
@@ -476,18 +491,29 @@ export async function validateSemanticModel(m: SemanticModelDraft) {
     if (!/^[a-z][a-z0-9_]{0,63}$/.test(dim.name))
       errors.push({ where: `dim.${dim.name}`, msg: 'name must be snake_case' });
     if (dim.type === 'time' && !dim.timeGrain)
-      errors.push({ where: `dim.${dim.name}`, msg: 'time dimension needs grain' });
+      errors.push({
+        where: `dim.${dim.name}`,
+        msg: 'time dimension needs grain',
+      });
   }
   for (const met of m.metrics) {
     if (met.kind === 'simple' && !met.agg)
-      errors.push({ where: `metric.${met.name}`, msg: 'simple metric needs agg' });
+      errors.push({
+        where: `metric.${met.name}`,
+        msg: 'simple metric needs agg',
+      });
     if (met.kind === 'ratio' && (!met.numeratorId || !met.denominatorId))
-      errors.push({ where: `metric.${met.name}`, msg: 'ratio needs numerator + denominator' });
+      errors.push({
+        where: `metric.${met.name}`,
+        msg: 'ratio needs numerator + denominator',
+      });
   }
   // Reference resolution: ensure derived expressions reference existing metrics.
   const metricNames = new Set(m.metrics.map(x => x.name));
   for (const met of m.metrics.filter(x => x.kind === 'derived')) {
-    const refs = (met.expression.match(/\{(\w+)\}/g) || []).map(s => s.slice(1, -1));
+    const refs = (met.expression.match(/\{(\w+)\}/g) || []).map(s =>
+      s.slice(1, -1),
+    );
     for (const r of refs)
       if (!metricNames.has(r))
         errors.push({ where: `metric.${met.name}`, msg: `unknown ref {${r}}` });

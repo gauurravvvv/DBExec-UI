@@ -52,8 +52,14 @@ function renderInline(text: string): string {
 
   // bold **x** then italic *x* / _x_
   out = out.replace(/\*\*([^*]+)\*\*/g, (_m, b) => `<strong>${b}</strong>`);
-  out = out.replace(/(^|[^*])\*([^*]+)\*/g, (_m, pre, i) => `${pre}<em>${i}</em>`);
-  out = out.replace(/(^|[^_])_([^_]+)_/g, (_m, pre, i) => `${pre}<em>${i}</em>`);
+  out = out.replace(
+    /(^|[^*])\*([^*]+)\*/g,
+    (_m, pre, i) => `${pre}<em>${i}</em>`,
+  );
+  out = out.replace(
+    /(^|[^_])_([^_]+)_/g,
+    (_m, pre, i) => `${pre}<em>${i}</em>`,
+  );
 
   return out;
 }

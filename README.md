@@ -49,35 +49,35 @@ Concretely, in the UI:
 - **Route guards enforce this.** `authGuard` checks the JWT; `roleGuard` gates routes like `/app/organisations` to `SYSTEM-ADMIN` only.
 - **No cross-org primitives.** Two organisations can have a user with the same email, a dataset with the same name, even a datasource pointing at the same external host — they never see or collide with each other.
 
-Keep this in mind when you read the module list below: when you see "Users", "Datasets", "Audit log", they all mean *the current organisation's* users, datasets, audit log — not a shared global pool.
+Keep this in mind when you read the module list below: when you see "Users", "Datasets", "Audit log", they all mean _the current organisation's_ users, datasets, audit log — not a shared global pool.
 
 ### Core surfaces
 
-| Area | What lives here |
-| --- | --- |
-| **Datasource Explorer** | Register external databases, browse their schema tree (schemas → tables → columns), test connections |
-| **Dataset Editor** | Monaco-based SQL editor with dialect-aware autocomplete, dataset definition, live result preview (docked bottom-sheet à la DataGrip / Hex), CSV export |
-| **Analyses** | Versioned analyses on top of datasets — filters, prompts, charts (ECharts + Chart.js) |
-| **Dashboards** | Multi-visual dashboards with publish + share flows; soft-references survive source deletion |
-| **Query Builder** | Visual builder with tabs, sections, and prompt-driven parameters for non-SQL users |
-| **Connections** | Per-datasource credential overrides (engine-aware forms; dbType badge surfaces dialect) |
-| **Users, Groups, Roles, RLS** | Identity + per-row access control |
-| **Audit + Login Activity** | Full history of who did what, when |
+| Area                          | What lives here                                                                                                                                        |
+| ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Datasource Explorer**       | Register external databases, browse their schema tree (schemas → tables → columns), test connections                                                   |
+| **Dataset Editor**            | Monaco-based SQL editor with dialect-aware autocomplete, dataset definition, live result preview (docked bottom-sheet à la DataGrip / Hex), CSV export |
+| **Analyses**                  | Versioned analyses on top of datasets — filters, prompts, charts (ECharts + Chart.js)                                                                  |
+| **Dashboards**                | Multi-visual dashboards with publish + share flows; soft-references survive source deletion                                                            |
+| **Query Builder**             | Visual builder with tabs, sections, and prompt-driven parameters for non-SQL users                                                                     |
+| **Connections**               | Per-datasource credential overrides (engine-aware forms; dbType badge surfaces dialect)                                                                |
+| **Users, Groups, Roles, RLS** | Identity + per-row access control                                                                                                                      |
+| **Audit + Login Activity**    | Full history of who did what, when                                                                                                                     |
 
 ## Tech stack
 
-| Layer | Choice |
-| --- | --- |
-| Framework | **Angular 18.2 (LTS)** with standalone-friendly module setup |
-| Component library | **PrimeNG 17** + PrimeFlex + PrimeIcons (7000+) |
-| Code editor | **Monaco Editor 0.52** (SQL syntax, IntelliSense, dialect-aware completion) |
-| SQL parsing | `pgsql-ast-parser`, `sql-formatter`, CodeMirror SQL lang |
-| Charts | **Apache ECharts 5** (via `ngx-echarts`) + Chart.js for simple cases |
-| State | **NgRx 18** (store + effects + devtools) |
-| i18n | **`@ngx-translate`** — 10 locales bundled |
-| HTTP | Angular `HttpClient` with JWT interceptors |
-| Theming | Built-in **light + dark** themes via CSS variables |
-| Tests | **Jest 29** (`jest-preset-angular`) |
+| Layer             | Choice                                                                      |
+| ----------------- | --------------------------------------------------------------------------- |
+| Framework         | **Angular 18.2 (LTS)** with standalone-friendly module setup                |
+| Component library | **PrimeNG 17** + PrimeFlex + PrimeIcons (7000+)                             |
+| Code editor       | **Monaco Editor 0.52** (SQL syntax, IntelliSense, dialect-aware completion) |
+| SQL parsing       | `pgsql-ast-parser`, `sql-formatter`, CodeMirror SQL lang                    |
+| Charts            | **Apache ECharts 5** (via `ngx-echarts`) + Chart.js for simple cases        |
+| State             | **NgRx 18** (store + effects + devtools)                                    |
+| i18n              | **`@ngx-translate`** — 10 locales bundled                                   |
+| HTTP              | Angular `HttpClient` with JWT interceptors                                  |
+| Theming           | Built-in **light + dark** themes via CSS variables                          |
+| Tests             | **Jest 29** (`jest-preset-angular`)                                         |
 
 ## Quick start
 
@@ -108,26 +108,26 @@ The app starts on **`http://localhost:4200`**. Log in with the super admin crede
 
 ## Available scripts
 
-| Command | What it does |
-| --- | --- |
-| `npm start` | `ng serve` — dev server on `:4200` |
-| `npm run dev` | Dev server with `environment.dev.ts` (API at `localhost:3000`) |
-| `npm run local` | Dev server with `environment.local.ts` |
-| `npm run build` | Default Angular build |
-| `npm run build-prod` | Production build with 8 GB Node heap (bundle is large with Monaco + ECharts + PrimeNG) — output to `dist/DBExec/` |
-| `npm test` | Jest test runner |
-| `npm run test:coverage` | Jest with coverage report |
-| `npm run test:watch` | Jest in watch mode |
-| `npm run lint` | ESLint via `ng lint` |
+| Command                 | What it does                                                                                                      |
+| ----------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| `npm start`             | `ng serve` — dev server on `:4200`                                                                                |
+| `npm run dev`           | Dev server with `environment.dev.ts` (API at `localhost:3000`)                                                    |
+| `npm run local`         | Dev server with `environment.local.ts`                                                                            |
+| `npm run build`         | Default Angular build                                                                                             |
+| `npm run build-prod`    | Production build with 8 GB Node heap (bundle is large with Monaco + ECharts + PrimeNG) — output to `dist/DBExec/` |
+| `npm test`              | Jest test runner                                                                                                  |
+| `npm run test:coverage` | Jest with coverage report                                                                                         |
+| `npm run test:watch`    | Jest in watch mode                                                                                                |
+| `npm run lint`          | ESLint via `ng lint`                                                                                              |
 
 ## Environments
 
 `src/environments/` holds three configs:
 
-| File | API server | Used by |
-| --- | --- | --- |
-| `environment.ts` | local fallback | `npm start` |
-| `environment.dev.ts` | `http://localhost:3000/api/v1` | `npm run dev` |
+| File                  | API server                            | Used by              |
+| --------------------- | ------------------------------------- | -------------------- |
+| `environment.ts`      | local fallback                        | `npm start`          |
+| `environment.dev.ts`  | `http://localhost:3000/api/v1`        | `npm run dev`        |
 | `environment.prod.ts` | `__API_SERVER__` (replaced at deploy) | `npm run build-prod` |
 
 For production deployments, replace the `__API_SERVER__` / `__APP_URL__` placeholders in `environment.prod.ts` (or in the built bundle) with your real URLs.
@@ -150,29 +150,29 @@ See `src/styles.scss` and `src/variables.scss` for the token system.
 
 All feature areas are lazy-loaded. Routing lives in `src/app/app-routing.module.ts`; the modules themselves under `src/app/modules/<name>/`.
 
-| Module | Route | Notes |
-| --- | --- | --- |
-| `auth` | `/login`, `/register`, password setup | Unauthenticated routes |
-| `home` | `/app/home` | Landing dashboard |
-| `datasource` | `/app/datasources` | List, add, edit, test external DB connections |
-| `connections` | `/app/connections` | Per-datasource credentials, with engine badge + dialect-aware copy |
-| `dataset` | `/app/datasets` | SQL editor, dataset save, query preview, CSV export |
-| `analyses` | `/app/analyses` | Versioned analyses, filters, charts |
-| `dashboard` | `/app/dashboards` | Multi-visual dashboards, publish, share |
-| `query-builder` | `/app/query-builders` | Visual query builder (no-SQL flow) |
-| `prompt` | `/app/prompts` | Reusable parameter templates |
-| `tab`, `section` | `/app/tabs`, `/app/sections` | Query-builder layout primitives |
-| `organisation` | `/app/organisations` | SYSTEM-ADMIN only — manage tenants |
-| `users` | `/app/users` | Per-org user CRUD |
-| `groups` | `/app/groups` | User groups + group permissions |
-| `role` | `/app/roles` | Role definitions |
-| `access` | `/app/access` | Resource-level access grants |
-| `rls-rules` | `/app/rls-rules` | Row-level security |
-| `system-admin` | `/app/admins` | Cross-org admins |
-| `app-settings` | `/app/settings` | App-wide configuration |
-| `audit-logs` | `/app/audit` | Audit trail |
-| `login-activity` | `/app/audit/logins` | Session history |
-| `profile` | `/app/profile` | Personal account settings |
+| Module           | Route                                 | Notes                                                              |
+| ---------------- | ------------------------------------- | ------------------------------------------------------------------ |
+| `auth`           | `/login`, `/register`, password setup | Unauthenticated routes                                             |
+| `home`           | `/app/home`                           | Landing dashboard                                                  |
+| `datasource`     | `/app/datasources`                    | List, add, edit, test external DB connections                      |
+| `connections`    | `/app/connections`                    | Per-datasource credentials, with engine badge + dialect-aware copy |
+| `dataset`        | `/app/datasets`                       | SQL editor, dataset save, query preview, CSV export                |
+| `analyses`       | `/app/analyses`                       | Versioned analyses, filters, charts                                |
+| `dashboard`      | `/app/dashboards`                     | Multi-visual dashboards, publish, share                            |
+| `query-builder`  | `/app/query-builders`                 | Visual query builder (no-SQL flow)                                 |
+| `prompt`         | `/app/prompts`                        | Reusable parameter templates                                       |
+| `tab`, `section` | `/app/tabs`, `/app/sections`          | Query-builder layout primitives                                    |
+| `organisation`   | `/app/organisations`                  | SYSTEM-ADMIN only — manage tenants                                 |
+| `users`          | `/app/users`                          | Per-org user CRUD                                                  |
+| `groups`         | `/app/groups`                         | User groups + group permissions                                    |
+| `role`           | `/app/roles`                          | Role definitions                                                   |
+| `access`         | `/app/access`                         | Resource-level access grants                                       |
+| `rls-rules`      | `/app/rls-rules`                      | Row-level security                                                 |
+| `system-admin`   | `/app/admins`                         | Cross-org admins                                                   |
+| `app-settings`   | `/app/settings`                       | App-wide configuration                                             |
+| `audit-logs`     | `/app/audit`                          | Audit trail                                                        |
+| `login-activity` | `/app/audit/logins`                   | Session history                                                    |
+| `profile`        | `/app/profile`                        | Personal account settings                                          |
 
 ## Notable UX choices
 

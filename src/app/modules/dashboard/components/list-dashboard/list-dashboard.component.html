@@ -78,13 +78,18 @@
             >
               <i
                 class="pi"
-                [ngClass]="isFavourite(dashboard.id) ? 'pi-star-fill' : 'pi-star'"
+                [ngClass]="
+                  isFavourite(dashboard.id) ? 'pi-star-fill' : 'pi-star'
+                "
               ></i>
             </button>
           </ng-template>
 
           <ng-template usGridCell="name" let-dashboard>
-            <a class="dataset-name-link" [routerLink]="['/app/dashboards', dashboard.id]">
+            <a
+              class="dataset-name-link"
+              [routerLink]="['/app/dashboards', dashboard.id]"
+            >
               {{ dashboard.name }}
             </a>
           </ng-template>
@@ -113,7 +118,9 @@
           <ng-template usGridCell="createdOn" let-dashboard>
             <span
               class="date-text"
-              [pTooltip]="(dashboard.createdOn | date: 'dd MMM yyyy, HH:mm:ss') || ''"
+              [pTooltip]="
+                (dashboard.createdOn | date: 'dd MMM yyyy, HH:mm:ss') || ''
+              "
               tooltipPosition="top"
             >
               {{ dashboard.createdOn | relativeTime }}

@@ -72,7 +72,10 @@
               {{ userInitials }}
             </div>
             <h3 class="admin-name">
-              {{ (userData?.firstName || '') + (userData?.lastName ? ' ' + userData?.lastName : '') }}
+              {{
+                (userData?.firstName || '') +
+                  (userData?.lastName ? ' ' + userData?.lastName : '')
+              }}
             </h3>
             <p class="admin-username">&#64;{{ userData?.username }}</p>
           </div>
@@ -208,7 +211,9 @@
       <div class="popup-icon">
         <i class="pi pi-trash"></i>
       </div>
-      <h3 id="viewUserDeleteTitle">{{ 'COMMON.CONFIRM_DELETE' | translate }}</h3>
+      <h3 id="viewUserDeleteTitle">
+        {{ 'COMMON.CONFIRM_DELETE' | translate }}
+      </h3>
     </div>
 
     <!-- Delete Info Section -->

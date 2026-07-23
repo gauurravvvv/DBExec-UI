@@ -38,7 +38,10 @@ const AGG_KEY: Record<string, string> = {
  * A minimal translator surface — `TranslateService.instant`. Passed in so this
  * stays framework-light + unit-testable (no Angular import).
  */
-export type Translate = (key: string, params?: Record<string, unknown>) => string;
+export type Translate = (
+  key: string,
+  params?: Record<string, unknown>,
+) => string;
 
 /**
  * Resolve a field's display name from the merged field list. Prefers the

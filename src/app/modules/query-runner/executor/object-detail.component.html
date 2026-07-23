@@ -3,30 +3,48 @@
     <!-- Header -->
     <div class="od-head">
       <div class="od-title">
-        <i class="pi" [ngClass]="{
-          'pi-table': kind === 'table',
-          'pi-eye': kind === 'view',
-          'pi-clone': kind === 'matview',
-          'pi-cog': kind === 'function',
-          'pi-sort-numeric-up': kind === 'sequence'
-        }"></i>
+        <i
+          class="pi"
+          [ngClass]="{
+            'pi-table': kind === 'table',
+            'pi-eye': kind === 'view',
+            'pi-clone': kind === 'matview',
+            'pi-cog': kind === 'function',
+            'pi-sort-numeric-up': kind === 'sequence',
+          }"
+        ></i>
         <span class="od-name">{{ schema }}.{{ name }}</span>
-        <span class="od-kind">{{ ('QUERY_RUNNER.KIND_' + (kind || '') | uppercase) | translate }}</span>
+        <span class="od-kind">{{
+          'QUERY_RUNNER.KIND_' + (kind || '') | uppercase | translate
+        }}</span>
       </div>
       <div class="od-head-actions">
-        <button class="od-refresh" *ngIf="kind === 'matview'"
-          (click)="refreshMatview()" [disabled]="refreshing">
-          <i class="pi" [ngClass]="refreshing ? 'pi-spin pi-spinner' : 'pi-refresh'"></i>
+        <button
+          class="od-refresh"
+          *ngIf="kind === 'matview'"
+          (click)="refreshMatview()"
+          [disabled]="refreshing"
+        >
+          <i
+            class="pi"
+            [ngClass]="refreshing ? 'pi-spin pi-spinner' : 'pi-refresh'"
+          ></i>
           {{ 'QUERY_RUNNER.REFRESH_MATVIEW' | translate }}
         </button>
-        <button class="od-close" (click)="close()"><i class="pi pi-times"></i></button>
+        <button class="od-close" (click)="close()">
+          <i class="pi pi-times"></i>
+        </button>
       </div>
     </div>
 
     <!-- Tabs -->
     <div class="od-tabs" *ngIf="detail && !loading">
-      <button *ngFor="let t of tabs" [class.active]="activeTab === t" (click)="setTab(t)">
-        {{ ('QUERY_RUNNER.TAB_' + (t | uppercase)) | translate }}
+      <button
+        *ngFor="let t of tabs"
+        [class.active]="activeTab === t"
+        (click)="setTab(t)"
+      >
+        {{ 'QUERY_RUNNER.TAB_' + (t | uppercase) | translate }}
       </button>
     </div>
 
@@ -57,14 +75,28 @@
               <td>
                 <i class="pi pi-key od-pk" *ngIf="c.isPrimaryKey"></i>
                 {{ c.column }}
-                <span class="od-badge od-badge-soft" *ngIf="c.identity">ID</span>
-                <span class="od-badge od-badge-soft" *ngIf="c.generated">GEN</span>
+                <span class="od-badge od-badge-soft" *ngIf="c.identity"
+                  >ID</span
+                >
+                <span class="od-badge od-badge-soft" *ngIf="c.generated"
+                  >GEN</span
+                >
               </td>
               <td class="od-mono">{{ c.dataType }}</td>
               <td>{{ c.nullable ? 'YES' : 'NO' }}</td>
               <td class="od-mono od-muted">{{ c.default || '—' }}</td>
               <td class="od-mono od-muted">
-                <span *ngIf="c.references" class="od-fk" [title]="c.references.schema + '.' + c.references.table + '.' + c.references.column">
+                <span
+                  *ngIf="c.references"
+                  class="od-fk"
+                  [title]="
+                    c.references.schema +
+                    '.' +
+                    c.references.table +
+                    '.' +
+                    c.references.column
+                  "
+                >
                   <i class="pi pi-link"></i>
                   {{ c.references.table }}.{{ c.references.column }}
                 </span>
@@ -88,13 +120,18 @@
           </thead>
           <tbody>
             <tr *ngFor="let ix of detail.indexes">
-              <td>{{ ix.name }}<span class="od-badge" *ngIf="ix.isPrimary">PK</span></td>
+              <td>
+                {{ ix.name
+                }}<span class="od-badge" *ngIf="ix.isPrimary">PK</span>
+              </td>
               <td>{{ ix.method }}</td>
               <td>{{ ix.isUnique ? 'YES' : 'NO' }}</td>
               <td>{{ humanSize(ix.sizeBytes) }}</td>
               <td class="od-mono od-muted od-def">{{ ix.definition }}</td>
             </tr>
-            <tr *ngIf="!detail.indexes?.length"><td colspan="5" class="od-none">—</td></tr>
+            <tr *ngIf="!detail.indexes?.length">
+              <td colspan="5" class="od-none">—</td>
+            </tr>
           </tbody>
         </table>
 
@@ -110,10 +147,14 @@
           <tbody>
             <tr *ngFor="let cn of detail.constraints">
               <td>{{ cn.name }}</td>
-              <td><span class="od-chip">{{ cn.type }}</span></td>
+              <td>
+                <span class="od-chip">{{ cn.type }}</span>
+              </td>
               <td class="od-mono od-muted od-def">{{ cn.definition }}</td>
             </tr>
-            <tr *ngIf="!detail.constraints?.length"><td colspan="3" class="od-none">—</td></tr>
+            <tr *ngIf="!detail.constraints?.length">
+              <td colspan="3" class="od-none">—</td>
+            </tr>
           </tbody>
         </table>
 
@@ -130,12 +171,17 @@
               <td>{{ tg.name }}</td>
               <td class="od-mono od-muted od-def">{{ tg.definition }}</td>
             </tr>
-            <tr *ngIf="!detail.triggers?.length"><td colspan="2" class="od-none">—</td></tr>
+            <tr *ngIf="!detail.triggers?.length">
+              <td colspan="2" class="od-none">—</td>
+            </tr>
           </tbody>
         </table>
 
         <!-- INDEXES (matview reuses the same shape) -->
-        <table class="od-table" *ngIf="activeTab === 'indexes' && kind === 'matview'">
+        <table
+          class="od-table"
+          *ngIf="activeTab === 'indexes' && kind === 'matview'"
+        >
           <thead>
             <tr>
               <th>{{ 'QUERY_RUNNER.IDX_NAME' | translate }}</th>
@@ -153,7 +199,9 @@
               <td>{{ humanSize(ix.sizeBytes) }}</td>
               <td class="od-mono od-muted od-def">{{ ix.definition }}</td>
             </tr>
-            <tr *ngIf="!detail.indexes?.length"><td colspan="5" class="od-none">—</td></tr>
+            <tr *ngIf="!detail.indexes?.length">
+              <td colspan="5" class="od-none">—</td>
+            </tr>
           </tbody>
         </table>
 
@@ -172,7 +220,9 @@
               <td class="od-mono od-muted od-def">{{ p.bound }}</td>
               <td>{{ humanSize(p.sizeBytes) }}</td>
             </tr>
-            <tr *ngIf="!detail.partitions?.length"><td colspan="3" class="od-none">—</td></tr>
+            <tr *ngIf="!detail.partitions?.length">
+              <td colspan="3" class="od-none">—</td>
+            </tr>
           </tbody>
         </table>
 
@@ -188,10 +238,14 @@
           <tbody>
             <tr *ngFor="let d of detail.dependencies">
               <td>{{ d.schema }}.{{ d.name }}</td>
-              <td><span class="od-chip">{{ d.type }}</span></td>
+              <td>
+                <span class="od-chip">{{ d.type }}</span>
+              </td>
               <td class="od-muted">{{ d.relationship }}</td>
             </tr>
-            <tr *ngIf="!detail.dependencies?.length"><td colspan="3" class="od-none">—</td></tr>
+            <tr *ngIf="!detail.dependencies?.length">
+              <td colspan="3" class="od-none">—</td>
+            </tr>
           </tbody>
         </table>
 
@@ -208,33 +262,80 @@
               <td>{{ p.grantee }}</td>
               <td class="od-mono od-muted">{{ p.privileges }}</td>
             </tr>
-            <tr *ngIf="!detail.permissions?.length"><td colspan="2" class="od-none">—</td></tr>
+            <tr *ngIf="!detail.permissions?.length">
+              <td colspan="2" class="od-none">—</td>
+            </tr>
           </tbody>
         </table>
 
         <!-- STATS -->
         <div class="od-info" *ngIf="activeTab === 'stats'">
-          <div class="od-kv"><label>{{ 'QUERY_RUNNER.ST_TABLE_SIZE' | translate }}</label><span>{{ humanSize(detail.tableBytes) }}</span></div>
-          <div class="od-kv"><label>{{ 'QUERY_RUNNER.ST_INDEX_SIZE' | translate }}</label><span>{{ humanSize(detail.indexBytes) }}</span></div>
-          <div class="od-kv"><label>{{ 'QUERY_RUNNER.ST_TOTAL_SIZE' | translate }}</label><span>{{ humanSize(detail.sizeBytes) }}</span></div>
-          <div class="od-kv"><label>{{ 'QUERY_RUNNER.ST_LIVE' | translate }}</label><span>{{ detail.stats?.liveTuples ?? '—' | number }}</span></div>
-          <div class="od-kv"><label>{{ 'QUERY_RUNNER.ST_DEAD' | translate }}</label><span>{{ detail.stats?.deadTuples ?? '—' | number }}</span></div>
-          <div class="od-kv"><label>{{ 'QUERY_RUNNER.ST_SEQ_SCAN' | translate }}</label><span>{{ detail.stats?.seqScan ?? '—' | number }}</span></div>
-          <div class="od-kv"><label>{{ 'QUERY_RUNNER.ST_IDX_SCAN' | translate }}</label><span>{{ detail.stats?.idxScan ?? '—' | number }}</span></div>
-          <div class="od-kv"><label>{{ 'QUERY_RUNNER.ST_WRITES' | translate }}</label><span>{{ (detail.stats?.inserts || 0) + (detail.stats?.updates || 0) + (detail.stats?.deletes || 0) | number }}</span></div>
-          <div class="od-kv" *ngIf="detail.stats?.lastVacuum"><label>{{ 'QUERY_RUNNER.ST_VACUUM' | translate }}</label><span>{{ detail.stats.lastVacuum | date: 'short' }}</span></div>
-          <div class="od-kv" *ngIf="detail.stats?.lastAnalyze"><label>{{ 'QUERY_RUNNER.ST_ANALYZE' | translate }}</label><span>{{ detail.stats.lastAnalyze | date: 'short' }}</span></div>
+          <div class="od-kv">
+            <label>{{ 'QUERY_RUNNER.ST_TABLE_SIZE' | translate }}</label
+            ><span>{{ humanSize(detail.tableBytes) }}</span>
+          </div>
+          <div class="od-kv">
+            <label>{{ 'QUERY_RUNNER.ST_INDEX_SIZE' | translate }}</label
+            ><span>{{ humanSize(detail.indexBytes) }}</span>
+          </div>
+          <div class="od-kv">
+            <label>{{ 'QUERY_RUNNER.ST_TOTAL_SIZE' | translate }}</label
+            ><span>{{ humanSize(detail.sizeBytes) }}</span>
+          </div>
+          <div class="od-kv">
+            <label>{{ 'QUERY_RUNNER.ST_LIVE' | translate }}</label
+            ><span>{{ detail.stats?.liveTuples ?? '—' | number }}</span>
+          </div>
+          <div class="od-kv">
+            <label>{{ 'QUERY_RUNNER.ST_DEAD' | translate }}</label
+            ><span>{{ detail.stats?.deadTuples ?? '—' | number }}</span>
+          </div>
+          <div class="od-kv">
+            <label>{{ 'QUERY_RUNNER.ST_SEQ_SCAN' | translate }}</label
+            ><span>{{ detail.stats?.seqScan ?? '—' | number }}</span>
+          </div>
+          <div class="od-kv">
+            <label>{{ 'QUERY_RUNNER.ST_IDX_SCAN' | translate }}</label
+            ><span>{{ detail.stats?.idxScan ?? '—' | number }}</span>
+          </div>
+          <div class="od-kv">
+            <label>{{ 'QUERY_RUNNER.ST_WRITES' | translate }}</label
+            ><span>{{
+              (detail.stats?.inserts || 0) +
+                (detail.stats?.updates || 0) +
+                (detail.stats?.deletes || 0) | number
+            }}</span>
+          </div>
+          <div class="od-kv" *ngIf="detail.stats?.lastVacuum">
+            <label>{{ 'QUERY_RUNNER.ST_VACUUM' | translate }}</label
+            ><span>{{ detail.stats.lastVacuum | date: 'short' }}</span>
+          </div>
+          <div class="od-kv" *ngIf="detail.stats?.lastAnalyze">
+            <label>{{ 'QUERY_RUNNER.ST_ANALYZE' | translate }}</label
+            ><span>{{ detail.stats.lastAnalyze | date: 'short' }}</span>
+          </div>
         </div>
 
         <!-- SIGNATURE (function arguments + attributes) -->
         <div class="od-signature" *ngIf="activeTab === 'signature'">
-          <div class="od-sig">{{ name }}({{ detail.args }}) → <span class="od-mono">{{ detail.returns }}</span></div>
+          <div class="od-sig">
+            {{ name }}({{ detail.args }}) →
+            <span class="od-mono">{{ detail.returns }}</span>
+          </div>
           <div class="od-chip-row">
             <span class="od-chip" *ngIf="detail.kind">{{ detail.kind }}</span>
-            <span class="od-chip" *ngIf="detail.language">{{ detail.language }}</span>
-            <span class="od-chip" *ngIf="detail.volatility">{{ detail.volatility }}</span>
-            <span class="od-chip" *ngIf="detail.security">SECURITY {{ detail.security }}</span>
-            <span class="od-chip" *ngIf="detail.parallelSafety">PARALLEL {{ detail.parallelSafety }}</span>
+            <span class="od-chip" *ngIf="detail.language">{{
+              detail.language
+            }}</span>
+            <span class="od-chip" *ngIf="detail.volatility">{{
+              detail.volatility
+            }}</span>
+            <span class="od-chip" *ngIf="detail.security"
+              >SECURITY {{ detail.security }}</span
+            >
+            <span class="od-chip" *ngIf="detail.parallelSafety"
+              >PARALLEL {{ detail.parallelSafety }}</span
+            >
             <span class="od-chip" *ngIf="detail.returnsSet">SETOF</span>
           </div>
           <table class="od-table" *ngIf="detail.arguments?.length">
@@ -248,14 +349,18 @@
             </thead>
             <tbody>
               <tr *ngFor="let a of detail.arguments">
-                <td><span class="od-chip">{{ a.mode }}</span></td>
+                <td>
+                  <span class="od-chip">{{ a.mode }}</span>
+                </td>
                 <td>{{ a.name || '—' }}</td>
                 <td class="od-mono">{{ a.type }}</td>
                 <td class="od-mono od-muted">{{ a.default || '—' }}</td>
               </tr>
             </tbody>
           </table>
-          <div class="od-none" *ngIf="!detail.arguments?.length">{{ 'QUERY_RUNNER.NO_ARGS' | translate }}</div>
+          <div class="od-none" *ngIf="!detail.arguments?.length">
+            {{ 'QUERY_RUNNER.NO_ARGS' | translate }}
+          </div>
         </div>
 
         <!-- DDL -->
@@ -276,8 +381,11 @@
 
         <!-- SOURCE (function) -->
         <div class="od-code-wrap" *ngIf="activeTab === 'source'">
-          <div class="od-sig">{{ name }}({{ detail.args }}) → {{ detail.returns }}
-            <span class="od-chip" *ngIf="detail.language">{{ detail.language }}</span>
+          <div class="od-sig">
+            {{ name }}({{ detail.args }}) → {{ detail.returns }}
+            <span class="od-chip" *ngIf="detail.language">{{
+              detail.language
+            }}</span>
           </div>
           <button class="od-copy" (click)="copy(detail.source)">
             <i class="pi pi-copy"></i> {{ 'QUERY_RUNNER.COPY' | translate }}
@@ -288,50 +396,132 @@
         <!-- INFO -->
         <div class="od-info" *ngIf="activeTab === 'info'">
           <!-- table / view / matview -->
-          <ng-container *ngIf="kind === 'table' || kind === 'view' || kind === 'matview'">
-            <div class="od-kv" *ngIf="detail.owner"><label>{{ 'QUERY_RUNNER.OD_OWNER' | translate }}</label><span>{{ detail.owner }}</span></div>
-            <div class="od-kv"><label>{{ 'QUERY_RUNNER.OD_SIZE' | translate }}</label><span>{{ humanSize(detail.sizeBytes) }}</span></div>
-            <div class="od-kv" *ngIf="detail.rowEstimate != null"><label>{{ 'QUERY_RUNNER.OD_EST_ROWS' | translate }}</label><span>{{ detail.rowEstimate | number }}</span></div>
-            <div class="od-kv" *ngIf="detail.comment"><label>{{ 'QUERY_RUNNER.OD_COMMENT' | translate }}</label><span>{{ detail.comment }}</span></div>
+          <ng-container
+            *ngIf="kind === 'table' || kind === 'view' || kind === 'matview'"
+          >
+            <div class="od-kv" *ngIf="detail.owner">
+              <label>{{ 'QUERY_RUNNER.OD_OWNER' | translate }}</label
+              ><span>{{ detail.owner }}</span>
+            </div>
+            <div class="od-kv">
+              <label>{{ 'QUERY_RUNNER.OD_SIZE' | translate }}</label
+              ><span>{{ humanSize(detail.sizeBytes) }}</span>
+            </div>
+            <div class="od-kv" *ngIf="detail.rowEstimate != null">
+              <label>{{ 'QUERY_RUNNER.OD_EST_ROWS' | translate }}</label
+              ><span>{{ detail.rowEstimate | number }}</span>
+            </div>
+            <div class="od-kv" *ngIf="detail.comment">
+              <label>{{ 'QUERY_RUNNER.OD_COMMENT' | translate }}</label
+              ><span>{{ detail.comment }}</span>
+            </div>
           </ng-container>
           <!-- function -->
           <ng-container *ngIf="kind === 'function'">
-            <div class="od-kv"><label>{{ 'QUERY_RUNNER.OD_RETURNS' | translate }}</label><span class="od-mono">{{ detail.returns }}</span></div>
-            <div class="od-kv" *ngIf="detail.language"><label>{{ 'QUERY_RUNNER.OD_LANGUAGE' | translate }}</label><span>{{ detail.language }}</span></div>
-            <div class="od-kv" *ngIf="detail.owner"><label>{{ 'QUERY_RUNNER.OD_OWNER' | translate }}</label><span>{{ detail.owner }}</span></div>
-            <div class="od-kv" *ngIf="detail.cost != null"><label>{{ 'QUERY_RUNNER.OD_COST' | translate }}</label><span class="od-mono">{{ detail.cost }}</span></div>
-            <div class="od-kv" *ngIf="detail.comment"><label>{{ 'QUERY_RUNNER.OD_COMMENT' | translate }}</label><span>{{ detail.comment }}</span></div>
+            <div class="od-kv">
+              <label>{{ 'QUERY_RUNNER.OD_RETURNS' | translate }}</label
+              ><span class="od-mono">{{ detail.returns }}</span>
+            </div>
+            <div class="od-kv" *ngIf="detail.language">
+              <label>{{ 'QUERY_RUNNER.OD_LANGUAGE' | translate }}</label
+              ><span>{{ detail.language }}</span>
+            </div>
+            <div class="od-kv" *ngIf="detail.owner">
+              <label>{{ 'QUERY_RUNNER.OD_OWNER' | translate }}</label
+              ><span>{{ detail.owner }}</span>
+            </div>
+            <div class="od-kv" *ngIf="detail.cost != null">
+              <label>{{ 'QUERY_RUNNER.OD_COST' | translate }}</label
+              ><span class="od-mono">{{ detail.cost }}</span>
+            </div>
+            <div class="od-kv" *ngIf="detail.comment">
+              <label>{{ 'QUERY_RUNNER.OD_COMMENT' | translate }}</label
+              ><span>{{ detail.comment }}</span>
+            </div>
           </ng-container>
           <!-- sequence -->
           <ng-container *ngIf="kind === 'sequence'">
-            <div class="od-kv" *ngIf="detail.dataType"><label>{{ 'QUERY_RUNNER.OD_DATA_TYPE' | translate }}</label><span class="od-mono">{{ detail.dataType }}</span></div>
-            <div class="od-kv"><label>{{ 'QUERY_RUNNER.OD_LAST_VALUE' | translate }}</label><span class="od-mono">{{ detail.lastValue }}</span></div>
-            <div class="od-kv"><label>{{ 'QUERY_RUNNER.OD_START' | translate }}</label><span class="od-mono">{{ detail.startValue }}</span></div>
-            <div class="od-kv"><label>{{ 'QUERY_RUNNER.OD_INCREMENT' | translate }}</label><span class="od-mono">{{ detail.increment }}</span></div>
-            <div class="od-kv"><label>{{ 'QUERY_RUNNER.OD_MIN' | translate }}</label><span class="od-mono">{{ detail.minValue }}</span></div>
-            <div class="od-kv"><label>{{ 'QUERY_RUNNER.OD_MAX' | translate }}</label><span class="od-mono">{{ detail.maxValue }}</span></div>
-            <div class="od-kv" *ngIf="detail.cacheSize"><label>{{ 'QUERY_RUNNER.OD_CACHE' | translate }}</label><span class="od-mono">{{ detail.cacheSize }}</span></div>
-            <div class="od-kv"><label>{{ 'QUERY_RUNNER.OD_CYCLE' | translate }}</label><span>{{ detail.cycle ? 'YES' : 'NO' }}</span></div>
-            <div class="od-kv" *ngIf="detail.ownedBy"><label>{{ 'QUERY_RUNNER.OD_OWNED_BY' | translate }}</label><span class="od-mono">{{ detail.ownedBy }}</span></div>
+            <div class="od-kv" *ngIf="detail.dataType">
+              <label>{{ 'QUERY_RUNNER.OD_DATA_TYPE' | translate }}</label
+              ><span class="od-mono">{{ detail.dataType }}</span>
+            </div>
+            <div class="od-kv">
+              <label>{{ 'QUERY_RUNNER.OD_LAST_VALUE' | translate }}</label
+              ><span class="od-mono">{{ detail.lastValue }}</span>
+            </div>
+            <div class="od-kv">
+              <label>{{ 'QUERY_RUNNER.OD_START' | translate }}</label
+              ><span class="od-mono">{{ detail.startValue }}</span>
+            </div>
+            <div class="od-kv">
+              <label>{{ 'QUERY_RUNNER.OD_INCREMENT' | translate }}</label
+              ><span class="od-mono">{{ detail.increment }}</span>
+            </div>
+            <div class="od-kv">
+              <label>{{ 'QUERY_RUNNER.OD_MIN' | translate }}</label
+              ><span class="od-mono">{{ detail.minValue }}</span>
+            </div>
+            <div class="od-kv">
+              <label>{{ 'QUERY_RUNNER.OD_MAX' | translate }}</label
+              ><span class="od-mono">{{ detail.maxValue }}</span>
+            </div>
+            <div class="od-kv" *ngIf="detail.cacheSize">
+              <label>{{ 'QUERY_RUNNER.OD_CACHE' | translate }}</label
+              ><span class="od-mono">{{ detail.cacheSize }}</span>
+            </div>
+            <div class="od-kv">
+              <label>{{ 'QUERY_RUNNER.OD_CYCLE' | translate }}</label
+              ><span>{{ detail.cycle ? 'YES' : 'NO' }}</span>
+            </div>
+            <div class="od-kv" *ngIf="detail.ownedBy">
+              <label>{{ 'QUERY_RUNNER.OD_OWNED_BY' | translate }}</label
+              ><span class="od-mono">{{ detail.ownedBy }}</span>
+            </div>
           </ng-container>
           <!-- trigger -->
           <ng-container *ngIf="kind === 'trigger'">
-            <div class="od-kv"><label>{{ 'QUERY_RUNNER.OD_TABLE' | translate }}</label><span class="od-mono">{{ detail.schema }}.{{ detail.table }}</span></div>
-            <div class="od-kv"><label>{{ 'QUERY_RUNNER.OD_TIMING' | translate }}</label><span>{{ detail.timing }}</span></div>
-            <div class="od-kv"><label>{{ 'QUERY_RUNNER.OD_EVENTS' | translate }}</label>
+            <div class="od-kv">
+              <label>{{ 'QUERY_RUNNER.OD_TABLE' | translate }}</label
+              ><span class="od-mono"
+                >{{ detail.schema }}.{{ detail.table }}</span
+              >
+            </div>
+            <div class="od-kv">
+              <label>{{ 'QUERY_RUNNER.OD_TIMING' | translate }}</label
+              ><span>{{ detail.timing }}</span>
+            </div>
+            <div class="od-kv">
+              <label>{{ 'QUERY_RUNNER.OD_EVENTS' | translate }}</label>
               <span>
-                <span class="od-chip" *ngFor="let ev of detail.events">{{ ev }}</span>
+                <span class="od-chip" *ngFor="let ev of detail.events">{{
+                  ev
+                }}</span>
               </span>
             </div>
-            <div class="od-kv"><label>{{ 'QUERY_RUNNER.OD_LEVEL' | translate }}</label><span>{{ detail.level }}</span></div>
-            <div class="od-kv" *ngIf="detail.function"><label>{{ 'QUERY_RUNNER.OD_FUNCTION' | translate }}</label><span class="od-mono">{{ detail.function }}</span></div>
-            <div class="od-kv"><label>{{ 'QUERY_RUNNER.OD_ENABLED' | translate }}</label><span>{{ detail.enabled }}</span></div>
-            <div class="od-kv" *ngIf="detail.comment"><label>{{ 'QUERY_RUNNER.OD_COMMENT' | translate }}</label><span>{{ detail.comment }}</span></div>
+            <div class="od-kv">
+              <label>{{ 'QUERY_RUNNER.OD_LEVEL' | translate }}</label
+              ><span>{{ detail.level }}</span>
+            </div>
+            <div class="od-kv" *ngIf="detail.function">
+              <label>{{ 'QUERY_RUNNER.OD_FUNCTION' | translate }}</label
+              ><span class="od-mono">{{ detail.function }}</span>
+            </div>
+            <div class="od-kv">
+              <label>{{ 'QUERY_RUNNER.OD_ENABLED' | translate }}</label
+              ><span>{{ detail.enabled }}</span>
+            </div>
+            <div class="od-kv" *ngIf="detail.comment">
+              <label>{{ 'QUERY_RUNNER.OD_COMMENT' | translate }}</label
+              ><span>{{ detail.comment }}</span>
+            </div>
           </ng-container>
         </div>
 
         <!-- DEFINITION (trigger reuses the code block) -->
-        <div class="od-code-wrap" *ngIf="activeTab === 'definition' && kind === 'trigger'">
+        <div
+          class="od-code-wrap"
+          *ngIf="activeTab === 'definition' && kind === 'trigger'"
+        >
           <button class="od-copy" (click)="copy(detail.definition)">
             <i class="pi pi-copy"></i> {{ 'QUERY_RUNNER.COPY' | translate }}
           </button>

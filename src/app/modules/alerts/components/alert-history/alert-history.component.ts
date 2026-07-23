@@ -72,12 +72,47 @@ export class AlertHistoryComponent implements OnInit, OnChanges, OnDestroy {
   private buildColumns(): CustomTableColumn[] {
     const t = (k: string) => this.translate.instant(k);
     return [
-      { colId: 'evaluatedAt', field: 'evaluatedAt', header: t('ALERTS.EVALUATED_AT'), width: '200px' },
-      { colId: 'eventStatus', field: 'eventStatus', header: t('COMMON.STATUS'), width: '128px', sortable: false },
-      { colId: 'observedValue', field: 'observedValue', header: t('ALERTS.OBSERVED_VALUE'), width: '240px', sortable: false },
-      { colId: 'notified', header: t('ALERTS.NOTIFIED'), width: '144px', sortable: false },
-      { colId: 'durationMs', field: 'durationMs', header: t('ALERTS.DURATION'), width: '112px', sortable: false, align: 'right' },
-      { colId: 'errorMessage', field: 'errorMessage', header: t('ALERTS.ERROR'), width: '260px', sortable: false },
+      {
+        colId: 'evaluatedAt',
+        field: 'evaluatedAt',
+        header: t('ALERTS.EVALUATED_AT'),
+        width: '200px',
+      },
+      {
+        colId: 'eventStatus',
+        field: 'eventStatus',
+        header: t('COMMON.STATUS'),
+        width: '128px',
+        sortable: false,
+      },
+      {
+        colId: 'observedValue',
+        field: 'observedValue',
+        header: t('ALERTS.OBSERVED_VALUE'),
+        width: '240px',
+        sortable: false,
+      },
+      {
+        colId: 'notified',
+        header: t('ALERTS.NOTIFIED'),
+        width: '144px',
+        sortable: false,
+      },
+      {
+        colId: 'durationMs',
+        field: 'durationMs',
+        header: t('ALERTS.DURATION'),
+        width: '112px',
+        sortable: false,
+        align: 'right',
+      },
+      {
+        colId: 'errorMessage',
+        field: 'errorMessage',
+        header: t('ALERTS.ERROR'),
+        width: '260px',
+        sortable: false,
+      },
     ];
   }
 

@@ -13,12 +13,7 @@ import { TranslateModule } from '@ngx-translate/core';
 import { QueryRunnerService } from '../services/query-runner.service';
 
 export type ObjectKind =
-  | 'table'
-  | 'view'
-  | 'matview'
-  | 'function'
-  | 'sequence'
-  | 'trigger';
+  'table' | 'view' | 'matview' | 'function' | 'sequence' | 'trigger';
 
 /**
  * ObjectDetailComponent — a read-only, tabbed modal describing one DB
@@ -115,19 +110,41 @@ export class ObjectDetailComponent implements OnChanges {
     let req: Promise<any>;
     switch (this.kind) {
       case 'table':
-        req = this.service.getTableDetail(this.connectionId, this.schema, this.name);
+        req = this.service.getTableDetail(
+          this.connectionId,
+          this.schema,
+          this.name,
+        );
         break;
       case 'view':
-        req = this.service.getViewDetail(this.connectionId, this.schema, this.name, false);
+        req = this.service.getViewDetail(
+          this.connectionId,
+          this.schema,
+          this.name,
+          false,
+        );
         break;
       case 'matview':
-        req = this.service.getViewDetail(this.connectionId, this.schema, this.name, true);
+        req = this.service.getViewDetail(
+          this.connectionId,
+          this.schema,
+          this.name,
+          true,
+        );
         break;
       case 'function':
-        req = this.service.getFunctionDetail(this.connectionId, this.schema, this.name);
+        req = this.service.getFunctionDetail(
+          this.connectionId,
+          this.schema,
+          this.name,
+        );
         break;
       case 'sequence':
-        req = this.service.getSequenceDetail(this.connectionId, this.schema, this.name);
+        req = this.service.getSequenceDetail(
+          this.connectionId,
+          this.schema,
+          this.name,
+        );
         break;
       case 'trigger':
         req = this.service.getTriggerDetail(

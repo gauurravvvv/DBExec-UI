@@ -33,11 +33,15 @@
         </p-tabPanel>
 
         <p-tabPanel [header]="'SIDEBAR.brandingManagement' | translate">
-          <app-branding-settings *ngIf="activeTab === 1"></app-branding-settings>
+          <app-branding-settings
+            *ngIf="activeTab === 1"
+          ></app-branding-settings>
         </p-tabPanel>
 
         <p-tabPanel [header]="'SIDEBAR.announcementManagement' | translate">
-          <app-list-announcements *ngIf="activeTab === 2"></app-list-announcements>
+          <app-list-announcements
+            *ngIf="activeTab === 2"
+          ></app-list-announcements>
         </p-tabPanel>
       </p-tabView>
     </div>

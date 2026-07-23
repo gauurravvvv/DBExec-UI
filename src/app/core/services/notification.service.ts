@@ -443,7 +443,10 @@ export class NotificationService implements OnDestroy {
       // nudge the SSE stream back open if it dropped while hidden.
       this.refreshUnreadCount();
       this.scheduleNextPoll();
-      if (!this.eventSource || this.eventSource.readyState === EventSource.CLOSED) {
+      if (
+        !this.eventSource ||
+        this.eventSource.readyState === EventSource.CLOSED
+      ) {
         this.openStream();
       }
     } else {

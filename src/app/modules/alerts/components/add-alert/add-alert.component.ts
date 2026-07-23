@@ -87,20 +87,31 @@ export class AddAlertComponent implements OnInit, HasUnsavedChanges {
 
   /* condition builder inputs */
   fields: ReturnType<typeof buildSourceFieldOptions> = [];
-  distinctFetcher: ((ref: string) => Promise<{ label: string; value: string }[]>) | null = null;
+  distinctFetcher:
+    ((ref: string) => Promise<{ label: string; value: string }[]>) | null =
+    null;
   conditionState: {
     valid: boolean;
     mode: 'builder' | 'expression';
     conditionBuilder: any;
     conditionExpression: string | null;
-  } = { valid: false, mode: 'builder', conditionBuilder: null, conditionExpression: null };
+  } = {
+    valid: false,
+    mode: 'builder',
+    conditionBuilder: null,
+    conditionExpression: null,
+  };
 
   /* recipients - user multiselect */
   preloadedUsers: any[] | null = null;
   preloadedUsersTotal: number | null = null;
 
   /* test-now result */
-  testResult: { breached?: boolean; observedValue?: any; error?: string } | null = null;
+  testResult: {
+    breached?: boolean;
+    observedValue?: any;
+    error?: string;
+  } | null = null;
 
   constructor(
     private fb: FormBuilder,
@@ -154,7 +165,10 @@ export class AddAlertComponent implements OnInit, HasUnsavedChanges {
       notifyEmail: [true],
       // state machine
       cooldownMinutes: [60, [Validators.min(0), Validators.max(10080)]],
-      consecutiveBreachesRequired: [1, [Validators.min(1), Validators.max(100)]],
+      consecutiveBreachesRequired: [
+        1,
+        [Validators.min(1), Validators.max(100)],
+      ],
       enabled: [true],
     });
 
@@ -205,7 +219,10 @@ export class AddAlertComponent implements OnInit, HasUnsavedChanges {
   }
 
   nextStep(): void {
-    if (this.currentStep < this.lastStep && this.isStepValid(this.currentStep)) {
+    if (
+      this.currentStep < this.lastStep &&
+      this.isStepValid(this.currentStep)
+    ) {
       this.currentStep++;
     }
   }
@@ -237,7 +254,10 @@ export class AddAlertComponent implements OnInit, HasUnsavedChanges {
     try {
       const res: any = await this.datasourceService.listDatasource(params);
       if (this.globalService.handleSuccessService(res, false)) {
-        return { items: res?.data?.datasources ?? [], total: res?.data?.count ?? 0 };
+        return {
+          items: res?.data?.datasources ?? [],
+          total: res?.data?.count ?? 0,
+        };
       }
       return { items: [], total: 0 };
     } catch {
@@ -363,7 +383,11 @@ export class AddAlertComponent implements OnInit, HasUnsavedChanges {
   }
 
   get canSave(): boolean {
-    return this.alertForm.valid && this.conditionState.valid && !!this.selectedDatasource;
+    return (
+      this.alertForm.valid &&
+      this.conditionState.valid &&
+      !!this.selectedDatasource
+    );
   }
 
   /* -- test now (preview, no persist) ------------------------------ */
@@ -386,7 +410,9 @@ export class AddAlertComponent implements OnInit, HasUnsavedChanges {
         this.cdr.markForCheck();
       })
       .catch(() => {
-        this.testResult = { error: this.translate.instant('ALERTS.TEST_FAILED') };
+        this.testResult = {
+          error: this.translate.instant('ALERTS.TEST_FAILED'),
+        };
         this.cdr.markForCheck();
       });
   }

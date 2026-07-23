@@ -50,7 +50,9 @@
     <ng-container *ngIf="!showEditor">
       <div class="cf-list-toolbar">
         <span class="cf-list-count">
-          {{ 'DATASET.CALC_FIELDS_COUNT' | translate: { count: fields.length } }}
+          {{
+            'DATASET.CALC_FIELDS_COUNT' | translate: { count: fields.length }
+          }}
         </span>
         <app-button
           variant="primary"
@@ -68,10 +70,7 @@
       </div>
 
       <div class="cf-list" *ngIf="fields.length > 0; else emptyList">
-        <div
-          class="cf-item"
-          *ngFor="let field of fields; trackBy: trackById"
-        >
+        <div class="cf-item" *ngFor="let field of fields; trackBy: trackById">
           <div class="cf-item__main">
             <div class="cf-item__name-row">
               <span class="cf-item__name">{{ field.name }}</span>

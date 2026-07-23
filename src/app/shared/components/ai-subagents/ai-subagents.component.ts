@@ -75,7 +75,7 @@ export class AiSubagentsComponent implements OnChanges, OnDestroy {
 
   /** Tick while ANY sub-agent is still running; stop when all finish. */
   private syncTicker(): void {
-    const anyRunning = this.subAgents.some((s) => s.status === 'running');
+    const anyRunning = this.subAgents.some(s => s.status === 'running');
     if (anyRunning) {
       if (!this.ticker) {
         this.now.set(Date.now());

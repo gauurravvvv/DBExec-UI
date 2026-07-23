@@ -168,7 +168,11 @@ textarea,
 // the existing PrimeNG vars already cascade correctly from CSS
 // `var(--primary-color)`.
 // ================================================================
-.p-button:not(.p-button-outlined):not(.p-button-text):not(.p-button-link):not(.p-button-secondary):not(.p-button-success):not(.p-button-warning):not(.p-button-danger):not(.p-button-help):not(.p-button-info),
+.p-button:not(.p-button-outlined):not(.p-button-text):not(.p-button-link):not(
+    .p-button-secondary
+  ):not(.p-button-success):not(.p-button-warning):not(.p-button-danger):not(
+    .p-button-help
+  ):not(.p-button-info),
 .p-button.p-button-primary {
   background: var(--primary-color) !important;
   border-color: var(--primary-color) !important;
@@ -220,12 +224,18 @@ textarea,
 // move with the brand. PrimeNG's compiled rule sets `color: #3f51b5`
 // (hardcoded) on `.p-button-outlined` and `.p-button-text`, which
 // means the label and border stay indigo regardless of the CSS var.
-.p-button.p-button-outlined:not(.p-button-secondary):not(.p-button-success):not(.p-button-warning):not(.p-button-danger):not(.p-button-help):not(.p-button-info),
-.p-button.p-button-text:not(.p-button-secondary):not(.p-button-success):not(.p-button-warning):not(.p-button-danger):not(.p-button-help):not(.p-button-info) {
+.p-button.p-button-outlined:not(.p-button-secondary):not(.p-button-success):not(
+    .p-button-warning
+  ):not(.p-button-danger):not(.p-button-help):not(.p-button-info),
+.p-button.p-button-text:not(.p-button-secondary):not(.p-button-success):not(
+    .p-button-warning
+  ):not(.p-button-danger):not(.p-button-help):not(.p-button-info) {
   color: var(--primary-color) !important;
 }
 
-.p-button.p-button-outlined:not(.p-button-secondary):not(.p-button-success):not(.p-button-warning):not(.p-button-danger):not(.p-button-help):not(.p-button-info) {
+.p-button.p-button-outlined:not(.p-button-secondary):not(.p-button-success):not(
+    .p-button-warning
+  ):not(.p-button-danger):not(.p-button-help):not(.p-button-info) {
   border-color: var(--primary-color) !important;
 
   &:enabled:hover,
@@ -674,7 +684,10 @@ app-custom-table {
   }
   .p-datatable-tbody > tr:nth-child(even) > td.p-frozen-column {
     background:
-      linear-gradient(var(--table-stripe, rgba(0, 0, 0, 0.025)), var(--table-stripe, rgba(0, 0, 0, 0.025))),
+      linear-gradient(
+        var(--table-stripe, rgba(0, 0, 0, 0.025)),
+        var(--table-stripe, rgba(0, 0, 0, 0.025))
+      ),
       var(--card-background) !important;
   }
   .p-datatable-tbody > tr:hover > td.p-frozen-column {
@@ -3379,7 +3392,8 @@ body {
       0 0 0 1px var(--border-color);
     cursor: pointer;
     overflow: hidden;
-    transition: transform var(--motion-base) ease,
+    transition:
+      transform var(--motion-base) ease,
       box-shadow var(--motion-base) ease;
 
     &:hover {
@@ -3482,4 +3496,3 @@ textarea,
   -ms-user-select: text;
   user-select: text;
 }
-

@@ -22,11 +22,7 @@ import type { ValueType } from 'src/app/modules/analyses/utils/field-type.util';
 
 /** The control a typed input resolves to — mirrors typed-value-input. */
 export type GateControlKind =
-  | 'dropdown'
-  | 'number'
-  | 'calendar'
-  | 'toggle'
-  | 'text';
+  'dropdown' | 'number' | 'calendar' | 'toggle' | 'text';
 
 /**
  * The values the gate emits on submit: resolved parameter values (feed
@@ -153,7 +149,8 @@ export class DashboardPreloadGateComponent implements OnChanges {
 
   onParamChange(p: AnalysisParameter, value: any): void {
     // Calendar emits a Date; store an ISO string so the payload is portable.
-    this.paramValues[p.key] = value instanceof Date ? value.toISOString() : value;
+    this.paramValues[p.key] =
+      value instanceof Date ? value.toISOString() : value;
   }
 
   trackParam(_i: number, p: AnalysisParameter): string {
@@ -186,7 +183,8 @@ export class DashboardPreloadGateComponent implements OnChanges {
   }
 
   onFilterChange(f: any, value: any): void {
-    this.filterValues[f.id] = value instanceof Date ? value.toISOString() : value;
+    this.filterValues[f.id] =
+      value instanceof Date ? value.toISOString() : value;
   }
 
   trackFilter(_i: number, f: any): string {

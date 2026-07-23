@@ -152,11 +152,9 @@ export class PromptService {
       // POST /prompts/:promptId/config — body still carries
       // the full payload; the id is taken from the path.
       return await lastValueFrom(
-        this.http.apiPost(
-          PROMPT.GET + data.id + PROMPT.CONFIG_SUFFIX,
-          data,
-          { skipLoader: true },
-        ),
+        this.http.apiPost(PROMPT.GET + data.id + PROMPT.CONFIG_SUFFIX, data, {
+          skipLoader: true,
+        }),
       );
     } finally {
       this._saving.set(false);

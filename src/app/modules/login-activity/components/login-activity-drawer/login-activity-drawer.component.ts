@@ -6,10 +6,7 @@ import {
   Output,
 } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
-import {
-  EVENT_FALLBACK,
-  EVENT_META,
-} from '../../login-activity-meta.constant';
+import { EVENT_FALLBACK, EVENT_META } from '../../login-activity-meta.constant';
 import { LoginActivity } from '../../models/login-activity.model';
 
 /**
@@ -38,16 +35,22 @@ export class LoginActivityDrawerComponent {
   }
 
   eventClass(eventType: string | null | undefined): string {
-    return (eventType && EVENT_META[eventType]?.cssClass) || EVENT_FALLBACK.cssClass;
+    return (
+      (eventType && EVENT_META[eventType]?.cssClass) || EVENT_FALLBACK.cssClass
+    );
   }
 
   eventLabel(eventType: string | null | undefined): string {
-    const key = (eventType && EVENT_META[eventType]?.labelKey) || EVENT_FALLBACK.labelKey;
+    const key =
+      (eventType && EVENT_META[eventType]?.labelKey) || EVENT_FALLBACK.labelKey;
     return this.translate.instant(key);
   }
 
   actorDisplay(log: LoginActivity): string {
-    return log.username?.trim() || this.translate.instant('LOGIN_ACTIVITY.UNKNOWN_USER');
+    return (
+      log.username?.trim() ||
+      this.translate.instant('LOGIN_ACTIVITY.UNKNOWN_USER')
+    );
   }
 
   /** Up-to-two-letter initials for the avatar. */

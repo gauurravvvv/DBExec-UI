@@ -89,7 +89,11 @@ export class SessionsComponent implements OnInit, OnDestroy {
 
   // Filters (fed to the server via serverFilter()).
   statusOptions: { label: string; value: string }[] = [];
-  filterValues: { name: string; state: string | null; hideBackground: boolean } = {
+  filterValues: {
+    name: string;
+    state: string | null;
+    hideBackground: boolean;
+  } = {
     name: '',
     state: null,
     hideBackground: true,
@@ -113,8 +117,14 @@ export class SessionsComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.statusOptions = [
-      { label: this.translate.instant('DB_ACCESS.SESSION_STATE_ACTIVE'), value: 'active' },
-      { label: this.translate.instant('DB_ACCESS.SESSION_STATE_IDLE'), value: 'idle' },
+      {
+        label: this.translate.instant('DB_ACCESS.SESSION_STATE_ACTIVE'),
+        value: 'active',
+      },
+      {
+        label: this.translate.instant('DB_ACCESS.SESSION_STATE_IDLE'),
+        value: 'idle',
+      },
       {
         label: this.translate.instant('DB_ACCESS.SESSION_STATE_IDLE_IN_TXN'),
         value: 'idle in transaction',
@@ -135,16 +145,71 @@ export class SessionsComponent implements OnInit, OnDestroy {
   private buildColumns(): CustomTableColumn[] {
     const t = (k: string) => this.translate.instant(k);
     return [
-      { colId: 'pid', field: 'pid', header: t('DB_ACCESS.PID'), width: '112px', frozen: true },
-      { colId: 'user', field: 'user', header: t('DB_ACCESS.SESSION_USER'), width: '160px' },
-      { colId: 'database', field: 'database', header: t('DB_ACCESS.SESSION_DATABASE'), width: '150px' },
-      { colId: 'clientAddr', field: 'clientAddr', header: t('DB_ACCESS.CLIENT_ADDR'), width: '150px', sortable: false },
-      { colId: 'applicationName', field: 'applicationName', header: t('DB_ACCESS.APPLICATION'), width: '170px', sortable: false },
-      { colId: 'state', field: 'state', header: t('DB_ACCESS.SESSION_STATE'), width: '160px' },
-      { colId: 'waitEventType', field: 'waitEventType', header: t('DB_ACCESS.WAIT'), width: '128px', sortable: false },
-      { colId: 'query', field: 'query', header: t('DB_ACCESS.QUERY'), width: '320px', sortable: false },
-      { colId: 'queryStart', field: 'queryStart', header: t('DB_ACCESS.STARTED'), width: '150px' },
-      { colId: 'actions', header: t('COMMON.ACTIONS'), width: '128px', sortable: false },
+      {
+        colId: 'pid',
+        field: 'pid',
+        header: t('DB_ACCESS.PID'),
+        width: '112px',
+        frozen: true,
+      },
+      {
+        colId: 'user',
+        field: 'user',
+        header: t('DB_ACCESS.SESSION_USER'),
+        width: '160px',
+      },
+      {
+        colId: 'database',
+        field: 'database',
+        header: t('DB_ACCESS.SESSION_DATABASE'),
+        width: '150px',
+      },
+      {
+        colId: 'clientAddr',
+        field: 'clientAddr',
+        header: t('DB_ACCESS.CLIENT_ADDR'),
+        width: '150px',
+        sortable: false,
+      },
+      {
+        colId: 'applicationName',
+        field: 'applicationName',
+        header: t('DB_ACCESS.APPLICATION'),
+        width: '170px',
+        sortable: false,
+      },
+      {
+        colId: 'state',
+        field: 'state',
+        header: t('DB_ACCESS.SESSION_STATE'),
+        width: '160px',
+      },
+      {
+        colId: 'waitEventType',
+        field: 'waitEventType',
+        header: t('DB_ACCESS.WAIT'),
+        width: '128px',
+        sortable: false,
+      },
+      {
+        colId: 'query',
+        field: 'query',
+        header: t('DB_ACCESS.QUERY'),
+        width: '320px',
+        sortable: false,
+      },
+      {
+        colId: 'queryStart',
+        field: 'queryStart',
+        header: t('DB_ACCESS.STARTED'),
+        width: '150px',
+      },
+      {
+        colId: 'actions',
+        header: t('COMMON.ACTIONS'),
+        width: '128px',
+        sortable: false,
+      },
     ];
   }
 
@@ -224,7 +289,11 @@ export class SessionsComponent implements OnInit, OnDestroy {
   }
 
   get isFilterActive(): boolean {
-    return !!this.filterValues.name || this.filterValues.state !== null || !this.filterValues.hideBackground;
+    return (
+      !!this.filterValues.name ||
+      this.filterValues.state !== null ||
+      !this.filterValues.hideBackground
+    );
   }
 
   onFilterChange(): void {
@@ -254,7 +323,8 @@ export class SessionsComponent implements OnInit, OnDestroy {
   stateClass(s: SessionRow): string {
     const st = (s.state || '').toLowerCase();
     if (st === 'active') return 'active';
-    if (st === 'idle in transaction' || st === 'idle in transaction (aborted)') return 'expired';
+    if (st === 'idle in transaction' || st === 'idle in transaction (aborted)')
+      return 'expired';
     if (st === 'idle') return 'no-login';
     return 'inactive';
   }
@@ -297,7 +367,10 @@ export class SessionsComponent implements OnInit, OnDestroy {
 
   get confirmMessage(): string {
     if (!this.confirmTarget) return '';
-    const params = { pid: this.confirmTarget.pid, user: this.confirmTarget.user || '—' };
+    const params = {
+      pid: this.confirmTarget.pid,
+      user: this.confirmTarget.user || '—',
+    };
     return this.confirmAction === 'terminate'
       ? this.translate.instant('DB_ACCESS.CONFIRM_TERMINATE_BODY', params)
       : this.translate.instant('DB_ACCESS.CONFIRM_CANCEL_BODY', params);

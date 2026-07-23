@@ -45,7 +45,9 @@ export const CRON_PATTERN = new RegExp(
 );
 
 export const dashboardSubscriptionCronSchema = z
-  .string({ message: 'validation.dashboardSubscriptions.cronExpression.required' })
+  .string({
+    message: 'validation.dashboardSubscriptions.cronExpression.required',
+  })
   .max(DASHBOARD_SUBSCRIPTION_LIMITS.CRON_MAX, {
     message: 'validation.dashboardSubscriptions.cronExpression.tooLong',
   })

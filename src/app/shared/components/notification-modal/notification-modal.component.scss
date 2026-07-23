@@ -16,7 +16,9 @@
   color: var(--secondary-color);
   padding: 4px 6px;
   border-radius: var(--radius-sm);
-  transition: color var(--motion-fast) ease, background var(--motion-fast) ease;
+  transition:
+    color var(--motion-fast) ease,
+    background var(--motion-fast) ease;
 
   i {
     font-size: var(--fs-label);
@@ -171,7 +173,9 @@
     border-radius: var(--radius-sm);
     cursor: pointer;
     opacity: 0;
-    transition: opacity var(--motion-fast) ease, background var(--motion-fast) ease,
+    transition:
+      opacity var(--motion-fast) ease,
+      background var(--motion-fast) ease,
       color var(--motion-fast) ease;
 
     i {

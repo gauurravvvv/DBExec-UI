@@ -825,10 +825,7 @@
     font-weight: var(--fw-semibold, 600);
     padding: 1px 6px;
     border-radius: 4px;
-    background: rgba(
-      var(--primary-color-rgb, 33, 150, 243),
-      0.12
-    );
+    background: rgba(var(--primary-color-rgb, 33, 150, 243), 0.12);
     color: var(--primary-color);
     letter-spacing: 0.02em;
     text-transform: uppercase;

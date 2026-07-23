@@ -47,7 +47,12 @@ export const ALERT_OPERATORS = [
 export type AlertOperator = (typeof ALERT_OPERATORS)[number];
 
 /** RHS value type — drives which typed input the FE renders. */
-export const ALERT_VALUE_TYPES = ['string', 'number', 'date', 'boolean'] as const;
+export const ALERT_VALUE_TYPES = [
+  'string',
+  'number',
+  'date',
+  'boolean',
+] as const;
 export type AlertValueType = (typeof ALERT_VALUE_TYPES)[number];
 
 /** Predicate group join. */
@@ -131,9 +136,12 @@ export const alertNameSchema = z.preprocess(
 
 export const alertDescriptionSchema = z.preprocess(
   blankToUndefined,
-  z.string().max(ALERT_LIMITS.DESCRIPTION_MAX, {
-    message: 'validation.alerts.description.tooLong',
-  }).optional(),
+  z
+    .string()
+    .max(ALERT_LIMITS.DESCRIPTION_MAX, {
+      message: 'validation.alerts.description.tooLong',
+    })
+    .optional(),
 );
 
 /** 5-field cron. Lenient regex here; cron-parser does authoritative parse in the controller. */
@@ -147,9 +155,16 @@ export const alertCronSchema = z
   .regex(CRON_PATTERN, { message: 'validation.alerts.cron.invalid' });
 
 export const alertRecipientsSchema = z.object({
-  userIds: z.array(z.string().uuid()).max(ALERT_LIMITS.MAX_RECIPIENTS).default([]),
+  userIds: z
+    .array(z.string().uuid())
+    .max(ALERT_LIMITS.MAX_RECIPIENTS)
+    .default([]),
   emails: z
-    .array(z.string().email({ message: 'validation.alerts.recipients.emailInvalid' }))
+    .array(
+      z
+        .string()
+        .email({ message: 'validation.alerts.recipients.emailInvalid' }),
+    )
     .max(ALERT_LIMITS.MAX_RECIPIENTS)
     .default([]),
 });
@@ -162,7 +177,9 @@ const alertBase = z.object({
   description: alertDescriptionSchema,
   sourceType: z.enum(ALERT_SOURCE_TYPES),
   sourceId: z.string().uuid({ message: 'validation.alerts.sourceId.invalid' }),
-  datasourceId: z.string().uuid({ message: 'validation.alerts.datasourceId.invalid' }),
+  datasourceId: z
+    .string()
+    .uuid({ message: 'validation.alerts.datasourceId.invalid' }),
 
   conditionMode: z.enum(ALERT_CONDITION_MODES).default('builder'),
   conditionBuilder: alertConditionBuilderSchema.optional(),
@@ -244,7 +261,9 @@ const alertConditionRefinement = (
 export const addAlertSchema = alertBase.superRefine(alertConditionRefinement);
 
 /** Update = same shape; id comes from the URL param, not the body. */
-export const updateAlertSchema = alertBase.superRefine(alertConditionRefinement);
+export const updateAlertSchema = alertBase.superRefine(
+  alertConditionRefinement,
+);
 
 /** Snooze payload. */
 export const snoozeAlertSchema = z.object({

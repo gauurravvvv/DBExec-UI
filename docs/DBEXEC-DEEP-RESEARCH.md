@@ -11,7 +11,7 @@
 
 > **Important — per-module deep dives**
 >
-> The §4 module deep-dives below are the *original* first-pass write-up.
+> The §4 module deep-dives below are the _original_ first-pass write-up.
 > Each module now has a much deeper companion at
 > [`research/modules/`](research/modules/) — typically 700–1,100 lines
 > each, with schemas, migrations, APIs, UI specs, code recipes,
@@ -35,31 +35,31 @@
 2. [DBExec today — module-by-module audit](#2-dbexec-today--module-by-module-audit)
 3. [Gap matrix (what's missing and how critical)](#3-gap-matrix)
 4. [Module deep-dives](#4-module-deep-dives)
-    1. [Datasource](#41-datasource)
-    2. [Semantic Layer (the missing middle)](#42-semantic-layer)
-    3. [Dataset](#43-dataset)
-    4. [Query Processor / Compiler](#44-query-processor)
-    5. [Cache & Materialisation](#45-cache-and-materialisation)
-    6. [Analysis](#46-analysis)
-    7. [Visual Builder](#47-visual-builder)
-    8. [Filters, Parameters, Cross-filters, Drill](#48-filters-and-actions)
-    9. [Dashboard](#49-dashboard)
-    10. [RLS & Column Security](#410-rls-and-column-security)
-    11. [Permissions / RBAC / SSO / SCIM](#411-permissions)
-    12. [Aggregation & Metrics](#412-metrics)
-    13. [Import / Upload / ETL-lite](#413-import)
-    14. [Export & Download](#414-export)
-    15. [Sharing & Embedding](#415-sharing-and-embedding)
-    16. [Scheduling, Subscriptions, Alerts](#416-scheduling)
-    17. [Notifications](#417-notifications)
-    18. [Search, Tagging, Catalogue](#418-search)
-    19. [Versioning, Git, Lineage](#419-versioning)
-    20. [Audit, Observability, Telemetry](#420-audit)
-    21. [Theming, Branding, White-label](#421-branding)
-    22. [Mobile, PWA, Offline](#422-mobile)
-    23. [Public API, SDKs, Plugins, Custom Viz](#423-extensibility)
-    24. [Internationalisation, Accessibility](#424-i18n-a11y)
-    25. [Admin Console & Org Settings](#425-admin)
+   1. [Datasource](#41-datasource)
+   2. [Semantic Layer (the missing middle)](#42-semantic-layer)
+   3. [Dataset](#43-dataset)
+   4. [Query Processor / Compiler](#44-query-processor)
+   5. [Cache & Materialisation](#45-cache-and-materialisation)
+   6. [Analysis](#46-analysis)
+   7. [Visual Builder](#47-visual-builder)
+   8. [Filters, Parameters, Cross-filters, Drill](#48-filters-and-actions)
+   9. [Dashboard](#49-dashboard)
+   10. [RLS & Column Security](#410-rls-and-column-security)
+   11. [Permissions / RBAC / SSO / SCIM](#411-permissions)
+   12. [Aggregation & Metrics](#412-metrics)
+   13. [Import / Upload / ETL-lite](#413-import)
+   14. [Export & Download](#414-export)
+   15. [Sharing & Embedding](#415-sharing-and-embedding)
+   16. [Scheduling, Subscriptions, Alerts](#416-scheduling)
+   17. [Notifications](#417-notifications)
+   18. [Search, Tagging, Catalogue](#418-search)
+   19. [Versioning, Git, Lineage](#419-versioning)
+   20. [Audit, Observability, Telemetry](#420-audit)
+   21. [Theming, Branding, White-label](#421-branding)
+   22. [Mobile, PWA, Offline](#422-mobile)
+   23. [Public API, SDKs, Plugins, Custom Viz](#423-extensibility)
+   24. [Internationalisation, Accessibility](#424-i18n-a11y)
+   25. [Admin Console & Org Settings](#425-admin)
 5. [Build plan with milestones and DB migrations](#5-build-plan)
 6. [Code recipes — copy-paste starting points](#6-code-recipes)
 7. [Glossary & references](#7-glossary)
@@ -135,15 +135,15 @@ Cross-cutting concerns sit alongside every layer:
 
 ### 1.1 Reference tool mapping
 
-| Layer | Tableau | Power BI | Looker | Metabase | Superset | DBExec today |
-|---|---|---|---|---|---|---|
-| 1. Connect | Drivers + Hyper extracts | Power Query + dataflows | Connections | Drivers | SQLAlchemy URI | **Datasource** + per-user **Connection** |
-| 2. Cache | Hyper, query cache | Vertipaq | Persistent derived tables (PDT), aggregate awareness | Native cache | Redis + SQL Lab results | **Missing** — no cache layer |
-| 3. Compile | VizQL | DAX | LookML → SQL | MBQL → SQL | SQLAlchemy core | **SQL editor only**; no compiler |
-| 4. Semantic | Calculated fields | Tabular model + measures | LookML views/explores | Models | Lightweight metrics on Datasets | **Partial** — calc fields, no metric/dimension types |
-| 5. Author | Worksheet | Report canvas | Explore | Question | Explore | **Analyses** edit page |
-| 6. Consume | Dashboard | Report page | Dashboard | Dashboard | Dashboard | **Dashboards** (snapshot only) |
-| 7. Distribute | Subscriptions + Tableau Public | Email/Teams/PDF | Schedules + embed | Pulses + alerts + embed | Alerts + reports + Superset Embedded SDK | **None** beyond viewing |
+| Layer         | Tableau                        | Power BI                 | Looker                                               | Metabase                | Superset                                 | DBExec today                                         |
+| ------------- | ------------------------------ | ------------------------ | ---------------------------------------------------- | ----------------------- | ---------------------------------------- | ---------------------------------------------------- |
+| 1. Connect    | Drivers + Hyper extracts       | Power Query + dataflows  | Connections                                          | Drivers                 | SQLAlchemy URI                           | **Datasource** + per-user **Connection**             |
+| 2. Cache      | Hyper, query cache             | Vertipaq                 | Persistent derived tables (PDT), aggregate awareness | Native cache            | Redis + SQL Lab results                  | **Missing** — no cache layer                         |
+| 3. Compile    | VizQL                          | DAX                      | LookML → SQL                                         | MBQL → SQL              | SQLAlchemy core                          | **SQL editor only**; no compiler                     |
+| 4. Semantic   | Calculated fields              | Tabular model + measures | LookML views/explores                                | Models                  | Lightweight metrics on Datasets          | **Partial** — calc fields, no metric/dimension types |
+| 5. Author     | Worksheet                      | Report canvas            | Explore                                              | Question                | Explore                                  | **Analyses** edit page                               |
+| 6. Consume    | Dashboard                      | Report page              | Dashboard                                            | Dashboard               | Dashboard                                | **Dashboards** (snapshot only)                       |
+| 7. Distribute | Subscriptions + Tableau Public | Email/Teams/PDF          | Schedules + embed                                    | Pulses + alerts + embed | Alerts + reports + Superset Embedded SDK | **None** beyond viewing                              |
 
 ### 1.2 The three architectural patterns every tool implements
 
@@ -169,7 +169,8 @@ breaks the moment you cross dialects.
 
 DBExec concatenates today. The dataset SQL is stored as text; prompts
 are spliced via `WHERE` injection. This is fine while we ship Postgres
-+ Snowflake but already costs us on MSSQL/Oracle quirks.
+
+- Snowflake but already costs us on MSSQL/Oracle quirks.
 
 #### (c) Snapshot vs live dashboards
 
@@ -186,20 +187,20 @@ ask for "live mode" within 6 months.
 The BE has **30 modules** under `src/modules/`. Mapped to the layer
 diagram:
 
-| Layer | DBExec module(s) | Maturity |
-|---|---|---|
-| L1 Connectivity | `datasources/`, `connections/` | ✅ Mature — Postgres / MySQL / MariaDB / MSSQL / Oracle / Snowflake; per-user `Connection` wraps admin creds |
-| L2 Cache | — | ❌ **Missing entirely.** Every preview re-queries the source DB. |
-| L3 Compile | `queries/` (saved SQL), `query-builders/` (template prompts) | 🟡 Stringly-typed templates; no AST |
-| L4 Semantic | `datasets/` + custom fields | 🟡 Has calc fields; lacks dimension/measure typing, metrics, joins |
-| L5 Author | `analyses/`, `analysis-filters/`, `visuals/` (within analyses) | 🟡 73 chart types, drag-drop role mapping, but no parameters/actions |
-| L6 Consume | `dashboards/`, `home/`, `search/` | 🟡 Snapshot dashboards, basic global search, home shell |
-| L7 Distribute | — | ❌ **Missing entirely.** No subscriptions, no alerts, no embed, no public links, no scheduled exports |
-| Cross — Auth | `auth/`, `users/`, `roles/`, `groups/`, `permissions/`, `org-policy/` | ✅ JWT + refresh, password policy, role grid, group ACLs |
-| Cross — RLS | `rls-rules/`, `access/` | 🟡 Rules exist (user/group scope), no column-level masking, no impersonation |
-| Cross — Audit | `audit-logs/`, `notifications/` | ✅ CUD audit rows + bell notifications |
-| Cross — Branding | `branding/`, `theme/`, `announcements/` | ✅ Per-org theme + banner |
-| Cross — Multi-tenant | `orgs/`, `system-admins/` | ✅ Org-scoped JWT, master DB, per-org shared DB |
+| Layer                | DBExec module(s)                                                      | Maturity                                                                                                     |
+| -------------------- | --------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| L1 Connectivity      | `datasources/`, `connections/`                                        | ✅ Mature — Postgres / MySQL / MariaDB / MSSQL / Oracle / Snowflake; per-user `Connection` wraps admin creds |
+| L2 Cache             | —                                                                     | ❌ **Missing entirely.** Every preview re-queries the source DB.                                             |
+| L3 Compile           | `queries/` (saved SQL), `query-builders/` (template prompts)          | 🟡 Stringly-typed templates; no AST                                                                          |
+| L4 Semantic          | `datasets/` + custom fields                                           | 🟡 Has calc fields; lacks dimension/measure typing, metrics, joins                                           |
+| L5 Author            | `analyses/`, `analysis-filters/`, `visuals/` (within analyses)        | 🟡 73 chart types, drag-drop role mapping, but no parameters/actions                                         |
+| L6 Consume           | `dashboards/`, `home/`, `search/`                                     | 🟡 Snapshot dashboards, basic global search, home shell                                                      |
+| L7 Distribute        | —                                                                     | ❌ **Missing entirely.** No subscriptions, no alerts, no embed, no public links, no scheduled exports        |
+| Cross — Auth         | `auth/`, `users/`, `roles/`, `groups/`, `permissions/`, `org-policy/` | ✅ JWT + refresh, password policy, role grid, group ACLs                                                     |
+| Cross — RLS          | `rls-rules/`, `access/`                                               | 🟡 Rules exist (user/group scope), no column-level masking, no impersonation                                 |
+| Cross — Audit        | `audit-logs/`, `notifications/`                                       | ✅ CUD audit rows + bell notifications                                                                       |
+| Cross — Branding     | `branding/`, `theme/`, `announcements/`                               | ✅ Per-org theme + banner                                                                                    |
+| Cross — Multi-tenant | `orgs/`, `system-admins/`                                             | ✅ Org-scoped JWT, master DB, per-org shared DB                                                              |
 
 The codebase is built right where it's built (auth, multi-tenancy,
 RBAC, datasource). The yawning gaps are:
@@ -225,46 +226,46 @@ Severity scale:
 - **P1** — strong differentiator; deal-loser against named competitors.
 - **P2** — quality of life; nice-to-have during evaluations.
 
-| # | Gap | Severity | Estimated effort | Depends on |
-|---|---|---|---|---|
-| G1 | Query result cache (Redis) | **P0** | 3-4 weeks | — |
-| G2 | Async query queue (Celery / BullMQ) | **P0** | 2-3 weeks | G1 |
-| G3 | Scheduled dashboard refresh + materialised views | **P1** | 4-6 weeks | G2 |
-| G4 | Subscriptions (scheduled email) | **P0** | 3-4 weeks | G2, G14 |
-| G5 | Alerts (threshold + anomaly) | **P0** | 4-6 weeks | G2, G14 |
-| G6 | Public sharing links (signed URL) | **P0** | 2 weeks | — |
-| G7 | Embedded analytics (JWT-signed iframe) | **P0** | 3-4 weeks | G6, G10 |
-| G8 | Export — PDF/PNG of dashboards | **P0** | 2-3 weeks | G2 |
-| G9 | Export — CSV/XLSX/JSON of dataset | **P0** | 1-2 weeks | — |
-| G10 | Cross-filters, dashboard filters, URL filters | **P0** | 4-6 weeks | — |
-| G11 | Drill-down / drill-through | **P0** | 3-4 weeks | G10 |
-| G12 | Parameters & parameter actions | **P1** | 3 weeks | — |
-| G13 | Semantic layer: metric/dimension typing | **P0** | 6-8 weeks | — |
-| G14 | Email service abstraction (transport + templates) | **P0** | 1-2 weeks | — |
-| G15 | Aggregate awareness | **P1** | 6 weeks | G13 |
-| G16 | Joins inside dataset definition (not raw SQL) | **P1** | 4-6 weeks | G13 |
-| G17 | Saved-question / shareable single chart | **P0** | 2 weeks | G6 |
-| G18 | Live dashboards (live mode toggle vs snapshot) | **P1** | 3-4 weeks | G1 |
-| G19 | File upload (CSV/XLSX) → dataset | **P0** | 3 weeks | G14 |
-| G20 | Column-level security & masking | **P0** | 3-4 weeks | — |
-| G21 | SSO (SAML + OIDC) | **P0** | 4-6 weeks | — |
-| G22 | SCIM provisioning | **P1** | 3-4 weeks | G21 |
-| G23 | MFA / TOTP | **P0** | 2 weeks | — |
-| G24 | API tokens & service accounts | **P0** | 2 weeks | — |
-| G25 | Public REST API + OpenAPI spec | **P0** | 4 weeks | G24 |
-| G26 | Plugin / custom-viz registry | **P1** | 4-6 weeks | G25 |
-| G27 | Versioning + git sync (LookML-style) | **P2** | 6-8 weeks | — |
-| G28 | Lineage graph (dataset → analysis → dashboard) | **P1** | 3-4 weeks | — |
-| G29 | Mobile PWA + offline cache | **P1** | 4-6 weeks | — |
-| G30 | Search v2 (semantic + dashboards + people) | **P2** | 3 weeks | — |
-| G31 | Tags + collections + favourites | **P1** | 2 weeks | — |
-| G32 | Inline commenting + @mentions on dashboards | **P1** | 3 weeks | G17 |
-| G33 | Slack / Teams webhooks | **P1** | 1 week | G14 |
-| G34 | dbt MetricFlow integration | **P2** | 4 weeks | G13 |
-| G35 | Geo data sources (shape file, lat/lng, regions) | **P1** | 3 weeks | — |
-| G36 | AI Insights / natural-language Q&A | **P2** | 6-8 weeks | G13, G25 |
-| G37 | Data freshness + SLA badges | **P1** | 2 weeks | G3 |
-| G38 | Cost observability per query | **P2** | 2 weeks | — |
+| #   | Gap                                               | Severity | Estimated effort | Depends on |
+| --- | ------------------------------------------------- | -------- | ---------------- | ---------- |
+| G1  | Query result cache (Redis)                        | **P0**   | 3-4 weeks        | —          |
+| G2  | Async query queue (Celery / BullMQ)               | **P0**   | 2-3 weeks        | G1         |
+| G3  | Scheduled dashboard refresh + materialised views  | **P1**   | 4-6 weeks        | G2         |
+| G4  | Subscriptions (scheduled email)                   | **P0**   | 3-4 weeks        | G2, G14    |
+| G5  | Alerts (threshold + anomaly)                      | **P0**   | 4-6 weeks        | G2, G14    |
+| G6  | Public sharing links (signed URL)                 | **P0**   | 2 weeks          | —          |
+| G7  | Embedded analytics (JWT-signed iframe)            | **P0**   | 3-4 weeks        | G6, G10    |
+| G8  | Export — PDF/PNG of dashboards                    | **P0**   | 2-3 weeks        | G2         |
+| G9  | Export — CSV/XLSX/JSON of dataset                 | **P0**   | 1-2 weeks        | —          |
+| G10 | Cross-filters, dashboard filters, URL filters     | **P0**   | 4-6 weeks        | —          |
+| G11 | Drill-down / drill-through                        | **P0**   | 3-4 weeks        | G10        |
+| G12 | Parameters & parameter actions                    | **P1**   | 3 weeks          | —          |
+| G13 | Semantic layer: metric/dimension typing           | **P0**   | 6-8 weeks        | —          |
+| G14 | Email service abstraction (transport + templates) | **P0**   | 1-2 weeks        | —          |
+| G15 | Aggregate awareness                               | **P1**   | 6 weeks          | G13        |
+| G16 | Joins inside dataset definition (not raw SQL)     | **P1**   | 4-6 weeks        | G13        |
+| G17 | Saved-question / shareable single chart           | **P0**   | 2 weeks          | G6         |
+| G18 | Live dashboards (live mode toggle vs snapshot)    | **P1**   | 3-4 weeks        | G1         |
+| G19 | File upload (CSV/XLSX) → dataset                  | **P0**   | 3 weeks          | G14        |
+| G20 | Column-level security & masking                   | **P0**   | 3-4 weeks        | —          |
+| G21 | SSO (SAML + OIDC)                                 | **P0**   | 4-6 weeks        | —          |
+| G22 | SCIM provisioning                                 | **P1**   | 3-4 weeks        | G21        |
+| G23 | MFA / TOTP                                        | **P0**   | 2 weeks          | —          |
+| G24 | API tokens & service accounts                     | **P0**   | 2 weeks          | —          |
+| G25 | Public REST API + OpenAPI spec                    | **P0**   | 4 weeks          | G24        |
+| G26 | Plugin / custom-viz registry                      | **P1**   | 4-6 weeks        | G25        |
+| G27 | Versioning + git sync (LookML-style)              | **P2**   | 6-8 weeks        | —          |
+| G28 | Lineage graph (dataset → analysis → dashboard)    | **P1**   | 3-4 weeks        | —          |
+| G29 | Mobile PWA + offline cache                        | **P1**   | 4-6 weeks        | —          |
+| G30 | Search v2 (semantic + dashboards + people)        | **P2**   | 3 weeks          | —          |
+| G31 | Tags + collections + favourites                   | **P1**   | 2 weeks          | —          |
+| G32 | Inline commenting + @mentions on dashboards       | **P1**   | 3 weeks          | G17        |
+| G33 | Slack / Teams webhooks                            | **P1**   | 1 week           | G14        |
+| G34 | dbt MetricFlow integration                        | **P2**   | 4 weeks          | G13        |
+| G35 | Geo data sources (shape file, lat/lng, regions)   | **P1**   | 3 weeks          | —          |
+| G36 | AI Insights / natural-language Q&A                | **P2**   | 6-8 weeks        | G13, G25   |
+| G37 | Data freshness + SLA badges                       | **P1**   | 2 weeks          | G3         |
+| G38 | Cost observability per query                      | **P2**   | 2 weeks          | —          |
 
 **Aggregate**: roughly **130-160 engineering weeks** of work, before
 any redundancy. Realistic phasing in section 5.
@@ -284,6 +285,7 @@ File paths, DB schemas, controller signatures, FE component sketches.
 ### 4.1 Datasource
 
 #### WHAT
+
 A datasource is the **connection metadata** for an external database
 (Postgres, MySQL, Snowflake, BigQuery, etc.). It holds host/port/db/
 user/password/SSL config + driver-specific extras (Snowflake account +
@@ -294,6 +296,7 @@ a per-user / per-role DB credential — so the admin's password isn't
 exposed to end-users.
 
 #### WHY
+
 - Customers connect their own warehouses. Always.
 - Multi-engine support widens the addressable market.
 - Pooling / SSL / IAM auth are table stakes for security review.
@@ -362,11 +365,14 @@ CREATE TABLE datasource_config (
 ```
 
 #### DBExec status
+
 ✅ Mature (G0 not in gap list). Add gap items: `BigQuery` + `Redshift`
-+ `Databricks SQL` drivers; SSL config UI; IAM auth for AWS/GCP; pool
-metrics endpoint.
+
+- `Databricks SQL` drivers; SSL config UI; IAM auth for AWS/GCP; pool
+  metrics endpoint.
 
 #### Gap
+
 - SSL config UI fields (mode, CA cert, client cert/key) not exposed.
 - BigQuery + Redshift + Databricks SQL drivers not present.
 - IAM auth (`AWS_RDS_IAM`, `GCP_OAUTH`) not present.
@@ -389,6 +395,7 @@ Tickets:
 ### 4.2 Semantic Layer (the missing middle)
 
 #### WHAT
+
 The semantic layer translates **business vocabulary** to **SQL**.
 Three primitives:
 
@@ -417,6 +424,7 @@ GROUP BY region
 …without the user writing any SQL.
 
 #### WHY
+
 - It's the **defining feature** of self-service BI. Without it the
   tool is "SQL Lab + charts" — a worse Mode/Hex.
 - One definition of "revenue" used everywhere — no spreadsheet drift.
@@ -506,11 +514,13 @@ LIMIT 1000
 ```
 
 #### DBExec status
+
 🟡 **Partial.** `Dataset.fields` carries calculated fields with a
 `dataType` and `customLogic`. No notion of `metric` vs `dimension`,
 no entity model, no joins.
 
 #### Gap
+
 Significant. Effectively a new module.
 
 #### Build plan
@@ -553,10 +563,12 @@ Significant. Effectively a new module.
 ### 4.3 Dataset
 
 #### WHAT
+
 A dataset is the **queryable unit** in DBExec. Currently: name +
 datasource + connection + free-form SQL + custom fields.
 
 #### WHY
+
 Every chart, RLS rule, alert, subscription needs a dataset behind it.
 This is the central object of the platform.
 
@@ -608,22 +620,24 @@ CREATE TABLE dataset_field (
 
 Operations:
 
-| Endpoint | Purpose |
-|---|---|
-| `POST /dataset` | Create from SQL |
-| `POST /dataset/builder` | Create from QueryBuilder template |
-| `POST /dataset/upload/csv` | **MISSING** — create from CSV upload |
-| `POST /dataset/upload/xlsx` | **MISSING** — XLSX upload |
-| `POST /dataset/preview` | Run + return first N rows |
-| `POST /dataset/distinct/:col` | Return distinct values for a column |
-| `POST /dataset/duplicate/:id` | Save-as |
-| `GET /dataset/:id/lineage` | **MISSING** — which analyses/dashboards consume me |
-| `GET /dataset/:id/usage` | **MISSING** — query count, p95 latency |
+| Endpoint                      | Purpose                                            |
+| ----------------------------- | -------------------------------------------------- |
+| `POST /dataset`               | Create from SQL                                    |
+| `POST /dataset/builder`       | Create from QueryBuilder template                  |
+| `POST /dataset/upload/csv`    | **MISSING** — create from CSV upload               |
+| `POST /dataset/upload/xlsx`   | **MISSING** — XLSX upload                          |
+| `POST /dataset/preview`       | Run + return first N rows                          |
+| `POST /dataset/distinct/:col` | Return distinct values for a column                |
+| `POST /dataset/duplicate/:id` | Save-as                                            |
+| `GET /dataset/:id/lineage`    | **MISSING** — which analyses/dashboards consume me |
+| `GET /dataset/:id/usage`      | **MISSING** — query count, p95 latency             |
 
 #### DBExec status
+
 🟡 SQL + custom fields work. Upload, lineage, usage stats are missing.
 
 #### Gap
+
 G19 (upload), G28 (lineage), G37 (freshness), G38 (cost).
 
 #### Build plan
@@ -665,7 +679,8 @@ export default async function uploadDatasetCsv(req: Request, res: Response) {
   const datasource = await acquireManagedDatasource(orgData.id);
   const tableName = `up_${orgData.id.replace(/-/g, '').slice(0, 8)}_${Date.now()}`;
 
-  const inferred: Record<string, 'text' | 'numeric' | 'timestamp' | 'bool'> = {};
+  const inferred: Record<string, 'text' | 'numeric' | 'timestamp' | 'bool'> =
+    {};
   const rows: Record<string, unknown>[] = [];
   await new Promise<void>((resolve, reject) => {
     Papa.parse(new PassThrough().end(file.buffer), {
@@ -679,12 +694,13 @@ export default async function uploadDatasetCsv(req: Request, res: Response) {
         rows.push(data);
       },
       complete: () => resolve(),
-      error: (e) => reject(e),
+      error: e => reject(e),
     });
   });
 
   const cols = Object.entries(inferred)
-    .map(([c, t]) => `"${sanitiseIdent(c)}" ${t}`).join(', ');
+    .map(([c, t]) => `"${sanitiseIdent(c)}" ${t}`)
+    .join(', ');
   await datasource.query(`CREATE TABLE "${tableName}" (${cols})`);
   // Bulk insert. For >50k rows, switch to COPY FROM STDIN.
   await batchInsert(datasource, tableName, rows, Object.keys(inferred));
@@ -706,8 +722,11 @@ function inferType(v: string): 'text' | 'numeric' | 'timestamp' | 'bool' {
   if (!isNaN(Date.parse(v))) return 'timestamp';
   return 'text';
 }
-const rank = (t: string) => ({ bool: 1, numeric: 2, timestamp: 3, text: 4 }[t] ?? 4);
-function sanitiseIdent(s: string) { return s.replace(/[^a-zA-Z0-9_]/g, '_').slice(0, 63); }
+const rank = (t: string) =>
+  ({ bool: 1, numeric: 2, timestamp: 3, text: 4 })[t] ?? 4;
+function sanitiseIdent(s: string) {
+  return s.replace(/[^a-zA-Z0-9_]/g, '_').slice(0, 63);
+}
 ```
 
 ---
@@ -715,11 +734,13 @@ function sanitiseIdent(s: string) { return s.replace(/[^a-zA-Z0-9_]/g, '_').slic
 ### 4.4 Query Processor
 
 #### WHAT
+
 Take a structured request (semantic query, filter set, drill state)
 and produce a dialect-specific SQL string that returns the right rows
 with the right aggregation.
 
 #### WHY
+
 - One AST → many dialects.
 - Aggregate awareness needs a compiler.
 - AI Q&A needs a compiler.
@@ -744,8 +765,8 @@ Pseudocode signature:
 ```ts
 interface SemanticRequest {
   modelId: string;
-  metrics: string[];                // names of metrics
-  dimensions: string[];             // names of dimensions
+  metrics: string[]; // names of metrics
+  dimensions: string[]; // names of dimensions
   filters: FilterClause[];
   orderBy?: { field: string; dir: 'asc' | 'desc' }[];
   limit?: number;
@@ -763,9 +784,9 @@ interface Compiler {
   compile(req: SemanticRequest, ctx: CompileCtx): CompiledSQL;
 }
 interface CompileCtx {
-  semanticModel: SemanticModel;       // resolved
-  dataset: Dataset;                   // for the base SQL
-  rlsPredicates: string[];            // injected for the caller's identity
+  semanticModel: SemanticModel; // resolved
+  dataset: Dataset; // for the base SQL
+  rlsPredicates: string[]; // injected for the caller's identity
   dialect: 'postgres' | 'mysql' | 'snowflake' | 'mssql' | 'oracle';
 }
 interface CompiledSQL {
@@ -776,10 +797,12 @@ interface CompiledSQL {
 ```
 
 #### DBExec status
+
 🟡 Today: prompts inject string fragments into a template. There is no
 AST, no dialect adapter, no cache key.
 
 #### Gap
+
 G13 (semantic), G15 (aggregate), G34 (dbt integration).
 
 #### Build plan
@@ -799,6 +822,7 @@ This is the same plan as 4.2 phase B but stated as standalone:
 ### 4.5 Cache and Materialisation
 
 #### WHAT
+
 Two distinct caches:
 
 1. **Query result cache** — `hash(SQL + bindings) → result rows`.
@@ -811,6 +835,7 @@ Superset (and Preset) ship a Redis-backed cache out of the box. dbt +
 Cube ship pre-aggregations / materialisations.
 
 #### WHY
+
 - Every dashboard reload re-queries the source by default. That is
   expensive for the customer's warehouse (BigQuery / Snowflake bills).
 - Aggregate awareness is impossible without it.
@@ -874,9 +899,11 @@ A Celery / BullMQ worker picks pending jobs and executes
 `CREATE TABLE AS (<dataset.sql>)` against the managed datasource.
 
 #### DBExec status
+
 ❌ No cache, no materialisation.
 
 #### Gap
+
 G1, G2, G3, G15.
 
 #### Build plan
@@ -906,6 +933,7 @@ G1, G2, G3, G15.
 ### 4.6 Analysis
 
 #### WHAT
+
 An analysis is a **multi-visual canvas** authored on top of a dataset.
 Tableau calls these "sheets + dashboards combined into a workbook";
 Superset calls a single one an "explore"; Power BI calls it a "report".
@@ -913,6 +941,7 @@ Superset calls a single one an "explore"; Power BI calls it a "report".
 A DBExec analysis = (dataset, visuals[], filters[], layout).
 
 #### WHY
+
 - The author's workspace.
 - Promotes / publishes to a dashboard.
 
@@ -941,11 +970,11 @@ CREATE TABLE analysis (
 ```ts
 interface Visual {
   id: string;
-  chartType: ChartType;            // 'bar' | 'line' | ...
+  chartType: ChartType; // 'bar' | 'line' | ...
   title: string;
-  fieldMapping: Record<string, FieldRef[]>;  // 'xAxis': [{datasetField}, ...]
-  options: ChartOptions;           // echarts opts overlay
-  layout: { x:number; y:number; w:number; h:number };
+  fieldMapping: Record<string, FieldRef[]>; // 'xAxis': [{datasetField}, ...]
+  options: ChartOptions; // echarts opts overlay
+  layout: { x: number; y: number; w: number; h: number };
 }
 ```
 
@@ -953,10 +982,12 @@ DBExec already stores this shape today; check
 `shared/db/shared_entity/analyses.entity.ts` plus `visuals/`.
 
 #### DBExec status
+
 🟡 Authoring works. Missing: parameters, drill, cross-filters,
 duplicate-analysis, version history.
 
 #### Gap
+
 G10, G11, G12.
 
 #### Build plan
@@ -976,11 +1007,13 @@ G10, G11, G12.
 ### 4.7 Visual Builder
 
 #### WHAT
+
 The right-click "Properties" panel of every chart. Defines colours,
 legend position, tooltips, data-zoom, animation, mark lines, etc. The
 73 chart types each expose ~15 properties.
 
 #### WHY
+
 Customers compare against Tableau / Power BI on visual polish. The
 defaults must be good; the overrides must be exhaustive.
 
@@ -993,17 +1026,17 @@ Industry pattern is a **registry**:
 export interface VisualSpec {
   chartType: string;
   family: 'bar' | 'line' | 'pie' | 'geo' | '3d' | 'gl' | 'special';
-  roles: Role[];                    // required field slots
+  roles: Role[]; // required field slots
   defaultOptions(ctx: VisualCtx): EChartsOption;
   properties: PropertyDescriptor[]; // for the Properties panel
 }
 
 interface PropertyDescriptor {
-  key: string;                      // 'legend.show'
-  label: string;                    // 'Show legend'
+  key: string; // 'legend.show'
+  label: string; // 'Show legend'
   control: 'toggle' | 'select' | 'color' | 'number' | 'slider';
   default: unknown;
-  optionPath: string;               // dot path to set in EChartsOption
+  optionPath: string; // dot path to set in EChartsOption
   appliesWhen?: (ctx: VisualCtx) => boolean;
 }
 ```
@@ -1016,10 +1049,12 @@ imperative. Migrating to a declarative registry pays back with:
 - New chart types are 1 file each.
 
 #### DBExec status
+
 🟡 73 chart types exist. The builder is largely procedural in
 `echarts-option-builder.ts`.
 
 #### Gap
+
 - No declarative registry.
 - Property merge-leak bugs (already encountered in production).
 - New chart types require deep edits to the builder.
@@ -1039,6 +1074,7 @@ imperative. Migrating to a declarative registry pays back with:
 ### 4.8 Filters, Parameters, Cross-filters, Drill
 
 #### WHAT
+
 Four related concepts:
 
 - **Filter** — predicate applied to the dataset. Lives in the
@@ -1049,6 +1085,7 @@ Four related concepts:
 - **Drill** — click a categorical value to descend a hierarchy.
 
 #### WHY
+
 Without these, charts are static reports. With them they're an
 explorable surface.
 
@@ -1088,8 +1125,8 @@ this.actionBus.emit({
 });
 
 // Visuals subscribe and rebuild their data with the extra predicate.
-this.actionBus.on('cross-filter', (filter) => {
-  if (filter.source === this.id) return;     // don't filter source
+this.actionBus.on('cross-filter', filter => {
+  if (filter.source === this.id) return; // don't filter source
   this.localFilters.push(filter);
   this.rebuild();
 });
@@ -1102,9 +1139,11 @@ URL deep-link:
 ```
 
 #### DBExec status
+
 🟡 Filters exist; cross-filters / drill / parameters do not.
 
 #### Gap
+
 G10, G11, G12.
 
 #### Build plan
@@ -1121,11 +1160,13 @@ G10, G11, G12.
 ### 4.9 Dashboard
 
 #### WHAT
+
 A frozen-at-publish OR live-mode page made of multiple analyses /
 visuals arranged on a grid layout. Has its own filter bar (which
 applies across analyses), description, last-published-at metadata.
 
 #### WHY
+
 The "viewing" surface — what end-users see most.
 
 #### HOW
@@ -1149,11 +1190,13 @@ CREATE TABLE dashboard (
 ```
 
 #### DBExec status
+
 🟡 Snapshot dashboards exist (see `dashboards/` module + publish flow).
 No live mode, no per-dashboard filter bar, no cross-analysis filters,
 no embed.
 
 #### Gap
+
 G6, G7, G10, G18.
 
 #### Build plan
@@ -1208,6 +1251,7 @@ export async function renderDashboardPdf(
 ### 4.10 RLS and Column Security
 
 #### WHAT
+
 - **Row-level security (RLS)** — predicates injected into queries based
   on the caller's identity. Result: user sees only their rows.
 - **Column-level security** — columns masked or removed for users
@@ -1217,6 +1261,7 @@ Looker uses `access_filter`, Metabase uses sandboxes, Tableau uses
 user filters. The SQL injection point is identical.
 
 #### WHY
+
 - Multi-tenant analytics tools are unsellable without RLS.
 - Regulators (GDPR, HIPAA) require column masking on PII.
 
@@ -1287,9 +1332,11 @@ FROM ...
 ```
 
 #### DBExec status
+
 🟡 Row-level rules ship today. Column security does not.
 
 #### Gap
+
 G20.
 
 #### Build plan
@@ -1305,6 +1352,7 @@ G20.
 ### 4.11 Permissions / RBAC / SSO / SCIM
 
 #### WHAT
+
 - **RBAC** — role-based access; permission tree per role.
 - **SSO** — SAML 2.0 + OIDC.
 - **MFA** — TOTP / WebAuthn.
@@ -1312,6 +1360,7 @@ G20.
 - **Service accounts** — API tokens that aren't tied to a human user.
 
 #### WHY
+
 Enterprises won't buy a tool without SSO + SCIM. MFA is now table stakes
 for SOC 2.
 
@@ -1324,20 +1373,24 @@ SAML pipeline (using `passport-saml`):
 import passport from 'passport';
 import { Strategy as SamlStrategy } from 'passport-saml';
 
-passport.use('saml', new SamlStrategy(
-  {
-    entryPoint: process.env.SAML_ENTRY_POINT!,
-    issuer: process.env.SAML_ISSUER!,
-    cert: process.env.SAML_CERT!,
-    callbackUrl: `${BACKEND_URL}/auth/saml/acs`,
-  },
-  async (profile, done) => {
-    const user = await upsertUserFromSaml(profile);
-    done(null, user);
-  },
-));
+passport.use(
+  'saml',
+  new SamlStrategy(
+    {
+      entryPoint: process.env.SAML_ENTRY_POINT!,
+      issuer: process.env.SAML_ISSUER!,
+      cert: process.env.SAML_CERT!,
+      callbackUrl: `${BACKEND_URL}/auth/saml/acs`,
+    },
+    async (profile, done) => {
+      const user = await upsertUserFromSaml(profile);
+      done(null, user);
+    },
+  ),
+);
 
-router.post('/saml/acs',
+router.post(
+  '/saml/acs',
   passport.authenticate('saml', { session: false }),
   async (req, res) => {
     const token = signJwt(req.user);
@@ -1380,9 +1433,11 @@ CREATE TABLE api_token (
 ```
 
 #### DBExec status
+
 🟡 JWT login + role grid mature. No SSO, no MFA, no SCIM, no API tokens.
 
 #### Gap
+
 G21-G25.
 
 #### Build plan
@@ -1434,12 +1489,14 @@ read-only data sources can still use the rest of the product.
 ### 4.14 Export & Download
 
 #### WHAT
+
 - **Dataset → CSV/XLSX/JSON** — bulk row export.
 - **Visual → PNG/SVG** — single-chart image.
 - **Dashboard → PDF** — multi-page printable report.
 - **Analysis → PowerPoint** — Tableau Story-style decks.
 
 #### WHY
+
 Every customer asks for export within the first 30 days.
 
 #### HOW
@@ -1455,7 +1512,10 @@ export default async function exportDataset(req: Request, res: Response) {
 
   if (format === 'csv') {
     res.setHeader('Content-Type', 'text/csv');
-    res.setHeader('Content-Disposition', `attachment; filename="${ds.name}.csv"`);
+    res.setHeader(
+      'Content-Disposition',
+      `attachment; filename="${ds.name}.csv"`,
+    );
     res.write(columns.join(',') + '\n');
     for (const row of rows) {
       res.write(columns.map(c => escapeCsv(row[c])).join(',') + '\n');
@@ -1470,7 +1530,10 @@ export default async function exportDataset(req: Request, res: Response) {
       'Content-Type',
       'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
     );
-    res.setHeader('Content-Disposition', `attachment; filename="${ds.name}.xlsx"`);
+    res.setHeader(
+      'Content-Disposition',
+      `attachment; filename="${ds.name}.xlsx"`,
+    );
     await workbook.xlsx.write(res);
     res.end();
   }
@@ -1493,9 +1556,11 @@ saveAs(blob, `${visual.title}.png`);
 PDF: covered in 4.9.
 
 #### DBExec status
+
 ❌ No exports today.
 
 #### Gap
+
 G8, G9.
 
 #### Build plan
@@ -1510,6 +1575,7 @@ G8, G9.
 ### 4.15 Sharing & Embedding
 
 #### WHAT
+
 Three modes:
 
 1. **Internal share** — share with a list of users / groups inside the
@@ -1521,6 +1587,7 @@ Three modes:
 Sigma and Looker have converged on JWT-signed embed URLs.
 
 #### WHY
+
 - Public links: marketing dashboards, board reports.
 - Embed: every SaaS that wants analytics inside their own product.
 
@@ -1578,9 +1645,11 @@ CSP: customer's domain must be in `Content-Security-Policy:
 frame-ancestors` allowlist.
 
 #### DBExec status
+
 ❌ Nothing today.
 
 #### Gap
+
 G6, G7, G17.
 
 #### Build plan
@@ -1599,6 +1668,7 @@ G6, G7, G17.
 ### 4.16 Scheduling, Subscriptions, Alerts
 
 #### WHAT
+
 - **Schedule** — refresh a dataset on a cron.
 - **Subscription** — email a dashboard PDF on a cron.
 - **Alert** — fire when a metric threshold is breached.
@@ -1607,6 +1677,7 @@ Power BI separates "subscriptions" (schedule-based delivery) from "data
 alerts" (threshold-based). Same pattern in Looker, Tableau, Superset.
 
 #### WHY
+
 - The single most-asked-for feature after charts work.
 - Drives daily active usage even when nobody logs in.
 
@@ -1651,13 +1722,20 @@ Scheduler:
 ```ts
 // src/services/scheduler.service.ts (BullMQ-backed)
 const queue = new Queue('dbexec-schedule', { connection: redis });
-const worker = new Worker('dbexec-schedule', async (job) => {
-  switch (job.name) {
-    case 'subscription:run': return runSubscription(job.data.id);
-    case 'alert:check':       return checkAlert(job.data.id);
-    case 'materialise':       return refreshMaterialised(job.data.id);
-  }
-}, { connection: redis });
+const worker = new Worker(
+  'dbexec-schedule',
+  async job => {
+    switch (job.name) {
+      case 'subscription:run':
+        return runSubscription(job.data.id);
+      case 'alert:check':
+        return checkAlert(job.data.id);
+      case 'materialise':
+        return refreshMaterialised(job.data.id);
+    }
+  },
+  { connection: redis },
+);
 
 // Cron registration uses a separate "scheduler" instance per spec.
 ```
@@ -1672,12 +1750,13 @@ const transporter = nodemailer.createTransport({
   auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS },
 });
 
-export async function sendEmail({
-  to, subject, html, attachments,
-}: SendOpts) {
+export async function sendEmail({ to, subject, html, attachments }: SendOpts) {
   return transporter.sendMail({
     from: process.env.SMTP_FROM!,
-    to, subject, html, attachments,
+    to,
+    subject,
+    html,
+    attachments,
   });
 }
 ```
@@ -1688,7 +1767,7 @@ Subscription run:
 async function runSubscription(id: string) {
   const sub = await Subscription.findOne({ where: { id } });
   const token = signServiceToken(sub.organisationId);
-  const pdf  = await renderDashboardPdf(sub.targetId, token);
+  const pdf = await renderDashboardPdf(sub.targetId, token);
   await sendEmail({
     to: sub.recipients,
     subject: `DBExec — ${sub.dashboardName}`,
@@ -1704,9 +1783,11 @@ async function runSubscription(id: string) {
 ```
 
 #### DBExec status
+
 ❌ None.
 
 #### Gap
+
 G3, G4, G5, G14, G33.
 
 #### Build plan
@@ -1747,14 +1828,17 @@ ALTER TABLE notification ADD COLUMN category varchar(32);
 ### 4.18 Search, Tagging, Catalogue
 
 #### WHAT
+
 A first-class search experience: find a dashboard, dataset, analysis,
 field, person by name + description + content.
 
 #### WHY
+
 At 200+ dashboards the home page becomes unusable. Search is the
 escape hatch.
 
 #### HOW
+
 - Server-side: Postgres `tsvector` indexes per entity.
 - Client-side: `Cmd-K` palette overlay; result groups; recent items.
 - Tag table:
@@ -1776,13 +1860,16 @@ CREATE TABLE tag_attachment (
 ```
 
 #### DBExec status
+
 🟡 Basic search exists. No tags, no collections, no Cmd-K palette,
 no favourites.
 
 #### Gap
+
 G30, G31.
 
 #### Build plan
+
 1. **SRCH-100** — Cmd-K palette.
 2. **SRCH-101** — `tag` + `tag_attachment` tables + UI.
 3. **SRCH-102** — Favourites (per-user star).
@@ -1793,14 +1880,16 @@ G30, G31.
 ### 4.19 Versioning, Git, Lineage
 
 #### WHAT
+
 - **Versioning** — every save of an analysis stores a snapshot.
   Revert + diff possible.
 - **Git sync** — semantic models (YAML files) pushed to a customer's
   git repo. LookML's killer feature.
 - **Lineage** — graph showing `column → dataset → analysis → dashboard
-  → subscription`.
+→ subscription`.
 
 #### WHY
+
 - Versioning: customers ask "who broke this dashboard yesterday".
 - Lineage: BI teams need to know what breaks when a column is renamed
   upstream.
@@ -1848,12 +1937,15 @@ function lineageFor(datasetId: string): LineageGraph {
 ```
 
 #### DBExec status
+
 ❌ Almost nothing.
 
 #### Gap
+
 G27, G28.
 
 #### Build plan
+
 1. **VER-100** — `object_version` table; on every analysis/dashboard
    save, snapshot the body.
 2. **VER-101** — UI diff view (text-diff of JSON, side-by-side).
@@ -1878,10 +1970,12 @@ Already mature in DBExec. To stretch:
 ### 4.21 Theming, Branding, White-label
 
 #### WHAT
+
 Org-level customisation: logo, primary colour, login background,
 favicon, custom CSS for embed.
 
 #### WHY
+
 Whitelabel embed is non-negotiable for ISVs.
 
 #### HOW
@@ -1909,23 +2003,28 @@ White-label: hide all "DBExec" mentions when `embed_chrome=false`.
 ### 4.22 Mobile, PWA, Offline
 
 #### WHAT
+
 - **Responsive layout** down to 360px.
 - **PWA manifest** + service worker for offline shell.
 - **Offline cache** of recently-viewed dashboards as snapshots.
 
 #### WHY
+
 Field-team usage. Sales reps on a delayed flight.
 
 #### HOW
+
 - `ngsw-config.json` for Angular's built-in service worker.
 - Cache the home page + last 5 dashboards' snapshot JSON.
 - When offline, render snapshots; show "offline — last refreshed N
   minutes ago" badge.
 
 #### DBExec status
+
 ❌
 
 #### Gap
+
 G29.
 
 ---
@@ -1933,16 +2032,19 @@ G29.
 ### 4.23 Public API, SDKs, Plugins, Custom Viz
 
 #### WHAT
+
 - Stable REST API at `/api/public/v1/*` with OpenAPI schema.
 - TypeScript SDK: `@dbexec/sdk` for customers' backends.
 - Embed SDK: `@dbexec/embed` for their frontends.
 - Plugin registry: drop-in chart types, drop-in data connectors.
 
 #### WHY
+
 - Every mature BI tool has an API.
 - Plugins unlock the long tail of niche chart types.
 
 #### HOW
+
 - OpenAPI spec generated from Zod via `zod-to-openapi`.
 - SDK auto-generated from the spec.
 - Plugin loader: `npm install` a package, register it at boot. Plugin
@@ -1957,12 +2059,15 @@ export class PluginRegistry {
       throw new Error(`duplicate chart type ${spec.chartType}`);
     this.specs.set(spec.chartType, spec);
   }
-  get(chartType: string) { return this.specs.get(chartType); }
+  get(chartType: string) {
+    return this.specs.get(chartType);
+  }
 }
 export const PLUGINS = new PluginRegistry();
 ```
 
 #### Gap
+
 G25, G26.
 
 ---
@@ -2002,26 +2107,26 @@ follow-on work.
 
 ### 5.1 Phasing
 
-| Quarter | Theme | Tickets | Outcome |
-|---|---|---|---|
-| **Q1 (months 1-3)** | Distribution core | G1 Redis cache, G2 BullMQ, G4 Subscriptions, G14 Email, G8 PDF export, G9 CSV/XLSX export | Customers can schedule + email + export dashboards |
-| **Q2 (months 4-6)** | Sharing + Embed | G6 Public links, G7 Embed JWT, G17 saved-question, G20 Column security | Whitelabel-embed-ready |
-| **Q3 (months 7-9)** | Semantic + Authoring | G13 Semantic types, G15 Aggregate awareness, G10 Cross-filters, G11 Drill, G12 Parameters | Self-service feature parity |
-| **Q4 (months 10-12)** | Enterprise + Polish | G21 SSO, G22 SCIM, G23 MFA, G24 API tokens, G25 Public API, G19 CSV upload, G29 PWA, G27 Versioning | Enterprise-RFP-ready |
+| Quarter               | Theme                | Tickets                                                                                             | Outcome                                            |
+| --------------------- | -------------------- | --------------------------------------------------------------------------------------------------- | -------------------------------------------------- |
+| **Q1 (months 1-3)**   | Distribution core    | G1 Redis cache, G2 BullMQ, G4 Subscriptions, G14 Email, G8 PDF export, G9 CSV/XLSX export           | Customers can schedule + email + export dashboards |
+| **Q2 (months 4-6)**   | Sharing + Embed      | G6 Public links, G7 Embed JWT, G17 saved-question, G20 Column security                              | Whitelabel-embed-ready                             |
+| **Q3 (months 7-9)**   | Semantic + Authoring | G13 Semantic types, G15 Aggregate awareness, G10 Cross-filters, G11 Drill, G12 Parameters           | Self-service feature parity                        |
+| **Q4 (months 10-12)** | Enterprise + Polish  | G21 SSO, G22 SCIM, G23 MFA, G24 API tokens, G25 Public API, G19 CSV upload, G29 PWA, G27 Versioning | Enterprise-RFP-ready                               |
 
 Plus continuous improvements: G5 Alerts (Q1 follow-on), G33 Slack
 (Q2), G26 Plugins (Q4 stretch), G35 Geo (Q3).
 
 ### 5.2 Team & headcount
 
-| Role | Q1 | Q2 | Q3 | Q4 |
-|---|---|---|---|---|
-| BE engineers | 3 | 3 | 4 | 4 |
-| FE engineers | 2 | 3 | 3 | 3 |
-| Data eng (compiler) | 0 | 1 | 2 | 1 |
-| QA | 1 | 1 | 2 | 2 |
-| Designer | 0.5 | 1 | 1 | 1 |
-| PM | 1 | 1 | 1 | 1 |
+| Role                | Q1  | Q2  | Q3  | Q4  |
+| ------------------- | --- | --- | --- | --- |
+| BE engineers        | 3   | 3   | 4   | 4   |
+| FE engineers        | 2   | 3   | 3   | 3   |
+| Data eng (compiler) | 0   | 1   | 2   | 1   |
+| QA                  | 1   | 1   | 2   | 2   |
+| Designer            | 0.5 | 1   | 1   | 1   |
+| PM                  | 1   | 1   | 1   | 1   |
 
 Total Q1: ~7-8 FTE. Total Q4: ~12 FTE. Aggregate ~135 FTE-months ≈ the
 130-160 we estimated.
@@ -2093,7 +2198,11 @@ export class CacheService {
     let cursor = '0';
     do {
       const [next, keys] = await this.redis.scan(
-        cursor, 'MATCH', `${prefix}*`, 'COUNT', 500,
+        cursor,
+        'MATCH',
+        `${prefix}*`,
+        'COUNT',
+        500,
       );
       cursor = next;
       if (keys.length) total += await this.redis.del(...keys);
@@ -2118,9 +2227,10 @@ export class SemanticCompiler {
     req.dimensions.forEach((dimName, i) => {
       const dim = ctx.semanticModel.dimensions.find(d => d.name === dimName);
       if (!dim) throw new Error(`unknown dimension: ${dimName}`);
-      const expr = dim.type === 'time'
-        ? this.wrapTimeGrain(dim.expression, dim.timeGrain, ctx.dialect)
-        : dim.expression;
+      const expr =
+        dim.type === 'time'
+          ? this.wrapTimeGrain(dim.expression, dim.timeGrain, ctx.dialect)
+          : dim.expression;
       const alias = sanitiseIdent(dim.name);
       cols.push(`${expr} AS ${alias}`);
       groupBy.push(String(i + 1));
@@ -2135,7 +2245,7 @@ export class SemanticCompiler {
 
     // 3. WHERE clauses.
     const where = this.renderFilters(req.filters, bindings, ctx);
-    const rls   = ctx.rlsPredicates.join(' AND ');
+    const rls = ctx.rlsPredicates.join(' AND ');
     const wheres = [where, rls].filter(Boolean).join(' AND ');
 
     // 4. Compose.
@@ -2172,34 +2282,64 @@ export class SemanticCompiler {
     }
   }
 
-  private renderFilters(fs: FilterClause[], b: unknown[], ctx: CompileCtx): string {
-    return fs.map(f => this.renderClause(f, b, ctx)).filter(Boolean).join(' AND ');
+  private renderFilters(
+    fs: FilterClause[],
+    b: unknown[],
+    ctx: CompileCtx,
+  ): string {
+    return fs
+      .map(f => this.renderClause(f, b, ctx))
+      .filter(Boolean)
+      .join(' AND ');
   }
   private renderClause(f: FilterClause, b: unknown[], ctx: CompileCtx): string {
     switch (f.op) {
-      case 'eq':  b.push(f.value); return `${q(f.field)} = $${b.length}`;
-      case 'ne':  b.push(f.value); return `${q(f.field)} <> $${b.length}`;
-      case 'in':  b.push(...f.values); return `${q(f.field)} IN (${placeholders(f.values, b.length)})`;
+      case 'eq':
+        b.push(f.value);
+        return `${q(f.field)} = $${b.length}`;
+      case 'ne':
+        b.push(f.value);
+        return `${q(f.field)} <> $${b.length}`;
+      case 'in':
+        b.push(...f.values);
+        return `${q(f.field)} IN (${placeholders(f.values, b.length)})`;
       case 'not_in':
-                  b.push(...f.values); return `${q(f.field)} NOT IN (${placeholders(f.values, b.length)})`;
+        b.push(...f.values);
+        return `${q(f.field)} NOT IN (${placeholders(f.values, b.length)})`;
       case 'between':
-                  b.push(f.values[0], f.values[1]);
-                  return `${q(f.field)} BETWEEN $${b.length - 1} AND $${b.length}`;
-      case 'is_null':     return `${q(f.field)} IS NULL`;
-      case 'is_not_null': return `${q(f.field)} IS NOT NULL`;
-      case 'and': return '(' + f.clauses.map(c => this.renderClause(c, b, ctx)).join(' AND ') + ')';
-      case 'or':  return '(' + f.clauses.map(c => this.renderClause(c, b, ctx)).join(' OR ') + ')';
+        b.push(f.values[0], f.values[1]);
+        return `${q(f.field)} BETWEEN $${b.length - 1} AND $${b.length}`;
+      case 'is_null':
+        return `${q(f.field)} IS NULL`;
+      case 'is_not_null':
+        return `${q(f.field)} IS NOT NULL`;
+      case 'and':
+        return (
+          '(' +
+          f.clauses.map(c => this.renderClause(c, b, ctx)).join(' AND ') +
+          ')'
+        );
+      case 'or':
+        return (
+          '(' +
+          f.clauses.map(c => this.renderClause(c, b, ctx)).join(' OR ') +
+          ')'
+        );
     }
   }
   private orderBy(o: { field: string; dir: 'asc' | 'desc' }[]) {
     return `ORDER BY ${o.map(x => `${q(x.field)} ${x.dir.toUpperCase()}`).join(', ')}`;
   }
 }
-function q(name: string) { return `"${name.replace(/"/g, '""')}"`; }
+function q(name: string) {
+  return `"${name.replace(/"/g, '""')}"`;
+}
 function placeholders(arr: unknown[], end: number) {
   return arr.map((_, i) => `$${end - arr.length + i + 1}`).join(', ');
 }
-function sanitiseIdent(s: string) { return s.replace(/[^a-zA-Z0-9_]/g, '_').slice(0, 63); }
+function sanitiseIdent(s: string) {
+  return s.replace(/[^a-zA-Z0-9_]/g, '_').slice(0, 63);
+}
 ```
 
 ### 6.3 BullMQ scheduler
@@ -2208,22 +2348,34 @@ function sanitiseIdent(s: string) { return s.replace(/[^a-zA-Z0-9_]/g, '_').slic
 // services/scheduler.bootstrap.ts
 import { Queue, Worker, QueueEvents } from 'bullmq';
 
-const connection = { host: process.env.REDIS_HOST!, port: Number(process.env.REDIS_PORT) };
+const connection = {
+  host: process.env.REDIS_HOST!,
+  port: Number(process.env.REDIS_PORT),
+};
 export const scheduleQueue = new Queue('dbexec-schedule', { connection });
 const events = new QueueEvents('dbexec-schedule', { connection });
 
-const worker = new Worker('dbexec-schedule', async (job) => {
-  switch (job.name) {
-    case 'subscription:run':   return runSubscription(job.data.id);
-    case 'alert:check':        return checkAlert(job.data.id);
-    case 'materialise:refresh':return refreshMaterialised(job.data.id);
-    case 'dataset:warm-cache': return warmCache(job.data.id);
-  }
-}, { connection, concurrency: 5 });
+const worker = new Worker(
+  'dbexec-schedule',
+  async job => {
+    switch (job.name) {
+      case 'subscription:run':
+        return runSubscription(job.data.id);
+      case 'alert:check':
+        return checkAlert(job.data.id);
+      case 'materialise:refresh':
+        return refreshMaterialised(job.data.id);
+      case 'dataset:warm-cache':
+        return warmCache(job.data.id);
+    }
+  },
+  { connection, concurrency: 5 },
+);
 
 events.on('completed', ({ jobId }) => console.log(`done ${jobId}`));
 events.on('failed', ({ jobId, failedReason }) =>
-  console.error(`fail ${jobId}: ${failedReason}`));
+  console.error(`fail ${jobId}: ${failedReason}`),
+);
 
 // Register cron schedules on boot.
 export async function registerSchedules() {
@@ -2245,8 +2397,13 @@ export async function registerSchedules() {
 import { Request, Response, NextFunction } from 'express';
 import * as jwt from 'jsonwebtoken';
 
-export default function embedGuard(req: Request, res: Response, next: NextFunction) {
-  const token = (req.query.token as string) || (req.headers['x-embed-token'] as string);
+export default function embedGuard(
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
+  const token =
+    (req.query.token as string) || (req.headers['x-embed-token'] as string);
   if (!token) return res.status(401).json({ error: 'embed token required' });
 
   try {
@@ -2281,7 +2438,7 @@ export default async function publicShareView(req: Request, res: Response) {
 
   if (link.mode === 'password') {
     const provided = req.body?.password || req.headers['x-share-password'];
-    if (!provided || !await bcrypt.compare(provided, link.passwordHash!))
+    if (!provided || !(await bcrypt.compare(provided, link.passwordHash!)))
       return sendResponse(res, false, CODE.UNAUTHORIZED, 'password required');
   }
 
@@ -2303,7 +2460,10 @@ export async function checkAlert(id: string) {
   if (!a) return;
 
   // Cooldown — skip if recently triggered.
-  if (a.lastTriggeredAt && Date.now() - +a.lastTriggeredAt < a.cooldownMins * 60_000)
+  if (
+    a.lastTriggeredAt &&
+    Date.now() - +a.lastTriggeredAt < a.cooldownMins * 60_000
+  )
     return;
 
   const dataset = await Dataset.findOne({ where: { id: a.datasetId } });

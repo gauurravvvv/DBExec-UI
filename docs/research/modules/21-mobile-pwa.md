@@ -20,15 +20,15 @@
 
 ## 1. Industry baseline
 
-| Tool | Mobile path | Offline | Push |
-|---|---|---|---|
-| **Tableau** | Native iOS/Android apps | partial (favourites cached) | ✓ |
-| **Power BI** | Native iOS/Android + PWA | yes | ✓ |
-| **Looker** | Mobile web | n/a | ✓ |
-| **Metabase** | Mobile web | n/a | ✗ |
-| **Hex** | Web-only (responsive) | n/a | ✓ |
-| **Notion** | Native apps + PWA | yes | ✓ |
-| **Linear** | Native + PWA | yes | ✓ |
+| Tool         | Mobile path              | Offline                     | Push |
+| ------------ | ------------------------ | --------------------------- | ---- |
+| **Tableau**  | Native iOS/Android apps  | partial (favourites cached) | ✓    |
+| **Power BI** | Native iOS/Android + PWA | yes                         | ✓    |
+| **Looker**   | Mobile web               | n/a                         | ✓    |
+| **Metabase** | Mobile web               | n/a                         | ✗    |
+| **Hex**      | Web-only (responsive)    | n/a                         | ✓    |
+| **Notion**   | Native apps + PWA        | yes                         | ✓    |
+| **Linear**   | Native + PWA             | yes                         | ✓    |
 
 **The patterns to copy:**
 
@@ -57,25 +57,25 @@
 
 ## 3. Gap matrix
 
-| ID | Gap | Severity | Effort |
-|---|---|---|---|
-| MO-G01 | Web App Manifest | P0 | S |
-| MO-G02 | Service worker with app-shell caching | P0 | M |
-| MO-G03 | Workbox-based caching strategies | P0 | M |
-| MO-G04 | Install prompt UX | P1 | S |
-| MO-G05 | Mobile-responsive dashboard layout | P0 | M |
-| MO-G06 | Mobile-responsive filter sidebar (slide-out) | P0 | M |
-| MO-G07 | Mobile-responsive analysis builder (view only) | P1 | M |
-| MO-G08 | Touch-friendly chart interactions (tap-to-tooltip, pinch-to-zoom) | P1 | M |
-| MO-G09 | Bottom-nav for primary actions on mobile | P1 | S |
-| MO-G10 | Offline indicator + last-fetched timestamp | P1 | S |
-| MO-G11 | Read-only offline render of cached dashboards | P1 | L |
-| MO-G12 | Web push subscription handshake | P0 | S |
-| MO-G13 | "Add to Home Screen" button | P1 | S |
-| MO-G14 | iOS Safari quirks workaround (no `beforeinstallprompt`) | P1 | S |
-| MO-G15 | Capacitor wrapper for App Store / Play Store | P2 | L |
-| MO-G16 | Biometric unlock (WebAuthn) on PWA | P2 | M |
-| MO-G17 | Kiosk mode (full-screen dashboard rotation) | P2 | S |
+| ID     | Gap                                                               | Severity | Effort |
+| ------ | ----------------------------------------------------------------- | -------- | ------ |
+| MO-G01 | Web App Manifest                                                  | P0       | S      |
+| MO-G02 | Service worker with app-shell caching                             | P0       | M      |
+| MO-G03 | Workbox-based caching strategies                                  | P0       | M      |
+| MO-G04 | Install prompt UX                                                 | P1       | S      |
+| MO-G05 | Mobile-responsive dashboard layout                                | P0       | M      |
+| MO-G06 | Mobile-responsive filter sidebar (slide-out)                      | P0       | M      |
+| MO-G07 | Mobile-responsive analysis builder (view only)                    | P1       | M      |
+| MO-G08 | Touch-friendly chart interactions (tap-to-tooltip, pinch-to-zoom) | P1       | M      |
+| MO-G09 | Bottom-nav for primary actions on mobile                          | P1       | S      |
+| MO-G10 | Offline indicator + last-fetched timestamp                        | P1       | S      |
+| MO-G11 | Read-only offline render of cached dashboards                     | P1       | L      |
+| MO-G12 | Web push subscription handshake                                   | P0       | S      |
+| MO-G13 | "Add to Home Screen" button                                       | P1       | S      |
+| MO-G14 | iOS Safari quirks workaround (no `beforeinstallprompt`)           | P1       | S      |
+| MO-G15 | Capacitor wrapper for App Store / Play Store                      | P2       | L      |
+| MO-G16 | Biometric unlock (WebAuthn) on PWA                                | P2       | M      |
+| MO-G17 | Kiosk mode (full-screen dashboard rotation)                       | P2       | S      |
 
 ## 4. Target architecture
 
@@ -96,11 +96,24 @@
   "icons": [
     { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
     { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png" },
-    { "src": "/icons/icon-mask.svg",  "sizes": "any",     "type": "image/svg+xml", "purpose": "maskable" }
+    {
+      "src": "/icons/icon-mask.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
   ],
   "shortcuts": [
-    { "name": "Home", "url": "/?source=shortcut", "icons": [{ "src": "/icons/home.png", "sizes": "96x96" }] },
-    { "name": "My dashboards", "url": "/dashboards?source=shortcut", "icons": [{ "src": "/icons/dash.png", "sizes": "96x96" }] }
+    {
+      "name": "Home",
+      "url": "/?source=shortcut",
+      "icons": [{ "src": "/icons/home.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "My dashboards",
+      "url": "/dashboards?source=shortcut",
+      "icons": [{ "src": "/icons/dash.png", "sizes": "96x96" }]
+    }
   ]
 }
 ```
@@ -137,7 +150,11 @@ app.get('/manifest.webmanifest', async (req, res) => {
 // src/sw.ts — compiled to public/sw.js by Angular service worker config
 import { precacheAndRoute } from 'workbox-precaching';
 import { registerRoute, NavigationRoute } from 'workbox-routing';
-import { StaleWhileRevalidate, NetworkFirst, CacheFirst } from 'workbox-strategies';
+import {
+  StaleWhileRevalidate,
+  NetworkFirst,
+  CacheFirst,
+} from 'workbox-strategies';
 import { ExpirationPlugin } from 'workbox-expiration';
 import { CacheableResponsePlugin } from 'workbox-cacheable-response';
 
@@ -153,7 +170,7 @@ registerRoute(new NavigationRoute(handler));
 
 // 3. Static assets (JS/CSS) → SWR
 registerRoute(
-  ({ request }) => ['style','script'].includes(request.destination),
+  ({ request }) => ['style', 'script'].includes(request.destination),
   new StaleWhileRevalidate({
     cacheName: 'static',
     plugins: [
@@ -177,7 +194,9 @@ registerRoute(
 // 5. API calls → network-only (don't cache freshness-sensitive data)
 //    EXCEPT for dashboard render results (cached for offline)
 registerRoute(
-  ({ url }) => url.pathname.startsWith('/api/v1/dashboards/') && url.pathname.endsWith('/render'),
+  ({ url }) =>
+    url.pathname.startsWith('/api/v1/dashboards/') &&
+    url.pathname.endsWith('/render'),
   new StaleWhileRevalidate({
     cacheName: 'dashboard-render',
     plugins: [
@@ -187,32 +206,35 @@ registerRoute(
 );
 
 // 6. Push event handler — see §4.5
-self.addEventListener('push', (event) => {
+self.addEventListener('push', event => {
   const data = event.data?.json() ?? {};
-  event.waitUntil(self.registration.showNotification(data.title, {
-    body: data.body,
-    icon: data.icon,
-    badge: data.badge,
-    data: { url: data.url, notificationId: data.notificationId },
-    actions: data.actions,
-  }));
+  event.waitUntil(
+    self.registration.showNotification(data.title, {
+      body: data.body,
+      icon: data.icon,
+      badge: data.badge,
+      data: { url: data.url, notificationId: data.notificationId },
+      actions: data.actions,
+    }),
+  );
 });
 
-self.addEventListener('notificationclick', (event) => {
+self.addEventListener('notificationclick', event => {
   event.notification.close();
   event.waitUntil(
-    self.clients.matchAll({ type: 'window', includeUncontrolled: true })
+    self.clients
+      .matchAll({ type: 'window', includeUncontrolled: true })
       .then(clients => {
         const url = event.notification.data?.url ?? '/';
         const focus = clients.find(c => c.url.includes(url));
         if (focus) return focus.focus();
         return self.clients.openWindow(url);
-      })
+      }),
   );
 });
 
 // 7. Periodic background sync (where supported) for dashboard refresh
-self.addEventListener('periodicsync', (event) => {
+self.addEventListener('periodicsync', event => {
   if (event.tag === 'refresh-favourite-dashboards') {
     event.waitUntil(refreshFavouriteDashboards());
   }
@@ -290,7 +312,7 @@ export class PwaInstallService {
     });
   }
 
-  async promptInstall(): Promise<'accepted'|'dismissed'> {
+  async promptInstall(): Promise<'accepted' | 'dismissed'> {
     if (!this.deferredPrompt) return 'dismissed';
     this.deferredPrompt.prompt();
     const choice = await this.deferredPrompt.userChoice;
@@ -341,7 +363,7 @@ async function enableWebPush() {
 }
 
 function urlBase64ToUint8Array(s: string): Uint8Array {
-  const padding = '='.repeat((4 - s.length % 4) % 4);
+  const padding = '='.repeat((4 - (s.length % 4)) % 4);
   const b64 = (s + padding).replace(/-/g, '+').replace(/_/g, '/');
   const raw = atob(b64);
   return Uint8Array.from(raw, c => c.charCodeAt(0));
@@ -369,13 +391,13 @@ The BE side is in module 16 §4.7 — sendWebPush with the
 
 @media (max-width: 768px) {
   .dashboard-canvas {
-    grid-template-columns: 1fr;     // single-column stack
+    grid-template-columns: 1fr; // single-column stack
     gap: 12px;
     padding: 12px;
 
     .visual {
       grid-column: span 1;
-      min-height: 280px;            // bigger touch target
+      min-height: 280px; // bigger touch target
     }
   }
 
@@ -389,7 +411,9 @@ The BE side is in module 16 §4.7 — sendWebPush with the
     transition: right 200ms ease;
     z-index: 100;
 
-    &.open { right: 0; }
+    &.open {
+      right: 0;
+    }
   }
 }
 ```
@@ -397,7 +421,10 @@ The BE side is in module 16 §4.7 — sendWebPush with the
 ```html
 <!-- view-dashboard.component.html (mobile) -->
 <button class="filter-toggle md:hidden" (click)="openFilters()">
-  Filters <span class="badge" *ngIf="activeFilterCount() > 0">{{ activeFilterCount() }}</span>
+  Filters
+  <span class="badge" *ngIf="activeFilterCount() > 0"
+    >{{ activeFilterCount() }}</span
+  >
 </button>
 <div class="filter-sidebar" [class.open]="filtersOpen()">
   <button class="close" (click)="closeFilters()">×</button>
@@ -419,14 +446,13 @@ const baseOption = {
     triggerOn: isMobile ? 'click' : 'mousemove',
     // On mobile, tap-to-show tooltip; on desktop hover.
   },
-  dataZoom: isMobile ? [
-    { type: 'inside', xAxisIndex: 0 },     // pinch-to-zoom
-    { type: 'slider', height: 30 },         // taller for touch
-  ] : [
-    { type: 'inside' },
-    { type: 'slider', height: 20 },
-  ],
-  toolbox: { show: !isMobile },             // hide toolbox on phone
+  dataZoom: isMobile
+    ? [
+        { type: 'inside', xAxisIndex: 0 }, // pinch-to-zoom
+        { type: 'slider', height: 30 }, // taller for touch
+      ]
+    : [{ type: 'inside' }, { type: 'slider', height: 20 }],
+  toolbox: { show: !isMobile }, // hide toolbox on phone
 };
 ```
 
@@ -476,9 +502,9 @@ The view component flags stale renders:
 
 ```html
 @if (render?._stale) {
-  <div class="stale-banner">
-    ⚠ Showing data from {{ render._stale_at | date:'short' }} — offline
-  </div>
+<div class="stale-banner">
+  ⚠ Showing data from {{ render._stale_at | date:'short' }} — offline
+</div>
 }
 ```
 
@@ -489,14 +515,22 @@ Where supported (Chrome desktop + Android):
 ```ts
 // app.ts — request permission once after install
 async function registerPeriodicSync() {
-  if (!('periodicSync' in (await navigator.serviceWorker.ready) as any)) return;
-  const status = await navigator.permissions.query({ name: 'periodic-background-sync' as any });
+  if (!(('periodicSync' in (await navigator.serviceWorker.ready)) as any))
+    return;
+  const status = await navigator.permissions.query({
+    name: 'periodic-background-sync' as any,
+  });
   if (status.state !== 'granted') return;
   try {
-    await (await navigator.serviceWorker.ready as any).periodicSync.register('refresh-favourite-dashboards', {
-      minInterval: 12 * 3600 * 1000,    // every 12 hours
-    });
-  } catch { /* not supported */ }
+    await ((await navigator.serviceWorker.ready) as any).periodicSync.register(
+      'refresh-favourite-dashboards',
+      {
+        minInterval: 12 * 3600 * 1000, // every 12 hours
+      },
+    );
+  } catch {
+    /* not supported */
+  }
 }
 ```
 
@@ -523,7 +557,9 @@ deep-link handling, share-extension. Defer to v2; PWA covers v1.
 ```ts
 // FE — register a passkey on first install
 async function enrolPasskey() {
-  const challenge = await fetch('/api/v1/auth/passkey/challenge').then(r => r.arrayBuffer());
+  const challenge = await fetch('/api/v1/auth/passkey/challenge').then(r =>
+    r.arrayBuffer(),
+  );
   const cred = await navigator.credentials.create({
     publicKey: {
       challenge,
@@ -534,7 +570,10 @@ async function enrolPasskey() {
         displayName: currentUser.firstName + ' ' + currentUser.lastName,
       },
       pubKeyCredParams: [{ type: 'public-key', alg: -7 }],
-      authenticatorSelection: { userVerification: 'required', residentKey: 'preferred' },
+      authenticatorSelection: {
+        userVerification: 'required',
+        residentKey: 'preferred',
+      },
     },
   });
   await fetch('/api/v1/auth/passkey/register', {
@@ -545,7 +584,9 @@ async function enrolPasskey() {
 
 // On subsequent login
 async function loginWithPasskey() {
-  const challenge = await fetch('/api/v1/auth/passkey/challenge').then(r => r.arrayBuffer());
+  const challenge = await fetch('/api/v1/auth/passkey/challenge').then(r =>
+    r.arrayBuffer(),
+  );
   const assertion = await navigator.credentials.get({
     publicKey: { challenge, userVerification: 'required' },
   });
@@ -571,9 +612,12 @@ For TVs / wall-displays / executive dashboards:
 
 if (route.queryParams.kiosk === 'true') {
   document.documentElement.requestFullscreen();
-  setInterval(() => {
-    cycleToNextTab();
-  }, Number(route.queryParams.rotation || 30) * 1000);
+  setInterval(
+    () => {
+      cycleToNextTab();
+    },
+    Number(route.queryParams.rotation || 30) * 1000,
+  );
 }
 ```
 
@@ -582,13 +626,13 @@ long-lived service token bound to a specific device. Deferred.
 
 ## 5. APIs
 
-| Method | Path | Purpose |
-|---|---|---|
-| GET | `/manifest.webmanifest` | Org-branded manifest |
-| GET | `/sw.js` | Service worker (cached forever client-side via integrity hash) |
-| POST | `/notifications/push/subscribe` | (module 16) |
-| POST | `/auth/passkey/register` | (module 10) |
-| GET | `/healthz/pwa` | Static "ok" used by SW for connectivity ping |
+| Method | Path                            | Purpose                                                        |
+| ------ | ------------------------------- | -------------------------------------------------------------- |
+| GET    | `/manifest.webmanifest`         | Org-branded manifest                                           |
+| GET    | `/sw.js`                        | Service worker (cached forever client-side via integrity hash) |
+| POST   | `/notifications/push/subscribe` | (module 16)                                                    |
+| POST   | `/auth/passkey/register`        | (module 10)                                                    |
+| GET    | `/healthz/pwa`                  | Static "ok" used by SW for connectivity ping                   |
 
 ## 6. FE specs
 

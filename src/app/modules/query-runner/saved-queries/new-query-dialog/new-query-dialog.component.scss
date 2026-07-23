@@ -32,7 +32,9 @@
     margin-top: var(--space-3);
     font-size: var(--fs-control);
     color: var(--secondary-color);
-    &.warn { color: var(--warning-color); }
+    &.warn {
+      color: var(--warning-color);
+    }
   }
 
   .nq-empty {
@@ -80,14 +82,25 @@
       font-size: var(--fs-body);
       cursor: pointer;
       color: var(--primary-text);
-      background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+      background: linear-gradient(
+        135deg,
+        var(--primary-color),
+        var(--primary-hover)
+      );
       box-shadow: 0 4px 14px var(--primary-color-transparent);
       transition: all var(--motion-base, 0.15s) ease;
 
-      i { font-size: var(--fs-control); } // normal-sized plus, aligned with text
+      i {
+        font-size: var(--fs-control);
+      } // normal-sized plus, aligned with text
 
-      &:hover { transform: translateY(-1px); box-shadow: var(--shadow-md); }
-      &:active { transform: translateY(0); }
+      &:hover {
+        transform: translateY(-1px);
+        box-shadow: var(--shadow-md);
+      }
+      &:active {
+        transform: translateY(0);
+      }
     }
 
     .nq-link {
@@ -99,7 +112,9 @@
       font-size: var(--fs-control);
       text-decoration: underline;
 
-      &:hover { color: var(--primary-hover); }
+      &:hover {
+        color: var(--primary-hover);
+      }
     }
   }
 }

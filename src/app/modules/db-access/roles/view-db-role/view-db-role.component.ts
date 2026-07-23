@@ -103,7 +103,8 @@ export class ViewDbRoleComponent implements OnInit {
   status(): 'active' | 'no-login' | 'expired' {
     if (!this.isLogin) return 'no-login';
     const validUntil = this.attrs.validUntil;
-    if (validUntil && new Date(validUntil).getTime() < Date.now()) return 'expired';
+    if (validUntil && new Date(validUntil).getTime() < Date.now())
+      return 'expired';
     return 'active';
   }
 
@@ -125,7 +126,8 @@ export class ViewDbRoleComponent implements OnInit {
 
   get connLimit(): string {
     const cl = this.attrs.connectionLimit;
-    if (cl === -1 || cl == null) return this.translate.instant('DB_ACCESS.UNLIMITED');
+    if (cl === -1 || cl == null)
+      return this.translate.instant('DB_ACCESS.UNLIMITED');
     return String(cl);
   }
 

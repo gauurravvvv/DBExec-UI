@@ -64,39 +64,39 @@ today. Industry standard is 8-12 first-party + community plugins.
 
 ## 2. DBExec today
 
-| Aspect | Status | File paths |
-|---|---|---|
-| Datasource entity | ✅ | `DBExec-API/src/shared/db/master_entity/database.entity.ts`, `shared_entity/datasourceS.entity.ts` |
-| Datasource config (host/port/credentials/etc.) | ✅ | `shared_entity/datasource_config.entity.ts` |
-| Connection entity | ✅ | `shared_entity/connections.entity.ts` |
-| Drivers | ✅ Postgres, MySQL, MariaDB, MSSQL, Oracle, Snowflake | `shared/services/connectionPool.service.ts` |
-| Schema explore | ✅ | `modules/datasources/middleware/schema/*` |
-| Activity/cancel | ✅ | `modules/datasources/middleware/activity/*` |
-| FE add/edit forms | ✅ Zod | `src/app/modules/datasource/*` |
-| SSL UI | ❌ | — |
-| IAM auth | ❌ | — |
-| BigQuery / Databricks / Redshift / Trino | ❌ | — |
-| Pool metrics endpoint | ❌ | — |
-| Connection rotation | 🟡 (manual edit) | — |
+| Aspect                                         | Status                                                | File paths                                                                                         |
+| ---------------------------------------------- | ----------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
+| Datasource entity                              | ✅                                                    | `DBExec-API/src/shared/db/master_entity/database.entity.ts`, `shared_entity/datasourceS.entity.ts` |
+| Datasource config (host/port/credentials/etc.) | ✅                                                    | `shared_entity/datasource_config.entity.ts`                                                        |
+| Connection entity                              | ✅                                                    | `shared_entity/connections.entity.ts`                                                              |
+| Drivers                                        | ✅ Postgres, MySQL, MariaDB, MSSQL, Oracle, Snowflake | `shared/services/connectionPool.service.ts`                                                        |
+| Schema explore                                 | ✅                                                    | `modules/datasources/middleware/schema/*`                                                          |
+| Activity/cancel                                | ✅                                                    | `modules/datasources/middleware/activity/*`                                                        |
+| FE add/edit forms                              | ✅ Zod                                                | `src/app/modules/datasource/*`                                                                     |
+| SSL UI                                         | ❌                                                    | —                                                                                                  |
+| IAM auth                                       | ❌                                                    | —                                                                                                  |
+| BigQuery / Databricks / Redshift / Trino       | ❌                                                    | —                                                                                                  |
+| Pool metrics endpoint                          | ❌                                                    | —                                                                                                  |
+| Connection rotation                            | 🟡 (manual edit)                                      | —                                                                                                  |
 
 ## 3. Gaps
 
-| ID | Gap | Severity |
-|---|---|---|
-| DS-G01 | SSL/TLS configuration UI + storage | P0 |
-| DS-G02 | BigQuery driver | P0 |
-| DS-G03 | Redshift driver (technically Postgres compat — but quirks) | P1 |
-| DS-G04 | Databricks SQL driver | P1 |
-| DS-G05 | Trino / Presto driver | P2 |
-| DS-G06 | ClickHouse driver | P2 |
-| DS-G07 | DuckDB embedded (for "managed" datasource holding uploads) | P0 |
-| DS-G08 | AWS RDS IAM auth | P1 |
-| DS-G09 | GCP OAuth (BigQuery) | P0 (paired with DS-G02) |
-| DS-G10 | Azure AD service principal | P1 |
-| DS-G11 | Pool metrics endpoint | P1 |
-| DS-G12 | Connection password rotation with grace period | P1 |
-| DS-G13 | "Test connection" inside the connection form (not just datasource) | P1 |
-| DS-G14 | Connection sharing audit (who uses which connection?) | P2 |
+| ID     | Gap                                                                | Severity                |
+| ------ | ------------------------------------------------------------------ | ----------------------- |
+| DS-G01 | SSL/TLS configuration UI + storage                                 | P0                      |
+| DS-G02 | BigQuery driver                                                    | P0                      |
+| DS-G03 | Redshift driver (technically Postgres compat — but quirks)         | P1                      |
+| DS-G04 | Databricks SQL driver                                              | P1                      |
+| DS-G05 | Trino / Presto driver                                              | P2                      |
+| DS-G06 | ClickHouse driver                                                  | P2                      |
+| DS-G07 | DuckDB embedded (for "managed" datasource holding uploads)         | P0                      |
+| DS-G08 | AWS RDS IAM auth                                                   | P1                      |
+| DS-G09 | GCP OAuth (BigQuery)                                               | P0 (paired with DS-G02) |
+| DS-G10 | Azure AD service principal                                         | P1                      |
+| DS-G11 | Pool metrics endpoint                                              | P1                      |
+| DS-G12 | Connection password rotation with grace period                     | P1                      |
+| DS-G13 | "Test connection" inside the connection form (not just datasource) | P1                      |
+| DS-G14 | Connection sharing audit (who uses which connection?)              | P2                      |
 
 ## 4. Target architecture
 
@@ -142,7 +142,10 @@ import { BigQuery } from '@google-cloud/bigquery';
 import { DBSQLClient } from '@databricks/sql';
 
 export interface DatasourcePool {
-  query<T = unknown>(sql: string, params?: unknown[]): Promise<{ rows: T[]; columns: ColumnMeta[] }>;
+  query<T = unknown>(
+    sql: string,
+    params?: unknown[],
+  ): Promise<{ rows: T[]; columns: ColumnMeta[] }>;
   destroy(): Promise<void>;
   metrics(): PoolMetrics;
 }
@@ -181,16 +184,25 @@ export class PoolManager {
 
   private async buildPool(ds: DatasourceConfig): Promise<DatasourcePool> {
     switch (ds.dbType) {
-      case 'postgres':   return new PgDatasourcePool(ds);
+      case 'postgres':
+        return new PgDatasourcePool(ds);
       case 'mysql':
-      case 'mariadb':    return new MySqlDatasourcePool(ds);
-      case 'mssql':      return new MssqlDatasourcePool(ds);
-      case 'oracle':     return new OracleDatasourcePool(ds);
-      case 'snowflake':  return new SnowflakeDatasourcePool(ds);
-      case 'bigquery':   return new BigQueryDatasourcePool(ds);
-      case 'databricks': return new DatabricksDatasourcePool(ds);
-      case 'duckdb':     return new DuckDbDatasourcePool(ds);
-      default: throw new Error(`unsupported db type ${ds.dbType}`);
+      case 'mariadb':
+        return new MySqlDatasourcePool(ds);
+      case 'mssql':
+        return new MssqlDatasourcePool(ds);
+      case 'oracle':
+        return new OracleDatasourcePool(ds);
+      case 'snowflake':
+        return new SnowflakeDatasourcePool(ds);
+      case 'bigquery':
+        return new BigQueryDatasourcePool(ds);
+      case 'databricks':
+        return new DatabricksDatasourcePool(ds);
+      case 'duckdb':
+        return new DuckDbDatasourcePool(ds);
+      default:
+        throw new Error(`unsupported db type ${ds.dbType}`);
     }
   }
 }
@@ -202,8 +214,13 @@ Each driver wrapper is small. Postgres:
 export class PgDatasourcePool implements DatasourcePool {
   private pool: pg.Pool;
   private metricsState: PoolMetrics = {
-    size: 0, idle: 0, inUse: 0, waiting: 0,
-    totalCheckouts: 0, totalErrors: 0, p95CheckoutMs: 0,
+    size: 0,
+    idle: 0,
+    inUse: 0,
+    waiting: 0,
+    totalCheckouts: 0,
+    totalErrors: 0,
+    p95CheckoutMs: 0,
   };
   private checkoutDurations: number[] = [];
 
@@ -215,16 +232,23 @@ export class PgDatasourcePool implements DatasourcePool {
       database: cfg.dbName,
       user: cfg.username,
       password,
-      ssl: cfg.ssl?.mode === 'require'
-        ? { rejectUnauthorized: cfg.ssl.rejectUnauthorized ?? true,
-            ca: cfg.ssl.caCert, cert: cfg.ssl.clientCert, key: cfg.ssl.clientKey }
-        : false,
+      ssl:
+        cfg.ssl?.mode === 'require'
+          ? {
+              rejectUnauthorized: cfg.ssl.rejectUnauthorized ?? true,
+              ca: cfg.ssl.caCert,
+              cert: cfg.ssl.clientCert,
+              key: cfg.ssl.clientKey,
+            }
+          : false,
       max: cfg.poolMax,
       idleTimeoutMillis: cfg.poolIdleMs,
       connectionTimeoutMillis: cfg.poolAcquireTimeoutMs,
       statement_timeout: cfg.statementTimeoutMs,
     });
-    this.pool.on('error', () => { this.metricsState.totalErrors++; });
+    this.pool.on('error', () => {
+      this.metricsState.totalErrors++;
+    });
     setInterval(() => this.refreshMetrics(), 5000);
   }
 
@@ -239,7 +263,10 @@ export class PgDatasourcePool implements DatasourcePool {
       if (this.checkoutDurations.length > 1000) this.checkoutDurations.shift();
       return {
         rows: res.rows as T[],
-        columns: res.fields.map(f => ({ name: f.name, type: pgTypeMap(f.dataTypeID) })),
+        columns: res.fields.map(f => ({
+          name: f.name,
+          type: pgTypeMap(f.dataTypeID),
+        })),
       };
     } catch (e) {
       this.metricsState.totalErrors++;
@@ -249,17 +276,19 @@ export class PgDatasourcePool implements DatasourcePool {
     }
   }
 
-  async destroy() { await this.pool.end(); }
+  async destroy() {
+    await this.pool.end();
+  }
 
   metrics(): PoolMetrics {
     return { ...this.metricsState };
   }
 
   private refreshMetrics() {
-    this.metricsState.size    = this.pool.totalCount;
-    this.metricsState.idle    = this.pool.idleCount;
+    this.metricsState.size = this.pool.totalCount;
+    this.metricsState.idle = this.pool.idleCount;
     this.metricsState.waiting = this.pool.waitingCount;
-    this.metricsState.inUse   = this.metricsState.size - this.metricsState.idle;
+    this.metricsState.inUse = this.metricsState.size - this.metricsState.idle;
     this.metricsState.p95CheckoutMs = percentile(this.checkoutDurations, 0.95);
   }
 }
@@ -273,13 +302,13 @@ export class BigQueryDatasourcePool implements DatasourcePool {
 
   constructor(cfg: DatasourceConfig) {
     const sa = JSON.parse(
-      decryptWithOrgPepper(cfg.serviceAccountJsonEnc!, cfg.organisationId)
+      decryptWithOrgPepper(cfg.serviceAccountJsonEnc!, cfg.organisationId),
     );
     this.client = new BigQuery({ projectId: sa.project_id, credentials: sa });
   }
 
   async query<T>(sql: string, params: unknown[] = []) {
-    const [job]  = await this.client.createQueryJob({
+    const [job] = await this.client.createQueryJob({
       query: sql,
       params,
       location: 'US',
@@ -289,12 +318,17 @@ export class BigQueryDatasourcePool implements DatasourcePool {
     return {
       rows: rows as T[],
       columns: meta.schema!.fields!.map((f: any) => ({
-        name: f.name, type: bqTypeMap(f.type),
+        name: f.name,
+        type: bqTypeMap(f.type),
       })),
     };
   }
-  async destroy() { /* no persistent pool */ }
-  metrics(): PoolMetrics { return zeroMetrics(); }
+  async destroy() {
+    /* no persistent pool */
+  }
+  metrics(): PoolMetrics {
+    return zeroMetrics();
+  }
 }
 ```
 
@@ -308,10 +342,18 @@ export function mapDriverError(e: unknown): Error {
   const msg = (e as any)?.message ?? String(e);
   if (/ECONNREFUSED|ETIMEDOUT|EAI_AGAIN/.test(msg))
     return new BadRequestError('Could not reach the database server.');
-  if (/password authentication failed|Access denied|ORA-01017|Login failed/.test(msg))
+  if (
+    /password authentication failed|Access denied|ORA-01017|Login failed/.test(
+      msg,
+    )
+  )
     return new BadRequestError('Invalid database credentials.');
-  if (/permission denied|insufficient privilege|SELECT command denied/.test(msg))
-    return new BadRequestError('The database user lacks permission for this operation.');
+  if (
+    /permission denied|insufficient privilege|SELECT command denied/.test(msg)
+  )
+    return new BadRequestError(
+      'The database user lacks permission for this operation.',
+    );
   if (/statement timeout|canceling statement/.test(msg))
     return new BadRequestError('Query timed out.');
   return new BadRequestError(`Database error: ${msg.slice(0, 200)}`);
@@ -357,24 +399,24 @@ CREATE INDEX ON datasource_pool_event (datasource_id, occurred_at DESC);
 
 ### 6.1 Existing (reaffirm)
 
-| Method | Path | Purpose |
-|---|---|---|
-| POST | `/datasource` | Create |
-| PUT | `/datasource/update` | Update |
-| DELETE | `/datasource/delete/:id` | Soft-delete |
-| GET | `/datasource/list` | Paginated list |
-| GET | `/datasource/get/:id` | Single |
-| POST | `/datasource/validate` | Connection test (no persist) |
-| GET | `/datasource/schema/list/:id` | schema → tables → columns |
+| Method | Path                          | Purpose                      |
+| ------ | ----------------------------- | ---------------------------- |
+| POST   | `/datasource`                 | Create                       |
+| PUT    | `/datasource/update`          | Update                       |
+| DELETE | `/datasource/delete/:id`      | Soft-delete                  |
+| GET    | `/datasource/list`            | Paginated list               |
+| GET    | `/datasource/get/:id`         | Single                       |
+| POST   | `/datasource/validate`        | Connection test (no persist) |
+| GET    | `/datasource/schema/list/:id` | schema → tables → columns    |
 
 ### 6.2 New endpoints
 
-| Method | Path | Purpose |
-|---|---|---|
-| GET | `/datasource/:id/pool/metrics` | Live pool stats |
-| POST | `/datasource/:id/pool/refresh` | Evict + rebuild pool |
-| POST | `/datasource/:id/rotate-password` | Rotate stored password |
-| POST | `/datasource/:id/test-ssl` | SSL handshake test |
+| Method | Path                              | Purpose                |
+| ------ | --------------------------------- | ---------------------- |
+| GET    | `/datasource/:id/pool/metrics`    | Live pool stats        |
+| POST   | `/datasource/:id/pool/refresh`    | Evict + rebuild pool   |
+| POST   | `/datasource/:id/rotate-password` | Rotate stored password |
+| POST   | `/datasource/:id/test-ssl`        | SSL handshake test     |
 
 Sample response shape:
 
@@ -391,8 +433,8 @@ Sample response shape:
     "waiting": 0,
     "totalCheckouts": 1827,
     "totalErrors": 4,
-    "p95CheckoutMs": 28
-  }
+    "p95CheckoutMs": 28,
+  },
 }
 ```
 
@@ -443,23 +485,31 @@ Add **"Test connection"** button (G13).
 import * as tls from 'node:tls';
 
 export function probeSsl(
-  host: string, port: number, opts: SslOpts,
+  host: string,
+  port: number,
+  opts: SslOpts,
 ): Promise<{ ok: boolean; peerSubject?: string; error?: string }> {
-  return new Promise((resolve) => {
-    const sock = tls.connect({
-      host, port,
-      ca: opts.caCert ? [opts.caCert] : undefined,
-      cert: opts.clientCert,
-      key: opts.clientKey,
-      rejectUnauthorized: opts.rejectUnauthorized,
-      timeout: 10_000,
-    }, () => {
-      const peer = sock.getPeerCertificate();
-      resolve({ ok: true, peerSubject: peer.subject?.CN });
-      sock.end();
-    });
-    sock.on('error', (e) => resolve({ ok: false, error: e.message }));
-    sock.on('timeout', () => resolve({ ok: false, error: 'TLS handshake timeout' }));
+  return new Promise(resolve => {
+    const sock = tls.connect(
+      {
+        host,
+        port,
+        ca: opts.caCert ? [opts.caCert] : undefined,
+        cert: opts.clientCert,
+        key: opts.clientKey,
+        rejectUnauthorized: opts.rejectUnauthorized,
+        timeout: 10_000,
+      },
+      () => {
+        const peer = sock.getPeerCertificate();
+        resolve({ ok: true, peerSubject: peer.subject?.CN });
+        sock.end();
+      },
+    );
+    sock.on('error', e => resolve({ ok: false, error: e.message }));
+    sock.on('timeout', () =>
+      resolve({ ok: false, error: 'TLS handshake timeout' }),
+    );
   });
 }
 ```

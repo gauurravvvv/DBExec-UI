@@ -6,7 +6,12 @@
           <i class="pi pi-arrow-left"></i>
         </button>
         <h2>
-          {{ (isEdit ? 'QUERY_RUNNER.EDIT_CONNECTION' : 'QUERY_RUNNER.NEW_CONNECTION') | translate }}
+          {{
+            (isEdit
+              ? 'QUERY_RUNNER.EDIT_CONNECTION'
+              : 'QUERY_RUNNER.NEW_CONNECTION'
+            ) | translate
+          }}
         </h2>
       </div>
       <div class="action-buttons">
@@ -26,7 +31,10 @@
           (click)="onSubmit()"
           [disabled]="form.invalid || saving"
         >
-          <i class="pi mr-2" [ngClass]="saving ? 'pi-spin pi-spinner' : 'pi-save'"></i>
+          <i
+            class="pi mr-2"
+            [ngClass]="saving ? 'pi-spin pi-spinner' : 'pi-save'"
+          ></i>
         </button>
       </div>
     </div>
@@ -42,10 +50,14 @@
           <app-custom-input
             formControlName="name"
             [label]="'QUERY_RUNNER.CONNECTION_NAME' | translate"
-            [placeholder]="'QUERY_RUNNER.CONNECTION_NAME_PLACEHOLDER' | translate"
+            [placeholder]="
+              'QUERY_RUNNER.CONNECTION_NAME_PLACEHOLDER' | translate
+            "
             icon="pi-link"
             [required]="true"
-            [showError]="!!(form.get('name')?.invalid && form.get('name')?.touched)"
+            [showError]="
+              !!(form.get('name')?.invalid && form.get('name')?.touched)
+            "
             [errorMessage]="getErrorMessage('name')"
           ></app-custom-input>
 
@@ -63,11 +75,18 @@
             appendTo="body"
             icon="pi-database"
             [required]="true"
-            [showError]="!!(form.get('datasourceId')?.invalid && form.get('datasourceId')?.touched)"
+            [showError]="
+              !!(
+                form.get('datasourceId')?.invalid &&
+                form.get('datasourceId')?.touched
+              )
+            "
             [errorMessage]="getErrorMessage('datasourceId')"
           ></app-custom-dropdown>
 
-          <h3 class="form-section-title">{{ 'QUERY_RUNNER.CREDENTIALS' | translate }}</h3>
+          <h3 class="form-section-title">
+            {{ 'QUERY_RUNNER.CREDENTIALS' | translate }}
+          </h3>
 
           <app-custom-input
             formControlName="username"
@@ -75,7 +94,9 @@
             [placeholder]="'QUERY_RUNNER.LOGIN_PLACEHOLDER' | translate"
             icon="pi-user"
             [required]="true"
-            [showError]="!!(form.get('username')?.invalid && form.get('username')?.touched)"
+            [showError]="
+              !!(form.get('username')?.invalid && form.get('username')?.touched)
+            "
             [errorMessage]="getErrorMessage('username')"
           ></app-custom-input>
 
@@ -86,8 +107,15 @@
             icon="pi-lock"
             [showPasswordToggle]="true"
             [required]="!isEdit"
-            [placeholder]="(isEdit ? 'QUERY_RUNNER.PASSWORD_UNCHANGED' : 'QUERY_RUNNER.PASSWORD_PLACEHOLDER') | translate"
-            [showError]="!!(form.get('password')?.invalid && form.get('password')?.touched)"
+            [placeholder]="
+              (isEdit
+                ? 'QUERY_RUNNER.PASSWORD_UNCHANGED'
+                : 'QUERY_RUNNER.PASSWORD_PLACEHOLDER'
+              ) | translate
+            "
+            [showError]="
+              !!(form.get('password')?.invalid && form.get('password')?.touched)
+            "
             [errorMessage]="getErrorMessage('password')"
           ></app-custom-input>
         </div>

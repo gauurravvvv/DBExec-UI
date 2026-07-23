@@ -21,9 +21,7 @@ export class ProfileService {
     this._loading.set(true);
     try {
       const res: any = await lastValueFrom(
-        this.http
-          .apiGet(PROFILE.GET)
-          .pipe(takeUntil(this._cancelReads$)),
+        this.http.apiGet(PROFILE.GET).pipe(takeUntil(this._cancelReads$)),
       );
       if (res?.status) this._profile.set(res.data);
     } catch (err) {

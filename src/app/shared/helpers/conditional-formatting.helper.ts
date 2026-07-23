@@ -40,7 +40,8 @@ export type ConditionalOperator =
  * datum's mark; 'text' colours the data label. For tables, 'cell' paints
  * the cell background, 'text' the cell foreground.
  */
-export type ConditionalAppliesTo = 'cell' | 'bar' | 'point' | 'text' | 'background';
+export type ConditionalAppliesTo =
+  'cell' | 'bar' | 'point' | 'text' | 'background';
 
 /**
  * A single conditional-formatting rule. `targetField` is the row key the
@@ -88,7 +89,8 @@ const isNil = (v: unknown): boolean =>
 /** True when the string/number looks like a finite number. */
 function looksNumeric(v: unknown): boolean {
   if (typeof v === 'number') return Number.isFinite(v);
-  if (typeof v === 'string' && v.trim() !== '') return Number.isFinite(Number(v));
+  if (typeof v === 'string' && v.trim() !== '')
+    return Number.isFinite(Number(v));
   return false;
 }
 
@@ -204,10 +206,18 @@ export function ruleMatches(
   // Cross-field: when targetField is set and a row is supplied, test that
   // field; otherwise test the value handed in (the datum's own measure).
   const subject =
-    rule.targetField && row && Object.prototype.hasOwnProperty.call(row, rule.targetField)
+    rule.targetField &&
+    row &&
+    Object.prototype.hasOwnProperty.call(row, rule.targetField)
       ? row[rule.targetField]
       : cellValue;
-  return compare(subject, rule.operator, rule.value, rule.value2, rule.dataType);
+  return compare(
+    subject,
+    rule.operator,
+    rule.value,
+    rule.value2,
+    rule.dataType,
+  );
 }
 
 /**
@@ -230,11 +240,7 @@ export function resolveConditionalStyle(
   if (!Array.isArray(rules) || rules.length === 0) return undefined;
   for (const rule of rules) {
     const applies = rule.appliesTo;
-    if (
-      filterAppliesTo &&
-      applies &&
-      !filterAppliesTo.includes(applies)
-    ) {
+    if (filterAppliesTo && applies && !filterAppliesTo.includes(applies)) {
       continue;
     }
     if (ruleMatches(rule, cellValue, row)) {

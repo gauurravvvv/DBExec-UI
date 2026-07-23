@@ -10,7 +10,10 @@ import {
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
-import { NOTIFICATIONS, notificationRoute } from 'src/app/core/constants/routes.constant';
+import {
+  NOTIFICATIONS,
+  notificationRoute,
+} from 'src/app/core/constants/routes.constant';
 import {
   NotificationRow,
   NotificationService,

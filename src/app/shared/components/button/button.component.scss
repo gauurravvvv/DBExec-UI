@@ -70,16 +70,26 @@
   width: 34px;
   height: 34px;
   border-radius: var(--radius-md);
-  &.sz-sm { width: 28px; height: 28px; }
-  &.sz-lg { width: 40px; height: 40px; }
-  .app-btn-ico { font-size: 1em; }
+  &.sz-sm {
+    width: 28px;
+    height: 28px;
+  }
+  &.sz-lg {
+    width: 40px;
+    height: 40px;
+  }
+  .app-btn-ico {
+    font-size: 1em;
+  }
 }
 
 /* ── variants ──────────────────────────────────────────── */
 .app-btn.v-primary {
   background: var(--primary-color);
   color: var(--primary-text);
-  &:hover:not(:disabled) { background: var(--primary-hover); }
+  &:hover:not(:disabled) {
+    background: var(--primary-hover);
+  }
 }
 
 .app-btn.v-secondary {
@@ -103,7 +113,9 @@
 .app-btn.v-danger {
   background: var(--error-color);
   color: #fff;
-  &:hover:not(:disabled) { filter: brightness(0.94); }
+  &:hover:not(:disabled) {
+    filter: brightness(0.94);
+  }
 }
 
 /* icon variant = ghost-shaped square by default; callers set tone via a
@@ -119,5 +131,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .app-btn { transition: none; }
+  .app-btn {
+    transition: none;
+  }
 }

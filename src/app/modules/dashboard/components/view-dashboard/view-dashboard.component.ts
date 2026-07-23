@@ -551,17 +551,13 @@ export class ViewDashboardComponent
   /** Visuals belonging to the active tab (all when single/implicit). */
   get visibleVisuals(): Visual[] {
     if (!this.showTabStrip) return this.visuals;
-    return this.visuals.filter(
-      v => (v.tabId ?? null) === this.activeTabId,
-    );
+    return this.visuals.filter(v => (v.tabId ?? null) === this.activeTabId);
   }
 
   /** Widgets belonging to the active tab. */
   get visibleWidgets(): DashboardWidget[] {
     if (!this.showTabStrip) return this.widgets;
-    return this.widgets.filter(
-      w => (w.tabId ?? null) === this.activeTabId,
-    );
+    return this.widgets.filter(w => (w.tabId ?? null) === this.activeTabId);
   }
 
   /** True when the active tab has neither visuals nor widgets. */
@@ -1102,10 +1098,7 @@ export class ViewDashboardComponent
     }
   }
 
-  trackByWarning(
-    index: number,
-    w: { scope: string; id: string },
-  ): string {
+  trackByWarning(index: number, w: { scope: string; id: string }): string {
     return `${w.scope}:${w.id}`;
   }
 

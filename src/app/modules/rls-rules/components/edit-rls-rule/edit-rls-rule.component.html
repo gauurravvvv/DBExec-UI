@@ -34,7 +34,12 @@
       </div>
     </div>
 
-    <form autocomplete="off" [formGroup]="rlsForm" class="admin-form" *ngIf="rlsForm">
+    <form
+      autocomplete="off"
+      [formGroup]="rlsForm"
+      class="admin-form"
+      *ngIf="rlsForm"
+    >
       <div class="form-grid">
         <input type="hidden" formControlName="id" />
 
@@ -203,7 +208,8 @@
               class="btn-add-condition"
               (click)="addMaskedColumn()"
             >
-              <i class="pi pi-plus"></i> {{ 'RLS.ADD_MASKED_COLUMN' | translate }}
+              <i class="pi pi-plus"></i>
+              {{ 'RLS.ADD_MASKED_COLUMN' | translate }}
             </button>
           </div>
           <div class="conditions-hint">

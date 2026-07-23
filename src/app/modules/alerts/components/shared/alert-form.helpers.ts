@@ -68,7 +68,11 @@ export const TIMEZONE_OPTIONS: { label: string; value: string }[] = [
  * shown on the step dot's active/label context. Purely presentational: the
  * step boundaries do not change the reactive form or the submit payload.
  */
-export const ALERT_WIZARD_STEPS: { key: string; titleKey: string; icon: string }[] = [
+export const ALERT_WIZARD_STEPS: {
+  key: string;
+  titleKey: string;
+  icon: string;
+}[] = [
   { key: 'source', titleKey: 'ALERTS.STEP_SOURCE', icon: 'pi-database' },
   { key: 'condition', titleKey: 'ALERTS.STEP_CONDITION', icon: 'pi-filter' },
   { key: 'schedule', titleKey: 'ALERTS.STEP_SCHEDULE', icon: 'pi-clock' },
@@ -85,17 +89,19 @@ export const ALERT_WIZARD_STEPS: { key: string; titleKey: string; icon: string }
  * (formulas) are tagged kind:'formula'.
  */
 export function buildSourceFieldOptions(rawFields: any[]): AlertFieldOption[] {
-  return (rawFields ?? []).map(f => {
-    const ref = f.columnToUse ?? f.columnName ?? f.columnToView ?? '';
-    const label = f.columnToView ?? f.displayName ?? ref;
-    const isFormula = !!(f.customLogic ?? f.isCustom ?? f.expression);
-    return {
-      ref,
-      label,
-      kind: isFormula ? 'formula' : 'field',
-      dataType: f.dataType,
-    } as AlertFieldOption;
-  }).filter(f => !!f.ref);
+  return (rawFields ?? [])
+    .map(f => {
+      const ref = f.columnToUse ?? f.columnName ?? f.columnToView ?? '';
+      const label = f.columnToView ?? f.displayName ?? ref;
+      const isFormula = !!(f.customLogic ?? f.isCustom ?? f.expression);
+      return {
+        ref,
+        label,
+        kind: isFormula ? 'formula' : 'field',
+        dataType: f.dataType,
+      } as AlertFieldOption;
+    })
+    .filter(f => !!f.ref);
 }
 
 /* ── source + field loading ───────────────────────────────────────── */
@@ -106,7 +112,9 @@ interface SourceServices {
     getDataset: (id: string) => Promise<any>;
     getDistinctColumnValues: (id: string, col: string) => Promise<any>;
   };
-  globalService: { handleSuccessService: (res: any, showToast?: boolean) => boolean };
+  globalService: {
+    handleSuccessService: (res: any, showToast?: boolean) => boolean;
+  };
   /** Injected only when analysis sources are in play. */
   http?: HttpClientService;
 }
@@ -131,13 +139,19 @@ export const loadSourceFields = {
           svc.http.apiGet(ANALYSES.LIST, { params, skipLoader: true }),
         );
         if (svc.globalService.handleSuccessService(res, false)) {
-          return { items: res?.data?.analyses ?? [], total: res?.data?.count ?? 0 };
+          return {
+            items: res?.data?.analyses ?? [],
+            total: res?.data?.count ?? 0,
+          };
         }
         return { items: [], total: 0 };
       }
       const res: any = await svc.datasetService.listDatasets(params);
       if (svc.globalService.handleSuccessService(res, false)) {
-        return { items: res?.data?.datasets ?? [], total: res?.data?.count ?? 0 };
+        return {
+          items: res?.data?.datasets ?? [],
+          total: res?.data?.count ?? 0,
+        };
       }
       return { items: [], total: 0 };
     } catch {
@@ -208,7 +222,9 @@ export const loadSourceFields = {
 
 /** Server-mode multiselect fetcher for org users (id + display label). */
 export function loadRecipientUsersPage(
-  deps: () => { globalService: { handleSuccessService: (r: any, t?: boolean) => boolean } },
+  deps: () => {
+    globalService: { handleSuccessService: (r: any, t?: boolean) => boolean };
+  },
   userLister?: (params: any) => Promise<any>,
 ) {
   return async ({ search, page, limit }: any) => {

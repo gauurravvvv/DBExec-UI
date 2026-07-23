@@ -166,7 +166,9 @@ export class AddSavedQueryComponent implements OnInit, HasUnsavedChanges {
     const dsId = this.form.get('datasourceId')?.value ?? null;
     const usable = this.usableConnectionsForDs(dsId);
     this.connectionOptions = usable.map(c => ({
-      label: c.isDefault ? `★ ${c.name} — ${c.username}` : `${c.name} — ${c.username}`,
+      label: c.isDefault
+        ? `★ ${c.name} — ${c.username}`
+        : `${c.name} — ${c.username}`,
       value: c.id,
     }));
   }

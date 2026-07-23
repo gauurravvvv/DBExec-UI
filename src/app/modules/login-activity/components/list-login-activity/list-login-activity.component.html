@@ -13,7 +13,8 @@
             tone="neutral"
             icon="pi pi-spin pi-spinner"
             [title]="'AUDIT.INTEGRITY_CHECKING' | translate"
-          >{{ 'AUDIT.INTEGRITY_CHECKING' | translate }}</app-chip>
+            >{{ 'AUDIT.INTEGRITY_CHECKING' | translate }}</app-chip
+          >
           <app-chip
             *ngIf="!integrityChecking && integrity?.ok"
             variant="status"
@@ -22,7 +23,8 @@
             [clickable]="true"
             (clicked)="verifyIntegrity()"
             [title]="'AUDIT.INTEGRITY_VERIFIED_HINT' | translate"
-          >{{ 'AUDIT.INTEGRITY_VERIFIED' | translate }}</app-chip>
+            >{{ 'AUDIT.INTEGRITY_VERIFIED' | translate }}</app-chip
+          >
           <app-chip
             *ngIf="!integrityChecking && integrity && !integrity.ok"
             variant="status"
@@ -31,7 +33,8 @@
             [clickable]="true"
             (clicked)="verifyIntegrity()"
             [title]="'AUDIT.INTEGRITY_BROKEN_HINT' | translate"
-          >{{ 'AUDIT.INTEGRITY_BROKEN' | translate }}</app-chip>
+            >{{ 'AUDIT.INTEGRITY_BROKEN' | translate }}</app-chip
+          >
         </div>
       </div>
 
@@ -121,7 +124,11 @@
 
           <!-- Event -->
           <ng-template usGridCell="event" let-activity>
-            <button type="button" class="ev-cell" (click)="openDetail(activity)">
+            <button
+              type="button"
+              class="ev-cell"
+              (click)="openDetail(activity)"
+            >
               <span class="mi" [ngClass]="eventClass(activity.eventType)">
                 <i [ngClass]="eventIcon(activity.eventType)"></i>
               </span>
@@ -133,7 +140,9 @@
           <ng-template usGridCell="actor" let-activity>
             <span class="actor-cell">
               <span class="avatar">{{ initials(activity) }}</span>
-              <span class="actor-name" [title]="actorDisplay(activity)">{{ actorDisplay(activity) }}</span>
+              <span class="actor-name" [title]="actorDisplay(activity)">{{
+                actorDisplay(activity)
+              }}</span>
             </span>
           </ng-template>
 
@@ -143,17 +152,23 @@
               class="description-text reason-text"
               *ngIf="activity.failureReason; else noReason"
               [title]="activity.failureReason | replaceUnderscores"
-            >{{ activity.failureReason | replaceUnderscores }}</span>
-            <ng-template #noReason><span class="description-text muted">—</span></ng-template>
+              >{{ activity.failureReason | replaceUnderscores }}</span
+            >
+            <ng-template #noReason
+              ><span class="description-text muted">—</span></ng-template
+            >
           </ng-template>
 
           <!-- When -->
           <ng-template usGridCell="when" let-activity>
             <span
               class="date-text ts"
-              [pTooltip]="(activity.createdOn | date: 'dd MMM yyyy, HH:mm:ss') || ''"
+              [pTooltip]="
+                (activity.createdOn | date: 'dd MMM yyyy, HH:mm:ss') || ''
+              "
               tooltipPosition="top"
-            >{{ activity.createdOn | relativeTime }}</span>
+              >{{ activity.createdOn | relativeTime }}</span
+            >
           </ng-template>
 
           <!-- Origin -->
@@ -163,9 +178,22 @@
 
           <!-- Outcome -->
           <ng-template usGridCell="outcome" let-activity>
-            <span class="outcome-cell" [class.ok]="activity.success" [class.fail]="!activity.success">
-              <i class="pi" [ngClass]="activity.success ? 'pi-check-circle' : 'pi-times-circle'"></i>
-              {{ activity.success ? ('LOGIN_ACTIVITY.SUCCESS' | translate) : ('LOGIN_ACTIVITY.FAILED' | translate) }}
+            <span
+              class="outcome-cell"
+              [class.ok]="activity.success"
+              [class.fail]="!activity.success"
+            >
+              <i
+                class="pi"
+                [ngClass]="
+                  activity.success ? 'pi-check-circle' : 'pi-times-circle'
+                "
+              ></i>
+              {{
+                activity.success
+                  ? ('LOGIN_ACTIVITY.SUCCESS' | translate)
+                  : ('LOGIN_ACTIVITY.FAILED' | translate)
+              }}
             </span>
           </ng-template>
         </app-custom-table>

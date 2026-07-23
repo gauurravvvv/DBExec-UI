@@ -31,9 +31,7 @@ export interface CrossFilterEvent {
  * targets only the listed visuals.
  */
 export type CrossFilterTargets =
-  | 'same-tab'
-  | 'dashboard'
-  | { visualIds: string[] };
+  'same-tab' | 'dashboard' | { visualIds: string[] };
 
 /**
  * Active SCOPED cross-filter (Wave 6). Unlike AppliedCrossFilter (which the

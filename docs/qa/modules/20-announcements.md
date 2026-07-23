@@ -1,6 +1,7 @@
 # 20 · Announcements — Deep Test Cases
 
 ## Happy
+
 - **ANN-H-01** · Admin posts announcement; next login banner appears. P0
 - **ANN-H-02** · Multiple announcements queue, auto-rotate every 8s. P1
 - **ANN-H-03** · Click banner → modal with full description. P1
@@ -10,6 +11,7 @@
 - **ANN-H-07** · Filter by status active/inactive; sort by createdOn. P2
 
 ## Negative
+
 - **ANN-N-01** · Non-admin POST /announcement → 401. P0
 - **ANN-N-02** · Title empty → required. P0
 - **ANN-N-03** · Title > 255 → tooLong. P1
@@ -21,6 +23,7 @@
 - **ANN-N-09** · XSS in title/message → rendered as text. P0 🟣
 
 ## Edge
+
 - **ANN-E-01** · System Admin never sees banner (no org context). P0
 - **ANN-E-02** · Announcement expired mid-session → still shown until next login (snapshot). P1
 - **ANN-E-03** · Typewriter mid-message + rotation timer → restarts cleanly. P1
@@ -31,5 +34,6 @@
 - **ANN-E-08** · Targeted to specific groups (when supported) only those users see. P1
 
 ## Regression buckets
+
 - Banner display + typewriter → ANN-H-01..04, ANN-E-03
 - XSS hardening → ANN-N-09

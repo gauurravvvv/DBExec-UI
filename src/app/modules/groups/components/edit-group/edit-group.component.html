@@ -45,7 +45,8 @@
     <app-content-loader *ngIf="loading() && !groupLoaded"></app-content-loader>
 
     <!-- Form Section -->
-    <form autocomplete="off"
+    <form
+      autocomplete="off"
       [formGroup]="groupForm"
       class="admin-form"
       *ngIf="groupForm && groupLoaded"
@@ -111,9 +112,9 @@
             >
               <i class="pi pi-lock"></i>
               <span class="locked-chip__name">{{ m.username }}</span>
-              <span
-                class="locked-chip__badge locked-chip__badge--self"
-              >{{ 'GROUP.YOU' | translate }}</span>
+              <span class="locked-chip__badge locked-chip__badge--self">{{
+                'GROUP.YOU' | translate
+              }}</span>
             </span>
           </div>
         </div>

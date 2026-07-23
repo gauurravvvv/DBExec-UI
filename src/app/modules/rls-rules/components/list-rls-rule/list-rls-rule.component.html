@@ -108,36 +108,36 @@
               </ng-container>
             </div>
             <ng-template #rowConds>
-            <div
-              class="conditions-summary"
-              *ngIf="rule.conditions?.length; else noConds"
-            >
-              <app-chip variant="count" size="sm">
-                {{
-                  'RLS.CONDITION_COUNT'
-                    | translate: { count: rule.conditions.length }
-                }}
-              </app-chip>
-              <ng-container
-                *ngFor="
-                  let c of rule.conditions;
-                  let i = index;
-                  trackBy: trackByIndex
-                "
+              <div
+                class="conditions-summary"
+                *ngIf="rule.conditions?.length; else noConds"
               >
-                <span class="condition-preview" *ngIf="i < 2">
-                  <span class="cond-col">{{ c.columnName }}</span>
-                  <span class="cond-op">{{ c.operator }}</span>
+                <app-chip variant="count" size="sm">
+                  {{
+                    'RLS.CONDITION_COUNT'
+                      | translate: { count: rule.conditions.length }
+                  }}
+                </app-chip>
+                <ng-container
+                  *ngFor="
+                    let c of rule.conditions;
+                    let i = index;
+                    trackBy: trackByIndex
+                  "
+                >
+                  <span class="condition-preview" *ngIf="i < 2">
+                    <span class="cond-col">{{ c.columnName }}</span>
+                    <span class="cond-op">{{ c.operator }}</span>
+                  </span>
+                </ng-container>
+                <span class="more-conds" *ngIf="rule.conditions.length > 2">
+                  {{
+                    'RLS.MORE_CONDITIONS'
+                      | translate: { count: rule.conditions.length - 2 }
+                  }}
                 </span>
-              </ng-container>
-              <span class="more-conds" *ngIf="rule.conditions.length > 2">
-                {{
-                  'RLS.MORE_CONDITIONS'
-                    | translate: { count: rule.conditions.length - 2 }
-                }}
-              </span>
-            </div>
-            <ng-template #noConds><span>-</span></ng-template>
+              </div>
+              <ng-template #noConds><span>-</span></ng-template>
             </ng-template>
           </ng-template>
 

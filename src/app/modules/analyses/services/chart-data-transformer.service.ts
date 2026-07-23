@@ -287,7 +287,11 @@ export class ChartDataTransformerService {
               }))
             : Array.from(buckets.entries()).map(([name, samples]) => ({
                 name,
-                value: this.aggregateSamples(samples, aggFn, mapping.percentile),
+                value: this.aggregateSamples(
+                  samples,
+                  aggFn,
+                  mapping.percentile,
+                ),
               }));
         }
         const total = countMode
@@ -1283,7 +1287,10 @@ export class ChartDataTransformerService {
     // Bin count: explicit config wins; otherwise Sturges' rule.
     const requested = Math.floor(mapping.histogramBins || 0);
     const sturges = Math.ceil(Math.log2(values.length)) + 1;
-    const binCount = Math.max(1, Math.min(50, requested > 0 ? requested : sturges));
+    const binCount = Math.max(
+      1,
+      Math.min(50, requested > 0 ? requested : sturges),
+    );
 
     const width = (max - min) / binCount;
     const counts = new Array(binCount).fill(0);
@@ -1688,9 +1695,9 @@ export class ChartDataTransformerService {
     // measures come from config.aggregations[].column. No-op when `aggregate`
     // is absent (raw-row back-compat).
     if (visual.aggregate) {
-      mapping.xAxisColumn = visual.dimensionColumn ?? visual.xAxisColumn ?? null;
-      mapping.yAxisColumn =
-        visual.measureColumn ?? visual.yAxisColumn ?? null;
+      mapping.xAxisColumn =
+        visual.dimensionColumn ?? visual.xAxisColumn ?? null;
+      mapping.yAxisColumn = visual.measureColumn ?? visual.yAxisColumn ?? null;
       mapping.aggregate = visual.aggregate;
       mapping.percentile =
         typeof visual.config?.percentile === 'number'

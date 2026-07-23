@@ -15,7 +15,15 @@ import { DbAccessService } from '../../services/db-access.service';
 import { ChangeIntent, describeChange } from '../../services/describe-change';
 
 /** PostgreSQL privilege sets per object level. */
-const TABLE_PRIVS = ['SELECT', 'INSERT', 'UPDATE', 'DELETE', 'TRUNCATE', 'REFERENCES', 'TRIGGER'];
+const TABLE_PRIVS = [
+  'SELECT',
+  'INSERT',
+  'UPDATE',
+  'DELETE',
+  'TRUNCATE',
+  'REFERENCES',
+  'TRIGGER',
+];
 const COLUMN_PRIVS = ['SELECT', 'INSERT', 'UPDATE', 'REFERENCES'];
 const SCHEMA_PRIVS = ['USAGE', 'CREATE'];
 const SEQUENCE_PRIVS = ['USAGE', 'SELECT', 'UPDATE'];
@@ -158,11 +166,26 @@ export class PrivilegesAccessComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.levelOptions = [
-      { label: this.translate.instant('DB_ACCESS.LEVEL_TABLE'), value: 'table' },
-      { label: this.translate.instant('DB_ACCESS.LEVEL_COLUMN'), value: 'column' },
-      { label: this.translate.instant('DB_ACCESS.LEVEL_SCHEMA'), value: 'schema' },
-      { label: this.translate.instant('DB_ACCESS.LEVEL_SEQUENCE'), value: 'sequence' },
-      { label: this.translate.instant('DB_ACCESS.LEVEL_FUNCTION'), value: 'function' },
+      {
+        label: this.translate.instant('DB_ACCESS.LEVEL_TABLE'),
+        value: 'table',
+      },
+      {
+        label: this.translate.instant('DB_ACCESS.LEVEL_COLUMN'),
+        value: 'column',
+      },
+      {
+        label: this.translate.instant('DB_ACCESS.LEVEL_SCHEMA'),
+        value: 'schema',
+      },
+      {
+        label: this.translate.instant('DB_ACCESS.LEVEL_SEQUENCE'),
+        value: 'sequence',
+      },
+      {
+        label: this.translate.instant('DB_ACCESS.LEVEL_FUNCTION'),
+        value: 'function',
+      },
     ];
   }
 
@@ -206,7 +229,10 @@ export class PrivilegesAccessComponent implements OnInit, OnDestroy {
     this.dbAccess
       .loadRoles(this.datasourceId)
       .then(() => {
-        this.roleOptions = (this.dbAccess.roles() ?? []).map(r => ({ label: r.name, value: r.name }));
+        this.roleOptions = (this.dbAccess.roles() ?? []).map(r => ({
+          label: r.name,
+          value: r.name,
+        }));
         this.cdr.markForCheck();
       })
       .catch(() => {});
@@ -270,7 +296,9 @@ export class PrivilegesAccessComponent implements OnInit, OnDestroy {
     // Tear down cached options for this rule's schema if no other rule uses
     // it (fix #12) — the context cache is shared, so only invalidate when
     // this was the last consumer.
-    const stillUsed = this.rules.some(r => r.id !== rule.id && r.schema === rule.schema);
+    const stillUsed = this.rules.some(
+      r => r.id !== rule.id && r.schema === rule.schema,
+    );
     if (rule.schema && !stillUsed) {
       this.ctx.invalidateSchema(this.datasourceId, rule.schema);
     }
@@ -281,12 +309,17 @@ export class PrivilegesAccessComponent implements OnInit, OnDestroy {
 
   privsFor(level: Level): string[] {
     switch (level) {
-      case 'column': return COLUMN_PRIVS;
-      case 'schema': return SCHEMA_PRIVS;
-      case 'sequence': return SEQUENCE_PRIVS;
-      case 'function': return FUNCTION_PRIVS;
+      case 'column':
+        return COLUMN_PRIVS;
+      case 'schema':
+        return SCHEMA_PRIVS;
+      case 'sequence':
+        return SEQUENCE_PRIVS;
+      case 'function':
+        return FUNCTION_PRIVS;
       case 'table':
-      default: return TABLE_PRIVS;
+      default:
+        return TABLE_PRIVS;
     }
   }
 
@@ -325,7 +358,9 @@ export class PrivilegesAccessComponent implements OnInit, OnDestroy {
       rule.allTables = false;
       if (rule.tables.length > 1) {
         rule.tables = [rule.tables[rule.tables.length - 1]];
-        this.ruleHints[rule.id] = this.translate.instant('DB_ACCESS.COLUMN_LEVEL_SINGLE_TABLE');
+        this.ruleHints[rule.id] = this.translate.instant(
+          'DB_ACCESS.COLUMN_LEVEL_SINGLE_TABLE',
+        );
       } else {
         delete this.ruleHints[rule.id];
       }
@@ -449,44 +484,63 @@ export class PrivilegesAccessComponent implements OnInit, OnDestroy {
   }
 
   usesObjects(rule: AccessRule): boolean {
-    return rule.level === 'table' || rule.level === 'column' ||
-      rule.level === 'sequence' || rule.level === 'function';
+    return (
+      rule.level === 'table' ||
+      rule.level === 'column' ||
+      rule.level === 'sequence' ||
+      rule.level === 'function'
+    );
   }
 
   /** i18n key for the "All <objects> in schema" toggle — level-aware so a
    *  Sequence rule reads "All sequences in schema", not "All tables…". */
   allObjectsLabelKey(rule: AccessRule): string {
     switch (rule.level) {
-      case 'sequence': return 'DB_ACCESS.ALL_SEQUENCES';
-      case 'function': return 'DB_ACCESS.ALL_FUNCTIONS';
-      default: return 'DB_ACCESS.ALL_TABLES';
+      case 'sequence':
+        return 'DB_ACCESS.ALL_SEQUENCES';
+      case 'function':
+        return 'DB_ACCESS.ALL_FUNCTIONS';
+      default:
+        return 'DB_ACCESS.ALL_TABLES';
     }
   }
 
   /** i18n key for the object-multiselect field label, by level. */
   objectsLabelKey(rule: AccessRule): string {
     switch (rule.level) {
-      case 'column': return 'DB_ACCESS.TABLE'; // column level targets one table
-      case 'sequence': return 'DB_ACCESS.SEQUENCES';
-      case 'function': return 'DB_ACCESS.FUNCTIONS';
-      default: return 'DB_ACCESS.TABLES';
+      case 'column':
+        return 'DB_ACCESS.TABLE'; // column level targets one table
+      case 'sequence':
+        return 'DB_ACCESS.SEQUENCES';
+      case 'function':
+        return 'DB_ACCESS.FUNCTIONS';
+      default:
+        return 'DB_ACCESS.TABLES';
     }
   }
 
   /** i18n key for the object-multiselect placeholder, by level. */
   objectsPlaceholderKey(rule: AccessRule): string {
     switch (rule.level) {
-      case 'sequence': return 'DB_ACCESS.SELECT_SEQUENCES';
-      case 'function': return 'DB_ACCESS.SELECT_FUNCTIONS';
-      default: return 'DB_ACCESS.SELECT_TABLES';
+      case 'sequence':
+        return 'DB_ACCESS.SELECT_SEQUENCES';
+      case 'function':
+        return 'DB_ACCESS.SELECT_FUNCTIONS';
+      default:
+        return 'DB_ACCESS.SELECT_TABLES';
     }
   }
 
   ruleValid(rule: AccessRule): boolean {
     if (!rule.schema || !rule.grantee || !rule.privileges.length) return false;
-    if (rule.level === 'table' && !rule.allTables && !rule.tables.length) return false;
+    if (rule.level === 'table' && !rule.allTables && !rule.tables.length)
+      return false;
     if (rule.level === 'column' && !rule.tables.length) return false;
-    if ((rule.level === 'sequence' || rule.level === 'function') && !rule.allTables && !rule.tables.length)
+    if (
+      (rule.level === 'sequence' || rule.level === 'function') &&
+      !rule.allTables &&
+      !rule.tables.length
+    )
       return false;
     return true;
   }
@@ -530,8 +584,13 @@ export class PrivilegesAccessComponent implements OnInit, OnDestroy {
    */
   private ruleToStatements(rule: AccessRule): any[] {
     const roleKey = rule.action === 'grant' ? 'toRole' : 'fromRole';
-    const base: any = { kind: rule.action, privileges: rule.privileges, [roleKey]: rule.grantee };
-    if (rule.action === 'grant' && rule.withGrantOption) base.withGrantOption = true;
+    const base: any = {
+      kind: rule.action,
+      privileges: rule.privileges,
+      [roleKey]: rule.grantee,
+    };
+    if (rule.action === 'grant' && rule.withGrantOption)
+      base.withGrantOption = true;
     if (rule.action === 'revoke') base.behavior = 'RESTRICT';
 
     if (rule.level === 'schema') {
@@ -559,7 +618,11 @@ export class PrivilegesAccessComponent implements OnInit, OnDestroy {
     if (rule.allTables) {
       return [{ ...base, objType, object: { allInSchema: rule.schema } }];
     }
-    return rule.tables.map(name => ({ ...base, objType, object: { parts: [rule.schema, name] } }));
+    return rule.tables.map(name => ({
+      ...base,
+      objType,
+      object: { parts: [rule.schema, name] },
+    }));
   }
 
   // ── Apply (fix #9 — was a no-op; now POSTs to /change-set) ──────────────
@@ -568,7 +631,9 @@ export class PrivilegesAccessComponent implements OnInit, OnDestroy {
     const valid = this.rules.filter(r => this.ruleValid(r));
     if (!valid.length) return;
     this.pendingStatements = valid.flatMap(r => this.ruleToStatements(r));
-    this.summaries = valid.map(r => describeChange(this.ruleToIntent(r), this.translate));
+    this.summaries = valid.map(r =>
+      describeChange(this.ruleToIntent(r), this.translate),
+    );
     this.confirmDestructive = valid.some(r => r.action === 'revoke');
     this.openConfirm();
   }
@@ -579,7 +644,10 @@ export class PrivilegesAccessComponent implements OnInit, OnDestroy {
     this.cdr.markForCheck();
     // Dry-run validate (previewOnly) — surface success only, never SQL.
     this.dbAccess
-      .applyChangeSet(this.datasourceId, { statements: this.pendingStatements, previewOnly: true })
+      .applyChangeSet(this.datasourceId, {
+        statements: this.pendingStatements,
+        previewOnly: true,
+      })
       .then(res => {
         if (!res?.status) {
           this.globalService.handleSuccessService(res);
@@ -595,7 +663,10 @@ export class PrivilegesAccessComponent implements OnInit, OnDestroy {
 
   confirmApply(): void {
     this.dbAccess
-      .applyChangeSet(this.datasourceId, { statements: this.pendingStatements, confirm: true })
+      .applyChangeSet(this.datasourceId, {
+        statements: this.pendingStatements,
+        confirm: true,
+      })
       .then(res => {
         if (this.globalService.handleSuccessService(res)) {
           this.showConfirm = false;
@@ -666,7 +737,10 @@ export class PrivilegesAccessComponent implements OnInit, OnDestroy {
    * makes the panel scannable — one line per table instead of one per grant.
    */
   private groupEffective(): void {
-    const byKey = new Map<string, { privs: Set<string>; sources: Set<string> }>();
+    const byKey = new Map<
+      string,
+      { privs: Set<string>; sources: Set<string> }
+    >();
     let privCount = 0;
     for (const r of this.effectiveRaw) {
       const table = r.table || r.object || r.name || '';

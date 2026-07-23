@@ -71,6 +71,7 @@ The doc covered driver layout, SSL, IAM, BigQuery shim, pool metrics.
 Missing:
 
 ### Concepts
+
 - **Connection-string-only input** as an alternative to per-field form
   (paste `postgres://user:pw@host:port/db?sslmode=require`). Looker,
   Metabase, Superset all accept it.
@@ -84,6 +85,7 @@ Missing:
   a "request datasource" → admin approves → BE creates. Not in doc.
 
 ### Schemas
+
 - `connection_string text` (encrypted, parsed at runtime).
 - `tunnel_config jsonb` (ssh host, port, private_key_enc, jump_host).
 - `read_replica_hosts text[]` for round-robin readers.
@@ -95,6 +97,7 @@ Missing:
 - `last_validated_at timestamptz` separate from last_refresh.
 
 ### Endpoints
+
 - `POST /datasource/test-connection-string` — parse + reach + return.
 - `POST /datasource/:id/tunnel/test` — separate from `validate`.
 - `POST /datasource/:id/approve` — approval workflow.
@@ -103,12 +106,14 @@ Missing:
   system?".
 
 ### FE
+
 - Connection-string mode toggle on add form.
 - Tunnel config sub-form.
 - "Bring your own driver" stub for enterprise on-prem (driver upload
   with signature check).
 
 ### Code
+
 - **PgBouncer awareness**: when the customer points us at PgBouncer,
   `SET statement_timeout` doesn't persist across pool reuse — must
   wrap every query with `SET LOCAL` inside a transaction.
@@ -118,6 +123,7 @@ Missing:
   abort handshake if mismatch.
 
 ### Tests
+
 - DS-N-30: connection string with unencoded `@` in password → still parses
 - DS-E-40: idle pool shrinks below min_idle and recovers
 - DS-E-41: read-replica hot-swap during a query
@@ -125,6 +131,7 @@ Missing:
 - DS-E-42: schema list with 100k tables paginates correctly
 
 ### Migration
+
 - The "connection string mode" is purely additive (single column).
 - Tunnel feature flag `enableSSHTunnel` per-org.
 
@@ -135,6 +142,7 @@ Missing:
 Strong skeleton. Specific gaps:
 
 ### Concepts missed
+
 - **Derived dimensions** (a dimension whose expression references
   another dimension), not just derived metrics. Looker supports this.
 - **Filtered metrics** — `revenue_in_apac = SUM(revenue) FILTER (WHERE region='APAC')`.
@@ -160,6 +168,7 @@ Strong skeleton. Specific gaps:
 - **Inheritance / model composition** (`include: base.lkml`).
 
 ### Schemas missed
+
 - `sem_dimension.parent_id` for hierarchies.
 - `sem_dimension.is_required boolean` (must filter before query).
 - `sem_dimension.display_sql text` (the human label expression).
@@ -175,6 +184,7 @@ Strong skeleton. Specific gaps:
 - Audit table: every save creates a `semantic_model_version` row.
 
 ### Endpoints missed
+
 - `POST /semantic-model/:id/dry-run` — compile but don't execute;
   return SQL + plan.
 - `POST /semantic-model/:id/lint` — run static checks (orphan refs,
@@ -187,6 +197,7 @@ Strong skeleton. Specific gaps:
   columns, propose dims/metrics (auto-bootstrap UI).
 
 ### FE missed
+
 - **YAML view** alongside the visual editor — full keyboard authoring
   for power users; FE round-trips YAML ↔ JSON.
 - **Diff view** when saving an existing model (show what changed +
@@ -194,6 +205,7 @@ Strong skeleton. Specific gaps:
 - **Impact preview**: "saving will affect 14 analyses and 3 dashboards".
 
 ### Code missed
+
 - **Fan-out detection algorithm**: after compile, count expected vs
   actual base rows; if join multiplies, wrap aggregates with
   `DISTINCT` or refuse + warn.
@@ -204,6 +216,7 @@ Strong skeleton. Specific gaps:
   percentiles, `APPROX_COUNT_DISTINCT` aliasing per engine.
 
 ### Tests
+
 - SEM-DERIV-CYCLE-N-01: derived metric referencing itself transitively
 - SEM-FANOUT-H-01: joined model fan-out detected + warning shown
 - SEM-HIER-H-01: hierarchy drill `region → country → city` works
@@ -214,6 +227,7 @@ Strong skeleton. Specific gaps:
 - SEM-LINT-H-01: unused dimension flagged
 
 ### Migration / ops
+
 - A `semantic_model.lock_version int` for optimistic concurrency.
 - `feature_flag.semanticLayer` per org.
 - Backfill: when enabling, generate a starter model from the dataset's
@@ -224,6 +238,7 @@ Strong skeleton. Specific gaps:
 ## 03 · Dataset — review
 
 ### Missed concepts
+
 - **Schema introspection cache**: re-running schema discovery on every
   edit is expensive on Snowflake. Cache the column list per dataset
   with a TTL.
@@ -244,6 +259,7 @@ Strong skeleton. Specific gaps:
 - **Snowflake / BQ external tables** as dataset source.
 
 ### Missed schemas
+
 - `dataset.column_descriptions jsonb` — `{ "revenue": "USD gross", ... }`.
 - `dataset.sample_rows jsonb` — cached preview.
 - `dataset.schema_introspection jsonb` + `schema_introspected_at`.
@@ -256,6 +272,7 @@ Strong skeleton. Specific gaps:
 - Index on `last_refresh_at` for finding stale datasets.
 
 ### Missed endpoints
+
 - `POST /dataset/:id/refresh/incremental` — upsert from new rows.
 - `POST /dataset/:id/columns/:name/description` — set field doc.
 - `GET /dataset/:id/sample` — cached sample (no query).
@@ -266,6 +283,7 @@ Strong skeleton. Specific gaps:
   schema_introspection.
 
 ### Missed FE
+
 - **Column docs panel** in the dataset detail page.
 - **Dataset templates gallery**.
 - **"Stale data" alert banner** when SLA missed.
@@ -275,6 +293,7 @@ Strong skeleton. Specific gaps:
 - **SQL editor with IntelliSense** based on schema_introspection.
 
 ### Missed code
+
 - **CSV streaming with progress events** via SSE: every 50k rows
   push `{ progress, rowsParsed }` to FE.
 - **xlsx multi-sheet picker**: list sheets + row counts before commit.
@@ -286,6 +305,7 @@ Strong skeleton. Specific gaps:
   numeric with thousands separator, currency symbols.
 
 ### Missed tests
+
 - DST-UPSERT-H-01: upsert reuses existing row by PK
 - DST-DRIFT-H-01: new column upstream → drift banner
 - DST-SAMPLE-H-01: sample cached, served without re-query
@@ -297,6 +317,7 @@ Strong skeleton. Specific gaps:
 ## 04 · Query Processor — review
 
 ### Missed concepts
+
 - **Query plan** as a separate artefact (not just compiled SQL).
 - **Pushdown predicates** beyond filters: limit pushdown into subquery,
   topN pushdown.
@@ -317,18 +338,21 @@ Strong skeleton. Specific gaps:
 - **Date arithmetic**: `INTERVAL '1 day'` vs `DATEADD(day, 1, ...)`.
 
 ### Missed schemas
+
 - `query_plan jsonb` returned by `/query/explain`.
 - `query_cache_entry` table for parsed-AST cache (Redis better, but
   for dev environments without Redis, fall back to a small in-memory
   LRU).
 
 ### Missed endpoints
+
 - `POST /query/cancel/:id` — cancel a running query by query-id.
 - `POST /query/explain-analyze` — actually run EXPLAIN ANALYZE if
   permitted.
 - `GET /query/stats` — slow query log per org.
 
 ### Missed code
+
 - **AST visitor pattern** rather than ad-hoc switch.
 - **Plan-aware identifier quoting** — quote everywhere, period; let
   drivers reject duplicates.
@@ -337,6 +361,7 @@ Strong skeleton. Specific gaps:
   (or driver-equivalent) using the pid stored at start.
 
 ### Missed tests
+
 - QP-CAN-H-01: cancel query mid-flight → caller gets 499 / "cancelled"
 - QP-NULL-H-01: `ORDER BY x ASC NULLS LAST` rendered per dialect
 - QP-INT-H-01: date interval arithmetic correct on all dialects
@@ -347,6 +372,7 @@ Strong skeleton. Specific gaps:
 ## 05 · Cache & Materialisation — review
 
 ### Missed concepts
+
 - **Cache warming on publish**: when a dashboard is published, pre-fill
   the cache for top-N queries with default filters.
 - **Soft TTL vs hard TTL**: serve stale while revalidating in
@@ -368,6 +394,7 @@ Strong skeleton. Specific gaps:
   cascade-refresh its dependent MVs.
 
 ### Missed schemas
+
 - `cache_namespace_quota (organisation_id, max_bytes)`.
 - `materialised_view.depends_on_dataset_ids uuid[]`.
 - `materialised_view.partition_by varchar`,
@@ -375,6 +402,7 @@ Strong skeleton. Specific gaps:
 - `cache_event` audit table (created, hit, evicted, invalidated).
 
 ### Missed endpoints
+
 - `POST /cache/warm/dashboard/:id` (not just /dataset).
 - `GET /cache/keys?prefix=...` (admin debug).
 - `POST /materialised/:id/preview` — run the query, show what rows
@@ -382,6 +410,7 @@ Strong skeleton. Specific gaps:
 - `POST /materialised/incremental-refresh/:id` — append-only refresh.
 
 ### Missed code
+
 - **Stale-while-revalidate**:
 
 ```ts
@@ -412,6 +441,7 @@ async setLarge(key: string, value: T) {
 ```
 
 ### Missed tests
+
 - CACHE-SWR-H-01: stale return + background refresh
 - CACHE-CHUNK-H-01: 50MB result round-trips
 - CACHE-QUOTA-H-01: org-wide LRU eviction kicks in
@@ -419,6 +449,7 @@ async setLarge(key: string, value: T) {
 - CACHE-MV-DEP-H-01: base dataset change cascades MV refresh
 
 ### Ops
+
 - Prometheus: `cache_hit_total`, `cache_miss_total`,
   `cache_swr_revalidate_total`, `cache_bytes_total{orgId}`.
 
@@ -427,6 +458,7 @@ async setLarge(key: string, value: T) {
 ## 06 · Analysis & Visual Builder — review
 
 ### Missed concepts
+
 - **Visual templates / starter kits**: pick "Funnel · 4-stage signup"
   → pre-mapped visual.
 - **Multi-axis charts**: dual y-axis with independent scales.
@@ -445,12 +477,14 @@ async setLarge(key: string, value: T) {
 - **Visual config diff** when editing — what changes downstream.
 
 ### Missed schemas
+
 - `visual_template` table for starter kits.
 - `analysis_bookmark (id, analysis_id, owner_id, name, state jsonb)`.
 - `visual_annotation` table.
 - `analysis.saved_views jsonb` array.
 
 ### Missed endpoints
+
 - `GET /visual-templates` list.
 - `POST /analysis/:id/bookmark` save.
 - `POST /analysis/:id/forecast` server-side compute (Python service or
@@ -458,6 +492,7 @@ async setLarge(key: string, value: T) {
 - `POST /analysis/:id/trendline` server-side regression.
 
 ### Missed FE
+
 - **Properties panel search box** noted in doc but not the global
   search across descriptors (typing "color" finds every colour-
   related setting in the registry).
@@ -466,6 +501,7 @@ async setLarge(key: string, value: T) {
 - **Visual-options "compare to default"** with a single click revert.
 
 ### Missed code
+
 - **Forecast** implementation:
 
 ```ts
@@ -473,7 +509,11 @@ import { ARIMA } from 'arima';
 function forecastSeries(data: number[], periods: number) {
   const arima = new ARIMA({ p: 2, d: 1, q: 2, verbose: false }).train(data);
   const [pred, errors] = arima.predict(periods);
-  return { values: pred, lower: pred.map((v, i) => v - 1.96 * errors[i]), upper: pred.map((v, i) => v + 1.96 * errors[i]) };
+  return {
+    values: pred,
+    lower: pred.map((v, i) => v - 1.96 * errors[i]),
+    upper: pred.map((v, i) => v + 1.96 * errors[i]),
+  };
 }
 ```
 
@@ -482,14 +522,18 @@ function forecastSeries(data: number[], periods: number) {
 ```ts
 function linearRegression(xs: number[], ys: number[]) {
   const n = xs.length;
-  const sx = sum(xs), sy = sum(ys), sxx = sum(xs.map(x => x*x)), sxy = sum(xs.map((x,i) => x*ys[i]));
-  const m = (n*sxy - sx*sy) / (n*sxx - sx*sx);
-  const b = (sy - m*sx) / n;
-  return { m, b, predict: (x: number) => m*x + b };
+  const sx = sum(xs),
+    sy = sum(ys),
+    sxx = sum(xs.map(x => x * x)),
+    sxy = sum(xs.map((x, i) => x * ys[i]));
+  const m = (n * sxy - sx * sy) / (n * sxx - sx * sx);
+  const b = (sy - m * sx) / n;
+  return { m, b, predict: (x: number) => m * x + b };
 }
 ```
 
 ### Missed tests
+
 - ANL-FC-H-01: forecast renders 6-period prediction with CI bands
 - ANL-TREND-H-01: trendline overlays on scatter
 - ANL-BOOK-H-01: bookmark restores filter+drill state
@@ -501,6 +545,7 @@ function linearRegression(xs: number[], ys: number[]) {
 ## 07 · Filters, Parameters, Cross-filters, Drill — review
 
 ### Missed concepts
+
 - **Filter hierarchies** (region → country → city) auto-cascading.
 - **Date filter relative phrases**: "this fiscal quarter", "previous
   4 weeks", "ytd vs last ytd". Doc has a basic set; need fiscal
@@ -519,17 +564,20 @@ function linearRegression(xs: number[], ys: number[]) {
 - **Filter highlight vs filter exclude** (Tableau distinction).
 
 ### Missed schemas
+
 - `org_fiscal_calendar (organisation_id, fy_start_month, fy_start_day)`.
 - `org_filter_library (id, organisation_id, name, definition jsonb)`.
 - `analysis_filter.compare_range jsonb` for prior-period overlay.
 
 ### Missed FE
+
 - **Filter "from URL" indicator** for shared deep links.
 - **"Reset filters"** vs **"Reset filters and parameters"**.
 - **Live preview of affected row count** as you type (cheap
   count-only query).
 
 ### Missed code
+
 - **Fiscal date resolver**:
 
 ```ts
@@ -543,6 +591,7 @@ function fiscalQuarter(date: Date, fyStartMonth: number) {
   `(prev_from, prev_to)` such that the spans match.
 
 ### Missed tests
+
 - FLT-FISCAL-H-01: "this fiscal quarter" picks the right window
 - FLT-COMP-H-01: comparison range overlays prior period
 - FLT-LIB-H-01: org filter library reusable across analyses
@@ -553,6 +602,7 @@ function fiscalQuarter(date: Date, fyStartMonth: number) {
 ## 08 · Dashboard — review
 
 ### Missed concepts
+
 - **Dashboard tabs / pages** (Power BI report pages).
 - **Conditional visibility** of visuals (show only when a filter is set).
 - **Custom layouts**: free-form vs grid (Tableau allows both).
@@ -568,12 +618,14 @@ function fiscalQuarter(date: Date, fyStartMonth: number) {
 - **CSV bundle** export per visual into a zip.
 
 ### Missed schemas
+
 - `dashboard_tab (id, dashboard_id, name, layout jsonb, ordering int)`.
 - `dashboard_snapshot (id, dashboard_id, version, payload jsonb, created_on)` — history.
 - `dashboard_variable (id, dashboard_id, name, default_value jsonb)`.
 - `dashboard.theme_override jsonb`.
 
 ### Missed endpoints
+
 - `POST /dashboards/:id/tabs` CRUD.
 - `POST /dashboards/:id/snapshots/:v/restore`.
 - `POST /dashboards/:id/export/zip` — per-visual CSV bundle.
@@ -581,15 +633,18 @@ function fiscalQuarter(date: Date, fyStartMonth: number) {
 - `GET /dashboards/:id/presentation-state` — TV mode poll endpoint.
 
 ### Missed FE
+
 - **TV mode** route at `/tv/dashboards/:id` with auto-refresh + page
   rotation.
 - **Print preview** with explicit "Print mode" toggle (changes paddings).
 
 ### Missed code
+
 - **Parameter sweep**: BullMQ job iterates param values, calls
   `renderDashboardPdf` for each, zips, emails link.
 
 ### Missed tests
+
 - DSH-TAB-H-01: multi-tab dashboard renders + remembers tab on reload
 - DSH-VAR-H-01: dashboard variable propagates to all visuals
 - DSH-SWEEP-H-01: per-region PDF sweep produces N files in zip
@@ -600,6 +655,7 @@ function fiscalQuarter(date: Date, fyStartMonth: number) {
 ## 09 · RLS & Column Security — review
 
 ### Missed concepts
+
 - **Connection impersonation** (Metabase's killer feature): instead of
   WHERE-rewriting, connect AS the user's DB role. Works when source
   DB has its own RLS / row-level policies.
@@ -618,34 +674,40 @@ function fiscalQuarter(date: Date, fyStartMonth: number) {
   for non-admins.
 
 ### Missed schemas
+
 - `connection_impersonation (datasource_id, scope, scope_id, db_role)`.
 - `column_metadata.is_pii boolean`, `pii_class varchar` (email/phone/ssn/...).
 - `rls_rule.precedence int` for ordering.
 - `rls_rule.deny_by_default boolean` — apply WHERE FALSE if no rule matches.
 
 ### Missed endpoints
+
 - `GET /security/effective/:datasetId?asUser=<id>` — explain output.
 - `POST /security/lint/:datasetId` — find users with 0-row result.
 - `POST /security/pii-scan/:datasetId` — heuristic scanner.
 
 ### Missed FE
+
 - **"Why am I seeing this row?"** debug overlay (admin only).
 - **PII auto-detect indicator** on column list.
 - **Effective permissions explorer** in the Security tab.
 
 ### Missed code
+
 - **PII heuristic detection** (regex per column sample):
 
 ```ts
 const PII_PATTERNS = {
   email: /^[A-Za-z0-9._-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/,
   phone: /^\+?\d[\d \-()]{6,}$/,
-  ssn:   /^\d{3}-\d{2}-\d{4}$/,
-  ccn:   /^\d{13,19}$/,
+  ssn: /^\d{3}-\d{2}-\d{4}$/,
+  ccn: /^\d{13,19}$/,
 };
 function scanColumnSample(values: unknown[]): string | null {
   for (const [name, re] of Object.entries(PII_PATTERNS)) {
-    const matches = values.filter(v => typeof v === 'string' && re.test(v)).length;
+    const matches = values.filter(
+      v => typeof v === 'string' && re.test(v),
+    ).length;
     if (matches / values.length > 0.6) return name;
   }
   return null;
@@ -653,6 +715,7 @@ function scanColumnSample(values: unknown[]): string | null {
 ```
 
 ### Missed tests
+
 - RLS-IMP-H-01: impersonation routes to DB role
 - RLS-PII-H-01: SSN column auto-tagged after scan
 - RLS-EXP-H-01: effective endpoint explains predicates
@@ -663,6 +726,7 @@ function scanColumnSample(values: unknown[]): string | null {
 ## 10 · RBAC / SSO / MFA / SCIM / API tokens — review
 
 ### Missed concepts
+
 - **OAuth2 third-party app authorization** (Slack-style: "DBExec
   wants to read your data"). Different from SSO; lets external apps
   call DBExec on a user's behalf without sharing creds.
@@ -688,6 +752,7 @@ function scanColumnSample(values: unknown[]): string | null {
   token is used twice, kill all sessions for that user.
 
 ### Missed schemas
+
 - `oauth_app` (third-party apps), `oauth_token`, `oauth_grant`.
 - `signing_key (id, kid, public_jwk, private_jwk_enc, status, activated_at, retired_at)`.
 - `step_up_event (user_id, action, occurred_at)` for require-recent-mfa enforcement.
@@ -696,6 +761,7 @@ function scanColumnSample(values: unknown[]): string | null {
   `user_session.suspicious boolean` + reason.
 
 ### Missed endpoints
+
 - `GET /.well-known/openid-configuration`
 - `GET /.well-known/jwks.json`
 - `POST /auth/step-up` → returns short-lived elevated token
@@ -704,25 +770,41 @@ function scanColumnSample(values: unknown[]): string | null {
 - `GET /scim/v2/Schemas`, `/scim/v2/ResourceTypes`
 
 ### Missed code
+
 - **Refresh token rotation with reuse detection**:
 
 ```ts
 async function rotate(oldRt: string) {
-  const stored = await Session.findOne({ where: { refreshTokenHash: hash(oldRt) } });
+  const stored = await Session.findOne({
+    where: { refreshTokenHash: hash(oldRt) },
+  });
   if (!stored) throw new Unauthorized();
   if (stored.revokedAt) {
     // Reuse detected — kill ALL sessions for this user.
-    await Session.update({ userId: stored.userId, revokedAt: IsNull() }, { revokedAt: new Date(), revokedReason: 'reuse-detected' });
+    await Session.update(
+      { userId: stored.userId, revokedAt: IsNull() },
+      { revokedAt: new Date(), revokedReason: 'reuse-detected' },
+    );
     throw new Unauthorized();
   }
   const newRt = randomToken();
-  await Session.update(stored.id, { revokedAt: new Date(), revokedBy: 'rotation' });
-  await Session.insert({ ...stored, id: undefined, refreshTokenHash: hash(newRt), createdAt: new Date(), revokedAt: null });
+  await Session.update(stored.id, {
+    revokedAt: new Date(),
+    revokedBy: 'rotation',
+  });
+  await Session.insert({
+    ...stored,
+    id: undefined,
+    refreshTokenHash: hash(newRt),
+    createdAt: new Date(),
+    revokedAt: null,
+  });
   return { refresh: newRt, access: signJwt(stored.userId) };
 }
 ```
 
 ### Missed tests
+
 - AUTH-RT-REUSE-N-01: reused refresh token kills all sessions
 - AUTH-JWKS-H-01: JWKS endpoint serves keys
 - AUTH-STEP-UP-H-01: step-up required to delete org
@@ -734,6 +816,7 @@ async function rotate(oldRt: string) {
 ## 11 · Aggregation & Metrics — review (was thin)
 
 ### Missed concepts (significant)
+
 - **Non-additive metrics**: distinct counts don't sum across windows.
   Compiler must refuse silly rollups.
 - **Approx-vs-exact distinct counts** flag per metric.
@@ -749,6 +832,7 @@ async function rotate(oldRt: string) {
   `metric_a - metric_b` shown as a virtual column.
 
 ### Missed schemas
+
 - `sem_metric.is_additive boolean` (true = SUM-compatible, false =
   AVG/distinct).
 - `sem_metric.is_semi_additive boolean`,
@@ -758,6 +842,7 @@ async function rotate(oldRt: string) {
 - `sem_metric.format_string text` (custom).
 
 ### Missed code
+
 - **Semi-additive measure compiler**:
 
 ```sql
@@ -768,6 +853,7 @@ GROUP BY month;
 ```
 
 ### Missed tests
+
 - METRIC-SEMIADD-H-01: balance = last value of month
 - METRIC-RESET-H-01: MTD resets at month boundary
 - METRIC-NONADD-N-01: cannot SUM distinct_count across regions
@@ -778,6 +864,7 @@ GROUP BY month;
 ## 12 · Import / Upload — review (was thin)
 
 ### Missed concepts
+
 - **Upload from URL** (S3 / GCS / Azure Blob / HTTPS).
 - **Chunked / resumable uploads** (tus.io protocol).
 - **Schema mapping UI**: when re-uploading, map "Region" in new file to
@@ -793,16 +880,19 @@ GROUP BY month;
 - **Backfill mode** (load historical files into one dataset).
 
 ### Missed schemas
+
 - `upload_job (id, dataset_id, source_type, source_uri, status, hash_sha256, bytes, rows, error, started_at, finished_at)`.
 - `upload_mapping (id, dataset_id, source_format, mapping jsonb)`.
 - `org_storage_quota (organisation_id, max_bytes, used_bytes)`.
 
 ### Missed endpoints
+
 - `POST /upload/url` — submit URL.
 - `POST /upload/init` + `/upload/chunk/:n` + `/upload/finish` (tus).
 - `POST /upload/dry-run` returns validation report.
 
 ### Missed code
+
 - **tus implementation** (resumable uploads): use `tus-node-server`.
 - **Virus scan hook**:
 
@@ -810,15 +900,20 @@ GROUP BY month;
 import { Socket } from 'node:net';
 async function clamavScan(buf: Buffer): Promise<boolean> {
   const sock = new Socket();
-  await new Promise<void>((res, rej) => sock.connect(3310, 'clamav', res).on('error', rej));
+  await new Promise<void>((res, rej) =>
+    sock.connect(3310, 'clamav', res).on('error', rej),
+  );
   sock.write(`zINSTREAM\0`);
   sock.write(buf);
-  sock.write(Buffer.from([0,0,0,0]));
-  return new Promise(res => sock.once('data', d => res(/OK/.test(d.toString()))));
+  sock.write(Buffer.from([0, 0, 0, 0]));
+  return new Promise(res =>
+    sock.once('data', d => res(/OK/.test(d.toString()))),
+  );
 }
 ```
 
 ### Missed tests
+
 - UP-URL-H-01: upload from S3 URL
 - UP-TUS-H-01: resumable upload after disconnect
 - UP-VIRUS-N-01: infected file rejected
@@ -829,6 +924,7 @@ async function clamavScan(buf: Buffer): Promise<boolean> {
 ## 13 · Export & Download — review
 
 ### Missed concepts
+
 - **Watermarks** on exported PDFs (org logo, "Confidential", user
   email, timestamp).
 - **Encrypted PDF** with password.
@@ -846,22 +942,26 @@ async function clamavScan(buf: Buffer): Promise<boolean> {
 - **Re-run protection**: export job idempotency.
 
 ### Missed schemas
+
 - `export_job.watermark_text varchar`,
   `export_job.password_enc bytea`,
   `export_job.expires_at` for signed-URL artifacts.
 
 ### Missed endpoints
+
 - `POST /export/dashboard/:id/pptx`
 - `POST /export/analysis/:id/markdown`
 - `POST /export/dashboard/:id/embed-html` (inline-HTML email body)
 
 ### Missed code
+
 - **PDF watermark** via puppeteer:
 
 ```ts
-await page.evaluate((wm) => {
+await page.evaluate(wm => {
   const div = document.createElement('div');
-  div.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) rotate(-30deg);opacity:.08;font-size:96px;pointer-events:none;z-index:9999;';
+  div.style.cssText =
+    'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) rotate(-30deg);opacity:.08;font-size:96px;pointer-events:none;z-index:9999;';
   div.textContent = wm;
   document.body.appendChild(div);
 }, watermarkText);
@@ -870,6 +970,7 @@ await page.evaluate((wm) => {
 - **Encrypted PDF**: `pdf-lib` for re-encryption with password.
 
 ### Missed tests
+
 - EXP-WM-H-01: watermark visible on every page
 - EXP-PWD-N-01: PDF without password prompts
 - EXP-PPTX-H-01: PPTX produced with one slide per visual
@@ -880,6 +981,7 @@ await page.evaluate((wm) => {
 ## 14 · Sharing & Embedding — review
 
 ### Missed concepts
+
 - **Group-shareable**: share with a dynamic group, not just a list of
   emails (covered briefly but no UX).
 - **Granular embed permissions**: which visuals are visible inside the
@@ -896,6 +998,7 @@ await page.evaluate((wm) => {
 - **Public link revocation list** + notify creator.
 
 ### Missed schemas
+
 - `share_link.view_log_id` reference into `share_link_view_event`.
 - `share_link_view_event (link_id, ip, user_agent, country, viewed_at)`.
 - `embed_session (id, link_id, jwt_jti, started_at, ended_at, last_action_at)`.
@@ -903,19 +1006,24 @@ await page.evaluate((wm) => {
 - `share_link.visible_visuals uuid[]`.
 
 ### Missed code
+
 - **postMessage protocol**:
 
 ```ts
 // iframe child
-window.parent.postMessage({ type: 'dbexec:event', event: 'filter-change', payload: state }, '*');
+window.parent.postMessage(
+  { type: 'dbexec:event', event: 'filter-change', payload: state },
+  '*',
+);
 // host
-window.addEventListener('message', (e) => {
+window.addEventListener('message', e => {
   if (e.data?.type !== 'dbexec:event') return;
   // ...
 });
 ```
 
 ### Missed tests
+
 - SH-EVENT-H-01: filter change inside iframe fires host callback
 - SH-EMBED-VIS-H-01: visible_visuals hides others
 - SH-PUBLIC-CAPTCHA-N-01: 50 views/hour triggers captcha
@@ -926,6 +1034,7 @@ window.addEventListener('message', (e) => {
 ## 15 · Scheduling & Alerts — review
 
 ### Missed concepts
+
 - **Snooze alerts**: temporarily silence without disabling.
 - **Acknowledge alerts**: PagerDuty-style.
 - **Severity levels**: info / warning / critical → routing.
@@ -944,6 +1053,7 @@ window.addEventListener('message', (e) => {
   flap).
 
 ### Missed schemas
+
 - `recipient_list (id, organisation_id, name, members jsonb)`.
 - `alert.severity varchar`, `alert.consecutive_breaches int`,
   `alert.acknowledged_until timestamptz`.
@@ -951,11 +1061,19 @@ window.addEventListener('message', (e) => {
 - `subscription.snoozed_until timestamptz`.
 
 ### Missed code
+
 - **HMAC webhook signature**:
 
 ```ts
-const sig = crypto.createHmac('sha256', secret).update(JSON.stringify(body)).digest('hex');
-await fetch(webhookUrl, { method: 'POST', body: JSON.stringify(body), headers: { 'X-DBExec-Signature': sig, 'Content-Type': 'application/json' } });
+const sig = crypto
+  .createHmac('sha256', secret)
+  .update(JSON.stringify(body))
+  .digest('hex');
+await fetch(webhookUrl, {
+  method: 'POST',
+  body: JSON.stringify(body),
+  headers: { 'X-DBExec-Signature': sig, 'Content-Type': 'application/json' },
+});
 ```
 
 - **Exponential retry**:
@@ -965,14 +1083,19 @@ const delays = [1, 5, 25, 125, 625]; // seconds
 async function withRetry<T>(fn: () => Promise<T>, max = 5): Promise<T> {
   let lastErr;
   for (let i = 0; i < max; i++) {
-    try { return await fn(); }
-    catch (e) { lastErr = e; await sleep(delays[i] * 1000); }
+    try {
+      return await fn();
+    } catch (e) {
+      lastErr = e;
+      await sleep(delays[i] * 1000);
+    }
   }
   throw lastErr;
 }
 ```
 
 ### Missed tests
+
 - AL-CONSEC-H-01: alert requires N=3 breaches before firing
 - AL-SNOOZE-H-01: snoozed alert skips its next run
 - SUB-FAIL-RETRY-H-01: failed delivery retries 3× then DLQs
@@ -984,6 +1107,7 @@ async function withRetry<T>(fn: () => Promise<T>, max = 5): Promise<T> {
 ## 16 · Notifications — review
 
 ### Missed concepts
+
 - **Push notifications** (browser, mobile).
 - **Quiet hours / DND**.
 - **Bundling**: 5 same-category events within 5 min → 1 notification
@@ -994,14 +1118,17 @@ async function withRetry<T>(fn: () => Promise<T>, max = 5): Promise<T> {
 - **Per-org notification template overrides**.
 
 ### Missed schemas
+
 - `notification.bundle_key varchar` (events with same key merge).
 - `user.dnd_window jsonb` ({ from: '22:00', to: '07:00' }).
 - `notification_preference.digest varchar` ('off'/'daily'/'weekly').
 
 ### Missed code
+
 - **Web Push** subscription endpoint + VAPID keys.
 
 ### Missed tests
+
 - NOT-BUNDLE-H-01: 5 mentions bundle into 1 notification
 - NOT-DND-H-01: notification queued during quiet hours, delivered after
 - NOT-DIGEST-H-01: daily digest summarises all unread
@@ -1011,6 +1138,7 @@ async function withRetry<T>(fn: () => Promise<T>, max = 5): Promise<T> {
 ## 17 · Search, Tags, Collections, Favourites — review
 
 ### Missed concepts
+
 - **Fuzzy search** (typo tolerance) via pg_trgm.
 - **Semantic / vector search** for natural-language queries.
 - **Boosting by recency / popularity / personal**.
@@ -1022,11 +1150,13 @@ async function withRetry<T>(fn: () => Promise<T>, max = 5): Promise<T> {
 - **Trending** (most viewed in last 7d).
 
 ### Missed schemas
+
 - pg_trgm extension + GIN(name gin_trgm_ops).
 - `pgvector` extension + embedding column (for semantic).
 - `saved_search (id, user_id, query jsonb, notify_on_match boolean)`.
 
 ### Missed code
+
 - **Vector search**:
 
 ```sql
@@ -1038,6 +1168,7 @@ LIMIT 10;
 ```
 
 ### Missed tests
+
 - SR-FUZZY-H-01: typo "dashbord" finds "dashboard"
 - SR-VEC-H-01: "show me revenue trends" returns relevant dashboards
 - SR-SAVED-H-01: saved search alerts on new match
@@ -1047,6 +1178,7 @@ LIMIT 10;
 ## 18 · Versioning & Lineage — review
 
 ### Missed concepts
+
 - **Branches** (like LookML dev mode): users edit a branch, merge
   when ready.
 - **Pull requests** between branches with diff view.
@@ -1059,14 +1191,17 @@ LIMIT 10;
 - **Restore-to-point** for an entire collection.
 
 ### Missed schemas
+
 - `branch (id, organisation_id, name, base_branch_id, created_by, status)`.
 - `branch_change (branch_id, target_type, target_id, body, action)`.
 - `column_lineage (dataset_id, column_name, source jsonb)`.
 
 ### Missed code
+
 - **Branch diff renderer**: tree of (object, before, after) tuples.
 
 ### Missed tests
+
 - VER-BRANCH-H-01: edit dashboard on branch, prod unaffected
 - VER-MERGE-H-01: merge applies all branch changes
 - LIN-COL-H-01: column-level lineage traces a metric back to source col
@@ -1077,6 +1212,7 @@ LIMIT 10;
 ## 19 · Audit & Observability — review
 
 ### Missed concepts
+
 - **Real-time stream**: push audit events via SSE to a "Live activity"
   page (Linear-style).
 - **Audit search** by free text.
@@ -1087,13 +1223,16 @@ LIMIT 10;
 - **Error tracking**: Sentry-style grouping by stack trace.
 
 ### Missed schemas
+
 - `audit_log.correlation_id varchar` — trace through to OpenTelemetry.
 
 ### Missed code
+
 - Sentry integration boilerplate.
 - `/healthz/ready` checks: DB ping, Redis ping, Email transport ping.
 
 ### Missed tests
+
 - OBS-HEALTH-H-01: /healthz/ready returns 200 only when all deps OK
 - OBS-CORR-H-01: correlation id passes through to trace
 - OBS-STREAM-H-01: SSE pushes audit events
@@ -1103,6 +1242,7 @@ LIMIT 10;
 ## 20 · Branding — review
 
 ### Missed concepts
+
 - **Email branding** (the templates already exist; per-tenant override).
 - **Custom domain** (`analytics.acme.com` CNAME).
 - **Custom favicon** with PNG/ICO/SVG.
@@ -1110,12 +1250,15 @@ LIMIT 10;
 - **Logo dark/light** with auto-swap.
 
 ### Missed schemas
+
 - `custom_domain (id, organisation_id, hostname, status, cert_arn, verified_at)`.
 
 ### Missed code
+
 - Let's Encrypt automation per custom domain (Caddy or Traefik upstream).
 
 ### Missed tests
+
 - BR-DOM-H-01: CNAME verified, traffic routes through
 - BR-PAL-WCAG-H-01: palette passes contrast check
 
@@ -1124,6 +1267,7 @@ LIMIT 10;
 ## 21 · Mobile / PWA — review
 
 ### Missed concepts
+
 - **Mobile-specific navigation pattern**: bottom tab bar.
 - **App install prompt** (PWA `beforeinstallprompt`).
 - **Push notifications via service worker**.
@@ -1133,9 +1277,11 @@ LIMIT 10;
 - **Splash screen**.
 
 ### Missed code
+
 - `beforeinstallprompt` capture + custom CTA.
 
 ### Missed tests
+
 - MOB-INSTALL-H-01: app install prompt fires once per visitor
 - MOB-PUSH-H-01: subscribed user receives push
 
@@ -1144,6 +1290,7 @@ LIMIT 10;
 ## 22 · API, SDK, Plugins — review
 
 ### Missed concepts
+
 - **GraphQL API** alongside REST.
 - **gRPC for service-to-service**.
 - **API changelog page**.
@@ -1157,9 +1304,11 @@ LIMIT 10;
 - **VS Code extension** stub.
 
 ### Missed schemas
+
 - `idempotency_key (key, organisation_id, request_hash, response_body jsonb, expires_at)`.
 
 ### Missed tests
+
 - API-IDEMP-H-01: same key returns first response, no second create
 - API-HEADER-H-01: rate-limit headers present
 - API-DEPR-H-01: deprecated route returns sunset header
@@ -1169,6 +1318,7 @@ LIMIT 10;
 ## 23 · i18n / a11y — review
 
 ### Missed concepts
+
 - **String externalisation completeness**: a CI step that fails on any
   raw English string in a `*.html` template.
 - **Locale-aware number/date formatters injected via Angular pipe**.
@@ -1181,17 +1331,22 @@ LIMIT 10;
 - **Focus management on dialog open/close** standardised in a directive.
 
 ### Missed code
+
 - **`prefers-reduced-motion`**:
 
 ```scss
 @media (prefers-reduced-motion: reduce) {
-  * { animation: none !important; transition: none !important; }
+  * {
+    animation: none !important;
+    transition: none !important;
+  }
 }
 ```
 
 - **Focus trap directive** for modals.
 
 ### Missed tests
+
 - A11Y-REDUCED-H-01: motion preference honoured
 - A11Y-FOCUS-TRAP-H-01: modal traps focus, restores on close
 
@@ -1200,6 +1355,7 @@ LIMIT 10;
 ## 24 · Admin Console — review
 
 ### Missed concepts
+
 - **Switch org** (super admin browsing other orgs).
 - **Org-level audit retention slider**.
 - **"Impersonate user"** for support (audited).
@@ -1214,9 +1370,11 @@ LIMIT 10;
 - **Backup encryption at rest**.
 
 ### Missed schemas
+
 - `impersonation_event (id, support_user_id, target_user_id, started_at, ended_at, reason)`.
 
 ### Missed tests
+
 - ADM-IMP-H-01: support can impersonate; audit logged
 - ADM-BULK-CSV-H-01: bulk user CSV imports 100 users
 - ADM-CLONE-H-01: org cloned with selective tables
@@ -1226,6 +1384,7 @@ LIMIT 10;
 ## 25 · AI Insights — review
 
 ### Missed concepts
+
 - **Conversation memory** across turns (Q → follow-up "and for last
   year").
 - **Explain a visual**: AI produces a 2-sentence summary of trends.
@@ -1242,13 +1401,16 @@ LIMIT 10;
 - **Cost meter per org** for LLM usage.
 
 ### Missed schemas
+
 - `ai_session (id, user_id, org_id, started_at, ended_at, total_tokens)`.
 - `ai_turn (session_id, role, content, tool_calls jsonb, latency_ms)`.
 
 ### Missed code
+
 - **Streaming SSE** from LLM to FE.
 
 ### Missed tests
+
 - AI-CONV-H-01: follow-up question reuses prior context
 - AI-EXPLAIN-H-01: "summarise this visual" returns 2 sentences
 - AI-INJ-N-01: prompt injection ignored
@@ -1259,6 +1421,7 @@ LIMIT 10;
 ## 26 · Geo / Maps — review
 
 ### Missed concepts
+
 - **MapTiler / Mapbox / OpenStreetMap tile providers** with token mgmt.
 - **Address geocoding** (street → lat/lng) via Mapbox / Google /
   open-source Photon.
@@ -1270,9 +1433,11 @@ LIMIT 10;
 - **Projection picker** (Mercator vs Albers vs Robinson).
 
 ### Missed schemas
+
 - `tile_provider (id, org, kind, token_enc)`.
 
 ### Missed code
+
 - h3-js bucketing:
 
 ```ts
@@ -1281,6 +1446,7 @@ const cells = rows.map(r => latLngToCell(r.lat, r.lng, 7));
 ```
 
 ### Missed tests
+
 - GEO-TILE-H-01: chosen tile provider's tiles load
 - GEO-GEOCODE-H-01: address column resolved to lat/lng
 - GEO-ANIM-H-01: time-series animation plays + scrubs
@@ -1290,6 +1456,7 @@ const cells = rows.map(r => latLngToCell(r.lat, r.lng, 7));
 ## 27 · Cost Observability — review
 
 ### Missed concepts
+
 - **Forecast bytes scanned**: ARIMA on the cost timeseries.
 - **Per-user budgets** (developer A burning Snowflake credits).
 - **Top expensive queries dashboard** (built-in).
@@ -1298,12 +1465,15 @@ const cells = rows.map(r => latLngToCell(r.lat, r.lng, 7));
 - **Auto-pause warehouse** at threshold (Snowflake API).
 
 ### Missed schemas
+
 - `cost_forecast (organisation_id, period, projected_bytes, projected_credits)`.
 
 ### Missed code
+
 - Snowflake warehouse pause via REST API.
 
 ### Missed tests
+
 - COST-FORE-H-01: forecast within 20% of actual on a stable workload
 - COST-AUTO-PAUSE-H-01: warehouse paused at hard limit
 
@@ -1312,6 +1482,7 @@ const cells = rows.map(r => latLngToCell(r.lat, r.lng, 7));
 ## 28 · Backup / Restore — review
 
 ### Missed concepts
+
 - **PITR (Point-in-time recovery)** beyond logical backups.
 - **Cross-tenant restore (M&A)**.
 - **Selective restore**: only restore dashboards, not users.
@@ -1321,12 +1492,15 @@ const cells = rows.map(r => latLngToCell(r.lat, r.lng, 7));
 - **Compliance retention**: legally required holds.
 
 ### Missed schemas
+
 - `backup_artifact (id, organisation_id, kind, location_uri, size_bytes, checksum, encrypted_by, created_at, verified_at, verified_ok)`.
 
 ### Missed code
+
 - KMS encryption per backup.
 
 ### Missed tests
+
 - BAK-PITR-H-01: restore to T-30min works
 - BAK-VERIFY-H-01: weekly restore-into-sandbox passes
 - BAK-KMS-H-01: KMS-encrypted backup decrypts

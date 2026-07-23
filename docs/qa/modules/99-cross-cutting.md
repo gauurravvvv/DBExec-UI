@@ -3,6 +3,7 @@
 ## Security
 
 ### Authn / Authz
+
 - **XCS-AUTH-N-01** · JWT tamper detected on every endpoint. P0 🟣
 - **XCS-AUTH-N-02** · Expired JWT 440 → forced refresh. P0
 - **XCS-AUTH-N-03** · Token reuse-detection kills all sessions. P0 🟣
@@ -10,11 +11,13 @@
 - **XCS-AUTH-N-05** · API token cannot escalate to UI session. P0 🟣
 
 ### Tenant isolation
+
 - **XCS-TEN-N-01** · Crafted UUID from another org → 404 (not 403). P0 🟣
 - **XCS-TEN-N-02** · JWT-source-of-truth for org id (header/body/param ignored). P0 🟣
 - **XCS-TEN-N-03** · Cross-tenant probe on every endpoint (generated suite). P0 🟣
 
 ### Input safety
+
 - **XCS-XSS-N-01** · XSS payloads in every text input → never executed. P0 🟣
 - **XCS-SQL-N-01** · SQL injection in every text input that feeds preview → parameterised. P0 🟣
 - **XCS-SSRF-N-01** · Datasource host pointed at AWS metadata → blocked. P0 🟣
@@ -22,15 +25,18 @@
 - **XCS-CSP-N-01** · X-Frame-Options / frame-ancestors set; clickjacking blocked. P0 🟣
 
 ### Sensitive data
+
 - **XCS-PII-N-01** · Passwords, refresh tokens, pepper keys never in any GET response. P0 🟣
 - **XCS-PII-N-02** · Audit metadata redacts PII columns. P0 🟣
 
 ### Rate limiting
+
 - **XCS-RL-H-01** · Login throttled by IP + by username. P0
 - **XCS-RL-H-02** · Public endpoints rate-limited per IP. P0
 - **XCS-RL-H-03** · API token rate-limited per token. P0
 
 ### Cryptography
+
 - **XCS-CRYPTO-H-01** · Encryption at rest for sensitive fields (password, pepper, refresh). P0 🟣
 - **XCS-CRYPTO-H-02** · TLS 1.2+ on every public endpoint. P0 🟣
 - **XCS-CRYPTO-H-03** · JWT signing keys rotated quarterly. P1 🟣
@@ -55,6 +61,7 @@
 - **XCS-REL-N-03** · BullMQ worker crash → job retried on restart. P0
 
 ## Browser matrix
+
 - **XCS-BR-H-01** · Chromium full suite green. P0
 - **XCS-BR-H-02** · Firefox full suite green. P1
 - **XCS-BR-H-03** · WebKit (Safari) full suite green. P1
@@ -76,7 +83,8 @@
 - **XCS-OBS-H-05** · SSE live audit stream for support. P2
 
 ## Regression buckets
+
 - Auth surface → XCS-AUTH-* + XCS-TEN-*
-- Input safety → XCS-XSS-*, XCS-SQL-*, XCS-SSRF-*
+- Input safety → XCS-XSS-_, XCS-SQL-_, XCS-SSRF-*
 - Rate limits → XCS-RL-*
 - Health + reliability → XCS-REL-*

@@ -134,16 +134,28 @@
   margin-right: 0.15rem;
   font-size: 0.9em;
   // Neutralise the default coloured emoji-ish glyphs.
-  &::after { opacity: 0.85; }
+  &::after {
+    opacity: 0.85;
+  }
 }
-.cm-completionIcon-keyword { color: var(--primary-color); }
+.cm-completionIcon-keyword {
+  color: var(--primary-color);
+}
 .cm-completionIcon-column,
-.cm-completionIcon-property { color: var(--primary-color); }
-.cm-completionIcon-pk { color: var(--warning-color); }
+.cm-completionIcon-property {
+  color: var(--primary-color);
+}
+.cm-completionIcon-pk {
+  color: var(--warning-color);
+}
 .cm-completionIcon-table,
-.cm-completionIcon-class { color: var(--text-color); }
+.cm-completionIcon-class {
+  color: var(--text-color);
+}
 .cm-completionIcon-schema,
-.cm-completionIcon-namespace { color: var(--text-muted); }
+.cm-completionIcon-namespace {
+  color: var(--text-muted);
+}
 
 // The detail panel that appears beside the completion list.
 .cm-tooltip.cm-completionInfo {
@@ -159,7 +171,9 @@
 }
 
 // Generic hover tooltips (lint messages, etc.).
-.cm-tooltip:not(.cm-tooltip-autocomplete):not(.cm-completionInfo):not(.cm-panel) {
+.cm-tooltip:not(.cm-tooltip-autocomplete):not(.cm-completionInfo):not(
+    .cm-panel
+  ) {
   background: var(--card-background);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-sm);
@@ -176,8 +190,12 @@
   background: var(--card-background);
   color: var(--text-color);
   border-bottom: 1px solid var(--border-color);
-  &.cm-panels-top { border-bottom: 1px solid var(--border-color); }
-  &.cm-panels-bottom { border-top: 1px solid var(--border-color); }
+  &.cm-panels-top {
+    border-bottom: 1px solid var(--border-color);
+  }
+  &.cm-panels-bottom {
+    border-top: 1px solid var(--border-color);
+  }
 }
 
 .cm-panel.cm-search {
@@ -202,13 +220,17 @@
     padding: 0 0.6rem;
     min-width: 15rem;
     outline: none;
-    transition: border-color var(--motion-base) ease, box-shadow var(--motion-base) ease;
+    transition:
+      border-color var(--motion-base) ease,
+      box-shadow var(--motion-base) ease;
 
     &:focus {
       border-color: var(--primary-color);
       box-shadow: 0 0 0 3px var(--primary-color-transparent);
     }
-    &::placeholder { color: var(--text-muted); }
+    &::placeholder {
+      color: var(--text-muted);
+    }
   }
 
   // Buttons (next / previous / all / replace / replace all) → app button.
@@ -234,7 +256,9 @@
       color: var(--primary-color);
       background: var(--primary-color-transparent);
     }
-    &:active { transform: translateY(1px); }
+    &:active {
+      transform: translateY(1px);
+    }
   }
 
   // Checkbox labels (match case / regexp / by word) — aligned + app-toned.
@@ -265,6 +289,8 @@
     font-size: 1.1rem;
     cursor: pointer;
     padding: 0 0.35rem;
-    &:hover { color: var(--error-color); }
+    &:hover {
+      color: var(--error-color);
+    }
   }
 }

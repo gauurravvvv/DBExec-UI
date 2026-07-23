@@ -117,7 +117,9 @@
           <ng-template usGridCell="createdOn" let-group>
             <span
               class="date-text"
-              [pTooltip]="(group.createdOn | date: 'dd MMM yyyy, HH:mm:ss') || ''"
+              [pTooltip]="
+                (group.createdOn | date: 'dd MMM yyyy, HH:mm:ss') || ''
+              "
               tooltipPosition="top"
             >
               {{ group.createdOn | relativeTime }}
@@ -183,7 +185,9 @@
       <div class="popup-icon">
         <i class="pi pi-trash"></i>
       </div>
-      <h3 id="listGroupDeleteTitle">{{ 'COMMON.CONFIRM_DELETE' | translate }}</h3>
+      <h3 id="listGroupDeleteTitle">
+        {{ 'COMMON.CONFIRM_DELETE' | translate }}
+      </h3>
     </div>
 
     <!-- Delete Info Section -->

@@ -75,10 +75,13 @@
     <!-- Centered branded loader while the GET is in flight. Page
          chrome (back, warning banner) stays usable; once
          datasourceLoaded the real form renders below. -->
-    <app-content-loader *ngIf="loading() && !datasourceLoaded"></app-content-loader>
+    <app-content-loader
+      *ngIf="loading() && !datasourceLoaded"
+    ></app-content-loader>
 
     <!-- Form Section -->
-    <form autocomplete="off"
+    <form
+      autocomplete="off"
       *ngIf="datasourceLoaded"
       [formGroup]="datasourceForm"
       class="admin-form"
@@ -227,9 +230,7 @@
             >
               <i
                 [class]="
-                  connectionTestLoading
-                    ? 'pi pi-spin pi-spinner'
-                    : 'pi pi-bolt'
+                  connectionTestLoading ? 'pi pi-spin pi-spinner' : 'pi pi-bolt'
                 "
               ></i>
               {{

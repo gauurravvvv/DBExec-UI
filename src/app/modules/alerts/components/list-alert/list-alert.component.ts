@@ -112,13 +112,54 @@ export class ListAlertComponent implements OnInit, OnDestroy {
   private buildColumns(): CustomTableColumn[] {
     const t = (k: string): string => this.translate.instant(k);
     return [
-      { colId: 'name', field: 'name', header: t('COMMON.NAME'), width: '224px', frozen: true, filter: 'text' },
-      { colId: 'sourceType', field: 'sourceType', header: t('ALERTS.SOURCE'), width: '128px', sortable: false },
-      { colId: 'severity', field: 'severity', header: t('ALERTS.SEVERITY'), width: '128px', sortable: false },
-      { colId: 'cronExpression', field: 'cronExpression', header: t('ALERTS.SCHEDULE'), width: '176px', sortable: false },
-      { colId: 'nextRunAt', field: 'nextRunAt', header: t('ALERTS.NEXT_RUN'), width: '176px' },
-      { colId: 'enabled', field: 'enabled', header: t('COMMON.STATUS'), width: '144px', sortable: false },
-      { colId: 'actions', header: t('COMMON.ACTIONS'), width: '160px', sortable: false },
+      {
+        colId: 'name',
+        field: 'name',
+        header: t('COMMON.NAME'),
+        width: '224px',
+        frozen: true,
+        filter: 'text',
+      },
+      {
+        colId: 'sourceType',
+        field: 'sourceType',
+        header: t('ALERTS.SOURCE'),
+        width: '128px',
+        sortable: false,
+      },
+      {
+        colId: 'severity',
+        field: 'severity',
+        header: t('ALERTS.SEVERITY'),
+        width: '128px',
+        sortable: false,
+      },
+      {
+        colId: 'cronExpression',
+        field: 'cronExpression',
+        header: t('ALERTS.SCHEDULE'),
+        width: '176px',
+        sortable: false,
+      },
+      {
+        colId: 'nextRunAt',
+        field: 'nextRunAt',
+        header: t('ALERTS.NEXT_RUN'),
+        width: '176px',
+      },
+      {
+        colId: 'enabled',
+        field: 'enabled',
+        header: t('COMMON.STATUS'),
+        width: '144px',
+        sortable: false,
+      },
+      {
+        colId: 'actions',
+        header: t('COMMON.ACTIONS'),
+        width: '160px',
+        sortable: false,
+      },
     ];
   }
 

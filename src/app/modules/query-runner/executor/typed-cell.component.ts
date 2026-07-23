@@ -18,8 +18,12 @@ import { ICellRendererParams } from 'ag-grid-community';
       <span class="cell-null">[NULL]</span>
     </ng-container>
     <ng-template #notNull [ngSwitch]="type">
-      <span *ngSwitchCase="'bool'" class="cell-bool">{{ value ? 'true' : 'false' }}</span>
-      <span *ngSwitchCase="'json'" class="cell-json" [title]="text">{{ preview }}</span>
+      <span *ngSwitchCase="'bool'" class="cell-bool">{{
+        value ? 'true' : 'false'
+      }}</span>
+      <span *ngSwitchCase="'json'" class="cell-json" [title]="text">{{
+        preview
+      }}</span>
       <span *ngSwitchCase="'array'" class="cell-array">{{ arrayText }}</span>
       <span *ngSwitchCase="'number'" class="cell-num">{{ value }}</span>
       <span *ngSwitchCase="'timestamp'" class="cell-ts">{{ text }}</span>
@@ -29,11 +33,26 @@ import { ICellRendererParams } from 'ag-grid-community';
   `,
   styles: [
     `
-      :host { display: block; width: 100%; }
-      .cell-null { color: var(--faint, #9aa3b1); font-style: italic; opacity: 0.7; }
-      .cell-num, .cell-ts { font-variant-numeric: tabular-nums; }
-      .cell-bool { font-weight: 600; }
-      .cell-json { color: var(--primary-color, #2f6f6a); text-decoration: underline dotted; }
+      :host {
+        display: block;
+        width: 100%;
+      }
+      .cell-null {
+        color: var(--faint, #9aa3b1);
+        font-style: italic;
+        opacity: 0.7;
+      }
+      .cell-num,
+      .cell-ts {
+        font-variant-numeric: tabular-nums;
+      }
+      .cell-bool {
+        font-weight: 600;
+      }
+      .cell-json {
+        color: var(--primary-color, #2f6f6a);
+        text-decoration: underline dotted;
+      }
     `,
   ],
 })

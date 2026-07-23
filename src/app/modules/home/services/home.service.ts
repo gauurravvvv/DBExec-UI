@@ -21,9 +21,7 @@ export class HomeService {
     this._loading.set(true);
     try {
       const res: any = await lastValueFrom(
-        this.http
-          .apiGet(HOME.SYSTEM_ADMIN)
-          .pipe(takeUntil(this._cancelReads$)),
+        this.http.apiGet(HOME.SYSTEM_ADMIN).pipe(takeUntil(this._cancelReads$)),
       );
       if (res?.status) this._dashboard.set(res.data);
       return res;

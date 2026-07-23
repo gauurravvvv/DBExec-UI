@@ -96,7 +96,8 @@
               <span
                 *ngIf="user.id === loggedInUserId"
                 class="row-badge row-badge--self"
-              >{{ 'COMMON.YOU_BADGE' | translate }}</span>
+                >{{ 'COMMON.YOU_BADGE' | translate }}</span
+              >
             </span>
           </ng-template>
 
@@ -120,8 +121,7 @@
               [title]="user.groupNames?.join(', ')"
             >
               {{
-                user.groupNames?.join(', ') ||
-                  ('USER.NO_GROUPS' | translate)
+                user.groupNames?.join(', ') || ('USER.NO_GROUPS' | translate)
               }}
             </span>
           </ng-template>
@@ -168,7 +168,9 @@
           <ng-template usGridCell="createdOn" let-user>
             <span
               class="date-text"
-              [pTooltip]="(user.createdOn | date: 'dd MMM yyyy, HH:mm:ss') || ''"
+              [pTooltip]="
+                (user.createdOn | date: 'dd MMM yyyy, HH:mm:ss') || ''
+              "
               tooltipPosition="top"
             >
               {{ user.createdOn | relativeTime }}
@@ -196,9 +198,7 @@
                 <i
                   class="pi"
                   [ngClass]="
-                    isUnlocking(user.id)
-                      ? 'pi-spin pi-spinner'
-                      : 'pi-lock-open'
+                    isUnlocking(user.id) ? 'pi-spin pi-spinner' : 'pi-lock-open'
                   "
                 ></i>
               </button>
@@ -259,7 +259,9 @@
       <div class="popup-icon">
         <i class="pi pi-trash"></i>
       </div>
-      <h3 id="listUserDeleteTitle">{{ 'COMMON.CONFIRM_DELETE' | translate }}</h3>
+      <h3 id="listUserDeleteTitle">
+        {{ 'COMMON.CONFIRM_DELETE' | translate }}
+      </h3>
     </div>
 
     <!-- Delete Info Section -->

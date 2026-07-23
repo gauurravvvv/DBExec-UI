@@ -28,11 +28,17 @@
        the right. Collapsed: brand icon centred, action icons hidden
        (same as today's search behaviour). -->
   <div class="sidebar-top">
-    <a class="brand" [routerLink]="['/']"
-       [pTooltip]="isExpanded ? undefined : 'Go to home'" tooltipPosition="right"
-       aria-label="DBExec — go to home">
+    <a
+      class="brand"
+      [routerLink]="['/']"
+      [pTooltip]="isExpanded ? undefined : 'Go to home'"
+      tooltipPosition="right"
+      aria-label="DBExec — go to home"
+    >
       <i class="ci ci-app-icon brand-icon"></i>
-      <span class="brand-text">DB<span class="brand-highlight">Exec</span></span>
+      <span class="brand-text"
+        >DB<span class="brand-highlight">Exec</span></span
+      >
     </a>
     <div class="sidebar-top-actions" *ngIf="isExpanded">
       <button
@@ -81,9 +87,14 @@
           >
             <div class="link-content">
               <i [class]="item.icon"></i>
-              <span class="nav-text">{{ 'SIDEBAR.' + item.value | translate }}</span>
+              <span class="nav-text">{{
+                'SIDEBAR.' + item.value | translate
+              }}</span>
             </div>
-            <i class="pi pi-chevron-down submenu-arrow" [class.expanded]="item.isExpanded"></i>
+            <i
+              class="pi pi-chevron-down submenu-arrow"
+              [class.expanded]="item.isExpanded"
+            ></i>
           </div>
 
           <!-- Menu item without subPermissions -->
@@ -98,12 +109,18 @@
           >
             <div class="link-content">
               <i [class]="item.icon"></i>
-              <span class="nav-text">{{ 'SIDEBAR.' + item.value | translate }}</span>
+              <span class="nav-text">{{
+                'SIDEBAR.' + item.value | translate
+              }}</span>
             </div>
           </a>
 
           <!-- Submenu -->
-          <ul class="submenu" [class.expanded]="item.isExpanded" *ngIf="item.subPermissions">
+          <ul
+            class="submenu"
+            [class.expanded]="item.isExpanded"
+            *ngIf="item.subPermissions"
+          >
             <li
               *ngFor="let subItem of item.subPermissions; trackBy: trackByIndex"
               class="submenu-item"
@@ -117,9 +134,14 @@
               >
                 <div class="link-content">
                   <i [class]="subItem.icon"></i>
-                  <span class="nav-text">{{ 'SIDEBAR.' + subItem.value | translate }}</span>
+                  <span class="nav-text">{{
+                    'SIDEBAR.' + subItem.value | translate
+                  }}</span>
                 </div>
-                <i class="pi pi-chevron-down submenu-arrow" [class.expanded]="subItem.isExpanded"></i>
+                <i
+                  class="pi pi-chevron-down submenu-arrow"
+                  [class.expanded]="subItem.isExpanded"
+                ></i>
               </div>
 
               <a
@@ -132,12 +154,17 @@
               >
                 <div class="link-content">
                   <i [class]="subItem.icon"></i>
-                  <span class="nav-text">{{ 'SIDEBAR.' + subItem.value | translate }}</span>
+                  <span class="nav-text">{{
+                    'SIDEBAR.' + subItem.value | translate
+                  }}</span>
                 </div>
               </a>
 
               <ng-container
-                *ngTemplateOutlet="nestedSubmenu; context: { $implicit: subItem }"
+                *ngTemplateOutlet="
+                  nestedSubmenu;
+                  context: { $implicit: subItem }
+                "
               ></ng-container>
             </li>
           </ul>
@@ -148,15 +175,20 @@
 
   <!-- ── BOTTOM: avatar only (bell moved to .sidebar-top) ─────────── -->
   <div class="sidebar-bottom">
-    <div class="user-profile" (click)="toggleProfileMenu($event)"
-         [pTooltip]="isExpanded ? undefined : (userName + ' — open account menu')"
-         tooltipPosition="right"
-         role="button"
-         [attr.aria-label]="userName + ' — open account menu'">
+    <div
+      class="user-profile"
+      (click)="toggleProfileMenu($event)"
+      [pTooltip]="isExpanded ? undefined : userName + ' — open account menu'"
+      tooltipPosition="right"
+      role="button"
+      [attr.aria-label]="userName + ' — open account menu'"
+    >
       <div class="avatar">{{ userInitials }}</div>
       <div class="user-meta" *ngIf="isExpanded">
         <div class="user-name">{{ userName }}</div>
-        <div class="user-org" *ngIf="organisationName">{{ organisationName }}</div>
+        <div class="user-org" *ngIf="organisationName">
+          {{ organisationName }}
+        </div>
       </div>
     </div>
   </div>
@@ -171,7 +203,9 @@
        the sidebar's bottom row already shows that. The email hints
        at "this is the account you're acting as" without restating
        what's directly below. -->
-  <div class="menu-identifier" *ngIf="userEmail" [title]="userEmail">{{ userEmail }}</div>
+  <div class="menu-identifier" *ngIf="userEmail" [title]="userEmail">
+    {{ userEmail }}
+  </div>
 
   <ul>
     <li class="menu-item">
@@ -225,16 +259,29 @@
       <i [class]="locale.flagClass" aria-hidden="true"></i>
       <span class="locale-label">
         {{ locale.label
-        }}<span class="locale-region" *ngIf="locale.region && !locale.label.includes('(')"> ({{ locale.region }})</span>
+        }}<span
+          class="locale-region"
+          *ngIf="locale.region && !locale.label.includes('(')"
+        >
+          ({{ locale.region }})</span
+        >
       </span>
-      <i *ngIf="locale.code === currentLocale" class="pi pi-check locale-check" aria-hidden="true"></i>
+      <i
+        *ngIf="locale.code === currentLocale"
+        class="pi pi-check locale-check"
+        aria-hidden="true"
+      ></i>
     </li>
   </ul>
 </div>
 
 <!-- ── Recursive nested-submenu template ──────────────────────────── -->
 <ng-template #nestedSubmenu let-item>
-  <ul class="nested-submenu" [class.expanded]="item.isExpanded" *ngIf="item.subPermissions">
+  <ul
+    class="nested-submenu"
+    [class.expanded]="item.isExpanded"
+    *ngIf="item.subPermissions"
+  >
     <li
       *ngFor="let nestedItem of item.subPermissions; trackBy: trackByIndex"
       class="nested-submenu-item"
@@ -248,9 +295,14 @@
       >
         <div class="link-content">
           <i [class]="nestedItem.icon"></i>
-          <span class="nav-text">{{ 'SIDEBAR.' + nestedItem.value | translate }}</span>
+          <span class="nav-text">{{
+            'SIDEBAR.' + nestedItem.value | translate
+          }}</span>
         </div>
-        <i class="pi pi-chevron-down submenu-arrow" [class.expanded]="nestedItem.isExpanded"></i>
+        <i
+          class="pi pi-chevron-down submenu-arrow"
+          [class.expanded]="nestedItem.isExpanded"
+        ></i>
       </div>
 
       <a
@@ -263,7 +315,9 @@
       >
         <div class="link-content">
           <i [class]="nestedItem.icon"></i>
-          <span class="nav-text">{{ 'SIDEBAR.' + nestedItem.value | translate }}</span>
+          <span class="nav-text">{{
+            'SIDEBAR.' + nestedItem.value | translate
+          }}</span>
         </div>
       </a>
 

@@ -100,8 +100,7 @@ export class GlobalSearchComponent implements OnInit {
       this.cdr.markForCheck();
     } else if (event.key === 'ArrowUp') {
       event.preventDefault();
-      this.selectedIndex =
-        (this.selectedIndex - 1 + rows.length) % rows.length;
+      this.selectedIndex = (this.selectedIndex - 1 + rows.length) % rows.length;
       this.cdr.markForCheck();
     } else if (event.key === 'Enter') {
       const target = rows[this.selectedIndex];

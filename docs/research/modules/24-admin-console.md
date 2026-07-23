@@ -12,24 +12,24 @@
 > [27 · Cost Observability](27-cost-observability.md).
 
 **Depends on:** Auth (10), Audit (19), Branding (20), Backup (28),
-  every module that needs an admin surface
+every module that needs an admin surface
 **Unblocks:** Enterprise procurement, SOC2 / GDPR compliance
 **Maturity:** 🟡 partial — scattered admin screens exist; need
-  consolidation + new primitives (impersonation, GDPR erasure,
-  bulk operations)
+consolidation + new primitives (impersonation, GDPR erasure,
+bulk operations)
 
 ---
 
 ## 1. Industry baseline
 
-| Tool | User mgmt | Audit | Backup self-serve | GDPR | Impersonate | Bulk ops |
-|---|---|---|---|---|---|---|
-| **Tableau Server** | ✓ | ✓ | ✓ | partial | ✗ | ✓ |
-| **Power BI** | M365 admin | M365 audit | n/a (cloud) | ✓ | ✓ (paid) | partial |
-| **Looker** | ✓ | Explore-based | ✓ | partial | ✓ | ✓ |
-| **Metabase** | ✓ | enterprise | ✗ | partial | ✗ | partial |
-| **Linear** | ✓ | enterprise | ✗ | ✓ | ✓ | ✓ |
-| **GitHub** | ✓ | ✓ | ✓ (export) | ✓ | n/a | ✓ |
+| Tool               | User mgmt  | Audit         | Backup self-serve | GDPR    | Impersonate | Bulk ops |
+| ------------------ | ---------- | ------------- | ----------------- | ------- | ----------- | -------- |
+| **Tableau Server** | ✓          | ✓             | ✓                 | partial | ✗           | ✓        |
+| **Power BI**       | M365 admin | M365 audit    | n/a (cloud)       | ✓       | ✓ (paid)    | partial  |
+| **Looker**         | ✓          | Explore-based | ✓                 | partial | ✓           | ✓        |
+| **Metabase**       | ✓          | enterprise    | ✗                 | partial | ✗           | partial  |
+| **Linear**         | ✓          | enterprise    | ✗                 | ✓       | ✓           | ✓        |
+| **GitHub**         | ✓          | ✓             | ✓ (export)        | ✓       | n/a         | ✓        |
 
 **The patterns to copy:**
 
@@ -62,31 +62,31 @@
 
 ## 3. Gap matrix
 
-| ID | Gap | Severity | Effort |
-|---|---|---|---|
-| ADM-G01 | Unified admin console shell | P0 | M |
-| ADM-G02 | Org settings landing page (overview) | P0 | M |
-| ADM-G03 | User management with bulk CSV import | P0 | M |
-| ADM-G04 | Group / role grid with diff before save | P0 | M |
-| ADM-G05 | Security policy editor | P0 | S |
-| ADM-G06 | GDPR right-to-access (export user data) | P0 | M |
-| ADM-G07 | GDPR right-to-erasure (anonymise + cascade delete) | P0 | M |
-| ADM-G08 | Admin impersonation with pink banner | P0 | M |
-| ADM-G09 | Bulk operations with dry-run preview | P1 | M |
-| ADM-G10 | Org clone (for staging / sandbox) | P1 | L |
-| ADM-G11 | Org delete (full purge with grace period) | P0 | M |
-| ADM-G12 | Quota & usage dashboard | P0 | M |
-| ADM-G13 | Billing tier display + upgrade flow | P1 | M |
-| ADM-G14 | Audit log filter + export (links to module 19) | P0 | S |
-| ADM-G15 | Login activity surface | P0 | S |
-| ADM-G16 | Backup admin (links to module 28) | P0 | S |
-| ADM-G17 | SSO / SCIM admin (links to module 10) | P0 | S |
-| ADM-G18 | API token admin (links to module 22) | P0 | S |
-| ADM-G19 | Webhook admin (links to module 22) | P0 | S |
-| ADM-G20 | Custom domain admin (links to module 20) | P0 | S |
-| ADM-G21 | Notifications + emails admin (templates, SMTP) | P1 | M |
-| ADM-G22 | Feature flag admin per org | P1 | M |
-| ADM-G23 | Plugin marketplace admin | P2 | M |
+| ID      | Gap                                                | Severity | Effort |
+| ------- | -------------------------------------------------- | -------- | ------ |
+| ADM-G01 | Unified admin console shell                        | P0       | M      |
+| ADM-G02 | Org settings landing page (overview)               | P0       | M      |
+| ADM-G03 | User management with bulk CSV import               | P0       | M      |
+| ADM-G04 | Group / role grid with diff before save            | P0       | M      |
+| ADM-G05 | Security policy editor                             | P0       | S      |
+| ADM-G06 | GDPR right-to-access (export user data)            | P0       | M      |
+| ADM-G07 | GDPR right-to-erasure (anonymise + cascade delete) | P0       | M      |
+| ADM-G08 | Admin impersonation with pink banner               | P0       | M      |
+| ADM-G09 | Bulk operations with dry-run preview               | P1       | M      |
+| ADM-G10 | Org clone (for staging / sandbox)                  | P1       | L      |
+| ADM-G11 | Org delete (full purge with grace period)          | P0       | M      |
+| ADM-G12 | Quota & usage dashboard                            | P0       | M      |
+| ADM-G13 | Billing tier display + upgrade flow                | P1       | M      |
+| ADM-G14 | Audit log filter + export (links to module 19)     | P0       | S      |
+| ADM-G15 | Login activity surface                             | P0       | S      |
+| ADM-G16 | Backup admin (links to module 28)                  | P0       | S      |
+| ADM-G17 | SSO / SCIM admin (links to module 10)              | P0       | S      |
+| ADM-G18 | API token admin (links to module 22)               | P0       | S      |
+| ADM-G19 | Webhook admin (links to module 22)                 | P0       | S      |
+| ADM-G20 | Custom domain admin (links to module 20)           | P0       | S      |
+| ADM-G21 | Notifications + emails admin (templates, SMTP)     | P1       | M      |
+| ADM-G22 | Feature flag admin per org                         | P1       | M      |
+| ADM-G23 | Plugin marketplace admin                           | P2       | M      |
 
 ## 4. Target architecture
 
@@ -167,15 +167,18 @@ analysis primitives against the platform's internal metrics.
 async function bulkImportUsers(req, res) {
   const file = req.file;
   const csv = file.buffer.toString('utf8');
-  const rows = parseCsv(csv);             // returns Array<{email, firstName, lastName, role, groups}>
+  const rows = parseCsv(csv); // returns Array<{email, firstName, lastName, role, groups}>
 
   // Validate before applying
   const errors: any[] = [];
   for (let i = 0; i < rows.length; i++) {
     const r = rows[i];
-    if (!validateEmail(r.email)) errors.push({ row: i + 1, field: 'email', msg: 'invalid' });
-    if (!r.firstName)             errors.push({ row: i + 1, field: 'firstName', msg: 'required' });
-    if (r.role && !rolesByName[r.role]) errors.push({ row: i + 1, field: 'role', msg: 'unknown' });
+    if (!validateEmail(r.email))
+      errors.push({ row: i + 1, field: 'email', msg: 'invalid' });
+    if (!r.firstName)
+      errors.push({ row: i + 1, field: 'firstName', msg: 'required' });
+    if (r.role && !rolesByName[r.role])
+      errors.push({ row: i + 1, field: 'role', msg: 'unknown' });
   }
   if (errors.length > 0 && !req.query.force) {
     return sendResponse(res, false, 400, 'admin.import.errors', { errors });
@@ -194,9 +197,11 @@ async function bulkImportUsers(req, res) {
 
   // Apply in transaction
   const created: User[] = [];
-  await master_db_connection.transaction(async (tx) => {
+  await master_db_connection.transaction(async tx => {
     for (const r of rows) {
-      const existing = await tx.getRepository(User).findOne({ where: { email: r.email, organisationId: orgId } });
+      const existing = await tx
+        .getRepository(User)
+        .findOne({ where: { email: r.email, organisationId: orgId } });
       if (existing) {
         existing.firstName = r.firstName;
         existing.lastName = r.lastName;
@@ -266,21 +271,25 @@ async function startImpersonation(req, res) {
 
   // Issue a special JWT that carries BOTH identities
   const token = signJwt({
-    sub: target.id,                              // the request runs AS target
-    impersonatedBy: res.locals.loggedInId,        // but the audit records the actor
+    sub: target.id, // the request runs AS target
+    impersonatedBy: res.locals.loggedInId, // but the audit records the actor
     impersonationSessionId: session.id,
     org: target.organisationId,
     role: target.roleId,
     permissions: targetPermissions,
     iat: Date.now() / 1000,
-    exp: Date.now() / 1000 + 3600,                // 1 hour TTL
+    exp: Date.now() / 1000 + 3600, // 1 hour TTL
   });
 
   // Audit the start
   await auditLogger.logAuditToOrg({
-    connection: master_db_connection, req, res,
-    module: 'admin', action: 'IMPERSONATE_START',
-    entityName: 'User', entityId: target.id,
+    connection: master_db_connection,
+    req,
+    res,
+    module: 'admin',
+    action: 'IMPERSONATE_START',
+    entityName: 'User',
+    entityId: target.id,
     metadata: { impersonationSessionId: session.id, reason: req.body.reason },
   });
 
@@ -290,10 +299,12 @@ async function startImpersonation(req, res) {
 // POST /admin/impersonate/end
 async function endImpersonation(req, res) {
   const sid = res.locals.impersonationSessionId;
-  if (!sid) return sendResponse(res, false, 400, 'admin.impersonate.not_active');
+  if (!sid)
+    return sendResponse(res, false, 400, 'admin.impersonate.not_active');
 
   await ImpersonationSession.update(sid, {
-    endedAt: new Date(), endReason: 'ended_by_actor',
+    endedAt: new Date(),
+    endReason: 'ended_by_actor',
   });
   await auditLogger.logAuditToOrg({
     /* ... */
@@ -310,8 +321,8 @@ Auth middleware stamps both identities on res.locals:
 ```ts
 // JWT decode extension
 if (payload.impersonatedBy) {
-  res.locals.loggedInId = payload.sub;          // the IMPERSONATED user
-  res.locals.actorUserId = payload.impersonatedBy;  // the ADMIN
+  res.locals.loggedInId = payload.sub; // the IMPERSONATED user
+  res.locals.actorUserId = payload.impersonatedBy; // the ADMIN
   res.locals.impersonationSessionId = payload.impersonationSessionId;
   res.locals.isImpersonation = true;
 }
@@ -337,10 +348,9 @@ FE banner across the whole UI:
 
 ```html
 @if (auth.isImpersonating()) {
-  <div class="impersonation-banner">
-    🎭 You are viewing as {{ targetUser.email }}
-    [End impersonation]
-  </div>
+<div class="impersonation-banner">
+  🎭 You are viewing as {{ targetUser.email }} [End impersonation]
+</div>
 }
 ```
 
@@ -392,31 +402,71 @@ export default async function gdprAccessJob(requestId: string) {
   const conn = await openOrgConnection(orgId);
 
   const bundle: Record<string, any[]> = {};
-  bundle.user = await conn.query(`SELECT * FROM "user" WHERE id = $1`, [userId]);
-  bundle.userGroupMappings = await conn.query(`SELECT * FROM user_group_mapping WHERE user_id = $1`, [userId]);
-  bundle.userAttributeValues = await conn.query(`SELECT * FROM user_attribute_value WHERE user_id = $1`, [userId]);
-  bundle.notifications = await conn.query(`SELECT * FROM notification WHERE user_id = $1`, [userId]);
-  bundle.favourites = await conn.query(`SELECT * FROM favourite WHERE user_id = $1`, [userId]);
-  bundle.recentViews = await conn.query(`SELECT * FROM recent_view WHERE user_id = $1`, [userId]);
-  bundle.sessions = await conn.query(`SELECT id, started_at, ended_at, ip_address, user_agent FROM user_session WHERE user_id = $1`, [userId]);
+  bundle.user = await conn.query(`SELECT * FROM "user" WHERE id = $1`, [
+    userId,
+  ]);
+  bundle.userGroupMappings = await conn.query(
+    `SELECT * FROM user_group_mapping WHERE user_id = $1`,
+    [userId],
+  );
+  bundle.userAttributeValues = await conn.query(
+    `SELECT * FROM user_attribute_value WHERE user_id = $1`,
+    [userId],
+  );
+  bundle.notifications = await conn.query(
+    `SELECT * FROM notification WHERE user_id = $1`,
+    [userId],
+  );
+  bundle.favourites = await conn.query(
+    `SELECT * FROM favourite WHERE user_id = $1`,
+    [userId],
+  );
+  bundle.recentViews = await conn.query(
+    `SELECT * FROM recent_view WHERE user_id = $1`,
+    [userId],
+  );
+  bundle.sessions = await conn.query(
+    `SELECT id, started_at, ended_at, ip_address, user_agent FROM user_session WHERE user_id = $1`,
+    [userId],
+  );
   // Authored / edited content
-  bundle.datasetsCreated = await conn.query(`SELECT id, name, description, created_on FROM dataset WHERE created_by = $1`, [userId]);
-  bundle.dashboardsCreated = await conn.query(`SELECT id, name, created_on FROM dashboard WHERE created_by = $1`, [userId]);
-  bundle.analysesCreated = await conn.query(`SELECT id, name, created_on FROM analysis WHERE created_by = $1`, [userId]);
+  bundle.datasetsCreated = await conn.query(
+    `SELECT id, name, description, created_on FROM dataset WHERE created_by = $1`,
+    [userId],
+  );
+  bundle.dashboardsCreated = await conn.query(
+    `SELECT id, name, created_on FROM dashboard WHERE created_by = $1`,
+    [userId],
+  );
+  bundle.analysesCreated = await conn.query(
+    `SELECT id, name, created_on FROM analysis WHERE created_by = $1`,
+    [userId],
+  );
   // Audit trail involving this user as actor
-  bundle.auditAsActor = await conn.query(`SELECT * FROM audit_log_s WHERE user_id = $1`, [userId]);
+  bundle.auditAsActor = await conn.query(
+    `SELECT * FROM audit_log_s WHERE user_id = $1`,
+    [userId],
+  );
   // Audit trail involving this user as subject
-  bundle.auditAsSubject = await conn.query(`SELECT * FROM audit_log_s WHERE entity_id = $1 AND entity_name = 'User'`, [userId]);
+  bundle.auditAsSubject = await conn.query(
+    `SELECT * FROM audit_log_s WHERE entity_id = $1 AND entity_name = 'User'`,
+    [userId],
+  );
 
   const json = JSON.stringify(bundle, null, 2);
   const key = `gdpr/${orgId}/${requestId}.json`;
-  await s3.upload({ Bucket: process.env.GDPR_BUCKET!, Key: key, Body: json }).promise();
+  await s3
+    .upload({ Bucket: process.env.GDPR_BUCKET!, Key: key, Body: json })
+    .promise();
   const url = await s3.getSignedUrlPromise('getObject', {
-    Bucket: process.env.GDPR_BUCKET!, Key: key, Expires: 7 * 24 * 3600,
+    Bucket: process.env.GDPR_BUCKET!,
+    Key: key,
+    Expires: 7 * 24 * 3600,
   });
 
   await GdprRequest.update(requestId, {
-    status: 'ready', artifactUrl: url,
+    status: 'ready',
+    artifactUrl: url,
     artifactExpiresAt: addDays(new Date(), 7),
     completedAt: new Date(),
   });
@@ -448,9 +498,13 @@ export default async function gdprErasureJob(requestId: string) {
   // Grace period — most jurisdictions require 30 days
   if (req.scheduledFor && req.scheduledFor > new Date()) {
     // Re-enqueue for later
-    await scheduleQueue.add('gdpr:erasure', { requestId }, {
-      delay: req.scheduledFor.getTime() - Date.now(),
-    });
+    await scheduleQueue.add(
+      'gdpr:erasure',
+      { requestId },
+      {
+        delay: req.scheduledFor.getTime() - Date.now(),
+      },
+    );
     return;
   }
 
@@ -459,37 +513,55 @@ export default async function gdprErasureJob(requestId: string) {
   const orgId = req.organisationId;
   const conn = await openOrgConnection(orgId);
 
-  await conn.transaction(async (tx) => {
+  await conn.transaction(async tx => {
     // 1. Anonymise audit_log_s references — keep the trail, lose the identity
-    await tx.query(`
+    await tx.query(
+      `
       UPDATE audit_log_s
         SET user_id = NULL,
             metadata = jsonb_set(COALESCE(metadata,'{}'::jsonb), '{erased}', 'true')
-      WHERE user_id = $1`, [userId]);
+      WHERE user_id = $1`,
+      [userId],
+    );
 
     // 2. Cascade-delete personal data
     await tx.query(`DELETE FROM notification WHERE user_id = $1`, [userId]);
     await tx.query(`DELETE FROM favourite WHERE user_id = $1`, [userId]);
     await tx.query(`DELETE FROM recent_view WHERE user_id = $1`, [userId]);
-    await tx.query(`DELETE FROM user_attribute_value WHERE user_id = $1`, [userId]);
-    await tx.query(`DELETE FROM user_group_mapping WHERE user_id = $1`, [userId]);
-    await tx.query(`DELETE FROM push_subscription WHERE user_id = $1`, [userId]);
-    await tx.query(`DELETE FROM saved_search WHERE owner_user_id = $1`, [userId]);
+    await tx.query(`DELETE FROM user_attribute_value WHERE user_id = $1`, [
+      userId,
+    ]);
+    await tx.query(`DELETE FROM user_group_mapping WHERE user_id = $1`, [
+      userId,
+    ]);
+    await tx.query(`DELETE FROM push_subscription WHERE user_id = $1`, [
+      userId,
+    ]);
+    await tx.query(`DELETE FROM saved_search WHERE owner_user_id = $1`, [
+      userId,
+    ]);
 
     // 3. Revoke all sessions
-    await tx.query(`
+    await tx.query(
+      `
       UPDATE user_session
         SET revoked_at = now(), revoked_reason = 'gdpr_erasure'
-      WHERE user_id = $1 AND revoked_at IS NULL`, [userId]);
+      WHERE user_id = $1 AND revoked_at IS NULL`,
+      [userId],
+    );
 
     // 4. Disable API tokens owned by the user
-    await tx.query(`
+    await tx.query(
+      `
       UPDATE api_token
         SET status = 0, revoked_at = now(), revoke_reason = 'gdpr_erasure'
-      WHERE owner_user_id = $1`, [userId]);
+      WHERE owner_user_id = $1`,
+      [userId],
+    );
 
     // 5. Replace PII on the user row with sentinels
-    await tx.query(`
+    await tx.query(
+      `
       UPDATE "user"
         SET email = $1,
             first_name = '[erased]',
@@ -504,25 +576,36 @@ export default async function gdprErasureJob(requestId: string) {
             status = 0,
             erased_at = now()
       WHERE id = $3`,
-      [`erased-${userId}@dbexec.invalid`, `erased-${userId}`, userId]);
+      [`erased-${userId}@dbexec.invalid`, `erased-${userId}`, userId],
+    );
 
     // 6. Authored content (datasets, dashboards, analyses) — keep
     //    the records but reassign authorship to a sentinel system
     //    user. Deleting the authored content would harm other
     //    legitimate users of the org.
-    await tx.query(`
+    await tx.query(
+      `
       UPDATE dataset SET created_by = '00000000-0000-0000-0000-000000000000'
-      WHERE created_by = $1`, [userId]);
-    await tx.query(`
+      WHERE created_by = $1`,
+      [userId],
+    );
+    await tx.query(
+      `
       UPDATE dashboard SET created_by = '00000000-0000-0000-0000-000000000000'
-      WHERE created_by = $1`, [userId]);
-    await tx.query(`
+      WHERE created_by = $1`,
+      [userId],
+    );
+    await tx.query(
+      `
       UPDATE analysis SET created_by = '00000000-0000-0000-0000-000000000000'
-      WHERE created_by = $1`, [userId]);
+      WHERE created_by = $1`,
+      [userId],
+    );
   });
 
   await GdprRequest.update(requestId, {
-    status: 'delivered', completedAt: new Date(),
+    status: 'delivered',
+    completedAt: new Date(),
   });
 
   // Notify org admin
@@ -544,7 +627,9 @@ async function bulkDisableUsers(req, res) {
   const orgId = res.locals.orgData.id;
 
   // Load + validate
-  const users = await User.find({ where: { id: In(ids), organisationId: orgId } });
+  const users = await User.find({
+    where: { id: In(ids), organisationId: orgId },
+  });
   if (users.length !== ids.length) {
     return sendResponse(res, false, 400, 'admin.bulk.some_not_found', {
       missing: ids.filter((id: string) => !users.some(u => u.id === id)),
@@ -552,14 +637,24 @@ async function bulkDisableUsers(req, res) {
   }
 
   // Compute side effects
-  const sideEffects = await Promise.all(users.map(async u => ({
-    userId: u.id,
-    email: u.email,
-    activeSessions: await UserSession.count({ where: { userId: u.id, revokedAt: IsNull() } }),
-    apiTokens: await ApiToken.count({ where: { ownerUserId: u.id, status: 1 } }),
-    subscriptionsOwned: await Subscription.count({ where: { ownerUserId: u.id, status: 1 } }),
-    alertsOwned: await Alert.count({ where: { ownerUserId: u.id, status: 1 } }),
-  })));
+  const sideEffects = await Promise.all(
+    users.map(async u => ({
+      userId: u.id,
+      email: u.email,
+      activeSessions: await UserSession.count({
+        where: { userId: u.id, revokedAt: IsNull() },
+      }),
+      apiTokens: await ApiToken.count({
+        where: { ownerUserId: u.id, status: 1 },
+      }),
+      subscriptionsOwned: await Subscription.count({
+        where: { ownerUserId: u.id, status: 1 },
+      }),
+      alertsOwned: await Alert.count({
+        where: { ownerUserId: u.id, status: 1 },
+      }),
+    })),
+  );
 
   if (dryRun) {
     return sendResponse(res, true, 200, 'admin.bulk.preview', {
@@ -567,14 +662,17 @@ async function bulkDisableUsers(req, res) {
         usersDisabled: users.length,
         sessionsRevoked: sideEffects.reduce((s, e) => s + e.activeSessions, 0),
         apiTokensRevoked: sideEffects.reduce((s, e) => s + e.apiTokens, 0),
-        subscriptionsOrphaned: sideEffects.reduce((s, e) => s + e.subscriptionsOwned, 0),
+        subscriptionsOrphaned: sideEffects.reduce(
+          (s, e) => s + e.subscriptionsOwned,
+          0,
+        ),
       },
       perUser: sideEffects,
     });
   }
 
   // Apply
-  await master_db_connection.transaction(async (tx) => {
+  await master_db_connection.transaction(async tx => {
     for (const u of users) {
       u.status = 0;
       u.disabledAt = new Date();
@@ -627,7 +725,10 @@ async function cloneOrg(req, res) {
 // jobs/cloneOrg.ts
 export default async function cloneOrgJob({ jobId }: { jobId: string }) {
   const job = await OrgCloneJob.findOne({ where: { id: jobId } });
-  await OrgCloneJob.update(jobId, { status: 'processing', startedAt: new Date() });
+  await OrgCloneJob.update(jobId, {
+    status: 'processing',
+    startedAt: new Date(),
+  });
 
   try {
     const newOrg = await createNewOrg(job.options.newOrgName, job.initiatedBy);
@@ -637,15 +738,27 @@ export default async function cloneOrgJob({ jobId }: { jobId: string }) {
     const dstConn = await openOrgConnection(newOrg.id);
 
     const tables = [
-      'role','user','group','user_group_mapping',
+      'role',
+      'user',
+      'group',
+      'user_group_mapping',
       'role_permission_mapping',
-      'datasource','datasource_config_s',
-      'connection','connection_config',
-      'dataset','dataset_field',
-      'analysis','analysis_filter','analysis_visual',
-      'dashboard','dashboard_tab','dashboard_filter',
-      'dashboard_visual','dashboard_visual_config',
-      'rls_rule','rls_rule_assignment',
+      'datasource',
+      'datasource_config_s',
+      'connection',
+      'connection_config',
+      'dataset',
+      'dataset_field',
+      'analysis',
+      'analysis_filter',
+      'analysis_visual',
+      'dashboard',
+      'dashboard_tab',
+      'dashboard_filter',
+      'dashboard_visual',
+      'dashboard_visual_config',
+      'rls_rule',
+      'rls_rule_assignment',
       // Skip volatile: notification, recent_view, session, audit
     ];
     for (const t of tables) {
@@ -656,11 +769,13 @@ export default async function cloneOrgJob({ jobId }: { jobId: string }) {
     }
 
     await OrgCloneJob.update(jobId, {
-      status: 'completed', completedAt: new Date(),
+      status: 'completed',
+      completedAt: new Date(),
     });
   } catch (e) {
     await OrgCloneJob.update(jobId, {
-      status: 'failed', error: (e as Error).message,
+      status: 'failed',
+      error: (e as Error).message,
     });
     throw e;
   }
@@ -668,6 +783,7 @@ export default async function cloneOrgJob({ jobId }: { jobId: string }) {
 ```
 
 Caveats:
+
 - Encrypted secrets (datasource passwords, signing keys) are NOT
   cloned — the new org has to re-enter them. UI surfaces this
   clearly.
@@ -691,18 +807,26 @@ async function scheduleDelete(req, res) {
   await Organisation.update(req.params.id, {
     scheduledDeletionAt: when,
     deletionReason: req.body.reason,
-    status: 0,                                     // disable login immediately
+    status: 0, // disable login immediately
   });
 
   await auditLogger.logAudit({
     /* master-level audit */
-    metadata: { gracePeriodDays: grace, scheduledFor: when, reason: req.body.reason },
+    metadata: {
+      gracePeriodDays: grace,
+      scheduledFor: when,
+      reason: req.body.reason,
+    },
   });
 
   // Send heads-up to every org admin
-  await emailEveryOrgAdmin(req.params.id, 'org-deletion-scheduled', { scheduledFor: when });
+  await emailEveryOrgAdmin(req.params.id, 'org-deletion-scheduled', {
+    scheduledFor: when,
+  });
 
-  return sendResponse(res, true, 200, 'admin.org.delete_scheduled', { scheduledFor: when });
+  return sendResponse(res, true, 200, 'admin.org.delete_scheduled', {
+    scheduledFor: when,
+  });
 }
 
 // Nightly cron
@@ -732,13 +856,13 @@ and writes a final master-audit entry.
 async function getQuota(req, res) {
   const orgId = res.locals.orgData.id;
   return sendResponse(res, true, 200, '', {
-    users:        { used: 27,   max: 100 },
-    storage:      { usedBytes: 1.2e9, maxBytes: 5e9 },
-    datasets:     { used: 38,   max: 200 },
-    dashboards:   { used: 12,   max: 50 },
-    exports24h:   { used: 8,    max: 100 },
-    emailsToday:  { used: 19,   max: 1000 },
-    embedTokens:  { used: 42,   max: 5000 },     // monthly active embed users
+    users: { used: 27, max: 100 },
+    storage: { usedBytes: 1.2e9, maxBytes: 5e9 },
+    datasets: { used: 38, max: 200 },
+    dashboards: { used: 12, max: 50 },
+    exports24h: { used: 8, max: 100 },
+    emailsToday: { used: 19, max: 1000 },
+    embedTokens: { used: 42, max: 5000 }, // monthly active embed users
   });
 }
 ```
@@ -777,26 +901,26 @@ the console links directly to each section's audit subset (e.g.
 
 ## 5. APIs
 
-| Method | Path | Purpose |
-|---|---|---|
-| GET | `/admin/overview` | Landing-page stats |
-| GET | `/admin/users` | Paginated user list |
-| POST | `/admin/users/bulk-import` | CSV import (dry-run supported) |
-| POST | `/admin/users/bulk-disable` | Bulk disable (dry-run) |
-| POST | `/admin/users/:id/impersonate` | Start impersonation |
-| POST | `/admin/impersonate/end` | End impersonation |
-| GET | `/admin/quota` | Per-domain usage + caps |
-| GET/PUT | `/admin/feature-flags` | Org flag toggles |
-| POST | `/admin/orgs/:id/clone` | Clone org (async) |
-| GET | `/admin/orgs/clone-jobs/:id` | Clone status |
-| POST | `/admin/orgs/:id/delete` | Schedule org deletion |
-| POST | `/admin/orgs/:id/delete/cancel` | Cancel pending deletion |
-| POST | `/admin/gdpr/access` | Initiate access request |
-| GET | `/admin/gdpr/requests` | List recent requests |
-| POST | `/admin/gdpr/erasure` | Initiate erasure |
-| POST | `/admin/gdpr/erasure/:id/cancel` | Cancel during grace |
-| GET | `/admin/audit` | Filterable audit search (links module 19) |
-| GET | `/admin/login-activity` | Login activity stream |
+| Method  | Path                             | Purpose                                   |
+| ------- | -------------------------------- | ----------------------------------------- |
+| GET     | `/admin/overview`                | Landing-page stats                        |
+| GET     | `/admin/users`                   | Paginated user list                       |
+| POST    | `/admin/users/bulk-import`       | CSV import (dry-run supported)            |
+| POST    | `/admin/users/bulk-disable`      | Bulk disable (dry-run)                    |
+| POST    | `/admin/users/:id/impersonate`   | Start impersonation                       |
+| POST    | `/admin/impersonate/end`         | End impersonation                         |
+| GET     | `/admin/quota`                   | Per-domain usage + caps                   |
+| GET/PUT | `/admin/feature-flags`           | Org flag toggles                          |
+| POST    | `/admin/orgs/:id/clone`          | Clone org (async)                         |
+| GET     | `/admin/orgs/clone-jobs/:id`     | Clone status                              |
+| POST    | `/admin/orgs/:id/delete`         | Schedule org deletion                     |
+| POST    | `/admin/orgs/:id/delete/cancel`  | Cancel pending deletion                   |
+| POST    | `/admin/gdpr/access`             | Initiate access request                   |
+| GET     | `/admin/gdpr/requests`           | List recent requests                      |
+| POST    | `/admin/gdpr/erasure`            | Initiate erasure                          |
+| POST    | `/admin/gdpr/erasure/:id/cancel` | Cancel during grace                       |
+| GET     | `/admin/audit`                   | Filterable audit search (links module 19) |
+| GET     | `/admin/login-activity`          | Login activity stream                     |
 
 ## 6. FE specs
 
@@ -810,7 +934,7 @@ export const bulkUserImportSchema = z.object({
 });
 
 export const startImpersonationSchema = z.object({
-  reason: z.string().min(10).max(255),     // mandatory justification
+  reason: z.string().min(10).max(255), // mandatory justification
 });
 
 export const gdprAccessSchema = z.object({

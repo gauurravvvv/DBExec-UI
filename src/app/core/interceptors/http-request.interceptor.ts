@@ -60,7 +60,6 @@ export class HttpRequestInterceptor implements HttpInterceptor {
     return this.injector.get(TranslateService);
   }
 
-
   constructor(
     private loadingService: LoadingService,
     private router: Router,
@@ -164,8 +163,7 @@ export class HttpRequestInterceptor implements HttpInterceptor {
             return of(evt as HttpEvent<any>);
           }
           const code = json?.code;
-          const actionable =
-            code === 440 || code === 501 || code === 503;
+          const actionable = code === 440 || code === 501 || code === 503;
           if (!actionable) {
             // Genuine file download (or any non-actionable JSON blob) — leave
             // the Blob intact for the caller to save.

@@ -133,7 +133,9 @@
       gap: var(--space-5);
       min-width: 0;
 
-      app-datasource-picker { flex: 0 0 auto; }
+      app-datasource-picker {
+        flex: 0 0 auto;
+      }
 
       // Inline capability spinner while probing the chosen datasource.
       .cap-loading {
@@ -160,8 +162,19 @@
       color: var(--secondary-color);
       text-align: center;
 
-      i { font-size: 1.75rem; opacity: 0.45; &.warn { color: var(--warning-color); opacity: 1; } }
-      span { font-size: var(--fs-body); max-width: 420px; line-height: 1.5; }
+      i {
+        font-size: 1.75rem;
+        opacity: 0.45;
+        &.warn {
+          color: var(--warning-color);
+          opacity: 1;
+        }
+      }
+      span {
+        font-size: var(--fs-body);
+        max-width: 420px;
+        line-height: 1.5;
+      }
     }
   }
 
@@ -236,14 +249,20 @@
     color: var(--secondary-color);
     text-align: center;
 
-    i { font-size: 1.75rem; opacity: 0.45; }
+    i {
+      font-size: 1.75rem;
+      opacity: 0.45;
+    }
     span {
       font-size: var(--fs-body);
       max-width: 420px;
       line-height: 1.5;
     }
 
-    &.unsupported i { color: var(--warning-color); opacity: 1; }
+    &.unsupported i {
+      color: var(--warning-color);
+      opacity: 1;
+    }
   }
 
   .cap-loading {
@@ -353,8 +372,12 @@
           }
         }
 
-        &:first-child { padding-left: var(--space-6); }
-        &:last-child { padding-right: var(--space-8); }
+        &:first-child {
+          padding-left: var(--space-6);
+        }
+        &:last-child {
+          padding-right: var(--space-8);
+        }
 
         &.sortable-th {
           cursor: pointer;
@@ -363,14 +386,18 @@
 
           &:hover {
             color: var(--text-color);
-            .sort-indicator { opacity: 1; }
+            .sort-indicator {
+              opacity: 1;
+            }
           }
 
           &.is-sorted {
             color: var(--primary-color);
             .sort-indicator {
               opacity: 1;
-              .pi { color: var(--primary-color); }
+              .pi {
+                color: var(--primary-color);
+              }
             }
           }
 
@@ -382,7 +409,9 @@
             opacity: 0;
             transition: opacity var(--motion-fast) ease;
 
-            &.is-sorted { opacity: 1; }
+            &.is-sorted {
+              opacity: 1;
+            }
 
             .pi {
               font-size: 11px;
@@ -418,8 +447,12 @@
         background: transparent;
         border-bottom: 1px solid var(--border-color);
 
-        &:first-child { padding-left: var(--space-6); }
-        &:last-child { padding-right: var(--space-8); }
+        &:first-child {
+          padding-left: var(--space-6);
+        }
+        &:last-child {
+          padding-right: var(--space-8);
+        }
 
         app-custom-dropdown,
         app-custom-daterange,
@@ -460,8 +493,12 @@
           font-size: var(--fs-control);
           line-height: 1.45;
 
-          &:first-child { padding-left: var(--space-6); }
-          &:last-child { padding-right: var(--space-8); }
+          &:first-child {
+            padding-left: var(--space-6);
+          }
+          &:last-child {
+            padding-right: var(--space-8);
+          }
         }
 
         &:hover {
@@ -470,7 +507,9 @@
           td:first-child {
             box-shadow: inset 3px 0 0 0 var(--primary-color);
           }
-          .row-actions { opacity: 1; }
+          .row-actions {
+            opacity: 1;
+          }
         }
       }
 
@@ -990,7 +1029,9 @@
 
     app-custom-toggle {
       flex-shrink: 0;
-      .form-field { margin: 0; }
+      .form-field {
+        margin: 0;
+      }
     }
   }
 
@@ -1248,7 +1289,9 @@
       max-height: 90vh;
 
       // Membership / other form dialogs need more room than a plain confirm.
-      &.wide { max-width: 640px; }
+      &.wide {
+        max-width: 640px;
+      }
     }
 
     .popup-header {
@@ -1292,7 +1335,9 @@
       text-align: center;
 
       // Form dialogs left-align their controls — a centered form looks broken.
-      &.form-body { text-align: left; }
+      &.form-body {
+        text-align: left;
+      }
 
       .form-field {
         margin-bottom: 1rem;
@@ -1302,7 +1347,9 @@
       .form-row {
         display: flex;
         gap: var(--space-5);
-        > * { flex: 1; }
+        > * {
+          flex: 1;
+        }
       }
 
       .field-label {
@@ -1375,7 +1422,9 @@
           gap: var(--space-4);
           color: var(--text-color);
           font-size: var(--fs-body);
-          i { color: var(--secondary-color); }
+          i {
+            color: var(--secondary-color);
+          }
         }
       }
     }
@@ -1402,13 +1451,17 @@
         cursor: pointer;
         transition: all var(--motion-base) ease;
 
-        i { font-size: var(--fs-control); }
+        i {
+          font-size: var(--fs-control);
+        }
 
         &.btn-cancel {
           background: var(--hover-background);
           color: var(--text-color);
           border: 1px solid var(--border-color);
-          &:hover { background: var(--border-color); }
+          &:hover {
+            background: var(--border-color);
+          }
         }
 
         &.btn-confirm {
@@ -1434,7 +1487,9 @@
             transform: translateY(-2px);
             box-shadow: var(--shadow-md);
           }
-          &:active { transform: translateY(0); }
+          &:active {
+            transform: translateY(0);
+          }
           &:disabled {
             opacity: 0.5;
             cursor: not-allowed;
@@ -1446,12 +1501,22 @@
   }
 
   @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
   }
   @keyframes scaleIn {
-    from { opacity: 0; transform: scale(0.95); }
-    to { opacity: 1; transform: scale(1); }
+    from {
+      opacity: 0;
+      transform: scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
   }
 }
 
@@ -1513,7 +1578,10 @@
           gap: var(--space-3);
           font-size: var(--fs-control);
           color: var(--secondary-color);
-          i { color: var(--primary-color); font-size: 11px; }
+          i {
+            color: var(--primary-color);
+            font-size: 11px;
+          }
         }
       }
 
@@ -1568,9 +1636,13 @@
       cursor: pointer;
       transition: all var(--motion-base);
 
-      i { font-size: 0.75rem; }
+      i {
+        font-size: 0.75rem;
+      }
 
-      &:hover:not(.active) { color: var(--text-color); }
+      &:hover:not(.active) {
+        color: var(--text-color);
+      }
 
       &.active {
         background: var(--card-background);
@@ -1628,7 +1700,9 @@
       flex-direction: column;
       gap: var(--space-5);
 
-      &::-webkit-scrollbar { width: 8px; }
+      &::-webkit-scrollbar {
+        width: 8px;
+      }
       &::-webkit-scrollbar-thumb {
         background: var(--border-color);
         border-radius: var(--radius-xs);
@@ -1695,7 +1769,9 @@
           background-color var(--motion-fast) ease,
           color var(--motion-fast) ease;
 
-        i { font-size: var(--fs-body); }
+        i {
+          font-size: var(--fs-body);
+        }
 
         &:hover {
           background: var(--card-background);
@@ -1716,7 +1792,9 @@
       grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: var(--space-5);
 
-      @media (max-width: 640px) { grid-template-columns: 1fr; }
+      @media (max-width: 640px) {
+        grid-template-columns: 1fr;
+      }
     }
 
     .rule-field {
@@ -1739,7 +1817,11 @@
       }
     }
 
-    .rule-objects { display: flex; flex-direction: column; gap: var(--space-5); }
+    .rule-objects {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-5);
+    }
 
     .priv-checks {
       display: flex;
@@ -1798,8 +1880,13 @@
     cursor: pointer;
     transition: all var(--motion-base);
 
-    i { font-size: 0.75rem; }
-    &:hover { background: var(--primary-color); color: #fff; }
+    i {
+      font-size: 0.75rem;
+    }
+    &:hover {
+      background: var(--primary-color);
+      color: #fff;
+    }
   }
 
   // Side rail — role filter (effective) + saved sets + defaults. Scrolls.
@@ -1832,7 +1919,10 @@
 
       // The default-privileges card is short — let it scroll its own list if
       // it ever overflows rather than stretching the row.
-      .defaults-list { overflow-y: auto; min-height: 0; }
+      .defaults-list {
+        overflow-y: auto;
+        min-height: 0;
+      }
 
       h4 {
         margin: 0;
@@ -1842,7 +1932,9 @@
         display: flex;
         align-items: center;
         gap: var(--space-4);
-        i { color: var(--primary-color); }
+        i {
+          color: var(--primary-color);
+        }
       }
       .rail-hint {
         margin: 0;
@@ -1883,7 +1975,9 @@
       font-family: var(--font-ui);
       transition: border-color var(--motion-base);
 
-      &::placeholder { color: var(--secondary-color); }
+      &::placeholder {
+        color: var(--secondary-color);
+      }
       &:focus {
         outline: none;
         border-color: var(--primary-color);
@@ -1905,7 +1999,10 @@
     // content is never clipped; vertical scroll is the virtual-scroll axis.
     overflow-x: auto;
 
-    &::-webkit-scrollbar { width: 8px; height: 8px; }
+    &::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
     &::-webkit-scrollbar-thumb {
       background: var(--border-color);
       border-radius: var(--radius-xs);
@@ -1984,8 +2081,18 @@
         flex-direction: column;
         gap: 2px;
         min-width: 0;
-        .set-name { font-weight: var(--fw-semibold); color: var(--text-color); font-size: var(--fs-control); }
-        .set-desc { color: var(--secondary-color); font-size: var(--fs-label); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .set-name {
+          font-weight: var(--fw-semibold);
+          color: var(--text-color);
+          font-size: var(--fs-control);
+        }
+        .set-desc {
+          color: var(--secondary-color);
+          font-size: var(--fs-label);
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
       }
     }
   }
@@ -2008,10 +2115,19 @@
       color: var(--text-color);
       padding: var(--space-3) 0;
       border-bottom: 1px dashed var(--border-color);
-      &:last-child { border-bottom: none; }
-      .def-scope { font-weight: var(--fw-medium); }
-      .def-privs { color: var(--secondary-color); }
-      .def-grantee { margin-left: auto; color: var(--primary-color); }
+      &:last-child {
+        border-bottom: none;
+      }
+      .def-scope {
+        font-weight: var(--fw-medium);
+      }
+      .def-privs {
+        color: var(--secondary-color);
+      }
+      .def-grantee {
+        margin-left: auto;
+        color: var(--primary-color);
+      }
     }
   }
 

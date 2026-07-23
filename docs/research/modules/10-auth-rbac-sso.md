@@ -19,38 +19,38 @@
 
 ## 2. DBExec today
 
-| Feature | Status |
-|---|---|
-| Username/password | ✅ |
-| JWT + refresh | ✅ |
-| RBAC permission tree | ✅ |
-| Password policy | ✅ (length, history, complexity) |
-| MFA | ❌ |
-| SSO (SAML) | ❌ |
-| SSO (OIDC) | ❌ |
-| SCIM | ❌ |
-| API tokens | ❌ |
-| Service accounts | ❌ |
-| Audit logging | ✅ |
+| Feature              | Status                           |
+| -------------------- | -------------------------------- |
+| Username/password    | ✅                               |
+| JWT + refresh        | ✅                               |
+| RBAC permission tree | ✅                               |
+| Password policy      | ✅ (length, history, complexity) |
+| MFA                  | ❌                               |
+| SSO (SAML)           | ❌                               |
+| SSO (OIDC)           | ❌                               |
+| SCIM                 | ❌                               |
+| API tokens           | ❌                               |
+| Service accounts     | ❌                               |
+| Audit logging        | ✅                               |
 
 ## 3. Gaps
 
-| ID | Gap | Severity |
-|---|---|---|
-| AUTH-G01 | SAML 2.0 SP-initiated | P0 |
-| AUTH-G02 | SAML 2.0 IdP-initiated | P1 |
-| AUTH-G03 | OIDC (Google, Microsoft, Okta, Auth0) | P0 |
-| AUTH-G04 | TOTP MFA | P0 |
-| AUTH-G05 | WebAuthn / Passkeys | P1 |
-| AUTH-G06 | Recovery codes | P0 (paired with AUTH-G04) |
-| AUTH-G07 | SCIM 2.0 endpoints | P1 |
-| AUTH-G08 | API tokens (PAT) | P0 |
-| AUTH-G09 | Service accounts | P0 |
-| AUTH-G10 | Session list + revoke | P0 |
-| AUTH-G11 | Force-logout-all on password change | P0 |
-| AUTH-G12 | Trusted devices ("Don't ask for 30 days") | P1 |
-| AUTH-G13 | Login captcha after N failures | P1 |
-| AUTH-G14 | Login IP allowlist | P1 |
+| ID       | Gap                                       | Severity                  |
+| -------- | ----------------------------------------- | ------------------------- |
+| AUTH-G01 | SAML 2.0 SP-initiated                     | P0                        |
+| AUTH-G02 | SAML 2.0 IdP-initiated                    | P1                        |
+| AUTH-G03 | OIDC (Google, Microsoft, Okta, Auth0)     | P0                        |
+| AUTH-G04 | TOTP MFA                                  | P0                        |
+| AUTH-G05 | WebAuthn / Passkeys                       | P1                        |
+| AUTH-G06 | Recovery codes                            | P0 (paired with AUTH-G04) |
+| AUTH-G07 | SCIM 2.0 endpoints                        | P1                        |
+| AUTH-G08 | API tokens (PAT)                          | P0                        |
+| AUTH-G09 | Service accounts                          | P0                        |
+| AUTH-G10 | Session list + revoke                     | P0                        |
+| AUTH-G11 | Force-logout-all on password change       | P0                        |
+| AUTH-G12 | Trusted devices ("Don't ask for 30 days") | P1                        |
+| AUTH-G13 | Login captcha after N failures            | P1                        |
+| AUTH-G14 | Login IP allowlist                        | P1                        |
 
 ## 4. Target architecture
 
@@ -147,28 +147,28 @@ CREATE TABLE scim_token (
 
 ### 4.2 Endpoint surface
 
-| Method | Path | Purpose |
-|---|---|---|
-| GET  | `/auth/sso/config` | Get org's SSO config |
-| PUT  | `/auth/sso/config` | Update |
-| GET  | `/auth/sso/saml/metadata.xml` | SP metadata for IdP setup |
-| POST | `/auth/sso/saml/acs` | ACS (AssertionConsumer) |
-| GET  | `/auth/sso/oidc/start` | Begin OIDC flow |
-| GET  | `/auth/sso/oidc/callback` | OIDC callback |
-| POST | `/auth/mfa/enroll/totp` | Begin TOTP enrolment (returns secret + QR) |
-| POST | `/auth/mfa/enroll/totp/confirm` | Confirm with code |
-| POST | `/auth/mfa/verify` | Step-up MFA on login |
-| POST | `/auth/mfa/recovery-codes` | Generate / regenerate |
-| POST | `/auth/mfa/disable` | Disable (requires password + recent MFA) |
-| GET  | `/auth/sessions` | List my sessions |
-| DELETE | `/auth/sessions/:id` | Revoke a session |
-| POST | `/api-tokens` | Create (returns token once) |
-| GET  | `/api-tokens/list` | List (no secrets) |
-| DELETE | `/api-tokens/:id` | Revoke |
-| POST | `/service-accounts` | Create |
-| GET  | `/scim/v2/Users` | SCIM list |
-| POST | `/scim/v2/Users` | SCIM create |
-| PATCH | `/scim/v2/Users/:id` | SCIM update |
+| Method | Path                            | Purpose                                    |
+| ------ | ------------------------------- | ------------------------------------------ |
+| GET    | `/auth/sso/config`              | Get org's SSO config                       |
+| PUT    | `/auth/sso/config`              | Update                                     |
+| GET    | `/auth/sso/saml/metadata.xml`   | SP metadata for IdP setup                  |
+| POST   | `/auth/sso/saml/acs`            | ACS (AssertionConsumer)                    |
+| GET    | `/auth/sso/oidc/start`          | Begin OIDC flow                            |
+| GET    | `/auth/sso/oidc/callback`       | OIDC callback                              |
+| POST   | `/auth/mfa/enroll/totp`         | Begin TOTP enrolment (returns secret + QR) |
+| POST   | `/auth/mfa/enroll/totp/confirm` | Confirm with code                          |
+| POST   | `/auth/mfa/verify`              | Step-up MFA on login                       |
+| POST   | `/auth/mfa/recovery-codes`      | Generate / regenerate                      |
+| POST   | `/auth/mfa/disable`             | Disable (requires password + recent MFA)   |
+| GET    | `/auth/sessions`                | List my sessions                           |
+| DELETE | `/auth/sessions/:id`            | Revoke a session                           |
+| POST   | `/api-tokens`                   | Create (returns token once)                |
+| GET    | `/api-tokens/list`              | List (no secrets)                          |
+| DELETE | `/api-tokens/:id`               | Revoke                                     |
+| POST   | `/service-accounts`             | Create                                     |
+| GET    | `/scim/v2/Users`                | SCIM list                                  |
+| POST   | `/scim/v2/Users`                | SCIM create                                |
+| PATCH  | `/scim/v2/Users/:id`            | SCIM update                                |
 
 ## 5. UI specs
 
@@ -236,7 +236,9 @@ export default async function samlAcs(req: Request, res: Response) {
 import { Issuer, generators } from 'openid-client';
 
 export async function oidcStart(req: Request, res: Response) {
-  const cfg = await SsoConfig.findOne({ where: { organisationId: req.query.orgId } });
+  const cfg = await SsoConfig.findOne({
+    where: { organisationId: req.query.orgId },
+  });
   const issuer = await Issuer.discover(cfg.oidcIssuer!);
   const client = new issuer.Client({
     client_id: cfg.oidcClientId!,
@@ -247,10 +249,13 @@ export async function oidcStart(req: Request, res: Response) {
   const state = generators.state();
   const nonce = generators.nonce();
   req.session.oidc = { state, nonce, orgId: cfg.organisationId };
-  res.redirect(client.authorizationUrl({
-    scope: cfg.oidcScopes.join(' '),
-    state, nonce,
-  }));
+  res.redirect(
+    client.authorizationUrl({
+      scope: cfg.oidcScopes.join(' '),
+      state,
+      nonce,
+    }),
+  );
 }
 ```
 
@@ -263,9 +268,14 @@ import qrcode from 'qrcode';
 export async function enrolTotpStart(req: Request, res: Response) {
   const user = res.locals.user;
   const secret = speakeasy.generateSecret({ name: `DBExec (${user.email})` });
-  await UserMfa.upsert({
-    userId: user.id, method: 'totp', totpSecretEnc: encrypt(secret.base32),
-  } as any, ['userId']);
+  await UserMfa.upsert(
+    {
+      userId: user.id,
+      method: 'totp',
+      totpSecretEnc: encrypt(secret.base32),
+    } as any,
+    ['userId'],
+  );
   const qrDataUrl = await qrcode.toDataURL(secret.otpauth_url!);
   res.json({ qrDataUrl, secret: secret.base32 });
 }
@@ -280,8 +290,9 @@ export async function enrolTotpConfirm(req: Request, res: Response) {
     window: 1,
   });
   if (!ok) return res.status(400).json({ error: 'invalid code' });
-  const codes = Array.from({ length: 10 },
-    () => crypto.randomBytes(4).toString('hex'));
+  const codes = Array.from({ length: 10 }, () =>
+    crypto.randomBytes(4).toString('hex'),
+  );
   await UserMfa.update(user.id, {
     recoveryCodesEnc: encrypt(JSON.stringify(codes)),
     enrolledAt: new Date(),
@@ -299,12 +310,12 @@ export async function createApiToken(req: Request, res: Response) {
   const hash = crypto.createHash('sha256').update(raw).digest('hex');
   const token = new ApiToken();
   token.organisationId = res.locals.orgData.id;
-  token.ownerUserId    = res.locals.user.id;
-  token.name           = name;
-  token.tokenHash      = hash;
-  token.scopes         = scopes;
-  token.prefix         = 'dbe_';
-  token.last4          = raw.slice(-4);
+  token.ownerUserId = res.locals.user.id;
+  token.name = name;
+  token.tokenHash = hash;
+  token.scopes = scopes;
+  token.prefix = 'dbe_';
+  token.last4 = raw.slice(-4);
   if (expiresInDays) token.expiresAt = addDays(new Date(), expiresInDays);
   await token.save();
   res.json({ token: raw, ...stripSecrets(token) });
@@ -312,9 +323,10 @@ export async function createApiToken(req: Request, res: Response) {
 
 // auth middleware accepts Bearer or x-api-token
 export async function apiAuth(req, res, next) {
-  const t = (req.headers.authorization || '').replace(/^Bearer\s+/, '')
-         || req.headers['x-api-token'];
-  if (!t || !t.startsWith('dbe_')) return next();   // fall through to JWT
+  const t =
+    (req.headers.authorization || '').replace(/^Bearer\s+/, '') ||
+    req.headers['x-api-token'];
+  if (!t || !t.startsWith('dbe_')) return next(); // fall through to JWT
   const hash = crypto.createHash('sha256').update(t).digest('hex');
   const row = await ApiToken.findOne({ where: { tokenHash: hash, status: 1 } });
   if (!row) return res.status(401).end();
@@ -336,7 +348,7 @@ router.post('/scim/v2/Users', scimAuth, async (req, res) => {
   user.username = body.userName;
   user.email = body.emails?.[0]?.value;
   user.firstName = body.name?.givenName;
-  user.lastName  = body.name?.familyName;
+  user.lastName = body.name?.familyName;
   await user.save();
   res.status(201).json(scimUserResponse(user));
 });

@@ -225,13 +225,20 @@ const search = async (req: Request, res: Response) => {
       ORDER BY final_score DESC
       LIMIT $${kinds && ownerId && tagIds ? 7 : 4};
     `;
-    const rows = await connection.query(sql, [q, qEmbedding, orgId, kinds, ownerId, tagIds, limit].filter(v => v !== undefined));
+    const rows = await connection.query(
+      sql,
+      [q, qEmbedding, orgId, kinds, ownerId, tagIds, limit].filter(
+        v => v !== undefined,
+      ),
+    );
 
     // Filter by RLS — entities the user can't access drop out
     const accessible = await filterByAccess(rows, loggedInId, orgId);
 
     await master_db_connection.close();
-    sendResponse(res, true, CODE.SUCCESS, SEARCH_MSG.OK, { results: accessible });
+    sendResponse(res, true, CODE.SUCCESS, SEARCH_MSG.OK, {
+      results: accessible,
+    });
   } catch (err: any) {
     Logger.error(`Search failed: ${err.message}`);
     await master_db_connection.close().catch(() => undefined);
@@ -268,9 +275,12 @@ export class CommandPaletteComponent implements OnInit {
   private debounceTimer: any;
 
   ngOnInit() {
-    fromEvent(window, 'keydown').pipe(
-      filter((ev: any) => (ev.metaKey || ev.ctrlKey) && ev.key === 'k'),
-    ).subscribe((ev: any) => { ev.preventDefault(); this.toggle(); });
+    fromEvent(window, 'keydown')
+      .pipe(filter((ev: any) => (ev.metaKey || ev.ctrlKey) && ev.key === 'k'))
+      .subscribe((ev: any) => {
+        ev.preventDefault();
+        this.toggle();
+      });
 
     // Preload recent + favourites
     this.search.getRecent().then(r => this.recent.set(r));
@@ -280,7 +290,10 @@ export class CommandPaletteComponent implements OnInit {
   onQueryChange(q: string) {
     this.query.set(q);
     clearTimeout(this.debounceTimer);
-    if (!q) { this.results.set([]); return; }
+    if (!q) {
+      this.results.set([]);
+      return;
+    }
     this.debounceTimer = setTimeout(async () => {
       const r = await this.search.search(q);
       this.results.set(r);
@@ -289,8 +302,12 @@ export class CommandPaletteComponent implements OnInit {
   }
 
   onKeydown(ev: KeyboardEvent) {
-    if (ev.key === 'ArrowDown') this.selectedIndex.update(i => Math.min(i + 1, this.results().length - 1));
-    if (ev.key === 'ArrowUp') this.selectedIndex.update(i => Math.max(i - 1, 0));
+    if (ev.key === 'ArrowDown')
+      this.selectedIndex.update(i =>
+        Math.min(i + 1, this.results().length - 1),
+      );
+    if (ev.key === 'ArrowUp')
+      this.selectedIndex.update(i => Math.max(i - 1, 0));
     if (ev.key === 'Enter') this.open(this.results()[this.selectedIndex()]);
     if (ev.key === 'Escape') this.close();
   }
@@ -342,44 +359,47 @@ Each follows the standard controller pattern.
 
 ## 6. Observability
 
-| Metric | Type | Labels | Purpose |
-|---|---|---|---|
-| `dbexec_search_query_total` | counter | `org`, `has_filters` | volume |
-| `dbexec_search_latency_ms` | histogram | `org` | end-to-end |
-| `dbexec_search_zero_results_total` | counter | `org` | leading indicator (what aren't we indexing?) |
-| `dbexec_search_click_position` | histogram | — | does the top result get clicked? |
-| `dbexec_search_index_lag_seconds` | gauge | — | how stale is the index |
-| `dbexec_search_embed_ms` | histogram | — | embedder latency |
+| Metric                             | Type      | Labels               | Purpose                                      |
+| ---------------------------------- | --------- | -------------------- | -------------------------------------------- |
+| `dbexec_search_query_total`        | counter   | `org`, `has_filters` | volume                                       |
+| `dbexec_search_latency_ms`         | histogram | `org`                | end-to-end                                   |
+| `dbexec_search_zero_results_total` | counter   | `org`                | leading indicator (what aren't we indexing?) |
+| `dbexec_search_click_position`     | histogram | —                    | does the top result get clicked?             |
+| `dbexec_search_index_lag_seconds`  | gauge     | —                    | how stale is the index                       |
+| `dbexec_search_embed_ms`           | histogram | —                    | embedder latency                             |
 
 ---
 
 ## 7. Security & threat model
 
-| Threat | Mitigation |
-|---|---|
-| User searches and sees an entity they can't access | RLS-style access filter after search ranking; entity-kind-specific resolver |
-| Index leaks confidential body (SQL with hard-coded ids) | `body` content tagged for sensitivity; admin can configure "exclude SQL from search body" |
-| pgvector index DoS via huge query embedding | Embeddings always 384-dim; embedder validates |
-| Search-as-you-type rate-abuse | Per-user rate-limit (10 req/s burst, 100 req/min sustained) |
-| Cross-org entity collision (UUIDs collide?) | UUIDv4 collision probability negligible; PRIMARY KEY is `(entity_kind, entity_id)` and `org_id` filter is mandatory |
-| Embedder microservice exfil | Internal-only; pinned hostname; no external request from embedder |
-| Empty query with no filter returns everything | Reject empty `q` unless filters present |
+| Threat                                                  | Mitigation                                                                                                          |
+| ------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| User searches and sees an entity they can't access      | RLS-style access filter after search ranking; entity-kind-specific resolver                                         |
+| Index leaks confidential body (SQL with hard-coded ids) | `body` content tagged for sensitivity; admin can configure "exclude SQL from search body"                           |
+| pgvector index DoS via huge query embedding             | Embeddings always 384-dim; embedder validates                                                                       |
+| Search-as-you-type rate-abuse                           | Per-user rate-limit (10 req/s burst, 100 req/min sustained)                                                         |
+| Cross-org entity collision (UUIDs collide?)             | UUIDv4 collision probability negligible; PRIMARY KEY is `(entity_kind, entity_id)` and `org_id` filter is mandatory |
+| Embedder microservice exfil                             | Internal-only; pinned hostname; no external request from embedder                                                   |
+| Empty query with no filter returns everything           | Reject empty `q` unless filters present                                                                             |
 
 ---
 
 ## 8. Runbook
 
 **Symptom: search results stale.**
+
 1. Check `dbexec_search_index_lag_seconds`. > 60s = worker
    backlog. Scale worker count or re-trigger from
    `/admin/search/reindex/:kind`.
 
 **Symptom: bad ranking ("the right dashboard is 5th").**
+
 1. Inspect the score breakdown via `?explain=1` query param —
    returns the four sub-scores per row. Tune weights in
    `org_search_config`.
 
 **Symptom: Cmd-K palette never opens.**
+
 1. Keyboard handler conflict with a chart that captures
    keydowns. Fix: stop propagation only when palette is open.
 
@@ -387,13 +407,13 @@ Each follows the standard controller pattern.
 
 ## 9. Perf budget
 
-| Operation | p50 | p95 | Hard ceiling |
-|---|---|---|---|
-| Search query (full hybrid) | 80 ms | 250 ms | 1 s |
-| Embed query (cached) | 1 ms | 5 ms | 20 ms |
-| Embed query (cold) | 30 ms | 100 ms | 500 ms |
-| Cmd-K render | 8 ms | 30 ms | 100 ms |
-| Index a single entity | 30 ms | 100 ms | 1 s |
+| Operation                  | p50   | p95    | Hard ceiling |
+| -------------------------- | ----- | ------ | ------------ |
+| Search query (full hybrid) | 80 ms | 250 ms | 1 s          |
+| Embed query (cached)       | 1 ms  | 5 ms   | 20 ms        |
+| Embed query (cold)         | 30 ms | 100 ms | 500 ms       |
+| Cmd-K render               | 8 ms  | 30 ms  | 100 ms       |
+| Index a single entity      | 30 ms | 100 ms | 1 s          |
 
 ---
 

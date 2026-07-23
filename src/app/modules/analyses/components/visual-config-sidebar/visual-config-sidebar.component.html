@@ -118,7 +118,11 @@
           </div>
           <div
             class="config-card"
-            *ngFor="let m of comboMeasures; let i = index; trackBy: trackByIndex"
+            *ngFor="
+              let m of comboMeasures;
+              let i = index;
+              trackBy: trackByIndex
+            "
           >
             <div class="config-group">
               <app-custom-dropdown
@@ -179,9 +183,14 @@
             [showStatusLabel]="false"
           ></app-custom-toggle>
         </div>
-        <div class="config-subsection" *ngIf="isCapable('dualAxis') && dualAxisEnabled">
+        <div
+          class="config-subsection"
+          *ngIf="isCapable('dualAxis') && dualAxisEnabled"
+        >
           <div class="config-group">
-            <label>{{ 'ANALYSES.ANALYTICS.RIGHT_AXIS_NAME' | translate }}</label>
+            <label>{{
+              'ANALYSES.ANALYTICS.RIGHT_AXIS_NAME' | translate
+            }}</label>
             <app-custom-input
               [(ngModel)]="focusedVisual.config.dualAxis.rightAxisName"
               [placeholder]="'ANALYSES.ANALYTICS.RIGHT_AXIS_NAME' | translate"
@@ -298,7 +307,9 @@
           ></app-custom-dropdown>
         </div>
         <div class="config-group" *ngIf="quickCalc === 'moving_average'">
-          <label>{{ 'ANALYSES.ANALYTICS.MOVING_AVG_WINDOW' | translate }}</label>
+          <label>{{
+            'ANALYSES.ANALYTICS.MOVING_AVG_WINDOW' | translate
+          }}</label>
           <app-custom-number
             [(ngModel)]="movingAverageWindow"
             [min]="2"
@@ -320,7 +331,9 @@
           ></app-custom-dropdown>
         </div>
         <div class="config-group" *ngIf="compareMode">
-          <label>{{ 'ANALYSES.ANALYTICS.COMPARE_DATE_COLUMN' | translate }}</label>
+          <label>{{
+            'ANALYSES.ANALYTICS.COMPARE_DATE_COLUMN' | translate
+          }}</label>
           <app-custom-dropdown
             [options]="allFieldOptions"
             [(ngModel)]="compareDateColumn"
@@ -328,7 +341,9 @@
             optionValue="value"
             [showClear]="true"
             appendTo="body"
-            [placeholder]="'ANALYSES.ANALYTICS.COMPARE_DATE_COLUMN_PH' | translate"
+            [placeholder]="
+              'ANALYSES.ANALYTICS.COMPARE_DATE_COLUMN_PH' | translate
+            "
           ></app-custom-dropdown>
         </div>
 
@@ -342,7 +357,10 @@
             [showStatusLabel]="false"
           ></app-custom-toggle>
         </div>
-        <div class="config-subsection" *ngIf="isCapable('smallMultiples') && smallMultiplesEnabled">
+        <div
+          class="config-subsection"
+          *ngIf="isCapable('smallMultiples') && smallMultiplesEnabled"
+        >
           <div class="config-group">
             <label>{{ 'ANALYSES.ANALYTICS.FACET_COLUMN' | translate }}</label>
             <app-custom-dropdown
@@ -471,7 +489,9 @@
         </div>
         <ng-container *ngIf="formatKind !== 'auto'">
           <div class="config-group">
-            <label>{{ 'ANALYSES.VISUAL.FORMAT_TARGET_TITLE' | translate }}</label>
+            <label>{{
+              'ANALYSES.VISUAL.FORMAT_TARGET_TITLE' | translate
+            }}</label>
             <app-custom-dropdown
               [options]="formatTargetOptions"
               [(ngModel)]="formatTarget"
@@ -482,7 +502,11 @@
           </div>
           <div
             class="config-group"
-            *ngIf="formatKind === 'number' || formatKind === 'currency' || formatKind === 'percent'"
+            *ngIf="
+              formatKind === 'number' ||
+              formatKind === 'currency' ||
+              formatKind === 'percent'
+            "
           >
             <label>{{ 'ANALYSES.VISUAL.FORMAT_DECIMALS' | translate }}</label>
             <app-custom-number
@@ -512,7 +536,11 @@
           </div>
           <div
             class="config-row"
-            *ngIf="formatKind === 'number' || formatKind === 'currency' || formatKind === 'percent'"
+            *ngIf="
+              formatKind === 'number' ||
+              formatKind === 'currency' ||
+              formatKind === 'percent'
+            "
           >
             <label>{{ 'ANALYSES.VISUAL.FORMAT_THOUSANDS' | translate }}</label>
             <app-custom-toggle
@@ -542,7 +570,9 @@
           ></app-custom-number>
         </div>
         <div class="config-row">
-          <label>{{ 'ANALYSES.VISUAL.HISTOGRAM_SHOW_COUNTS' | translate }}</label>
+          <label>{{
+            'ANALYSES.VISUAL.HISTOGRAM_SHOW_COUNTS' | translate
+          }}</label>
           <app-custom-toggle
             [(ngModel)]="focusedVisual.config.histogramShowCounts"
             [showStatusLabel]="false"
@@ -579,7 +609,9 @@
             ></app-custom-dropdown>
           </div>
           <div class="config-group" *ngIf="crossFilterTargetMode === 'visuals'">
-            <label>{{ 'ANALYSES.INTERACTION.TARGET_VISUALS' | translate }}</label>
+            <label>{{
+              'ANALYSES.INTERACTION.TARGET_VISUALS' | translate
+            }}</label>
             <app-custom-multiselect
               [options]="siblingVisualOptions"
               [(ngModel)]="crossFilterVisualIds"
@@ -616,7 +648,9 @@
 
         <!-- Drill-to-detail (Wave 6) — opt-in underlying-row inspector. -->
         <div class="config-row">
-          <label>{{ 'ANALYSES.V2.INTERACTION.DRILL_TO_DETAIL' | translate }}</label>
+          <label>{{
+            'ANALYSES.V2.INTERACTION.DRILL_TO_DETAIL' | translate
+          }}</label>
           <app-custom-toggle
             [ngModel]="drillToDetailEnabled"
             (ngModelChange)="drillToDetailEnabled = $event"
@@ -717,7 +751,7 @@
         <div class="config-group" *ngIf="focusedVisual.config.showXAxisLabel">
           <app-custom-input
             [(ngModel)]="focusedVisual.config.xAxisLabel"
-              [maxLength]="50"
+            [maxLength]="50"
             [placeholder]="'ANALYSES.X_AXIS_LABEL' | translate"
             icon="pi-tag"
           >
@@ -733,7 +767,7 @@
         <div class="config-group" *ngIf="focusedVisual.config.showYAxisLabel">
           <app-custom-input
             [(ngModel)]="focusedVisual.config.yAxisLabel"
-              [maxLength]="50"
+            [maxLength]="50"
             [placeholder]="'ANALYSES.Y_AXIS_LABEL' | translate"
             icon="pi-tag"
           >
@@ -758,7 +792,9 @@
         </div>
         <!-- Value-axis scale type + explicit min/max (Slice C).
              Only meaningful for cartesian value axes. -->
-        <ng-container *ngIf="supportsPerVisualControls(focusedVisual.chartType)">
+        <ng-container
+          *ngIf="supportsPerVisualControls(focusedVisual.chartType)"
+        >
           <div class="config-group">
             <label>{{ 'ANALYSES.VISUAL.AXIS_SCALE_TYPE' | translate }}</label>
             <app-custom-dropdown
@@ -855,7 +891,9 @@
             class="config-group"
             *ngIf="supportsPerVisualControls(focusedVisual.chartType)"
           >
-            <label>{{ 'ANALYSES.VISUAL.LABEL_CONTENT_TITLE' | translate }}</label>
+            <label>{{
+              'ANALYSES.VISUAL.LABEL_CONTENT_TITLE' | translate
+            }}</label>
             <app-custom-dropdown
               [options]="labelContentOptions"
               [(ngModel)]="labelContent"
@@ -878,10 +916,7 @@
         class="config-section"
         *ngIf="supportsLegend(focusedVisual.chartType)"
       >
-        <div
-          class="section-title"
-          *ngIf="focusedVisual.config.legend"
-        >
+        <div class="section-title" *ngIf="focusedVisual.config.legend">
           {{ 'ANALYSES.LEGEND' | translate }}
         </div>
         <div class="config-row">
@@ -1057,7 +1092,15 @@
           <div class="config-group">
             <app-custom-input
               [(ngModel)]="focusedVisual.config.barWidth"
-              [dimension]="{ allowAuto: true, allowPx: true, allowPercent: true, pxMin: 1, pxMax: 200, percentMin: 1, percentMax: 100 }"
+              [dimension]="{
+                allowAuto: true,
+                allowPx: true,
+                allowPercent: true,
+                pxMin: 1,
+                pxMax: 200,
+                percentMin: 1,
+                percentMax: 100,
+              }"
               [label]="'ANALYSES.BAR_WIDTH' | translate"
               [placeholder]="'ANALYSES.AUTO' | translate"
               icon="pi-hashtag"
@@ -1067,7 +1110,11 @@
           <div class="config-group">
             <app-custom-input
               [(ngModel)]="focusedVisual.config.barGap"
-              [dimension]="{ allowPercent: true, percentMin: -100, percentMax: 100 }"
+              [dimension]="{
+                allowPercent: true,
+                percentMin: -100,
+                percentMax: 100,
+              }"
               [label]="'ANALYSES.BAR_GAP' | translate"
               [placeholder]="'ANALYSES.DEFAULT_30_PERCENT' | translate"
               icon="pi-hashtag"
@@ -1077,7 +1124,11 @@
           <div class="config-group">
             <app-custom-input
               [(ngModel)]="focusedVisual.config.barCategoryGap"
-              [dimension]="{ allowPercent: true, percentMin: 0, percentMax: 100 }"
+              [dimension]="{
+                allowPercent: true,
+                percentMin: 0,
+                percentMax: 100,
+              }"
               [label]="'ANALYSES.CATEGORY_GAP' | translate"
               [placeholder]="'ANALYSES.DEFAULT_20_PERCENT' | translate"
               icon="pi-hashtag"
@@ -2000,7 +2051,11 @@
           <div class="config-group">
             <app-custom-input
               [(ngModel)]="focusedVisual.config.funnelMinSize"
-              [dimension]="{ allowPercent: true, percentMin: 0, percentMax: 100 }"
+              [dimension]="{
+                allowPercent: true,
+                percentMin: 0,
+                percentMax: 100,
+              }"
               [label]="'ANALYSES.MIN_SIZE' | translate"
               [placeholder]="'ANALYSES.DEFAULT_0_PERCENT' | translate"
               icon="pi-hashtag"
@@ -2010,7 +2065,11 @@
           <div class="config-group">
             <app-custom-input
               [(ngModel)]="focusedVisual.config.funnelMaxSize"
-              [dimension]="{ allowPercent: true, percentMin: 0, percentMax: 100 }"
+              [dimension]="{
+                allowPercent: true,
+                percentMin: 0,
+                percentMax: 100,
+              }"
               [label]="'ANALYSES.MAX_SIZE' | translate"
               [placeholder]="'ANALYSES.DEFAULT_100_PERCENT' | translate"
               icon="pi-hashtag"
@@ -2047,7 +2106,11 @@
           <div class="config-group">
             <app-custom-input
               [(ngModel)]="focusedVisual.config.sunburstRadius"
-              [dimension]="{ allowPercent: true, percentMin: 1, percentMax: 100 }"
+              [dimension]="{
+                allowPercent: true,
+                percentMin: 1,
+                percentMax: 100,
+              }"
               [label]="'ANALYSES.OUTER_RADIUS' | translate"
               [placeholder]="'ANALYSES.DEFAULT_90_PERCENT' | translate"
               icon="pi-hashtag"
@@ -2378,7 +2441,11 @@
           <div class="config-group">
             <app-custom-input
               [(ngModel)]="focusedVisual.config.treeEdgeForkPosition"
-              [dimension]="{ allowPercent: true, percentMin: 0, percentMax: 100 }"
+              [dimension]="{
+                allowPercent: true,
+                percentMin: 0,
+                percentMax: 100,
+              }"
               [label]="'ANALYSES.EDGE_FORK_POSITION' | translate"
               [placeholder]="'ANALYSES.EXAMPLE_50_PERCENT' | translate"
               icon="pi-hashtag"
@@ -2460,7 +2527,15 @@
           <div class="config-group">
             <app-custom-input
               [(ngModel)]="focusedVisual.config.pictorialSymbolMargin"
-              [dimension]="{ allowAuto: true, allowPercent: true, allowBareNumber: true, percentMin: -50, percentMax: 50, bareMin: -50, bareMax: 50 }"
+              [dimension]="{
+                allowAuto: true,
+                allowPercent: true,
+                allowBareNumber: true,
+                percentMin: -50,
+                percentMax: 50,
+                bareMin: -50,
+                bareMax: 50,
+              }"
               [label]="'ANALYSES.SYMBOL_MARGIN' | translate"
               [placeholder]="'ANALYSES.AUTO_OR_NUMBER' | translate"
               icon="pi-hashtag"
@@ -2578,7 +2653,15 @@
           <div class="config-group">
             <app-custom-input
               [(ngModel)]="focusedVisual.config.candleBarWidth"
-              [dimension]="{ allowAuto: true, allowPx: true, allowPercent: true, pxMin: 1, pxMax: 200, percentMin: 1, percentMax: 100 }"
+              [dimension]="{
+                allowAuto: true,
+                allowPx: true,
+                allowPercent: true,
+                pxMin: 1,
+                pxMax: 200,
+                percentMin: 1,
+                percentMax: 100,
+              }"
               [label]="'ANALYSES.BAR_WIDTH' | translate"
               [placeholder]="'ANALYSES.AUTO_OR_NUMBER' | translate"
               icon="pi-hashtag"
@@ -3170,7 +3253,15 @@
           <label>{{ 'ANALYSES.BAR_MAX_WIDTH' | translate }}</label>
           <app-custom-input
             [(ngModel)]="focusedVisual.config.barMaxWidth"
-              [dimension]="{ allowAuto: true, allowPx: true, allowPercent: true, pxMin: 1, pxMax: 200, percentMin: 1, percentMax: 100 }"
+            [dimension]="{
+              allowAuto: true,
+              allowPx: true,
+              allowPercent: true,
+              pxMin: 1,
+              pxMax: 200,
+              percentMin: 1,
+              percentMax: 100,
+            }"
             placeholder="auto / 32px / 30%"
             icon="pi-hashtag"
           ></app-custom-input>
@@ -3179,7 +3270,15 @@
           <label>{{ 'ANALYSES.BAR_MIN_WIDTH' | translate }}</label>
           <app-custom-input
             [(ngModel)]="focusedVisual.config.barMinWidth"
-              [dimension]="{ allowAuto: true, allowPx: true, allowPercent: true, pxMin: 1, pxMax: 200, percentMin: 1, percentMax: 100 }"
+            [dimension]="{
+              allowAuto: true,
+              allowPx: true,
+              allowPercent: true,
+              pxMin: 1,
+              pxMax: 200,
+              percentMin: 1,
+              percentMax: 100,
+            }"
             placeholder="auto / 4px"
             icon="pi-hashtag"
           ></app-custom-input>
@@ -3399,7 +3498,7 @@
           <label>{{ 'ANALYSES.DETAIL_FORMATTER' | translate }}</label>
           <app-custom-input
             [(ngModel)]="focusedVisual.config.gaugeDetailFormatter"
-              [maxLength]="40"
+            [maxLength]="40"
             placeholder="{value}%"
             icon="pi-code"
           ></app-custom-input>
@@ -3700,7 +3799,9 @@
         class="config-section"
         *ngIf="isTableChartType(focusedVisual.chartType)"
       >
-        <div class="section-title">{{ 'ANALYSES.PIVOT.TITLE' | translate }}</div>
+        <div class="section-title">
+          {{ 'ANALYSES.PIVOT.TITLE' | translate }}
+        </div>
         <div class="config-row">
           <label>{{ 'ANALYSES.PIVOT.ENABLE' | translate }}</label>
           <app-custom-toggle
@@ -3813,7 +3914,11 @@
 
         <div
           class="rule-card"
-          *ngFor="let rule of conditionalRules; let i = index; trackBy: trackByRuleId"
+          *ngFor="
+            let rule of conditionalRules;
+            let i = index;
+            trackBy: trackByRuleId
+          "
         >
           <div class="rule-card__head">
             <span class="rule-card__title"
@@ -3938,7 +4043,11 @@
           </div>
         </div>
 
-        <button type="button" class="add-rule-btn" (click)="addConditionalRule()">
+        <button
+          type="button"
+          class="add-rule-btn"
+          (click)="addConditionalRule()"
+        >
           <i class="pi pi-plus"></i>
           <span>{{ 'ANALYSES.CF.ADD_RULE' | translate }}</span>
         </button>
@@ -3947,11 +4056,10 @@
       <!-- ═══════════════ REFERENCE LINES & ANNOTATIONS ═══════════════ -->
       <!-- Capability-gated: reference overlays render only on charts whose
            `referenceLines` capability is true (every capable cartesian chart). -->
-      <div
-        class="config-section"
-        *ngIf="isCapable('referenceLines')"
-      >
-        <div class="section-title">{{ 'ANALYSES.REFLINE.TITLE' | translate }}</div>
+      <div class="config-section" *ngIf="isCapable('referenceLines')">
+        <div class="section-title">
+          {{ 'ANALYSES.REFLINE.TITLE' | translate }}
+        </div>
 
         <!-- Reference lines -->
         <div class="subsection-title">
@@ -3959,7 +4067,11 @@
         </div>
         <div
           class="rule-card"
-          *ngFor="let line of referenceLines; let i = index; trackBy: trackByGenId"
+          *ngFor="
+            let line of referenceLines;
+            let i = index;
+            trackBy: trackByGenId
+          "
         >
           <div class="rule-card__head">
             <span class="rule-card__title"
@@ -4053,7 +4165,11 @@
         </div>
         <div
           class="rule-card"
-          *ngFor="let band of referenceBands; let i = index; trackBy: trackByGenId"
+          *ngFor="
+            let band of referenceBands;
+            let i = index;
+            trackBy: trackByGenId
+          "
         >
           <div class="rule-card__head">
             <span class="rule-card__title"
@@ -4173,10 +4289,7 @@
       <!-- Capability-gated: the continuous colour scale is offered only on
            charts whose `colorScale` capability is true (scatter, heat-map,
            tree-map, calendar-heatmap, choropleth, …). -->
-      <div
-        class="config-section"
-        *ngIf="isCapable('colorScale')"
-      >
+      <div class="config-section" *ngIf="isCapable('colorScale')">
         <div class="section-title">
           {{ 'ANALYSES.COLORSCALE.TITLE' | translate }}
         </div>
@@ -4225,7 +4338,9 @@
               <input
                 type="color"
                 class="color-swatch"
-                [ngModel]="(focusedVisual.config.visualMapColors || [])[0] || '#e0f2fe'"
+                [ngModel]="
+                  (focusedVisual.config.visualMapColors || [])[0] || '#e0f2fe'
+                "
                 (ngModelChange)="setVisualMapColor(0, $event)"
               />
             </div>
@@ -4234,7 +4349,9 @@
               <input
                 type="color"
                 class="color-swatch"
-                [ngModel]="(focusedVisual.config.visualMapColors || [])[1] || '#0369a1'"
+                [ngModel]="
+                  (focusedVisual.config.visualMapColors || [])[1] || '#0369a1'
+                "
                 (ngModelChange)="setVisualMapColor(1, $event)"
               />
             </div>

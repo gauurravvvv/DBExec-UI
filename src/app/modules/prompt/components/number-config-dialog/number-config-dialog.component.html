@@ -238,10 +238,7 @@
       (click)="onSave()"
       [disabled]="saving"
     >
-      <i
-        class="pi"
-        [ngClass]="saving ? 'pi-spin pi-spinner' : 'pi-check'"
-      ></i>
+      <i class="pi" [ngClass]="saving ? 'pi-spin pi-spinner' : 'pi-check'"></i>
       {{ 'PROMPT_MODULE.APPLY' | translate }}
     </button>
   </ng-template>

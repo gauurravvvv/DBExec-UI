@@ -178,15 +178,12 @@ export const addDatasetReducer = createReducer(
   }),
 
   // Clear all schemas
-  on(
-    AddDatasetActions.clearAllSchemas,
-    (state): AddDatasetState => ({
-      ...state,
-      schemas: {},
-      accessOrder: [],
-      activeSchemaKey: null,
-    }),
-  ),
+  on(AddDatasetActions.clearAllSchemas, (state): AddDatasetState => ({
+    ...state,
+    schemas: {},
+    accessOrder: [],
+    activeSchemaKey: null,
+  })),
 
   // Refresh schema data - clear existing and reload
   on(

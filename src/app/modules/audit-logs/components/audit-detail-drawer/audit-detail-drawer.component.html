@@ -26,9 +26,15 @@
         <div class="head-text">
           <h3>{{ actionLabel(row.action) }} · {{ moduleLabel(row.module) }}</h3>
           <div class="head-sub">
-            <span class="entity-name" *ngIf="row.entityName">{{ row.entityName }}</span>
-            <span class="entity-name muted" *ngIf="!row.entityName">{{ moduleLabel(row.module) }}</span>
-            <span class="ver-badge" *ngIf="row.assetVersion != null">{{ versionLabel(row) }}</span>
+            <span class="entity-name" *ngIf="row.entityName">{{
+              row.entityName
+            }}</span>
+            <span class="entity-name muted" *ngIf="!row.entityName">{{
+              moduleLabel(row.module)
+            }}</span>
+            <span class="ver-badge" *ngIf="row.assetVersion != null">{{
+              versionLabel(row)
+            }}</span>
           </div>
         </div>
       </div>
@@ -68,10 +74,13 @@
               class="avatar"
               [class.sys]="isSystemActor(row)"
               [attr.aria-hidden]="true"
-            >{{ initials(row) }}</span>
+              >{{ initials(row) }}</span
+            >
             <span class="actor-text">
               <span class="em">{{ actorDisplay(row) }}</span>
-              <span class="actor-type">{{ actorTypeLabel(row.actorType) }}</span>
+              <span class="actor-type">{{
+                actorTypeLabel(row.actorType)
+              }}</span>
             </span>
           </span>
         </dd>
@@ -91,41 +100,71 @@
                Who/What/When/Why/Outcome. The value is the readable endpoint —
                method + resource path with the raw id/query stripped — not the
                full developer URL. -->
-          <span *ngIf="whereSummary(row); else noWhere">{{ whereSummary(row) }}</span>
+          <span *ngIf="whereSummary(row); else noWhere">{{
+            whereSummary(row)
+          }}</span>
           <ng-template #noWhere><span class="muted">—</span></ng-template>
         </dd>
 
         <dt>{{ 'AUDIT.WHY' | translate }}</dt>
         <dd>
-          <span *ngIf="row.justification; else noWhy">{{ row.justification }}</span>
+          <span *ngIf="row.justification; else noWhy">{{
+            row.justification
+          }}</span>
           <ng-template #noWhy><span class="muted">—</span></ng-template>
         </dd>
 
         <dt>{{ 'AUDIT.OUTCOME' | translate }}</dt>
         <dd>
-          <span class="outcome" [class.ok]="row.responseSuccess" [class.fail]="!row.responseSuccess">
-            <i class="pi" [ngClass]="row.responseSuccess ? 'pi-check-circle' : 'pi-times-circle'"></i>
-            {{ row.responseSuccess ? ('AUDIT.SUCCESS' | translate) : ('AUDIT.FAILED' | translate) }}
+          <span
+            class="outcome"
+            [class.ok]="row.responseSuccess"
+            [class.fail]="!row.responseSuccess"
+          >
+            <i
+              class="pi"
+              [ngClass]="
+                row.responseSuccess ? 'pi-check-circle' : 'pi-times-circle'
+              "
+            ></i>
+            {{
+              row.responseSuccess
+                ? ('AUDIT.SUCCESS' | translate)
+                : ('AUDIT.FAILED' | translate)
+            }}
           </span>
         </dd>
       </dl>
 
       <!-- Before → After diff (precomputed changedFields; values are names) -->
       <div class="section" *ngIf="hasDiff(row)">
-        <div class="section-label">{{ 'AUDIT.CHANGED_BEFORE_AFTER' | translate }}</div>
+        <div class="section-label">
+          {{ 'AUDIT.CHANGED_BEFORE_AFTER' | translate }}
+        </div>
         <div class="difftable">
           <div class="dt-head">
             <div>{{ 'AUDIT.FIELD' | translate }}</div>
             <div>{{ 'AUDIT.FROM' | translate }}</div>
             <div>{{ 'AUDIT.TO' | translate }}</div>
           </div>
-          <div class="dt-row" *ngFor="let d of diffRows(row); trackBy: trackByIndex">
+          <div
+            class="dt-row"
+            *ngFor="let d of diffRows(row); trackBy: trackByIndex"
+          >
             <div class="fld">{{ d.label || d.field }}</div>
             <div class="from" [class.empty]="isEmptyValue(d.from)">
-              {{ isEmptyValue(d.from) ? ('AUDIT.NONE' | translate) : displayValue(d.from) }}
+              {{
+                isEmptyValue(d.from)
+                  ? ('AUDIT.NONE' | translate)
+                  : displayValue(d.from)
+              }}
             </div>
             <div class="to" [class.empty]="isEmptyValue(d.to)">
-              {{ isEmptyValue(d.to) ? ('AUDIT.NONE' | translate) : displayValue(d.to) }}
+              {{
+                isEmptyValue(d.to)
+                  ? ('AUDIT.NONE' | translate)
+                  : displayValue(d.to)
+              }}
             </div>
           </div>
         </div>
@@ -135,7 +174,9 @@
       <div class="section" *ngIf="hasSnapshot(row)">
         <div class="section-label">{{ snapshotLabelKey(row) | translate }}</div>
         <dl class="kv-list">
-          <ng-container *ngFor="let item of snapshotRows(row); trackBy: trackByIndex">
+          <ng-container
+            *ngFor="let item of snapshotRows(row); trackBy: trackByIndex"
+          >
             <dt>{{ item.key }}</dt>
             <dd>
               <span *ngIf="item.value; else emptyKv">{{ item.value }}</span>
@@ -147,7 +188,9 @@
 
       <!-- Request context -->
       <div class="section">
-        <div class="section-label">{{ 'AUDIT.REQUEST_CONTEXT' | translate }}</div>
+        <div class="section-label">
+          {{ 'AUDIT.REQUEST_CONTEXT' | translate }}
+        </div>
         <dl class="meta-list">
           <dt>{{ 'AUDIT.IP_ADDRESS' | translate }}</dt>
           <dd>
@@ -157,17 +200,25 @@
 
           <dt>{{ 'AUDIT.USER_AGENT' | translate }}</dt>
           <dd>
-            <span class="mono ua" *ngIf="row.userAgent; else noUa" [title]="row.userAgent">{{ row.userAgent }}</span>
+            <span
+              class="mono ua"
+              *ngIf="row.userAgent; else noUa"
+              [title]="row.userAgent"
+              >{{ row.userAgent }}</span
+            >
             <ng-template #noUa><span class="muted">—</span></ng-template>
           </dd>
 
           <dt>{{ 'AUDIT.CORRELATION' | translate }}</dt>
           <dd>
             <span class="corr" *ngIf="row.correlationId; else standalone">
-              <i class="pi pi-link"></i> {{ 'AUDIT.GROUPED_OPERATION' | translate }}
+              <i class="pi pi-link"></i>
+              {{ 'AUDIT.GROUPED_OPERATION' | translate }}
             </span>
             <ng-template #standalone>
-              <span class="muted">{{ 'AUDIT.STANDALONE_EVENT' | translate }}</span>
+              <span class="muted">{{
+                'AUDIT.STANDALONE_EVENT' | translate
+              }}</span>
             </ng-template>
           </dd>
         </dl>

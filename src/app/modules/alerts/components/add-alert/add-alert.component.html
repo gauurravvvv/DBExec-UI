@@ -60,7 +60,9 @@
 
     <!-- Stepper progress (custom index, mirroring add-organisation) -->
     <div class="steps-container" [ngClass]="'step-' + (currentStep + 1)">
-      <ng-container *ngFor="let step of steps; let i = index; trackBy: trackByIndex">
+      <ng-container
+        *ngFor="let step of steps; let i = index; trackBy: trackByIndex"
+      >
         <div
           class="step"
           [class.active]="currentStep === i"
@@ -91,7 +93,9 @@
             [placeholder]="'ALERTS.ENTER_ALERT_NAME' | translate"
             [required]="true"
             [showError]="
-              !!(alertForm.get('name')?.invalid && alertForm.get('name')?.touched)
+              !!(
+                alertForm.get('name')?.invalid && alertForm.get('name')?.touched
+              )
             "
             [errorMessage]="getNameError() | translate"
             icon="pi-bell"
@@ -309,55 +313,90 @@
       </section>
 
       <!-- Review summary (read-only) -->
-      <section class="form-section review-summary" *ngIf="currentStep === lastStep">
+      <section
+        class="form-section review-summary"
+        *ngIf="currentStep === lastStep"
+      >
         <h3 class="section-title">
           <i class="pi pi-list"></i> {{ 'ALERTS.REVIEW_SUMMARY' | translate }}
         </h3>
         <div class="summary-grid">
           <div class="summary-row">
-            <span class="summary-label">{{ 'ALERTS.ALERT_NAME' | translate }}</span>
-            <span class="summary-value">{{ alertForm.get('name')?.value || '—' }}</span>
+            <span class="summary-label">{{
+              'ALERTS.ALERT_NAME' | translate
+            }}</span>
+            <span class="summary-value">{{
+              alertForm.get('name')?.value || '—'
+            }}</span>
           </div>
           <div class="summary-row">
             <span class="summary-label">{{ 'ALERTS.SOURCE' | translate }}</span>
             <span class="summary-value">{{ sourceTypeLabel }}</span>
           </div>
           <div class="summary-row">
-            <span class="summary-label">{{ 'ALERTS.SCHEDULE' | translate }}</span>
+            <span class="summary-label">{{
+              'ALERTS.SCHEDULE' | translate
+            }}</span>
             <span class="summary-value">
-              {{ alertForm.get('cronExpression')?.value }} · {{ alertForm.get('timezone')?.value }}
+              {{ alertForm.get('cronExpression')?.value }} ·
+              {{ alertForm.get('timezone')?.value }}
             </span>
           </div>
           <div class="summary-row">
-            <span class="summary-label">{{ 'ALERTS.SEVERITY' | translate }}</span>
+            <span class="summary-label">{{
+              'ALERTS.SEVERITY' | translate
+            }}</span>
             <span class="summary-value">{{ severityLabel }}</span>
           </div>
           <div class="summary-row">
-            <span class="summary-label">{{ 'ALERTS.RECIPIENTS' | translate }}</span>
+            <span class="summary-label">{{
+              'ALERTS.RECIPIENTS' | translate
+            }}</span>
             <span class="summary-value">
-              {{ 'ALERTS.SUMMARY_RECIPIENTS'
-                | translate: { users: recipientUsersCount, emails: recipientEmailsCount } }}
+              {{
+                'ALERTS.SUMMARY_RECIPIENTS'
+                  | translate
+                    : {
+                        users: recipientUsersCount,
+                        emails: recipientEmailsCount,
+                      }
+              }}
             </span>
           </div>
           <div class="summary-row">
-            <span class="summary-label">{{ 'ALERTS.CHANNELS' | translate }}</span>
+            <span class="summary-label">{{
+              'ALERTS.CHANNELS' | translate
+            }}</span>
             <span class="summary-value">
-              <span *ngIf="alertForm.get('notifyInApp')?.value" class="channel-chip">
+              <span
+                *ngIf="alertForm.get('notifyInApp')?.value"
+                class="channel-chip"
+              >
                 {{ 'ALERTS.NOTIFY_IN_APP' | translate }}
               </span>
-              <span *ngIf="alertForm.get('notifyEmail')?.value" class="channel-chip">
+              <span
+                *ngIf="alertForm.get('notifyEmail')?.value"
+                class="channel-chip"
+              >
                 {{ 'ALERTS.NOTIFY_EMAIL' | translate }}
               </span>
               <span
-                *ngIf="!alertForm.get('notifyInApp')?.value && !alertForm.get('notifyEmail')?.value"
-              >—</span>
+                *ngIf="
+                  !alertForm.get('notifyInApp')?.value &&
+                  !alertForm.get('notifyEmail')?.value
+                "
+                >—</span
+              >
             </span>
           </div>
         </div>
       </section>
 
       <!-- Test-now result -->
-      <section class="form-section test-result" *ngIf="currentStep === lastStep && testResult">
+      <section
+        class="form-section test-result"
+        *ngIf="currentStep === lastStep && testResult"
+      >
         <div
           class="test-banner"
           [ngClass]="{

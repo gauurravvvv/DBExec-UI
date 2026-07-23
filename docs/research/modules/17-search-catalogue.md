@@ -18,17 +18,17 @@
 
 ## 1. Industry baseline
 
-| Tool | Search surface | Tech | Fuzzy | Semantic |
-|---|---|---|---|---|
-| **Tableau** | "Explore" search across workbooks / datasources | Lucene-ish in-app index | ✓ | ✗ |
-| **Looker** | Search bar in nav | Looker's own index | ✓ | ✗ |
-| **Power BI** | Workspace search + global search | Azure Cog Search | ✓ | partial (recent) |
-| **Notion** | Universal search Cmd-K | Postgres ts_vector + recent custom | ✓ | ✓ ("ask AI") |
-| **Linear** | Cmd-K | Postgres + Algolia hybrid | ✓ | ✓ |
-| **Figma** | Quick search Cmd-/ | Postgres + custom ranking | ✓ | ✗ |
-| **Hex** | Cmd-K across notebooks / projects | Postgres + pgvector | ✓ | ✓ |
-| **Metabase** | Search bar | Postgres ts_vector | ✓ | ✗ |
-| **Superset** | List-page filter only | Postgres ILIKE | ✗ | ✗ |
+| Tool         | Search surface                                  | Tech                               | Fuzzy | Semantic         |
+| ------------ | ----------------------------------------------- | ---------------------------------- | ----- | ---------------- |
+| **Tableau**  | "Explore" search across workbooks / datasources | Lucene-ish in-app index            | ✓     | ✗                |
+| **Looker**   | Search bar in nav                               | Looker's own index                 | ✓     | ✗                |
+| **Power BI** | Workspace search + global search                | Azure Cog Search                   | ✓     | partial (recent) |
+| **Notion**   | Universal search Cmd-K                          | Postgres ts_vector + recent custom | ✓     | ✓ ("ask AI")     |
+| **Linear**   | Cmd-K                                           | Postgres + Algolia hybrid          | ✓     | ✓                |
+| **Figma**    | Quick search Cmd-/                              | Postgres + custom ranking          | ✓     | ✗                |
+| **Hex**      | Cmd-K across notebooks / projects               | Postgres + pgvector                | ✓     | ✓                |
+| **Metabase** | Search bar                                      | Postgres ts_vector                 | ✓     | ✗                |
+| **Superset** | List-page filter only                           | Postgres ILIKE                     | ✗     | ✗                |
 
 **The patterns to copy:**
 
@@ -54,24 +54,24 @@
 
 ## 3. Gap matrix
 
-| ID | Gap | Severity | Effort |
-|---|---|---|---|
-| SR-G01 | Cross-object search (datasets, analyses, dashboards, users) | P0 | M |
-| SR-G02 | Lexical full-text via `ts_vector` + GIN index | P0 | M |
-| SR-G03 | Fuzzy via `pg_trgm` for typos | P0 | S |
-| SR-G04 | Semantic via `pgvector` (embeddings of name + description) | P1 | L |
-| SR-G05 | Boost by recency (last-viewed, last-edited) | P0 | S |
-| SR-G06 | Boost by user affinity (I open X often) | P1 | M |
-| SR-G07 | RLS / permission filter on results | P0 | M |
-| SR-G08 | Tags entity + tag picker UI | P0 | M |
-| SR-G09 | Collections (folder-like grouping) | P1 | M |
-| SR-G10 | Favourites (per-user bookmark) | P0 | S |
-| SR-G11 | Recent items per user | P0 | S |
-| SR-G12 | Saved searches | P1 | S |
-| SR-G13 | "What links here" — inverse references | P1 | M |
-| SR-G14 | Search analytics (popular terms, no-result terms) | P2 | S |
-| SR-G15 | Cmd-K command palette UI | P0 | M |
-| SR-G16 | Keyboard-only result navigation | P0 | S |
+| ID     | Gap                                                         | Severity | Effort |
+| ------ | ----------------------------------------------------------- | -------- | ------ |
+| SR-G01 | Cross-object search (datasets, analyses, dashboards, users) | P0       | M      |
+| SR-G02 | Lexical full-text via `ts_vector` + GIN index               | P0       | M      |
+| SR-G03 | Fuzzy via `pg_trgm` for typos                               | P0       | S      |
+| SR-G04 | Semantic via `pgvector` (embeddings of name + description)  | P1       | L      |
+| SR-G05 | Boost by recency (last-viewed, last-edited)                 | P0       | S      |
+| SR-G06 | Boost by user affinity (I open X often)                     | P1       | M      |
+| SR-G07 | RLS / permission filter on results                          | P0       | M      |
+| SR-G08 | Tags entity + tag picker UI                                 | P0       | M      |
+| SR-G09 | Collections (folder-like grouping)                          | P1       | M      |
+| SR-G10 | Favourites (per-user bookmark)                              | P0       | S      |
+| SR-G11 | Recent items per user                                       | P0       | S      |
+| SR-G12 | Saved searches                                              | P1       | S      |
+| SR-G13 | "What links here" — inverse references                      | P1       | M      |
+| SR-G14 | Search analytics (popular terms, no-result terms)           | P2       | S      |
+| SR-G15 | Cmd-K command palette UI                                    | P0       | M      |
+| SR-G16 | Keyboard-only result navigation                             | P0       | S      |
 
 ## 4. Target architecture
 
@@ -266,7 +266,8 @@ export async function indexDataset(dataset: Dataset, conn: DataSource) {
   const fields = await DatasetField.find({ where: { datasetId: dataset.id } });
   const tagNames = await loadTagNames('dataset', dataset.id);
 
-  await conn.query(`
+  await conn.query(
+    `
     INSERT INTO search_doc (
       organisation_id, object_type, object_id,
       title, subtitle, body, tags,
@@ -282,17 +283,24 @@ export async function indexDataset(dataset: Dataset, conn: DataSource) {
         visibility = EXCLUDED.visibility,
         indexed_at = now()`,
     [
-      dataset.organisationId, dataset.id,
+      dataset.organisationId,
+      dataset.id,
       dataset.name,
       `Dataset · ${fields.length} columns`,
       [dataset.description ?? '', ...fields.map(f => f.name)].join(' '),
       tagNames,
-      dataset.createdBy, dataset.updatedOn, dataset.status,
+      dataset.createdBy,
+      dataset.updatedOn,
+      dataset.status,
       'private',
-    ]);
+    ],
+  );
 
   // Embedding generation is async — enqueue if missing
-  await scheduleQueue.add('search:embed', { docType: 'dataset', docId: dataset.id });
+  await scheduleQueue.add('search:embed', {
+    docType: 'dataset',
+    docId: dataset.id,
+  });
 }
 
 // Similarly for indexAnalysis, indexDashboard, indexUser, indexTag,
@@ -310,7 +318,8 @@ import OpenAI from 'openai';
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 export default async function embedSearchDoc(jobData: {
-  docType: string; docId: string;
+  docType: string;
+  docId: string;
 }) {
   const doc = await SearchDoc.findOne({
     where: { objectType: jobData.docType, objectId: jobData.docId },
@@ -358,15 +367,14 @@ async function search(req: Request, res: Response) {
   }
 
   // Build the tsquery — escape, prefix-match each term
-  const tsq = q.split(/\s+/)
+  const tsq = q
+    .split(/\s+/)
     .map(w => w.replace(/[^\w]/g, ''))
     .filter(Boolean)
     .map(w => `${w}:*`)
     .join(' & ');
 
-  const typesClause = types?.length
-    ? `AND object_type = ANY($3)`
-    : ``;
+  const typesClause = types?.length ? `AND object_type = ANY($3)` : ``;
 
   // Hybrid query — lexical AND fuzzy AND optionally semantic.
   // The ORDER BY combines three signals:
@@ -374,7 +382,8 @@ async function search(req: Request, res: Response) {
   //   2. similarity(title, q) (fuzzy)
   //   3. embedding cosine distance (semantic), if embedding present
   //   4. recency boost
-  const rows = await master_db_connection.query(`
+  const rows = await master_db_connection.query(
+    `
     WITH semantic_ref AS (
       SELECT embedding
       FROM search_doc
@@ -410,12 +419,17 @@ async function search(req: Request, res: Response) {
       recency_rank * 0.3
     ) DESC
     LIMIT $5`,
-    [orgData.id, tsq, types ?? [], q, limit]);
+    [orgData.id, tsq, types ?? [], q, limit],
+  );
 
   // Filter by permission — drop results the user can't open.
   // For now, simple owner-or-shared check. RLS-strict filtering
   // happens on the detail load.
-  const filtered = await filterByPermission(rows, loggedInId, master_db_connection);
+  const filtered = await filterByPermission(
+    rows,
+    loggedInId,
+    master_db_connection,
+  );
 
   // Log the search for analytics
   await SearchEvent.insert({
@@ -436,7 +450,8 @@ async function search(req: Request, res: Response) {
 
 ```ts
 async function recentForUser(userId: string, limit: number, conn: DataSource) {
-  const rows = await conn.query(`
+  const rows = await conn.query(
+    `
     SELECT sd.object_type, sd.object_id, sd.title, sd.subtitle,
            sd.tags, rv.viewed_at
     FROM recent_view rv
@@ -445,21 +460,30 @@ async function recentForUser(userId: string, limit: number, conn: DataSource) {
     WHERE rv.user_id = $1
       AND sd.status = 1
     ORDER BY rv.viewed_at DESC
-    LIMIT $2`, [userId, limit]);
+    LIMIT $2`,
+    [userId, limit],
+  );
   return rows;
 }
 
 // Called from every "view" endpoint (renderDashboard, openAnalysis, ...)
-export async function recordView(userId: string, objectType: string, objectId: string) {
-  await master_db_connection.query(`
+export async function recordView(
+  userId: string,
+  objectType: string,
+  objectId: string,
+) {
+  await master_db_connection.query(
+    `
     INSERT INTO recent_view (user_id, object_type, object_id, viewed_at)
     VALUES ($1, $2, $3, now())
     ON CONFLICT (user_id, object_type, object_id)
     DO UPDATE SET viewed_at = EXCLUDED.viewed_at`,
-    [userId, objectType, objectId]);
+    [userId, objectType, objectId],
+  );
 
   // Prune old: keep only 100 most recent per user
-  await master_db_connection.query(`
+  await master_db_connection.query(
+    `
     DELETE FROM recent_view
     WHERE user_id = $1
       AND viewed_at < (
@@ -467,7 +491,9 @@ export async function recordView(userId: string, objectType: string, objectId: s
         WHERE user_id = $1
         ORDER BY viewed_at DESC
         OFFSET 100 LIMIT 1
-      )`, [userId]);
+      )`,
+    [userId],
+  );
 
   // Also bump view_count on search_doc — debounced via a counter so
   // we don't hammer the row on every render
@@ -482,22 +508,28 @@ export async function recordView(userId: string, objectType: string, objectId: s
 async function createTag(req, res) {
   const { name, displayName, color } = req.body;
   const canonical = name.toLowerCase().replace(/[^a-z0-9_]/g, '_');
-  await Tag.upsert({
-    organisationId: res.locals.orgData.id,
-    name: canonical,
-    displayName,
-    color,
-  }, ['organisationId', 'name']);
+  await Tag.upsert(
+    {
+      organisationId: res.locals.orgData.id,
+      name: canonical,
+      displayName,
+      color,
+    },
+    ['organisationId', 'name'],
+  );
 }
 
 // POST /tags/:id/assign  body: { objectType, objectId }
 async function assignTag(req, res) {
-  await TagAssignment.upsert({
-    tagId: req.params.id,
-    objectType: req.body.objectType,
-    objectId: req.body.objectId,
-    assignedBy: res.locals.loggedInId,
-  }, ['tagId', 'objectType', 'objectId']);
+  await TagAssignment.upsert(
+    {
+      tagId: req.params.id,
+      objectType: req.body.objectType,
+      objectId: req.body.objectId,
+      assignedBy: res.locals.loggedInId,
+    },
+    ['tagId', 'objectType', 'objectId'],
+  );
 
   // Re-index the object to include this tag
   await reIndex(req.body.objectType, req.body.objectId);
@@ -515,6 +547,7 @@ Folder-like structure. A collection can contain any object type:
 ```
 
 Visibility:
+
 - **`private`** — only the owner sees it.
 - **`org`** — everyone in the org can see it.
 - **`public`** — anonymous (via a public link; rare).
@@ -530,11 +563,14 @@ The simplest of the three — just a per-user marker:
 ```ts
 // POST /favourites  body: { objectType, objectId }
 async function addFavourite(req, res) {
-  await Favourite.upsert({
-    userId: res.locals.loggedInId,
-    objectType: req.body.objectType,
-    objectId: req.body.objectId,
-  }, ['userId', 'objectType', 'objectId']);
+  await Favourite.upsert(
+    {
+      userId: res.locals.loggedInId,
+      objectType: req.body.objectType,
+      objectId: req.body.objectId,
+    },
+    ['userId', 'objectType', 'objectId'],
+  );
 }
 ```
 
@@ -548,7 +584,7 @@ async function saveSearch(req, res) {
     name: req.body.name,
     query: req.body.query,
     filters: req.body.filters,
-    shortcutKey: req.body.shortcutKey,    // "1".."9"
+    shortcutKey: req.body.shortcutKey, // "1".."9"
   });
 }
 ```
@@ -569,8 +605,11 @@ async function backReferences(req, res) {
   // For datasets: find analyses with datasetId pointing here, find
   // dashboards via published snapshot referring to those analyses,
   // find RLS rules + subscriptions, etc.
-  const refs = await collectReferences(objectType as string, objectId as string,
-                                       res.locals.master_db_connection);
+  const refs = await collectReferences(
+    objectType as string,
+    objectId as string,
+    res.locals.master_db_connection,
+  );
   return sendResponse(res, true, CODE.SUCCESS, '', { refs });
 }
 ```
@@ -580,22 +619,22 @@ formal lineage graph; back-references are a simpler subset.
 
 ## 5. APIs
 
-| Method | Path | Purpose |
-|---|---|---|
-| GET | `/search?q=...&types=dataset,dashboard&limit=20` | Cross-object search |
-| GET | `/search/recent` | Recent items for current user |
-| POST | `/search/click` | Click telemetry (rank tracking) |
-| GET | `/search/back-references?type&id` | Inverse lineage |
-| GET/POST/DELETE | `/saved-searches` | CRUD |
-| GET/POST/DELETE | `/tags` | CRUD |
-| POST | `/tags/:id/assign` | Add tag to object |
-| DELETE | `/tags/:id/assign` | Remove tag |
-| GET/POST/PUT/DELETE | `/collections` | CRUD |
-| POST | `/collections/:id/items` | Add object to collection |
-| DELETE | `/collections/:id/items/:objType/:id` | Remove object from collection |
-| POST | `/favourites` | Add |
-| DELETE | `/favourites` | Remove |
-| GET | `/favourites` | List mine |
+| Method              | Path                                             | Purpose                         |
+| ------------------- | ------------------------------------------------ | ------------------------------- |
+| GET                 | `/search?q=...&types=dataset,dashboard&limit=20` | Cross-object search             |
+| GET                 | `/search/recent`                                 | Recent items for current user   |
+| POST                | `/search/click`                                  | Click telemetry (rank tracking) |
+| GET                 | `/search/back-references?type&id`                | Inverse lineage                 |
+| GET/POST/DELETE     | `/saved-searches`                                | CRUD                            |
+| GET/POST/DELETE     | `/tags`                                          | CRUD                            |
+| POST                | `/tags/:id/assign`                               | Add tag to object               |
+| DELETE              | `/tags/:id/assign`                               | Remove tag                      |
+| GET/POST/PUT/DELETE | `/collections`                                   | CRUD                            |
+| POST                | `/collections/:id/items`                         | Add object to collection        |
+| DELETE              | `/collections/:id/items/:objType/:id`            | Remove object from collection   |
+| POST                | `/favourites`                                    | Add                             |
+| DELETE              | `/favourites`                                    | Remove                          |
+| GET                 | `/favourites`                                    | List mine                       |
 
 ## 6. FE specs
 
@@ -692,30 +731,46 @@ Subscriptions (0)
 ```ts
 export const searchQuerySchema = z.object({
   q: z.string().max(500).optional(),
-  types: z.string().regex(/^[a-z,]+$/).optional(),
+  types: z
+    .string()
+    .regex(/^[a-z,]+$/)
+    .optional(),
   limit: z.coerce.number().int().min(1).max(100).optional(),
 });
 
 export const createTagSchema = z.object({
-  name: z.string().min(1).max(64).regex(/^[a-z][a-z0-9_-]*$/),
+  name: z
+    .string()
+    .min(1)
+    .max(64)
+    .regex(/^[a-z][a-z0-9_-]*$/),
   displayName: z.string().min(1).max(64),
-  color: z.string().regex(/^#[a-f0-9]{6}$/).optional(),
+  color: z
+    .string()
+    .regex(/^#[a-f0-9]{6}$/)
+    .optional(),
 });
 
 export const createCollectionSchema = z.object({
   name: z.string().min(1).max(100),
   description: z.string().max(500).optional(),
   parentId: z.string().uuid().optional(),
-  visibility: z.enum(['private','org','public']).default('private'),
+  visibility: z.enum(['private', 'org', 'public']).default('private'),
   icon: z.string().max(32).optional(),
-  coverColor: z.string().regex(/^#[a-f0-9]{6}$/).optional(),
+  coverColor: z
+    .string()
+    .regex(/^#[a-f0-9]{6}$/)
+    .optional(),
 });
 
 export const saveSearchSchema = z.object({
   name: z.string().min(1).max(100),
   query: z.string().min(1).max(500),
   filters: z.record(z.string(), z.any()).optional(),
-  shortcutKey: z.string().regex(/^[1-9]$/).optional(),
+  shortcutKey: z
+    .string()
+    .regex(/^[1-9]$/)
+    .optional(),
 });
 ```
 

@@ -81,7 +81,9 @@
                     ? 'warning'
                     : 'neutral'
               "
-              [icon]="db.status === 0 ? 'pi pi-exclamation-triangle' : undefined"
+              [icon]="
+                db.status === 0 ? 'pi pi-exclamation-triangle' : undefined
+              "
               [dot]="db.status === 0 ? undefined : 'currentColor'"
             >
               {{

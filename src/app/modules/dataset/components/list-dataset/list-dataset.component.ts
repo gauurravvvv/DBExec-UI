@@ -240,13 +240,54 @@ export class ListDatasetComponent implements OnInit, OnDestroy {
   private buildColumns(): CustomTableColumn[] {
     const t = (k: string) => this.translate.instant(k);
     return [
-      { colId: 'favourite', header: '', width: '56px', sortable: false, align: 'center' },
-      { colId: 'name', field: 'name', header: t('COMMON.NAME'), width: '224px', frozen: true, filter: 'text' },
-      { colId: 'datasource', field: 'datasource.name', header: t('COMMON.DATASOURCE'), width: '200px', sortable: false },
-      { colId: 'description', field: 'description', header: t('COMMON.DESCRIPTION'), width: '320px', filter: 'text', sortable: false },
-      { colId: 'status', field: 'status', header: t('COMMON.STATUS'), width: '144px' },
-      { colId: 'createdOn', field: 'createdOn', header: t('COMMON.CREATED_ON'), width: '192px' },
-      { colId: 'actions', header: t('COMMON.ACTIONS'), width: '144px', sortable: false },
+      {
+        colId: 'favourite',
+        header: '',
+        width: '56px',
+        sortable: false,
+        align: 'center',
+      },
+      {
+        colId: 'name',
+        field: 'name',
+        header: t('COMMON.NAME'),
+        width: '224px',
+        frozen: true,
+        filter: 'text',
+      },
+      {
+        colId: 'datasource',
+        field: 'datasource.name',
+        header: t('COMMON.DATASOURCE'),
+        width: '200px',
+        sortable: false,
+      },
+      {
+        colId: 'description',
+        field: 'description',
+        header: t('COMMON.DESCRIPTION'),
+        width: '320px',
+        filter: 'text',
+        sortable: false,
+      },
+      {
+        colId: 'status',
+        field: 'status',
+        header: t('COMMON.STATUS'),
+        width: '144px',
+      },
+      {
+        colId: 'createdOn',
+        field: 'createdOn',
+        header: t('COMMON.CREATED_ON'),
+        width: '192px',
+      },
+      {
+        colId: 'actions',
+        header: t('COMMON.ACTIONS'),
+        width: '144px',
+        sortable: false,
+      },
     ];
   }
 
@@ -276,7 +317,6 @@ export class ListDatasetComponent implements OnInit, OnDestroy {
       return { items: [], total: 0 };
     }
   };
-
 
   /* ── adapter wiring ─────────────────────────────────── */
 
@@ -586,7 +626,9 @@ export class ListDatasetComponent implements OnInit, OnDestroy {
   useAsAnalysis(row: any) {
     this.analysisDatasetId = typeof row === 'string' ? row : row?.id;
     this.analysisDatasourceId =
-      typeof row === 'string' ? this.selectedDatasource : (row?.datasourceId ?? null);
+      typeof row === 'string'
+        ? this.selectedDatasource
+        : (row?.datasourceId ?? null);
     this.showCreateAnalysisDialog = true;
   }
 

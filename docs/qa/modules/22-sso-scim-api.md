@@ -60,6 +60,7 @@
 - **AUTH-RT-REUSE-N-01** · Reused refresh token kills all sessions. P0 🟣
 
 ## Regression buckets
+
 - Identity flows → SAML-* and OIDC-*
 - API surface auth → API-*
 - SCIM lifecycle → SCIM-*

@@ -473,8 +473,8 @@ export class VisualsChartSidebarComponent implements OnInit, OnDestroy {
   /** Toggle whether clicking this visual broadcasts a cross-filter. */
   toggleCrossFilterEnabled(): void {
     if (!this.focusedVisual) return;
-    this.focusedVisual.crossFilterEnabled = !this.focusedVisual
-      .crossFilterEnabled;
+    this.focusedVisual.crossFilterEnabled =
+      !this.focusedVisual.crossFilterEnabled;
     this.interactionChanged.emit();
   }
 
@@ -659,7 +659,11 @@ export class VisualsChartSidebarComponent implements OnInit, OnDestroy {
    * transform pipeline's applySortAndLimit reads — no bespoke sort key.
    * 'none' clears sorting. Generalised over any column.
    */
-  setPillSort(role: RoleKey, direction: 'asc' | 'desc' | 'none', op?: any): void {
+  setPillSort(
+    role: RoleKey,
+    direction: 'asc' | 'desc' | 'none',
+    op?: any,
+  ): void {
     const v = this.focusedVisual as any;
     if (!v) return;
     this.encodingWillChange.emit();

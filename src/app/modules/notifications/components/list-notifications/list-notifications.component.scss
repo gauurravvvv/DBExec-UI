@@ -68,7 +68,9 @@
   font-size: var(--fs-control);
   font-weight: var(--fw-medium);
   color: var(--secondary-color);
-  transition: background var(--motion-fast) ease, color var(--motion-fast) ease;
+  transition:
+    background var(--motion-fast) ease,
+    color var(--motion-fast) ease;
 
   &:hover {
     color: var(--text-color);
@@ -253,7 +255,9 @@
     color: var(--secondary-color);
     border-radius: var(--radius-sm);
     cursor: pointer;
-    transition: background var(--motion-fast) ease, color var(--motion-fast) ease;
+    transition:
+      background var(--motion-fast) ease,
+      color var(--motion-fast) ease;
 
     i {
       font-size: var(--fs-control);

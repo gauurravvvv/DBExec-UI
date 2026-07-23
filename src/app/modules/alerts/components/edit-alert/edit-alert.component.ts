@@ -92,20 +92,31 @@ export class EditAlertComponent implements OnInit, HasUnsavedChanges {
 
   /* condition builder inputs */
   fields: ReturnType<typeof buildSourceFieldOptions> = [];
-  distinctFetcher: ((ref: string) => Promise<{ label: string; value: string }[]>) | null = null;
+  distinctFetcher:
+    ((ref: string) => Promise<{ label: string; value: string }[]>) | null =
+    null;
   conditionState: {
     valid: boolean;
     mode: 'builder' | 'expression';
     conditionBuilder: any;
     conditionExpression: string | null;
-  } = { valid: true, mode: 'builder', conditionBuilder: null, conditionExpression: null };
+  } = {
+    valid: true,
+    mode: 'builder',
+    conditionBuilder: null,
+    conditionExpression: null,
+  };
 
   /* recipients */
   preloadedUsers: any[] | null = null;
   preloadedUsersTotal: number | null = null;
 
   /* test-now result */
-  testResult: { breached?: boolean; observedValue?: any; error?: string } | null = null;
+  testResult: {
+    breached?: boolean;
+    observedValue?: any;
+    error?: string;
+  } | null = null;
 
   constructor(
     private fb: FormBuilder,
@@ -157,7 +168,10 @@ export class EditAlertComponent implements OnInit, HasUnsavedChanges {
       notifyInApp: [true],
       notifyEmail: [true],
       cooldownMinutes: [60, [Validators.min(0), Validators.max(10080)]],
-      consecutiveBreachesRequired: [1, [Validators.min(1), Validators.max(100)]],
+      consecutiveBreachesRequired: [
+        1,
+        [Validators.min(1), Validators.max(100)],
+      ],
       enabled: [true],
       filterState: [null],
     });
@@ -279,7 +293,10 @@ export class EditAlertComponent implements OnInit, HasUnsavedChanges {
   }
 
   nextStep(): void {
-    if (this.currentStep < this.lastStep && this.isStepValid(this.currentStep)) {
+    if (
+      this.currentStep < this.lastStep &&
+      this.isStepValid(this.currentStep)
+    ) {
       this.currentStep++;
     }
   }
@@ -303,7 +320,10 @@ export class EditAlertComponent implements OnInit, HasUnsavedChanges {
     try {
       const res: any = await this.datasourceService.listDatasource(params);
       if (this.globalService.handleSuccessService(res, false)) {
-        return { items: res?.data?.datasources ?? [], total: res?.data?.count ?? 0 };
+        return {
+          items: res?.data?.datasources ?? [],
+          total: res?.data?.count ?? 0,
+        };
       }
       return { items: [], total: 0 };
     } catch {
@@ -327,7 +347,10 @@ export class EditAlertComponent implements OnInit, HasUnsavedChanges {
 
   onDatasourceChange(datasourceId: string): void {
     this.selectedDatasource = datasourceId;
-    this.alertForm.patchValue({ sourceId: '', datasourceId: datasourceId || '' });
+    this.alertForm.patchValue({
+      sourceId: '',
+      datasourceId: datasourceId || '',
+    });
     this.preloadedSources = null;
     this.preloadedSourcesTotal = null;
     this.fields = [];
@@ -402,7 +425,8 @@ export class EditAlertComponent implements OnInit, HasUnsavedChanges {
   private checkDirty(): void {
     if (!this.originalFormValue) return;
     this.isFormDirty =
-      JSON.stringify(this.originalFormValue) !== JSON.stringify(this.alertForm.value);
+      JSON.stringify(this.originalFormValue) !==
+      JSON.stringify(this.alertForm.value);
   }
 
   /* -- review-summary helpers -------------------------------------- */
@@ -432,7 +456,11 @@ export class EditAlertComponent implements OnInit, HasUnsavedChanges {
   }
 
   get canSave(): boolean {
-    return this.alertForm.valid && this.conditionState.valid && !!this.selectedDatasource;
+    return (
+      this.alertForm.valid &&
+      this.conditionState.valid &&
+      !!this.selectedDatasource
+    );
   }
 
   /* -- test now ---------------------------------------------------- */
@@ -455,7 +483,9 @@ export class EditAlertComponent implements OnInit, HasUnsavedChanges {
         this.cdr.markForCheck();
       })
       .catch(() => {
-        this.testResult = { error: this.translate.instant('ALERTS.TEST_FAILED') };
+        this.testResult = {
+          error: this.translate.instant('ALERTS.TEST_FAILED'),
+        };
         this.cdr.markForCheck();
       });
   }

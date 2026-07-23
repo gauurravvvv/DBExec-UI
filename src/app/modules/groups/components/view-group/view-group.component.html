@@ -33,7 +33,9 @@
           <button
             class="btn-danger"
             type="button"
-            [disabled]="groupData.canDelete === false || isDeleting(groupData.id)"
+            [disabled]="
+              groupData.canDelete === false || isDeleting(groupData.id)
+            "
             [pTooltip]="
               groupData.canDelete === false
                 ? ('GROUP.CANNOT_DELETE_DEFAULT' | translate)
@@ -71,10 +73,7 @@
               <label>{{ 'COMMON.NAME' | translate }}</label>
               <p>
                 {{ groupData.name }}
-                <span
-                  *ngIf="groupData.isDefault === 1"
-                  class="default-badge"
-                >
+                <span *ngIf="groupData.isDefault === 1" class="default-badge">
                   {{ 'GROUP.DEFAULT' | translate }}
                 </span>
               </p>
@@ -145,7 +144,6 @@
             </div>
           </div>
         </div>
-
       </div>
     </div>
   </div>
@@ -163,7 +161,9 @@
       <div class="popup-icon">
         <i class="pi pi-trash"></i>
       </div>
-      <h3 id="viewGroupDeleteTitle">{{ 'COMMON.CONFIRM_DELETE' | translate }}</h3>
+      <h3 id="viewGroupDeleteTitle">
+        {{ 'COMMON.CONFIRM_DELETE' | translate }}
+      </h3>
     </div>
 
     <!-- Delete Info Section -->
@@ -213,8 +213,7 @@
         class="btn-confirm"
         (click)="proceedDelete()"
         [disabled]="
-          !deleteJustification.trim() ||
-          (groupData && isDeleting(groupData.id))
+          !deleteJustification.trim() || (groupData && isDeleting(groupData.id))
         "
       >
         <i

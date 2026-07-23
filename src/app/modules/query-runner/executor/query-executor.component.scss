@@ -126,13 +126,19 @@ $qx-btn-h: 34px;
     transition: all var(--motion-base) ease;
     box-shadow: none;
 
-    .pi { font-size: 0.95rem; }
+    .pi {
+      font-size: 0.95rem;
+    }
   }
 
   // Primary Run — the ONE strong accent in the toolbar (matches dataset/new
   // .btn-run exactly: 135° gradient, soft primary shadow, hover lift).
   ::ng-deep .qx-run-btn.p-button.p-button-primary:not(#_) {
-    background: linear-gradient(135deg, var(--primary-color), var(--primary-hover)) !important;
+    background: linear-gradient(
+      135deg,
+      var(--primary-color),
+      var(--primary-hover)
+    ) !important;
     border: 1px solid transparent !important;
     color: #fff !important;
     padding: 0 1rem !important;
@@ -142,7 +148,11 @@ $qx-btn-h: 34px;
       transform: translateY(-1px);
       box-shadow: var(--shadow-md);
     }
-    &:disabled { opacity: 0.55; box-shadow: none; transform: none; }
+    &:disabled {
+      opacity: 0.55;
+      box-shadow: none;
+      transform: none;
+    }
   }
 
   // Labelled secondary (Format) — flat/ghost text button (matches dataset/new
@@ -163,7 +173,9 @@ $qx-btn-h: 34px;
       background: var(--hover-background) !important;
       border-color: transparent !important;
     }
-    &:disabled { opacity: 0.5; }
+    &:disabled {
+      opacity: 0.5;
+    }
   }
 
   // Icon-only — flat/ghost (matches dataset/new .btn-export etc): transparent,
@@ -202,7 +214,9 @@ $qx-btn-h: 34px;
       border-color: transparent !important;
     }
 
-    &:disabled { opacity: 0.45; }
+    &:disabled {
+      opacity: 0.45;
+    }
   }
 
   .qx-sep {
@@ -270,7 +284,9 @@ $qx-btn-h: 34px;
     border: 1px solid var(--border-color);
     color: var(--text-muted);
 
-    .pi { font-size: 0.9rem; }
+    .pi {
+      font-size: 0.9rem;
+    }
 
     &:hover {
       border-color: var(--primary-color);
@@ -281,7 +297,10 @@ $qx-btn-h: 34px;
       background: var(--warning-bg);
       border-color: var(--warning-color);
       color: var(--warning-color);
-      &:hover { background: var(--warning-bg); color: var(--warning-color); }
+      &:hover {
+        background: var(--warning-bg);
+        color: var(--warning-color);
+      }
     }
   }
 }
@@ -307,8 +326,12 @@ $qx-btn-h: 34px;
   animation: qxFade 0.15s ease-out;
 }
 @keyframes qxFade {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 .qx-palette {
@@ -329,7 +352,9 @@ $qx-btn-h: 34px;
     gap: 0.5rem;
     padding: 0.75rem 1rem;
     border-bottom: 1px solid var(--border-color);
-    i { color: var(--text-muted); }
+    i {
+      color: var(--text-muted);
+    }
     input {
       flex: 1;
       border: none;
@@ -357,9 +382,16 @@ $qx-btn-h: 34px;
     font-size: var(--fs-control);
     cursor: pointer;
     text-align: left;
-    &:hover { background: var(--hover-background); }
-    i { color: var(--text-muted); width: 1rem; }
-    .qx-palette-label { flex: 1; }
+    &:hover {
+      background: var(--hover-background);
+    }
+    i {
+      color: var(--text-muted);
+      width: 1rem;
+    }
+    .qx-palette-label {
+      flex: 1;
+    }
     .qx-palette-hint {
       color: var(--text-muted);
       font-size: var(--fs-label);
@@ -392,7 +424,9 @@ $qx-btn-h: 34px;
     color: var(--text-muted);
     line-height: 1.5;
   }
-  .qx-goto-actions { flex-wrap: wrap; }
+  .qx-goto-actions {
+    flex-wrap: wrap;
+  }
 }
 
 // Save-query prompt reuses the goto-box shell; adds a name+description form,
@@ -436,7 +470,9 @@ $qx-btn-h: 34px;
         color: var(--primary-color);
         box-shadow: var(--shadow-sm);
       }
-      &:hover:not(.active) { color: var(--text-color); }
+      &:hover:not(.active) {
+        color: var(--text-color);
+      }
     }
   }
 
@@ -463,14 +499,19 @@ $qx-btn-h: 34px;
       font-family: var(--font-ui);
       color: var(--text-color);
       background: var(--card-background);
-      &::placeholder { color: var(--text-subtle); }
+      &::placeholder {
+        color: var(--text-subtle);
+      }
       &:focus {
         outline: none;
         border-color: var(--primary-color);
         box-shadow: 0 0 0 2px var(--primary-color-transparent);
       }
     }
-    textarea { resize: vertical; min-height: 64px; }
+    textarea {
+      resize: vertical;
+      min-height: 64px;
+    }
   }
 }
 
@@ -491,7 +532,10 @@ $qx-btn-h: 34px;
     font-size: var(--fs-body);
     color: var(--text-color);
     background: var(--card-background);
-    &:focus { outline: none; border-color: var(--primary-color); }
+    &:focus {
+      outline: none;
+      border-color: var(--primary-color);
+    }
   }
   .qx-goto-actions {
     display: flex;
@@ -511,10 +555,16 @@ $qx-btn-h: 34px;
     background: var(--card-background);
     border: 1px solid var(--border-color);
     color: var(--text-color);
-    &:hover { background: var(--hover-background); }
+    &:hover {
+      background: var(--hover-background);
+    }
   }
   .qx-btn-primary {
-    background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+    background: linear-gradient(
+      135deg,
+      var(--primary-color),
+      var(--primary-hover)
+    );
     border: none;
     color: #fff;
   }
@@ -604,7 +654,9 @@ $qx-btn-h: 34px;
   background: transparent;
   color: var(--qx-muted);
   cursor: pointer;
-  &:hover:not(:disabled) { color: var(--qx-accent); }
+  &:hover:not(:disabled) {
+    color: var(--qx-accent);
+  }
 }
 .qx-tree {
   flex: 1;
@@ -626,10 +678,21 @@ $qx-btn-h: 34px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  &:hover { background: var(--qx-bg); }
-  &.indent { padding-left: 1.4rem; }
-  > .pi:first-child { font-size: 0.6rem; color: var(--qx-muted); }
-  .qx-node-spin { margin-left: auto; font-size: var(--fs-label); color: var(--qx-accent); }
+  &:hover {
+    background: var(--qx-bg);
+  }
+  &.indent {
+    padding-left: 1.4rem;
+  }
+  > .pi:first-child {
+    font-size: 0.6rem;
+    color: var(--qx-muted);
+  }
+  .qx-node-spin {
+    margin-left: auto;
+    font-size: var(--fs-label);
+    color: var(--qx-accent);
+  }
 }
 .qx-mini-hint {
   padding: 3px 0.75rem 3px 2.4rem;
@@ -644,7 +707,9 @@ $qx-btn-h: 34px;
   color: var(--qx-muted);
   cursor: pointer;
   font-size: var(--fs-label);
-  &:hover { color: var(--qx-accent); }
+  &:hover {
+    color: var(--qx-accent);
+  }
 }
 .qx-node.group {
   color: var(--qx-muted);
@@ -661,11 +726,21 @@ $qx-btn-h: 34px;
   border-radius: 999px;
   padding: 0 6px;
 }
-.qx-node.indent2 { padding-left: 2.2rem; }
-.qx-node.leaf { cursor: pointer; }
-.qx-twist { cursor: pointer; }
-.qx-node .qx-node-spin { margin-left: auto; }
-.qx-cols { padding-left: 0.4rem; }
+.qx-node.indent2 {
+  padding-left: 2.2rem;
+}
+.qx-node.leaf {
+  cursor: pointer;
+}
+.qx-twist {
+  cursor: pointer;
+}
+.qx-node .qx-node-spin {
+  margin-left: auto;
+}
+.qx-cols {
+  padding-left: 0.4rem;
+}
 .qx-col {
   display: flex;
   align-items: center;
@@ -673,11 +748,24 @@ $qx-btn-h: 34px;
   padding: 2px 0.75rem 2px 2.4rem;
   cursor: pointer;
   font-size: var(--fs-control);
-  &:hover { background: var(--qx-bg); }
-  .pi { font-size: 0.55rem; color: var(--qx-muted); }
-  .pi-key { color: var(--warning-color); }
-  .qx-col-name { color: var(--qx-text); }
-  .qx-col-type { margin-left: auto; color: var(--qx-muted); font-size: var(--fs-label); }
+  &:hover {
+    background: var(--qx-bg);
+  }
+  .pi {
+    font-size: 0.55rem;
+    color: var(--qx-muted);
+  }
+  .pi-key {
+    color: var(--warning-color);
+  }
+  .qx-col-name {
+    color: var(--qx-text);
+  }
+  .qx-col-type {
+    margin-left: auto;
+    color: var(--qx-muted);
+    font-size: var(--fs-label);
+  }
 }
 
 /* editor + results */
@@ -698,7 +786,9 @@ $qx-btn-h: 34px;
 }
 .qx-editor-host {
   height: 100%;
-  :global(.cm-editor) { height: 100%; }
+  :global(.cm-editor) {
+    height: 100%;
+  }
 
   // ── Find/replace: a compact floating card top-right of the editor ──
   // Our custom CM panel (search-panel.ts, class .qx-find) mounts inside
@@ -745,9 +835,13 @@ $qx-btn-h: 34px;
       font-size: var(--fs-control);
       padding: 0 var(--space-4);
       outline: none;
-      transition: border-color var(--motion-base) ease, box-shadow var(--motion-base) ease;
+      transition:
+        border-color var(--motion-base) ease,
+        box-shadow var(--motion-base) ease;
 
-      &::placeholder { color: var(--text-muted); }
+      &::placeholder {
+        color: var(--text-muted);
+      }
       &:focus {
         border-color: var(--primary-color);
         box-shadow: 0 0 0 3px var(--primary-color-transparent);
@@ -774,7 +868,10 @@ $qx-btn-h: 34px;
       cursor: pointer;
       transition: all var(--motion-base) ease;
 
-      &:hover { background: var(--hover-background); color: var(--text-color); }
+      &:hover {
+        background: var(--hover-background);
+        color: var(--text-color);
+      }
       // Enabled flag — primary tint, matching the toolbar's .qx-active.
       &.on {
         background: var(--primary-color-transparent);
@@ -790,7 +887,9 @@ $qx-btn-h: 34px;
       font-size: var(--fs-label);
       font-variant-numeric: tabular-nums;
       color: var(--text-muted);
-      &.empty { color: var(--error-color); }
+      &.empty {
+        color: var(--error-color);
+      }
     }
 
     // Prev / next / close — flat/ghost icon buttons (toolbar language).
@@ -812,9 +911,17 @@ $qx-btn-h: 34px;
       cursor: pointer;
       transition: all var(--motion-base) ease;
 
-      .pi { font-size: 0.8rem; }
-      &:hover { background: var(--hover-background); color: var(--primary-color); }
-      &.qx-find-close:hover { color: var(--error-color); background: var(--error-bg); }
+      .pi {
+        font-size: 0.8rem;
+      }
+      &:hover {
+        background: var(--hover-background);
+        color: var(--primary-color);
+      }
+      &.qx-find-close:hover {
+        color: var(--error-color);
+        background: var(--error-bg);
+      }
     }
 
     // Replace / Replace-all — flat text buttons.
@@ -870,7 +977,9 @@ $qx-btn-h: 34px;
     font-size: var(--fs-body);
     font-weight: var(--fw-semibold);
     box-shadow: var(--shadow-md);
-    i { font-size: 1.75rem; }
+    i {
+      font-size: 1.75rem;
+    }
   }
 }
 .qx-results {
@@ -930,8 +1039,12 @@ $qx-btn-h: 34px;
     background: var(--card-background);
     color: var(--text-color);
     width: 180px;
-    transition: border-color var(--motion-base) ease, box-shadow var(--motion-base) ease;
-    &::placeholder { color: var(--text-muted); }
+    transition:
+      border-color var(--motion-base) ease,
+      box-shadow var(--motion-base) ease;
+    &::placeholder {
+      color: var(--text-muted);
+    }
     &:focus {
       outline: none;
       border-color: var(--primary-color);
@@ -964,7 +1077,9 @@ $qx-btn-h: 34px;
     justify-content: center;
     cursor: pointer;
     transition: all var(--motion-base) ease;
-    .pi { font-size: var(--icon-sm); }
+    .pi {
+      font-size: var(--icon-sm);
+    }
     &:hover {
       color: var(--primary-color);
       background: var(--hover-background);
@@ -997,9 +1112,16 @@ $qx-btn-h: 34px;
   flex-shrink: 0;
   background: var(--secondary-background);
 
-  .qx-ctx-count { color: var(--text-color); font-weight: var(--fw-semibold); }
-  .qx-ctx-sep { opacity: 0.5; }
-  .qx-ctx-time { font-variant-numeric: tabular-nums; }
+  .qx-ctx-count {
+    color: var(--text-color);
+    font-weight: var(--fw-semibold);
+  }
+  .qx-ctx-sep {
+    opacity: 0.5;
+  }
+  .qx-ctx-time {
+    font-variant-numeric: tabular-nums;
+  }
   // "Server-side" chip — soft primary, flags that sort/filter/page hit the DB.
   .qx-ctx-mode {
     display: inline-flex;
@@ -1012,7 +1134,9 @@ $qx-btn-h: 34px;
     background: var(--primary-color-transparent);
     color: var(--primary-color);
     cursor: default;
-    i { font-size: var(--fs-label); }
+    i {
+      font-size: var(--fs-label);
+    }
   }
   .qx-ctx-trunc {
     display: inline-flex;
@@ -1020,7 +1144,9 @@ $qx-btn-h: 34px;
     gap: var(--space-2);
     margin-left: auto;
     color: var(--warning-color);
-    i { font-size: var(--fs-label); }
+    i {
+      font-size: var(--fs-label);
+    }
   }
   .qx-ctx-spin {
     margin-left: auto;
@@ -1068,10 +1194,16 @@ $qx-btn-h: 34px;
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
-  &:hover { background: var(--qx-bg); }
+  &:hover {
+    background: var(--qx-bg);
+  }
 }
-.qx-cursor { font-variant-numeric: tabular-nums; }
-.qx-sep-dot { opacity: 0.5; }
+.qx-cursor {
+  font-variant-numeric: tabular-nums;
+}
+.qx-sep-dot {
+  opacity: 0.5;
+}
 .qx-result-empty,
 .qx-result-loading {
   height: 100%;
@@ -1082,10 +1214,16 @@ $qx-btn-h: 34px;
   gap: var(--space-5);
   color: var(--text-muted);
   font-size: var(--fs-control);
-  i { font-size: var(--icon-xl); opacity: 0.55; }
+  i {
+    font-size: var(--icon-xl);
+    opacity: 0.55;
+  }
 }
 // Running state — same calm centred layout; spinner uses the accent.
-.qx-result-loading i { color: var(--primary-color); opacity: 1; }
+.qx-result-loading i {
+  color: var(--primary-color);
+  opacity: 1;
+}
 .qx-msg {
   display: flex;
   align-items: center;
@@ -1102,7 +1240,9 @@ $qx-btn-h: 34px;
     gap: 0.5rem;
     color: var(--qx-error);
     font-size: var(--fs-body);
-    strong { font-family: ui-monospace, monospace; }
+    strong {
+      font-family: ui-monospace, monospace;
+    }
   }
   .qx-error-hint {
     margin-top: 0.4rem;
@@ -1132,7 +1272,9 @@ $qx-btn-h: 34px;
       font-size: var(--fs-control);
       font-weight: var(--fw-semibold);
       color: var(--qx-text);
-      i { color: var(--qx-accent); }
+      i {
+        color: var(--qx-accent);
+      }
     }
   }
   .qx-plan-tree {
@@ -1150,12 +1292,17 @@ $qx-btn-h: 34px;
     padding: 3px 0.75rem;
     white-space: nowrap;
     border-left: 2px solid transparent;
-    &:hover { background: var(--qx-bg); border-left-color: var(--qx-accent); }
+    &:hover {
+      background: var(--qx-bg);
+      border-left-color: var(--qx-accent);
+    }
     .qx-plan-op {
       color: var(--qx-accent);
       font-weight: var(--fw-semibold);
     }
-    .qx-plan-rel { color: var(--qx-text); }
+    .qx-plan-rel {
+      color: var(--qx-text);
+    }
     .qx-plan-cost {
       margin-left: auto;
       color: var(--qx-muted);
@@ -1172,7 +1319,9 @@ $qx-btn-h: 34px;
       font-size: var(--fs-control);
       color: var(--qx-muted);
       user-select: none;
-      &:hover { color: var(--qx-text); }
+      &:hover {
+        color: var(--qx-text);
+      }
     }
     pre {
       margin: 0;
@@ -1195,7 +1344,9 @@ $qx-btn-h: 34px;
     align-items: center;
     gap: 2px;
   }
-  &:hover .qx-node-actions { display: inline-flex; }
+  &:hover .qx-node-actions {
+    display: inline-flex;
+  }
   .qx-node-act {
     border: none;
     background: transparent;
@@ -1204,8 +1355,14 @@ $qx-btn-h: 34px;
     padding: 1px 4px;
     border-radius: var(--radius-xs);
     font-size: var(--fs-control);
-    &:hover:not(:disabled) { color: var(--qx-accent); background: var(--qx-bg); }
-    &:disabled { opacity: 0.4; cursor: not-allowed; }
+    &:hover:not(:disabled) {
+      color: var(--qx-accent);
+      background: var(--qx-bg);
+    }
+    &:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
   }
 }
 .qx-trigger-table {
@@ -1239,8 +1396,12 @@ $qx-btn-h: 34px;
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  &.read { background: var(--qx-muted); }
-  &.write { background: var(--warning-color); }
+  &.read {
+    background: var(--qx-muted);
+  }
+  &.write {
+    background: var(--warning-color);
+  }
 }
 
 /* NOTE: All CodeMirror chrome (autocomplete popup, find/replace panel, base

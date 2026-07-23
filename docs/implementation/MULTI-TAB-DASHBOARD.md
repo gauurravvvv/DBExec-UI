@@ -43,7 +43,7 @@ can disagree before reading 2000 lines of code based on them.
   the only thing resolved live). We preserve that. Adding tabs
   doesn't make dashboards live; it just adds another nesting level
   in the snapshot.
-- **Filter scope is a *declaration*, not a *target*.** A filter says
+- **Filter scope is a _declaration_, not a _target_.** A filter says
   "I want to participate in queries at scope X with these
   optional exclusions." It does not directly list visuals. This
   matches Tableau / Power BI semantics and lets us add visuals to
@@ -52,10 +52,10 @@ can disagree before reading 2000 lines of code based on them.
   of filters that hit a given visual is computed at render time as
   the intersection of (dashboard-global ∪ tab-scope ∪ visual-scope)
   minus per-filter exclusions. The visual never sees a filter
-  *added* by a child scope that conflicts with what the parent
+  _added_ by a child scope that conflicts with what the parent
   declared — that path is explicitly forbidden, see §2.
-- **No new visualisation work.** This doc focuses on *containment*
-  and *filter routing*. Charts already render. Tabs are containers.
+- **No new visualisation work.** This doc focuses on _containment_
+  and _filter routing_. Charts already render. Tabs are containers.
 - **One commit per moving piece.** The migration plus the
   contract change is enough to get wrong; the implementation lands
   behind a feature flag so the old single-page dashboard keeps
@@ -108,7 +108,7 @@ Three reasons:
    place to enforce uniqueness within a scope.
 2. **Filter definition is identical across scopes** — `columnName`,
    `filterType`, `controlType`, `config`, `nullOption`, `defaultValue`.
-   Only the *targeting* differs. Three tables would carry identical
+   Only the _targeting_ differs. Three tables would carry identical
    columns and accrete drift over time (we've already seen
    `analysis_filter` and the old `dashboard_filter` diverge despite
    wanting to be the same thing).
@@ -125,11 +125,11 @@ fixed three-element lookup, no perf concern.
 
 The semantics that the resolver implements:
 
-| Scope | Default reach | excludeRefs meaning |
-|---|---|---|
-| `dashboard` | every visual on every tab | visual ids to *exclude* |
-| `tab` | every visual on the named tab | visual ids to exclude within that tab |
-| `visual` | exactly one visual | always empty; the visualId is in `scopeRef` |
+| Scope       | Default reach                 | excludeRefs meaning                         |
+| ----------- | ----------------------------- | ------------------------------------------- |
+| `dashboard` | every visual on every tab     | visual ids to _exclude_                     |
+| `tab`       | every visual on the named tab | visual ids to exclude within that tab       |
+| `visual`    | exactly one visual            | always empty; the visualId is in `scopeRef` |
 
 ### 2.1 Composition rules
 
@@ -158,7 +158,7 @@ same column from different scopes are independent — they both run
 in the WHERE chain, AND-composed. This is deliberate: a
 dashboard-global "year = 2026" combined with a tab-level
 "region = APAC" should compose; a tab-level "year = 2025" should
-*not* silently override the dashboard-global "year = 2026".
+_not_ silently override the dashboard-global "year = 2026".
 
 ### 2.2 Mandatory filters
 
@@ -548,7 +548,9 @@ export const reorderDashboardTabsSchema = z.object({
     .array(idSchema('validation.dashboard.tab.id.required'))
     .min(1, { message: 'validation.dashboard.tab.reorder.empty' }),
 });
-export type ReorderDashboardTabsInput = z.infer<typeof reorderDashboardTabsSchema>;
+export type ReorderDashboardTabsInput = z.infer<
+  typeof reorderDashboardTabsSchema
+>;
 
 // ── Filter scope refinements on the existing dashboard_filter ─────
 
@@ -615,10 +617,7 @@ export const addDashboardFilterSchema = z
     isMandatory: z.boolean().optional().default(false),
     isEnabled: z.boolean().optional().default(true),
     // NEW —
-    scope: z
-      .enum(DASHBOARD_FILTER_SCOPES)
-      .optional()
-      .default('dashboard'),
+    scope: z.enum(DASHBOARD_FILTER_SCOPES).optional().default('dashboard'),
     scopeRef: z.string().uuid().optional(),
     excludeRefs: z.array(z.string().uuid()).optional().default([]),
   })
@@ -665,7 +664,9 @@ export const updateDashboardFilterSchema = z
     justification: analysisJustificationSchema,
   })
   .superRefine(scopeAndRefRule);
-export type UpdateDashboardFilterInput = z.infer<typeof updateDashboardFilterSchema>;
+export type UpdateDashboardFilterInput = z.infer<
+  typeof updateDashboardFilterSchema
+>;
 
 /**
  * Render request shape — used by GET /:dashboardId/render and the
@@ -687,7 +688,9 @@ export const dashboardRenderRequestSchema = z.object({
    */
   filterValues: z.record(z.string().uuid(), z.any()).optional(),
 });
-export type DashboardRenderRequest = z.infer<typeof dashboardRenderRequestSchema>;
+export type DashboardRenderRequest = z.infer<
+  typeof dashboardRenderRequestSchema
+>;
 ```
 
 ### 5.1 i18n keys (add to `src/assets/i18n/*.json`)
@@ -721,7 +724,7 @@ extends this with three changes — none invasive:
    rows, not in `dashboard.snapshot`.
    - Why: tabs are admin-curated containers, and their lifecycle is
      decoupled from the underlying analysis state. The visual
-     options inside *are* frozen at publish; the tab itself is just
+     options inside _are_ frozen at publish; the tab itself is just
      where they live.
 2. **Visuals on publish get assigned to a tab.** The publish
    payload now requires a `visualToTabMap` (visualId → tabId). If
@@ -759,8 +762,8 @@ interface PublishOptions {
    * `visualToTabMap` to use real ids.
    */
   tabs?: Array<{
-    tempId?: string;        // FE-supplied placeholder for new tabs
-    id?: string;            // existing tab id (republish case)
+    tempId?: string; // FE-supplied placeholder for new tabs
+    id?: string; // existing tab id (republish case)
     name: string;
     description?: string;
     icon?: string;
@@ -823,8 +826,7 @@ import sendResponse from '../../../shared/utility/response';
 
 const addDashboardTab = async (req: Request, res: Response) => {
   Logger.info('Add Dashboard Tab request');
-  const { dashboardId, name, description, icon, sequence, isHidden } =
-    req.body;
+  const { dashboardId, name, description, icon, sequence, isHidden } = req.body;
   const { loggedInId, orgData, master_db_connection } = res.locals;
 
   try {
@@ -882,7 +884,7 @@ const addDashboardTab = async (req: Request, res: Response) => {
             .select('COALESCE(MAX(t.sequence), -1)', 'maxSeq')
             .where('t.dashboardId = :dashboardId', { dashboardId })
             .getRawOne<{ maxSeq: string }>();
-          targetSeq = (Number(max?.maxSeq ?? -1) + 1) || 0;
+          targetSeq = Number(max?.maxSeq ?? -1) + 1 || 0;
         }
 
         const tab = tabRepo.create({
@@ -942,7 +944,12 @@ const updateDashboardTab = async (req: Request, res: Response) => {
       .getRepository(DashboardTab)
       .findOne({ where: { id, organisationId: orgData.id } });
     if (!tab)
-      return sendResponse(res, false, CODE.NOT_FOUND, DASHBOARD_MSG.TAB_NOT_FOUND);
+      return sendResponse(
+        res,
+        false,
+        CODE.NOT_FOUND,
+        DASHBOARD_MSG.TAB_NOT_FOUND,
+      );
 
     if (tab.isDefault && req.body.name && req.body.name !== tab.name) {
       // The default tab can be renamed, but the rename is audited
@@ -952,7 +959,10 @@ const updateDashboardTab = async (req: Request, res: Response) => {
     const oldSnapshot = snapshotEntity(tab, AUDIT_FIELDS.DASHBOARD_TAB);
 
     // Sequence change inline? Reject — use reorderDashboardTabs.
-    if (typeof req.body.sequence === 'number' && req.body.sequence !== tab.sequence) {
+    if (
+      typeof req.body.sequence === 'number' &&
+      req.body.sequence !== tab.sequence
+    ) {
       return sendResponse(
         res,
         false,
@@ -964,14 +974,16 @@ const updateDashboardTab = async (req: Request, res: Response) => {
     if (req.body.name) tab.name = req.body.name;
     if ('description' in req.body) tab.description = req.body.description;
     if ('icon' in req.body) tab.icon = req.body.icon;
-    if (typeof req.body.isHidden === 'boolean') tab.isHidden = req.body.isHidden;
+    if (typeof req.body.isHidden === 'boolean')
+      tab.isHidden = req.body.isHidden;
     tab.updatedBy = loggedInId;
 
     await master_db_connection.getRepository(DashboardTab).save(tab);
 
     await auditLogger.logAuditToOrg({
       connection: master_db_connection,
-      req, res,
+      req,
+      res,
       module: AUDIT_MODULES.DASHBOARD,
       action: AUDIT_ACTIONS.UPDATE,
       entityName: 'DashboardTab',
@@ -983,7 +995,9 @@ const updateDashboardTab = async (req: Request, res: Response) => {
       },
     });
 
-    return sendResponse(res, true, CODE.SUCCESS, DASHBOARD_MSG.TAB_UPDATED, { tab });
+    return sendResponse(res, true, CODE.SUCCESS, DASHBOARD_MSG.TAB_UPDATED, {
+      tab,
+    });
   } catch (error) {
     Logger.error(`updateDashboardTab error: ${getErrorMessage(error)}`);
     return sendResponse(res, false, CODE.SERVER_ERROR, GENERIC.SERVER_ERROR);
@@ -1015,7 +1029,12 @@ const deleteDashboardTab = async (req: Request, res: Response) => {
       where: { id, organisationId: orgData.id },
     });
     if (!tab)
-      return sendResponse(res, false, CODE.NOT_FOUND, DASHBOARD_MSG.TAB_NOT_FOUND);
+      return sendResponse(
+        res,
+        false,
+        CODE.NOT_FOUND,
+        DASHBOARD_MSG.TAB_NOT_FOUND,
+      );
 
     const visibleSiblings = await master_db_connection
       .getRepository(DashboardTab)
@@ -1050,7 +1069,7 @@ const deleteDashboardTab = async (req: Request, res: Response) => {
       }
     }
 
-    await master_db_connection.manager.transaction(async (manager) => {
+    await master_db_connection.manager.transaction(async manager => {
       // Cascade visuals on this tab — soft-delete each.
       await manager.query(
         `UPDATE dashboard_visual
@@ -1081,7 +1100,8 @@ const deleteDashboardTab = async (req: Request, res: Response) => {
 
     await auditLogger.logAuditToOrg({
       connection: master_db_connection,
-      req, res,
+      req,
+      res,
       module: AUDIT_MODULES.DASHBOARD,
       action: AUDIT_ACTIONS.DELETE,
       entityName: 'DashboardTab',
@@ -1118,12 +1138,10 @@ const listDashboardTabs = async (req: Request, res: Response) => {
     if (!dashboard)
       return sendResponse(res, false, CODE.NOT_FOUND, DASHBOARD_MSG.NOT_FOUND);
 
-    const tabs = await master_db_connection
-      .getRepository(DashboardTab)
-      .find({
-        where: { dashboardId, organisationId: orgData.id },
-        order: { sequence: 'ASC' },
-      });
+    const tabs = await master_db_connection.getRepository(DashboardTab).find({
+      where: { dashboardId, organisationId: orgData.id },
+      order: { sequence: 'ASC' },
+    });
 
     return sendResponse(res, true, CODE.SUCCESS, '', { tabs });
   } catch (error) {
@@ -1163,7 +1181,12 @@ const reorderDashboardTabs = async (req: Request, res: Response) => {
       .find({ where: { dashboardId } });
 
     if (existing.length !== tabIds.length)
-      return sendResponse(res, false, CODE.BAD_REQUEST, DASHBOARD_MSG.TAB_REORDER_PARTIAL);
+      return sendResponse(
+        res,
+        false,
+        CODE.BAD_REQUEST,
+        DASHBOARD_MSG.TAB_REORDER_PARTIAL,
+      );
 
     const existingSet = new Set(existing.map(t => t.id));
     const requestedSet = new Set(tabIds);
@@ -1171,7 +1194,12 @@ const reorderDashboardTabs = async (req: Request, res: Response) => {
       tabIds.some((id: string) => !existingSet.has(id)) ||
       [...existingSet].some(id => !requestedSet.has(id))
     ) {
-      return sendResponse(res, false, CODE.BAD_REQUEST, DASHBOARD_MSG.TAB_REORDER_MISMATCH);
+      return sendResponse(
+        res,
+        false,
+        CODE.BAD_REQUEST,
+        DASHBOARD_MSG.TAB_REORDER_MISMATCH,
+      );
     }
 
     // Two-phase rewrite — first move everything to a high offset
@@ -1179,7 +1207,7 @@ const reorderDashboardTabs = async (req: Request, res: Response) => {
     // (dashboard_id, sequence) values we might add later. Then
     // assign final sequences. Cheap because each tab gets touched
     // twice in a single tx.
-    await master_db_connection.manager.transaction(async (manager) => {
+    await master_db_connection.manager.transaction(async manager => {
       await manager.query(
         `UPDATE dashboard_tab
             SET sequence = sequence + 100000
@@ -1198,7 +1226,9 @@ const reorderDashboardTabs = async (req: Request, res: Response) => {
     });
 
     await auditLogger.logAuditToOrg({
-      connection: master_db_connection, req, res,
+      connection: master_db_connection,
+      req,
+      res,
       module: AUDIT_MODULES.DASHBOARD,
       action: AUDIT_ACTIONS.UPDATE,
       entityName: 'DashboardTabs (reorder)',
@@ -1231,9 +1261,14 @@ const setDefaultDashboardTab = async (req: Request, res: Response) => {
       .getRepository(DashboardTab)
       .findOne({ where: { id, organisationId: orgData.id } });
     if (!tab)
-      return sendResponse(res, false, CODE.NOT_FOUND, DASHBOARD_MSG.TAB_NOT_FOUND);
+      return sendResponse(
+        res,
+        false,
+        CODE.NOT_FOUND,
+        DASHBOARD_MSG.TAB_NOT_FOUND,
+      );
 
-    await master_db_connection.manager.transaction(async (manager) => {
+    await master_db_connection.manager.transaction(async manager => {
       await manager.query(
         `UPDATE dashboard_tab
             SET is_default = false
@@ -1289,19 +1324,21 @@ const renderDashboard = async (req: Request, res: Response) => {
     if (!dashboard)
       return sendResponse(res, false, CODE.NOT_FOUND, DASHBOARD_MSG.NOT_FOUND);
 
-    const tabs = await master_db_connection
-      .getRepository(DashboardTab)
-      .find({
-        where: { dashboardId: id },
-        order: { sequence: 'ASC' },
-      });
+    const tabs = await master_db_connection.getRepository(DashboardTab).find({
+      where: { dashboardId: id },
+      order: { sequence: 'ASC' },
+    });
 
     // Tabs is always non-empty after the backfill in §12. Belt-
     // and-suspenders: if it somehow is (data corruption), surface
     // a clear error instead of returning a half-broken render.
     if (tabs.length === 0)
-      return sendResponse(res, false, CODE.SERVER_ERROR,
-        DASHBOARD_MSG.TABS_MISSING);
+      return sendResponse(
+        res,
+        false,
+        CODE.SERVER_ERROR,
+        DASHBOARD_MSG.TABS_MISSING,
+      );
 
     const visuals = await master_db_connection
       .getRepository(DashboardVisual)
@@ -1368,7 +1405,12 @@ const runDashboardQuery = async (req: Request, res: Response) => {
     .getRepository(DashboardVisual)
     .findOne({ where: { id: visualId, dashboardId: id } });
   if (!visual)
-    return sendResponse(res, false, CODE.NOT_FOUND, DASHBOARD_MSG.VISUAL_NOT_FOUND);
+    return sendResponse(
+      res,
+      false,
+      CODE.NOT_FOUND,
+      DASHBOARD_MSG.VISUAL_NOT_FOUND,
+    );
 
   const allFilters = await master_db_connection
     .getRepository(DashboardFilter)
@@ -1384,9 +1426,13 @@ const runDashboardQuery = async (req: Request, res: Response) => {
     const value = filterValues?.[id] ?? f.defaultValue;
     if (value === undefined) {
       if (f.isMandatory) {
-        return sendResponse(res, false, CODE.BAD_REQUEST,
+        return sendResponse(
+          res,
+          false,
+          CODE.BAD_REQUEST,
           DASHBOARD_MSG.FILTER_VALUE_MISSING,
-          { filterId: id, name: f.name });
+          { filterId: id, name: f.name },
+        );
       }
       continue;
     }
@@ -1442,7 +1488,7 @@ export function resolveFiltersForVisual(
     }
 
     if (f.scope === 'tab') {
-      if (!visual.tabId) continue;          // visual not on a tab
+      if (!visual.tabId) continue; // visual not on a tab
       if (f.scopeRef !== visual.tabId) continue;
       if (f.excludeRefs.includes(visual.id)) continue;
       out.push(f.id);
@@ -1490,10 +1536,15 @@ export function visualsTouchedByFilter(
         .map(v => v.id);
     case 'tab':
       return visuals
-        .filter(v => v.tabId === filter.scopeRef && !filter.excludeRefs.includes(v.id))
+        .filter(
+          v =>
+            v.tabId === filter.scopeRef && !filter.excludeRefs.includes(v.id),
+        )
         .map(v => v.id);
     case 'visual':
-      return visuals.find(v => v.id === filter.scopeRef) ? [filter.scopeRef!] : [];
+      return visuals.find(v => v.id === filter.scopeRef)
+        ? [filter.scopeRef!]
+        : [];
   }
 }
 ```
@@ -1585,11 +1636,11 @@ It's listed in §16 as deferred.
 
 Deletion semantics matrix:
 
-| Action | Tab visuals | Tab filters | Dashboard filters that excluded this tab |
-|---|---|---|---|
-| Soft-delete tab | Soft-deleted (cascade) | Soft-deleted (cascade) | `excludeRefs` array updated to drop the deleted tab's id |
-| Soft-delete a visual on a tab | n/a | Visual-scoped filters pointing at it soft-deleted (cascade); `excludeRefs` arrays cleaned up | same |
-| Soft-delete dashboard | All tabs soft-deleted | All filters at any scope soft-deleted | n/a |
+| Action                        | Tab visuals            | Tab filters                                                                                  | Dashboard filters that excluded this tab                 |
+| ----------------------------- | ---------------------- | -------------------------------------------------------------------------------------------- | -------------------------------------------------------- |
+| Soft-delete tab               | Soft-deleted (cascade) | Soft-deleted (cascade)                                                                       | `excludeRefs` array updated to drop the deleted tab's id |
+| Soft-delete a visual on a tab | n/a                    | Visual-scoped filters pointing at it soft-deleted (cascade); `excludeRefs` arrays cleaned up | same                                                     |
+| Soft-delete dashboard         | All tabs soft-deleted  | All filters at any scope soft-deleted                                                        | n/a                                                      |
 
 The cascade helper is centralised in `cascadeSoftDelete.ts` already
 — add three new functions:
@@ -1663,16 +1714,36 @@ export async function cascadeDashboardVisualChildren(
 export const AUDIT_FIELDS = {
   // ... existing ...
   DASHBOARD_TAB: [
-    'id', 'dashboardId', 'name', 'description', 'icon',
-    'sequence', 'isDefault', 'isHidden', 'status',
-    'createdOn', 'updatedOn',
+    'id',
+    'dashboardId',
+    'name',
+    'description',
+    'icon',
+    'sequence',
+    'isDefault',
+    'isHidden',
+    'status',
+    'createdOn',
+    'updatedOn',
   ],
   DASHBOARD_FILTER: [
-    'id', 'dashboardId', 'name', 'columnName', 'filterType',
-    'controlType', 'config', 'defaultValue', 'nullOption',
-    'sequence', 'isMandatory', 'isEnabled',
-    'scope', 'scopeRef', 'excludeRefs',
-    'createdOn', 'updatedOn',
+    'id',
+    'dashboardId',
+    'name',
+    'columnName',
+    'filterType',
+    'controlType',
+    'config',
+    'defaultValue',
+    'nullOption',
+    'sequence',
+    'isMandatory',
+    'isEnabled',
+    'scope',
+    'scopeRef',
+    'excludeRefs',
+    'createdOn',
+    'updatedOn',
   ],
 };
 ```

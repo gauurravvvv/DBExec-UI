@@ -47,7 +47,10 @@ import { TooltipModule } from 'primeng/tooltip';
           <span class="us-paginator__counter-of">of</span>
           {{ total }}
         </span>
-        <span class="us-paginator__counter us-paginator__counter--empty" *ngIf="total === 0">
+        <span
+          class="us-paginator__counter us-paginator__counter--empty"
+          *ngIf="total === 0"
+        >
           0 of 0
         </span>
       </div>
@@ -161,7 +164,9 @@ import { TooltipModule } from 'primeng/tooltip';
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        transition: background 0.12s, border-color 0.12s;
+        transition:
+          background 0.12s,
+          border-color 0.12s;
       }
       .us-paginator__btn:hover:not(:disabled) {
         background: var(--surface-hover, #f3f4f6);

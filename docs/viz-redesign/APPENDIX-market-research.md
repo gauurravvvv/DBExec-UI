@@ -2,11 +2,7 @@
 
 > The per-focus-area research the gap analysis draws on. Benchmark tools cited inline.
 
-
-
-
 # Config Panel
-
 
 I now have solid, current, tool-specific detail across every tool named in the brief. I have enough to write the authoritative reference. Let me compose the final deliverable.
 
@@ -22,14 +18,14 @@ A cross-tool benchmark of how leading analytics products let users assign fields
 
 Strip away branding and every mature tool splits chart configuration along the **same two axes**:
 
-| Axis | Question it answers | Triggers a re-query? | Common names |
-|---|---|---|---|
-| **Encoding / Data** | *What* data appears and how it maps to visual channels | Yes — changing this re-runs the query | Marks + shelves (Tableau), Build (Power BI), Data tab (Superset/Metabase), Setup (Looker Studio), Properties (Sigma) |
-| **Format / Style** | *How* it looks — colors, fonts, axes, labels, number format | No — pure presentation, applied client-side | Format pane (Power BI), Customize (Superset), Display/Style/Formatting (Metabase), Style (Looker), Format (Sigma/Mode) |
+| Axis                | Question it answers                                         | Triggers a re-query?                        | Common names                                                                                                           |
+| ------------------- | ----------------------------------------------------------- | ------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| **Encoding / Data** | _What_ data appears and how it maps to visual channels      | Yes — changing this re-runs the query       | Marks + shelves (Tableau), Build (Power BI), Data tab (Superset/Metabase), Setup (Looker Studio), Properties (Sigma)   |
+| **Format / Style**  | _How_ it looks — colors, fonts, axes, labels, number format | No — pure presentation, applied client-side | Format pane (Power BI), Customize (Superset), Display/Style/Formatting (Metabase), Style (Looker), Format (Sigma/Mode) |
 
-This split is the single most important structural decision. Superset even encodes it *programmatically*: its `ControlPanelsContainer` decides whether a control belongs in the Data tab by checking whether that control's `renderTrigger` is `false` (i.e. it forces a new query) or is explicitly marked `tabOverride: 'data'` ([Superset design proposal](https://github.com/apache/superset/discussions/14275)). The rule that falls out of this: **anything that changes the SQL goes in Data; anything that only re-paints goes in Format.** DBExec should adopt exactly this test as the sorting function for controls.
+This split is the single most important structural decision. Superset even encodes it _programmatically_: its `ControlPanelsContainer` decides whether a control belongs in the Data tab by checking whether that control's `renderTrigger` is `false` (i.e. it forces a new query) or is explicitly marked `tabOverride: 'data'` ([Superset design proposal](https://github.com/apache/superset/discussions/14275)). The rule that falls out of this: **anything that changes the SQL goes in Data; anything that only re-paints goes in Format.** DBExec should adopt exactly this test as the sorting function for controls.
 
-Two tools deliberately *don't* tab-split and instead stack everything in one scroll (Tableau's Marks card, Hex's config panel). That works only when the encoding surface is small and visual (see §2).
+Two tools deliberately _don't_ tab-split and instead stack everything in one scroll (Tableau's Marks card, Hex's config panel). That works only when the encoding surface is small and visual (see §2).
 
 ---
 
@@ -38,48 +34,59 @@ Two tools deliberately *don't* tab-split and instead stack everything in one scr
 This is where the tools diverge most, and where "polish" is most visible.
 
 ### Idiom A — Drag-to-shelf (Tableau, the archetype)
+
 Fields are dragged from a Data pane onto named **shelves**: Columns and Rows define the axes; the **Marks card** holds the visual-channel shelves — **Color, Size, Label, Detail, Tooltip, Shape** ([Tableau Shelves & Cards](https://help.tableau.com/current/pro/desktop/en-us/buildmanual_shelves.htm)). Dropped fields become **pills** that are themselves interactive: click for a context menu (change aggregation, sort, edit), drag to reorder or move between shelves.
 
 Two subtleties worth stealing:
-- **Cardinality rules per channel.** Color, Label, Detail, and Tooltip accept *multiple* fields; Size and Shape accept exactly *one* ([Tableau Marks](https://help.tableau.com/current/pro/desktop/en-us/viewparts_marks_markproperties.htm)). The UI enforces this — dropping a second field on Size replaces the first.
+
+- **Cardinality rules per channel.** Color, Label, Detail, and Tooltip accept _multiple_ fields; Size and Shape accept exactly _one_ ([Tableau Marks](https://help.tableau.com/current/pro/desktop/en-us/viewparts_marks_markproperties.htm)). The UI enforces this — dropping a second field on Size replaces the first.
 - **The Marks card mutates with mark type.** The available channels change based on whether the mark is a bar, line, circle, or map ([mark-type behavior](https://medium.com/@deepak.holla/how-do-the-properties-in-the-marks-card-vary-based-on-the-mark-type-selected-or-present-in-the-fb1c375270ab)). Selecting "Pie" reveals an **Angle** shelf that doesn't exist for bars. Progressive disclosure by chart type, not just by basic/advanced.
 
-Tableau also ships **"Show Me"** — a chart-picker that inspects the fields currently in play and highlights which chart types are *valid* for that combination, greying out the rest. This is guided disclosure: the tool tells you what's possible before you commit.
+Tableau also ships **"Show Me"** — a chart-picker that inspects the fields currently in play and highlights which chart types are _valid_ for that combination, greying out the rest. This is guided disclosure: the tool tells you what's possible before you commit.
 
 ### Idiom B — Named buckets / field wells (Power BI, Looker Studio, Mode)
-Instead of a freeform card, fields drop into **labelled wells** that name their role. Power BI's **Build pane** shows wells that *change per visual*: a bar chart exposes **Axis / Legend / Values**, a different visual exposes different wells ([Power BI report editor tour](https://learn.microsoft.com/en-us/power-bi/create-reports/service-the-report-editor-take-a-tour)). Looker Studio's **Setup tab** is the same pattern — drag fields into Dimension / Metric / Sort wells ([Looker Studio Setup vs Style](https://docs.cloud.google.com/looker/docs/editing-visualizations-new-explore-experience)). Mode's builder uses explicit **X-axis / Y-axis / Color drop zones** and does date-math and aggregation **on the fly as you drop** ([Mode drag-and-drop charts](https://mode.com/blog/drag-and-drop-charts/)).
+
+Instead of a freeform card, fields drop into **labelled wells** that name their role. Power BI's **Build pane** shows wells that _change per visual_: a bar chart exposes **Axis / Legend / Values**, a different visual exposes different wells ([Power BI report editor tour](https://learn.microsoft.com/en-us/power-bi/create-reports/service-the-report-editor-take-a-tour)). Looker Studio's **Setup tab** is the same pattern — drag fields into Dimension / Metric / Sort wells ([Looker Studio Setup vs Style](https://docs.cloud.google.com/looker/docs/editing-visualizations-new-explore-experience)). Mode's builder uses explicit **X-axis / Y-axis / Color drop zones** and does date-math and aggregation **on the fly as you drop** ([Mode drag-and-drop charts](https://mode.com/blog/drag-and-drop-charts/)).
 
 Power BI shipped two refinements in 2024 that are directly relevant:
-- **On-object interaction**: the Build button lives *on the visual* itself, not only in a side rail, so you configure in place ([on-object interaction](https://learn.microsoft.com/en-us/power-bi/create-reports/power-bi-on-object-interaction)).
-- **Empty-well hinting**: cards that only become relevant once a field is present are now *shown greyed with a tooltip explaining what to add to enable them*, rather than hidden entirely ([new Format pane](https://powerbi.microsoft.com/en-us/blog/introducing-the-new-format-pane-preview/)). This solves the classic "where did that option go?" problem.
+
+- **On-object interaction**: the Build button lives _on the visual_ itself, not only in a side rail, so you configure in place ([on-object interaction](https://learn.microsoft.com/en-us/power-bi/create-reports/power-bi-on-object-interaction)).
+- **Empty-well hinting**: cards that only become relevant once a field is present are now _shown greyed with a tooltip explaining what to add to enable them_, rather than hidden entirely ([new Format pane](https://powerbi.microsoft.com/en-us/blog/introducing-the-new-format-pane-preview/)). This solves the classic "where did that option go?" problem.
 
 ### Idiom C — Dropdown pickers (Superset, Metabase)
+
 No canvas drag. Each encoding is a **dropdown/multiselect** in the Data tab: pick the temporal column, pick the metric, pick the group-by dimension ([Superset exploring data](https://superset.apache.org/docs/using-superset/exploring-data/)). This is faster for keyboard users and far easier to build, but loses the spatial intuition of shelves. Superset's metric pickers open a **popover sub-editor** (choose column → aggregate → optional label / SQL), which recovers some of the pill richness.
 
 ### Idiom D — Hybrid pill-in-dropzone (Hex, Sigma — the modern synthesis)
-The newest tools merge B and A. Hex's rebuilt chart cell lets you **drag fields into the config panel *or* directly into the chart's empty state**, and the dropped fields become **clickable pills** that change aggregate type and date-truncation inline; series can be dragged to reorder or reassigned to a second Y-axis ([Hex new chart cells](https://hex.tech/blog/new-chart-cells/), [Hex chart cells docs](https://learn.hex.tech/docs/explore-data/cells/visualization-cells/chart-cells)). Sigma organizes the same idea under a **Properties tab** (chart type + source columns) beside a **Format tab** ([Sigma intro to charts](https://help.sigmacomputing.com/docs/intro-to-visualizations)).
 
-**Recommendation for DBExec:** Idiom D is the current state of the art and the right target — **dropzone wells that accept drag *and* click-to-pick, producing interactive pills** with inline aggregate/format menus. It gives beginners dropdowns, power users drag, and keeps the spatial role-labelling of wells.
+The newest tools merge B and A. Hex's rebuilt chart cell lets you **drag fields into the config panel _or_ directly into the chart's empty state**, and the dropped fields become **clickable pills** that change aggregate type and date-truncation inline; series can be dragged to reorder or reassigned to a second Y-axis ([Hex new chart cells](https://hex.tech/blog/new-chart-cells/), [Hex chart cells docs](https://learn.hex.tech/docs/explore-data/cells/visualization-cells/chart-cells)). Sigma organizes the same idea under a **Properties tab** (chart type + source columns) beside a **Format tab** ([Sigma intro to charts](https://help.sigmacomputing.com/docs/intro-to-visualizations)).
+
+**Recommendation for DBExec:** Idiom D is the current state of the art and the right target — **dropzone wells that accept drag _and_ click-to-pick, producing interactive pills** with inline aggregate/format menus. It gives beginners dropdowns, power users drag, and keeps the spatial role-labelling of wells.
 
 ---
 
 ## 3. How the panel is sectioned
 
 ### Tabs at the top level
+
 The dominant pattern is **2–5 top tabs**, always leading with data:
+
 - Metabase: **Data · Display · Axes · Formatting · Style** (tabs vary by chart; a plugin per chart type declares which sections it owns) ([Metabase visualization overview](https://www.metabase.com/docs/latest/questions/visualizations/visualizing-results)).
 - Superset & Looker Studio & Sigma & Mode: two tabs (**Data/Setup/Properties + Customize/Style/Format**).
 - Power BI: **Build + Format** tabs, with Format further split into **Visual** vs **General** sub-tabs (see below).
 
 ### Collapsible sections inside a tab
+
 Within a tab, controls are grouped into **collapsible accordion sections** with clear headers. Superset added these deliberately (["add collapsible Control sections"](https://github.com/apache/superset/pull/3354)) and made **most sections collapsed by default** so the panel opens uncluttered — Query section first, filters pulled to the top ([Explore control panel improvements](https://github.com/apache/superset/issues/11916)). Looker Studio's Style tab uses the same **expandable sections**, named identically to the classic tab names for muscle-memory continuity ([Looker editing visualizations](https://docs.cloud.google.com/looker/docs/editing-visualizations-new-explore-experience)).
 
 Superset's other structural principle is worth stating verbatim as a design goal: **the same kind of control should live under the same-named section across every chart type**, so users build a stable spatial map ([design proposal](https://github.com/apache/superset/issues/11916)). Inconsistent section placement per chart is the #1 thing that makes a config panel feel amateur.
 
 ### Power BI's Visual-vs-General split
+
 Power BI's Format pane divides every card into **Visual-specific** (only relevant to this chart type — e.g. bar rounding) vs **General** (the container: title, background, border, shadow, padding — identical across all visuals) ([format pane model](https://learn.microsoft.com/en-us/power-bi/developer/visuals/format-pane-general)). This is a clean third axis of grouping that DBExec should copy: **chart-intrinsic formatting** separated from **container/chrome formatting**.
 
 ### Per-column configuration
+
 Tables get a dedicated pattern: Metabase's **Columns tab** lists every visible column with an **eye icon to hide** and **drag-to-reorder**; clicking a column header (or its gear) opens a **per-column Formatting sub-panel** ([Metabase tables](https://www.metabase.com/docs/latest/questions/visualizations/table)). Conditional formatting is its own tab with rule-based single-color/color-range editors. This maps directly onto DBExec task #1027 (per-column display name + description + format hints).
 
 ---
@@ -89,13 +96,14 @@ Tables get a dedicated pattern: Metabase's **Columns tab** lists every visible c
 Every polished panel hides complexity until asked:
 
 - **Collapse-by-default** (Superset): advanced sections are shut on open; the common 80% is visible, the rest one click away.
-- **Contextual reveal by chart type** (Tableau Marks card, Power BI dynamic cards): options appear *only when applicable*. Power BI's 2024 refinement is the tell — instead of hiding, it now **shows the card disabled with a tooltip saying what to add to enable it** ([new Format pane](https://powerbi.microsoft.com/en-us/blog/introducing-the-new-format-pane-preview/)). Reveal-when-relevant beats hide-completely because it teaches.
+- **Contextual reveal by chart type** (Tableau Marks card, Power BI dynamic cards): options appear _only when applicable_. Power BI's 2024 refinement is the tell — instead of hiding, it now **shows the card disabled with a tooltip saying what to add to enable it** ([new Format pane](https://powerbi.microsoft.com/en-us/blog/introducing-the-new-format-pane-preview/)). Reveal-when-relevant beats hide-completely because it teaches.
 - **Contextual reveal by field presence**: a Legend/Color format section only materializes once a field sits in the color well.
 - **Escape hatch to raw config** (Superset): a full **ECharts Option Editor** at the bottom of the Customize tab for ECharts-based charts, so power users can drop to the underlying library's JSON when the GUI runs out ([Superset exploring data](https://superset.apache.org/docs/using-superset/exploring-data/)). Provide a ceiling, not a wall.
 - **Search across the panel** (Power BI): a search box over format cards — essential once the panel exceeds ~15 sections ([format pane search](https://powerbi.microsoft.com/en-us/blog/introducing-the-new-format-pane-preview/)).
 
 ### The declarative counterpoint — Observable Plot
-Observable Plot has **no config panel at all**; the "panel" is the marks + channels API in code (`Plot.barY(data, {x, y, fill})`). Every GUI above is essentially a visual front-end onto exactly this grammar-of-graphics vocabulary — mark type + channel encodings + scales. The lesson for a config-panel designer: **your panel's sections should mirror a clean declarative schema** (marks / encodings / scales / legends / labels). If the panel maps 1:1 to a serializable config object, state, undo, templating, and copy-paste-between-charts all come nearly free. DBExec should design the config *object* first and generate the panel from it.
+
+Observable Plot has **no config panel at all**; the "panel" is the marks + channels API in code (`Plot.barY(data, {x, y, fill})`). Every GUI above is essentially a visual front-end onto exactly this grammar-of-graphics vocabulary — mark type + channel encodings + scales. The lesson for a config-panel designer: **your panel's sections should mirror a clean declarative schema** (marks / encodings / scales / legends / labels). If the panel maps 1:1 to a serializable config object, state, undo, templating, and copy-paste-between-charts all come nearly free. DBExec should design the config _object_ first and generate the panel from it.
 
 ---
 
@@ -106,56 +114,39 @@ What separates "works" from "feels good," pulled from Mode, Metabase, and Power 
 - **Number/date format editors** with live preview: precision, thousands separators, currency/percent, prefix/suffix, date truncation. Mode's format panel handles axis-label format, precision, and scale type (linear/log) per axis ([Mode visualizations](https://mode.com/help/articles/visualizations/)).
 - **Axis controls**: title on/off + custom text, label rotation angle, scale type, min/max, dual-axis assignment (Mode, Hex's two-axis-with-multi-series model).
 - **Color**: named palettes + fully custom palettes; per-series color override; conditional/data-driven color. Both Mode and Metabase expose palette pickers plus custom palettes ([Mode custom palettes](https://mode.com/blog/custom-color-palettes/)).
-- **Labels & legend**: toggle data labels, legend position, tooltip field customization (Tableau's Tooltip *is* a shelf you drop fields onto).
+- **Labels & legend**: toggle data labels, legend position, tooltip field customization (Tableau's Tooltip _is_ a shelf you drop fields onto).
 - **Live, debounced preview**: format changes must repaint instantly with no re-query — this is the whole point of the Data/Format split and is what makes the panel feel responsive.
 
 ---
 
 ## 6. What makes each feel polished (the "why it's good" notes)
 
-- **Tableau** — pills are first-class objects (menu, drag, aggregate); channels enforce cardinality; the card *is the chart's identity*, mutating with mark type. Show Me guides valid choices.
+- **Tableau** — pills are first-class objects (menu, drag, aggregate); channels enforce cardinality; the card _is the chart's identity_, mutating with mark type. Show Me guides valid choices.
 - **Power BI** — on-object editing; Visual/General format split; disabled-with-tooltip cards; format search; ubiquitous reset-to-default per section.
 - **Metabase** — chart-type-declared sections (each viz owns its tabs); per-column table management with hide/reorder; conditional formatting as a rule builder.
 - **Superset** — programmatic Data/Customize sorting via `renderTrigger`; collapse-by-default; cross-chart section consistency; ECharts escape hatch.
 - **Looker Studio** — dead-simple Setup(what)/Style(how); Style sections named identically to the legacy tabs for continuity.
-- **Hex / Sigma** — the modern synthesis: drag *or* click into wells, interactive pills with inline aggregate/trunc menus, a **one-click "clear all fields and formatting"** reset ([Hex chart cells](https://learn.hex.tech/docs/explore-data/cells/visualization-cells/chart-cells)), multi-series drag between axes.
+- **Hex / Sigma** — the modern synthesis: drag _or_ click into wells, interactive pills with inline aggregate/trunc menus, a **one-click "clear all fields and formatting"** reset ([Hex chart cells](https://learn.hex.tech/docs/explore-data/cells/visualization-cells/chart-cells)), multi-series drag between axes.
 
 ---
 
 ## 7. Checklist — what a modern config panel MUST have
 
 **Structure**
+
 1. Split into **Data/Encoding** vs **Format/Style** — top tabs or clearly divided regions. Data always first/leftmost.
 2. Sort every control by the **`renderTrigger` test**: changes the query → Data; only repaints → Format. (Superset)
 3. Inside each tab, **collapsible accordion sections with headers**, most **collapsed by default**. (Superset)
 4. **Section names identical across all chart types** — same control, same place, every time. (Superset)
 5. Separate **chart-intrinsic** formatting from **container/chrome** formatting (title, background, border, padding). (Power BI Visual vs General)
 
-**Field assignment**
-6. **Named wells/dropzones** that label the encoding role (Axis, Value, Color, Size, Detail, Tooltip). (Power BI / Tableau)
-7. Accept **both drag-and-drop and click-to-pick**; also allow dropping onto the **empty chart** directly. (Hex)
-8. Dropped fields render as **interactive pills** — click to change aggregate, date-truncation, sort, label, or remove; drag to reorder / move between wells. (Tableau, Hex)
-9. **Enforce channel cardinality** (single-field vs multi-field wells) in the UI. (Tableau)
-10. **Wells change per chart type**; selecting a chart reveals only its valid encodings. (Tableau, Power BI)
+**Field assignment** 6. **Named wells/dropzones** that label the encoding role (Axis, Value, Color, Size, Detail, Tooltip). (Power BI / Tableau) 7. Accept **both drag-and-drop and click-to-pick**; also allow dropping onto the **empty chart** directly. (Hex) 8. Dropped fields render as **interactive pills** — click to change aggregate, date-truncation, sort, label, or remove; drag to reorder / move between wells. (Tableau, Hex) 9. **Enforce channel cardinality** (single-field vs multi-field wells) in the UI. (Tableau) 10. **Wells change per chart type**; selecting a chart reveals only its valid encodings. (Tableau, Power BI)
 
-**Progressive disclosure**
-11. **Reveal-when-relevant**, and prefer **disabled-with-tooltip over hidden** for context-dependent controls. (Power BI)
-12. A guided **chart-type picker** that indicates which types are valid for the current fields. (Tableau Show Me)
-13. **Search box** over sections/controls once the panel is large. (Power BI)
-14. An **escape hatch to raw config** (library JSON / advanced editor) for power users. (Superset ECharts editor)
+**Progressive disclosure** 11. **Reveal-when-relevant**, and prefer **disabled-with-tooltip over hidden** for context-dependent controls. (Power BI) 12. A guided **chart-type picker** that indicates which types are valid for the current fields. (Tableau Show Me) 13. **Search box** over sections/controls once the panel is large. (Power BI) 14. An **escape hatch to raw config** (library JSON / advanced editor) for power users. (Superset ECharts editor)
 
-**Format quality**
-15. **Number & date format editors** with live preview (precision, separators, currency/percent, prefix/suffix, truncation).
-16. **Axis controls**: title toggle+text, scale type (linear/log), min/max, label rotation, dual-axis.
-17. **Color**: named + custom palettes, per-series override, conditional/data-driven color.
-18. **Per-column config for tables**: hide (eye icon), drag-reorder, per-column format sub-panel, conditional-formatting rules. (Metabase)
-19. **Labels/legend/tooltip** toggles and positioning; customizable tooltip fields.
+**Format quality** 15. **Number & date format editors** with live preview (precision, separators, currency/percent, prefix/suffix, truncation). 16. **Axis controls**: title toggle+text, scale type (linear/log), min/max, label rotation, dual-axis. 17. **Color**: named + custom palettes, per-series override, conditional/data-driven color. 18. **Per-column config for tables**: hide (eye icon), drag-reorder, per-column format sub-panel, conditional-formatting rules. (Metabase) 19. **Labels/legend/tooltip** toggles and positioning; customizable tooltip fields.
 
-**Behavior & feel**
-20. **Format changes repaint instantly, never re-query** (debounced, client-side).
-21. **Reset-to-default** per section and a **"clear all fields + formatting"** action. (Hex)
-22. Config maps **1:1 to a serializable schema object** → free undo/redo, templating, copy-between-charts, and a declarative source of truth. (Observable Plot lesson)
-23. Consider **on-object / in-context editing** so config lives next to the chart, not only in a distant rail. (Power BI 2024)
+**Behavior & feel** 20. **Format changes repaint instantly, never re-query** (debounced, client-side). 21. **Reset-to-default** per section and a **"clear all fields + formatting"** action. (Hex) 22. Config maps **1:1 to a serializable schema object** → free undo/redo, templating, copy-between-charts, and a declarative source of truth. (Observable Plot lesson) 23. Consider **on-object / in-context editing** so config lives next to the chart, not only in a distant rail. (Power BI 2024)
 
 ---
 
@@ -183,9 +174,7 @@ What separates "works" from "feels good," pulled from Mode, Metabase, and Power 
 
 **Bottom line for DBExec (task #1295):** adopt the two-tab **Data vs Format** split sorted by the re-query test; use **named dropzone wells with drag-or-click pills** (Hex/Sigma idiom); make **sections consistent across chart types and collapsed by default** (Superset); separate **chart-intrinsic from container formatting** (Power BI); and design the **config as a serializable schema object** first, rendering the panel from it (Observable Plot lesson). The checklist in §7 is the acceptance spec.
 
-
 # Chart Chrome
-
 
 I now have comprehensive, well-sourced material across all seven tools plus accessibility, tooltip, and formatting references. I have enough to synthesize the benchmark and produce the checklist. Let me compose the deliverable.
 
@@ -228,7 +217,7 @@ The "card" is the framed container that wraps one visualization on a dashboard. 
 
 Strong cross-tool consensus:
 
-- **Content:** exact value(s) + dimension context; **2–3 metrics max**; readable in 3–5 seconds; don't put information *essential* to understanding the chart only in the tooltip. ([tooltip best practices](https://nastengraph.medium.com/tooltips-in-dashboards-b0200980300d), [InterWorks say less](https://interworks.com/blog/2023/06/02/say-less-how-to-ensure-your-tooltips-add-value/))
+- **Content:** exact value(s) + dimension context; **2–3 metrics max**; readable in 3–5 seconds; don't put information _essential_ to understanding the chart only in the tooltip. ([tooltip best practices](https://nastengraph.medium.com/tooltips-in-dashboards-b0200980300d), [InterWorks say less](https://interworks.com/blog/2023/06/02/say-less-how-to-ensure-your-tooltips-add-value/))
 - **Typography/hierarchy:** larger/bold for the headline value, smaller/gray for secondary; **right-align numbers** (Tableau's tab-alignment trick) so digits line up across rows. ([Tableau tooltips](https://interworks.com/blog/ccapitula/2015/02/17/tableau-essentials-formatting-tips-tooltips/))
 - **Sigma & Hex** auto-select default tooltip fields (the plotted values) and let you **add custom tooltip entries** (Hex `+ Tooltip`; Sigma customizable mark tooltips). ([Sigma tooltip](https://help.sigmacomputing.com/docs/customize-chart-mark-tooltip-fields), [Hex](https://learn.hex.tech/docs/explore-data/cells/visualization-cells/chart-cells))
 - **Power BI** supports both a formatted **default tooltip** (font/color/background/transparency) and a **report-page tooltip** (a mini-dashboard on hover), plus tooltip actions like drill-through. ([Power BI tooltips](https://learn.microsoft.com/en-us/power-bi/visuals/power-bi-visualization-visual-tooltips))
@@ -279,6 +268,7 @@ All four should live **inside the card frame**, preserving title + card chrome s
 ## Must-Have Chart-Card + Rendering-Polish Checklist
 
 **A. Card chrome / anatomy**
+
 - [ ] Header with **title** (insight-led, ≤ 8 words) + optional **subtitle** (source / timeframe / units) as separate styled blocks.
 - [ ] **Kebab `...`** actions menu (view data, export CSV/PNG, focus/fullscreen, refresh, edit, remove) right-aligned in header.
 - [ ] Optional **divider** between header and plot area with independent spacing control.
@@ -288,35 +278,42 @@ All four should live **inside the card frame**, preserving title + card chrome s
 - [ ] Optional **footer/caption** slot for notes/last-updated.
 
 **B. Typography scale (card-local)**
+
 - [ ] Title **16px / 600**, subtitle **13px / 400 muted (gray-600)**, axis labels **12px**, tick/legend labels **11–12px**, tooltip headline **13–14px bold** + secondary **11–12px gray**. Never below **11px** for chart text.
 - [ ] **Tabular figures** everywhere numbers align (axes, tooltips, data labels, tables).
 
 **C. Legend**
+
 - [ ] Present by default; **near the chart** (top or right); position configurable.
 - [ ] **Click-to-toggle** series; hidden series visibly de-emphasized.
 - [ ] Auto-hide + **direct-label** when single series or ≤ ~4 points.
 
 **D. Tooltip**
+
 - [ ] On hover **and** keyboard focus (not hover-only); consistent placement; never blocks the mark.
 - [ ] Dimension context + exact value; **≤ 2–3 metrics**; headline value bold, secondary muted; **right-aligned numbers**; full precision (tooltip) vs compact (axis).
 
 **E. Axis & gridlines**
+
 - [ ] Gridlines **gray-200, 1px, horizontal-only** by default; user-toggleable per axis.
 - [ ] Axis labels include **units**; **auto-skip** crowded ticks; no forced label rotation on narrow cards.
 - [ ] Data marks ≥ **3:1** vs background; data text labels ≥ **4.5:1**.
 
 **F. Color**
+
 - [ ] Dashboard-level **palette token** inherited by all cards (single source of truth).
 - [ ] Categorical **≤ 7 colors**; palette ordered by lightness; **avoid red-green pairing**; default sequential = single-hue, diverging = orange-blue.
 - [ ] Meaning never by color alone — pair with **line style / pattern / shape / label / icon**.
 
 **G. Formatting defaults**
+
 - [ ] **Locale-aware** numbers, currency, dates.
 - [ ] **Compact notation** on axes (1.2k/3.4M), full in tooltip.
 - [ ] Per-field format override that doesn't mutate the dataset.
 - [ ] Time-series shows **granularity** and allows switching.
 
 **H. State coverage (all four, inside the card frame)**
+
 - [ ] **Loading:** skeleton/shimmer > 300ms; never a bare axis or blank box.
 - [ ] **No-data:** "No data" + guidance, card chrome preserved.
 - [ ] **Empty/unconfigured:** prompt to choose metric/fields.
@@ -324,6 +321,7 @@ All four should live **inside the card frame**, preserving title + card chrome s
 - [ ] Chart entrance animation respects **prefers-reduced-motion**; data readable immediately.
 
 **I. Accessibility backstop**
+
 - [ ] Interactive marks **keyboard-navigable**, ≥ 44px tap area (or expand on touch).
 - [ ] Per-chart **aria-label / text summary** of the key insight; **table alternative** available.
 - [ ] Export (CSV + image) for data-heavy charts.
@@ -331,6 +329,7 @@ All four should live **inside the card frame**, preserving title + card chrome s
 ---
 
 ## Sources
+
 - [Power BI — Format pane General tab (card chrome, title/subtitle/divider/spacing, effects, header icons, tooltips, alt text)](https://learn.microsoft.com/en-us/power-bi/visuals/power-bi-visualization-format-pane-overview)
 - [Power BI — Visual tooltips](https://learn.microsoft.com/en-us/power-bi/visuals/power-bi-visualization-visual-tooltips)
 - [Tableau — Format individual parts of the view (titles)](https://help.tableau.com/current/pro/desktop/en-us/formatting_specific_titlecaption.htm)
@@ -360,9 +359,7 @@ All four should live **inside the card frame**, preserving title + card chrome s
 
 Internal reference: `ui-ux-pro-max` skill Charts & Data ruleset (`legend-visible`, `legend-interactive`, `tooltip-on-interact`, `tooltip-keyboard`, `gridline-subtle`, `axis-readability`, `contrast-data`, `color-not-only`, `pattern-texture`, `number-formatting`, `number-tabular`, `empty-data-state`, `loading-chart`, `error-state-chart`, `animation-optional`, `direct-labeling`, `no-pie-overuse`, `export-option`) at `/Users/gaurav.goel/.claude/skills/ui-ux-pro-max`.
 
-
 # Chart Types
-
 
 I have all the research I need. This is a research deliverable that goes into my final response verbatim, so I'll synthesize the full checklist now. I won't touch the task list — that's the parent's job.
 
@@ -380,92 +377,92 @@ Benchmarked across **Tableau, Power BI, Metabase, Superset, Looker (+ Looker Stu
 
 ### 1A. Comparison (categorical)
 
-| Chart | Tier | Tableau | Power BI | Metabase | Superset | Looker | Hex | Sigma | Obs Plot |
-|---|---|---|---|---|---|---|---|---|---|
-| Bar (horizontal) | **TS** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| Column (vertical bar) | **TS** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| Grouped / clustered bar | **TS** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| Stacked bar/column | **TS** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| 100% stacked bar/column | **STD** | ✅ | ✅ | ✅ | ✅ | ✅ | ◐ | ✅ | ✅ |
-| Combo / dual (bar + line) | **STD** | ✅ | ✅ | ✅ | ✅ | ✅ | ◐ | ✅ | ✅ |
-| Bullet chart | **NTH** | ✅ | ◐ | ✕ | ✕ | ✅ | ✕ | ◐ | ◐ |
-| Radar / spider | **NTH** | ✕ | ◐ | ✕ | ✅ | ✕ | ✕ | ✕ | ◐ |
-| Radial / rose | **NTH** | ◐ | ◐ | ✕ | ✅ | ✕ | ✕ | ✕ | ◐ |
+| Chart                     | Tier    | Tableau | Power BI | Metabase | Superset | Looker | Hex | Sigma | Obs Plot |
+| ------------------------- | ------- | ------- | -------- | -------- | -------- | ------ | --- | ----- | -------- |
+| Bar (horizontal)          | **TS**  | ✅      | ✅       | ✅       | ✅       | ✅     | ✅  | ✅    | ✅       |
+| Column (vertical bar)     | **TS**  | ✅      | ✅       | ✅       | ✅       | ✅     | ✅  | ✅    | ✅       |
+| Grouped / clustered bar   | **TS**  | ✅      | ✅       | ✅       | ✅       | ✅     | ✅  | ✅    | ✅       |
+| Stacked bar/column        | **TS**  | ✅      | ✅       | ✅       | ✅       | ✅     | ✅  | ✅    | ✅       |
+| 100% stacked bar/column   | **STD** | ✅      | ✅       | ✅       | ✅       | ✅     | ◐   | ✅    | ✅       |
+| Combo / dual (bar + line) | **STD** | ✅      | ✅       | ✅       | ✅       | ✅     | ◐   | ✅    | ✅       |
+| Bullet chart              | **NTH** | ✅      | ◐        | ✕        | ✕        | ✅     | ✕   | ◐     | ◐        |
+| Radar / spider            | **NTH** | ✕       | ◐        | ✕        | ✅       | ✕      | ✕   | ✕     | ◐        |
+| Radial / rose             | **NTH** | ◐       | ◐        | ✕        | ✅       | ✕      | ✕   | ✕     | ◐        |
 
 ### 1B. Trend / change-over-time
 
-| Chart | Tier | Tableau | Power BI | Metabase | Superset | Looker | Hex | Sigma | Obs Plot |
-|---|---|---|---|---|---|---|---|---|---|
-| Line | **TS** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| Multi-series line | **TS** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| Area | **TS** | ✅ | ✅ | ✅ | ✅ | ✅ | ◐ | ✅ | ✅ |
-| Stacked area | **STD** | ✅ | ✅ | ✅ | ✅ | ✅ | ◐ | ✅ | ✅ |
-| Sparkline (inline mini-trend) | **STD** | ✅ | ✅ | ✅ | ✅ | ✅ | ◐ | ✅ | ✅ |
-| Step line | **NTH** | ◐ | ✅ | ✕ | ✅ | ◐ | ✕ | ✕ | ✅ |
-| Timeline / Gantt | **NTH** | ✅ | ◐ | ✕ | ✕ | ✅ | ✕ | ✕ | ◐ |
-| Candlestick / OHLC | **NTH** | ◐ | ◐ | ✕ | ✕ | ✕ | ✕ | ✕ | ◐ |
-| Stream graph | **NTH** | ◐ | ◐ | ✕ | ✅ | ✕ | ✕ | ✕ | ✅ |
+| Chart                         | Tier    | Tableau | Power BI | Metabase | Superset | Looker | Hex | Sigma | Obs Plot |
+| ----------------------------- | ------- | ------- | -------- | -------- | -------- | ------ | --- | ----- | -------- |
+| Line                          | **TS**  | ✅      | ✅       | ✅       | ✅       | ✅     | ✅  | ✅    | ✅       |
+| Multi-series line             | **TS**  | ✅      | ✅       | ✅       | ✅       | ✅     | ✅  | ✅    | ✅       |
+| Area                          | **TS**  | ✅      | ✅       | ✅       | ✅       | ✅     | ◐   | ✅    | ✅       |
+| Stacked area                  | **STD** | ✅      | ✅       | ✅       | ✅       | ✅     | ◐   | ✅    | ✅       |
+| Sparkline (inline mini-trend) | **STD** | ✅      | ✅       | ✅       | ✅       | ✅     | ◐   | ✅    | ✅       |
+| Step line                     | **NTH** | ◐       | ✅       | ✕        | ✅       | ◐      | ✕   | ✕     | ✅       |
+| Timeline / Gantt              | **NTH** | ✅      | ◐        | ✕        | ✕        | ✅     | ✕   | ✕     | ◐        |
+| Candlestick / OHLC            | **NTH** | ◐       | ◐        | ✕        | ✕        | ✕      | ✕   | ✕     | ◐        |
+| Stream graph                  | **NTH** | ◐       | ◐        | ✕        | ✅       | ✕      | ✕   | ✕     | ✅       |
 
 ### 1C. Part-to-whole
 
-| Chart | Tier | Tableau | Power BI | Metabase | Superset | Looker | Hex | Sigma | Obs Plot |
-|---|---|---|---|---|---|---|---|---|---|
-| Pie | **TS** | ✅ | ✅ | ✅ | ✅ | ✅ | ◐ | ✅ | ◐ |
-| Donut | **TS** | ◐ | ✅ | ✅ | ✅ | ✅ | ◐ | ✅ | ◐ |
-| Treemap | **STD** | ✅ | ✅ | ✅ | ✅ | ✅ | ✕ | ✅ | ◐ |
-| Stacked/100% bar (as part-to-whole) | **TS** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| Funnel | **STD** | ◐ | ✅ | ✅ | ✅ | ✅ | ✕ | ✅ | ◐ |
-| Sunburst (hierarchical) | **NTH** | ◐ | ◐ | ✅ | ✅ | ✕ | ✕ | ✕ | ◐ |
-| Sankey / flow | **NTH** | ◐ | ◐ | ✅ | ✅ | ✅ | ✕ | ✅ | ◐ |
-| Waterfall | **STD** | ✅ | ✅ | ✅ | ✅ | ✅ | ✕ | ✅ | ◐ |
+| Chart                               | Tier    | Tableau | Power BI | Metabase | Superset | Looker | Hex | Sigma | Obs Plot |
+| ----------------------------------- | ------- | ------- | -------- | -------- | -------- | ------ | --- | ----- | -------- |
+| Pie                                 | **TS**  | ✅      | ✅       | ✅       | ✅       | ✅     | ◐   | ✅    | ◐        |
+| Donut                               | **TS**  | ◐       | ✅       | ✅       | ✅       | ✅     | ◐   | ✅    | ◐        |
+| Treemap                             | **STD** | ✅      | ✅       | ✅       | ✅       | ✅     | ✕   | ✅    | ◐        |
+| Stacked/100% bar (as part-to-whole) | **TS**  | ✅      | ✅       | ✅       | ✅       | ✅     | ✅  | ✅    | ✅       |
+| Funnel                              | **STD** | ◐       | ✅       | ✅       | ✅       | ✅     | ✕   | ✅    | ◐        |
+| Sunburst (hierarchical)             | **NTH** | ◐       | ◐        | ✅       | ✅       | ✕      | ✕   | ✕     | ◐        |
+| Sankey / flow                       | **NTH** | ◐       | ◐        | ✅       | ✅       | ✅     | ✕   | ✅    | ◐        |
+| Waterfall                           | **STD** | ✅      | ✅       | ✅       | ✅       | ✅     | ✕   | ✅    | ◐        |
 
 ### 1D. Distribution
 
-| Chart | Tier | Tableau | Power BI | Metabase | Superset | Looker | Hex | Sigma | Obs Plot |
-|---|---|---|---|---|---|---|---|---|---|
-| Histogram | **TS** | ✅ | ✅ | ✅ | ✅ | ✅ | ◐ | ✅ | ✅ |
-| Box plot | **STD** | ✅ | ◐ | ✕ | ✅ | ✅ | ✕ | ✅ | ✅ |
-| Heatmap (matrix) | **STD** | ✅ | ◐ | ✅ | ✅ | ✅ | ◐ | ✅ | ✅ |
-| Density / violin | **NTH** | ◐ | ✕ | ✕ | ✕ | ✕ | ✕ | ✕ | ◐ |
+| Chart            | Tier    | Tableau | Power BI | Metabase | Superset | Looker | Hex | Sigma | Obs Plot |
+| ---------------- | ------- | ------- | -------- | -------- | -------- | ------ | --- | ----- | -------- |
+| Histogram        | **TS**  | ✅      | ✅       | ✅       | ✅       | ✅     | ◐   | ✅    | ✅       |
+| Box plot         | **STD** | ✅      | ◐        | ✕        | ✅       | ✅     | ✕   | ✅    | ✅       |
+| Heatmap (matrix) | **STD** | ✅      | ◐        | ✅       | ✅       | ✅     | ◐   | ✅    | ✅       |
+| Density / violin | **NTH** | ◐       | ✕        | ✕        | ✕        | ✕      | ✕   | ✕     | ◐        |
 
 ### 1E. Correlation / relationship
 
-| Chart | Tier | Tableau | Power BI | Metabase | Superset | Looker | Hex | Sigma | Obs Plot |
-|---|---|---|---|---|---|---|---|---|---|
-| Scatter plot | **TS** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| Bubble (scatter + size) | **STD** | ✅ | ✅ | ◐ | ✅ | ✅ | ◐ | ✅ | ✅ |
-| Correlation matrix / heatmap | **NTH** | ◐ | ✕ | ✕ | ✅ | ◐ | ◐ | ◐ | ✅ |
-| Network / graph | **NTH** | ◐ | ◐ | ✕ | ✅ | ✕ | ✕ | ✕ | ◐ |
+| Chart                        | Tier    | Tableau | Power BI | Metabase | Superset | Looker | Hex | Sigma | Obs Plot |
+| ---------------------------- | ------- | ------- | -------- | -------- | -------- | ------ | --- | ----- | -------- |
+| Scatter plot                 | **TS**  | ✅      | ✅       | ✅       | ✅       | ✅     | ✅  | ✅    | ✅       |
+| Bubble (scatter + size)      | **STD** | ✅      | ✅       | ◐        | ✅       | ✅     | ◐   | ✅    | ✅       |
+| Correlation matrix / heatmap | **NTH** | ◐       | ✕        | ✕        | ✅       | ◐      | ◐   | ◐     | ✅       |
+| Network / graph              | **NTH** | ◐       | ◐        | ✕        | ✅       | ✕      | ✕   | ✕     | ◐        |
 
 ### 1F. KPI / single-value
 
-| Chart | Tier | Tableau | Power BI | Metabase | Superset | Looker | Hex | Sigma | Obs Plot |
-|---|---|---|---|---|---|---|---|---|---|
-| Single big number / card | **TS** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✕ |
-| KPI (value + target + trend) | **TS** | ◐ | ✅ | ✅ | ✅ | ✅ | ◐ | ✅ | ✕ |
-| Number + delta vs prior period | **STD** | ◐ | ✅ | ✅ | ✅ | ◐ | ◐ | ✅ | ✕ |
-| Card + sparkline | **STD** | ◐ | ✅ | ✅ | ◐ | ✅ | ◐ | ✅ | ✕ |
-| Gauge | **STD** | ◐ | ✅ | ✅ | ✅ | ✅ | ✕ | ✅ | ✕ |
+| Chart                          | Tier    | Tableau | Power BI | Metabase | Superset | Looker | Hex | Sigma | Obs Plot |
+| ------------------------------ | ------- | ------- | -------- | -------- | -------- | ------ | --- | ----- | -------- |
+| Single big number / card       | **TS**  | ✅      | ✅       | ✅       | ✅       | ✅     | ✅  | ✅    | ✕        |
+| KPI (value + target + trend)   | **TS**  | ◐       | ✅       | ✅       | ✅       | ✅     | ◐   | ✅    | ✕        |
+| Number + delta vs prior period | **STD** | ◐       | ✅       | ✅       | ✅       | ◐      | ◐   | ✅    | ✕        |
+| Card + sparkline               | **STD** | ◐       | ✅       | ✅       | ◐        | ✅     | ◐   | ✅    | ✕        |
+| Gauge                          | **STD** | ◐       | ✅       | ✅       | ✅       | ✅     | ✕   | ✅    | ✕        |
 
 ### 1G. Tables / pivots
 
-| Chart | Tier | Tableau | Power BI | Metabase | Superset | Looker | Hex | Sigma | Obs Plot |
-|---|---|---|---|---|---|---|---|---|---|
-| Plain data table | **TS** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ◐ |
-| Pivot / crosstab / matrix | **TS** | ✅ | ✅ | ✅ | ✅ | ✅ | ◐ | ✅ | ✕ |
-| Table w/ subtotals + grand totals | **TS** | ✅ | ✅ | ✅ | ✅ | ✅ | ◐ | ✅ | ✕ |
-| Highlight table (heat-colored) | **STD** | ✅ | ✅ | ✅ | ✅ | ✅ | ◐ | ✅ | ✅ |
-| Table w/ in-cell bars / sparklines | **STD** | ◐ | ✅ | ◐ | ◐ | ✅ | ◐ | ✅ | ✕ |
+| Chart                              | Tier    | Tableau | Power BI | Metabase | Superset | Looker | Hex | Sigma | Obs Plot |
+| ---------------------------------- | ------- | ------- | -------- | -------- | -------- | ------ | --- | ----- | -------- |
+| Plain data table                   | **TS**  | ✅      | ✅       | ✅       | ✅       | ✅     | ✅  | ✅    | ◐        |
+| Pivot / crosstab / matrix          | **TS**  | ✅      | ✅       | ✅       | ✅       | ✅     | ◐   | ✅    | ✕        |
+| Table w/ subtotals + grand totals  | **TS**  | ✅      | ✅       | ✅       | ✅       | ✅     | ◐   | ✅    | ✕        |
+| Highlight table (heat-colored)     | **STD** | ✅      | ✅       | ✅       | ✅       | ✅     | ◐   | ✅    | ✅       |
+| Table w/ in-cell bars / sparklines | **STD** | ◐       | ✅       | ◐        | ◐        | ✅     | ◐   | ✅    | ✕        |
 
 ### 1H. Maps
 
-| Chart | Tier | Tableau | Power BI | Metabase | Superset | Looker | Hex | Sigma | Obs Plot |
-|---|---|---|---|---|---|---|---|---|---|
-| Choropleth / filled region map | **STD** | ✅ | ✅ | ✅ | ✅ | ✅ | ◐ | ✅ | ◐ |
-| Point / symbol map (lat-long) | **STD** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ◐ |
-| Bubble map (sized points) | **STD** | ✅ | ✅ | ◐ | ✅ | ✅ | ◐ | ✅ | ◐ |
-| Heatmap / density map | **NTH** | ✅ | ◐ | ✅ | ✅ | ◐ | ✅ | ✅ | ◐ |
-| Custom GeoJSON boundaries | **NTH** | ◐ | ◐ | ✕ | ✅ | ◐ | ◐ | ✅ | ◐ |
+| Chart                          | Tier    | Tableau | Power BI | Metabase | Superset | Looker | Hex | Sigma | Obs Plot |
+| ------------------------------ | ------- | ------- | -------- | -------- | -------- | ------ | --- | ----- | -------- |
+| Choropleth / filled region map | **STD** | ✅      | ✅       | ✅       | ✅       | ✅     | ◐   | ✅    | ◐        |
+| Point / symbol map (lat-long)  | **STD** | ✅      | ✅       | ✅       | ✅       | ✅     | ✅  | ✅    | ◐        |
+| Bubble map (sized points)      | **STD** | ✅      | ✅       | ◐        | ✅       | ✅     | ◐   | ✅    | ◐        |
+| Heatmap / density map          | **NTH** | ✅      | ◐        | ✅       | ✅       | ◐      | ✅  | ✅    | ◐        |
+| Custom GeoJSON boundaries      | **NTH** | ◐       | ◐        | ✕        | ✅       | ◐      | ◐   | ✅    | ◐        |
 
 ### 1I. Specialized (all **NTH** unless noted)
 
@@ -494,116 +491,116 @@ This is where tools separate. A tool can have 40 chart types and still feel toy-
 
 ### 2A. Labeling & annotation
 
-| Feature | Prio | Tableau | Power BI | Metabase | Superset | Looker | Sigma | Hex | Obs Plot |
-|---|---|---|---|---|---|---|---|---|---|
-| Data labels (on/off) | **P0** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| Data-label format (decimals, prefix/suffix, %) | **P0** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ◐ | ✅ |
-| Label position (inside/outside/auto) | **P1** | ✅ | ✅ | ◐ | ✅ | ✅ | ✅ | ◐ | ✅ |
-| Show total-of-stack label | **P1** | ✅ | ✅ | ◐ | ◐ | ◐ | ✅ | ✕ | ◐ |
-| Label only min/max/first/last/N | **P2** | ✅ | ◐ | ✕ | ✕ | ✕ | ◐ | ✕ | ✅ |
-| Text annotations / callouts on canvas | **P1** | ✅ | ✅ | ✕ | ✅ | ◐ | ✅ | ◐ | ✅ |
+| Feature                                        | Prio   | Tableau | Power BI | Metabase | Superset | Looker | Sigma | Hex | Obs Plot |
+| ---------------------------------------------- | ------ | ------- | -------- | -------- | -------- | ------ | ----- | --- | -------- |
+| Data labels (on/off)                           | **P0** | ✅      | ✅       | ✅       | ✅       | ✅     | ✅    | ✅  | ✅       |
+| Data-label format (decimals, prefix/suffix, %) | **P0** | ✅      | ✅       | ✅       | ✅       | ✅     | ✅    | ◐   | ✅       |
+| Label position (inside/outside/auto)           | **P1** | ✅      | ✅       | ◐        | ✅       | ✅     | ✅    | ◐   | ✅       |
+| Show total-of-stack label                      | **P1** | ✅      | ✅       | ◐        | ◐        | ◐      | ✅    | ✕   | ◐        |
+| Label only min/max/first/last/N                | **P2** | ✅      | ◐        | ✕        | ✕        | ✕      | ◐     | ✕   | ✅       |
+| Text annotations / callouts on canvas          | **P1** | ✅      | ✅       | ✕        | ✅       | ◐      | ✅    | ◐   | ✅       |
 
 ### 2B. Axes
 
-| Feature | Prio | Tableau | Power BI | Metabase | Superset | Looker | Sigma | Hex |
-|---|---|---|---|---|---|---|---|---|
-| Dual / secondary Y-axis | **P0** | ✅ | ✅ (combo) | ✅ | ✅ | ✅ | ✅ | ✅ |
-| Independent axis scale per axis | **P0** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| Log scale | **P1** | ✅ | ✅ | ✅ | ✅ | ✅ | ◐ | ✅ |
-| Manual axis min/max + tick interval | **P0** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| Axis title / unit override | **P0** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| Synchronized / shared axis | **P1** | ✅ | ◐ | ◐ | ◐ | ◐ | ◐ | ◐ |
-| Reversed axis | **P2** | ✅ | ✅ | ◐ | ✅ | ✅ | ◐ | ✅ |
-| Categorical vs continuous axis toggle | **P1** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| Feature                               | Prio   | Tableau | Power BI   | Metabase | Superset | Looker | Sigma | Hex |
+| ------------------------------------- | ------ | ------- | ---------- | -------- | -------- | ------ | ----- | --- |
+| Dual / secondary Y-axis               | **P0** | ✅      | ✅ (combo) | ✅       | ✅       | ✅     | ✅    | ✅  |
+| Independent axis scale per axis       | **P0** | ✅      | ✅         | ✅       | ✅       | ✅     | ✅    | ✅  |
+| Log scale                             | **P1** | ✅      | ✅         | ✅       | ✅       | ✅     | ◐     | ✅  |
+| Manual axis min/max + tick interval   | **P0** | ✅      | ✅         | ✅       | ✅       | ✅     | ✅    | ✅  |
+| Axis title / unit override            | **P0** | ✅      | ✅         | ✅       | ✅       | ✅     | ✅    | ✅  |
+| Synchronized / shared axis            | **P1** | ✅      | ◐          | ◐        | ◐        | ◐      | ◐     | ◐   |
+| Reversed axis                         | **P2** | ✅      | ✅         | ◐        | ✅       | ✅     | ◐     | ✅  |
+| Categorical vs continuous axis toggle | **P1** | ✅      | ✅         | ✅       | ✅       | ✅     | ✅    | ✅  |
 
 ### 2C. Reference / analytics overlays
 
-| Feature | Prio | Tableau | Power BI | Metabase | Superset | Looker | Sigma | Hex | Obs Plot |
-|---|---|---|---|---|---|---|---|---|---|
-| Constant reference line (fixed value) | **P0** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ◐ | ✅ |
-| Computed reference line (avg/median/min/max/percentile) | **P1** | ✅ | ✅ | ◐ | ◐ | ◐ | ◐ | ✕ | ✅ |
-| Reference band / shaded region | **P1** | ✅ | ◐ | ✕ | ◐ | ◐ | ◐ | ✕ | ✅ |
-| Multiple ref lines per chart | **P1** | ✅ | ✅ | ◐ | ◐ | ◐ | ◐ | ✕ | ✅ |
-| Trend line (linear/poly/exp/log) | **P1** | ✅ | ✅ | ◐ | ✅ | ✅ | ◐ | ✕ | ✅ |
-| Forecast (with confidence interval) | **P2** | ✅ | ✅ | ✕ | ◐ | ◐ | ◐ | ✕ | ◐ |
-| Anomaly / outlier detection | **P2** | ◐ | ✅ | ✕ | ✕ | ✕ | ✕ | ✕ | ✕ |
-| Error bars | **P2** | ✅ | ✅ | ✕ | ◐ | ◐ | ✕ | ✕ | ✅ |
+| Feature                                                 | Prio   | Tableau | Power BI | Metabase | Superset | Looker | Sigma | Hex | Obs Plot |
+| ------------------------------------------------------- | ------ | ------- | -------- | -------- | -------- | ------ | ----- | --- | -------- |
+| Constant reference line (fixed value)                   | **P0** | ✅      | ✅       | ✅       | ✅       | ✅     | ✅    | ◐   | ✅       |
+| Computed reference line (avg/median/min/max/percentile) | **P1** | ✅      | ✅       | ◐        | ◐        | ◐      | ◐     | ✕   | ✅       |
+| Reference band / shaded region                          | **P1** | ✅      | ◐        | ✕        | ◐        | ◐      | ◐     | ✕   | ✅       |
+| Multiple ref lines per chart                            | **P1** | ✅      | ✅       | ◐        | ◐        | ◐      | ◐     | ✕   | ✅       |
+| Trend line (linear/poly/exp/log)                        | **P1** | ✅      | ✅       | ◐        | ✅       | ✅     | ◐     | ✕   | ✅       |
+| Forecast (with confidence interval)                     | **P2** | ✅      | ✅       | ✕        | ◐        | ◐      | ◐     | ✕   | ◐        |
+| Anomaly / outlier detection                             | **P2** | ◐       | ✅       | ✕        | ✕        | ✕      | ✕     | ✕   | ✕        |
+| Error bars                                              | **P2** | ✅      | ✅       | ✕        | ◐        | ◐      | ✕     | ✕   | ✅       |
 
 ### 2D. Series formatting & stacking
 
-| Feature | Prio | Tableau | Power BI | Metabase | Superset | Looker | Sigma | Hex |
-|---|---|---|---|---|---|---|---|---|
-| Per-series color | **P0** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| Per-series chart type (this series = bar, that = line) | **P1** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ◐ |
-| Per-series axis assignment (→ secondary) | **P0** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| Stacking mode: none / stacked / 100% | **P0** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ◐ |
-| Series display order / reorder | **P1** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| Line style (solid/dash), width, marker toggle | **P1** | ✅ | ✅ | ◐ | ✅ | ✅ | ◐ | ✅ |
-| Custom color palette / brand theme | **P1** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| Diverging / sequential color scales | **P1** | ✅ | ✅ | ◐ | ✅ | ✅ | ✅ | ✅ |
+| Feature                                                | Prio   | Tableau | Power BI | Metabase | Superset | Looker | Sigma | Hex |
+| ------------------------------------------------------ | ------ | ------- | -------- | -------- | -------- | ------ | ----- | --- |
+| Per-series color                                       | **P0** | ✅      | ✅       | ✅       | ✅       | ✅     | ✅    | ✅  |
+| Per-series chart type (this series = bar, that = line) | **P1** | ✅      | ✅       | ✅       | ✅       | ✅     | ✅    | ◐   |
+| Per-series axis assignment (→ secondary)               | **P0** | ✅      | ✅       | ✅       | ✅       | ✅     | ✅    | ✅  |
+| Stacking mode: none / stacked / 100%                   | **P0** | ✅      | ✅       | ✅       | ✅       | ✅     | ✅    | ◐   |
+| Series display order / reorder                         | **P1** | ✅      | ✅       | ✅       | ✅       | ✅     | ✅    | ✅  |
+| Line style (solid/dash), width, marker toggle          | **P1** | ✅      | ✅       | ◐        | ✅       | ✅     | ◐     | ✅  |
+| Custom color palette / brand theme                     | **P1** | ✅      | ✅       | ✅       | ✅       | ✅     | ✅    | ✅  |
+| Diverging / sequential color scales                    | **P1** | ✅      | ✅       | ◐        | ✅       | ✅     | ✅    | ✅  |
 
 ### 2E. Conditional formatting
 
-| Feature | Prio | Tableau | Power BI | Metabase | Superset | Looker | Sigma | Hex |
-|---|---|---|---|---|---|---|---|---|
-| Color by rule / threshold (charts) | **P1** | ✅ | ✅ | ◐ | ◐ | ✅ | ✅ | ◐ |
-| Color scale / gradient by value | **P1** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ◐ |
-| Table cell background / font color rules | **P0** (tables) | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| In-cell data bars | **P1** | ◐ | ✅ | ✕ | ◐ | ✅ | ✅ | ◐ |
-| Icon sets / status indicators | **P2** | ◐ | ✅ | ✕ | ✕ | ◐ | ✅ | ✕ |
+| Feature                                  | Prio            | Tableau | Power BI | Metabase | Superset | Looker | Sigma | Hex |
+| ---------------------------------------- | --------------- | ------- | -------- | -------- | -------- | ------ | ----- | --- |
+| Color by rule / threshold (charts)       | **P1**          | ✅      | ✅       | ◐        | ◐        | ✅     | ✅    | ◐   |
+| Color scale / gradient by value          | **P1**          | ✅      | ✅       | ✅       | ✅       | ✅     | ✅    | ◐   |
+| Table cell background / font color rules | **P0** (tables) | ✅      | ✅       | ✅       | ✅       | ✅     | ✅    | ✅  |
+| In-cell data bars                        | **P1**          | ◐       | ✅       | ✕        | ◐        | ✅     | ✅    | ◐   |
+| Icon sets / status indicators            | **P2**          | ◐       | ✅       | ✕        | ✕        | ◐      | ✅    | ✕   |
 
 ### 2F. Sorting, Top-N, filtering
 
-| Feature | Prio | Tableau | Power BI | Metabase | Superset | Looker | Sigma | Hex |
-|---|---|---|---|---|---|---|---|---|
-| Sort by dimension (A-Z) | **P0** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| Sort by measure (value, asc/desc) | **P0** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| Top-N / Bottom-N filter | **P0** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ◐ |
-| "Others" bucket for remainder | **P1** | ◐ | ◐ | ◐ | ✅ | ✅ | ◐ | ✕ |
-| Chart-level (viz) filters | **P0** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| Interactive legend show/hide series | **P1** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| Feature                             | Prio   | Tableau | Power BI | Metabase | Superset | Looker | Sigma | Hex |
+| ----------------------------------- | ------ | ------- | -------- | -------- | -------- | ------ | ----- | --- |
+| Sort by dimension (A-Z)             | **P0** | ✅      | ✅       | ✅       | ✅       | ✅     | ✅    | ✅  |
+| Sort by measure (value, asc/desc)   | **P0** | ✅      | ✅       | ✅       | ✅       | ✅     | ✅    | ✅  |
+| Top-N / Bottom-N filter             | **P0** | ✅      | ✅       | ✅       | ✅       | ✅     | ✅    | ◐   |
+| "Others" bucket for remainder       | **P1** | ◐       | ◐        | ◐        | ✅       | ✅     | ◐     | ✕   |
+| Chart-level (viz) filters           | **P0** | ✅      | ✅       | ✅       | ✅       | ✅     | ✅    | ✅  |
+| Interactive legend show/hide series | **P1** | ✅      | ✅       | ✅       | ✅       | ✅     | ✅    | ✅  |
 
 ### 2G. Drill & interactivity
 
-| Feature | Prio | Tableau | Power BI | Metabase | Superset | Looker | Sigma | Hex |
-|---|---|---|---|---|---|---|---|---|
-| Tooltip on hover | **P0** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| Customizable tooltip (fields, format, text) | **P1** | ✅ | ✅ | ◐ | ◐ | ✅ | ✅ | ✅ |
-| Drill-down hierarchy (expand a level) | **P1** | ✅ | ✅ | ✅ | ◐ | ✅ | ✅ | ◐ |
-| Drill-through (jump to detail view) | **P1** | ✅ | ✅ | ✅ | ◐ | ✅ | ✅ | ◐ |
-| Cross-filter (click chart → filter others) | **P1** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| Click-through to underlying rows | **P1** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| Feature                                     | Prio   | Tableau | Power BI | Metabase | Superset | Looker | Sigma | Hex |
+| ------------------------------------------- | ------ | ------- | -------- | -------- | -------- | ------ | ----- | --- |
+| Tooltip on hover                            | **P0** | ✅      | ✅       | ✅       | ✅       | ✅     | ✅    | ✅  |
+| Customizable tooltip (fields, format, text) | **P1** | ✅      | ✅       | ◐        | ◐        | ✅     | ✅    | ✅  |
+| Drill-down hierarchy (expand a level)       | **P1** | ✅      | ✅       | ✅       | ◐        | ✅     | ✅    | ◐   |
+| Drill-through (jump to detail view)         | **P1** | ✅      | ✅       | ✅       | ◐        | ✅     | ✅    | ◐   |
+| Cross-filter (click chart → filter others)  | **P1** | ✅      | ✅       | ✅       | ✅       | ✅     | ✅    | ✅  |
+| Click-through to underlying rows            | **P1** | ✅      | ✅       | ✅       | ✅       | ✅     | ✅    | ✅  |
 
 ### 2H. Small multiples / faceting
 
-| Feature | Prio | Tableau | Power BI | Metabase | Superset | Looker | Sigma | Hex | Obs Plot |
-|---|---|---|---|---|---|---|---|---|---|
-| Small multiples / trellis / facet grid | **P2** | ✅ | ✅ | ◐ | ✅ | ◐ | ✅ | ◐ | ✅ |
-| Shared vs independent scales across facets | **P2** | ✅ | ◐ | ✕ | ◐ | ✕ | ◐ | ✕ | ✅ |
+| Feature                                    | Prio   | Tableau | Power BI | Metabase | Superset | Looker | Sigma | Hex | Obs Plot |
+| ------------------------------------------ | ------ | ------- | -------- | -------- | -------- | ------ | ----- | --- | -------- |
+| Small multiples / trellis / facet grid     | **P2** | ✅      | ✅       | ◐        | ✅       | ◐      | ✅    | ◐   | ✅       |
+| Shared vs independent scales across facets | **P2** | ✅      | ◐        | ✕        | ◐        | ✕      | ◐     | ✕   | ✅       |
 
 ### 2I. Number formatting
 
-| Feature | Prio | Tableau | Power BI | Metabase | Superset | Looker | Sigma | Hex |
-|---|---|---|---|---|---|---|---|---|
-| Decimal places control | **P0** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ◐ |
-| Thousands separator / grouping | **P0** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ◐ |
-| Currency + symbol | **P0** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ◐ |
-| Percent format | **P0** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ◐ |
-| Abbreviation (1.2K / 3.4M / 1.1B) | **P1** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ◐ |
-| Date/time format tokens | **P0** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| Prefix / suffix / custom format string | **P1** | ✅ | ✅ | ◐ | ✅ | ✅ | ✅ | ◐ |
-| Negative-number style (parens / red) | **P1** | ✅ | ✅ | ◐ | ◐ | ✅ | ✅ | ✕ |
-| Locale-aware formatting | **P1** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ◐ |
+| Feature                                | Prio   | Tableau | Power BI | Metabase | Superset | Looker | Sigma | Hex |
+| -------------------------------------- | ------ | ------- | -------- | -------- | -------- | ------ | ----- | --- |
+| Decimal places control                 | **P0** | ✅      | ✅       | ✅       | ✅       | ✅     | ✅    | ◐   |
+| Thousands separator / grouping         | **P0** | ✅      | ✅       | ✅       | ✅       | ✅     | ✅    | ◐   |
+| Currency + symbol                      | **P0** | ✅      | ✅       | ✅       | ✅       | ✅     | ✅    | ◐   |
+| Percent format                         | **P0** | ✅      | ✅       | ✅       | ✅       | ✅     | ✅    | ◐   |
+| Abbreviation (1.2K / 3.4M / 1.1B)      | **P1** | ✅      | ✅       | ✅       | ✅       | ✅     | ✅    | ◐   |
+| Date/time format tokens                | **P0** | ✅      | ✅       | ✅       | ✅       | ✅     | ✅    | ✅  |
+| Prefix / suffix / custom format string | **P1** | ✅      | ✅       | ◐        | ✅       | ✅     | ✅    | ◐   |
+| Negative-number style (parens / red)   | **P1** | ✅      | ✅       | ◐        | ◐        | ✅     | ✅    | ✕   |
+| Locale-aware formatting                | **P1** | ✅      | ✅       | ✅       | ✅       | ✅     | ✅    | ◐   |
 
 ### 2J. Null / missing-data handling
 
-| Feature | Prio | Tableau | Power BI | Metabase | Superset | Looker | Sigma | Hex |
-|---|---|---|---|---|---|---|---|---|
-| Line: gap vs connect-across-null | **P0** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ◐ |
-| Treat null as zero (toggle) | **P1** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ◐ |
-| Show/hide empty categories ("no data" rows) | **P1** | ✅ | ✅ | ◐ | ◐ | ◐ | ◐ | ✕ |
-| Null placeholder text in tables | **P1** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | ◐ |
-| Date densification / fill gaps in time series | **P2** | ✅ | ◐ | ◐ | ◐ | ✅ | ◐ | ✕ |
+| Feature                                       | Prio   | Tableau | Power BI | Metabase | Superset | Looker | Sigma | Hex |
+| --------------------------------------------- | ------ | ------- | -------- | -------- | -------- | ------ | ----- | --- |
+| Line: gap vs connect-across-null              | **P0** | ✅      | ✅       | ✅       | ✅       | ✅     | ✅    | ◐   |
+| Treat null as zero (toggle)                   | **P1** | ✅      | ✅       | ✅       | ✅       | ✅     | ✅    | ◐   |
+| Show/hide empty categories ("no data" rows)   | **P1** | ✅      | ✅       | ◐        | ◐        | ◐      | ◐     | ✕   |
+| Null placeholder text in tables               | **P1** | ✅      | ✅       | ✅       | ✅       | ✅     | ✅    | ◐   |
+| Date densification / fill gaps in time series | **P2** | ✅      | ◐        | ◐        | ◐        | ✅     | ◐     | ✕   |
 
 ---
 
@@ -629,18 +626,16 @@ A chart engine is **not credible** until every **P0** across 2A–2J is present.
 
 ### Notable observations for the DBExec diff
 
-- **Observable Plot** is the outlier: it's a *marks grammar*, not a chart picker — it has no KPI card, no pivot, weak maps, but unbeaten composability and faceting. Treat it as the model for the *rendering layer*, not the *feature checklist*.
-- **Hex** is deliberately lean (bar/line/scatter/map/single-value/table) — it leans on notebook code for anything advanced. It sets the *floor*, not the bar.
+- **Observable Plot** is the outlier: it's a _marks grammar_, not a chart picker — it has no KPI card, no pivot, weak maps, but unbeaten composability and faceting. Treat it as the model for the _rendering layer_, not the _feature checklist_.
+- **Hex** is deliberately lean (bar/line/scatter/map/single-value/table) — it leans on notebook code for anything advanced. It sets the _floor_, not the bar.
 - **Power BI's Analytics pane** is the reference implementation for reference lines / trend / forecast / anomaly — the richest single feature surface to benchmark 2C against.
 - **Tableau** sets the bar for reference bands, per-mark control, tooltips, and null/densification.
-- **Superset** sets the bar for *breadth* (30+ ECharts types incl. Sankey/radar/graph/deck.gl) but is weaker on polished per-chart config UX.
+- **Superset** sets the bar for _breadth_ (30+ ECharts types incl. Sankey/radar/graph/deck.gl) but is weaker on polished per-chart config UX.
 - **Pivot/crosstab with subtotals + grand totals** is table-stakes everywhere except the two code-native tools — a common under-invested area worth checking in DBExec.
 
 **Sources:** [Tableau chart types](https://help.tableau.com/current/pro/desktop/en-us/what_chart_example.htm) · [Tableau reference lines & bands](https://help.tableau.com/current/pro/desktop/en-us/reference_lines.htm) · [Tableau missing values](https://help.tableau.com/current/pro/desktop/en-us/missing_values.htm) · [Power BI visualizations overview](https://learn.microsoft.com/en-us/power-bi/visuals/power-bi-visualizations-overview) · [Power BI Analytics pane](https://learn.microsoft.com/en-us/power-bi/transform-model/desktop-analytics-pane) · [Power BI conditional formatting](https://learn.microsoft.com/en-us/power-bi/visuals/power-bi-visualization-conditional-formatting) · [Power BI combo chart](https://learn.microsoft.com/en-us/power-bi/visuals/power-bi-visualization-combo-chart) · [Metabase visualization overview](https://www.metabase.com/docs/latest/questions/visualizations/visualizing-results) · [Metabase combo charts](https://www.metabase.com/docs/latest/questions/visualizations/combo-chart) · [Metabase maps](https://www.metabase.com/docs/latest/questions/visualizations/map) · [Superset chart plugins](https://deepwiki.com/apache/superset/3.6-chart-plugins-and-visualization) · [Superset 30 chart types](https://www.tvl-managed-superset.com/tutorials/apache-superset-types-de-graphiques) · [Looker visualization types](https://docs.cloud.google.com/looker/docs/visualization-types) · [Looker Studio chart types](https://docs.cloud.google.com/looker/docs/studio/types-of-charts-in-looker-studio) · [Sigma intro to charts](https://help.sigmacomputing.com/docs/intro-to-visualizations) · [Sigma combo charts](https://help.sigmacomputing.com/docs/combo-charts) · [Sigma KPI chart](https://help.sigmacomputing.com/docs/build-a-kpi-chart) · [Hex chart cells](https://learn.hex.tech/docs/explore-data/cells/visualization-cells/chart-cells) · [Hex single value cells](https://learn.hex.tech/docs/explore-data/cells/visualization-cells/single-value-cells) · [Observable Plot marks](https://observablehq.com/plot/features/marks)
 
-
 # Interaction
-
 
 I now have current confirmation on the newer/less-stable behaviors. Combined with my established knowledge of Tableau, Power BI, and Looker, I have enough to synthesize the full benchmark and checklist. Let me produce the final research output.
 
@@ -669,6 +664,7 @@ Every modern BI tool converges on the same conceptual verbs, but names them diff
 ## Part 2 — Tool-by-tool benchmark
 
 ### Tableau (the reference implementation for "dashboard actions")
+
 The richest and most explicit action model. Interactions are configured as **Dashboard Actions**, each with a **source**, a **run trigger** (Hover / Select / Menu), and a **target**.
 
 - **Filter actions** — source sheet selection filters target sheet(s). This is Tableau's cross-filter. Configurable field mapping (which source field maps to which target field), and "clearing the selection" behavior (show all / leave filtered / exclude all values).
@@ -683,6 +679,7 @@ The richest and most explicit action model. Interactions are configured as **Das
 - Trigger granularity (Hover vs Select vs Menu) is the thing most other tools lack.
 
 ### Power BI (the reference for the filter-vs-highlight distinction)
+
 Power BI is the clearest at separating the two destructive/non-destructive modes, and its terminology has become the industry vocabulary.
 
 - **Cross-highlight (default)** — clicking a bar highlights related portions of other visuals, keeping full bars visible but faded. Non-destructive.
@@ -695,15 +692,18 @@ Power BI is the clearest at separating the two destructive/non-destructive modes
 - **Filter pane** — hierarchy of visual / page / report / drill-through filter scopes.
 
 ### Metabase
+
 Pragmatic, click-behavior-per-column model. Three click behaviors, chosen per card (and per column on tables):
 
 1. **Open the drill-through menu** (default) — a context menu with "Filter by this value," "See these records" (→ raw rows), "Break out by…" (ad-hoc drill-down by a chosen dimension), "Zoom in," "X-ray."
 2. **Update a dashboard filter** — this is Metabase's cross-filter; a click on chart A sets a dashboard filter that other cards consume.
 3. **Go to a custom destination** — another dashboard, a saved question, or an external URL, passing clicked values / user attributes into the destination's filters. SQL-native questions only get options 2 and 3 (no auto drill menu).
-- No true cross-*highlight* (dim-in-place); cross-interaction is filter-based.
+
+- No true cross-_highlight_ (dim-in-place); cross-interaction is filter-based.
 - "See these records" is the built-in drill-to-detail.
 
 ### Superset
+
 Feature-flagged, maturing fast; three relevant features (all default-on in recent 4.x):
 
 - **Cross-filters** (`DASHBOARD_CROSS_FILTERS`) — click a mark emits a cross-filter to the dashboard, relayed to appropriately-scoped charts; bi-directional; as of 4.1.x works across datasets. Chart-level opt-out of emitting/receiving.
@@ -713,6 +713,7 @@ Feature-flagged, maturing fast; three relevant features (all default-on in recen
 - Weaker on cross-highlight and on hover-sync across charts.
 
 ### Looker (LookML-governed)
+
 Governed, semantic-layer-driven interactions.
 
 - **Drill fields / drilling** — LookML `drill_fields` define what happens on click; opens a drill overlay (a table or another viz) filtered to the clicked context. This is both drill-down and drill-to-detail depending on the fields defined.
@@ -722,6 +723,7 @@ Governed, semantic-layer-driven interactions.
 - Tooltips are comparatively basic; hover-sync limited.
 
 ### Sigma (spreadsheet-native, "actions + sequences")
+
 Most flexible modern action model after Tableau.
 
 - **Actions** (and chained **Sequences**) — user-defined interactivity within and across elements: on click/select → **Filter** other elements, **Navigate** to another page passing context, set **control** values, open a modal, run write-back. Actions can be chained conditionally.
@@ -731,6 +733,7 @@ Most flexible modern action model after Tableau.
 - **Controls** = the dashboard-level parameter/filter primitive; actions can read and write them.
 
 ### Hex (notebook/app-native)
+
 Cross-filtering came to apps relatively recently; UI-first "project filters" are the primitive.
 
 - **Chart selections** — click-drag range select, individual mark select, legend-based filtering directly on the chart.
@@ -743,15 +746,15 @@ Cross-filtering came to apps relatively recently; UI-first "project filters" are
 
 ## Part 3 — Cross-tool terminology map (the confusing part)
 
-| Concept | Tableau | Power BI | Metabase | Superset | Looker | Sigma | Hex |
-|---|---|---|---|---|---|---|---|
-| Cross-filter (destructive) | Filter action | Cross-filter (via Edit Interactions) | "Update a dashboard filter" click behavior | Cross-filters | Dashboard cross-filtering | Filter action / cross-chart action | Project filter from chart selection |
-| Cross-highlight (non-destructive) | Highlight action | Cross-highlight (default) | — (not native) | — (limited) | — (limited) | via conditional formatting | limited |
-| Drill-down (hierarchy) | Hierarchy +/- | Drill mode | "Break out by" / Zoom in | Drill By | Drilling (`drill_fields`) | Drill anywhere / drill path | conditional cells |
-| Drill-through (to rows/detail) | View Data / nav action | Drill-through page | "See these records" | Drill to Detail | Drill overlay | Drill-through / navigate | app-page navigation |
-| Custom destination / URL | URL action / nav action | Buttons + drill-through | "Go to custom destination" | — (URL via markup) | `link` / Action Hub | Navigate action | app navigation |
-| Rich hover | Viz-in-Tooltip | Report-page tooltip | tooltip | tooltip | tooltip | tooltip | tooltip |
-| Saved view state | (via URL/params) | Bookmarks | — | — (permalink) | — | (bookmarks) | app versions |
+| Concept                           | Tableau                 | Power BI                             | Metabase                                   | Superset           | Looker                    | Sigma                              | Hex                                 |
+| --------------------------------- | ----------------------- | ------------------------------------ | ------------------------------------------ | ------------------ | ------------------------- | ---------------------------------- | ----------------------------------- |
+| Cross-filter (destructive)        | Filter action           | Cross-filter (via Edit Interactions) | "Update a dashboard filter" click behavior | Cross-filters      | Dashboard cross-filtering | Filter action / cross-chart action | Project filter from chart selection |
+| Cross-highlight (non-destructive) | Highlight action        | Cross-highlight (default)            | — (not native)                             | — (limited)        | — (limited)               | via conditional formatting         | limited                             |
+| Drill-down (hierarchy)            | Hierarchy +/-           | Drill mode                           | "Break out by" / Zoom in                   | Drill By           | Drilling (`drill_fields`) | Drill anywhere / drill path        | conditional cells                   |
+| Drill-through (to rows/detail)    | View Data / nav action  | Drill-through page                   | "See these records"                        | Drill to Detail    | Drill overlay             | Drill-through / navigate           | app-page navigation                 |
+| Custom destination / URL          | URL action / nav action | Buttons + drill-through              | "Go to custom destination"                 | — (URL via markup) | `link` / Action Hub       | Navigate action                    | app navigation                      |
+| Rich hover                        | Viz-in-Tooltip          | Report-page tooltip                  | tooltip                                    | tooltip            | tooltip                   | tooltip                            | tooltip                             |
+| Saved view state                  | (via URL/params)        | Bookmarks                            | —                                          | — (permalink)      | —                         | (bookmarks)                        | app versions                        |
 
 ---
 
@@ -772,7 +775,7 @@ Tiered by expectation. Tier 1 = table stakes (a dashboard without these reads as
 
 ### Tier 2 — Expected of a serious BI tool
 
-- [ ] **Explicit cross-filter vs cross-highlight choice.** Adopt Power BI's model: per source→target pair, choose Filter / Highlight / None. Even if you ship only cross-*filter* first, design the config surface so highlight can slot in. Highlight (dim-in-place) is what keeps context on dense dashboards.
+- [ ] **Explicit cross-filter vs cross-highlight choice.** Adopt Power BI's model: per source→target pair, choose Filter / Highlight / None. Even if you ship only cross-_filter_ first, design the config surface so highlight can slot in. Highlight (dim-in-place) is what keeps context on dense dashboards.
 - [ ] **Edit-interactions matrix.** A dashboard-author UI to decide which chart affects which (the Power BI "Edit interactions" grid, or Superset's per-chart emit/receive toggles). Without this, cross-filtering everything-affects-everything gets chaotic on >4 charts.
 - [ ] **Drill-down on hierarchies.** Author defines a hierarchy (Year→Q→Month, Country→State→City); clicking descends within the same chart; breadcrumb + drill-up. Distinguish clearly in UI from drill-through.
 - [ ] **Drill-through to another view.** Click an entity → navigate to a detail dashboard/page that receives the clicked context as its filters, with an auto back-button. Power BI drill-through pages / Sigma navigate action / Metabase custom destination are the models.

@@ -48,19 +48,22 @@
       [class.relay__status--error]="state() === 'error'"
       [ngSwitch]="state()"
     >
-      <span *ngSwitchCase="'loading'">{{ 'AUTH.RELAY.SETTING_UP' | translate }}</span>
-      <span *ngSwitchCase="'slow'">{{ 'AUTH.RELAY.STILL_WORKING' | translate }}</span>
+      <span *ngSwitchCase="'loading'">{{
+        'AUTH.RELAY.SETTING_UP' | translate
+      }}</span>
+      <span *ngSwitchCase="'slow'">{{
+        'AUTH.RELAY.STILL_WORKING' | translate
+      }}</span>
       <span *ngSwitchCase="'ready'">{{ 'AUTH.RELAY.READY' | translate }}</span>
-      <span *ngSwitchCase="'error'">{{ 'AUTH.RELAY.ERROR_GENERIC' | translate }}</span>
+      <span *ngSwitchCase="'error'">{{
+        'AUTH.RELAY.ERROR_GENERIC' | translate
+      }}</span>
     </p>
 
     <!-- Server-supplied detail. Muted, smaller, only shown when we
          have one. Lets ops copy a meaningful line into a bug
          report without polluting the primary error copy. -->
-    <p
-      class="relay__details"
-      *ngIf="state() === 'error' && errorDetails()"
-    >
+    <p class="relay__details" *ngIf="state() === 'error' && errorDetails()">
       {{ 'AUTH.RELAY.DETAILS_LABEL' | translate }}:
       <span>{{ errorDetails() }}</span>
     </p>
@@ -117,7 +120,5 @@
     </p>
   </div>
 
-  <div class="relay__bottom" aria-hidden="true">
-    © DBExec · {{ year }}
-  </div>
+  <div class="relay__bottom" aria-hidden="true">© DBExec · {{ year }}</div>
 </div>

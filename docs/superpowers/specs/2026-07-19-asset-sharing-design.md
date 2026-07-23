@@ -14,13 +14,13 @@ substrate serving all three asset types.
 
 ## 1. Phase 1 research — how the five tools do it
 
-| Tool | Grant unit | Levels (→ our map) | Re-share right | "Who has access" surface | Multi-grant resolution |
-|---|---|---|---|---|---|
-| **Tableau** | users + groups | View / Explore / Publish / Overwrite capability templates. View→**VIEW**, Explore+→**EDIT** | "Overwrite" = save + become owner (ownership transfer) | Per-content Permissions panel; project defaults inherited | grant/deny/unspecified, deny wins |
-| **Power BI** | users + groups (+ link) | Viewer=**VIEW**, Contributor/Member=**EDIT**; separate **Build** + **Reshare** toggles | Explicit "Allow recipients to share" toggle | Manage-permissions pane per item + workspace roles | role = max container role |
-| **Looker** | users + groups | **View** (see/view/copy) / **Manage-Edit** (view + rename/move/delete + *manage access*) | Bundled into Manage-Edit | Folder "Add group or user → pick level → Add" list (Google-Docs UX) | most permissive |
-| **Metabase** | groups only | **View** / **Curate** (=edit) / No-access (hidden) | Bundled into Curate | Collection permissions grid | **additive — most permissive across groups** |
-| **Superset** | users + groups | per-resource **editors** / **viewers** subject pickers; owner=full | editors can edit; groups recommended | editors/viewers picker; DASHBOARD_RBAC role list | max |
+| Tool         | Grant unit              | Levels (→ our map)                                                                          | Re-share right                                         | "Who has access" surface                                            | Multi-grant resolution                       |
+| ------------ | ----------------------- | ------------------------------------------------------------------------------------------- | ------------------------------------------------------ | ------------------------------------------------------------------- | -------------------------------------------- |
+| **Tableau**  | users + groups          | View / Explore / Publish / Overwrite capability templates. View→**VIEW**, Explore+→**EDIT** | "Overwrite" = save + become owner (ownership transfer) | Per-content Permissions panel; project defaults inherited           | grant/deny/unspecified, deny wins            |
+| **Power BI** | users + groups (+ link) | Viewer=**VIEW**, Contributor/Member=**EDIT**; separate **Build** + **Reshare** toggles      | Explicit "Allow recipients to share" toggle            | Manage-permissions pane per item + workspace roles                  | role = max container role                    |
+| **Looker**   | users + groups          | **View** (see/view/copy) / **Manage-Edit** (view + rename/move/delete + _manage access_)    | Bundled into Manage-Edit                               | Folder "Add group or user → pick level → Add" list (Google-Docs UX) | most permissive                              |
+| **Metabase** | groups only             | **View** / **Curate** (=edit) / No-access (hidden)                                          | Bundled into Curate                                    | Collection permissions grid                                         | **additive — most permissive across groups** |
+| **Superset** | users + groups          | per-resource **editors** / **viewers** subject pickers; owner=full                          | editors can edit; groups recommended                   | editors/viewers picker; DASHBOARD_RBAC role list                    | max                                          |
 
 **Distilled patterns → decisions**
 
@@ -30,17 +30,17 @@ substrate serving all three asset types.
    modify + run + view. Owner = full. This is the common denominator of every
    tool's two "content" tiers.
 3. **Effective permission = MAX(ownership, direct-user grant, group grants the
-   user is in).** This is Metabase's *additive/most-permissive* rule, echoed by
+   user is in).** This is Metabase's _additive/most-permissive_ rule, echoed by
    Looker and Power BI. Owner always wins (= full).
 4. **Re-share** is a fork: Power BI/Superset make it a separate bit; Looker/
    Metabase bundle "manage access" into Edit. **DECISION: bundle into EDIT** —
    simpler, matches the two-tier brief. An **Editor can add/modify/revoke other
    grants**; only the **Owner can delete the asset and transfer ownership**. A
    `canReshare` bit is a trivial future add if the user wants Power-BI-style
-   separation. *(Flagged for user.)*
+   separation. _(Flagged for user.)_
 5. **Explicit grants are orthogonal to public links.** DBExec already has a
    public share-token subsystem for dashboards (`dashboard_share_token`, the
-   `share-dashboard-dialog`). This feature is *internal, identity-based* grants
+   `share-dashboard-dialog`). This feature is _internal, identity-based_ grants
    to known users/groups. Both coexist; the new Share dialog is a separate
    management surface.
 6. **No folder/project inheritance.** DBExec removed folders (flat lists per
@@ -48,7 +48,7 @@ substrate serving all three asset types.
    from. Grants are per-asset and flat. Simpler.
 7. **"Who has access" = a Looker/Docs-style list** inside the Share dialog:
    the owner pinned at top ("Owner"), then each grant as `name/email · Edit|View
-   dropdown · Revoke`, plus an add-recipients row (users + groups multiselect +
+dropdown · Revoke`, plus an add-recipients row (users + groups multiselect +
    level dropdown).
 
 ---
@@ -59,7 +59,7 @@ substrate serving all three asset types.
 
 Justification vs per-type (`dataset_share` / `analysis_share` / `dashboard_share`):
 
-- The row shape is *identical* for all three (assetType + assetId + grantee +
+- The row shape is _identical_ for all three (assetType + assetId + grantee +
   level + tenant/audit). Per-type tables would triplicate the entity, the
   controllers, the validator and the migration for zero schema divergence.
 - Superset's newer model is exactly this: one editors/viewers substrate over
@@ -89,6 +89,7 @@ version           VersionColumn(select:false)
 ```
 
 Indexes (all auto-named, unnamed `@Index`):
+
 - `@Index(['organisationId', 'assetType', 'assetId'])` — the hot path: "who can
   see asset X" + "does user's grant exist for X".
 - `@Index(['organisationId', 'granteeType', 'granteeId'])` — reverse: "what is
@@ -121,6 +122,7 @@ otherwise                                => (org-wide READ today; see §4)
 
 `resolveEffectivePermission(conn, orgId, userId, assetType, assetId, assetOwnerId?)`
 returns one of `'owner' | 'edit' | 'view' | null` = **MAX** of:
+
 1. owner check (`assetOwnerId === userId` → `owner`),
 2. direct user grant,
 3. any group grant where the user is a member (via `UserGroupMapping`).
@@ -129,15 +131,16 @@ Rank: `owner(3) > edit(2) > view(1) > null(0)`.
 
 **Capability map**
 
-| Capability | owner | edit | view |
-|---|---|---|---|
-| View / read / run | ✓ | ✓ | ✓ |
-| Modify (update, add fields, republish) | ✓ | ✓ | ✗ |
-| Manage grants (add/change/revoke shares, incl. re-share) | ✓ | ✓ | ✗ |
-| Delete the asset | ✓ | ✗ | ✗ |
-| Transfer ownership | ✓ (deferred) | ✗ | ✗ |
+| Capability                                               | owner        | edit | view |
+| -------------------------------------------------------- | ------------ | ---- | ---- |
+| View / read / run                                        | ✓            | ✓    | ✓    |
+| Modify (update, add fields, republish)                   | ✓            | ✓    | ✗    |
+| Manage grants (add/change/revoke shares, incl. re-share) | ✓            | ✓    | ✗    |
+| Delete the asset                                         | ✓            | ✗    | ✗    |
+| Transfer ownership                                       | ✓ (deferred) | ✗    | ✗    |
 
 Decisions flagged for the user:
+
 - **Editors CAN re-share** (Looker/Metabase model). If you want Power-BI's
   "reshare is a separate toggle", add a `canReshare` boolean later — trivial.
 - **Delete is owner-only** (stricter than Looker where Edit deletes). Safer for
@@ -154,18 +157,18 @@ Decisions flagged for the user:
 - `listDataset`, `listAnalyses`, `listDashboard` all filter by
   `organisationId` **only** — every org user already sees every asset. So
   **"shared-with-me appears in my list" is already true today** at the list
-  level. The sharing feature does not have to *add* rows to lists.
+  level. The sharing feature does not have to _add_ rows to lists.
 - The `Get*Validation` middleware preloads the org-scoped entity into
   `res.locals.{dataset|analysis|dashboard}`; the run/get/delete/update
   controllers consume it. Today they gate purely on the route-level
-  `VerifyPermissionMiddleware('<perm>', ACCESS.<X>)` — i.e. *anyone in the org
-  with the module permission* can edit/delete any asset.
+  `VerifyPermissionMiddleware('<perm>', ACCESS.<X>)` — i.e. _anyone in the org
+  with the module permission_ can edit/delete any asset.
 
 **Two-layer model (what changes):**
 
-1. **RLS (`resolveRlsFilters`) is untouched.** RLS is *row/column* security on
-   the *data a dataset returns*. Asset-sharing is *object* security on *who can
-   open/edit/delete the asset*. Orthogonal — asset-share never touches
+1. **RLS (`resolveRlsFilters`) is untouched.** RLS is _row/column_ security on
+   the _data a dataset returns_. Asset-sharing is _object_ security on _who can
+   open/edit/delete the asset_. Orthogonal — asset-share never touches
    `resolveRlsFilters`, and a VIEW grant still runs the dataset through the
    caller's RLS identity. No interaction, no regression.
 
@@ -179,14 +182,14 @@ Decisions flagged for the user:
      mode is on (see below); by default stays org-wide READ so nothing breaks.
 
 **Backward-compat switch — `SHARE_ENFORCEMENT` (default `permissive`).**
-Because lists are org-wide *today*, flipping every asset to "owner+shared only"
+Because lists are org-wide _today_, flipping every asset to "owner+shared only"
 is a behaviour change for existing orgs. The enforcement helper runs in one of
 two modes (a single config flag, `config.share.enforcement`):
 
 - `permissive` (**default, ships on**): the module permission still grants
   org-wide READ (view/run/list unchanged); **but** update/delete now
   additionally require `edit`/`owner` when the caller is **not** the owner and
-  has **no** grant — i.e. we *tighten writes* (a non-owner without an edit grant
+  has **no** grant — i.e. we _tighten writes_ (a non-owner without an edit grant
   can no longer silently overwrite/delete someone else's asset) while leaving
   reads exactly as they are. This is the safe, shippable default: pure
   hardening, no lost visibility.
@@ -195,7 +198,7 @@ two modes (a single config flag, `config.share.enforcement`):
   "no-access hides it" posture. We build the list-filter SQL now but leave it
   gated off so the user can enable per-deployment after review.
 
-*Flagged for the user:* default is `permissive` (tighten writes only). Say the
+_Flagged for the user:_ default is `permissive` (tighten writes only). Say the
 word and we flip to `strict` (hide unshared assets) — the code path exists.
 
 **Effect on the four controllers per module** (dataset/analysis/dashboard):
@@ -210,16 +213,16 @@ shared helper; on failure it `sendResponse(res, false, CODE.UNAUTHORIZED, …)`.
 ## 5. API surface — a shared `/asset-shares` router
 
 Mounted at `/api/v1/asset-shares` (after `SanitizeOrgInputMiddleware`, like all
-per-org routers). Gated by the *asset's own* module permission at WRITE (sharing
+per-org routers). Gated by the _asset's own_ module permission at WRITE (sharing
 is a write-grade management action), resolved per `assetType`.
 
-| Method | Path | Permission | Body / Result |
-|---|---|---|---|
-| POST | `/:assetType/:assetId/shares` | asset module WRITE | `{ granteeType, granteeId, permission }` → upsert one grant. Returns the grant. |
-| POST | `/:assetType/:assetId/shares/bulk` | asset module WRITE | `{ grants: [{granteeType,granteeId,permission}] }` → upsert many (the dialog's "Add" adds several at once). |
-| GET | `/:assetType/:assetId/shares` | asset module READ | → `{ owner: {...}, shares: [{ id, granteeType, granteeId, granteeName, permission, ... }] }` ("who has access"). |
-| PUT | `/shares/:shareId` | asset module WRITE | `{ permission }` → change a grant's level. |
-| DELETE | `/shares/:shareId` | asset module WRITE | revoke a grant (soft-delete). |
+| Method | Path                               | Permission         | Body / Result                                                                                                    |
+| ------ | ---------------------------------- | ------------------ | ---------------------------------------------------------------------------------------------------------------- |
+| POST   | `/:assetType/:assetId/shares`      | asset module WRITE | `{ granteeType, granteeId, permission }` → upsert one grant. Returns the grant.                                  |
+| POST   | `/:assetType/:assetId/shares/bulk` | asset module WRITE | `{ grants: [{granteeType,granteeId,permission}] }` → upsert many (the dialog's "Add" adds several at once).      |
+| GET    | `/:assetType/:assetId/shares`      | asset module READ  | → `{ owner: {...}, shares: [{ id, granteeType, granteeId, granteeName, permission, ... }] }` ("who has access"). |
+| PUT    | `/shares/:shareId`                 | asset module WRITE | `{ permission }` → change a grant's level.                                                                       |
+| DELETE | `/shares/:shareId`                 | asset module WRITE | revoke a grant (soft-delete).                                                                                    |
 
 `:assetType` ∈ `dataset|analysis|dashboard`. `assetId` existence + org scope is
 verified in a validation middleware that also preloads the target asset owner so
@@ -245,8 +248,9 @@ list/create/revoke surface: `[visible]` + `(closed)`, OnPush + `markForCheck`,
 toast helpers, inline confirm). New generic component:
 
 `shared/components/asset-share-dialog/` (shared so all three modules reuse it):
+
 - `@Input() visible; @Input() assetType: 'dataset'|'analysis'|'dashboard';
-  @Input() assetId; @Input() assetName; @Output() closed`.
+@Input() assetId; @Input() assetName; @Output() closed`.
 - `.confirmation-popup` overlay (NOT p-dialog), backdrop-click-to-close.
 - **Add row:** `app-custom-multiselect` (server fetcher → users) + a second for
   groups (or one toggle), plus an `app-custom-dropdown` Edit/View, `appendTo="body"`.
@@ -260,6 +264,7 @@ toast helpers, inline confirm). New generic component:
   `api.constant.ts`.
 
 **Adoption:** add a **Share** action (`pi-share-alt`) to:
+
 - list-row actions of `list-dataset`, `list-analyses`, `list-dashboard`
   (`<ng-template usGridCell="actions">`), gated
   `*hasPermission="'<perm>'; level: 'write'"`.
@@ -274,20 +279,20 @@ FE↔BE, Zod 4, messages = `validation.assetShares.<field>.<rule>` i18n keys.
 
 ## 7. Enforcement points (summary)
 
-| Module | Controller | Guard added | Level |
-|---|---|---|---|
-| datasets | update, addField, updateField, deleteField, duplicate, from-builder update | `requireAssetPermission('dataset','edit')` | edit/owner |
-| datasets | delete | `requireAssetPermission('dataset','owner')` | owner |
-| datasets | get, run, list, distinct-values | strict-only guard | view |
-| analyses | update, duplicate | `edit` | edit/owner |
-| analyses | delete | `owner` | owner |
-| analyses | get, run, list, distinct, bootstrap, fields, versions | strict-only | view |
-| dashboards | publish (republish existing), duplicate | `edit` | edit/owner |
-| dashboards | delete | `owner` | owner |
-| dashboards | get, run, render, list, distinct | strict-only | view |
+| Module     | Controller                                                                 | Guard added                                 | Level      |
+| ---------- | -------------------------------------------------------------------------- | ------------------------------------------- | ---------- |
+| datasets   | update, addField, updateField, deleteField, duplicate, from-builder update | `requireAssetPermission('dataset','edit')`  | edit/owner |
+| datasets   | delete                                                                     | `requireAssetPermission('dataset','owner')` | owner      |
+| datasets   | get, run, list, distinct-values                                            | strict-only guard                           | view       |
+| analyses   | update, duplicate                                                          | `edit`                                      | edit/owner |
+| analyses   | delete                                                                     | `owner`                                     | owner      |
+| analyses   | get, run, list, distinct, bootstrap, fields, versions                      | strict-only                                 | view       |
+| dashboards | publish (republish existing), duplicate                                    | `edit`                                      | edit/owner |
+| dashboards | delete                                                                     | `owner`                                     | owner      |
+| dashboards | get, run, render, list, distinct                                           | strict-only                                 | view       |
 
-`publish` is subtle: creating a *new* dashboard is fine (no asset yet); only
-*re-publishing an existing* dashboard id requires edit — the guard runs only
+`publish` is subtle: creating a _new_ dashboard is fine (no asset yet); only
+_re-publishing an existing_ dashboard id requires edit — the guard runs only
 when the target dashboard already exists.
 
 ---
@@ -298,15 +303,16 @@ when the target dashboard already exists.
 2. **Levels = Edit / View**, owner = full. — §3
 3. **Effective = MAX(owner, user grant, group grant)** (additive). — §3
 4. **Editors can re-share; delete + transfer are owner-only.** — §3
-5. **Default enforcement = `permissive`** (tighten *writes* only; reads stay
+5. **Default enforcement = `permissive`** (tighten _writes_ only; reads stay
    org-wide). `strict` (hide unshared) is built but gated off. — §4
 6. **Explicit grants are separate from public share links.** — §1.5
 7. **No folder inheritance** (folders removed). — §1.6
 8. **Ownership transfer deferred** (owner = createdBy). — §3
 
 **Needs the user's eyes:**
+
 - Flip to `strict` enforcement (hide assets a user has no grant on)? Default is
   `permissive`.
 - Split re-share into its own bit (Power BI style)? Default bundles it into Edit.
-- Should VIEW-only recipients be blocked from *duplicating* an asset (a copy is
+- Should VIEW-only recipients be blocked from _duplicating_ an asset (a copy is
   a back-door to edit)? Default: duplicate requires edit.

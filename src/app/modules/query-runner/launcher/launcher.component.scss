@@ -42,7 +42,9 @@
   margin-top: var(--space-3);
   font-size: var(--fs-control);
   color: var(--secondary-color);
-  &.warn { color: var(--warning-color); }
+  &.warn {
+    color: var(--warning-color);
+  }
 }
 
 // Primary action row — right-aligned like a form's Save button.

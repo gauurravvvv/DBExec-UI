@@ -275,8 +275,6 @@ export class UserService {
   }
 
   viewOrgUser(id: string) {
-    return lastValueFrom(
-      this.http.apiGet(USER.GET + id, { skipLoader: true }),
-    );
+    return lastValueFrom(this.http.apiGet(USER.GET + id, { skipLoader: true }));
   }
 }

@@ -43,17 +43,20 @@
           [disabled]="!isStep1Valid()"
         ></button>
         <ng-container *hasPermission="'orgManagement'; level: 'write'">
-        <button
-          *ngIf="(!hasMasterDb && currentStep === 0) || (hasMasterDb && currentStep === 1)"
-          pButton
-          class="p-button-primary btn-save"
-          type="submit"
-          [label]="'COMMON.SAVE' | translate"
-          [icon]="saving() ? 'pi pi-spin pi-spinner' : 'pi pi-save'"
-          iconPos="left"
-          (click)="onSubmit()"
-          [disabled]="!isFormValid() || saving()"
-        ></button>
+          <button
+            *ngIf="
+              (!hasMasterDb && currentStep === 0) ||
+              (hasMasterDb && currentStep === 1)
+            "
+            pButton
+            class="p-button-primary btn-save"
+            type="submit"
+            [label]="'COMMON.SAVE' | translate"
+            [icon]="saving() ? 'pi pi-spin pi-spinner' : 'pi pi-save'"
+            iconPos="left"
+            (click)="onSubmit()"
+            [disabled]="!isFormValid() || saving()"
+          ></button>
         </ng-container>
       </div>
     </div>
@@ -80,9 +83,7 @@
         (click)="onStepClick(1)"
       >
         <div class="step-dot">2</div>
-        <span class="step-label">{{
-          'ORG.STEP_DB_CONFIG' | translate
-        }}</span>
+        <span class="step-label">{{ 'ORG.STEP_DB_CONFIG' | translate }}</span>
       </div>
     </div>
 
@@ -90,7 +91,12 @@
          form is in flight. The page header + breadcrumb stay
          visible above so the user can navigate away mid-load. -->
     <app-content-loader *ngIf="loading() && !orgData"></app-content-loader>
-    <form autocomplete="off" *ngIf="orgData" [formGroup]="orgForm" class="admin-form mt-4">
+    <form
+      autocomplete="off"
+      *ngIf="orgData"
+      [formGroup]="orgForm"
+      class="admin-form mt-4"
+    >
       <!-- Step 1: Organisation Details -->
       <div *ngIf="currentStep === 0" class="step-1-layout">
         <div class="step-1-left">
@@ -266,7 +272,9 @@
                   orgForm.get('dbPassword')?.touched
                 ) || !!passwordRequiredError
               "
-              [errorMessage]="passwordRequiredError || getDbFieldError('dbPassword')"
+              [errorMessage]="
+                passwordRequiredError || getDbFieldError('dbPassword')
+              "
             >
             </app-custom-input>
 

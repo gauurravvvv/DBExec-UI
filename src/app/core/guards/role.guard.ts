@@ -19,9 +19,7 @@ import { PermissionService } from '../services/permission.service';
  * authoritative "platform operator?" signal regardless of how many
  * roles the user has. Org admins + org users share the same home.
  */
-function getHomeFromPermissions(
-  permissionService: PermissionService,
-): string {
+function getHomeFromPermissions(permissionService: PermissionService): string {
   return permissionService.canRead(PERMISSIONS.SYSTEM_ADMIN)
     ? HOME_ROUTES.SYSTEM_ADMIN
     : HOME_ROUTES.ORG_ADMIN;

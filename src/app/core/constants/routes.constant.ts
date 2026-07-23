@@ -196,7 +196,10 @@ export interface NotificationRouteInput {
 }
 
 /** assetType → the matching view-builder for asset_shared/unshared. */
-function assetView(assetType: string | undefined, assetId: string): string | null {
+function assetView(
+  assetType: string | undefined,
+  assetId: string,
+): string | null {
   switch (assetType) {
     case 'dataset':
       return DATASET.view(assetId);

@@ -131,7 +131,9 @@ export class NewQueryDialogComponent implements OnInit {
 
     for (const c of usable) this.connectionsById.set(c.id, c);
     this.connectionOptions = usable.map(c => ({
-      label: c.isDefault ? `★ ${c.name} — ${c.username}` : `${c.name} — ${c.username}`,
+      label: c.isDefault
+        ? `★ ${c.name} — ${c.username}`
+        : `${c.name} — ${c.username}`,
       value: c.id,
     }));
 

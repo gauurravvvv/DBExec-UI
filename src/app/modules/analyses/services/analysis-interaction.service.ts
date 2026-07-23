@@ -353,12 +353,7 @@ export class AnalysisInteractionService {
         nullOption: 'ALL_VALUES',
       });
     }
-    if (
-      columnName &&
-      value !== null &&
-      value !== undefined &&
-      value !== ''
-    ) {
+    if (columnName && value !== null && value !== undefined && value !== '') {
       out.push({
         columnName,
         filterType: 'category',

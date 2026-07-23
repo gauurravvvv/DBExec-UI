@@ -31,7 +31,11 @@
 
     <div
       class="group-card"
-      *ngFor="let group of groups.controls; let gi = index; trackBy: trackByIndex"
+      *ngFor="
+        let group of groups.controls;
+        let gi = index;
+        trackBy: trackByIndex
+      "
       [formGroupName]="gi"
     >
       <div class="group-header">
@@ -199,7 +203,9 @@
       [rows]="4"
     ></app-custom-textarea>
     <div class="expression-fields" *ngIf="fields.length">
-      <span class="fields-caption">{{ 'ALERTS.AVAILABLE_FIELDS' | translate }}</span>
+      <span class="fields-caption">{{
+        'ALERTS.AVAILABLE_FIELDS' | translate
+      }}</span>
       <span class="field-chip" *ngFor="let f of fields; trackBy: trackByIndex">
         {{ f.ref }}
       </span>

@@ -141,10 +141,10 @@ import { ExprNode, Plan } from '../query/ir';
 import { AuthUser } from '../../types';
 
 export interface RlsResolution {
-  predicates: ExprNode[];        // ANDed into plan.where
-  maskedColumns: Record<string, ColumnMaskDecision>;  // applied to plan.select
-  ruleIds: string[];             // for audit log
-  empty: boolean;                // true = "default deny, no rules matched" → 1 = 0
+  predicates: ExprNode[]; // ANDed into plan.where
+  maskedColumns: Record<string, ColumnMaskDecision>; // applied to plan.select
+  ruleIds: string[]; // for audit log
+  empty: boolean; // true = "default deny, no rules matched" → 1 = 0
 }
 
 export interface ColumnMaskDecision {
@@ -165,7 +165,10 @@ export async function resolveRls(
   const matchedRules = [];
   let defaultRule: any = null;
   for (const rule of rules) {
-    if (rule.isDefault) { defaultRule = rule; continue; }
+    if (rule.isDefault) {
+      defaultRule = rule;
+      continue;
+    }
     if (await matchesScope(rule, user, connection)) {
       matchedRules.push(rule);
     }
@@ -216,7 +219,11 @@ export async function resolveRls(
 `matchesScope` for the three rule kinds:
 
 ```typescript
-async function matchesScope(rule: any, user: AuthUser, connection: Connection): Promise<boolean> {
+async function matchesScope(
+  rule: any,
+  user: AuthUser,
+  connection: Connection,
+): Promise<boolean> {
   if (rule.kind === 'group') {
     return user.groupIds.includes(rule.scope_group_id);
   }
@@ -251,7 +258,14 @@ function applyMasking(
   masked: Record<string, ColumnMaskDecision>,
 ): SelectItem[] {
   return selectItems
-    .filter(s => !(s.origin?.kind === 'raw' && s.origin.column && masked[s.origin.column]?.mode === 'hide'))
+    .filter(
+      s =>
+        !(
+          s.origin?.kind === 'raw' &&
+          s.origin.column &&
+          masked[s.origin.column]?.mode === 'hide'
+        ),
+    )
     .map(s => {
       if (s.origin?.kind !== 'raw' || !s.origin.column) return s;
       const decision = masked[s.origin.column];
@@ -265,11 +279,18 @@ function applyMasking(
           return {
             ...s,
             expr: {
-              type: 'fn', name: 'CONCAT',
+              type: 'fn',
+              name: 'CONCAT',
               args: [
                 { type: 'lit', value: '***' },
-                { type: 'fn', name: 'RIGHT',
-                  args: [s.expr, { type: 'lit', value: decision.partial_keep ?? 4 }] },
+                {
+                  type: 'fn',
+                  name: 'RIGHT',
+                  args: [
+                    s.expr,
+                    { type: 'lit', value: decision.partial_keep ?? 4 },
+                  ],
+                },
               ],
             },
           };
@@ -326,8 +347,19 @@ import { validatePredicate } from '../../services/rls/predicateValidator';
 import Logger from '../../utility/logger';
 
 const addRlsRule = async (req: Request, res: Response) => {
-  const { datasetId, name, kind, scopeGroupId, scopeAttrKey, scopeAttrOp,
-          scopeAttrValue, predicate, isDefault, defaultPolicy, displayOrder } = req.body;
+  const {
+    datasetId,
+    name,
+    kind,
+    scopeGroupId,
+    scopeAttrKey,
+    scopeAttrOp,
+    scopeAttrValue,
+    predicate,
+    isDefault,
+    defaultPolicy,
+    displayOrder,
+  } = req.body;
   const { orgData, master_db_connection } = res.locals;
   const connection = orgData.connection;
 
@@ -336,29 +368,46 @@ const addRlsRule = async (req: Request, res: Response) => {
     const v = await validatePredicate(predicate, datasetId, connection);
     if (!v.ok) {
       await master_db_connection.close();
-      return sendResponse(res, false, CODE.BAD_REQUEST, RLS_MSG.BAD_PREDICATE,
-                          { errors: v.errors });
+      return sendResponse(res, false, CODE.BAD_REQUEST, RLS_MSG.BAD_PREDICATE, {
+        errors: v.errors,
+      });
     }
 
     // Only one default rule per dataset
     if (isDefault) {
-      const existingDefault = await connection.getRepository('RlsRule')
+      const existingDefault = await connection
+        .getRepository('RlsRule')
         .findOne({ where: { datasetId, isDefault: true } });
       if (existingDefault) {
         await master_db_connection.close();
-        return sendResponse(res, false, CODE.BAD_REQUEST, RLS_MSG.DUPLICATE_DEFAULT);
+        return sendResponse(
+          res,
+          false,
+          CODE.BAD_REQUEST,
+          RLS_MSG.DUPLICATE_DEFAULT,
+        );
       }
     }
 
     const rule = await connection.getRepository('RlsRule').save({
-      datasetId, name, kind, scopeGroupId, scopeAttrKey, scopeAttrOp,
-      scopeAttrValue, predicate, isDefault: !!isDefault,
+      datasetId,
+      name,
+      kind,
+      scopeGroupId,
+      scopeAttrKey,
+      scopeAttrOp,
+      scopeAttrValue,
+      predicate,
+      isDefault: !!isDefault,
       defaultPolicy: defaultPolicy ?? 'deny',
-      isEnabled: true, displayOrder: displayOrder ?? 0,
+      isEnabled: true,
+      displayOrder: displayOrder ?? 0,
     });
 
     await auditLogger.logAuditToOrg({
-      connection, req, res,
+      connection,
+      req,
+      res,
       module: AUDIT_MODULES.RLS_RULE,
       action: AUDIT_ACTIONS.CREATE,
       entityName: 'RlsRule',
@@ -430,26 +479,26 @@ src/app/modules/datasets/components/
 
 ## 7. Integration points
 
-| Module | Where RLS is applied | How |
-|---|---|---|
-| 04 Query processor | every plan via `applyRls(plan, user)` before render | resolver is called once per dataset reference |
-| 06 Analysis builder | author preview also runs through processor | author sees data **as themselves**, not as everyone — by design |
-| 08 Dashboard live mode | every visual tile re-queries with viewer's RLS | resolver re-runs per request |
-| 13 Export & 15 Scheduling | renderer runs as the *subscription owner* (documented in [PER-TAB-SCHEDULED-EXPORTS.md](PER-TAB-SCHEDULED-EXPORTS.md) §14) | RLS resolved with owner's auth context |
-| 14 Share / Embed | for `internal` shares: viewer's RLS; for `embed`: the JWT-bound subject's RLS | per-link resolution |
-| 25 AI Insights | sanitiser drops PII columns from semantic-model description; tool calls run with user's RLS | doubly defended |
+| Module                    | Where RLS is applied                                                                                                       | How                                                             |
+| ------------------------- | -------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------- |
+| 04 Query processor        | every plan via `applyRls(plan, user)` before render                                                                        | resolver is called once per dataset reference                   |
+| 06 Analysis builder       | author preview also runs through processor                                                                                 | author sees data **as themselves**, not as everyone — by design |
+| 08 Dashboard live mode    | every visual tile re-queries with viewer's RLS                                                                             | resolver re-runs per request                                    |
+| 13 Export & 15 Scheduling | renderer runs as the _subscription owner_ (documented in [PER-TAB-SCHEDULED-EXPORTS.md](PER-TAB-SCHEDULED-EXPORTS.md) §14) | RLS resolved with owner's auth context                          |
+| 14 Share / Embed          | for `internal` shares: viewer's RLS; for `embed`: the JWT-bound subject's RLS                                              | per-link resolution                                             |
+| 25 AI Insights            | sanitiser drops PII columns from semantic-model description; tool calls run with user's RLS                                | doubly defended                                                 |
 
 ---
 
 ## 8. Observability
 
-| Metric | Type | Labels | Purpose |
-|---|---|---|---|
-| `dbexec_rls_resolve_ms` | histogram | `dataset` | resolver latency |
-| `dbexec_rls_predicates_per_query` | histogram | `dataset` | how many predicates layered |
-| `dbexec_rls_empty_total` | counter | `dataset`, `user_kind` | how often default-deny fires — leading indicator of misconfigured rules |
-| `dbexec_rls_test_run_total` | counter | `outcome` | nightly cron health |
-| `dbexec_column_mask_applied_total` | counter | `column`, `mode` | masking usage |
+| Metric                             | Type      | Labels                 | Purpose                                                                 |
+| ---------------------------------- | --------- | ---------------------- | ----------------------------------------------------------------------- |
+| `dbexec_rls_resolve_ms`            | histogram | `dataset`              | resolver latency                                                        |
+| `dbexec_rls_predicates_per_query`  | histogram | `dataset`              | how many predicates layered                                             |
+| `dbexec_rls_empty_total`           | counter   | `dataset`, `user_kind` | how often default-deny fires — leading indicator of misconfigured rules |
+| `dbexec_rls_test_run_total`        | counter   | `outcome`              | nightly cron health                                                     |
+| `dbexec_column_mask_applied_total` | counter   | `column`, `mode`       | masking usage                                                           |
 
 Audit-log every RLS resolution? **No** — too noisy. Instead, the
 `query.execute` audit row includes
@@ -460,31 +509,33 @@ single audit query reconstructs the security context of any read.
 
 ## 9. Security & threat model
 
-| Threat | Mitigation |
-|---|---|
-| Author writes a predicate that drops nothing (`1=1`) | Linter warns at save; auditor flags "always-true predicate" on review |
-| Author writes a predicate that references a table outside the dataset | Predicate AST whitelist rejects unknown identifiers |
-| User-attribute injection via SSO | Attributes coerced to string/array primitives at write; never interpreted as SQL |
-| Cache poisoning — user A's RLS-restricted result served to user B | Cache key includes a hash of resolved RLS rule IDs + predicate values (module 05) |
-| Bypass via dataset SQL editor (CTE renaming) | RLS resolver works on parsed AST; CTE shadowing handled by name-resolution walk |
-| Default-policy flip without audit | Toggle between deny/allow writes an audit row with both before/after values |
-| Group membership lookup race | Group memberships read once per query, in the same connection / tx; subsequent membership changes affect the *next* query |
-| Mask bypass via direct dataset SQL preview | Preview also passes through resolver; no escape hatch |
-| Privilege escalation via predicate that references `user_attribute` directly | Predicate parser blocks references to `user_attribute` table — attributes are interpolated, not joined |
-| Mask + aggregate leakage (`AVG(salary)` reveals one masked salary) | Documented limitation — k-anonymity tags on metrics (k=5 minimum count) is a future-work item; flag in 11 |
+| Threat                                                                       | Mitigation                                                                                                                |
+| ---------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| Author writes a predicate that drops nothing (`1=1`)                         | Linter warns at save; auditor flags "always-true predicate" on review                                                     |
+| Author writes a predicate that references a table outside the dataset        | Predicate AST whitelist rejects unknown identifiers                                                                       |
+| User-attribute injection via SSO                                             | Attributes coerced to string/array primitives at write; never interpreted as SQL                                          |
+| Cache poisoning — user A's RLS-restricted result served to user B            | Cache key includes a hash of resolved RLS rule IDs + predicate values (module 05)                                         |
+| Bypass via dataset SQL editor (CTE renaming)                                 | RLS resolver works on parsed AST; CTE shadowing handled by name-resolution walk                                           |
+| Default-policy flip without audit                                            | Toggle between deny/allow writes an audit row with both before/after values                                               |
+| Group membership lookup race                                                 | Group memberships read once per query, in the same connection / tx; subsequent membership changes affect the _next_ query |
+| Mask bypass via direct dataset SQL preview                                   | Preview also passes through resolver; no escape hatch                                                                     |
+| Privilege escalation via predicate that references `user_attribute` directly | Predicate parser blocks references to `user_attribute` table — attributes are interpolated, not joined                    |
+| Mask + aggregate leakage (`AVG(salary)` reveals one masked salary)           | Documented limitation — k-anonymity tags on metrics (k=5 minimum count) is a future-work item; flag in 11                 |
 
 ---
 
 ## 10. Operational runbook
 
 **Symptom: user complains "I see no data".**
+
 1. Run `/rls/test/run` as the user against the dataset.
 2. Result shows `empty: true` → user matched no rule.
    Diagnosis: check group memberships and user_attribute values.
 3. Result shows `predicates: ['(false)']` → default-deny fired.
    Diagnosis: rule scope conditions don't match this user.
 
-**Symptom: user complains "I see *too much* data".**
+**Symptom: user complains "I see _too much_ data".**
+
 1. Run `/rls/test/run` for the user.
 2. Inspect predicates — usually a rule's predicate template
    interpolates an attribute the user doesn't have, defaulting
@@ -495,6 +546,7 @@ single audit query reconstructs the security context of any read.
    attribute missing" rule.
 
 **Symptom: nightly RLS test suite has 3 failures.**
+
 1. Read `rls_test_case.last_run_actual_rows` — outside the
    expected range = the rule changed or the data changed.
 2. If a rule changed legitimately, update the test case.
@@ -502,22 +554,22 @@ single audit query reconstructs the security context of any read.
    module 18 (version history).
 
 **Symptom: query times spike.**
+
 1. Inspect `dbexec_rls_resolve_ms` — usually a slow
    `loadUserAttributes` because the user has thousands of
-   attributes. Add a per-user attribute count limit (default
-   200) at SCIM ingest.
+   attributes. Add a per-user attribute count limit (default 200) at SCIM ingest.
 
 ---
 
 ## 11. Performance budget
 
-| Operation | p50 | p95 | Hard ceiling |
-|---|---|---|---|
-| resolveRls (cold) | 12 ms | 40 ms | 150 ms |
-| resolveRls (cached attributes) | 3 ms | 10 ms | 30 ms |
-| Group membership lookup | 2 ms | 8 ms | 25 ms |
-| Test-as-user end-to-end | 200 ms | 800 ms | 3 s |
-| Nightly suite (200 cases) | 5 min | 15 min | 1 h |
+| Operation                      | p50    | p95    | Hard ceiling |
+| ------------------------------ | ------ | ------ | ------------ |
+| resolveRls (cold)              | 12 ms  | 40 ms  | 150 ms       |
+| resolveRls (cached attributes) | 3 ms   | 10 ms  | 30 ms        |
+| Group membership lookup        | 2 ms   | 8 ms   | 25 ms        |
+| Test-as-user end-to-end        | 200 ms | 800 ms | 3 s          |
+| Nightly suite (200 cases)      | 5 min  | 15 min | 1 h          |
 
 Attribute lookup is the hot path. Cache per-request in
 `AsyncLocalStorage` so one query touches user_attribute at most

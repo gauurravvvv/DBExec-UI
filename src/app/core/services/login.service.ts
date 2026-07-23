@@ -67,11 +67,7 @@ export class LoginService implements OnDestroy {
    * a future signal joins the set. Callers that don't have a locale
    * to apply can omit it.
    */
-  public applyAuthArtefacts(
-    theme: any,
-    branding: any,
-    locale?: string,
-  ): void {
+  public applyAuthArtefacts(theme: any, branding: any, locale?: string): void {
     this.themeService.applyFromLogin(theme);
     this.brandingService.applyFromLogin(branding);
     if (locale) this.localeService.applyTempLocale(locale);
@@ -229,8 +225,7 @@ export class LoginService implements OnDestroy {
       // into a 200 success whose body carries the original status
       // code. 5xx codes here mean the server tried and failed —
       // treat as transient so the relay's silent retry fires.
-      const code: number =
-        typeof result?.code === 'number' ? result.code : -1;
+      const code: number = typeof result?.code === 'number' ? result.code : -1;
       const isTransient = code >= 500 && code < 600;
       return {
         ok: false,
@@ -244,8 +239,7 @@ export class LoginService implements OnDestroy {
       // API response / etc.). status === 0 is offline/CORS/DNS;
       // 5xx is server-side failure. Both transient. Anything else
       // is fatal — a fresh attempt won't help.
-      const status: number =
-        typeof err?.status === 'number' ? err.status : -1;
+      const status: number = typeof err?.status === 'number' ? err.status : -1;
       const isTransient = status === 0 || (status >= 500 && status < 600);
       return {
         ok: false,
@@ -271,10 +265,7 @@ export class LoginService implements OnDestroy {
     const user = d.user;
 
     StorageService.set(StorageType.ROLE, d.role || user.role || '');
-    StorageService.set(
-      StorageType.ORGANISATION_ID,
-      user.organisationId || '',
-    );
+    StorageService.set(StorageType.ORGANISATION_ID, user.organisationId || '');
     StorageService.set(
       StorageType.ORGANISATION,
       user.organisationName || StorageService.get(StorageType.ORGANISATION),
@@ -439,7 +430,7 @@ export class LoginService implements OnDestroy {
           // already on their previous URL and reactive 440 will
           // recover if the token genuinely is bad.
           this.bootstrapSession()
-            .then((outcome) => {
+            .then(outcome => {
               if (outcome.ok) this.applyBootstrap(outcome.data);
             })
             .catch(() => {});

@@ -90,7 +90,6 @@ export const SET_PASSWORD_PAGE_OPTIONS = [
   },
 ];
 
-
 export const MAX_LIMIT = 10000000;
 export const DEFAULT_PAGE = 1;
 

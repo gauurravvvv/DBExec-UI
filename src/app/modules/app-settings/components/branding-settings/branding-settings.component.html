@@ -12,7 +12,8 @@
       *ngIf="loading() && !brandingForm.value.watermarkText"
     ></app-content-loader>
 
-    <form autocomplete="off"
+    <form
+      autocomplete="off"
       *ngIf="!loading() || brandingForm.value.watermarkText"
       [formGroup]="brandingForm"
       class="admin-form"
@@ -132,7 +133,10 @@
               [style.background-color]="swatchValue('watermarkBgColor')"
               [style.color]="swatchValue('watermarkTextColor')"
             >
-              {{ brandingForm.value.watermarkText || ('BRANDING.WATERMARK_PLACEHOLDER' | translate) }}
+              {{
+                brandingForm.value.watermarkText ||
+                  ('BRANDING.WATERMARK_PLACEHOLDER' | translate)
+              }}
             </span>
           </div>
         </ng-container>

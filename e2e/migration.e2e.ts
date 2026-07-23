@@ -15,7 +15,9 @@ import * as path from 'path';
  *   4. Bulk multi-select on the (opt-in) selectable table exports N-in-one.
  */
 
-const ORG = 'GauravOrg', USER = 'administrator', PASS = 'Pass@1234';
+const ORG = 'GauravOrg',
+  USER = 'administrator',
+  PASS = 'Pass@1234';
 const OUT = path.join(__dirname, '_migration_artifacts');
 
 async function login(page: any) {
@@ -32,7 +34,9 @@ test.beforeAll(() => {
   fs.mkdirSync(OUT, { recursive: true });
 });
 
-test('migration — export a dashboard, inspect the bundle, re-import it', async ({ page }) => {
+test('migration — export a dashboard, inspect the bundle, re-import it', async ({
+  page,
+}) => {
   test.setTimeout(300_000);
   const pause = (ms: number) => page.waitForTimeout(ms);
   const logs: string[] = [];
@@ -43,13 +47,21 @@ test('migration — export a dashboard, inspect the bundle, re-import it', async
 
   // --- Navigate to the Dashboard list via sidebar (deep-goto bounces home) ---
   // Try the sidebar link first; fall back to the list route.
-  const dashNav = page.locator('a,[routerlink]').filter({ hasText: /^\s*Dashboards?\s*$/i }).first();
+  const dashNav = page
+    .locator('a,[routerlink]')
+    .filter({ hasText: /^\s*Dashboards?\s*$/i })
+    .first();
   if (await dashNav.count()) {
     await dashNav.click({ timeout: 8000 }).catch(() => {});
   }
-  await page.goto('/app/dashboards', { waitUntil: 'networkidle' }).catch(() => {});
+  await page
+    .goto('/app/dashboards', { waitUntil: 'networkidle' })
+    .catch(() => {});
   await pause(4000);
-  await page.screenshot({ path: path.join(OUT, '01-dashboard-list.png'), fullPage: true });
+  await page.screenshot({
+    path: path.join(OUT, '01-dashboard-list.png'),
+    fullPage: true,
+  });
 
   // --- Find the Export row action (mirrors the Share button in row-actions) ---
   // Row actions render as icon buttons; export uses pi-download.
@@ -61,16 +73,24 @@ test('migration — export a dashboard, inspect the bundle, re-import it', async
 
   let bundlePath = '';
   if (haveExport) {
-    const dlPromise = page.waitForEvent('download', { timeout: 30000 }).catch(() => null);
+    const dlPromise = page
+      .waitForEvent('download', { timeout: 30000 })
+      .catch(() => null);
     await exportBtn.click({ timeout: 8000 }).catch(() => {});
     const dl = await dlPromise;
     if (dl) {
-      bundlePath = path.join(OUT, dl.suggestedFilename() || 'export.dbexec.json');
+      bundlePath = path.join(
+        OUT,
+        dl.suggestedFilename() || 'export.dbexec.json',
+      );
       await dl.saveAs(bundlePath);
       logs.push(`downloaded=${dl.suggestedFilename()}`);
     }
   }
-  await page.screenshot({ path: path.join(OUT, '02-after-export-click.png'), fullPage: true });
+  await page.screenshot({
+    path: path.join(OUT, '02-after-export-click.png'),
+    fullPage: true,
+  });
 
   // --- Inspect the bundle (the real evidence) ---
   const findings: Record<string, unknown> = {};
@@ -91,20 +111,28 @@ test('migration — export a dashboard, inspect the bundle, re-import it', async
         : [];
     findings['datasourceDescriptorKeys'] = dsKeys;
   } else {
-    findings['note'] = 'no bundle captured — export button may not have triggered a download';
+    findings['note'] =
+      'no bundle captured — export button may not have triggered a download';
   }
-  fs.writeFileSync(path.join(OUT, 'bundle-findings.json'), JSON.stringify(findings, null, 2));
+  fs.writeFileSync(
+    path.join(OUT, 'bundle-findings.json'),
+    JSON.stringify(findings, null, 2),
+  );
   logs.push('findings=' + JSON.stringify(findings));
 
   // --- Import the same file back (round-trip) ---
   let importReported = '';
   if (bundlePath && fs.existsSync(bundlePath)) {
     const importBtn = page
-      .locator('button:has(i.pi-upload), [aria-label*="Import" i], button:has-text("Import")')
+      .locator(
+        'button:has(i.pi-upload), [aria-label*="Import" i], button:has-text("Import")',
+      )
       .first();
     if (await importBtn.count()) {
       // The import button triggers a hidden <input type=file>. Set the chooser.
-      const chooserPromise = page.waitForEvent('filechooser', { timeout: 10000 }).catch(() => null);
+      const chooserPromise = page
+        .waitForEvent('filechooser', { timeout: 10000 })
+        .catch(() => null);
       await importBtn.click({ timeout: 8000 }).catch(() => {});
       const chooser = await chooserPromise;
       if (chooser) {
@@ -122,19 +150,30 @@ test('migration — export a dashboard, inspect the bundle, re-import it', async
       }
     }
   }
-  await page.screenshot({ path: path.join(OUT, '03-after-import.png'), fullPage: true });
+  await page.screenshot({
+    path: path.join(OUT, '03-after-import.png'),
+    fullPage: true,
+  });
   logs.push(`import=${importReported}`);
 
   // --- Check the datasource list for a "Needs credentials" stub ---
-  await page.goto('/app/datasources', { waitUntil: 'networkidle' }).catch(() => {});
+  await page
+    .goto('/app/datasources', { waitUntil: 'networkidle' })
+    .catch(() => {});
   await pause(4000);
   const needsCreds = page.locator(':text-matches("Needs credentials", "i")');
   const needsCredsCount = await needsCreds.count();
   logs.push(`needsCredentialsChips=${needsCredsCount}`);
-  await page.screenshot({ path: path.join(OUT, '04-datasource-list.png'), fullPage: true });
+  await page.screenshot({
+    path: path.join(OUT, '04-datasource-list.png'),
+    fullPage: true,
+  });
 
   fs.writeFileSync(path.join(OUT, 'console.log'), logs.join('\n'));
 
   // Soft assertions — we want the artifacts regardless, but flag the essentials.
-  expect(haveExport, 'an Export control should exist on the dashboard list').toBeGreaterThan(0);
+  expect(
+    haveExport,
+    'an Export control should exist on the dashboard list',
+  ).toBeGreaterThan(0);
 });

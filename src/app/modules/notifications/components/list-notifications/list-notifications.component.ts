@@ -72,7 +72,9 @@ export class ListNotificationsComponent implements OnInit {
 
   /** Type-filter dropdown options, translated at construction. */
   readonly typeOptions = NOTIFICATION_TYPE_KEYS.map(type => ({
-    label: this.translate.instant(notificationTitleKey({ type } as NotificationRow)),
+    label: this.translate.instant(
+      notificationTitleKey({ type } as NotificationRow),
+    ),
     value: type as string,
   }));
 
@@ -99,9 +101,7 @@ export class ListNotificationsComponent implements OnInit {
   });
 
   /** Whether more rows exist beyond the current reveal window. */
-  readonly hasMore = computed(
-    () => this.visibleCount() < this.filteredTotal(),
-  );
+  readonly hasMore = computed(() => this.visibleCount() < this.filteredTotal());
 
   readonly hasAnyUnread = computed(
     () => this.notificationService.unreadCount() > 0,
@@ -157,8 +157,7 @@ export class ListNotificationsComponent implements OnInit {
    *  the next page. */
   onScroll(event: Event): void {
     const el = event.target as HTMLElement;
-    const nearBottom =
-      el.scrollTop + el.clientHeight >= el.scrollHeight - 120;
+    const nearBottom = el.scrollTop + el.clientHeight >= el.scrollHeight - 120;
     if (nearBottom) this.loadMore();
   }
 

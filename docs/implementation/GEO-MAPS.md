@@ -75,9 +75,9 @@ A visual with `chartType='choropleth'`. Encoding:
 
 ```jsonc
 {
-  "regionKey":   "country_code",      // column matching GeoJSON feature property
-  "value":       "revenue",
-  "regionGeoSet": "world-countries"   // built-in name or org_geojson.id
+  "regionKey": "country_code", // column matching GeoJSON feature property
+  "value": "revenue",
+  "regionGeoSet": "world-countries", // built-in name or org_geojson.id
 }
 ```
 
@@ -85,7 +85,13 @@ Builder transforms rows + GeoJSON into ECharts `map` series:
 
 ```typescript
 // src/app/shared/builders/choropleth.builder.ts
-export const buildChoroplethOption: ChartBuilder = async (encoding, config, rows, fields, ctx) => {
+export const buildChoroplethOption: ChartBuilder = async (
+  encoding,
+  config,
+  rows,
+  fields,
+  ctx,
+) => {
   const geo = await loadGeoSet(encoding.regionGeoSet);
   echarts.registerMap(encoding.regionGeoSet, geo);
 
@@ -99,22 +105,29 @@ export const buildChoroplethOption: ChartBuilder = async (encoding, config, rows
 
   return {
     visualMap: {
-      min: vmin, max: vmax,
-      left: 'left', top: 'bottom',
+      min: vmin,
+      max: vmax,
+      left: 'left',
+      top: 'bottom',
       text: ['high', 'low'],
       calculable: true,
       inRange: { color: paletteFor(config.palette, ctx.theme) },
     },
-    series: [{
-      name: encoding.value, type: 'map',
-      map: encoding.regionGeoSet,
-      roam: true,
-      label: { show: !!config.showLabels },
-      emphasis: { label: { show: true } },
-      data,
-    }],
-    tooltip: { trigger: 'item', formatter: (p: any) =>
-      `${p.name}: ${ctx.formatService.number(p.value)}` },
+    series: [
+      {
+        name: encoding.value,
+        type: 'map',
+        map: encoding.regionGeoSet,
+        roam: true,
+        label: { show: !!config.showLabels },
+        emphasis: { label: { show: true } },
+        data,
+      },
+    ],
+    tooltip: {
+      trigger: 'item',
+      formatter: (p: any) => `${p.name}: ${ctx.formatService.number(p.value)}`,
+    },
   };
 };
 ```
@@ -143,14 +156,17 @@ GL for very-large point overlays.
 ```typescript
 import h3 from 'h3-js';
 
-export function bucketByH3(points: Array<{ lat: number; lng: number; value?: number }>,
-                           zoom: number): Array<{ h3Index: string; count: number; total: number }> {
+export function bucketByH3(
+  points: Array<{ lat: number; lng: number; value?: number }>,
+  zoom: number,
+): Array<{ h3Index: string; count: number; total: number }> {
   const resolution = zoomToResolution(zoom);
   const buckets = new Map<string, { count: number; total: number }>();
   for (const p of points) {
     const idx = h3.latLngToCell(p.lat, p.lng, resolution);
     const b = buckets.get(idx) ?? { count: 0, total: 0 };
-    b.count++; b.total += p.value ?? 1;
+    b.count++;
+    b.total += p.value ?? 1;
     buckets.set(idx, b);
   }
   return Array.from(buckets, ([h3Index, b]) => ({ h3Index, ...b }));
@@ -175,21 +191,36 @@ At each zoom level, re-bucket on the client. Avoids sending
 ## 5. GeoJSON upload + validation
 
 ```typescript
-export async function validateGeoJson(buf: Buffer): Promise<{ ok: boolean; reason?: string; meta?: any }> {
+export async function validateGeoJson(
+  buf: Buffer,
+): Promise<{ ok: boolean; reason?: string; meta?: any }> {
   const text = buf.toString('utf-8');
-  if (buf.byteLength > 50 * 1024 * 1024) return { ok: false, reason: 'TOO_LARGE_50MB' };
+  if (buf.byteLength > 50 * 1024 * 1024)
+    return { ok: false, reason: 'TOO_LARGE_50MB' };
   let parsed: any;
-  try { parsed = JSON.parse(text); }
-  catch { return { ok: false, reason: 'INVALID_JSON' }; }
-  if (parsed.type !== 'FeatureCollection') return { ok: false, reason: 'NOT_FEATURE_COLLECTION' };
-  if (!Array.isArray(parsed.features)) return { ok: false, reason: 'NO_FEATURES' };
+  try {
+    parsed = JSON.parse(text);
+  } catch {
+    return { ok: false, reason: 'INVALID_JSON' };
+  }
+  if (parsed.type !== 'FeatureCollection')
+    return { ok: false, reason: 'NOT_FEATURE_COLLECTION' };
+  if (!Array.isArray(parsed.features))
+    return { ok: false, reason: 'NO_FEATURES' };
   for (const f of parsed.features) {
-    if (!['Polygon','MultiPolygon'].includes(f.geometry?.type)) {
+    if (!['Polygon', 'MultiPolygon'].includes(f.geometry?.type)) {
       return { ok: false, reason: 'UNSUPPORTED_GEOMETRY' };
     }
   }
-  const propertyKeys = Array.from(new Set(parsed.features.flatMap((f: any) => Object.keys(f.properties ?? {}))));
-  return { ok: true, meta: { featureCount: parsed.features.length, propertyKeys } };
+  const propertyKeys = Array.from(
+    new Set(
+      parsed.features.flatMap((f: any) => Object.keys(f.properties ?? {})),
+    ),
+  );
+  return {
+    ok: true,
+    meta: { featureCount: parsed.features.length, propertyKeys },
+  };
 }
 ```
 
@@ -207,7 +238,10 @@ self-hosted). Caches results in Redis (24h) to keep cost down.
 
 ```typescript
 // src/services/geo/geocoder.ts
-export async function geocode(query: string, org: Org): Promise<GeocodeResult | null> {
+export async function geocode(
+  query: string,
+  org: Org,
+): Promise<GeocodeResult | null> {
   const cacheKey = `geocode:${org.id}:${sha256(query)}`;
   const hit = await redis.get(cacheKey);
   if (hit) return JSON.parse(hit);
@@ -231,10 +265,12 @@ import countries from 'i18n-iso-countries';
 
 export function normaliseCountry(input: string): string | null {
   // Try alpha2 / alpha3 / numeric / name
-  return countries.getAlpha2Code(input, 'en')
-      ?? countries.getAlpha2Code(input, 'es')
-      ?? countries.getAlpha2Code(input, 'fr')
-      ?? null;
+  return (
+    countries.getAlpha2Code(input, 'en') ??
+    countries.getAlpha2Code(input, 'es') ??
+    countries.getAlpha2Code(input, 'fr') ??
+    null
+  );
 }
 ```
 
@@ -251,24 +287,35 @@ natively.
 ### 8.1 Sankey
 
 ```typescript
-export const buildSankeyOption: ChartBuilder = (encoding, config, rows, fields, ctx) => {
+export const buildSankeyOption: ChartBuilder = (
+  encoding,
+  config,
+  rows,
+  fields,
+  ctx,
+) => {
   const nodes = uniqueValues([
     ...rows.map(r => r[encoding.source]),
     ...rows.map(r => r[encoding.target]),
   ]).map(n => ({ name: n }));
 
   const links = rows.map(r => ({
-    source: r[encoding.source], target: r[encoding.target], value: r[encoding.value],
+    source: r[encoding.source],
+    target: r[encoding.target],
+    value: r[encoding.value],
   }));
 
   return {
-    series: [{
-      type: 'sankey',
-      data: nodes, links,
-      lineStyle: { curveness: 0.5 },
-      label: { show: true },
-      emphasis: { focus: 'adjacency' },
-    }],
+    series: [
+      {
+        type: 'sankey',
+        data: nodes,
+        links,
+        lineStyle: { curveness: 0.5 },
+        label: { show: true },
+        emphasis: { focus: 'adjacency' },
+      },
+    ],
     tooltip: { trigger: 'item' },
   };
 };
@@ -311,7 +358,7 @@ Bundle stays small for the 90% of dashboards that don't use 3D.
 ```typescript
 // src/controllers/geo/uploadGeojson.ts
 const uploadGeojson = async (req: Request, res: Response) => {
-  const { name, description, bytes } = req.body;        // bytes: base64 of file
+  const { name, description, bytes } = req.body; // bytes: base64 of file
   const { loggedInId, orgData, master_db_connection } = res.locals;
   const connection = orgData.connection;
   try {
@@ -319,7 +366,9 @@ const uploadGeojson = async (req: Request, res: Response) => {
     const v = await validateGeoJson(buf);
     if (!v.ok) {
       await master_db_connection.close();
-      return sendResponse(res, false, CODE.BAD_REQUEST, GEO_MSG.BAD_GEOJSON, { reason: v.reason });
+      return sendResponse(res, false, CODE.BAD_REQUEST, GEO_MSG.BAD_GEOJSON, {
+        reason: v.reason,
+      });
     }
 
     const storageKey = `org/${orgData.orgId}/geojson/${crypto.randomUUID()}.json.gz`;
@@ -327,17 +376,23 @@ const uploadGeojson = async (req: Request, res: Response) => {
 
     const row = await connection.getRepository('OrgGeojson').save({
       orgId: orgData.orgId,
-      name, description,
+      name,
+      description,
       featureCount: v.meta.featureCount,
       propertyKeys: v.meta.propertyKeys,
-      storageKey, byteSize: buf.byteLength,
+      storageKey,
+      byteSize: buf.byteLength,
       uploadedBy: loggedInId,
     });
 
     await auditLogger.logAuditToOrg({
-      connection, req, res,
-      module: AUDIT_MODULES.GEO, action: AUDIT_ACTIONS.UPLOAD,
-      entityName: 'OrgGeojson', entityId: row.id,
+      connection,
+      req,
+      res,
+      module: AUDIT_MODULES.GEO,
+      action: AUDIT_ACTIONS.UPLOAD,
+      entityName: 'OrgGeojson',
+      entityId: row.id,
       metadata: { featureCount: v.meta.featureCount, byteSize: buf.byteLength },
     });
 
@@ -355,40 +410,43 @@ const uploadGeojson = async (req: Request, res: Response) => {
 
 ## 11. Observability
 
-| Metric | Type | Labels | Purpose |
-|---|---|---|---|
-| `dbexec_geo_render_ms` | histogram | `chart_type` | per-chart-type latency |
-| `dbexec_geo_tile_request_total` | counter | `provider`, `outcome` | tile-API cost tracking |
-| `dbexec_geo_geocode_total` | counter | `provider`, `outcome` | geocode cost |
-| `dbexec_geo_h3_bucket_count` | histogram | `zoom` | bucketing effectiveness |
-| `dbexec_geo_geojson_unmatched_total` | counter | `geojson` | data quality leading indicator |
+| Metric                               | Type      | Labels                | Purpose                        |
+| ------------------------------------ | --------- | --------------------- | ------------------------------ |
+| `dbexec_geo_render_ms`               | histogram | `chart_type`          | per-chart-type latency         |
+| `dbexec_geo_tile_request_total`      | counter   | `provider`, `outcome` | tile-API cost tracking         |
+| `dbexec_geo_geocode_total`           | counter   | `provider`, `outcome` | geocode cost                   |
+| `dbexec_geo_h3_bucket_count`         | histogram | `zoom`                | bucketing effectiveness        |
+| `dbexec_geo_geojson_unmatched_total` | counter   | `geojson`             | data quality leading indicator |
 
 ---
 
 ## 12. Security & threat model
 
-| Threat | Mitigation |
-|---|---|
-| API key for Mapbox in client | Key proxied via our backend; never exposed to client |
-| GeoJSON DoS via 100k-point polygon | Per-feature point cap (10k); reject if exceeded |
-| ECharts-GL WebGL exploit | Sandboxed via the chart-visual component; CSP allows webgl only on the visual canvas |
-| Country code spoof | Normaliser whitelist (ISO-3166); reject unknown |
-| Cross-org GeoJSON access | All endpoints scope by org_id |
-| Tile provider cost runaway | Per-org daily quota on tile requests; throttle at 80% |
+| Threat                             | Mitigation                                                                           |
+| ---------------------------------- | ------------------------------------------------------------------------------------ |
+| API key for Mapbox in client       | Key proxied via our backend; never exposed to client                                 |
+| GeoJSON DoS via 100k-point polygon | Per-feature point cap (10k); reject if exceeded                                      |
+| ECharts-GL WebGL exploit           | Sandboxed via the chart-visual component; CSP allows webgl only on the visual canvas |
+| Country code spoof                 | Normaliser whitelist (ISO-3166); reject unknown                                      |
+| Cross-org GeoJSON access           | All endpoints scope by org_id                                                        |
+| Tile provider cost runaway         | Per-org daily quota on tile requests; throttle at 80%                                |
 
 ---
 
 ## 13. Runbook
 
 **Symptom: choropleth shows blank.**
+
 1. Unmatched country codes — `dbexec_geo_geojson_unmatched_total`.
    Run normaliser; fix data or upload custom GeoJSON.
 
 **Symptom: heatmap laggy on zoom.**
+
 1. H3 resolution too high for zoom level — adjust
    `zoomToResolution` mapping; favour fewer-but-larger hexes.
 
 **Symptom: tile cost spike.**
+
 1. Public dashboard with high traffic. Cache tiles at our
    CDN; switch to a flat-pricing provider (Mapbox business).
 
@@ -396,14 +454,14 @@ const uploadGeojson = async (req: Request, res: Response) => {
 
 ## 14. Perf budget
 
-| Operation | p50 | p95 | Hard ceiling |
-|---|---|---|---|
-| Choropleth render (200 features) | 80 ms | 250 ms | 1 s |
-| Point map (1k points) | 60 ms | 200 ms | 1 s |
-| Heatmap H3 bucket (1M points) | 400 ms | 1.5 s | 5 s |
-| GeoJSON upload + validate (10 MB) | 1 s | 3 s | 30 s |
-| Geocode (cached) | 5 ms | 20 ms | 100 ms |
-| Geocode (cold) | 100 ms | 500 ms | 5 s |
+| Operation                         | p50    | p95    | Hard ceiling |
+| --------------------------------- | ------ | ------ | ------------ |
+| Choropleth render (200 features)  | 80 ms  | 250 ms | 1 s          |
+| Point map (1k points)             | 60 ms  | 200 ms | 1 s          |
+| Heatmap H3 bucket (1M points)     | 400 ms | 1.5 s  | 5 s          |
+| GeoJSON upload + validate (10 MB) | 1 s    | 3 s    | 30 s         |
+| Geocode (cached)                  | 5 ms   | 20 ms  | 100 ms       |
+| Geocode (cold)                    | 100 ms | 500 ms | 5 s          |
 
 ---
 

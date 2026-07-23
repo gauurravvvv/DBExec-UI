@@ -206,10 +206,7 @@
       <!-- Cascade parent (Slice D, item 3) — category filters only.
            When set, this filter's runtime options are re-fetched
            constrained by the parent filter's current selection. -->
-      <div
-        class="filter-dialog-field"
-        *ngIf="filterDialogType === 'category'"
-      >
+      <div class="filter-dialog-field" *ngIf="filterDialogType === 'category'">
         <app-custom-dropdown
           [options]="parentFilterOptions"
           [(ngModel)]="filterDialogDependsOnFilterId"

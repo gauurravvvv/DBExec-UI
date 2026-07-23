@@ -615,11 +615,9 @@ export class AnalysesService {
     try {
       // PUT /analysis-filters/:filterId — id moves to path.
       return await lastValueFrom(
-        this.http.apiPut(
-          ANALYSIS_FILTER.UPDATE + payload.id,
-          payload,
-          { skipLoader: true },
-        ),
+        this.http.apiPut(ANALYSIS_FILTER.UPDATE + payload.id, payload, {
+          skipLoader: true,
+        }),
       );
     } finally {
       this._saving.set(false);
@@ -709,8 +707,15 @@ export class AnalysesService {
     // thus a byte-identical payload) when no table visual requests totals.
     pivotTotals?: any;
   }) {
-    const { datasetId, analysisId, filters, parameters, limit, refresh, pivotTotals } =
-      payload;
+    const {
+      datasetId,
+      analysisId,
+      filters,
+      parameters,
+      limit,
+      refresh,
+      pivotTotals,
+    } = payload;
     const body: any = { datasetId, analysisId };
     if (filters && filters.length > 0) {
       body.filters = filters;

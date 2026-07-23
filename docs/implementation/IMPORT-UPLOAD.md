@@ -86,7 +86,12 @@ const initUpload = async (req: Request, res: Response) => {
     }
     if (!ACCEPTED_TYPES.includes(contentType)) {
       await master_db_connection.close();
-      return sendResponse(res, false, CODE.BAD_REQUEST, UPLOAD_MSG.UNSUPPORTED_TYPE);
+      return sendResponse(
+        res,
+        false,
+        CODE.BAD_REQUEST,
+        UPLOAD_MSG.UNSUPPORTED_TYPE,
+      );
     }
 
     // Quota check
@@ -99,19 +104,31 @@ const initUpload = async (req: Request, res: Response) => {
 
     const fileId = crypto.randomUUID();
     const tusUrl = await tus.createSlot({
-      fileId, orgId: orgData.orgId, userId: loggedInId,
-      size, contentType, metadata: { fileName, datasetSlug, replace: !!replace },
+      fileId,
+      orgId: orgData.orgId,
+      userId: loggedInId,
+      size,
+      contentType,
+      metadata: { fileName, datasetSlug, replace: !!replace },
     });
 
     // Persist a row so we can resume after server restart
     await connection.getRepository('UploadJob').save({
-      id: fileId, orgId: orgData.orgId, userId: loggedInId,
-      fileName, size, contentType, datasetSlug,
-      replaceExisting: !!replace, status: 'awaiting_upload',
+      id: fileId,
+      orgId: orgData.orgId,
+      userId: loggedInId,
+      fileName,
+      size,
+      contentType,
+      datasetSlug,
+      replaceExisting: !!replace,
+      status: 'awaiting_upload',
     });
 
     await auditLogger.logAuditToOrg({
-      connection, req, res,
+      connection,
+      req,
+      res,
       module: AUDIT_MODULES.UPLOAD,
       action: AUDIT_ACTIONS.INIT,
       entityName: 'UploadJob',
@@ -145,20 +162,23 @@ export async function processUpload(jobId: string): Promise<void> {
 
   // Peek + parse first 1024 lines
   const peeked = await peekLines(decoded, 1024);
-  const dialect = sniffCsvDialect(peeked);   // delimiter, quote, header
+  const dialect = sniffCsvDialect(peeked); // delimiter, quote, header
   const columns = await inferColumns(peeked, dialect);
 
   // Provision target table
   const targetSchema = `org_${job.orgId.replace(/-/g, '_')}`;
-  const targetTable = job.replaceExisting && (await tableExists(targetSchema, job.datasetSlug))
-    ? `tbl_${job.datasetSlug}_${Date.now()}`        // new physical, atomic swap later
-    : `tbl_${job.datasetSlug}_${Date.now()}`;
+  const targetTable =
+    job.replaceExisting && (await tableExists(targetSchema, job.datasetSlug))
+      ? `tbl_${job.datasetSlug}_${Date.now()}` // new physical, atomic swap later
+      : `tbl_${job.datasetSlug}_${Date.now()}`;
   const ddl = renderCreateTable(targetSchema, targetTable, columns);
   await managedPool.query(ddl);
 
   // Stream rows via COPY FROM STDIN
   const csv = stringifyCsv(decoded, dialect);
-  const copyStream = managedPool.query(copyFrom(`COPY ${targetSchema}.${targetTable} FROM STDIN WITH CSV HEADER`));
+  const copyStream = managedPool.query(
+    copyFrom(`COPY ${targetSchema}.${targetTable} FROM STDIN WITH CSV HEADER`),
+  );
   await pipeline(csv, copyStream);
 
   // Atomic swap if replacing
@@ -188,18 +208,27 @@ export async function processUpload(jobId: string): Promise<void> {
   for (const c of columns) {
     await connection.getRepository('DatasetField').save({
       datasetId: dataset.id,
-      name: c.normalisedName, displayName: c.originalName,
-      dataType: c.dataType, semanticType: c.semanticType,
-      isPii: c.isPii, displayOrder: c.order,
+      name: c.normalisedName,
+      displayName: c.originalName,
+      dataType: c.dataType,
+      semanticType: c.semanticType,
+      isPii: c.isPii,
+      displayOrder: c.order,
     });
   }
 
   // Mark job done; emit event
-  await connection.getRepository('UploadJob').update({ id: jobId },
-    { status: 'completed', datasetId: dataset.id, completedAt: new Date() });
+  await connection
+    .getRepository('UploadJob')
+    .update(
+      { id: jobId },
+      { status: 'completed', datasetId: dataset.id, completedAt: new Date() },
+    );
 
   await events.publish('upload.completed', {
-    orgId: job.orgId, userId: job.userId, datasetId: dataset.id,
+    orgId: job.orgId,
+    userId: job.userId,
+    datasetId: dataset.id,
     rowCount: await rowCountOf(targetSchema, targetTable),
   });
 }
@@ -219,7 +248,10 @@ export interface ColumnGuess {
   order: number;
 }
 
-export function inferColumns(rows: string[][], dialect: CsvDialect): ColumnGuess[] {
+export function inferColumns(
+  rows: string[][],
+  dialect: CsvDialect,
+): ColumnGuess[] {
   const header = rows[0];
   const sample = rows.slice(1).slice(0, 200);
   return header.map((h, i) => {
@@ -229,7 +261,8 @@ export function inferColumns(rows: string[][], dialect: CsvDialect): ColumnGuess
     return {
       originalName: h,
       normalisedName: normaliseColumnName(h),
-      dataType, semanticType,
+      dataType,
+      semanticType,
       isPii: looksLikePii(h, vals),
       order: i,
     };
@@ -240,16 +273,19 @@ function inferDataType(values: string[]): ColumnGuess['dataType'] {
   if (values.every(v => /^-?\d+$/.test(v))) return 'integer';
   if (values.every(v => /^-?\d+\.?\d*$/.test(v))) return 'number';
   if (values.every(v => /^\d{4}-\d{2}-\d{2}$/.test(v))) return 'date';
-  if (values.every(v => /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/.test(v))) return 'timestamp';
-  if (values.every(v => /^(true|false|yes|no|1|0|y|n)$/i.test(v))) return 'boolean';
+  if (values.every(v => /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/.test(v)))
+    return 'timestamp';
+  if (values.every(v => /^(true|false|yes|no|1|0|y|n)$/i.test(v)))
+    return 'boolean';
   return 'string';
 }
 
 function normaliseColumnName(name: string): string {
-  return name.toLowerCase()
+  return name
+    .toLowerCase()
     .replace(/[^a-z0-9_]+/g, '_')
     .replace(/^_+|_+$/g, '')
-    .slice(0, 63);              // Postgres identifier limit
+    .slice(0, 63); // Postgres identifier limit
 }
 ```
 
@@ -266,15 +302,21 @@ correct?" so the user can intervene.
 steps 3-13 with one extra preamble:
 
 ```typescript
-async function pullFromUrl(url: string, orgId: string, userId: string): Promise<string> {
+async function pullFromUrl(
+  url: string,
+  orgId: string,
+  userId: string,
+): Promise<string> {
   // SSRF guard
   const resolved = await guardedDnsLookup(url);
   if (isPrivateIp(resolved.address)) throw new Error('SSRF_BLOCKED');
-  if (resolved.address === '169.254.169.254') throw new Error('SSRF_BLOCKED_METADATA');
+  if (resolved.address === '169.254.169.254')
+    throw new Error('SSRF_BLOCKED_METADATA');
 
   // Stream with size cap
   const res = await fetch(url, {
-    redirect: 'follow', signal: AbortSignal.timeout(60_000),
+    redirect: 'follow',
+    signal: AbortSignal.timeout(60_000),
     headers: { 'User-Agent': 'DBExec-URL-Pull/1.0' },
   });
   if (!res.ok) throw new Error(`URL pull failed: ${res.status}`);
@@ -305,47 +347,50 @@ producing a new `tbl_<slug>_<ts>` and atomic-swapping.
 
 ## 8. Observability
 
-| Metric | Type | Labels | Purpose |
-|---|---|---|---|
-| `dbexec_upload_init_total` | counter | `org`, `outcome` | init success/failure |
-| `dbexec_upload_bytes_received_total` | counter | `org` | for quota tracking |
-| `dbexec_upload_processing_ms` | histogram | `kind` (csv/xlsx/url) | end-to-end |
-| `dbexec_upload_rows_loaded` | histogram | `kind` | row counts |
-| `dbexec_upload_failed_total` | counter | `phase`, `reason` | which step fails most |
-| `dbexec_upload_quota_used_bytes` | gauge | `org` | quota dashboard |
+| Metric                               | Type      | Labels                | Purpose               |
+| ------------------------------------ | --------- | --------------------- | --------------------- |
+| `dbexec_upload_init_total`           | counter   | `org`, `outcome`      | init success/failure  |
+| `dbexec_upload_bytes_received_total` | counter   | `org`                 | for quota tracking    |
+| `dbexec_upload_processing_ms`        | histogram | `kind` (csv/xlsx/url) | end-to-end            |
+| `dbexec_upload_rows_loaded`          | histogram | `kind`                | row counts            |
+| `dbexec_upload_failed_total`         | counter   | `phase`, `reason`     | which step fails most |
+| `dbexec_upload_quota_used_bytes`     | gauge     | `org`                 | quota dashboard       |
 
 ---
 
 ## 9. Security & threat model
 
-| Threat | Mitigation |
-|---|---|
-| Zip-bomb XLSX | Cap decompressed size at 5× declared size; reject if exceeded |
-| CSV formula injection | Cells starting with `=`, `+`, `-`, `@` prefixed with `'` before display (export side); never executed by us |
-| Path traversal via filename | Filename treated as opaque; storage uses internal fileId; original name stored as metadata only |
-| Schema overflow (1000 columns) | Cap at 200 columns by default; org admin can raise |
-| Encoding sniff misleads | If decode fails, surface "Couldn't decode this file" and let user pick encoding manually |
-| SSRF via URL pull | DNS resolved once + pinned; private/metadata IPs blocked; 60s timeout |
-| OAuth token leak | Tokens KMS-wrapped per user; never logged; revocable from user profile |
-| Re-upload race | UploadJob.status state machine + DB unique on (orgId, datasetSlug) for in-flight uploads |
-| User uploads malware | We don't execute; AV scan optional and configurable per org |
-| Cross-org schema access | Managed-DB grants scoped to `org_<id>` schema only |
+| Threat                         | Mitigation                                                                                                  |
+| ------------------------------ | ----------------------------------------------------------------------------------------------------------- |
+| Zip-bomb XLSX                  | Cap decompressed size at 5× declared size; reject if exceeded                                               |
+| CSV formula injection          | Cells starting with `=`, `+`, `-`, `@` prefixed with `'` before display (export side); never executed by us |
+| Path traversal via filename    | Filename treated as opaque; storage uses internal fileId; original name stored as metadata only             |
+| Schema overflow (1000 columns) | Cap at 200 columns by default; org admin can raise                                                          |
+| Encoding sniff misleads        | If decode fails, surface "Couldn't decode this file" and let user pick encoding manually                    |
+| SSRF via URL pull              | DNS resolved once + pinned; private/metadata IPs blocked; 60s timeout                                       |
+| OAuth token leak               | Tokens KMS-wrapped per user; never logged; revocable from user profile                                      |
+| Re-upload race                 | UploadJob.status state machine + DB unique on (orgId, datasetSlug) for in-flight uploads                    |
+| User uploads malware           | We don't execute; AV scan optional and configurable per org                                                 |
+| Cross-org schema access        | Managed-DB grants scoped to `org_<id>` schema only                                                          |
 
 ---
 
 ## 10. Runbook
 
 **Symptom: upload completes but no data.**
+
 1. Encoding mis-detect → empty parse. Inspect `processing_ms`
    logs for "encoding: ...". Rerun with manual encoding hint
    via `/upload/reprocess`.
 
 **Symptom: quota exceeded but data is gone.**
+
 1. User probably did "replace" on a smaller file but quota
    counter is per-row over time, not current. Add nightly
    reconciliation cron.
 
 **Symptom: Google Sheet refresh stops working.**
+
 1. OAuth token refresh failed (user revoked). Surface a
    per-import "needs reauthorise" banner in dataset detail.
 
@@ -353,13 +398,13 @@ producing a new `tbl_<slug>_<ts>` and atomic-swapping.
 
 ## 11. Perf budget
 
-| Operation | p50 | p95 | Hard ceiling |
-|---|---|---|---|
-| Upload init | 80 ms | 250 ms | 1 s |
-| 100 MB CSV processing | 30 s | 90 s | 5 min |
-| 1 GB CSV processing | 5 min | 15 min | 30 min |
-| URL pull (100 MB) | 30 s | 90 s | 5 min |
-| Column inference (200 rows × 50 cols) | 100 ms | 300 ms | 2 s |
+| Operation                             | p50    | p95    | Hard ceiling |
+| ------------------------------------- | ------ | ------ | ------------ |
+| Upload init                           | 80 ms  | 250 ms | 1 s          |
+| 100 MB CSV processing                 | 30 s   | 90 s   | 5 min        |
+| 1 GB CSV processing                   | 5 min  | 15 min | 30 min       |
+| URL pull (100 MB)                     | 30 s   | 90 s   | 5 min        |
+| Column inference (200 rows × 50 cols) | 100 ms | 300 ms | 2 s          |
 
 ---
 

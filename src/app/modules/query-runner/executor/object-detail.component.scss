@@ -101,7 +101,9 @@
   color: var(--od-muted);
   cursor: pointer;
   font-size: 1rem;
-  &:hover { color: var(--od-text); }
+  &:hover {
+    color: var(--od-text);
+  }
 }
 
 // Segmented tab strip — matches the app's .priv-tabs pattern: a subtle track
@@ -152,7 +154,9 @@
   color: var(--od-muted);
   padding: 1rem;
 }
-.od-error { color: var(--error-color, #f44336); }
+.od-error {
+  color: var(--error-color, #f44336);
+}
 
 // Data table — mirrors the app's .modern-table: shaded sticky header, zebra
 // body rows, hover highlight, compact mono cells (was a bare HTML table with
@@ -176,8 +180,12 @@
     white-space: nowrap;
   }
   tbody tr {
-    &:nth-child(even) > td { background: rgba(0, 0, 0, 0.018); }
-    &:hover > td { background: var(--hover-background, #f5f5f5); }
+    &:nth-child(even) > td {
+      background: rgba(0, 0, 0, 0.018);
+    }
+    &:hover > td {
+      background: var(--hover-background, #f5f5f5);
+    }
   }
   td {
     padding: 0.4rem 0.7rem;
@@ -192,10 +200,19 @@
     font-size: var(--fs-label);
   }
 }
-.od-mono { font-family: ui-monospace, monospace; }
-.od-muted { color: var(--od-muted); }
-.od-def { word-break: break-all; }
-.od-none { text-align: center; color: var(--od-muted); }
+.od-mono {
+  font-family: ui-monospace, monospace;
+}
+.od-muted {
+  color: var(--od-muted);
+}
+.od-def {
+  word-break: break-all;
+}
+.od-none {
+  text-align: center;
+  color: var(--od-muted);
+}
 .od-chip,
 .od-badge {
   display: inline-block;
@@ -205,9 +222,13 @@
   background: var(--hover-background, #f5f5f5);
   color: var(--od-text);
 }
-.od-badge { margin-left: 0.4rem; }
+.od-badge {
+  margin-left: 0.4rem;
+}
 
-.od-code-wrap { position: relative; }
+.od-code-wrap {
+  position: relative;
+}
 .od-copy {
   position: absolute;
   top: 0;
@@ -221,7 +242,9 @@
   cursor: pointer;
   display: inline-flex;
   gap: 0.3rem;
-  &:hover { color: var(--od-accent); }
+  &:hover {
+    color: var(--od-accent);
+  }
 }
 .od-code {
   margin: 0;
@@ -260,7 +283,12 @@
     color: var(--od-muted);
     flex-shrink: 0;
   }
-  span { display: flex; flex-wrap: wrap; gap: 0.3rem; align-items: center; }
+  span {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+    align-items: center;
+  }
 }
 
 /* Soft inline badge for column identity/generated flags. */
@@ -276,7 +304,9 @@
   align-items: center;
   gap: 0.25rem;
   color: var(--od-accent);
-  i { font-size: var(--fs-label); }
+  i {
+    font-size: var(--fs-label);
+  }
 }
 
 /* Function signature tab: mono signature line + attribute chip row. */
@@ -288,6 +318,9 @@
     display: flex;
     flex-wrap: wrap;
     gap: 0.35rem;
-    .od-chip { text-transform: uppercase; letter-spacing: 0.03em; }
+    .od-chip {
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
   }
 }

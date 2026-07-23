@@ -27,9 +27,9 @@
           [disabled]="!adminData?.canEdit"
           [pTooltip]="
             !adminData?.canEdit
-              ? (adminData?.isDefault === 1
-                  ? ('SYSTEM_ADMIN.CANNOT_EDIT_DEFAULT' | translate)
-                  : ('SYSTEM_ADMIN.CANNOT_EDIT_SELF' | translate))
+              ? adminData?.isDefault === 1
+                ? ('SYSTEM_ADMIN.CANNOT_EDIT_DEFAULT' | translate)
+                : ('SYSTEM_ADMIN.CANNOT_EDIT_SELF' | translate)
               : ('COMMON.EDIT' | translate)
           "
           tooltipPosition="bottom"
@@ -77,7 +77,10 @@
             {{ adminInitials }}
           </div>
           <h3 class="admin-name">
-            {{ (adminData.firstName || '') + (adminData.lastName ? ' ' + adminData.lastName : '') }}
+            {{
+              (adminData.firstName || '') +
+                (adminData.lastName ? ' ' + adminData.lastName : '')
+            }}
           </h3>
           <p class="admin-username">&#64;{{ adminData.username }}</p>
           <div class="status-wrapper">

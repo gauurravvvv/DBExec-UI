@@ -108,12 +108,21 @@ export async function saveDatasetVersion(
   connection: Connection,
   datasetId: string,
   next: Dataset,
-  ctx: { actorUserId: string; message?: string; isDraft?: boolean; branch?: string },
+  ctx: {
+    actorUserId: string;
+    message?: string;
+    isDraft?: boolean;
+    branch?: string;
+  },
 ): Promise<DatasetVersion> {
   const branch = ctx.branch ?? 'main';
-  const prev = await connection.getRepository('DatasetVersion')
+  const prev = await connection
+    .getRepository('DatasetVersion')
     .createQueryBuilder('v')
-    .where('v.dataset_id = :id AND v.branch = :br', { id: datasetId, br: branch })
+    .where('v.dataset_id = :id AND v.branch = :br', {
+      id: datasetId,
+      br: branch,
+    })
     .orderBy('v.version_no', 'DESC')
     .limit(1)
     .getOne();
@@ -150,17 +159,26 @@ export async function rollbackDataset(
   targetVersionId: string,
   actorUserId: string,
 ): Promise<DatasetVersion> {
-  const target = await connection.getRepository('DatasetVersion').findOne({ where: { id: targetVersionId } });
+  const target = await connection
+    .getRepository('DatasetVersion')
+    .findOne({ where: { id: targetVersionId } });
   if (!target) throw new Error('VERSION_NOT_FOUND');
 
   // Re-save target.snapshot as a new version with a "rollback to" message
-  const restored = await saveDatasetVersion(connection, datasetId, target.snapshot, {
-    actorUserId,
-    message: `Rollback to v${target.versionNo}`,
-  });
+  const restored = await saveDatasetVersion(
+    connection,
+    datasetId,
+    target.snapshot,
+    {
+      actorUserId,
+      message: `Rollback to v${target.versionNo}`,
+    },
+  );
 
   // Replace the live dataset row
-  await connection.getRepository('Dataset').update({ id: datasetId }, target.snapshot);
+  await connection
+    .getRepository('Dataset')
+    .update({ id: datasetId }, target.snapshot);
 
   return restored;
 }
@@ -227,41 +245,62 @@ On every entity save, re-derive edges from the entity's
 references:
 
 ```typescript
-export async function reextractLineage(kind: string, id: string, entity: any): Promise<void> {
+export async function reextractLineage(
+  kind: string,
+  id: string,
+  entity: any,
+): Promise<void> {
   const newEdges: LineageEdge[] = [];
 
   if (kind === 'analysis') {
     if (entity.datasetId) {
-      newEdges.push({ upstreamKind: 'dataset', upstreamId: entity.datasetId,
-                      downstreamKind: 'analysis', downstreamId: id,
-                      relation: 'derived_from' });
+      newEdges.push({
+        upstreamKind: 'dataset',
+        upstreamId: entity.datasetId,
+        downstreamKind: 'analysis',
+        downstreamId: id,
+        relation: 'derived_from',
+      });
     }
     if (entity.semanticModelId) {
-      newEdges.push({ upstreamKind: 'semantic_model', upstreamId: entity.semanticModelId,
-                      downstreamKind: 'analysis', downstreamId: id,
-                      relation: 'derived_from' });
+      newEdges.push({
+        upstreamKind: 'semantic_model',
+        upstreamId: entity.semanticModelId,
+        downstreamKind: 'analysis',
+        downstreamId: id,
+        relation: 'derived_from',
+      });
     }
   }
 
   if (kind === 'dashboard') {
     for (const tab of entity.tabs ?? []) {
       for (const v of tab.visuals ?? []) {
-        newEdges.push({ upstreamKind: 'analysis', upstreamId: v.analysisId,
-                        downstreamKind: 'dashboard', downstreamId: id,
-                        relation: 'embedded_in' });
+        newEdges.push({
+          upstreamKind: 'analysis',
+          upstreamId: v.analysisId,
+          downstreamKind: 'dashboard',
+          downstreamId: id,
+          relation: 'embedded_in',
+        });
       }
     }
   }
 
   if (kind === 'subscription') {
-    newEdges.push({ upstreamKind: 'dashboard', upstreamId: entity.dashboardId,
-                    downstreamKind: 'subscription', downstreamId: id,
-                    relation: 'aggregates' });
+    newEdges.push({
+      upstreamKind: 'dashboard',
+      upstreamId: entity.dashboardId,
+      downstreamKind: 'subscription',
+      downstreamId: id,
+      relation: 'aggregates',
+    });
   }
 
   // Replace edges for this downstream
   await connection.getRepository('LineageEdge').delete({
-    downstreamKind: kind, downstreamId: id,
+    downstreamKind: kind,
+    downstreamId: id,
   });
   for (const e of newEdges) {
     await connection.getRepository('LineageEdge').save(e);
@@ -307,14 +346,24 @@ const listDatasetVersions = async (req: Request, res: Response) => {
       take: Math.min(Number(limit), 200),
     });
     await master_db_connection.close();
-    sendResponse(res, true, CODE.SUCCESS, VER_MSG.OK,
+    sendResponse(
+      res,
+      true,
+      CODE.SUCCESS,
+      VER_MSG.OK,
       versions.map((v: any) => ({
-        id: v.id, versionNo: v.versionNo, branch: v.branch, tag: v.tag,
-        isDraft: v.isDraft, isPublished: v.isPublished,
-        actor: v.actorUserId, message: v.message,
+        id: v.id,
+        versionNo: v.versionNo,
+        branch: v.branch,
+        tag: v.tag,
+        isDraft: v.isDraft,
+        isPublished: v.isPublished,
+        actor: v.actorUserId,
+        message: v.message,
         diffSummary: summariseDiff(v.diffFromParent),
         createdAt: v.createdAt,
-      })));
+      })),
+    );
   } catch (err: any) {
     Logger.error(`List versions failed: ${err.message}`);
     await master_db_connection.close().catch(() => undefined);
@@ -325,7 +374,7 @@ const listDatasetVersions = async (req: Request, res: Response) => {
 function summariseDiff(ops: jsonpatch.Operation[] | null): string {
   if (!ops) return '(initial version)';
   const counts = { add: 0, remove: 0, replace: 0 };
-  for (const o of ops) counts[o.op as 'add'|'remove'|'replace']++;
+  for (const o of ops) counts[o.op as 'add' | 'remove' | 'replace']++;
   return `+${counts.add} -${counts.remove} ~${counts.replace}`;
 }
 ```
@@ -358,47 +407,50 @@ In every entity edit screen, "History" tab:
 
 Diff viewer: side-by-side JSON with `add`/`remove`/`replace`
 highlights. For semantic model and dashboard, render a "logical
-diff" — "metric *revenue* changed agg from `SUM` to `AVG`" — by
+diff" — "metric _revenue_ changed agg from `SUM` to `AVG`" — by
 post-processing the JSON Patch.
 
 ---
 
 ## 12. Observability
 
-| Metric | Type | Labels | Purpose |
-|---|---|---|---|
-| `dbexec_version_save_total` | counter | `kind`, `is_draft` | usage |
-| `dbexec_version_save_ms` | histogram | `kind` | latency |
-| `dbexec_version_rollback_total` | counter | `kind` | rollback frequency |
-| `dbexec_version_retained_count` | gauge | `kind` | per-kind retention size |
-| `dbexec_lineage_edges_count` | gauge | — | edges table size |
-| `dbexec_lineage_extract_ms` | histogram | `kind` | extraction cost |
+| Metric                          | Type      | Labels             | Purpose                 |
+| ------------------------------- | --------- | ------------------ | ----------------------- |
+| `dbexec_version_save_total`     | counter   | `kind`, `is_draft` | usage                   |
+| `dbexec_version_save_ms`        | histogram | `kind`             | latency                 |
+| `dbexec_version_rollback_total` | counter   | `kind`             | rollback frequency      |
+| `dbexec_version_retained_count` | gauge     | `kind`             | per-kind retention size |
+| `dbexec_lineage_edges_count`    | gauge     | —                  | edges table size        |
+| `dbexec_lineage_extract_ms`     | histogram | `kind`             | extraction cost         |
 
 ---
 
 ## 13. Security & threat model
 
-| Threat | Mitigation |
-|---|---|
-| Author rolls back to a version they shouldn't see | Version reads gated by entity-read permission |
-| Snapshot leaks deleted PII | Versions are stored with the same RLS rules as the live entity; reads via the snapshot pass through resolver |
-| Branch name injection | Branch name is `[a-z0-9-_/]{1,80}` only |
-| Diff payload bloat (huge snapshots) | Per-snapshot size limit 5 MB; entities exceeding switch to compressed JSONB |
-| Tag tampering | Tag move is its own audit event |
+| Threat                                            | Mitigation                                                                                                   |
+| ------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| Author rolls back to a version they shouldn't see | Version reads gated by entity-read permission                                                                |
+| Snapshot leaks deleted PII                        | Versions are stored with the same RLS rules as the live entity; reads via the snapshot pass through resolver |
+| Branch name injection                             | Branch name is `[a-z0-9-_/]{1,80}` only                                                                      |
+| Diff payload bloat (huge snapshots)               | Per-snapshot size limit 5 MB; entities exceeding switch to compressed JSONB                                  |
+| Tag tampering                                     | Tag move is its own audit event                                                                              |
 
 ---
 
 ## 14. Runbook
 
 **Symptom: rollback doesn't take effect.**
+
 1. Cache (module 05) holds the old result. Invalidation should
    bump cache_version automatically — verify.
 
 **Symptom: lineage graph missing edges.**
+
 1. Re-extract for the upstream entity:
    `POST /admin/lineage/reextract/:kind/:id`.
 
 **Symptom: version table growing fast.**
+
 1. Auto-save draft frequency too high? Default 30s; bump to 60s
    under load.
 2. Retention cron stalled? `dbexec_version_retained_count` rising
@@ -408,15 +460,15 @@ post-processing the JSON Patch.
 
 ## 15. Perf budget
 
-| Operation | p50 | p95 | Hard ceiling |
-|---|---|---|---|
-| Save version (5 KB entity) | 20 ms | 80 ms | 500 ms |
-| Save version (500 KB entity) | 100 ms | 400 ms | 3 s |
-| List 50 versions | 30 ms | 100 ms | 1 s |
-| Diff render (small) | 5 ms | 20 ms | 100 ms |
-| Rollback | 50 ms | 200 ms | 1 s |
-| Lineage extract | 30 ms | 100 ms | 1 s |
-| Impact preview (one upstream) | 10 ms | 30 ms | 200 ms |
+| Operation                     | p50    | p95    | Hard ceiling |
+| ----------------------------- | ------ | ------ | ------------ |
+| Save version (5 KB entity)    | 20 ms  | 80 ms  | 500 ms       |
+| Save version (500 KB entity)  | 100 ms | 400 ms | 3 s          |
+| List 50 versions              | 30 ms  | 100 ms | 1 s          |
+| Diff render (small)           | 5 ms   | 20 ms  | 100 ms       |
+| Rollback                      | 50 ms  | 200 ms | 1 s          |
+| Lineage extract               | 30 ms  | 100 ms | 1 s          |
+| Impact preview (one upstream) | 10 ms  | 30 ms  | 200 ms       |
 
 ---
 

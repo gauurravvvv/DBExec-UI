@@ -73,7 +73,10 @@ export interface UsServerListAdapterConfig<TRow> {
    *  into one filter object before JSON.stringify.
    *
    *  Default builder is the identity map `{[colId]: cellValue}`. */
-  filterBuilders?: Record<string, (cellValue: unknown) => Record<string, unknown>>;
+  filterBuilders?: Record<
+    string,
+    (cellValue: unknown) => Record<string, unknown>
+  >;
 
   /** Optional starting state. */
   initial?: {
@@ -100,7 +103,8 @@ function defaultUnwrap<TRow>(res: unknown): UsListResponse<TRow> {
         ? (data['total'] as number)
         : 0;
   const explicit =
-    (data['rows'] as TRow[] | undefined) ?? (data['items'] as TRow[] | undefined);
+    (data['rows'] as TRow[] | undefined) ??
+    (data['items'] as TRow[] | undefined);
   if (explicit && Array.isArray(explicit)) return { rows: explicit, total };
   for (const [k, v] of Object.entries(data)) {
     if (k === 'count' || k === 'total' || k === 'status') continue;
@@ -251,7 +255,11 @@ export class UsServerListAdapter<TRow = unknown> {
         // multiple BE fields (e.g. a date range maps to
         // `lastLoginFrom` + `lastLoginTo`).
         Object.assign(filterPayload, builder(cell));
-      } else if (typeof cell === 'object' && cell && 'filter' in (cell as object)) {
+      } else if (
+        typeof cell === 'object' &&
+        cell &&
+        'filter' in (cell as object)
+      ) {
         // AG Grid cell-filter shape: {filter, type, filterType}.
         // Default behaviour — just lift the `filter` value under
         // the colId. Modules with richer needs supply a builder.

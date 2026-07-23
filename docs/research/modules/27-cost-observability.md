@@ -15,21 +15,21 @@
 
 **Depends on:** Datasource (01), Audit (19), Query Processor (04)
 **Unblocks:** "Why is our Snowflake bill 3× last month?", cost
-  governance, paid-tier features
+governance, paid-tier features
 **Maturity:** 🔴 not in product today
 
 ---
 
 ## 1. Industry baseline
 
-| Tool | Per-query cost | Budgets | Auto-pause | Forecast |
-|---|---|---|---|---|
-| **Looker** | partial (admin view) | yes (Looker Cloud) | n/a | partial |
-| **Hex** | yes (Snowflake billing API) | yes | yes (Snowflake) | yes |
-| **Mode** | partial | partial | n/a | n/a |
-| **Sigma** | partial | partial | yes (Snowflake) | partial |
-| **Snowflake native** | yes (account usage) | resource monitors | yes (auto-suspend) | yes |
-| **BigQuery** | yes (INFORMATION_SCHEMA.JOBS) | quotas | n/a (pay-per-query) | yes |
+| Tool                 | Per-query cost                | Budgets            | Auto-pause          | Forecast |
+| -------------------- | ----------------------------- | ------------------ | ------------------- | -------- |
+| **Looker**           | partial (admin view)          | yes (Looker Cloud) | n/a                 | partial  |
+| **Hex**              | yes (Snowflake billing API)   | yes                | yes (Snowflake)     | yes      |
+| **Mode**             | partial                       | partial            | n/a                 | n/a      |
+| **Sigma**            | partial                       | partial            | yes (Snowflake)     | partial  |
+| **Snowflake native** | yes (account usage)           | resource monitors  | yes (auto-suspend)  | yes      |
+| **BigQuery**         | yes (INFORMATION_SCHEMA.JOBS) | quotas             | n/a (pay-per-query) | yes      |
 
 **The patterns to copy:**
 
@@ -53,24 +53,24 @@
 
 ## 3. Gap matrix
 
-| ID | Gap | Severity | Effort |
-|---|---|---|---|
-| CO-G01 | Per-query bytes-scanned + duration capture | P0 | M |
-| CO-G02 | Cost estimation per query (per-engine pricing rules) | P0 | M |
-| CO-G03 | Daily / weekly / monthly cost rollup | P0 | M |
-| CO-G04 | Budget table (org / datasource / user scopes) | P0 | M |
-| CO-G05 | Budget enforcement (hard + soft) | P0 | M |
-| CO-G06 | Dry-run for BigQuery before execution | P0 | S |
-| CO-G07 | Snowflake warehouse auto-pause on idle | P1 | M |
-| CO-G08 | "Top expensive users / dashboards this month" report | P1 | M |
-| CO-G09 | 30-day spend forecast | P1 | M |
-| CO-G10 | Cost-of-execution attribution (dataset → analysis → dashboard) | P1 | M |
-| CO-G11 | Slack / email alert at 80% / 100% of budget | P0 | S |
-| CO-G12 | Webhook event `budget.threshold_crossed` | P1 | S |
-| CO-G13 | "Cache hit ratio" report (refer to module 05) | P1 | S |
-| CO-G14 | Per-engine pricing config (admin-editable) | P1 | S |
-| CO-G15 | Cost-aware rate limiting (slow down expensive workloads) | P2 | M |
-| CO-G16 | Reservations / commit-tier optimisation | P2 | L |
+| ID     | Gap                                                            | Severity | Effort |
+| ------ | -------------------------------------------------------------- | -------- | ------ |
+| CO-G01 | Per-query bytes-scanned + duration capture                     | P0       | M      |
+| CO-G02 | Cost estimation per query (per-engine pricing rules)           | P0       | M      |
+| CO-G03 | Daily / weekly / monthly cost rollup                           | P0       | M      |
+| CO-G04 | Budget table (org / datasource / user scopes)                  | P0       | M      |
+| CO-G05 | Budget enforcement (hard + soft)                               | P0       | M      |
+| CO-G06 | Dry-run for BigQuery before execution                          | P0       | S      |
+| CO-G07 | Snowflake warehouse auto-pause on idle                         | P1       | M      |
+| CO-G08 | "Top expensive users / dashboards this month" report           | P1       | M      |
+| CO-G09 | 30-day spend forecast                                          | P1       | M      |
+| CO-G10 | Cost-of-execution attribution (dataset → analysis → dashboard) | P1       | M      |
+| CO-G11 | Slack / email alert at 80% / 100% of budget                    | P0       | S      |
+| CO-G12 | Webhook event `budget.threshold_crossed`                       | P1       | S      |
+| CO-G13 | "Cache hit ratio" report (refer to module 05)                  | P1       | S      |
+| CO-G14 | Per-engine pricing config (admin-editable)                     | P1       | S      |
+| CO-G15 | Cost-aware rate limiting (slow down expensive workloads)       | P2       | M      |
+| CO-G16 | Reservations / commit-tier optimisation                        | P2       | L      |
 
 ## 4. Target architecture
 
@@ -130,7 +130,7 @@ export async function instrumentedExecute<T>(
   },
 ): Promise<T> {
   const t0 = Date.now();
-  let status: 'ok'|'timeout'|'error'|'cancelled' = 'ok';
+  let status: 'ok' | 'timeout' | 'error' | 'cancelled' = 'ok';
   let error: string | undefined;
   let bytesScanned: number | undefined;
   let bytesReturned: number | undefined;
@@ -141,13 +141,13 @@ export async function instrumentedExecute<T>(
   try {
     // BigQuery exposes bytes scanned via the job metadata
     if (ctx.datasourceType === 'bigquery') {
-      result = await pool.query(sql, params) as any;
+      result = (await pool.query(sql, params)) as any;
       bytesScanned = (result as any).bytesProcessed;
       rowCount = (result as any).rows?.length;
     }
     // Snowflake exposes warehouse size via QUERY_HISTORY
     else if (ctx.datasourceType === 'snowflake') {
-      result = await pool.query(sql, params) as any;
+      result = (await pool.query(sql, params)) as any;
       // Snowflake doesn't return cost in the same response; we
       // poll QUERY_HISTORY for the query_id later (async)
       rowCount = (result as any).rows?.length;
@@ -155,34 +155,44 @@ export async function instrumentedExecute<T>(
     // Postgres / MySQL — count only rows + duration; bytes via
     // EXPLAIN (BUFFERS) optionally
     else {
-      result = await pool.query(sql, params) as any;
+      result = (await pool.query(sql, params)) as any;
       rowCount = (result as any).rows?.length;
     }
 
     return result;
   } catch (e: any) {
     error = e.message;
-    status = /timeout/i.test(error ?? '') ? 'timeout' :
-             /cancel/i.test(error ?? '')  ? 'cancelled' : 'error';
+    status = /timeout/i.test(error ?? '')
+      ? 'timeout'
+      : /cancel/i.test(error ?? '')
+        ? 'cancelled'
+        : 'error';
     throw e;
   } finally {
     const duration = Date.now() - t0;
     const cost = estimateCost({
       datasourceType: ctx.datasourceType,
-      bytesScanned, durationMs: duration, credits,
+      bytesScanned,
+      durationMs: duration,
+      credits,
       pricingProfile: ctx.pricingProfile,
     });
     QueryExecutionLog.insert({
       organisationId: ctx.organisationId,
       userId: ctx.userId,
       datasourceId: ctx.datasourceId,
-      surface: ctx.surface, surfaceId: ctx.surfaceId,
+      surface: ctx.surface,
+      surfaceId: ctx.surfaceId,
       sqlPreview: sql.slice(0, 1000),
       queryHash: sha256(normaliseSql(sql)),
-      bytesScanned, bytesReturned, rowCount,
+      bytesScanned,
+      bytesReturned,
+      rowCount,
       durationMs: duration,
-      credits, estimatedCostUsd: cost,
-      status, errorMessage: error,
+      credits,
+      estimatedCostUsd: cost,
+      status,
+      errorMessage: error,
     }).catch(() => {});
   }
 }
@@ -239,9 +249,11 @@ function estimateCost(args: {
     case 'mssql':
     case 'oracle':
       // Approximation — treat duration as CPU time
-      return (args.durationMs / 3_600_000) * (p.cpu_usd_per_hour ?? 0.20);
+      return (args.durationMs / 3_600_000) * (p.cpu_usd_per_hour ?? 0.2);
     case 'redshift':
-      return (args.durationMs / 3_600_000) * (p.redshift_usd_per_node_hour ?? 0.85);
+      return (
+        (args.durationMs / 3_600_000) * (p.redshift_usd_per_node_hour ?? 0.85)
+      );
     default:
       return 0;
   }
@@ -250,7 +262,7 @@ function estimateCost(args: {
 
 ### 4.3 BigQuery dry-run estimation
 
-Before executing a query that *might* be expensive, dry-run it:
+Before executing a query that _might_ be expensive, dry-run it:
 
 ```ts
 import { BigQuery } from '@google-cloud/bigquery';
@@ -259,7 +271,9 @@ export async function bigqueryDryRunEstimate(
   cfg: DatasourceConfig,
   sql: string,
 ): Promise<{ bytesScanned: number; estimatedCostUsd: number }> {
-  const sa = JSON.parse(decryptForOrg(cfg.serviceAccountJsonEnc!, cfg.organisationId));
+  const sa = JSON.parse(
+    decryptForOrg(cfg.serviceAccountJsonEnc!, cfg.organisationId),
+  );
   const bq = new BigQuery({ projectId: sa.project_id, credentials: sa });
 
   const [job] = await bq.createQueryJob({
@@ -268,8 +282,10 @@ export async function bigqueryDryRunEstimate(
     useLegacySql: false,
   });
 
-  const bytesScanned = Number(job.metadata.statistics?.totalBytesProcessed ?? 0);
-  const estimatedCostUsd = (bytesScanned / 1e12) * 6.25;   // $6.25/TiB on-demand
+  const bytesScanned = Number(
+    job.metadata.statistics?.totalBytesProcessed ?? 0,
+  );
+  const estimatedCostUsd = (bytesScanned / 1e12) * 6.25; // $6.25/TiB on-demand
   return { bytesScanned, estimatedCostUsd };
 }
 
@@ -407,9 +423,10 @@ async function maybeAutoPause(b: Budget) {
   if (!b.autoPause) return;
   if (b.scope !== 'datasource' && b.scope !== 'org') return;
 
-  const datasources = b.scope === 'datasource'
-    ? [await DatasourceS.findOne({ where: { id: b.scopeId! } })]
-    : await DatasourceS.find({ where: { organisationId: b.organisationId } });
+  const datasources =
+    b.scope === 'datasource'
+      ? [await DatasourceS.findOne({ where: { id: b.scopeId! } })]
+      : await DatasourceS.find({ where: { organisationId: b.organisationId } });
 
   for (const ds of datasources) {
     if (!ds || ds.config.dbType !== 'snowflake') continue;
@@ -418,7 +435,9 @@ async function maybeAutoPause(b: Budget) {
     try {
       const pool = await acquire(ds.config);
       await pool.query(`ALTER WAREHOUSE ${quoteIdentifier(warehouse)} SUSPEND`);
-      Logger.warn(`Auto-paused Snowflake warehouse ${warehouse} for budget ${b.id}`);
+      Logger.warn(
+        `Auto-paused Snowflake warehouse ${warehouse} for budget ${b.id}`,
+      );
     } catch (e) {
       // Likely already suspended — fine
       Logger.info(`Warehouse pause skipped: ${(e as Error).message}`);
@@ -430,14 +449,20 @@ async function maybeAutoPause(b: Budget) {
 // increases the limit), unpause:
 async function resumeWarehouses(orgId: string, datasourceId?: string) {
   const datasources = datasourceId
-    ? [await DatasourceS.findOne({ where: { id: datasourceId, organisationId: orgId } })]
+    ? [
+        await DatasourceS.findOne({
+          where: { id: datasourceId, organisationId: orgId },
+        }),
+      ]
     : await DatasourceS.find({ where: { organisationId: orgId } });
 
   for (const ds of datasources) {
     if (!ds || ds.config.dbType !== 'snowflake') continue;
     const pool = await acquire(ds.config);
     try {
-      await pool.query(`ALTER WAREHOUSE ${quoteIdentifier(ds.config.warehouse!)} RESUME`);
+      await pool.query(
+        `ALTER WAREHOUSE ${quoteIdentifier(ds.config.warehouse!)} RESUME`,
+      );
     } catch {}
   }
 }
@@ -452,8 +477,9 @@ admin setting:
 ```ts
 // PUT /datasources/:id/snowflake-config  body: { autoSuspendSec: 60 }
 async function updateSnowflakeAutoSuspend(req, res) {
-  const ds = await DatasourceS.findOne({ /* ... */ });
-  if (ds.config.dbType !== 'snowflake') return sendResponse(res, false, 400, 'not_snowflake');
+  const ds = await DatasourceS.findOne({/* ... */});
+  if (ds.config.dbType !== 'snowflake')
+    return sendResponse(res, false, 400, 'not_snowflake');
   const pool = await acquire(ds.config);
   await pool.query(`
     ALTER WAREHOUSE ${quoteIdentifier(ds.config.warehouse!)}
@@ -488,7 +514,8 @@ Rollup cron (5-min cadence so the dashboard is near-real-time):
 ```ts
 async function rollupCostDaily() {
   const yesterday = subDays(new Date(), 1);
-  await master_db_connection.query(`
+  await master_db_connection.query(
+    `
     INSERT INTO cost_daily (
       organisation_id, datasource_id, user_id, day,
       queries, bytes_scanned, duration_ms, credits, estimated_cost_usd
@@ -512,7 +539,8 @@ async function rollupCostDaily() {
       duration_ms = EXCLUDED.duration_ms,
       credits = EXCLUDED.credits,
       estimated_cost_usd = EXCLUDED.estimated_cost_usd`,
-    [yesterday]);
+    [yesterday],
+  );
 }
 ```
 
@@ -543,7 +571,9 @@ export async function forecastMonthlySpend(orgId: string): Promise<{
 
   // Linear fit on (dayOffset, cumulativeSpend)
   const start = +last30[0].day;
-  const points = last30.map((d, i) => [i, d.estimatedCostUsd] as [number, number]);
+  const points = last30.map(
+    (d, i) => [i, d.estimatedCostUsd] as [number, number],
+  );
   const reg = ss.linearRegression(points);
   const fit = ss.linearRegressionLine(reg);
 
@@ -621,8 +651,14 @@ async function notifyBudgetThreshold(b: Budget, pct: number, spent: number) {
   await eventBus.emit({
     type: 'budget.threshold_crossed',
     organisationId: b.organisationId,
-    payload: { budgetId: b.id, scope: b.scope, scopeId: b.scopeId,
-                pct, spentUsd: spent, limitUsd: b.limitUsd },
+    payload: {
+      budgetId: b.id,
+      scope: b.scope,
+      scopeId: b.scopeId,
+      pct,
+      spentUsd: spent,
+      limitUsd: b.limitUsd,
+    },
     actor: { type: 'service', id: 'cost-watcher' },
   });
 
@@ -648,15 +684,18 @@ hit the hard cap:
 ```ts
 async function maybeSlowdownExpensiveUser(orgId: string, userId: string) {
   // Look at last hour's spend by this user
-  const recent = await master_db_connection.query(`
+  const recent = await master_db_connection.query(
+    `
     SELECT SUM(estimated_cost_usd) AS spent
     FROM query_execution_log
     WHERE organisation_id = $1 AND user_id = $2
       AND occurred_at > now() - interval '1 hour'`,
-    [orgId, userId]);
+    [orgId, userId],
+  );
 
   const spent = Number(recent[0]?.spent ?? 0);
-  if (spent > 50) {     // $50/hour soft threshold
+  if (spent > 50) {
+    // $50/hour soft threshold
     // Throttle this user's queries to 1/sec
     await redis.set(`cost-throttle:${userId}`, '1', 'EX', 3600);
   }
@@ -667,22 +706,22 @@ Query middleware checks the throttle flag and delays accordingly.
 
 ## 5. APIs
 
-| Method | Path | Purpose |
-|---|---|---|
-| GET | `/admin/cost/overview` | Org cost summary (today / this week / month / forecast) |
-| GET | `/admin/cost/by-datasource` | Per-datasource breakdown |
-| GET | `/admin/cost/by-user` | Top-N expensive users |
-| GET | `/admin/cost/by-surface` | dataset/analysis/dashboard/adhoc |
-| GET | `/admin/cost/queries` | Top 50 expensive queries with details |
-| GET | `/admin/cost/forecast` | Projected month-end |
-| GET | `/admin/budgets` | List budgets |
-| POST | `/admin/budgets` | Create |
-| PUT | `/admin/budgets/:id` | Update |
-| DELETE | `/admin/budgets/:id` | Remove |
-| POST | `/admin/budgets/:id/resume` | Resume after hard-limit pause |
-| GET | `/admin/pricing-profile` | Org pricing config |
-| PUT | `/admin/pricing-profile` | Update |
-| POST | `/datasources/:id/snowflake-autosuspend` | Snowflake auto-suspend config |
+| Method | Path                                     | Purpose                                                 |
+| ------ | ---------------------------------------- | ------------------------------------------------------- |
+| GET    | `/admin/cost/overview`                   | Org cost summary (today / this week / month / forecast) |
+| GET    | `/admin/cost/by-datasource`              | Per-datasource breakdown                                |
+| GET    | `/admin/cost/by-user`                    | Top-N expensive users                                   |
+| GET    | `/admin/cost/by-surface`                 | dataset/analysis/dashboard/adhoc                        |
+| GET    | `/admin/cost/queries`                    | Top 50 expensive queries with details                   |
+| GET    | `/admin/cost/forecast`                   | Projected month-end                                     |
+| GET    | `/admin/budgets`                         | List budgets                                            |
+| POST   | `/admin/budgets`                         | Create                                                  |
+| PUT    | `/admin/budgets/:id`                     | Update                                                  |
+| DELETE | `/admin/budgets/:id`                     | Remove                                                  |
+| POST   | `/admin/budgets/:id/resume`              | Resume after hard-limit pause                           |
+| GET    | `/admin/pricing-profile`                 | Org pricing config                                      |
+| PUT    | `/admin/pricing-profile`                 | Update                                                  |
+| POST   | `/datasources/:id/snowflake-autosuspend` | Snowflake auto-suspend config                           |
 
 ## 6. FE specs
 
@@ -748,6 +787,7 @@ Cost (this dashboard)
 ```
 
 ### 4.7's idea (cost telemetry) closes the loop with module 25's
+
 AI to offer optimisation suggestions.
 
 ### 6.3 Budget editor
@@ -778,24 +818,28 @@ Create budget
 ## 7. Validators
 
 ```ts
-export const createBudgetSchema = z.object({
-  scope: z.enum(['org','datasource','user']),
-  scopeId: z.string().uuid().optional(),
-  period: z.enum(['day','week','month']),
-  limitUsd: z.number().min(1).max(1_000_000),
-  hardLimit: z.boolean().default(false),
-  autoPause: z.boolean().default(false),
-  alertThresholdsPct: z.array(z.number().int().min(1).max(200)).default([50,80,100]),
-  alertChannels: z.array(channelSpecSchema).optional(),
-}).superRefine((data, ctx) => {
-  if (data.scope !== 'org' && !data.scopeId) {
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      path: ['scopeId'],
-      message: 'validation.budget.scopeId.required',
-    });
-  }
-});
+export const createBudgetSchema = z
+  .object({
+    scope: z.enum(['org', 'datasource', 'user']),
+    scopeId: z.string().uuid().optional(),
+    period: z.enum(['day', 'week', 'month']),
+    limitUsd: z.number().min(1).max(1_000_000),
+    hardLimit: z.boolean().default(false),
+    autoPause: z.boolean().default(false),
+    alertThresholdsPct: z
+      .array(z.number().int().min(1).max(200))
+      .default([50, 80, 100]),
+    alertChannels: z.array(channelSpecSchema).optional(),
+  })
+  .superRefine((data, ctx) => {
+    if (data.scope !== 'org' && !data.scopeId) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['scopeId'],
+        message: 'validation.budget.scopeId.required',
+      });
+    }
+  });
 
 export const updatePricingProfileSchema = z.object({
   bigquery_usd_per_tib: z.number().min(0).max(100).optional(),

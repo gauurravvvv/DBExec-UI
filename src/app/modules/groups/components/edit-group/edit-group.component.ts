@@ -181,8 +181,7 @@ export class EditGroupComponent
     this.groupForm.markAsPristine();
 
     // Lock the whole form for the seeded default Administrators group.
-    this.isLocked =
-      groupData.isDefault === 1 || groupData.canEdit === false;
+    this.isLocked = groupData.isDefault === 1 || groupData.canEdit === false;
     if (this.isLocked) {
       this.groupForm.disable({ emitEvent: false });
     }
@@ -276,13 +275,10 @@ export class EditGroupComponent
       // expects the complete membership list per save and treats
       // anyone missing from it as removed — without this merge, the
       // locked self member would silently disappear.
-      const manageable: string[] =
-        this.groupForm.get('users')?.value || [];
+      const manageable: string[] = this.groupForm.get('users')?.value || [];
       const usersPayload = [
         ...this.lockedMembers.map(m => m.id),
-        ...manageable.filter(
-          id => !this.lockedMembers.some(m => m.id === id),
-        ),
+        ...manageable.filter(id => !this.lockedMembers.some(m => m.id === id)),
       ];
 
       // Fire the request first (service.edit uses getRawValue, which

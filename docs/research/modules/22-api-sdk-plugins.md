@@ -16,22 +16,22 @@ mirrors the platform's internal modules)
 **Unblocks:** Customers building automation, dbt-style git workflows,
 custom visual marketplaces
 **Maturity:** 🔴 internal API exists; no public-facing API surface,
-  no SDK, no plugin model
+no SDK, no plugin model
 
 ---
 
 ## 1. Industry baseline
 
-| Tool | REST | GraphQL | Webhooks | SDK languages | Plugins | Custom viz |
-|---|---|---|---|---|---|---|
-| **Tableau** | yes | no | partial | JavaScript, Python | yes (Extensions API) | yes (Extensions) |
-| **Power BI** | yes | no | yes | .NET, JS, Python | yes (Custom Visuals) | yes (R/Python/JS) |
-| **Looker** | yes | no | yes | Python, Ruby, Java, Kotlin, Swift, TypeScript | yes (Custom Visualization API) | yes |
-| **Metabase** | yes | no | no | unofficial | yes (Source plugins) | partial |
-| **Hex** | yes | no | yes | Python | no | yes (notebook cells) |
-| **Mode** | yes | no | yes | Python | no | partial |
-| **Superset** | yes | no | yes | Python | yes | yes (chart plugins) |
-| **dbt** | yes | no | yes | Python | yes (adapters) | n/a |
+| Tool         | REST | GraphQL | Webhooks | SDK languages                                 | Plugins                        | Custom viz           |
+| ------------ | ---- | ------- | -------- | --------------------------------------------- | ------------------------------ | -------------------- |
+| **Tableau**  | yes  | no      | partial  | JavaScript, Python                            | yes (Extensions API)           | yes (Extensions)     |
+| **Power BI** | yes  | no      | yes      | .NET, JS, Python                              | yes (Custom Visuals)           | yes (R/Python/JS)    |
+| **Looker**   | yes  | no      | yes      | Python, Ruby, Java, Kotlin, Swift, TypeScript | yes (Custom Visualization API) | yes                  |
+| **Metabase** | yes  | no      | no       | unofficial                                    | yes (Source plugins)           | partial              |
+| **Hex**      | yes  | no      | yes      | Python                                        | no                             | yes (notebook cells) |
+| **Mode**     | yes  | no      | yes      | Python                                        | no                             | partial              |
+| **Superset** | yes  | no      | yes      | Python                                        | yes                            | yes (chart plugins)  |
+| **dbt**      | yes  | no      | yes      | Python                                        | yes (adapters)                 | n/a                  |
 
 **The patterns to copy:**
 
@@ -64,29 +64,29 @@ custom visual marketplaces
 
 ## 3. Gap matrix
 
-| ID | Gap | Severity | Effort |
-|---|---|---|---|
-| API-G01 | API token entity + create/rotate/revoke endpoints | P0 | M |
-| API-G02 | Public API namespace `/api/public/v1/*` | P0 | M |
-| API-G03 | OpenAPI document generation from Zod | P0 | M |
-| API-G04 | ReDoc / Scalar docs page | P0 | S |
-| API-G05 | Idempotency-Key middleware | P0 | S |
-| API-G06 | Rate-limit middleware with headers | P0 | S |
-| API-G07 | Per-token scope check | P0 | M |
-| API-G08 | Per-token allowed-IP list | P1 | S |
-| API-G09 | Deprecation headers (`Sunset`, `Deprecation`) | P1 | S |
-| API-G10 | Pagination cursor convention (already in shared util) | P0 | S |
-| API-G11 | Webhook subscription registry + delivery worker | P0 | M |
-| API-G12 | Event catalog (which events DBExec emits) | P0 | S |
-| API-G13 | Webhook receiver verification helpers (per-lang) | P1 | S |
-| API-G14 | TypeScript SDK (`@dbexec/sdk`) | P1 | M |
-| API-G15 | Python SDK | P1 | M |
-| API-G16 | OpenAPI-generated CLI (`dbexec` binary) | P2 | M |
-| API-G17 | Plugin runtime (sandboxed iframe + postMessage) | P2 | L |
-| API-G18 | Custom visual API + marketplace | P2 | L |
-| API-G19 | GraphQL endpoint (read-only) | P2 | M |
-| API-G20 | YAML workspace import/export (module 18) | P1 | M |
-| API-G21 | Webhook DLQ + replay UI | P1 | S |
+| ID      | Gap                                                   | Severity | Effort |
+| ------- | ----------------------------------------------------- | -------- | ------ |
+| API-G01 | API token entity + create/rotate/revoke endpoints     | P0       | M      |
+| API-G02 | Public API namespace `/api/public/v1/*`               | P0       | M      |
+| API-G03 | OpenAPI document generation from Zod                  | P0       | M      |
+| API-G04 | ReDoc / Scalar docs page                              | P0       | S      |
+| API-G05 | Idempotency-Key middleware                            | P0       | S      |
+| API-G06 | Rate-limit middleware with headers                    | P0       | S      |
+| API-G07 | Per-token scope check                                 | P0       | M      |
+| API-G08 | Per-token allowed-IP list                             | P1       | S      |
+| API-G09 | Deprecation headers (`Sunset`, `Deprecation`)         | P1       | S      |
+| API-G10 | Pagination cursor convention (already in shared util) | P0       | S      |
+| API-G11 | Webhook subscription registry + delivery worker       | P0       | M      |
+| API-G12 | Event catalog (which events DBExec emits)             | P0       | S      |
+| API-G13 | Webhook receiver verification helpers (per-lang)      | P1       | S      |
+| API-G14 | TypeScript SDK (`@dbexec/sdk`)                        | P1       | M      |
+| API-G15 | Python SDK                                            | P1       | M      |
+| API-G16 | OpenAPI-generated CLI (`dbexec` binary)               | P2       | M      |
+| API-G17 | Plugin runtime (sandboxed iframe + postMessage)       | P2       | L      |
+| API-G18 | Custom visual API + marketplace                       | P2       | L      |
+| API-G19 | GraphQL endpoint (read-only)                          | P2       | M      |
+| API-G20 | YAML workspace import/export (module 18)              | P1       | M      |
+| API-G21 | Webhook DLQ + replay UI                               | P1       | S      |
 
 ## 4. Target architecture
 
@@ -140,7 +140,7 @@ CREATE TABLE service_account (
 );
 ```
 
-Token creation returns the full token *once* — never stored:
+Token creation returns the full token _once_ — never stored:
 
 ```ts
 async function createApiToken(req, res) {
@@ -149,10 +149,23 @@ async function createApiToken(req, res) {
 
   // Scope validation — caller can only grant scopes they themselves have
   const callerPerms = res.locals.permissions as string[];
-  const invalidScopes = scopes.filter((s: string) => !satisfiesScope(callerPerms, s));
+  const invalidScopes = scopes.filter(
+    (s: string) => !satisfiesScope(callerPerms, s),
+  );
   if (invalidScopes.length > 0) {
-    return sendResponse(res, false, 403, 'api_token.scope.exceeds_caller',
-      null, [{ field: 'scopes', message: `Cannot grant: ${invalidScopes.join(', ')}` }]);
+    return sendResponse(
+      res,
+      false,
+      403,
+      'api_token.scope.exceeds_caller',
+      null,
+      [
+        {
+          field: 'scopes',
+          message: `Cannot grant: ${invalidScopes.join(', ')}`,
+        },
+      ],
+    );
   }
 
   const fullToken = `dbe_${randomBase64Url(40)}`;
@@ -164,8 +177,12 @@ async function createApiToken(req, res) {
     organisationId: orgId,
     ownerUserId: ownerKind === 'user' ? ownerId : null,
     serviceAccountId: ownerKind === 'service' ? ownerId : null,
-    name, prefix, tokenHash, last4,
-    scopes, allowedIps: allowedIps ?? null,
+    name,
+    prefix,
+    tokenHash,
+    last4,
+    scopes,
+    allowedIps: allowedIps ?? null,
     expiresAt: expiresAt ? new Date(expiresAt) : null,
     createdBy: res.locals.loggedInId,
   });
@@ -179,8 +196,10 @@ async function createApiToken(req, res) {
   return sendResponse(res, true, 201, 'api_token.created', {
     id: t.id,
     name: t.name,
-    token: fullToken,         // ← only time the caller ever sees this
-    prefix, last4, scopes,
+    token: fullToken, // ← only time the caller ever sees this
+    prefix,
+    last4,
+    scopes,
     expiresAt: t.expiresAt,
     warning: 'Save this token now. You will not be able to retrieve it again.',
   });
@@ -231,8 +250,9 @@ export function requireScope(scope: string) {
   return (req, res, next) => {
     const scopes = (res.locals.scopes ?? []) as string[];
     if (!satisfiesScope(scopes, scope)) {
-      return sendResponse(res, false, 403, 'api_token.scope.missing',
-        null, [{ message: `Required scope: ${scope}` }]);
+      return sendResponse(res, false, 403, 'api_token.scope.missing', null, [
+        { message: `Required scope: ${scope}` },
+      ]);
     }
     next();
   };
@@ -253,36 +273,49 @@ export function satisfiesScope(granted: string[], required: string): boolean {
 // src/shared/constants/api.scopes.ts
 export const API_SCOPES = [
   // Datasets
-  'datasets:read', 'datasets:write', 'datasets:delete',
+  'datasets:read',
+  'datasets:write',
+  'datasets:delete',
 
   // Analyses
-  'analyses:read', 'analyses:write', 'analyses:delete',
+  'analyses:read',
+  'analyses:write',
+  'analyses:delete',
 
   // Dashboards
-  'dashboards:read', 'dashboards:write', 'dashboards:delete',
-  'dashboards:publish', 'dashboards:export',
+  'dashboards:read',
+  'dashboards:write',
+  'dashboards:delete',
+  'dashboards:publish',
+  'dashboards:export',
 
   // RLS
-  'rls:read', 'rls:write',
+  'rls:read',
+  'rls:write',
 
   // Embed
-  'embed:sign',         // create signed embed JWTs
+  'embed:sign', // create signed embed JWTs
 
   // Users / orgs (admin)
-  'users:read', 'users:write',
-  'orgs:read', 'orgs:write',
+  'users:read',
+  'users:write',
+  'orgs:read',
+  'orgs:write',
 
   // Search
   'search:read',
 
   // Audit
-  'audit:read', 'audit:export',
+  'audit:read',
+  'audit:export',
 
   // Webhooks
-  'webhooks:read', 'webhooks:write',
+  'webhooks:read',
+  'webhooks:write',
 
   // Datasource credentials (very privileged)
-  'datasources:read', 'datasources:write',
+  'datasources:read',
+  'datasources:write',
 
   // Wildcards
   '*',
@@ -305,18 +338,30 @@ import deprecation from '../../shared/middleware/deprecation.middleware';
 
 const router = Router();
 
-router.use(apiToken);                              // bearer dbe_…
-router.use(idempotency({ ttlHours: 24 }));         // Idempotency-Key header
+router.use(apiToken); // bearer dbe_…
+router.use(idempotency({ ttlHours: 24 })); // Idempotency-Key header
 router.use(rateLimit({ windowSecs: 60, limit: 100 }));
-router.use(deprecation);                            // adds Deprecation / Sunset headers
+router.use(deprecation); // adds Deprecation / Sunset headers
 
 // Datasets
-router.get   ('/datasets',        requireScope('datasets:read'),  listPublicDatasets);
-router.get   ('/datasets/:id',    requireScope('datasets:read'),  getPublicDataset);
-router.post  ('/datasets',        requireScope('datasets:write'), createPublicDataset);
-router.put   ('/datasets/:id',    requireScope('datasets:write'), updatePublicDataset);
-router.delete('/datasets/:id',    requireScope('datasets:delete'), deletePublicDataset);
-router.post  ('/datasets/:id/run', requireScope('datasets:read'),  runPublicDataset);
+router.get('/datasets', requireScope('datasets:read'), listPublicDatasets);
+router.get('/datasets/:id', requireScope('datasets:read'), getPublicDataset);
+router.post('/datasets', requireScope('datasets:write'), createPublicDataset);
+router.put(
+  '/datasets/:id',
+  requireScope('datasets:write'),
+  updatePublicDataset,
+);
+router.delete(
+  '/datasets/:id',
+  requireScope('datasets:delete'),
+  deletePublicDataset,
+);
+router.post(
+  '/datasets/:id/run',
+  requireScope('datasets:read'),
+  runPublicDataset,
+);
 
 // (... analyses, dashboards, etc. ...)
 
@@ -324,10 +369,10 @@ router.post  ('/datasets/:id/run', requireScope('datasets:read'),  runPublicData
 router.post('/embed/sign', requireScope('embed:sign'), signEmbed);
 
 // Webhooks
-router.get   ('/webhooks',         requireScope('webhooks:read'),  listWebhooks);
-router.post  ('/webhooks',         requireScope('webhooks:write'), createWebhook);
-router.delete('/webhooks/:id',     requireScope('webhooks:write'), revokeWebhook);
-router.post  ('/webhooks/:id/test', requireScope('webhooks:write'), testWebhook);
+router.get('/webhooks', requireScope('webhooks:read'), listWebhooks);
+router.post('/webhooks', requireScope('webhooks:write'), createWebhook);
+router.delete('/webhooks/:id', requireScope('webhooks:write'), revokeWebhook);
+router.post('/webhooks/:id/test', requireScope('webhooks:write'), testWebhook);
 
 export default router;
 
@@ -348,13 +393,21 @@ export default function idempotency(opts: { ttlHours?: number } = {}) {
     if (!key || !/^POST|PUT|PATCH$/.test(req.method)) return next();
     const orgId = res.locals.orgData.id;
 
-    const reqHash = sha256(JSON.stringify({ p: req.path, b: req.body, m: req.method }));
-    const existing = await IdempotencyRecord.findOne({ where: { key, organisationId: orgId } });
+    const reqHash = sha256(
+      JSON.stringify({ p: req.path, b: req.body, m: req.method }),
+    );
+    const existing = await IdempotencyRecord.findOne({
+      where: { key, organisationId: orgId },
+    });
 
     if (existing) {
       if (existing.requestHash !== reqHash) {
-        return sendResponse(res, false, 409,
-          'Idempotency key reused with a different request body');
+        return sendResponse(
+          res,
+          false,
+          409,
+          'Idempotency key reused with a different request body',
+        );
       }
       return res.status(existing.responseStatus).json(existing.responseBody);
     }
@@ -363,8 +416,11 @@ export default function idempotency(opts: { ttlHours?: number } = {}) {
     res.json = (body: any) => {
       // Persist asynchronously; don't block the response
       IdempotencyRecord.save({
-        key, organisationId: orgId, requestHash: reqHash,
-        responseStatus: res.statusCode, responseBody: body,
+        key,
+        organisationId: orgId,
+        requestHash: reqHash,
+        responseStatus: res.statusCode,
+        responseBody: body,
         expiresAt: new Date(Date.now() + ttl),
       }).catch(() => {});
       return originalJson(body);
@@ -379,15 +435,18 @@ export default function idempotency(opts: { ttlHours?: number } = {}) {
 ```ts
 export function rateLimit(opts: { windowSecs: number; limit: number }) {
   return async (req, res, next) => {
-    const subject = res.locals.tokenId
-                  ?? `${res.locals.orgData?.id ?? 'anon'}:${req.ip}`;
+    const subject =
+      res.locals.tokenId ?? `${res.locals.orgData?.id ?? 'anon'}:${req.ip}`;
     const key = `rl:${req.method}:${req.path}:${subject}`;
     const n = await redis.incr(key);
     if (n === 1) await redis.expire(key, opts.windowSecs);
     const ttl = await redis.ttl(key);
     res.setHeader('X-RateLimit-Limit', String(opts.limit));
     res.setHeader('X-RateLimit-Remaining', String(Math.max(0, opts.limit - n)));
-    res.setHeader('X-RateLimit-Reset', String(Math.floor(Date.now()/1000) + ttl));
+    res.setHeader(
+      'X-RateLimit-Reset',
+      String(Math.floor(Date.now() / 1000) + ttl),
+    );
     if (n > opts.limit) {
       res.setHeader('Retry-After', String(ttl));
       return sendResponse(res, false, 429, 'rate_limit');
@@ -423,33 +482,43 @@ export default function deprecation(req, res, next) {
 
 ```ts
 // src/openapi/build.ts
-import { OpenApiGeneratorV3, OpenAPIRegistry, extendZodWithOpenApi } from '@asteasolutions/zod-to-openapi';
+import {
+  OpenApiGeneratorV3,
+  OpenAPIRegistry,
+  extendZodWithOpenApi,
+} from '@asteasolutions/zod-to-openapi';
 import { z } from 'zod';
 extendZodWithOpenApi(z);
 
 import {
-  datasetCreateSchema, datasetUpdateSchema,
-  analysisCreateSchema, /* ... */
+  datasetCreateSchema,
+  datasetUpdateSchema,
+  analysisCreateSchema /* ... */,
 } from '../shared/validators/datasets';
 
 const registry = new OpenAPIRegistry();
 
 // Register schemas
-registry.register('Dataset', datasetCreateSchema.openapi({
-  title: 'Dataset',
-  description: 'A dataset is a query against a datasource that returns tabular data.',
-}));
+registry.register(
+  'Dataset',
+  datasetCreateSchema.openapi({
+    title: 'Dataset',
+    description:
+      'A dataset is a query against a datasource that returns tabular data.',
+  }),
+);
 // ... others ...
 
 // Register paths
 registry.registerPath({
-  method: 'post', path: '/api/public/v1/datasets',
+  method: 'post',
+  path: '/api/public/v1/datasets',
   tags: ['Datasets'],
   summary: 'Create a dataset',
   description: 'Creates a new dataset for the authenticated organisation.',
   request: {
     headers: z.object({
-      'authorization': z.string().openapi({
+      authorization: z.string().openapi({
         description: 'Bearer <api-token>',
         example: 'Bearer dbe_abc123…',
       }),
@@ -580,20 +649,27 @@ X-DBExec-Idempotency-Key: del_abc123…
 ```ts
 // @dbexec/sdk — npm package
 export class DBExecClient {
-  constructor(public config: {
-    apiKey: string;
-    baseUrl?: string;            // default https://app.dbexec.com
-    timeoutMs?: number;          // default 30000
-    fetch?: typeof fetch;        // injectable for tests
-  }) {}
+  constructor(
+    public config: {
+      apiKey: string;
+      baseUrl?: string; // default https://app.dbexec.com
+      timeoutMs?: number; // default 30000
+      fetch?: typeof fetch; // injectable for tests
+    },
+  ) {}
 
-  async request<T>(method: string, path: string, body?: any, opts: {
-    idempotencyKey?: string;
-    signal?: AbortSignal;
-  } = {}): Promise<T> {
+  async request<T>(
+    method: string,
+    path: string,
+    body?: any,
+    opts: {
+      idempotencyKey?: string;
+      signal?: AbortSignal;
+    } = {},
+  ): Promise<T> {
     const fetcher = this.config.fetch ?? globalThis.fetch;
-    const headers: Record<string,string> = {
-      'Authorization': `Bearer ${this.config.apiKey}`,
+    const headers: Record<string, string> = {
+      Authorization: `Bearer ${this.config.apiKey}`,
       'Content-Type': 'application/json',
       'User-Agent': '@dbexec/sdk/1.0.0',
     };
@@ -609,37 +685,59 @@ export class DBExecClient {
 
     if (!resp.ok) {
       const errBody = await resp.json().catch(() => ({}));
-      throw new DBExecError(errBody.message ?? resp.statusText, resp.status, errBody);
+      throw new DBExecError(
+        errBody.message ?? resp.statusText,
+        resp.status,
+        errBody,
+      );
     }
     return resp.json();
   }
 
   // Domain accessors — slim wrappers around request
-  get datasets()   { return new DatasetsAPI(this); }
-  get dashboards() { return new DashboardsAPI(this); }
-  get analyses()   { return new AnalysesAPI(this); }
-  get exports()    { return new ExportsAPI(this); }
-  get webhooks()   { return new WebhooksAPI(this); }
+  get datasets() {
+    return new DatasetsAPI(this);
+  }
+  get dashboards() {
+    return new DashboardsAPI(this);
+  }
+  get analyses() {
+    return new AnalysesAPI(this);
+  }
+  get exports() {
+    return new ExportsAPI(this);
+  }
+  get webhooks() {
+    return new WebhooksAPI(this);
+  }
 }
 
 class DatasetsAPI {
   constructor(private c: DBExecClient) {}
   list(opts: { limit?: number; cursor?: string } = {}) {
-    return this.c.request<{ items: Dataset[]; nextCursor: string|null }>(
+    return this.c.request<{ items: Dataset[]; nextCursor: string | null }>(
       'GET',
       `/datasets?${new URLSearchParams(opts as any).toString()}`,
     );
   }
-  get(id: string) { return this.c.request<Dataset>('GET', `/datasets/${id}`); }
+  get(id: string) {
+    return this.c.request<Dataset>('GET', `/datasets/${id}`);
+  }
   create(input: DatasetCreate, opts: { idempotencyKey?: string } = {}) {
     return this.c.request<Dataset>('POST', '/datasets', input, opts);
   }
   update(id: string, input: DatasetUpdate) {
     return this.c.request<Dataset>('PUT', `/datasets/${id}`, input);
   }
-  delete(id: string) { return this.c.request<void>('DELETE', `/datasets/${id}`); }
+  delete(id: string) {
+    return this.c.request<void>('DELETE', `/datasets/${id}`);
+  }
   run(id: string, body: RunDatasetBody) {
-    return this.c.request<RunDatasetResponse>('POST', `/datasets/${id}/run`, body);
+    return this.c.request<RunDatasetResponse>(
+      'POST',
+      `/datasets/${id}/run`,
+      body,
+    );
   }
 }
 
@@ -734,7 +832,7 @@ export default new Plugin({
     return [
       { name: 'source', kind: 'column', cardinality: 'one' },
       { name: 'target', kind: 'column', cardinality: 'one' },
-      { name: 'value',  kind: 'metric', cardinality: 'one' },
+      { name: 'value', kind: 'metric', cardinality: 'one' },
     ];
   },
 
@@ -742,7 +840,11 @@ export default new Plugin({
     return {
       type: 'object',
       properties: {
-        nodeAlign: { type: 'string', enum: ['left','right','center','justify'], default: 'justify' },
+        nodeAlign: {
+          type: 'string',
+          enum: ['left', 'right', 'center', 'justify'],
+          default: 'justify',
+        },
         showLabels: { type: 'boolean', default: true },
       },
     };
@@ -755,18 +857,21 @@ DBExec FE invokes the iframe:
 ```ts
 const iframe = document.createElement('iframe');
 iframe.src = `https://plugins.dbexec.com/run/${plugin.id}?ver=${plugin.version}`;
-iframe.sandbox.add('allow-scripts', 'allow-same-origin');     // no top navigation
+iframe.sandbox.add('allow-scripts', 'allow-same-origin'); // no top navigation
 iframe.style.width = '100%';
 iframe.style.height = '100%';
 container.appendChild(iframe);
 
 iframe.addEventListener('load', () => {
-  iframe.contentWindow!.postMessage({
-    type: 'dbexec.plugin.render',
-    data: chartData,
-    options: userOptions,
-    brand: themeTokens,
-  }, 'https://plugins.dbexec.com');
+  iframe.contentWindow!.postMessage(
+    {
+      type: 'dbexec.plugin.render',
+      data: chartData,
+      options: userOptions,
+      brand: themeTokens,
+    },
+    'https://plugins.dbexec.com',
+  );
 });
 ```
 
@@ -802,7 +907,7 @@ export default new Plugin({
   type: 'transform',
   name: 'date-buckets',
   async transform({ data, params }) {
-    const { dateCol, bucket } = params;     // 'day'|'week'|'month'|...
+    const { dateCol, bucket } = params; // 'day'|'week'|'month'|...
     return {
       columns: [...data.columns, `${dateCol}_bucket`],
       rows: data.rows.map(r => ({
@@ -826,10 +931,11 @@ export default new Plugin({
   async send({ payload, config }) {
     await fetch('https://api.pagerduty.com/incidents', {
       method: 'POST',
-      headers: { 'Authorization': `Token token=${config.apiKey}` },
+      headers: { Authorization: `Token token=${config.apiKey}` },
       body: JSON.stringify({
         incident: {
-          type: 'incident', title: payload.subject,
+          type: 'incident',
+          title: payload.subject,
           service: { id: config.serviceId, type: 'service_reference' },
           urgency: payload.severity === 'critical' ? 'high' : 'low',
           body: { type: 'incident_body', details: payload.bodyHtml },
@@ -845,18 +951,18 @@ export default new Plugin({
 The complete public-API surface is generated from OpenAPI; see
 `/docs` for the live reference. Key entry points:
 
-| Surface | Methods |
-|---|---|
-| `/api/public/v1/datasets` | CRUD + run |
-| `/api/public/v1/analyses` | CRUD + run + filter values |
-| `/api/public/v1/dashboards` | CRUD + publish + render + run |
-| `/api/public/v1/exports` | Create + list + download |
-| `/api/public/v1/embed/sign` | Embed JWT signing |
-| `/api/public/v1/webhooks` | Subscription CRUD |
-| `/api/public/v1/api-tokens` | Token management |
-| `/api/public/v1/me` | Whoami (decoded token info) |
-| `/api/public/v1/workspace/export.yaml` | YAML bundle (module 18) |
-| `/api/public/v1/workspace/import` | YAML bundle ingest (V2) |
+| Surface                                | Methods                       |
+| -------------------------------------- | ----------------------------- |
+| `/api/public/v1/datasets`              | CRUD + run                    |
+| `/api/public/v1/analyses`              | CRUD + run + filter values    |
+| `/api/public/v1/dashboards`            | CRUD + publish + render + run |
+| `/api/public/v1/exports`               | Create + list + download      |
+| `/api/public/v1/embed/sign`            | Embed JWT signing             |
+| `/api/public/v1/webhooks`              | Subscription CRUD             |
+| `/api/public/v1/api-tokens`            | Token management              |
+| `/api/public/v1/me`                    | Whoami (decoded token info)   |
+| `/api/public/v1/workspace/export.yaml` | YAML bundle (module 18)       |
+| `/api/public/v1/workspace/import`      | YAML bundle ingest (V2)       |
 
 ## 6. FE specs
 
@@ -918,6 +1024,7 @@ Token created
 
 ReDoc at `/docs` rendering the generated spec. Each operation
 includes:
+
 - Description + tags
 - Required scopes
 - Rate-limit info
@@ -957,7 +1064,7 @@ Deliveries
 ```ts
 export const createApiTokenSchema = z.object({
   name: z.string().min(1).max(100),
-  ownerKind: z.enum(['user','service']),
+  ownerKind: z.enum(['user', 'service']),
   ownerId: z.string().uuid(),
   scopes: z.array(z.enum(API_SCOPES)).min(1).max(50),
   allowedIps: z.array(z.string()).optional(),
@@ -966,10 +1073,13 @@ export const createApiTokenSchema = z.object({
 
 export const createWebhookSchema = z.object({
   name: z.string().min(1).max(100),
-  url: z.string().url().refine(u => u.startsWith('https://'), 'webhook.url.must_be_https'),
+  url: z
+    .string()
+    .url()
+    .refine(u => u.startsWith('https://'), 'webhook.url.must_be_https'),
   events: z.array(z.string()).min(1),
   filterModules: z.array(z.string().max(64)).optional(),
-  signingSecret: z.string().min(32).max(128).optional(),    // auto-generated if absent
+  signingSecret: z.string().min(32).max(128).optional(), // auto-generated if absent
 });
 ```
 

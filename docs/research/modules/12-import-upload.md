@@ -17,18 +17,18 @@
 
 ## 1. Industry baseline
 
-| Tool | Upload path | Limits | Storage backend |
-|---|---|---|---|
-| **Tableau Public / Online** | Drag CSV/XLSX/JSON, "Add to data source" | 15M rows (Public), 16GB (Cloud) | Hyper extract |
-| **Power BI** | Get Data → File. Same flow as live but data resides in dataset | 1GB per dataset (Pro), 100GB (Premium) | VertiPaq |
-| **Looker Studio** | Upload CSV (free), Google Sheets connector | 100MB per upload | BigQuery |
-| **Metabase** | "Upload CSV" since v0.49 — drops into the application DB | 200MB by default | App DB Postgres |
-| **Mode** | Upload via SQL Editor's "+ Upload" | 100MB | Mode's redshift |
-| **Hex** | Notebook "Files" panel, multi-file | 5GB per project | Hex's DuckDB or your warehouse |
+| Tool                        | Upload path                                                    | Limits                                 | Storage backend                |
+| --------------------------- | -------------------------------------------------------------- | -------------------------------------- | ------------------------------ |
+| **Tableau Public / Online** | Drag CSV/XLSX/JSON, "Add to data source"                       | 15M rows (Public), 16GB (Cloud)        | Hyper extract                  |
+| **Power BI**                | Get Data → File. Same flow as live but data resides in dataset | 1GB per dataset (Pro), 100GB (Premium) | VertiPaq                       |
+| **Looker Studio**           | Upload CSV (free), Google Sheets connector                     | 100MB per upload                       | BigQuery                       |
+| **Metabase**                | "Upload CSV" since v0.49 — drops into the application DB       | 200MB by default                       | App DB Postgres                |
+| **Mode**                    | Upload via SQL Editor's "+ Upload"                             | 100MB                                  | Mode's redshift                |
+| **Hex**                     | Notebook "Files" panel, multi-file                             | 5GB per project                        | Hex's DuckDB or your warehouse |
 
 **The patterns to copy:**
 
-- Push the actual rows into a *managed datasource* — a Postgres
+- Push the actual rows into a _managed datasource_ — a Postgres
   schema that DBExec owns, separate from any customer-connected
   database. Hides storage details from the user.
 - Idempotency by content hash. Re-uploading the same file with the
@@ -50,27 +50,27 @@
 
 ## 3. Gap matrix
 
-| ID | Gap | Severity | Effort |
-|---|---|---|---|
-| UP-G01 | CSV upload | P0 | M |
-| UP-G02 | XLSX upload | P0 | M |
-| UP-G03 | JSON upload (line-delimited + array forms) | P1 | S |
-| UP-G04 | Parquet upload | P1 | M |
-| UP-G05 | URL pull (HTTP/S) | P1 | M |
-| UP-G06 | Google Sheets sync | P1 | M |
-| UP-G07 | Tus.io resumable upload (>500MB) | P1 | M |
-| UP-G08 | Content-hash idempotency | P0 | S |
-| UP-G09 | Per-org storage quota | P0 | S |
-| UP-G10 | Per-org row-count quota | P1 | S |
-| UP-G11 | Schema inference (types from sample rows) | P0 | M |
-| UP-G12 | Column-name sanitization (sql-safe identifiers) | P0 | S |
-| UP-G13 | Refresh / replace existing dataset from new file | P1 | M |
-| UP-G14 | Append / incremental upload | P2 | M |
-| UP-G15 | Mapping templates (skip rows, header offset, ...) | P1 | M |
-| UP-G16 | Per-column manual type override on upload | P1 | S |
-| UP-G17 | Virus / malware scan before parse | P1 | S |
-| UP-G18 | Upload audit + size + sha256 in audit log | P0 | S |
-| UP-G19 | Background processing (worker queue) for big files | P1 | M |
+| ID     | Gap                                                | Severity | Effort |
+| ------ | -------------------------------------------------- | -------- | ------ |
+| UP-G01 | CSV upload                                         | P0       | M      |
+| UP-G02 | XLSX upload                                        | P0       | M      |
+| UP-G03 | JSON upload (line-delimited + array forms)         | P1       | S      |
+| UP-G04 | Parquet upload                                     | P1       | M      |
+| UP-G05 | URL pull (HTTP/S)                                  | P1       | M      |
+| UP-G06 | Google Sheets sync                                 | P1       | M      |
+| UP-G07 | Tus.io resumable upload (>500MB)                   | P1       | M      |
+| UP-G08 | Content-hash idempotency                           | P0       | S      |
+| UP-G09 | Per-org storage quota                              | P0       | S      |
+| UP-G10 | Per-org row-count quota                            | P1       | S      |
+| UP-G11 | Schema inference (types from sample rows)          | P0       | M      |
+| UP-G12 | Column-name sanitization (sql-safe identifiers)    | P0       | S      |
+| UP-G13 | Refresh / replace existing dataset from new file   | P1       | M      |
+| UP-G14 | Append / incremental upload                        | P2       | M      |
+| UP-G15 | Mapping templates (skip rows, header offset, ...)  | P1       | M      |
+| UP-G16 | Per-column manual type override on upload          | P1       | S      |
+| UP-G17 | Virus / malware scan before parse                  | P1       | S      |
+| UP-G18 | Upload audit + size + sha256 in audit log          | P0       | S      |
+| UP-G19 | Background processing (worker queue) for big files | P1       | M      |
 
 ## 4. Target architecture
 
@@ -78,7 +78,7 @@
 
 For every org that has uploads enabled, DBExec provisions exactly
 one Postgres database (separate from the master DB and the org's
-own master DB) called the *managed datasource*. Schema:
+own master DB) called the _managed datasource_. Schema:
 `up_<short_org_id>`. Each uploaded file becomes a table inside it.
 
 ```
@@ -149,29 +149,29 @@ export class OrgStorageQuota {
   @PrimaryGeneratedColumn('uuid') id!: string;
   @Column('uuid', { unique: true }) organisationId!: string;
   @Column('bigint', { default: 0 }) usedBytes!: number;
-  @Column('bigint') maxBytes!: number;             // default 1 GiB
+  @Column('bigint') maxBytes!: number; // default 1 GiB
   @Column('bigint', { default: 0 }) usedRows!: number;
-  @Column('bigint') maxRows!: number;              // default 5 million
+  @Column('bigint') maxRows!: number; // default 5 million
   @Column('int', { default: 0 }) usedDatasets!: number;
-  @Column('int') maxDatasets!: number;             // default 100
+  @Column('int') maxDatasets!: number; // default 100
   @UpdateDateColumn() updatedOn!: Date;
 }
 ```
 
 ### 4.3 Endpoints
 
-| Method | Path | Purpose |
-|---|---|---|
-| POST | `/datasets/upload/csv` | multipart CSV (≤500 MiB) |
-| POST | `/datasets/upload/xlsx` | multipart XLSX |
-| POST | `/datasets/upload/json` | multipart JSON / NDJSON |
-| POST | `/datasets/upload/parquet` | multipart Parquet |
-| POST | `/datasets/upload/url` | server pulls from URL (deny private IPs — see [01 · Datasource](01-datasource-connection.md) §SSRF guard) |
-| POST | `/datasets/upload/google-sheets` | OAuth'd sheet pull |
-| POST | `/api/v1/upload/tus` | tus.io resumable upload (mounts a tus server for >500 MiB) |
-| POST | `/datasets/:id/refresh-from-file` | replace a dataset's rows from a new upload (same column schema) |
-| POST | `/datasets/:id/append-from-file` | append rows from a new upload |
-| GET | `/quota/storage` | org's quota usage + limits |
+| Method | Path                              | Purpose                                                                                                   |
+| ------ | --------------------------------- | --------------------------------------------------------------------------------------------------------- |
+| POST   | `/datasets/upload/csv`            | multipart CSV (≤500 MiB)                                                                                  |
+| POST   | `/datasets/upload/xlsx`           | multipart XLSX                                                                                            |
+| POST   | `/datasets/upload/json`           | multipart JSON / NDJSON                                                                                   |
+| POST   | `/datasets/upload/parquet`        | multipart Parquet                                                                                         |
+| POST   | `/datasets/upload/url`            | server pulls from URL (deny private IPs — see [01 · Datasource](01-datasource-connection.md) §SSRF guard) |
+| POST   | `/datasets/upload/google-sheets`  | OAuth'd sheet pull                                                                                        |
+| POST   | `/api/v1/upload/tus`              | tus.io resumable upload (mounts a tus server for >500 MiB)                                                |
+| POST   | `/datasets/:id/refresh-from-file` | replace a dataset's rows from a new upload (same column schema)                                           |
+| POST   | `/datasets/:id/append-from-file`  | append rows from a new upload                                                                             |
+| GET    | `/quota/storage`                  | org's quota usage + limits                                                                                |
 
 ### 4.4 Upload pipeline (CSV — others are variations)
 
@@ -232,36 +232,44 @@ async function streamCsvIntoTable(
   columns: ColumnDef[],
 ): Promise<{ rowCount: number }> {
   const parser = csvParse({
-    columns: true,           // first row is header
+    columns: true, // first row is header
     skip_empty_lines: true,
     bom: true,
-    relax_quotes: true,      // tolerate occasional broken quotes
+    relax_quotes: true, // tolerate occasional broken quotes
   });
 
   const stringify = new Transform({
     objectMode: true,
     transform(row, _, cb) {
       // Convert object row → tab-separated literal for COPY
-      const line = columns.map(c => {
-        const v = row[c.originalName];
-        if (v == null || v === '') return '\\N';   // null sentinel
-        const s = String(v).replace(/\\/g, '\\\\')
-                            .replace(/\t/g, '\\t')
-                            .replace(/\n/g, '\\n')
-                            .replace(/\r/g, '');
-        return s;
-      }).join('\t') + '\n';
+      const line =
+        columns
+          .map(c => {
+            const v = row[c.originalName];
+            if (v == null || v === '') return '\\N'; // null sentinel
+            const s = String(v)
+              .replace(/\\/g, '\\\\')
+              .replace(/\t/g, '\\t')
+              .replace(/\n/g, '\\n')
+              .replace(/\r/g, '');
+            return s;
+          })
+          .join('\t') + '\n';
       cb(null, line);
     },
   });
 
-  const copyStream = client.query(copyFrom(
-    `COPY ${q(table)} (${columns.map(c => q(c.name)).join(', ')})
+  const copyStream = client.query(
+    copyFrom(
+      `COPY ${q(table)} (${columns.map(c => q(c.name)).join(', ')})
      FROM STDIN WITH (FORMAT text, NULL '\\N')`,
-  ));
+    ),
+  );
 
   let rowCount = 0;
-  parser.on('readable', () => { while (parser.read()) rowCount++; });
+  parser.on('readable', () => {
+    while (parser.read()) rowCount++;
+  });
 
   await new Promise<void>((resolve, reject) => {
     pipeline(
@@ -270,7 +278,7 @@ async function streamCsvIntoTable(
       parser,
       stringify,
       copyStream,
-      (err) => err ? reject(err) : resolve(),
+      err => (err ? reject(err) : resolve()),
     );
   });
 
@@ -282,11 +290,19 @@ async function streamCsvIntoTable(
 
 ```ts
 type Inferred = {
-  name: string;         // sanitised (snake_case, ascii)
+  name: string; // sanitised (snake_case, ascii)
   originalName: string; // raw from header
-  type: 'bool' | 'smallint' | 'integer' | 'bigint'
-        | 'numeric' | 'real' | 'double precision'
-        | 'date' | 'timestamptz' | 'text';
+  type:
+    | 'bool'
+    | 'smallint'
+    | 'integer'
+    | 'bigint'
+    | 'numeric'
+    | 'real'
+    | 'double precision'
+    | 'date'
+    | 'timestamptz'
+    | 'text';
   nullable: boolean;
 };
 
@@ -296,7 +312,7 @@ function inferColumns(rows: Record<string, string>[]): Inferred[] {
   const headers = Object.keys(sample[0]);
 
   return headers.map(rawName => {
-    const name = sanitiseColumnName(rawName);    // see §4.7
+    const name = sanitiseColumnName(rawName); // see §4.7
     const observations = sample.map(r => r[rawName]);
     const type = dominantType(observations);
     const nullable = observations.some(v => v == null || v === '');
@@ -311,9 +327,19 @@ function dominantType(values: (string | null)[]): Inferred['type'] {
     counts[detect(v)] = (counts[detect(v)] || 0) + 1;
   }
   // Numeric beats bool when both could match (e.g. '0','1' samples)
-  const order = ['bool','smallint','integer','bigint','numeric','real',
-                 'double precision','date','timestamptz','text'];
-  return order.find(t => counts[t]) as Inferred['type'] ?? 'text';
+  const order = [
+    'bool',
+    'smallint',
+    'integer',
+    'bigint',
+    'numeric',
+    'real',
+    'double precision',
+    'date',
+    'timestamptz',
+    'text',
+  ];
+  return (order.find(t => counts[t]) as Inferred['type']) ?? 'text';
 }
 
 function detect(v: string): Inferred['type'] {
@@ -324,7 +350,8 @@ function detect(v: string): Inferred['type'] {
   if (/^-?\d+$/.test(s)) return 'bigint';
   if (/^-?\d+\.\d+$/.test(s)) return 'numeric';
   if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return 'date';
-  if (!isNaN(Date.parse(s)) && /\d{4}/.test(s) && s.length > 10) return 'timestamptz';
+  if (!isNaN(Date.parse(s)) && /\d{4}/.test(s) && s.length > 10)
+    return 'timestamptz';
   return 'text';
 }
 ```
@@ -338,8 +365,10 @@ User can override any inferred type via the upload-mapping step
 function sanitiseColumnName(raw: string): string {
   // Lowercase, replace non-ascii word chars with _, collapse runs,
   // trim leading/trailing underscores, prefix _ if starts with digit.
-  let n = raw.toLowerCase()
-    .normalize('NFKD').replace(/[̀-ͯ]/g, '')   // strip accents
+  let n = raw
+    .toLowerCase()
+    .normalize('NFKD')
+    .replace(/[̀-ͯ]/g, '') // strip accents
     .replace(/[^a-z0-9]+/g, '_')
     .replace(/^_+|_+$/g, '');
   if (/^[0-9]/.test(n)) n = '_' + n;
@@ -371,7 +400,8 @@ async function ensureQuotaForUpload(
   rowCount: number | null,
   conn: DataSource,
 ): Promise<{ ok: true } | { ok: false; reason: string }> {
-  const quota = await conn.getRepository(OrgStorageQuota)
+  const quota = await conn
+    .getRepository(OrgStorageQuota)
     .findOne({ where: { organisationId: orgId } });
   if (!quota) return { ok: false, reason: 'quota.not_configured' };
 
@@ -391,14 +421,16 @@ async function commitQuotaAfterUpload(
   rowCount: number,
   conn: DataSource,
 ) {
-  await conn.query(`
+  await conn.query(
+    `
     UPDATE org_storage_quota
        SET used_bytes = used_bytes + $1,
            used_rows = used_rows + $2,
            used_datasets = used_datasets + 1,
            updated_on = now()
      WHERE organisation_id = $3`,
-    [sizeBytes, rowCount, orgId]);
+    [sizeBytes, rowCount, orgId],
+  );
 }
 ```
 
@@ -414,7 +446,8 @@ async function uploadFromUrl(req, res) {
 
   // SSRF guard — module 01 ipReachability.shouldBlockHost
   const host = new URL(url).hostname;
-  if (shouldBlockHost(host)) return sendResponse(res, false, 400, 'url.blocked');
+  if (shouldBlockHost(host))
+    return sendResponse(res, false, 400, 'url.blocked');
 
   // Stream the response straight into the pipeline — no temp file.
   const upstream = await fetch(url, {
@@ -425,7 +458,8 @@ async function uploadFromUrl(req, res) {
   if (!upstream.ok) return sendResponse(res, false, 502, 'url.fetch_failed');
 
   const contentLength = Number(upstream.headers.get('content-length') || 0);
-  if (contentLength > MAX_UPLOAD_BYTES) return sendResponse(res, false, 413, 'url.too_large');
+  if (contentLength > MAX_UPLOAD_BYTES)
+    return sendResponse(res, false, 413, 'url.too_large');
 
   // Tee the body — hash + parse + store happen in parallel
   // ... (same pipeline as CSV upload, source stream is upstream.body)
@@ -514,7 +548,7 @@ columnTypes:    {"qty":"integer"}  optional, override inference per column
     },
     "fields": [
       { "name": "invoice_id", "type": "bigint", "nullable": false },
-      { "name": "issued_at",  "type": "timestamptz", "nullable": true }
+      { "name": "issued_at", "type": "timestamptz", "nullable": true }
     ]
   }
 }
@@ -522,18 +556,18 @@ columnTypes:    {"qty":"integer"}  optional, override inference per column
 
 **Errors:**
 
-| code | reason | message |
-|---|---|---|
-| 400 | empty file | `upload.empty` |
-| 400 | malformed format (CSV parse error) | `upload.csv.parse_error` with row number |
-| 400 | column inference inconsistent (rare) | `upload.inference.ambiguous` |
-| 400 | schema mismatch on refresh | `upload.schema.drift` + diff |
-| 409 | duplicate (sha256 already uploaded) | returns existing dataset, status 200 with a `duplicate: true` flag — not an error |
-| 413 | size > MAX_UPLOAD_BYTES (500MB) | `upload.too_large` |
-| 413 | rowCount > MAX_UPLOAD_ROWS (10M) | `upload.too_many_rows` |
-| 413 | org quota exceeded | `quota.storage.exceeded` etc. |
-| 422 | unsupported encoding | `upload.encoding.unsupported` |
-| 500 | virus detected | `upload.virus.detected` (only if ClamAV is wired) |
+| code | reason                               | message                                                                           |
+| ---- | ------------------------------------ | --------------------------------------------------------------------------------- |
+| 400  | empty file                           | `upload.empty`                                                                    |
+| 400  | malformed format (CSV parse error)   | `upload.csv.parse_error` with row number                                          |
+| 400  | column inference inconsistent (rare) | `upload.inference.ambiguous`                                                      |
+| 400  | schema mismatch on refresh           | `upload.schema.drift` + diff                                                      |
+| 409  | duplicate (sha256 already uploaded)  | returns existing dataset, status 200 with a `duplicate: true` flag — not an error |
+| 413  | size > MAX_UPLOAD_BYTES (500MB)      | `upload.too_large`                                                                |
+| 413  | rowCount > MAX_UPLOAD_ROWS (10M)     | `upload.too_many_rows`                                                            |
+| 413  | org quota exceeded                   | `quota.storage.exceeded` etc.                                                     |
+| 422  | unsupported encoding                 | `upload.encoding.unsupported`                                                     |
+| 500  | virus detected                       | `upload.virus.detected` (only if ClamAV is wired)                                 |
 
 ## 6. FE specs
 
@@ -583,8 +617,8 @@ For an existing upload-kind dataset:
 
 See [BE implementation doc](../../be-implementation/DBEXEC-BE-IMPLEMENTATION.md)
 §12 for the complete `uploadDatasetCsv` controller — that's the
-canonical implementation. This module describes *what* and *why*;
-the BE doc is the *how*.
+canonical implementation. This module describes _what_ and _why_;
+the BE doc is the _how_.
 
 ### 7.2 Sample-row dry run
 
@@ -598,7 +632,10 @@ async function dryRunUpload(req, res) {
   const rows: any[] = [];
   await new Promise<void>((resolve, reject) => {
     csvParse(head, { columns: true, skip_empty_lines: true, bom: true })
-      .on('readable', function () { let r; while ((r = this.read())) rows.push(r); })
+      .on('readable', function () {
+        let r;
+        while ((r = this.read())) rows.push(r);
+      })
       .on('error', reject)
       .on('end', () => resolve());
   });
@@ -630,7 +667,7 @@ async function refreshDatasetFromFile(req, res) {
 
   // TRUNCATE + COPY inside a transaction. On failure, rollback —
   // quota stays consistent.
-  await managedPool.transaction(async (tx) => {
+  await managedPool.transaction(async tx => {
     await tx.query(`TRUNCATE ${q(dataset.targetTable!)}`);
     await streamCsvIntoTable(req.file!, tx, dataset.targetTable!, newCols);
   });

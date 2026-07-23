@@ -119,7 +119,10 @@ export class CalculatedFieldsDialogComponent implements OnChanges {
 
   private buildDataTypeOptions(): void {
     this.dataTypeOptions = [
-      { label: this.translate.instant('DATASET.CALC_FIELD_TYPE_AUTO'), value: '' },
+      {
+        label: this.translate.instant('DATASET.CALC_FIELD_TYPE_AUTO'),
+        value: '',
+      },
       ...CALC_FIELD_DATA_TYPE_VALUES.map((v: CalcFieldDataType) => ({
         label: this.translate.instant(
           'DATASET.CALC_FIELD_TYPE_' + v.toUpperCase(),
@@ -226,7 +229,8 @@ export class CalculatedFieldsDialogComponent implements OnChanges {
     });
     if (!parsed.success) {
       const key =
-        parsed.error.issues[0]?.message ?? 'DATASET.CALC_FIELD_VALIDATION_FAILED';
+        parsed.error.issues[0]?.message ??
+        'DATASET.CALC_FIELD_VALIDATION_FAILED';
       this.expressionError = this.translate.instant(key);
       this.cdr.markForCheck();
       return;

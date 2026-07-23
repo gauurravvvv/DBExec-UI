@@ -23,7 +23,11 @@
 
     <!-- Center: segmented panel toggles (grouped pairs) -->
     <div class="a-toolbar__center">
-      <div class="a-segment" role="group" [attr.aria-label]="'ANALYSES.A11Y_DATA_PANELS' | translate">
+      <div
+        class="a-segment"
+        role="group"
+        [attr.aria-label]="'ANALYSES.A11Y_DATA_PANELS' | translate"
+      >
         <button
           type="button"
           class="a-segment__btn"
@@ -43,7 +47,11 @@
           <span>{{ 'ANALYSES.FILTERS' | translate }}</span>
         </button>
       </div>
-      <div class="a-segment" role="group" [attr.aria-label]="'ANALYSES.A11Y_BUILD_PANELS' | translate">
+      <div
+        class="a-segment"
+        role="group"
+        [attr.aria-label]="'ANALYSES.A11Y_BUILD_PANELS' | translate"
+      >
         <button
           type="button"
           class="a-segment__btn"
@@ -265,10 +273,15 @@
                   aria-hidden="true"
                 ></span>
                 <span class="layer-group__name">{{ group.tab.name }}</span>
-                <span class="layer-group__count">{{ group.visuals.length }}</span>
+                <span class="layer-group__count">{{
+                  group.visuals.length
+                }}</span>
               </div>
 
-              <div class="layer-group__empty" *ngIf="group.visuals.length === 0">
+              <div
+                class="layer-group__empty"
+                *ngIf="group.visuals.length === 0"
+              >
                 {{ 'ANALYSES.NO_VISUALS_YET' | translate }}
               </div>
 
@@ -694,11 +707,7 @@
       <div class="interaction-bar" *ngIf="hasActiveInteractions">
         <div class="drill-breadcrumb" *ngIf="interaction.drillPath().length">
           <i class="pi pi-sitemap"></i>
-          <button
-            type="button"
-            class="crumb crumb--root"
-            (click)="drillTo(-1)"
-          >
+          <button type="button" class="crumb crumb--root" (click)="drillTo(-1)">
             {{ 'ANALYSES.DRILL_ALL' | translate }}
           </button>
           <ng-container
@@ -727,11 +736,7 @@
           class="crossfilter-chips"
           *ngIf="interaction.scopedCrossFilter() as cf"
         >
-          <app-chip
-            variant="tag"
-            tone="primary"
-            icon="pi pi-filter"
-          >
+          <app-chip variant="tag" tone="primary" icon="pi pi-filter">
             {{ cf.columnName }} = {{ cf.value }}
           </app-chip>
         </div>
@@ -754,49 +759,101 @@
            overlaps visuals (see component note). -->
       <div class="align-toolbar" *ngIf="selectedCount >= 2">
         <span class="align-toolbar__count">
-          {{ 'ANALYSES.AUTHORING.SELECTED_COUNT' | translate: { count: selectedCount } }}
+          {{
+            'ANALYSES.AUTHORING.SELECTED_COUNT'
+              | translate: { count: selectedCount }
+          }}
         </span>
         <div class="align-toolbar__group" role="group">
-          <span class="align-toolbar__glabel">{{ 'ANALYSES.AUTHORING.ALIGN' | translate }}</span>
-          <button type="button" class="align-btn" (click)="alignSelected('left')"
-            [pTooltip]="'ANALYSES.AUTHORING.ALIGN_LEFT' | translate" tooltipPosition="bottom">
+          <span class="align-toolbar__glabel">{{
+            'ANALYSES.AUTHORING.ALIGN' | translate
+          }}</span>
+          <button
+            type="button"
+            class="align-btn"
+            (click)="alignSelected('left')"
+            [pTooltip]="'ANALYSES.AUTHORING.ALIGN_LEFT' | translate"
+            tooltipPosition="bottom"
+          >
             <i class="pi pi-align-left"></i>
           </button>
-          <button type="button" class="align-btn" (click)="alignSelected('center')"
-            [pTooltip]="'ANALYSES.AUTHORING.ALIGN_CENTER' | translate" tooltipPosition="bottom">
+          <button
+            type="button"
+            class="align-btn"
+            (click)="alignSelected('center')"
+            [pTooltip]="'ANALYSES.AUTHORING.ALIGN_CENTER' | translate"
+            tooltipPosition="bottom"
+          >
             <i class="pi pi-align-center"></i>
           </button>
-          <button type="button" class="align-btn" (click)="alignSelected('right')"
-            [pTooltip]="'ANALYSES.AUTHORING.ALIGN_RIGHT' | translate" tooltipPosition="bottom">
+          <button
+            type="button"
+            class="align-btn"
+            (click)="alignSelected('right')"
+            [pTooltip]="'ANALYSES.AUTHORING.ALIGN_RIGHT' | translate"
+            tooltipPosition="bottom"
+          >
             <i class="pi pi-align-right"></i>
           </button>
           <span class="align-toolbar__sep"></span>
-          <button type="button" class="align-btn" (click)="alignSelected('top')"
-            [pTooltip]="'ANALYSES.AUTHORING.ALIGN_TOP' | translate" tooltipPosition="bottom">
+          <button
+            type="button"
+            class="align-btn"
+            (click)="alignSelected('top')"
+            [pTooltip]="'ANALYSES.AUTHORING.ALIGN_TOP' | translate"
+            tooltipPosition="bottom"
+          >
             <i class="pi pi-arrow-up"></i>
           </button>
-          <button type="button" class="align-btn" (click)="alignSelected('middle')"
-            [pTooltip]="'ANALYSES.AUTHORING.ALIGN_MIDDLE' | translate" tooltipPosition="bottom">
+          <button
+            type="button"
+            class="align-btn"
+            (click)="alignSelected('middle')"
+            [pTooltip]="'ANALYSES.AUTHORING.ALIGN_MIDDLE' | translate"
+            tooltipPosition="bottom"
+          >
             <i class="pi pi-arrows-v"></i>
           </button>
-          <button type="button" class="align-btn" (click)="alignSelected('bottom')"
-            [pTooltip]="'ANALYSES.AUTHORING.ALIGN_BOTTOM' | translate" tooltipPosition="bottom">
+          <button
+            type="button"
+            class="align-btn"
+            (click)="alignSelected('bottom')"
+            [pTooltip]="'ANALYSES.AUTHORING.ALIGN_BOTTOM' | translate"
+            tooltipPosition="bottom"
+          >
             <i class="pi pi-arrow-down"></i>
           </button>
         </div>
         <div class="align-toolbar__group" role="group" *ngIf="canDistribute">
-          <span class="align-toolbar__glabel">{{ 'ANALYSES.AUTHORING.DISTRIBUTE' | translate }}</span>
-          <button type="button" class="align-btn" (click)="distributeSelected('horizontal')"
-            [pTooltip]="'ANALYSES.AUTHORING.DISTRIBUTE_H' | translate" tooltipPosition="bottom">
+          <span class="align-toolbar__glabel">{{
+            'ANALYSES.AUTHORING.DISTRIBUTE' | translate
+          }}</span>
+          <button
+            type="button"
+            class="align-btn"
+            (click)="distributeSelected('horizontal')"
+            [pTooltip]="'ANALYSES.AUTHORING.DISTRIBUTE_H' | translate"
+            tooltipPosition="bottom"
+          >
             <i class="pi pi-arrows-h"></i>
           </button>
-          <button type="button" class="align-btn" (click)="distributeSelected('vertical')"
-            [pTooltip]="'ANALYSES.AUTHORING.DISTRIBUTE_V' | translate" tooltipPosition="bottom">
+          <button
+            type="button"
+            class="align-btn"
+            (click)="distributeSelected('vertical')"
+            [pTooltip]="'ANALYSES.AUTHORING.DISTRIBUTE_V' | translate"
+            tooltipPosition="bottom"
+          >
             <i class="pi pi-arrows-v"></i>
           </button>
         </div>
-        <button type="button" class="align-toolbar__clear" (click)="clearSelection()"
-          [pTooltip]="'COMMON.CLOSE' | translate" tooltipPosition="bottom">
+        <button
+          type="button"
+          class="align-toolbar__clear"
+          (click)="clearSelection()"
+          [pTooltip]="'COMMON.CLOSE' | translate"
+          tooltipPosition="bottom"
+        >
           <i class="pi pi-times"></i>
         </button>
       </div>
@@ -809,139 +866,135 @@
              horizontally when there are more tabs than fit; the "Add widget"
              action stays pinned outside so it never scrolls off. -->
         <div class="analysis-tabs-scroll">
-        <!-- CDK drag-drop reorder (Wave 7, feature 4). Horizontal list. -->
-        <div
-          class="analysis-tabs-track"
-          cdkDropList
-          cdkDropListOrientation="horizontal"
-          (cdkDropListDropped)="onTabDrop($event)"
-        >
-        <div
-          class="analysis-tab"
-          *ngFor="let tab of tabs; let ti = index; trackBy: trackByTabId"
-          cdkDrag
-          [cdkDragData]="tab"
-          [class.active]="tab.id === activeTabId"
-          [style.--tab-color]="tabColor(tab) || 'transparent'"
-          [class.has-color]="!!tabColor(tab)"
-          (click)="selectTab(tab.id)"
-          (contextmenu)="openTabContextMenu(tab, $event, tabCtxOp)"
-        >
-          <span
-            class="analysis-tab__color-dot"
-            *ngIf="tabColor(tab)"
-            [style.background]="tabColor(tab)"
-            aria-hidden="true"
-          ></span>
-          <ng-container *ngIf="editingTabId !== tab.id">
-            <!-- Clean tab: no inline action icons. Every tab action (rename,
+          <!-- CDK drag-drop reorder (Wave 7, feature 4). Horizontal list. -->
+          <div
+            class="analysis-tabs-track"
+            cdkDropList
+            cdkDropListOrientation="horizontal"
+            (cdkDropListDropped)="onTabDrop($event)"
+          >
+            <div
+              class="analysis-tab"
+              *ngFor="let tab of tabs; let ti = index; trackBy: trackByTabId"
+              cdkDrag
+              [cdkDragData]="tab"
+              [class.active]="tab.id === activeTabId"
+              [style.--tab-color]="tabColor(tab) || 'transparent'"
+              [class.has-color]="!!tabColor(tab)"
+              (click)="selectTab(tab.id)"
+              (contextmenu)="openTabContextMenu(tab, $event, tabCtxOp)"
+            >
+              <span
+                class="analysis-tab__color-dot"
+                *ngIf="tabColor(tab)"
+                [style.background]="tabColor(tab)"
+                aria-hidden="true"
+              ></span>
+              <ng-container *ngIf="editingTabId !== tab.id">
+                <!-- Clean tab: no inline action icons. Every tab action (rename,
                  duplicate, set colour, delete) lives in the right-click menu.
                  Double-click the name to rename quickly. -->
-            <span
-              class="analysis-tab__name"
-              (dblclick)="startRenameTab(tab, $event)"
-              [pTooltip]="'ANALYSES.TABS.RIGHT_CLICK_HINT' | translate"
-              tooltipPosition="bottom"
-              >{{ tab.name }}</span
-            >
-          </ng-container>
-          <input
-            *ngIf="editingTabId === tab.id"
-            #tabRenameInput
-            class="analysis-tab__rename"
-            [(ngModel)]="editingTabName"
-            [maxlength]="60"
-            (blur)="finishRenameTab()"
-            (keydown)="onTabNameKeydown($event)"
-            (click)="$event.stopPropagation()"
-            autocomplete="off"
-          />
-          <!-- CDK drag placeholder — a ghost slot while reordering. -->
-          <div class="analysis-tab__drag-ph" *cdkDragPlaceholder></div>
-        </div>
-        </div>
-        <!-- /analysis-tabs-track -->
+                <span
+                  class="analysis-tab__name"
+                  (dblclick)="startRenameTab(tab, $event)"
+                  [pTooltip]="'ANALYSES.TABS.RIGHT_CLICK_HINT' | translate"
+                  tooltipPosition="bottom"
+                  >{{ tab.name }}</span
+                >
+              </ng-container>
+              <input
+                *ngIf="editingTabId === tab.id"
+                #tabRenameInput
+                class="analysis-tab__rename"
+                [(ngModel)]="editingTabName"
+                [maxlength]="60"
+                (blur)="finishRenameTab()"
+                (keydown)="onTabNameKeydown($event)"
+                (click)="$event.stopPropagation()"
+                autocomplete="off"
+              />
+              <!-- CDK drag placeholder — a ghost slot while reordering. -->
+              <div class="analysis-tab__drag-ph" *cdkDragPlaceholder></div>
+            </div>
+          </div>
+          <!-- /analysis-tabs-track -->
 
-        <!-- Tab right-click context menu (Wave 7, feature 4) — token-styled
+          <!-- Tab right-click context menu (Wave 7, feature 4) — token-styled
              popover, appendTo body. Rename / duplicate / delete / set colour /
              move. All draft-only (persisted on Save). -->
-        <p-overlayPanel
-          #tabCtxOp
-          appendTo="body"
-          styleClass="tab-ctx-panel"
-        >
-          <div class="tab-ctx" *ngIf="ctxTab">
-            <button
-              type="button"
-              class="tab-ctx__item"
-              (click)="ctxRenameTab(tabCtxOp)"
-            >
-              <i class="pi pi-pencil"></i>
-              <span>{{ 'ANALYSES.TABS.RENAME' | translate }}</span>
-            </button>
-            <button
-              type="button"
-              class="tab-ctx__item"
-              [disabled]="isTabBusy"
-              (click)="ctxDuplicateTab(tabCtxOp)"
-            >
-              <i class="pi pi-clone"></i>
-              <span>{{ 'ANALYSES.TABS.DUPLICATE' | translate }}</span>
-            </button>
-
-            <div class="tab-ctx__divider"></div>
-            <div class="tab-ctx__label">
-              {{ 'ANALYSES.TABS.SET_COLOR' | translate }}
-            </div>
-            <div class="tab-ctx__swatches">
+          <p-overlayPanel #tabCtxOp appendTo="body" styleClass="tab-ctx-panel">
+            <div class="tab-ctx" *ngIf="ctxTab">
               <button
                 type="button"
-                class="tab-ctx__swatch"
-                *ngFor="let c of tabColorSwatches; trackBy: trackByIndex"
-                [style.background]="c"
-                [class.is-active]="tabColor(ctxTab) === c"
-                [attr.aria-label]="c"
-                (click)="setTabColor(c)"
-              ></button>
-              <button
-                type="button"
-                class="tab-ctx__swatch tab-ctx__swatch--clear"
-                [class.is-active]="!tabColor(ctxTab)"
-                [pTooltip]="'ANALYSES.TABS.CLEAR_COLOR' | translate"
-                tooltipPosition="top"
-                (click)="clearTabColor()"
+                class="tab-ctx__item"
+                (click)="ctxRenameTab(tabCtxOp)"
               >
-                <i class="pi pi-ban"></i>
+                <i class="pi pi-pencil"></i>
+                <span>{{ 'ANALYSES.TABS.RENAME' | translate }}</span>
+              </button>
+              <button
+                type="button"
+                class="tab-ctx__item"
+                [disabled]="isTabBusy"
+                (click)="ctxDuplicateTab(tabCtxOp)"
+              >
+                <i class="pi pi-clone"></i>
+                <span>{{ 'ANALYSES.TABS.DUPLICATE' | translate }}</span>
+              </button>
+
+              <div class="tab-ctx__divider"></div>
+              <div class="tab-ctx__label">
+                {{ 'ANALYSES.TABS.SET_COLOR' | translate }}
+              </div>
+              <div class="tab-ctx__swatches">
+                <button
+                  type="button"
+                  class="tab-ctx__swatch"
+                  *ngFor="let c of tabColorSwatches; trackBy: trackByIndex"
+                  [style.background]="c"
+                  [class.is-active]="tabColor(ctxTab) === c"
+                  [attr.aria-label]="c"
+                  (click)="setTabColor(c)"
+                ></button>
+                <button
+                  type="button"
+                  class="tab-ctx__swatch tab-ctx__swatch--clear"
+                  [class.is-active]="!tabColor(ctxTab)"
+                  [pTooltip]="'ANALYSES.TABS.CLEAR_COLOR' | translate"
+                  tooltipPosition="top"
+                  (click)="clearTabColor()"
+                >
+                  <i class="pi pi-ban"></i>
+                </button>
+              </div>
+
+              <div class="tab-ctx__divider" *ngIf="tabs.length > 1"></div>
+              <button
+                type="button"
+                class="tab-ctx__item tab-ctx__item--danger"
+                *ngIf="tabs.length > 1"
+                (click)="ctxDeleteTab($event, tabCtxOp)"
+              >
+                <i class="pi pi-trash"></i>
+                <span>{{ 'ANALYSES.TABS.DELETE' | translate }}</span>
               </button>
             </div>
+          </p-overlayPanel>
 
-            <div class="tab-ctx__divider" *ngIf="tabs.length > 1"></div>
-            <button
-              type="button"
-              class="tab-ctx__item tab-ctx__item--danger"
-              *ngIf="tabs.length > 1"
-              (click)="ctxDeleteTab($event, tabCtxOp)"
-            >
-              <i class="pi pi-trash"></i>
-              <span>{{ 'ANALYSES.TABS.DELETE' | translate }}</span>
-            </button>
-          </div>
-        </p-overlayPanel>
-
-        <!-- Add-tab: a single click adds a new tab straightaway (named
+          <!-- Add-tab: a single click adds a new tab straightaway (named
              "Tab N", switched to it) — no intermediate type/name popover.
              Double-click the new tab to rename it. -->
-        <button
-          type="button"
-          class="analysis-tab-add"
-          (click)="addTab()"
-          [disabled]="isTabBusy"
-          [pTooltip]="'ANALYSES.TABS.ADD' | translate"
-          tooltipPosition="bottom"
-          [attr.aria-label]="'ANALYSES.TABS.ADD' | translate"
-        >
-          <i class="pi pi-plus"></i>
-        </button>
+          <button
+            type="button"
+            class="analysis-tab-add"
+            (click)="addTab()"
+            [disabled]="isTabBusy"
+            [pTooltip]="'ANALYSES.TABS.ADD' | translate"
+            tooltipPosition="bottom"
+            [attr.aria-label]="'ANALYSES.TABS.ADD' | translate"
+          >
+            <i class="pi pi-plus"></i>
+          </button>
         </div>
         <!-- /analysis-tabs-scroll — "Add widget" now lives in the Charts panel
              (next to "Add Visual"), so the tab strip is just tabs + add-tab. -->
@@ -949,7 +1002,10 @@
 
       <!-- When there are NO tabs yet, still offer an "add tab" affordance so
            the author can start organising an existing analysis into pages. -->
-      <div class="analysis-tab-strip analysis-tab-strip--empty" *ngIf="tabs.length === 0">
+      <div
+        class="analysis-tab-strip analysis-tab-strip--empty"
+        *ngIf="tabs.length === 0"
+      >
         <button
           type="button"
           class="analysis-tab-add analysis-tab-add--labelled"
@@ -982,226 +1038,236 @@
           [style.grid-column]="visual.gridCol + 1 + ' / span ' + visual.colSpan"
           [style.grid-row]="visual.gridRow + 1 + ' / span ' + visual.rowSpan"
         >
-        <div
-          class="visual-box"
-          cdkDrag
-          [cdkDragData]="visual"
-          (cdkDragStarted)="onVisualCdkDragStarted()"
-          [class.focused]="focusedVisualId === visual.id"
-          [class.selected]="isSelected(visual.id)"
-          [class.disabled]="
-            focusedVisualId !== null && focusedVisualId !== visual.id && !isSelected(visual.id)
-          "
-          [class.resizing]="resizingVisual?.id === visual.id"
-          (click)="onVisualClick($event, visual.id)"
-          (contextmenu)="onVisualRightClick($event, visual.id)"
-        >
-          <!-- Inline Title — CDK drag handle for reposition (grip). -->
-          <div class="visual-inline-title" cdkDragHandle>
-            <i class="pi pi-bars visual-drag-grip" aria-hidden="true"></i>
-            <span class="inline-title-text">{{ visual.title }}</span>
-            <!-- Actions — consolidated into a single kebab (⋮) menu so the
+          <div
+            class="visual-box"
+            cdkDrag
+            [cdkDragData]="visual"
+            (cdkDragStarted)="onVisualCdkDragStarted()"
+            [class.focused]="focusedVisualId === visual.id"
+            [class.selected]="isSelected(visual.id)"
+            [class.disabled]="
+              focusedVisualId !== null &&
+              focusedVisualId !== visual.id &&
+              !isSelected(visual.id)
+            "
+            [class.resizing]="resizingVisual?.id === visual.id"
+            (click)="onVisualClick($event, visual.id)"
+            (contextmenu)="onVisualRightClick($event, visual.id)"
+          >
+            <!-- Inline Title — CDK drag handle for reposition (grip). -->
+            <div class="visual-inline-title" cdkDragHandle>
+              <i class="pi pi-bars visual-drag-grip" aria-hidden="true"></i>
+              <span class="inline-title-text">{{ visual.title }}</span>
+              <!-- Actions — consolidated into a single kebab (⋮) menu so the
                  card header stays clean. Cross-filter keeps an inline toggle
                  ONLY while active (so the author sees which visuals broadcast
                  a filter at a glance); everything else lives in the menu. -->
-            <div class="visual-action-buttons">
-              <!-- Active cross-filter indicator (inline, active-only). -->
-              <i
-                *ngIf="
-                  visual.chartType &&
-                  !isTableChartType(visual.chartType) &&
-                  hasRequiredChartFields(visual) &&
-                  visual.crossFilterEnabled
-                "
-                class="pi pi-filter action-icon crossfilter-icon active"
-                (click)="toggleCrossFilter(visual, $event)"
-                [pTooltip]="'ANALYSES.CROSSFILTER_ON' | translate"
-                tooltipPosition="top"
-              ></i>
+              <div class="visual-action-buttons">
+                <!-- Active cross-filter indicator (inline, active-only). -->
+                <i
+                  *ngIf="
+                    visual.chartType &&
+                    !isTableChartType(visual.chartType) &&
+                    hasRequiredChartFields(visual) &&
+                    visual.crossFilterEnabled
+                  "
+                  class="pi pi-filter action-icon crossfilter-icon active"
+                  (click)="toggleCrossFilter(visual, $event)"
+                  [pTooltip]="'ANALYSES.CROSSFILTER_ON' | translate"
+                  tooltipPosition="top"
+                ></i>
 
-              <!-- Kebab menu trigger. -->
-              <button
-                type="button"
-                class="action-icon visual-kebab-btn"
-                (click)="openVisualMenu(visual, $event, visualMenuOp)"
-                [pTooltip]="'COMMON.MORE' | translate"
-                tooltipPosition="top"
-                [attr.aria-label]="'COMMON.MORE' | translate"
-              >
-                <i class="pi pi-ellipsis-v"></i>
-              </button>
+                <!-- Kebab menu trigger. -->
+                <button
+                  type="button"
+                  class="action-icon visual-kebab-btn"
+                  (click)="openVisualMenu(visual, $event, visualMenuOp)"
+                  [pTooltip]="'COMMON.MORE' | translate"
+                  tooltipPosition="top"
+                  [attr.aria-label]="'COMMON.MORE' | translate"
+                >
+                  <i class="pi pi-ellipsis-v"></i>
+                </button>
 
-              <!-- Kebab overlay — token-styled, appendTo body, reuses the
+                <!-- Kebab overlay — token-styled, appendTo body, reuses the
                    tab-context-menu look for a consistent menu surface. -->
-              <p-overlayPanel
-                #visualMenuOp
-                appendTo="body"
-                styleClass="tab-ctx-panel"
-              >
-                <div class="tab-ctx" *ngIf="menuVisual as v">
-                  <!-- Focus (full-screen) -->
-                  <button
-                    type="button"
-                    class="tab-ctx__item"
-                    *ngIf="
-                      v.chartType &&
-                      (hasRequiredChartFields(v) ||
-                        isLines3dChartType(v.chartType) ||
-                        isPolygons3dChartType(v.chartType))
-                    "
-                    (click)="focusVisual(v, $event); visualMenuOp.hide()"
-                  >
-                    <i class="pi pi-expand"></i>
-                    <span>{{ 'ANALYSES.AUTHORING.FOCUS' | translate }}</span>
-                  </button>
-                  <!-- Maximize -->
-                  <button
-                    type="button"
-                    class="tab-ctx__item"
-                    *ngIf="
-                      v.chartType &&
-                      (hasRequiredChartFields(v) ||
-                        isLines3dChartType(v.chartType) ||
-                        isPolygons3dChartType(v.chartType))
-                    "
-                    (click)="maximizeVisual(v, $event); visualMenuOp.hide()"
-                  >
-                    <i class="pi pi-window-maximize"></i>
-                    <span>{{ 'ANALYSES.MAXIMIZE' | translate }}</span>
-                  </button>
-                  <!-- Duplicate -->
-                  <button
-                    type="button"
-                    class="tab-ctx__item"
-                    [disabled]="!!duplicatingVisualId"
-                    (click)="duplicateVisual(v, $event); visualMenuOp.hide()"
-                  >
-                    <i
-                      class="pi"
-                      [class.pi-copy]="duplicatingVisualId !== v.id"
-                      [class.pi-spin]="duplicatingVisualId === v.id"
-                      [class.pi-spinner]="duplicatingVisualId === v.id"
-                    ></i>
-                    <span>{{ 'ANALYSES.AUTHORING.DUPLICATE' | translate }}</span>
-                  </button>
+                <p-overlayPanel
+                  #visualMenuOp
+                  appendTo="body"
+                  styleClass="tab-ctx-panel"
+                >
+                  <div class="tab-ctx" *ngIf="menuVisual as v">
+                    <!-- Focus (full-screen) -->
+                    <button
+                      type="button"
+                      class="tab-ctx__item"
+                      *ngIf="
+                        v.chartType &&
+                        (hasRequiredChartFields(v) ||
+                          isLines3dChartType(v.chartType) ||
+                          isPolygons3dChartType(v.chartType))
+                      "
+                      (click)="focusVisual(v, $event); visualMenuOp.hide()"
+                    >
+                      <i class="pi pi-expand"></i>
+                      <span>{{ 'ANALYSES.AUTHORING.FOCUS' | translate }}</span>
+                    </button>
+                    <!-- Maximize -->
+                    <button
+                      type="button"
+                      class="tab-ctx__item"
+                      *ngIf="
+                        v.chartType &&
+                        (hasRequiredChartFields(v) ||
+                          isLines3dChartType(v.chartType) ||
+                          isPolygons3dChartType(v.chartType))
+                      "
+                      (click)="maximizeVisual(v, $event); visualMenuOp.hide()"
+                    >
+                      <i class="pi pi-window-maximize"></i>
+                      <span>{{ 'ANALYSES.MAXIMIZE' | translate }}</span>
+                    </button>
+                    <!-- Duplicate -->
+                    <button
+                      type="button"
+                      class="tab-ctx__item"
+                      [disabled]="!!duplicatingVisualId"
+                      (click)="duplicateVisual(v, $event); visualMenuOp.hide()"
+                    >
+                      <i
+                        class="pi"
+                        [class.pi-copy]="duplicatingVisualId !== v.id"
+                        [class.pi-spin]="duplicatingVisualId === v.id"
+                        [class.pi-spinner]="duplicatingVisualId === v.id"
+                      ></i>
+                      <span>{{
+                        'ANALYSES.AUTHORING.DUPLICATE' | translate
+                      }}</span>
+                    </button>
 
-                  <div
-                    class="tab-ctx__divider"
-                    *ngIf="
-                      v.chartType &&
-                      !isTableChartType(v.chartType) &&
-                      hasRequiredChartFields(v)
-                    "
-                  ></div>
+                    <div
+                      class="tab-ctx__divider"
+                      *ngIf="
+                        v.chartType &&
+                        !isTableChartType(v.chartType) &&
+                        hasRequiredChartFields(v)
+                      "
+                    ></div>
 
-                  <!-- Cross-filter toggle -->
-                  <button
-                    type="button"
-                    class="tab-ctx__item"
-                    [class.is-active]="v.crossFilterEnabled"
-                    *ngIf="
-                      v.chartType &&
-                      !isTableChartType(v.chartType) &&
-                      hasRequiredChartFields(v)
-                    "
-                    (click)="toggleCrossFilter(v, $event); visualMenuOp.hide()"
-                  >
-                    <i class="pi pi-filter"></i>
-                    <span>{{
-                      (v.crossFilterEnabled
-                        ? 'ANALYSES.CROSSFILTER_ON'
-                        : 'ANALYSES.CROSSFILTER_OFF'
-                      ) | translate
-                    }}</span>
-                  </button>
-                  <!-- Drill-to-detail -->
-                  <button
-                    type="button"
-                    class="tab-ctx__item"
-                    *ngIf="
-                      v.chartType &&
-                      hasRequiredChartFields(v) &&
-                      isDrillToDetailEnabled(v)
-                    "
-                    (click)="openDrillToDetail(v, null); visualMenuOp.hide()"
-                  >
-                    <i class="pi pi-table"></i>
-                    <span>{{
-                      'ANALYSES.V2.INTERACTION.DRILL_TO_DETAIL' | translate
-                    }}</span>
-                  </button>
+                    <!-- Cross-filter toggle -->
+                    <button
+                      type="button"
+                      class="tab-ctx__item"
+                      [class.is-active]="v.crossFilterEnabled"
+                      *ngIf="
+                        v.chartType &&
+                        !isTableChartType(v.chartType) &&
+                        hasRequiredChartFields(v)
+                      "
+                      (click)="
+                        toggleCrossFilter(v, $event); visualMenuOp.hide()
+                      "
+                    >
+                      <i class="pi pi-filter"></i>
+                      <span>{{
+                        (v.crossFilterEnabled
+                          ? 'ANALYSES.CROSSFILTER_ON'
+                          : 'ANALYSES.CROSSFILTER_OFF'
+                        ) | translate
+                      }}</span>
+                    </button>
+                    <!-- Drill-to-detail -->
+                    <button
+                      type="button"
+                      class="tab-ctx__item"
+                      *ngIf="
+                        v.chartType &&
+                        hasRequiredChartFields(v) &&
+                        isDrillToDetailEnabled(v)
+                      "
+                      (click)="openDrillToDetail(v, null); visualMenuOp.hide()"
+                    >
+                      <i class="pi pi-table"></i>
+                      <span>{{
+                        'ANALYSES.V2.INTERACTION.DRILL_TO_DETAIL' | translate
+                      }}</span>
+                    </button>
 
-                  <div class="tab-ctx__divider" *ngIf="v.chartType"></div>
+                    <div class="tab-ctx__divider" *ngIf="v.chartType"></div>
 
-                  <!-- Export PNG -->
-                  <button
-                    type="button"
-                    class="tab-ctx__item"
-                    *ngIf="v.chartType && !isTableChartType(v.chartType)"
-                    (click)="exportVisualPng(v, $event); visualMenuOp.hide()"
-                  >
-                    <i class="pi pi-image"></i>
-                    <span>{{ 'ANALYSES.AUTHORING.EXPORT_PNG' | translate }}</span>
-                  </button>
-                  <!-- Export CSV -->
-                  <button
-                    type="button"
-                    class="tab-ctx__item"
-                    *ngIf="v.chartType"
-                    (click)="exportVisualCsv(v, $event); visualMenuOp.hide()"
-                  >
-                    <i class="pi pi-file-export"></i>
-                    <span>{{ 'ANALYSES.AUTHORING.EXPORT_CSV' | translate }}</span>
-                  </button>
+                    <!-- Export PNG -->
+                    <button
+                      type="button"
+                      class="tab-ctx__item"
+                      *ngIf="v.chartType && !isTableChartType(v.chartType)"
+                      (click)="exportVisualPng(v, $event); visualMenuOp.hide()"
+                    >
+                      <i class="pi pi-image"></i>
+                      <span>{{
+                        'ANALYSES.AUTHORING.EXPORT_PNG' | translate
+                      }}</span>
+                    </button>
+                    <!-- Export CSV -->
+                    <button
+                      type="button"
+                      class="tab-ctx__item"
+                      *ngIf="v.chartType"
+                      (click)="exportVisualCsv(v, $event); visualMenuOp.hide()"
+                    >
+                      <i class="pi pi-file-export"></i>
+                      <span>{{
+                        'ANALYSES.AUTHORING.EXPORT_CSV' | translate
+                      }}</span>
+                    </button>
 
-                  <div class="tab-ctx__divider"></div>
-                  <!-- Delete (danger) -->
-                  <button
-                    type="button"
-                    class="tab-ctx__item tab-ctx__item--danger"
-                    (click)="removeVisual(v.id); visualMenuOp.hide()"
-                  >
-                    <i class="pi pi-trash"></i>
-                    <span>{{ 'ANALYSES.REMOVE' | translate }}</span>
-                  </button>
+                    <div class="tab-ctx__divider"></div>
+                    <!-- Delete (danger) -->
+                    <button
+                      type="button"
+                      class="tab-ctx__item tab-ctx__item--danger"
+                      (click)="removeVisual(v.id); visualMenuOp.hide()"
+                    >
+                      <i class="pi pi-trash"></i>
+                      <span>{{ 'ANALYSES.REMOVE' | translate }}</span>
+                    </button>
+                  </div>
+                </p-overlayPanel>
+              </div>
+            </div>
+            <div class="visual-body">
+              <!-- Loading Placeholder -->
+              <div class="visual-loading-placeholder" *ngIf="visual.loading">
+                <div class="loading-content">
+                  <i class="pi pi-spin pi-spinner loading-spinner"></i>
+                  <span class="loading-text">{{
+                    'ANALYSES.LOADING_VISUALIZATION' | translate
+                  }}</span>
                 </div>
-              </p-overlayPanel>
-            </div>
-          </div>
-          <div class="visual-body">
-            <!-- Loading Placeholder -->
-            <div class="visual-loading-placeholder" *ngIf="visual.loading">
-              <div class="loading-content">
-                <i class="pi pi-spin pi-spinner loading-spinner"></i>
-                <span class="loading-text">{{
-                  'ANALYSES.LOADING_VISUALIZATION' | translate
-                }}</span>
               </div>
-            </div>
 
-            <!-- Error State -->
-            <div class="visual-error-placeholder" *ngIf="visual.error">
-              <div class="error-content">
-                <i class="pi pi-exclamation-triangle error-icon"></i>
-                <span class="error-text">{{
-                  'ANALYSES.FAILED_LOAD_VISUALIZATION' | translate
-                }}</span>
+              <!-- Error State -->
+              <div class="visual-error-placeholder" *ngIf="visual.error">
+                <div class="error-content">
+                  <i class="pi pi-exclamation-triangle error-icon"></i>
+                  <span class="error-text">{{
+                    'ANALYSES.FAILED_LOAD_VISUALIZATION' | translate
+                  }}</span>
+                </div>
               </div>
-            </div>
 
-            <!-- Placeholder when no chart type selected (and not loading) -->
-            <div
-              class="visual-content-placeholder"
-              *ngIf="!visual.chartType && !visual.loading && !visual.error"
-            >
-              <div class="placeholder-icon-wrap">
-                <i class="ci ci-chart-simple" aria-hidden="true"></i>
+              <!-- Placeholder when no chart type selected (and not loading) -->
+              <div
+                class="visual-content-placeholder"
+                *ngIf="!visual.chartType && !visual.loading && !visual.error"
+              >
+                <div class="placeholder-icon-wrap">
+                  <i class="ci ci-chart-simple" aria-hidden="true"></i>
+                </div>
+                <p>{{ 'ANALYSES.SELECT_CHART_TYPE' | translate }}</p>
+                <small>{{ 'ANALYSES.CLICK_TO_CONFIGURE' | translate }}</small>
               </div>
-              <p>{{ 'ANALYSES.SELECT_CHART_TYPE' | translate }}</p>
-              <small>{{ 'ANALYSES.CLICK_TO_CONFIGURE' | translate }}</small>
-            </div>
 
-            <!--
+              <!--
               Missing-field placeholder — distinct from the generic
               "map your axes" prompt below. Shown when the visual is
               configured (chart type + axis names present) but one or
@@ -1214,96 +1280,101 @@
               don't tell the user to "select an axis" when they
               already did and the field just disappeared.
             -->
-            <div
-              class="visual-content-placeholder visual-content-placeholder--missing-field"
-              *ngIf="
-                visual.chartType &&
-                getMissingFields(visual).length > 0 &&
-                !visual.loading &&
-                !visual.error
-              "
-            >
-              <div class="placeholder-icon-wrap">
-                <i class="pi pi-exclamation-triangle" aria-hidden="true"></i>
-              </div>
-              <p>{{ 'ANALYSES.VISUAL_FIELD_MISSING' | translate }}</p>
-              <small>
-                {{
-                  'ANALYSES.VISUAL_FIELD_MISSING_DESC'
-                    | translate: { fields: getMissingFields(visual).join(', ') }
-                }}
-              </small>
-              <button
-                type="button"
-                class="visual-remap-btn"
-                (click)="openVisualConfigForRemap(visual.id, $event)"
+              <div
+                class="visual-content-placeholder visual-content-placeholder--missing-field"
+                *ngIf="
+                  visual.chartType &&
+                  getMissingFields(visual).length > 0 &&
+                  !visual.loading &&
+                  !visual.error
+                "
               >
-                <i class="pi pi-pencil"></i>
-                {{ 'ANALYSES.VISUAL_FIX_FIELD' | translate }}
-              </button>
-            </div>
+                <div class="placeholder-icon-wrap">
+                  <i class="pi pi-exclamation-triangle" aria-hidden="true"></i>
+                </div>
+                <p>{{ 'ANALYSES.VISUAL_FIELD_MISSING' | translate }}</p>
+                <small>
+                  {{
+                    'ANALYSES.VISUAL_FIELD_MISSING_DESC'
+                      | translate
+                        : { fields: getMissingFields(visual).join(', ') }
+                  }}
+                </small>
+                <button
+                  type="button"
+                  class="visual-remap-btn"
+                  (click)="openVisualConfigForRemap(visual.id, $event)"
+                >
+                  <i class="pi pi-pencil"></i>
+                  {{ 'ANALYSES.VISUAL_FIX_FIELD' | translate }}
+                </button>
+              </div>
 
-            <!-- Placeholder when chart type selected but fields not mapped -->
-            <!-- Not shown for lines3d/polygons3d since they display dummy data immediately -->
-            <!-- Not shown for tables — they have no axis mapping and render
+              <!-- Placeholder when chart type selected but fields not mapped -->
+              <!-- Not shown for lines3d/polygons3d since they display dummy data immediately -->
+              <!-- Not shown for tables — they have no axis mapping and render
                  their own empty-state when no rows are present. -->
-            <div
-              class="visual-content-placeholder"
-              *ngIf="
-                visual.chartType &&
-                !hasRequiredChartFields(visual) &&
-                getMissingFields(visual).length === 0 &&
-                !isLines3dChartType(visual.chartType) &&
-                !isPolygons3dChartType(visual.chartType) &&
-                !isTableChartType(visual.chartType) &&
-                !visual.loading &&
-                !visual.error
-              "
-            >
-              <div class="placeholder-icon-wrap">
-                <i class="ci ci-database" aria-hidden="true"></i>
-              </div>
-              <p>{{ 'ANALYSES.MAP_DATA_FIELDS' | translate }}</p>
-              <small>{{
-                'ANALYSES.ASSIGN_AXES_HINT'
-                  | translate
-                    : {
-                        axes: isHeatMapChartType(visual.chartType)
-                          ? ('ANALYSES.ROW_COLUMN_VALUE' | translate)
-                          : isSankeyChartType(visual.chartType) ||
-                              isGraphChartType(visual.chartType) ||
-                              isFlowLinesChartType(visual.chartType)
-                            ? ('ANALYSES.SOURCE_TARGET_VALUE' | translate)
-                            : isWorldMapChartType(visual.chartType)
-                              ? ('ANALYSES.REGION_AND_VALUE' | translate)
-                              : isLines3dChartType(visual.chartType)
-                                ? ('ANALYSES.LONGITUDE_AND_LATITUDE'
-                                  | translate)
-                                : isPolygons3dChartType(visual.chartType)
-                                  ? ('ANALYSES.NAME_LONGITUDE_LATITUDE'
+              <div
+                class="visual-content-placeholder"
+                *ngIf="
+                  visual.chartType &&
+                  !hasRequiredChartFields(visual) &&
+                  getMissingFields(visual).length === 0 &&
+                  !isLines3dChartType(visual.chartType) &&
+                  !isPolygons3dChartType(visual.chartType) &&
+                  !isTableChartType(visual.chartType) &&
+                  !visual.loading &&
+                  !visual.error
+                "
+              >
+                <div class="placeholder-icon-wrap">
+                  <i class="ci ci-database" aria-hidden="true"></i>
+                </div>
+                <p>{{ 'ANALYSES.MAP_DATA_FIELDS' | translate }}</p>
+                <small>{{
+                  'ANALYSES.ASSIGN_AXES_HINT'
+                    | translate
+                      : {
+                          axes: isHeatMapChartType(visual.chartType)
+                            ? ('ANALYSES.ROW_COLUMN_VALUE' | translate)
+                            : isSankeyChartType(visual.chartType) ||
+                                isGraphChartType(visual.chartType) ||
+                                isFlowLinesChartType(visual.chartType)
+                              ? ('ANALYSES.SOURCE_TARGET_VALUE' | translate)
+                              : isWorldMapChartType(visual.chartType)
+                                ? ('ANALYSES.REGION_AND_VALUE' | translate)
+                                : isLines3dChartType(visual.chartType)
+                                  ? ('ANALYSES.LONGITUDE_AND_LATITUDE'
                                     | translate)
-                                  : ('ANALYSES.X_AXIS_AND_Y_AXIS' | translate),
-                      }
-              }}</small>
-            </div>
-
-            <!-- Chart Components (only show when loaded, not loading/error, and has chart type) -->
-            <ng-container
-              *ngIf="!visual.loading && !visual.error && visual.chartType"
-            >
-              <div class="chart-click-guard" (click)="$event.stopPropagation()">
-                <app-chart-renderer
-                  [visual]="visual"
-                  [chartWidth]="visual.width"
-                  [chartHeight]="visual.height - 35"
-                  [configVersion]="chartConfigVersion"
-                  [dataVersion]="chartDataVersion"
-                  (chartSelect)="onVisualChartSelect(visual, $event)"
-                ></app-chart-renderer>
+                                  : isPolygons3dChartType(visual.chartType)
+                                    ? ('ANALYSES.NAME_LONGITUDE_LATITUDE'
+                                      | translate)
+                                    : ('ANALYSES.X_AXIS_AND_Y_AXIS'
+                                      | translate),
+                        }
+                }}</small>
               </div>
-            </ng-container>
-          </div>
-          <!--
+
+              <!-- Chart Components (only show when loaded, not loading/error, and has chart type) -->
+              <ng-container
+                *ngIf="!visual.loading && !visual.error && visual.chartType"
+              >
+                <div
+                  class="chart-click-guard"
+                  (click)="$event.stopPropagation()"
+                >
+                  <app-chart-renderer
+                    [visual]="visual"
+                    [chartWidth]="visual.width"
+                    [chartHeight]="visual.height - 35"
+                    [configVersion]="chartConfigVersion"
+                    [dataVersion]="chartDataVersion"
+                    (chartSelect)="onVisualChartSelect(visual, $event)"
+                  ></app-chart-renderer>
+                </div>
+              </ng-container>
+            </div>
+            <!--
             Hover insights chip — bottom-left, hover-revealed.
             Shows row count + chart-type for at-a-glance context.
             Hidden when the visual is in a missing-field state
@@ -1311,42 +1382,42 @@
             phantom rows that aren't being rendered — surfacing
             "N rows" would mislead the user about what's on screen.
           -->
-          <div
-            class="visual-insights"
-            *ngIf="
-              visual.chartType &&
-              (visual.chartData?.length || hasRequiredChartFields(visual)) &&
-              getMissingFields(visual).length === 0
-            "
-          >
-            <span
-              class="visual-insights__chunk"
-              *ngIf="visual.chartData?.length"
+            <div
+              class="visual-insights"
+              *ngIf="
+                visual.chartType &&
+                (visual.chartData?.length || hasRequiredChartFields(visual)) &&
+                getMissingFields(visual).length === 0
+              "
             >
-              <i class="pi pi-database"></i>
-              {{ visual.chartData.length }} rows
-            </span>
-            <span class="visual-insights__chunk" *ngIf="visual.chartType">
-              <i class="pi pi-chart-bar"></i>
-              {{ visual.chartType }}
-            </span>
-          </div>
+              <span
+                class="visual-insights__chunk"
+                *ngIf="visual.chartData?.length"
+              >
+                <i class="pi pi-database"></i>
+                {{ visual.chartData.length }} rows
+              </span>
+              <span class="visual-insights__chunk" *ngIf="visual.chartType">
+                <i class="pi pi-chart-bar"></i>
+                {{ visual.chartType }}
+              </span>
+            </div>
 
-          <!-- Resize Handles -->
-          <div
-            class="resize-handle-right"
-            (mousedown)="startResize($event, visual, 'right')"
-          ></div>
-          <div
-            class="resize-handle-bottom"
-            (mousedown)="startResize($event, visual, 'bottom')"
-          ></div>
-          <div
-            class="resize-handle-corner-br"
-            (mousedown)="startResize($event, visual, 'bottom-right')"
-          ></div>
-        </div>
-        <!-- /visual-box (cdkDrag) -->
+            <!-- Resize Handles -->
+            <div
+              class="resize-handle-right"
+              (mousedown)="startResize($event, visual, 'right')"
+            ></div>
+            <div
+              class="resize-handle-bottom"
+              (mousedown)="startResize($event, visual, 'bottom')"
+            ></div>
+            <div
+              class="resize-handle-corner-br"
+              (mousedown)="startResize($event, visual, 'bottom-right')"
+            ></div>
+          </div>
+          <!-- /visual-box (cdkDrag) -->
         </div>
         <!-- /visual-cell (cdkDropList) -->
       </div>
@@ -1392,7 +1463,9 @@
            from picking a chart → dropping fields → the visual rendering. -->
       <div
         class="empty-state"
-        *ngIf="visualsInActiveTab.length === 0 && widgetsInActiveTab.length === 0"
+        *ngIf="
+          visualsInActiveTab.length === 0 && widgetsInActiveTab.length === 0
+        "
       >
         <i class="ci ci-visualization empty-state__icon" aria-hidden="true"></i>
         <h3 class="empty-state__title">
@@ -1404,15 +1477,21 @@
         <ol class="empty-state__steps">
           <li class="empty-state__step">
             <span class="empty-state__step-num">1</span>
-            <span class="empty-state__step-text">{{ 'ANALYSES.TIP_CLICK_CHART' | translate }}</span>
+            <span class="empty-state__step-text">{{
+              'ANALYSES.TIP_CLICK_CHART' | translate
+            }}</span>
           </li>
           <li class="empty-state__step">
             <span class="empty-state__step-num">2</span>
-            <span class="empty-state__step-text">{{ 'ANALYSES.TIP_DRAG_RESIZE' | translate }}</span>
+            <span class="empty-state__step-text">{{
+              'ANALYSES.TIP_DRAG_RESIZE' | translate
+            }}</span>
           </li>
           <li class="empty-state__step">
             <span class="empty-state__step-num">3</span>
-            <span class="empty-state__step-text">{{ 'ANALYSES.TIP_RIGHT_CLICK' | translate }}</span>
+            <span class="empty-state__step-text">{{
+              'ANALYSES.TIP_RIGHT_CLICK' | translate
+            }}</span>
           </li>
         </ol>
         <button
@@ -1476,7 +1555,9 @@
   <div class="present-topbar">
     <div class="present-topbar__title">
       <i class="pi pi-play-circle"></i>
-      <span>{{ analysisDetails?.name || ('ANALYSES.EDIT_ANALYSIS' | translate) }}</span>
+      <span>{{
+        analysisDetails?.name || ('ANALYSES.EDIT_ANALYSIS' | translate)
+      }}</span>
     </div>
     <div class="present-tabs" *ngIf="tabs.length > 0">
       <button
@@ -1552,14 +1633,19 @@
           {{ $any(w.config).markdown }}
         </div>
         <div class="present-widget__kpi" *ngIf="w.widgetType === 'kpi'">
-          <app-kpi-card [config]="kpiConfig(w)" [data]="rawGraphData"></app-kpi-card>
+          <app-kpi-card
+            [config]="kpiConfig(w)"
+            [data]="rawGraphData"
+          ></app-kpi-card>
         </div>
       </div>
     </div>
 
     <div
       class="present-empty"
-      *ngIf="visualsInPresentTab.length === 0 && widgetsInPresentTab.length === 0"
+      *ngIf="
+        visualsInPresentTab.length === 0 && widgetsInPresentTab.length === 0
+      "
     >
       <i class="ci ci-visualization" aria-hidden="true"></i>
       <p>{{ 'ANALYSES.NO_VISUALS_YET' | translate }}</p>
@@ -1755,7 +1841,6 @@
   </div>
 </div>
 
-
 <!-- Delete-tab confirmation (Track A4). Deleting a tab reassigns its
      visuals to the first remaining tab (BE-side); the justification is
      optional and flows to the audit log. Reuses the .confirmation-popup
@@ -1771,7 +1856,8 @@
     <div class="standard-delete-section">
       <p class="delete-intro" *ngIf="tabToDelete">
         {{
-          'ANALYSES.TABS.CONFIRM_DELETE_MSG' | translate: { name: tabToDelete.name }
+          'ANALYSES.TABS.CONFIRM_DELETE_MSG'
+            | translate: { name: tabToDelete.name }
         }}
       </p>
       <ul class="delete-info-list">
@@ -1798,7 +1884,9 @@
           [maxLength]="500"
           icon="pi-info-circle"
         ></app-custom-input>
-        <small class="char-count">{{ tabDeleteJustification.length }}/500</small>
+        <small class="char-count"
+          >{{ tabDeleteJustification.length }}/500</small
+        >
       </div>
     </div>
     <div class="popup-actions">

@@ -14,12 +14,20 @@
           class="p-button-outlined modern-button"
         ></button>
         <button
-          *ngIf="datasourceId && !unsupported() && !capabilityLoading() && canManage && activeTab === 'compose'"
+          *ngIf="
+            datasourceId &&
+            !unsupported() &&
+            !capabilityLoading() &&
+            canManage &&
+            activeTab === 'compose'
+          "
           pButton
           [label]="'DB_ACCESS.APPLY_CHANGES' | translate"
           [icon]="saving() ? 'pi pi-spin pi-spinner' : 'pi pi-check'"
           [disabled]="!allRulesValid || saving()"
-          [pTooltip]="!allRulesValid ? ('DB_ACCESS.APPLY_DISABLED_HINT' | translate) : ''"
+          [pTooltip]="
+            !allRulesValid ? ('DB_ACCESS.APPLY_DISABLED_HINT' | translate) : ''
+          "
           tooltipPosition="bottom"
           (click)="applyChanges()"
           class="p-button-raised p-button-primary modern-button"
@@ -29,13 +37,15 @@
           tone="success"
           icon="pi pi-check-circle"
           *ngIf="datasourceId && capability() && canManage && !unsupported()"
-        >{{ 'DB_ACCESS.CAP_FULL_BADGE' | translate }}</app-chip>
+          >{{ 'DB_ACCESS.CAP_FULL_BADGE' | translate }}</app-chip
+        >
         <app-chip
           variant="badge"
           tone="neutral"
           icon="pi pi-lock"
           *ngIf="datasourceId && capability() && !canManage && !unsupported()"
-        >{{ 'DB_ACCESS.CAP_READONLY_BADGE' | translate }}</app-chip>
+          >{{ 'DB_ACCESS.CAP_READONLY_BADGE' | translate }}</app-chip
+        >
       </div>
     </div>
 
@@ -43,7 +53,9 @@
     <div class="content-card">
       <div class="card-toolbar">
         <div class="toolbar-left">
-          <app-datasource-picker (changed)="onDatasourceChange($event)"></app-datasource-picker>
+          <app-datasource-picker
+            (changed)="onDatasourceChange($event)"
+          ></app-datasource-picker>
         </div>
       </div>
 
@@ -64,7 +76,10 @@
            privileges inspector (read-only). Each gets the full page width.
            Self-owned segmented control — NO p-tabView. The Apply action
            lives in the page header (like Save on Add User/Role). -->
-      <div class="composer-page" *ngIf="datasourceId && !unsupported() && !capabilityLoading()">
+      <div
+        class="composer-page"
+        *ngIf="datasourceId && !unsupported() && !capabilityLoading()"
+      >
         <div class="priv-tabs" role="tablist">
           <button
             type="button"
@@ -73,7 +88,8 @@
             [attr.aria-selected]="activeTab === 'compose'"
             (click)="activeTab = 'compose'"
           >
-            <i class="pi pi-pencil"></i> {{ 'DB_ACCESS.TAB_COMPOSE' | translate }}
+            <i class="pi pi-pencil"></i>
+            {{ 'DB_ACCESS.TAB_COMPOSE' | translate }}
           </button>
           <button
             type="button"
@@ -82,7 +98,8 @@
             [attr.aria-selected]="activeTab === 'effective'"
             (click)="activeTab = 'effective'"
           >
-            <i class="pi pi-shield"></i> {{ 'DB_ACCESS.TAB_EFFECTIVE_PRIVS' | translate }}
+            <i class="pi pi-shield"></i>
+            {{ 'DB_ACCESS.TAB_EFFECTIVE_PRIVS' | translate }}
           </button>
         </div>
 
@@ -93,10 +110,17 @@
             <div class="panel-head">
               <div>
                 <h3>{{ 'DB_ACCESS.ACCESS_RULES' | translate }}</h3>
-                <p class="panel-hint">{{ 'DB_ACCESS.ACCESS_RULES_HINT' | translate }}</p>
+                <p class="panel-hint">
+                  {{ 'DB_ACCESS.ACCESS_RULES_HINT' | translate }}
+                </p>
               </div>
-              <button *ngIf="canManage" class="add-rule-btn" (click)="addRule()">
-                <i class="pi pi-plus"></i> {{ 'DB_ACCESS.ADD_RULE' | translate }}
+              <button
+                *ngIf="canManage"
+                class="add-rule-btn"
+                (click)="addRule()"
+              >
+                <i class="pi pi-plus"></i>
+                {{ 'DB_ACCESS.ADD_RULE' | translate }}
               </button>
             </div>
 
@@ -116,7 +140,8 @@
                       tone="warning"
                       icon="pi pi-exclamation-circle"
                       *ngIf="!ruleValid(rule)"
-                    >{{ 'DB_ACCESS.RULE_INCOMPLETE' | translate }}</app-chip>
+                      >{{ 'DB_ACCESS.RULE_INCOMPLETE' | translate }}</app-chip
+                    >
                   </span>
                   <button
                     class="icon-btn delete-btn"
@@ -135,8 +160,14 @@
                       [(ngModel)]="rule.action"
                       [label]="'DB_ACCESS.ACTION' | translate"
                       [options]="[
-                        { label: ('DB_ACCESS.GRANT' | translate), value: 'grant' },
-                        { label: ('DB_ACCESS.REVOKE' | translate), value: 'revoke' }
+                        {
+                          label: ('DB_ACCESS.GRANT' | translate),
+                          value: 'grant',
+                        },
+                        {
+                          label: ('DB_ACCESS.REVOKE' | translate),
+                          value: 'revoke',
+                        },
                       ]"
                       optionLabel="label"
                       optionValue="value"
@@ -195,25 +226,37 @@
                 </div>
 
                 <!-- Objects (table / column / sequence / function) -->
-                <div class="rule-objects" *ngIf="usesObjects(rule) && rule.schema">
+                <div
+                  class="rule-objects"
+                  *ngIf="usesObjects(rule) && rule.schema"
+                >
                   <app-custom-toggle
                     *ngIf="rule.level !== 'column'"
                     [ngModel]="rule.allTables"
-                    (ngModelChange)="rule.allTables = $event; onAllTablesChange(rule)"
+                    (ngModelChange)="
+                      rule.allTables = $event; onAllTablesChange(rule)
+                    "
                     [label]="allObjectsLabelKey(rule) | translate"
                     [trueLabel]="'COMMON.YES' | translate"
                     [falseLabel]="'COMMON.NO' | translate"
                     [disabled]="!canManage"
                   ></app-custom-toggle>
 
-                  <div class="rule-field" *ngIf="rule.level === 'column' || !rule.allTables">
+                  <div
+                    class="rule-field"
+                    *ngIf="rule.level === 'column' || !rule.allTables"
+                  >
                     <label class="field-label">
                       {{ objectsLabelKey(rule) | translate }}
-                      <span class="field-hint" *ngIf="ruleHints[rule.id]">· {{ ruleHints[rule.id] }}</span>
+                      <span class="field-hint" *ngIf="ruleHints[rule.id]"
+                        >· {{ ruleHints[rule.id] }}</span
+                      >
                     </label>
                     <app-custom-multiselect
                       [ngModel]="rule.tables"
-                      (ngModelChange)="rule.tables = $event; onTablesChange(rule)"
+                      (ngModelChange)="
+                        rule.tables = $event; onTablesChange(rule)
+                      "
                       [options]="objectsFor(rule)"
                       optionLabel="label"
                       optionValue="value"
@@ -225,11 +268,22 @@
                   </div>
 
                   <!-- Column picker (column level, first table) -->
-                  <div class="rule-field" *ngIf="rule.level === 'column' && rule.tables.length">
+                  <div
+                    class="rule-field"
+                    *ngIf="rule.level === 'column' && rule.tables.length"
+                  >
                     <label class="field-label">
-                      {{ 'DB_ACCESS.COLUMNS_OF' | translate: { table: rule.tables[0] } }}
-                      <button type="button" class="mini-link" (click)="loadColumnsFor(rule, rule.tables[0])">
-                        <i class="pi pi-download"></i> {{ 'DB_ACCESS.LOAD_COLUMNS' | translate }}
+                      {{
+                        'DB_ACCESS.COLUMNS_OF'
+                          | translate: { table: rule.tables[0] }
+                      }}
+                      <button
+                        type="button"
+                        class="mini-link"
+                        (click)="loadColumnsFor(rule, rule.tables[0])"
+                      >
+                        <i class="pi pi-download"></i>
+                        {{ 'DB_ACCESS.LOAD_COLUMNS' | translate }}
                       </button>
                     </label>
                     <app-custom-multiselect
@@ -247,7 +301,9 @@
 
                 <!-- Privileges -->
                 <div class="rule-field">
-                  <label class="field-label">{{ 'DB_ACCESS.PRIVILEGES' | translate }}</label>
+                  <label class="field-label">{{
+                    'DB_ACCESS.PRIVILEGES' | translate
+                  }}</label>
                   <div class="priv-checks">
                     <span
                       *ngFor="let p of privsFor(rule.level)"
@@ -282,8 +338,13 @@
           <div class="composer-rail" *ngIf="activeTab === 'effective'">
             <!-- Effective privileges filter (merged from old Effective tab) -->
             <div class="rail-card">
-              <h4><i class="pi pi-shield"></i>{{ 'DB_ACCESS.ROLE_FILTER' | translate }}</h4>
-              <p class="rail-hint">{{ 'DB_ACCESS.ROLE_FILTER_HINT' | translate }}</p>
+              <h4>
+                <i class="pi pi-shield"></i
+                >{{ 'DB_ACCESS.ROLE_FILTER' | translate }}
+              </h4>
+              <p class="rail-hint">
+                {{ 'DB_ACCESS.ROLE_FILTER_HINT' | translate }}
+              </p>
               <app-custom-dropdown
                 [(ngModel)]="filterRole"
                 [options]="roleOptions"
@@ -299,7 +360,8 @@
               ></app-custom-dropdown>
 
               <div class="rail-empty" *ngIf="effectiveLoading">
-                <i class="pi pi-spin pi-spinner"></i> {{ 'COMMON.LOADING' | translate }}
+                <i class="pi pi-spin pi-spinner"></i>
+                {{ 'COMMON.LOADING' | translate }}
               </div>
 
               <!-- Grouped, filterable, virtualised effective privileges -->
@@ -308,7 +370,11 @@
                 <div class="eff-summary">
                   {{
                     'DB_ACCESS.EFFECTIVE_SUMMARY'
-                      | translate: { objects: effectiveObjectCount, privileges: effectivePrivCount }
+                      | translate
+                        : {
+                            objects: effectiveObjectCount,
+                            privileges: effectivePrivCount,
+                          }
                   }}
                 </div>
                 <div class="eff-filter">
@@ -330,7 +396,10 @@
                 >
                   <div
                     class="eff-group"
-                    *cdkVirtualFor="let g of filteredGroups; trackBy: trackByGroupKey"
+                    *cdkVirtualFor="
+                      let g of filteredGroups;
+                      trackBy: trackByGroupKey
+                    "
                   >
                     <div class="eff-group-head">
                       <span class="eff-obj" [title]="g.key">{{ g.key }}</span>
@@ -340,13 +409,30 @@
                           size="sm"
                           *ngFor="let s of g.sources"
                           [tone]="s === 'Direct' ? 'primary' : 'neutral'"
-                          [title]="s === 'Direct' ? '' : ('DB_ACCESS.VIA_ROLE' | translate: { role: s })"
-                        >{{ s === 'Direct' ? ('DB_ACCESS.DIRECT' | translate) : s }}</app-chip>
+                          [title]="
+                            s === 'Direct'
+                              ? ''
+                              : ('DB_ACCESS.VIA_ROLE' | translate: { role: s })
+                          "
+                          >{{
+                            s === 'Direct'
+                              ? ('DB_ACCESS.DIRECT' | translate)
+                              : s
+                          }}</app-chip
+                        >
                       </span>
                     </div>
                     <div class="eff-privs" [title]="g.privileges.join(', ')">
-                      <app-chip variant="tag" tone="primary" size="sm" *ngFor="let p of g.shown">{{ p }}</app-chip>
-                      <app-chip variant="tag" size="sm" *ngIf="g.extra">+{{ g.extra }}</app-chip>
+                      <app-chip
+                        variant="tag"
+                        tone="primary"
+                        size="sm"
+                        *ngFor="let p of g.shown"
+                        >{{ p }}</app-chip
+                      >
+                      <app-chip variant="tag" size="sm" *ngIf="g.extra"
+                        >+{{ g.extra }}</app-chip
+                      >
                     </div>
                   </div>
                 </cdk-virtual-scroll-viewport>
@@ -357,7 +443,12 @@
                 </div>
               </ng-container>
 
-              <div class="rail-empty" *ngIf="!effectiveLoading && filterRole && !effectiveGroups.length">
+              <div
+                class="rail-empty"
+                *ngIf="
+                  !effectiveLoading && filterRole && !effectiveGroups.length
+                "
+              >
                 {{ 'DB_ACCESS.NO_EFFECTIVE' | translate }}
               </div>
               <div class="rail-empty" *ngIf="!effectiveLoading && !filterRole">
@@ -367,16 +458,28 @@
 
             <!-- Default privileges -->
             <div class="rail-card">
-              <h4><i class="pi pi-sliders-h"></i>{{ 'DB_ACCESS.DEFAULT_PRIVILEGES' | translate }}</h4>
-              <ul class="defaults-list" *ngIf="defaultPrivileges.length; else noDefaults">
+              <h4>
+                <i class="pi pi-sliders-h"></i
+                >{{ 'DB_ACCESS.DEFAULT_PRIVILEGES' | translate }}
+              </h4>
+              <ul
+                class="defaults-list"
+                *ngIf="defaultPrivileges.length; else noDefaults"
+              >
                 <li *ngFor="let d of defaultPrivileges">
-                  <span class="def-scope">{{ d.schema || d.objectType || '—' }}</span>
-                  <span class="def-privs">{{ (d.privileges || []).join(', ') }}</span>
+                  <span class="def-scope">{{
+                    d.schema || d.objectType || '—'
+                  }}</span>
+                  <span class="def-privs">{{
+                    (d.privileges || []).join(', ')
+                  }}</span>
                   <span class="def-grantee">{{ d.grantee }}</span>
                 </li>
               </ul>
               <ng-template #noDefaults>
-                <p class="rail-empty">{{ 'DB_ACCESS.NO_DEFAULTS' | translate }}</p>
+                <p class="rail-empty">
+                  {{ 'DB_ACCESS.NO_DEFAULTS' | translate }}
+                </p>
               </ng-template>
             </div>
           </div>

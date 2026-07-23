@@ -23,8 +23,13 @@
         <i class="pi pi-link"></i>
         <p>{{ 'QUERY_RUNNER.NO_CONNECTIONS_HINT' | translate }}</p>
         <div class="nq-empty-actions">
-          <button type="button" class="btn-confirm" (click)="goCreateConnection()">
-            <i class="pi pi-plus"></i>{{ 'QUERY_RUNNER.NEW_CONNECTION' | translate }}
+          <button
+            type="button"
+            class="btn-confirm"
+            (click)="goCreateConnection()"
+          >
+            <i class="pi pi-plus"></i
+            >{{ 'QUERY_RUNNER.NEW_CONNECTION' | translate }}
           </button>
           <button type="button" class="nq-link" (click)="goManageConnections()">
             {{ 'QUERY_RUNNER.MANAGE_CONNECTIONS' | translate }}
@@ -34,7 +39,9 @@
 
       <!-- NORMAL STATE — at least one connection exists: datasource → connection. -->
       <ng-container *ngIf="!connectionsLoading && !hasNoConnections">
-        <p class="nq-subtitle">{{ 'QUERY_RUNNER.NEW_QUERY_SUBTITLE' | translate }}</p>
+        <p class="nq-subtitle">
+          {{ 'QUERY_RUNNER.NEW_QUERY_SUBTITLE' | translate }}
+        </p>
 
         <!-- Datasource -->
         <app-custom-dropdown
@@ -70,9 +77,21 @@
             appendTo="body"
             icon="pi-link"
             [disabled]="!selectedDatasourceId"
-            [placeholder]="(selectedDatasourceId ? 'QUERY_RUNNER.SELECT_CONNECTION' : 'QUERY_RUNNER.SELECT_DATASOURCE_FIRST') | translate"
+            [placeholder]="
+              (selectedDatasourceId
+                ? 'QUERY_RUNNER.SELECT_CONNECTION'
+                : 'QUERY_RUNNER.SELECT_DATASOURCE_FIRST'
+              ) | translate
+            "
           ></app-custom-dropdown>
-          <small class="form-hint warn" *ngIf="selectedDatasourceId && connectionOptions.length === 0 && !allDisabledForDs">
+          <small
+            class="form-hint warn"
+            *ngIf="
+              selectedDatasourceId &&
+              connectionOptions.length === 0 &&
+              !allDisabledForDs
+            "
+          >
             {{ 'QUERY_RUNNER.NO_CONNECTIONS_FOR_DS' | translate }}
           </small>
           <small class="form-hint warn" *ngIf="allDisabledForDs">
@@ -94,8 +113,14 @@
         (click)="open()"
         [disabled]="!canOpen"
       >
-        <i class="pi" [ngClass]="verifying ? 'pi-spin pi-spinner' : 'pi-external-link'"></i>
-        {{ (verifying ? 'QUERY_RUNNER.VERIFYING' : 'QUERY_RUNNER.OPEN_EXECUTOR') | translate }}
+        <i
+          class="pi"
+          [ngClass]="verifying ? 'pi-spin pi-spinner' : 'pi-external-link'"
+        ></i>
+        {{
+          (verifying ? 'QUERY_RUNNER.VERIFYING' : 'QUERY_RUNNER.OPEN_EXECUTOR')
+            | translate
+        }}
       </button>
     </div>
   </div>
