@@ -253,3 +253,36 @@ The most complex FE module. Standalone executor tab at
 Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 Claude-Session: https://claude.ai/code/session_<id>
 ```
+
+---
+
+# Session Context Protocol (docs/context/)
+
+> **Read this before every task, and update it after. Never skip the post-change update.**
+
+@docs/context/INDEX.md
+
+## Prime directive
+`docs/context/` is the single source of truth for what each module is, its goals, and its
+status — not chat history. On every task:
+1. **Before working** → read `INDEX.md` + the relevant module file(s) (+ `ARCHITECTURE.md` if the
+   task is cross-cutting: auth/token storage/layout/build/conventions).
+2. **After working** → update the docs (see below).
+Updating the docs is part of the definition of "done": a code change without a matching doc update
+is an incomplete task. **If docs and code disagree, the CODE is truth** — fix the docs and log the
+correction in the module's Progress log.
+
+## Session-start protocol
+Read `INDEX.md` → identify affected module(s) → read those module files in full → read
+`ARCHITECTURE.md` if the change touches auth/token storage/layout/build/conventions. Read only
+what's relevant, to stay token-efficient.
+
+## Session-end protocol (do all before ending the turn)
+1. Prepend a dated Progress entry to each affected module file (newest first).
+2. Update that module's Status + Last updated line.
+3. Update the module's row (status + date) in `INDEX.md`.
+4. Add a dated `SESSION_LOG.md` entry; update `ARCHITECTURE.md` if a cross-cutting decision changed.
+When a NEW module appears: create its file from the module template and add a row to `INDEX.md`.
+
+Status legend: 🟢 stable · 🟡 in progress · 🔴 blocked · ⚪ planned. Dates `YYYY-MM-DD`
+(`date +%Y-%m-%d`, never guess). Progress logs are append-only, newest entry at the top.
