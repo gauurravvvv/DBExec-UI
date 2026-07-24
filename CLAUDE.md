@@ -245,14 +245,16 @@ The most complex FE module. Standalone executor tab at
 - i18n: all 10 locales, no raw strings.
 - Verify: `tsc` → `ngc --noEmit` → `ng build --configuration production`.
 - Git: work on `version_261`; **the user pushes, never the agent**; never
-  commit `environment*.ts` / `.env`. Commit trailer required (see below).
+  commit `environment*.ts` / `.env`. Follow the commit-message convention below.
 
-### Commit trailer (required)
+### Commit message convention
 
-```
-Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
-Claude-Session: https://claude.ai/code/session_<id>
-```
+- Write like a human developer: plain, factual, present-tense summary of what
+  changed and why. No AI/model attribution — **never** mention Claude, an AI
+  assistant, or any model name, and **no** `Co-Authored-By` / `Claude-Session`
+  or any generated-by trailer.
+- Subject: `type(scope): short summary` (e.g. `feat(users): bulk CSV add`),
+  imperative, ~72 chars. Optional body: bullet points on the notable changes.
 
 ---
 
