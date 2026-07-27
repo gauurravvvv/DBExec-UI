@@ -15,6 +15,14 @@
 - Modules updated: all (initialized).
 - Open for next session: Module files carry accurate Context/Goals scaffolds; enrich individual files with deeper specifics as work touches them. Follow the session-end protocol on every future change.
 
+## 2026-07-27 — Formula suggestions made live
+The Monaco completion provider snapshotted its function and field lists when the
+dialog opened, so a just-created field was not suggestable until reopen. Both are
+now resolved per keystroke, and fields come from the live store unioned with the
+@Input. Fixed a FormulaCatalogService.load() race that could set a palette to
+empty when two dialogs opened together.
+Not done: browser verification — the AIOrg credentials were rejected.
+
 ## 2026-07-27 — Pushdown removed from the formula UI
 Derived fields are computed on the API, always. The execution-tier badge is
 replaced by a calculation-kind badge (Row / Aggregate / Window) plus a note
