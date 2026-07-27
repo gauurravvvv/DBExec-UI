@@ -2519,6 +2519,12 @@ export class EditDatasetComponent
             }))
             .filter((c: SimpleColumn) => !!c.name);
 
+          // Seed the live field store and the formula dialog's completion rows.
+          // From here, saving a field patches the store instead of reloading, so
+          // the sidebar and the editor's {field} suggestions stay current.
+          this.datasetFieldRows = fields;
+          this.fieldsStore.setAll(fields, dataset.id ?? this.datasetId ?? null);
+
           // Set database from API response. Spread the full
           // datasource payload (rather than just {id, name}) so the
           // `config.dbType` is available to the

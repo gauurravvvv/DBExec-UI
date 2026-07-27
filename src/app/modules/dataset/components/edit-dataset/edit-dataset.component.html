@@ -409,6 +409,20 @@
               </div>
             </div>
           </div>
+
+          <!--
+            Formula fields. Lives beside the schema tree so a field can be
+            authored while the SQL is being written; the list is store-backed, so
+            saving one updates it here and in the editor's {field} completions
+            with no reload.
+          -->
+          <app-field-sidebar
+            class="sidebar-field-panel"
+            [canEdit]="!!datasetId"
+            (createRequested)="openFormulaFieldDialog()"
+            (editRequested)="openFormulaFieldDialog($event)"
+          ></app-field-sidebar>
+
         </div>
       </div>
     </div>
