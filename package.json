@@ -3,6 +3,7 @@
   "version": "26.1.0",
   "scripts": {
     "ng": "ng",
+    "test:e2e:formula": "playwright test -c e2e/playwright.config.ts formula-fields",
     "start": "ng serve",
     "build": "ng build",
     "local": "ng serve --configuration local",

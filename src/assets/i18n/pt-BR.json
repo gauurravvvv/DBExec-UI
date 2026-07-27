@@ -1040,7 +1040,10 @@
     "STAGE_ROW": "Cálculo por linha",
     "STAGE_AGGREGATE": "Agregado",
     "STAGE_WINDOW": "Cálculo de janela",
-    "FORMULA_COMPUTED_ON_SERVER": "Calculado no servidor após a consulta. Para filtrar ou agregar um valor calculado no banco de dados, coloque a expressão no SQL do conjunto de dados."
+    "FORMULA_COMPUTED_ON_SERVER": "Calculado no servidor após a consulta. Para filtrar ou agregar um valor calculado no banco de dados, coloque a expressão no SQL do conjunto de dados.",
+    "STAGE_ROW_SHORT": "Linha",
+    "STAGE_AGGREGATE_SHORT": "Agregado",
+    "STAGE_WINDOW_SHORT": "Janela"
   },
   "ANALYSES": {
     "CREATE_MISSING_DATASET": "Não é possível criar a análise: o conjunto de dados de origem está ausente. Tente novamente a partir de um dataset.",

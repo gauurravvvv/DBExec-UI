@@ -1044,7 +1044,10 @@
     "STAGE_ROW": "Row calculation",
     "STAGE_AGGREGATE": "Aggregate",
     "STAGE_WINDOW": "Window calculation",
-    "FORMULA_COMPUTED_ON_SERVER": "Computed on the server after the query. To filter or aggregate on a computed value at the database, put the expression in your dataset SQL."
+    "FORMULA_COMPUTED_ON_SERVER": "Computed on the server after the query. To filter or aggregate on a computed value at the database, put the expression in your dataset SQL.",
+    "STAGE_ROW_SHORT": "Row",
+    "STAGE_AGGREGATE_SHORT": "Aggregate",
+    "STAGE_WINDOW_SHORT": "Window"
   },
   "ANALYSES": {
     "CREATE_MISSING_DATASET": "Cannot create analysis: the source dataset is missing. Please retry from a dataset.",

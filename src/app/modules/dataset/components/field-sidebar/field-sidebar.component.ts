@@ -67,6 +67,23 @@ export class FieldSidebarComponent {
     return 'pi pi-list';
   }
 
+  /**
+   * Short label for the badge. The row is narrow, so the full wording lives in
+   * the tooltip — but an icon alone is not readable, so the abbreviation is
+   * rendered as text.
+   */
+  stageShortKey(field: DatasetFieldVm): string | null {
+    if (!field.isCustom || !field.stage) return null;
+    switch (field.stage) {
+      case 'AGG':
+        return 'DATASET.STAGE_AGGREGATE_SHORT';
+      case 'WINDOW':
+        return 'DATASET.STAGE_WINDOW_SHORT';
+      default:
+        return 'DATASET.STAGE_ROW_SHORT';
+    }
+  }
+
   trackById(_index: number, field: DatasetFieldVm): string {
     return field.id || field.name;
   }

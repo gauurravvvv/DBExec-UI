@@ -1040,7 +1040,10 @@
     "STAGE_ROW": "Calcolo per riga",
     "STAGE_AGGREGATE": "Aggregato",
     "STAGE_WINDOW": "Calcolo finestra",
-    "FORMULA_COMPUTED_ON_SERVER": "Calcolato sul server dopo la query. Per filtrare o aggregare un valore calcolato nel database, inserisci l’espressione nell’SQL del dataset."
+    "FORMULA_COMPUTED_ON_SERVER": "Calcolato sul server dopo la query. Per filtrare o aggregare un valore calcolato nel database, inserisci l’espressione nell’SQL del dataset.",
+    "STAGE_ROW_SHORT": "Riga",
+    "STAGE_AGGREGATE_SHORT": "Aggregato",
+    "STAGE_WINDOW_SHORT": "Finestra"
   },
   "ANALYSES": {
     "CREATE_MISSING_DATASET": "Impossibile creare l'analisi: il set di dati di origine è mancante. Riprova da un dataset.",

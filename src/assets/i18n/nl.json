@@ -1040,7 +1040,10 @@
     "STAGE_ROW": "Rijberekening",
     "STAGE_AGGREGATE": "Aggregaat",
     "STAGE_WINDOW": "Vensterberekening",
-    "FORMULA_COMPUTED_ON_SERVER": "Wordt na de query op de server berekend. Zet de expressie in de dataset-SQL om op een berekende waarde te filteren of aggregeren in de database."
+    "FORMULA_COMPUTED_ON_SERVER": "Wordt na de query op de server berekend. Zet de expressie in de dataset-SQL om op een berekende waarde te filteren of aggregeren in de database.",
+    "STAGE_ROW_SHORT": "Rij",
+    "STAGE_AGGREGATE_SHORT": "Aggregaat",
+    "STAGE_WINDOW_SHORT": "Venster"
   },
   "ANALYSES": {
     "CREATE_MISSING_DATASET": "Kan analyse niet maken: de brondataset ontbreekt. Probeer het opnieuw vanuit een dataset.",

@@ -100,4 +100,11 @@
     font-size: var(--fs-micro);
     color: var(--text-color-secondary);
   }
+
+  /* Short stage label beside the badge icon — an icon alone is not readable. */
+  &__stage {
+    margin-left: var(--space-1);
+    font-size: var(--fs-micro);
+    letter-spacing: 0.02em;
+  }
 }

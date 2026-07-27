@@ -1040,7 +1040,10 @@
     "STAGE_ROW": "행 단위 계산",
     "STAGE_AGGREGATE": "집계",
     "STAGE_WINDOW": "윈도우 계산",
-    "FORMULA_COMPUTED_ON_SERVER": "쿼리 후 서버에서 계산됩니다. 계산된 값을 데이터베이스에서 필터링하거나 집계하려면 표현식을 데이터셋 SQL에 넣으세요."
+    "FORMULA_COMPUTED_ON_SERVER": "쿼리 후 서버에서 계산됩니다. 계산된 값을 데이터베이스에서 필터링하거나 집계하려면 표현식을 데이터셋 SQL에 넣으세요.",
+    "STAGE_ROW_SHORT": "행",
+    "STAGE_AGGREGATE_SHORT": "집계",
+    "STAGE_WINDOW_SHORT": "윈도우"
   },
   "ANALYSES": {
     "CREATE_MISSING_DATASET": "분석을 만들 수 없습니다: 원본 데이터셋이 없습니다. 데이터셋에서 다시 시도하세요.",

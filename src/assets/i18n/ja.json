@@ -1040,7 +1040,10 @@
     "STAGE_ROW": "行単位の計算",
     "STAGE_AGGREGATE": "集計",
     "STAGE_WINDOW": "ウィンドウ計算",
-    "FORMULA_COMPUTED_ON_SERVER": "クエリ後にサーバーで計算されます。計算値をデータベースで絞り込み・集計するには、式をデータセットの SQL に記述してください。"
+    "FORMULA_COMPUTED_ON_SERVER": "クエリ後にサーバーで計算されます。計算値をデータベースで絞り込み・集計するには、式をデータセットの SQL に記述してください。",
+    "STAGE_ROW_SHORT": "行",
+    "STAGE_AGGREGATE_SHORT": "集計",
+    "STAGE_WINDOW_SHORT": "ウィンドウ"
   },
   "ANALYSES": {
     "CREATE_MISSING_DATASET": "分析を作成できません:元のデータセットがありません。データセットから再試行してください。",

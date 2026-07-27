@@ -52,9 +52,12 @@
       <app-chip
         *ngIf="stageKey(field) as key"
         [variant]="field.stage === 'ROW' ? 'status' : 'tag'"
-        [title]="key | translate"
+        [attr.title]="key | translate"
       >
         <i [ngClass]="stageIcon(field)"></i>
+        <span class="field-sidebar__stage" *ngIf="stageShortKey(field) as short">{{
+          short | translate
+        }}</span>
       </app-chip>
     </li>
   </ul>

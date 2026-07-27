@@ -1040,7 +1040,10 @@
     "STAGE_ROW": "Calcul par ligne",
     "STAGE_AGGREGATE": "Agrégat",
     "STAGE_WINDOW": "Calcul de fenêtre",
-    "FORMULA_COMPUTED_ON_SERVER": "Calculé sur le serveur après la requête. Pour filtrer ou agréger une valeur calculée dans la base de données, placez l’expression dans le SQL du jeu de données."
+    "FORMULA_COMPUTED_ON_SERVER": "Calculé sur le serveur après la requête. Pour filtrer ou agréger une valeur calculée dans la base de données, placez l’expression dans le SQL du jeu de données.",
+    "STAGE_ROW_SHORT": "Ligne",
+    "STAGE_AGGREGATE_SHORT": "Agrégat",
+    "STAGE_WINDOW_SHORT": "Fenêtre"
   },
   "ANALYSES": {
     "CREATE_MISSING_DATASET": "Impossible de créer l'analyse : le jeu de données source est manquant. Réessayez à partir d'un dataset.",
