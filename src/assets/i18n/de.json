@@ -1010,7 +1010,6 @@
       "AVG": "Durchschn.",
       "BASED_ON_PREVIEW": "Basierend auf Vorschauzeilen"
     },
-    "CALC_FIELDS_TITLE": "Berechnete Felder",
     "CALC_FIELDS_SUBTITLE": "Neue Spalten aus einem sicheren Formelausdruck ableiten",
     "CALC_FIELDS_COUNT": "{{count}} berechnete(s) Feld(er)",
     "CALC_FIELDS_EMPTY": "Noch keine berechneten Felder. Fügen Sie eines hinzu, um eine neue Spalte abzuleiten.",
@@ -1032,7 +1031,14 @@
     "CALC_FIELD_TYPE_NUMERIC": "Numerisch",
     "CALC_FIELD_TYPE_TEXT": "Text",
     "CALC_FIELD_TYPE_DATE": "Datum",
-    "CALC_FIELD_TYPE_BOOLEAN": "Boolescher Wert"
+    "CALC_FIELD_TYPE_BOOLEAN": "Boolescher Wert",
+    "FORMULA_AT_SOURCE": "An der Quelle berechnet — filterbar, sortierbar, aggregierbar",
+    "FORMULA_AFTER_QUERY": "Nach der Abfrage berechnet — nur Anzeige",
+    "FIELDS_TITLE": "Felder",
+    "NEW_FIELD": "Neues Feld",
+    "FORMULA_FIELD": "Formelfeld",
+    "BASE_COLUMN": "Spalte",
+    "NO_FIELDS_YET": "Noch keine Felder"
   },
   "ANALYSES": {
     "CREATE_MISSING_DATASET": "Analyse kann nicht erstellt werden: Der Quelldatensatz fehlt. Bitte erneut über ein Dataset versuchen.",

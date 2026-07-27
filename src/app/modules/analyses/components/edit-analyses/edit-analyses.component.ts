@@ -15,6 +15,7 @@ import {
   ViewChildren,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { DatasetFieldsStore } from 'src/app/modules/dataset/services/dataset-fields.store';
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
@@ -691,6 +692,7 @@ export class EditAnalysesComponent
     public interaction: AnalysisInteractionService,
     private analysisTabsService: AnalysisTabsService,
     private analysisWidgetsService: AnalysisWidgetsService,
+    private fieldsStore: DatasetFieldsStore,
   ) {}
 
   // ─── Analysis parameters (Slice 4) ──────────────────────────────────

@@ -1226,6 +1226,21 @@
   </ng-template>
 </p-dialog>
 
+<!--
+  Formula field authoring from the editor. The dataset already exists here, so a
+  field can be created while the SQL is being written; the sidebar list and the
+  editor's {field} completions update from the shared store with no reload.
+-->
+<app-formula-field-dialog
+  *ngIf="showFormulaFieldDialog"
+  [visible]="true"
+  [datasetId]="datasetId || ''"
+  [datasetFields]="datasetFieldRows"
+  [editMode]="!!editingFormulaField"
+  [editFieldData]="editingFormulaField"
+  (close)="onFormulaFieldDialogClose($event)"
+></app-formula-field-dialog>
+
 <!-- Hidden File Input for SQL Import -->
 <input type="file" #fileInput hidden (change)="onFileSelected($event)" />
 

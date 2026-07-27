@@ -517,7 +517,7 @@
     </div>
 
     <!-- Custom Field Dialog -->
-    <app-add-custom-field-dialog
+    <app-formula-field-dialog
       [visible]="showCustomFieldDialog"
       [datasetId]="datasetId"
       [analysisId]="analysisId"
@@ -525,7 +525,7 @@
       [editMode]="editFieldMode"
       [editFieldData]="editFieldData"
       (close)="onCustomFieldDialogClose($event)"
-    ></app-add-custom-field-dialog>
+    ></app-formula-field-dialog>
 
     <!-- Left Sidebar 2 - Visuals Panel -->
     <div class="visuals-sidebar" [class.collapsed]="!isVisualsPanelOpen">

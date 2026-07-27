@@ -9,6 +9,7 @@ import {
   Input,
   OnChanges,
   OnDestroy,
+  OnInit,
   Output,
   SimpleChanges,
   ViewChild,
@@ -18,11 +19,11 @@ import { GlobalService } from 'src/app/core/services/global.service';
 import { MonacoLoaderService } from 'src/app/core/services/monaco-loader.service';
 import { FORMULA_EDITOR_OPTIONS } from '../../config/formula-editor.config';
 import {
-  FunctionCategory,
-  FunctionDefinition,
-  FUNCTION_CATEGORIES,
-  getAllFunctions,
-} from '../../constants/functions-reference';
+  FormulaCatalogService,
+  FormulaCategory,
+  FormulaFunction,
+} from '../../services/formula-catalog.service';
+import { DatasetFieldsStore } from '../../services/dataset-fields.store';
 import { DatasetService } from '../../services/dataset.service';
 import { ANALYTICAL_TYPES } from '../edit-dataset-fields-dialog/edit-dataset-fields-dialog.component';
 import {
@@ -33,20 +34,20 @@ import {
   FORMULA_LANGUAGE_CONFIG,
   FORMULA_TOKENIZER,
   getCurrentMonacoTheme,
-} from './add-custom-field-dialog.helper';
+} from './formula-monaco.helper';
 
 // Declare Monaco for TypeScript
 declare const monaco: any;
 declare const window: any;
 
 @Component({
-  selector: 'app-add-custom-field-dialog',
-  templateUrl: './add-custom-field-dialog.component.html',
-  styleUrls: ['./add-custom-field-dialog.component.scss'],
+  selector: 'app-formula-field-dialog',
+  templateUrl: './formula-field-dialog.component.html',
+  styleUrls: ['./formula-field-dialog.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class AddCustomFieldDialogComponent
-  implements OnChanges, AfterViewInit, OnDestroy
+export class FormulaFieldDialogComponent
+  implements OnInit, OnChanges, AfterViewInit, OnDestroy
 {
   @Input() visible = false;
   @ViewChild('formulaEditorContainer')
@@ -69,19 +70,53 @@ export class AddCustomFieldDialogComponent
   isSaveEnabled = false;
   isSubmitting = false;
   isValidating = false;
+
+  /** Where the validated formula will run — drives the tier badge. */
+  resolvedStage: 'ROW' | 'AGG' | 'WINDOW' | null = null;
+
+  /** Whether it is computed at the data source rather than after the query. */
+  resolvedPushdownable: boolean | null = null;
   isValidated = false;
   validationResult: { valid: boolean; message: string } | null = null;
   fieldNameError: string | null = null;
 
   // Reserved function names — field names cannot collide with these
-  private reservedNames = new Set(getAllFunctions().map(fn => fn.name));
+  // Field names may not shadow a function name. Sourced from the catalog, so it
+  // stays correct as the registry grows.
+  private reservedNames = new Set<string>();
 
   // Functions Reference
-  functionCategories: FunctionCategory[] = FUNCTION_CATEGORIES;
+  // Populated from GET /datasets/formula/catalog. The UI owns no function list
+  // of its own, so the palette can never drift from the engine.
+  functionCategories: FormulaCategory[] = [];
+
+  /**
+   * Icon per catalog category. Purely presentational, so it stays in the UI —
+   * the backend serves what the functions ARE, the frontend decides how they
+   * look. An unlisted category falls back to a neutral glyph.
+   */
+  private readonly categoryIcons: Record<string, string> = {
+    string: 'pi pi-align-left',
+    date: 'pi pi-calendar',
+    numeric: 'pi pi-percentage',
+    aggregate: 'pi pi-chart-bar',
+    conditional: 'pi pi-filter',
+    comparison: 'pi pi-sort-alt',
+    conversion: 'pi pi-refresh',
+    lookup: 'pi pi-search',
+    window: 'pi pi-table',
+    running: 'pi pi-forward',
+    ranking: 'pi pi-sort-amount-down',
+    over: 'pi pi-clone',
+  };
+
+  categoryIcon(categoryId: string): string {
+    return this.categoryIcons[categoryId] ?? 'pi pi-code';
+  }
   expandedCategories: { [key: string]: boolean } = {};
   functionSearchQuery = '';
-  filteredCategories: FunctionCategory[] = [];
-  selectedFunction: FunctionDefinition | null = null;
+  filteredCategories: FormulaCategory[] = [];
+  selectedFunction: FormulaFunction | null = null;
 
   // Dataset Fields
   fieldSearchQuery = '';
@@ -115,7 +150,21 @@ export class AddCustomFieldDialogComponent
     private cdr: ChangeDetectorRef,
     private monacoLoader: MonacoLoaderService,
     private translate: TranslateService,
+    private catalog: FormulaCatalogService,
+    private fieldsStore: DatasetFieldsStore,
   ) {}
+
+  ngOnInit(): void {
+    // The catalog is static and shared, so this is a no-op after the first call.
+    this.catalog.load().subscribe({
+      next: () => {
+        this.functionCategories = this.catalog.categories();
+        this.reservedNames = new Set(this.catalog.functionNames());
+        this.onFunctionSearch();
+        this.cdr.markForCheck();
+      },
+    });
+  }
 
   // ESC is wired through requestClose() so the unsaved-changes guard
   // runs before the dialog actually closes. p-dialog's built-in
@@ -411,7 +460,7 @@ export class AddCustomFieldDialogComponent
           }
 
           // Add function suggestions using helper
-          allFunctions.forEach((fn: FunctionDefinition) => {
+          allFunctions.forEach((fn: FormulaFunction) => {
             suggestions.push(createFunctionCompletionItem(fn, range, monaco));
           });
 
@@ -427,9 +476,10 @@ export class AddCustomFieldDialogComponent
       });
   }
 
-  private getAllFunctions(): FunctionDefinition[] {
+  /** Flat function list, from the catalog. */
+  private getAllFunctions(): FormulaFunction[] {
     return this.functionCategories.reduce(
-      (acc: FunctionDefinition[], cat: FunctionCategory) =>
+      (acc: FormulaFunction[], cat: FormulaCategory) =>
         acc.concat(cat.functions),
       [],
     );
@@ -734,7 +784,7 @@ export class AddCustomFieldDialogComponent
     // Build a flat ordered list of functions across expanded categories
     // — keyboard nav should feel continuous even though the UI groups
     // them. Collapsed categories are skipped.
-    const flat: FunctionDefinition[] = [];
+    const flat: FormulaFunction[] = [];
     for (const cat of this.filteredCategories) {
       if (this.isCategoryExpanded(cat.id)) {
         flat.push(...cat.functions);
@@ -802,6 +852,12 @@ export class AddCustomFieldDialogComponent
               response.message ||
               this.translate.instant('DATASET.FORMULA_VALIDATED'),
           };
+          // The engine reports where this formula will run. Surfaced as a badge
+          // so the author knows what the field can do: a pushed-down field is a
+          // real warehouse column (filterable, sortable, aggregatable), while an
+          // aggregate or window field is computed after the query.
+          this.resolvedStage = response?.data?.stage ?? null;
+          this.resolvedPushdownable = response?.data?.pushdownable ?? null;
           // Enable Save only when name + formula are present AND there is no
           // outstanding inline name error (e.g. a reserved function name).
           // Without the !fieldNameError guard, validating re-enabled Save
@@ -813,6 +869,8 @@ export class AddCustomFieldDialogComponent
         } else {
           this.isValidating = false;
           this.isValidated = false;
+          this.resolvedStage = null;
+          this.resolvedPushdownable = null;
           this.validationResult = {
             valid: false,
             message:
@@ -827,27 +885,65 @@ export class AddCustomFieldDialogComponent
         if (this.customField.columnToUse !== validatedFormula) return;
         this.isValidating = false;
         this.isValidated = false;
+        this.resolvedStage = null;
+        this.resolvedPushdownable = null;
+        // The engine returns a source offset with its message, so point the
+        // caret at the offending token rather than only printing the text.
+        const position = error?.error?.data?.position;
         this.validationResult = {
           valid: false,
           message:
             error?.error?.message ||
             this.translate.instant('DATASET.VALIDATION_FAILED_RETRY'),
         };
+        if (typeof position === 'number') this.markErrorPosition(position);
         this.cdr.markForCheck();
       });
+  }
+
+  /** i18n key for the tier badge, or null when there is nothing to show. */
+  get tierBadgeKey(): string | null {
+    if (!this.isValidated || this.resolvedPushdownable === null) return null;
+    return this.resolvedPushdownable
+      ? 'DATASET.FORMULA_AT_SOURCE'
+      : 'DATASET.FORMULA_AFTER_QUERY';
+  }
+
+  /**
+   * Put a Monaco marker on the character the engine objected to, so the author
+   * sees WHERE the problem is instead of only what it is.
+   */
+  private markErrorPosition(position: number): void {
+    try {
+      const model = this.editor?.getModel?.();
+      if (!model || typeof monaco === 'undefined') return;
+      const at = model.getPositionAt(position);
+      monaco.editor.setModelMarkers(model, 'formula', [
+        {
+          severity: monaco.MarkerSeverity.Error,
+          message: this.validationResult?.message ?? '',
+          startLineNumber: at.lineNumber,
+          startColumn: at.column,
+          endLineNumber: at.lineNumber,
+          endColumn: at.column + 1,
+        },
+      ]);
+    } catch {
+      // A marker is a nicety; never let it break validation feedback.
+    }
   }
 
   // Functions Panel Methods
   getTotalFunctionCount(): number {
     return this.functionCategories.reduce(
-      (total: number, cat: FunctionCategory) => total + cat.functions.length,
+      (total: number, cat: FormulaCategory) => total + cat.functions.length,
       0,
     );
   }
 
   getFilteredFunctionCount(): number {
     return this.filteredCategories.reduce(
-      (total: number, cat: FunctionCategory) => total + cat.functions.length,
+      (total: number, cat: FormulaCategory) => total + cat.functions.length,
       0,
     );
   }
@@ -870,11 +966,11 @@ export class AddCustomFieldDialogComponent
     }
 
     this.filteredCategories = this.functionCategories
-      .map((category: FunctionCategory) => {
-        const nameMatches: FunctionDefinition[] = [];
-        const otherMatches: FunctionDefinition[] = [];
+      .map((category: FormulaCategory) => {
+        const nameMatches: FormulaFunction[] = [];
+        const otherMatches: FormulaFunction[] = [];
 
-        category.functions.forEach((fn: FunctionDefinition) => {
+        category.functions.forEach((fn: FormulaFunction) => {
           if (fn.name.toLowerCase().includes(query)) {
             nameMatches.push(fn);
           } else if (
@@ -890,21 +986,21 @@ export class AddCustomFieldDialogComponent
           functions: [...nameMatches, ...otherMatches],
         };
       })
-      .filter((category: FunctionCategory) => category.functions.length > 0);
+      .filter((category: FormulaCategory) => category.functions.length > 0);
 
     // Auto-expand categories that have results
     this.expandedCategories = {};
-    this.filteredCategories.forEach((cat: FunctionCategory) => {
+    this.filteredCategories.forEach((cat: FormulaCategory) => {
       this.expandedCategories[cat.id] = true;
     });
   }
 
-  insertFunction(fn: FunctionDefinition) {
+  insertFunction(fn: FormulaFunction) {
     this.insertTextAtCursor(fn.usage);
     this.onFormulaChange();
   }
 
-  selectFunction(fn: FunctionDefinition) {
+  selectFunction(fn: FormulaFunction) {
     this.selectedFunction = fn;
     this.selectedField = null;
   }

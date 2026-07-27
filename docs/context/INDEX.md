@@ -20,7 +20,7 @@
 | auth | `src/app/modules/auth` | [auth](./modules/auth.md) | 🟢 | 2026-07-24 |
 | dashboard | `src/app/modules/dashboard` | [dashboard](./modules/dashboard.md) | 🟢 | 2026-07-24 |
 | data-transfer | `src/app/modules/data-transfer` | [data-transfer](./modules/data-transfer.md) | ⚪ | 2026-07-24 |
-| dataset | `src/app/modules/dataset` | [dataset](./modules/dataset.md) | 🟢 | 2026-07-24 |
+| dataset | `src/app/modules/dataset` | [dataset](./modules/dataset.md) | 🟢 | 2026-07-27 |
 | datasource | `src/app/modules/datasource` | [datasource](./modules/datasource.md) | 🟢 | 2026-07-24 |
 | db-access | `src/app/modules/db-access` | [db-access](./modules/db-access.md) | 🟢 | 2026-07-24 |
 | embed | `src/app/modules/embed` | [embed](./modules/embed.md) | 🟢 | 2026-07-24 |

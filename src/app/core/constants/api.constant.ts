@@ -172,6 +172,8 @@ export const GROUP = {
 
 export const DATASET = {
   LIST: '/datasets',
+  /** Formula function catalog — drives the editor palette + IntelliSense. */
+  FORMULA_CATALOG: '/datasets/formula/catalog',
   ADD: '/datasets',
   ADD_VIA_BUILDER: '/datasets/from-builder',
   GET: '/datasets/', // GET /datasets/:datasetId

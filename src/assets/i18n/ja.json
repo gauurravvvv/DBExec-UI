@@ -1010,7 +1010,6 @@
       "AVG": "平均",
       "BASED_ON_PREVIEW": "プレビュー行に基づく"
     },
-    "CALC_FIELDS_TITLE": "計算フィールド",
     "CALC_FIELDS_SUBTITLE": "安全な数式から新しい列を導出します",
     "CALC_FIELDS_COUNT": "{{count}} 個の計算フィールド",
     "CALC_FIELDS_EMPTY": "計算フィールドはまだありません。追加して新しい列を導出してください。",
@@ -1032,7 +1031,14 @@
     "CALC_FIELD_TYPE_NUMERIC": "数値",
     "CALC_FIELD_TYPE_TEXT": "テキスト",
     "CALC_FIELD_TYPE_DATE": "日付",
-    "CALC_FIELD_TYPE_BOOLEAN": "ブール値"
+    "CALC_FIELD_TYPE_BOOLEAN": "ブール値",
+    "FORMULA_AT_SOURCE": "ソースで計算 — フィルター・並べ替え・集計が可能",
+    "FORMULA_AFTER_QUERY": "クエリ後に計算 — 表示のみ",
+    "FIELDS_TITLE": "フィールド",
+    "NEW_FIELD": "新しいフィールド",
+    "FORMULA_FIELD": "数式フィールド",
+    "BASE_COLUMN": "列",
+    "NO_FIELDS_YET": "フィールドがありません"
   },
   "ANALYSES": {
     "CREATE_MISSING_DATASET": "分析を作成できません:元のデータセットがありません。データセットから再試行してください。",

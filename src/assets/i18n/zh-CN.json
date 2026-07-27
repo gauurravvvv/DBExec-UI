@@ -1010,7 +1010,6 @@
       "AVG": "平均值",
       "BASED_ON_PREVIEW": "基于预览行"
     },
-    "CALC_FIELDS_TITLE": "计算字段",
     "CALC_FIELDS_SUBTITLE": "从安全的公式表达式派生新列",
     "CALC_FIELDS_COUNT": "{{count}} 个计算字段",
     "CALC_FIELDS_EMPTY": "尚无计算字段。添加一个以派生新列。",
@@ -1032,7 +1031,14 @@
     "CALC_FIELD_TYPE_NUMERIC": "数值",
     "CALC_FIELD_TYPE_TEXT": "文本",
     "CALC_FIELD_TYPE_DATE": "日期",
-    "CALC_FIELD_TYPE_BOOLEAN": "布尔值"
+    "CALC_FIELD_TYPE_BOOLEAN": "布尔值",
+    "FORMULA_AT_SOURCE": "在数据源计算 — 可筛选、可排序、可聚合",
+    "FORMULA_AFTER_QUERY": "查询后计算 — 仅用于显示",
+    "FIELDS_TITLE": "字段",
+    "NEW_FIELD": "新建字段",
+    "FORMULA_FIELD": "公式字段",
+    "BASE_COLUMN": "列",
+    "NO_FIELDS_YET": "尚无字段"
   },
   "ANALYSES": {
     "CREATE_MISSING_DATASET": "无法创建分析：缺少源数据集。请从数据集重试。",

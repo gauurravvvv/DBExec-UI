@@ -1,0 +1,61 @@
+<!--
+  Live field list. Reads the shared field store, so saving a field updates this
+  immediately with no dataset refetch.
+-->
+<section class="field-sidebar">
+  <header class="field-sidebar__head">
+    <h3 class="field-sidebar__title">
+      {{ titleKey | translate }}
+      <span class="field-sidebar__count">{{ total() }}</span>
+    </h3>
+
+    <app-button
+      *ngIf="canEdit"
+      variant="secondary"
+      size="sm"
+      icon="pi pi-plus"
+      (clicked)="createRequested.emit()"
+    >
+      {{ 'DATASET.NEW_FIELD' | translate }}
+    </app-button>
+  </header>
+
+  <p class="field-sidebar__empty" *ngIf="total() === 0">
+    {{ 'DATASET.NO_FIELDS_YET' | translate }}
+  </p>
+
+  <ul class="field-sidebar__list" *ngIf="total() > 0">
+    <li
+      class="field-sidebar__item"
+      *ngFor="let field of fields(); trackBy: trackById"
+      [class.is-formula]="field.isCustom"
+      (click)="field.isCustom ? editRequested.emit(field) : null"
+    >
+      <span class="field-sidebar__icon">
+        <i
+          class="pi"
+          [ngClass]="field.isCustom ? 'pi-code' : 'pi-table'"
+          [attr.aria-hidden]="true"
+        ></i>
+      </span>
+
+      <span class="field-sidebar__body">
+        <span class="field-sidebar__name">{{ field.label || field.name }}</span>
+        <code class="field-sidebar__formula" *ngIf="field.formula">{{
+          field.formula
+        }}</code>
+        <span class="field-sidebar__type" *ngIf="!field.formula && field.dataType">{{
+          field.dataType
+        }}</span>
+      </span>
+
+      <app-chip
+        *ngIf="tierKey(field) as key"
+        [variant]="field.pushdownable ? 'status' : 'tag'"
+        [title]="key | translate"
+      >
+        <i class="pi" [ngClass]="tierIcon(field)"></i>
+      </app-chip>
+    </li>
+  </ul>
+</section>

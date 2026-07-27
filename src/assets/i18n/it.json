@@ -1010,7 +1010,6 @@
       "AVG": "Media",
       "BASED_ON_PREVIEW": "In base alle righe di anteprima"
     },
-    "CALC_FIELDS_TITLE": "Campi calcolati",
     "CALC_FIELDS_SUBTITLE": "Deriva nuove colonne da un'espressione di formula sicura",
     "CALC_FIELDS_COUNT": "{{count}} campo/i calcolato/i",
     "CALC_FIELDS_EMPTY": "Ancora nessun campo calcolato. Aggiungine uno per derivare una nuova colonna.",
@@ -1032,7 +1031,14 @@
     "CALC_FIELD_TYPE_NUMERIC": "Numerico",
     "CALC_FIELD_TYPE_TEXT": "Testo",
     "CALC_FIELD_TYPE_DATE": "Data",
-    "CALC_FIELD_TYPE_BOOLEAN": "Booleano"
+    "CALC_FIELD_TYPE_BOOLEAN": "Booleano",
+    "FORMULA_AT_SOURCE": "Calcolato alla sorgente — filtrabile, ordinabile, aggregabile",
+    "FORMULA_AFTER_QUERY": "Calcolato dopo la query — solo visualizzazione",
+    "FIELDS_TITLE": "Campi",
+    "NEW_FIELD": "Nuovo campo",
+    "FORMULA_FIELD": "Campo formula",
+    "BASE_COLUMN": "Colonna",
+    "NO_FIELDS_YET": "Nessun campo finora"
   },
   "ANALYSES": {
     "CREATE_MISSING_DATASET": "Impossibile creare l'analisi: il set di dati di origine è mancante. Riprova da un dataset.",

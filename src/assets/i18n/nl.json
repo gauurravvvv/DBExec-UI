@@ -1010,7 +1010,6 @@
       "AVG": "Gem.",
       "BASED_ON_PREVIEW": "Gebaseerd op voorbeeldrijen"
     },
-    "CALC_FIELDS_TITLE": "Berekende velden",
     "CALC_FIELDS_SUBTITLE": "Leid nieuwe kolommen af uit een veilige formule-expressie",
     "CALC_FIELDS_COUNT": "{{count}} berekend(e) veld(en)",
     "CALC_FIELDS_EMPTY": "Nog geen berekende velden. Voeg er een toe om een nieuwe kolom af te leiden.",
@@ -1032,7 +1031,14 @@
     "CALC_FIELD_TYPE_NUMERIC": "Numeriek",
     "CALC_FIELD_TYPE_TEXT": "Tekst",
     "CALC_FIELD_TYPE_DATE": "Datum",
-    "CALC_FIELD_TYPE_BOOLEAN": "Booleaans"
+    "CALC_FIELD_TYPE_BOOLEAN": "Booleaans",
+    "FORMULA_AT_SOURCE": "Berekend bij de bron — filterbaar, sorteerbaar, aggregeerbaar",
+    "FORMULA_AFTER_QUERY": "Berekend na de query — alleen weergave",
+    "FIELDS_TITLE": "Velden",
+    "NEW_FIELD": "Nieuw veld",
+    "FORMULA_FIELD": "Formuleveld",
+    "BASE_COLUMN": "Kolom",
+    "NO_FIELDS_YET": "Nog geen velden"
   },
   "ANALYSES": {
     "CREATE_MISSING_DATASET": "Kan analyse niet maken: de brondataset ontbreekt. Probeer het opnieuw vanuit een dataset.",

@@ -261,6 +261,22 @@
           ></i>
           <span>{{ validationResult.message }}</span>
         </div>
+
+        <!--
+          Execution-tier badge. Tells the author what the field can do rather
+          than making them choose an engine: a field computed at the source is a
+          real warehouse column, so it can be filtered, sorted and aggregated;
+          one computed after the query is display-only.
+        -->
+        <div class="acf-tier" *ngIf="tierBadgeKey as tierKey">
+          <app-chip [variant]="resolvedPushdownable ? 'status' : 'tag'">
+            <i
+              class="pi"
+              [ngClass]="resolvedPushdownable ? 'pi-database' : 'pi-calculator'"
+            ></i>
+            {{ tierKey | translate }}
+          </app-chip>
+        </div>
       </div>
     </section>
 
@@ -308,7 +324,7 @@
             [attr.aria-expanded]="isCategoryExpanded(category.id)"
           >
             <span class="acf-category__title">
-              <i [class]="category.icon"></i>
+              <i [class]="categoryIcon(category.id)"></i>
               <span>{{ category.name }}</span>
               <span class="acf-count acf-count--inline">
                 {{ category.functions.length }}

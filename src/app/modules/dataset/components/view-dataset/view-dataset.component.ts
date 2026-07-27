@@ -8,6 +8,7 @@ import {
 import { ActivatedRoute, Router } from '@angular/router';
 import { DATASET, QUERY_BUILDER } from 'src/app/core/constants/routes.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
+import { DatasetFieldsStore } from '../../services/dataset-fields.store';
 import { DatasetService } from '../../services/dataset.service';
 
 @Component({
@@ -73,6 +74,7 @@ export class ViewDatasetComponent implements OnInit, OnDestroy {
     private datasetService: DatasetService,
     private globalService: GlobalService,
     private cdr: ChangeDetectorRef,
+    private fieldsStore: DatasetFieldsStore,
   ) {}
 
   isArray = Array.isArray;
@@ -213,6 +215,13 @@ export class ViewDatasetComponent implements OnInit, OnDestroy {
     const response: any = await this.datasetService.loadOne(datasetId);
     if (this.globalService.handleSuccessService(response, false)) {
       this.datasetData = this.datasetService.current();
+      // Seed the live field store. From here on, saving a field patches the
+      // store rather than refetching, so the sidebar and the formula editor's
+      // {field} completions stay current with no reload.
+      this.fieldsStore.setAll(
+        this.datasetData?.datasetFields ?? [],
+        this.datasetData?.id ?? null,
+      );
       // Kick off the freshness fetch once we know the dataset exists.
       // Fire-and-forget: the header renders "loading" then fills in.
       this.loadFreshness(datasetId);
@@ -494,20 +503,14 @@ export class ViewDatasetComponent implements OnInit, OnDestroy {
 
   onEditFieldDialogClose(data: any): void {
     this.showEditFieldsDialog = false;
-    if (data) {
-      // Reload dataset data from API
-      this.loadDatasetData();
-    }
+    this.applySavedField(data);
     this.selectedField = null;
     this.selectedFieldIndex = -1;
   }
 
   onEditCustomFieldDialogClose(data: any): void {
     this.showEditCustomFieldDialog = false;
-    if (data) {
-      // Reload dataset data from API
-      this.loadDatasetData();
-    }
+    this.applySavedField(data);
     this.selectedField = null;
     this.selectedFieldIndex = -1;
   }
@@ -518,27 +521,38 @@ export class ViewDatasetComponent implements OnInit, OnDestroy {
 
   onAddCustomFieldDialogClose(data: any): void {
     this.showAddCustomFieldDialog = false;
-    if (data?.field) {
-      // Reload dataset data from API
-      this.loadDatasetData();
+    this.applySavedField(data);
+  }
+
+  /**
+   * Patch the live field store instead of refetching the dataset.
+   *
+   * This is what makes create -> pick -> create seamless: the sidebar list, the
+   * Monaco {field} completions and the dependency picker all read the same
+   * signal, so a field saved a moment ago is immediately referenceable in the
+   * next formula with no reload. Previously every dialog close called
+   * loadDatasetData() and rebuilt the whole screen.
+   */
+  private applySavedField(payload: any): void {
+    const field = payload?.field ?? payload;
+    if (!field) return;
+
+    this.fieldsStore.upsert(field);
+
+    // Keep the locally-rendered dataset object in step so the field count and
+    // table reflect the change without a round-trip.
+    if (this.datasetData) {
+      const rows: any[] = this.datasetData.datasetFields ?? [];
+      const key = field.id ?? field.columnToUse;
+      const index = rows.findIndex(
+        (r: any) =>
+          (field.id && r.id === field.id) ||
+          (!!key && r.columnToUse === field.columnToUse),
+      );
+      this.datasetData.datasetFields =
+        index === -1
+          ? [...rows, field]
+          : rows.map((r: any, i: number) => (i === index ? field : r));
     }
-  }
-
-  // ── Calculated fields (safe-expression REST surface) ────────────────
-  showCalcFieldsDialog = false;
-
-  openCalcFieldsDialog(): void {
-    this.showCalcFieldsDialog = true;
-  }
-
-  onCalcFieldsDialogClose(): void {
-    this.showCalcFieldsDialog = false;
-  }
-
-  onCalcFieldsChanged(): void {
-    // A calc field was added/edited/deleted — re-fetch so the new
-    // fields surface in the dataset (and downstream in the analysis
-    // field picker, which sources from the same dataset fields).
-    this.loadDatasetData();
   }
 }

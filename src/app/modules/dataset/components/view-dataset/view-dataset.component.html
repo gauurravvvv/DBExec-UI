@@ -320,14 +320,6 @@
               <button
                 *hasPermission="'datasetManager'; level: 'write'"
                 class="btn-add-field"
-                (click)="openCalcFieldsDialog()"
-              >
-                <i class="pi pi-calculator"></i>
-                {{ 'DATASET.CALC_FIELDS_TITLE' | translate }}
-              </button>
-              <button
-                *hasPermission="'datasetManager'; level: 'write'"
-                class="btn-add-field"
                 (click)="openAddCustomFieldDialog()"
               >
                 <i class="pi pi-plus"></i>
@@ -515,16 +507,16 @@
 </app-edit-dataset-fields-dialog>
 
 <!-- Add Custom Field Dialog -->
-<app-add-custom-field-dialog
+<app-formula-field-dialog
   [visible]="showAddCustomFieldDialog"
   [datasetId]="datasetData?.id"
   [datasetFields]="datasetData?.datasetFields || []"
   (close)="onAddCustomFieldDialogClose($event)"
 >
-</app-add-custom-field-dialog>
+</app-formula-field-dialog>
 
 <!-- Edit Custom Field Dialog -->
-<app-add-custom-field-dialog
+<app-formula-field-dialog
   [visible]="showEditCustomFieldDialog"
   [datasetId]="datasetData?.id"
   [datasetFields]="datasetData?.datasetFields || []"
@@ -532,15 +524,8 @@
   [editFieldData]="selectedField"
   (close)="onEditCustomFieldDialogClose($event)"
 >
-</app-add-custom-field-dialog>
+</app-formula-field-dialog>
 
-<!-- Calculated Fields Dialog (safe-expression REST surface) -->
-<app-calculated-fields-dialog
-  [visible]="showCalcFieldsDialog"
-  [datasetId]="datasetData?.id"
-  (close)="onCalcFieldsDialogClose()"
-  (changed)="onCalcFieldsChanged()"
-></app-calculated-fields-dialog>
 
 <div class="confirmation-popup" *ngIf="showDeleteConfirm">
   <div class="popup-content">

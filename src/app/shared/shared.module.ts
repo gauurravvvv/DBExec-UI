@@ -4,8 +4,9 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { TranslateModule } from '@ngx-translate/core';
 import { AnalysisFilterBarComponent } from '../modules/analyses/components/analysis-filter-bar/analysis-filter-bar.component';
 import { SaveAnalysesDialogComponent } from '../modules/analyses/components/save-analyses-dialog/save-analyses-dialog.component';
-import { AddCustomFieldDialogComponent } from '../modules/dataset/components/add-custom-field-dialog/add-custom-field-dialog.component';
-import { CalculatedFieldsDialogComponent } from '../modules/dataset/components/calculated-fields-dialog/calculated-fields-dialog.component';
+import { ChipComponent } from './components/chip/chip.component';
+import { FieldSidebarComponent } from '../modules/dataset/components/field-sidebar/field-sidebar.component';
+import { FormulaFieldDialogComponent } from '../modules/dataset/components/formula-field-dialog/formula-field-dialog.component';
 import { DatasetPickerDialogComponent } from '../modules/dataset/components/dataset-picker-dialog/dataset-picker-dialog.component';
 import { AssetShareDialogComponent } from './components/asset-share-dialog/asset-share-dialog.component';
 import { ButtonComponent } from './components/button/button.component';
@@ -65,8 +66,8 @@ import { ReplaceUnderscoresPipe } from './pipes/replace-underscores.pipe';
     AiLauncherComponent,
     AiToolStepComponent,
     AiSubagentsComponent,
-    AddCustomFieldDialogComponent,
-    CalculatedFieldsDialogComponent,
+    FieldSidebarComponent,
+    FormulaFieldDialogComponent,
     SaveAnalysesDialogComponent,
     DatasetPickerDialogComponent,
     AnalysisFilterBarComponent,
@@ -83,6 +84,7 @@ import { ReplaceUnderscoresPipe } from './pipes/replace-underscores.pipe';
     HasPermissionDirective,
   ],
   imports: [
+    ChipComponent,
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
@@ -112,8 +114,8 @@ import { ReplaceUnderscoresPipe } from './pipes/replace-underscores.pipe';
     AiLauncherComponent,
     AiToolStepComponent,
     AiSubagentsComponent,
-    AddCustomFieldDialogComponent,
-    CalculatedFieldsDialogComponent,
+    FieldSidebarComponent,
+    FormulaFieldDialogComponent,
     SaveAnalysesDialogComponent,
     DatasetPickerDialogComponent,
     AnalysisFilterBarComponent,

@@ -1014,7 +1014,6 @@
       "AVG": "Avg",
       "BASED_ON_PREVIEW": "Based on preview rows"
     },
-    "CALC_FIELDS_TITLE": "Calculated fields",
     "CALC_FIELDS_SUBTITLE": "Derive new columns from a safe formula expression",
     "CALC_FIELDS_COUNT": "{{count}} calculated field(s)",
     "CALC_FIELDS_EMPTY": "No calculated fields yet. Add one to derive a new column.",
@@ -1036,7 +1035,14 @@
     "CALC_FIELD_TYPE_NUMERIC": "Numeric",
     "CALC_FIELD_TYPE_TEXT": "Text",
     "CALC_FIELD_TYPE_DATE": "Date",
-    "CALC_FIELD_TYPE_BOOLEAN": "Boolean"
+    "CALC_FIELD_TYPE_BOOLEAN": "Boolean",
+    "FORMULA_AT_SOURCE": "Computed at source — filterable, sortable, aggregatable",
+    "FORMULA_AFTER_QUERY": "Computed after query — display only",
+    "FIELDS_TITLE": "Fields",
+    "NEW_FIELD": "New field",
+    "FORMULA_FIELD": "Formula field",
+    "BASE_COLUMN": "Column",
+    "NO_FIELDS_YET": "No fields yet"
   },
   "ANALYSES": {
     "CREATE_MISSING_DATASET": "Cannot create analysis: the source dataset is missing. Please retry from a dataset.",

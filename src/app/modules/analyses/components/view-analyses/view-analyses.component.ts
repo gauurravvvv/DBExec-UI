@@ -8,6 +8,7 @@ import {
   OnInit,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { DatasetFieldsStore } from 'src/app/modules/dataset/services/dataset-fields.store';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ANALYSES } from 'src/app/core/constants/routes.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
@@ -53,6 +54,7 @@ export class ViewAnalysesComponent implements OnInit, OnDestroy {
     private globalService: GlobalService,
     private analysesService: AnalysesService,
     private favouritesService: FavouritesService,
+    private fieldsStore: DatasetFieldsStore,
   ) {}
 
   get saving() {
@@ -248,9 +250,13 @@ export class ViewAnalysesComponent implements OnInit, OnDestroy {
 
   onAddCustomFieldDialogClose(data: any): void {
     this.showAddCustomFieldDialog = false;
-    if (data?.field) {
-      this.loadAnalysisFields();
-    }
+    const field = data?.field ?? data;
+    if (!field) return;
+    // Patch the live store so the field picker and the formula editor's {field}
+    // completions pick it up immediately, then refresh the analysis field list
+    // that drives the visual shelves.
+    this.fieldsStore.upsert(field);
+    this.loadAnalysisFields();
   }
 
   trackById(index: number, item: any): any {

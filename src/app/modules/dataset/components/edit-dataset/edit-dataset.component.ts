@@ -12,6 +12,7 @@ import {
   ViewChild,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { DatasetFieldsStore } from '../../services/dataset-fields.store';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { TranslateService } from '@ngx-translate/core';
@@ -158,6 +159,40 @@ export class EditDatasetComponent
   private originalFields: SimpleColumn[] = [];
   /** True while the diff dialog is open awaiting confirm/cancel. */
   showDiffDialog = false;
+
+  // ── Formula field authoring from the editor ───────────────────────
+  /** Rows handed to the formula dialog for its {field} completions. */
+  datasetFieldRows: any[] = [];
+  showFormulaFieldDialog = false;
+  editingFormulaField: any = null;
+
+  openFormulaFieldDialog(field?: any): void {
+    this.editingFormulaField = field ?? null;
+    this.showFormulaFieldDialog = true;
+  }
+
+  /**
+   * Patch the shared store rather than reloading the dataset, so the sidebar and
+   * the formula editor's field completions reflect the save immediately.
+   */
+  onFormulaFieldDialogClose(payload: any): void {
+    this.showFormulaFieldDialog = false;
+    const field = payload?.field ?? payload;
+    this.editingFormulaField = null;
+    if (!field) return;
+    this.fieldsStore.upsert(field);
+    const key = field.id ?? field.columnToUse;
+    const index = this.datasetFieldRows.findIndex(
+      (r: any) =>
+        (field.id && r.id === field.id) || r.columnToUse === field.columnToUse,
+    );
+    this.datasetFieldRows =
+      index === -1 || !key
+        ? [...this.datasetFieldRows, field]
+        : this.datasetFieldRows.map((r: any, i: number) =>
+            i === index ? field : r,
+          );
+  }
   /** Computed line diff for the SQL side-by-side pane. */
   diffLines: SqlDiffLine[] = [];
   /** Old / new SQL captured when the diff opened. */
@@ -360,6 +395,7 @@ export class EditDatasetComponent
     private monacoLoader: MonacoLoaderService,
     private translate: TranslateService,
     private elementRef: ElementRef<HTMLElement>,
+    private fieldsStore: DatasetFieldsStore,
   ) {}
 
   ngOnInit(): void {

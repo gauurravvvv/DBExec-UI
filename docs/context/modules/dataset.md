@@ -1,6 +1,6 @@
 # dataset
 > Update the Progress log on every change.
-> Code path: `src/app/modules/dataset` · Status: 🟢 · Last updated: 2026-07-24
+> Code path: `src/app/modules/dataset` · Status: 🟢 · Last updated: 2026-07-27
 
 ## 1. Context
 - Responsibility: The semantic layer. A dataset = a saved SQL query against a datasource + typed field metadata + calculated fields + `{{name}}` query params. It's the source for analyses/dashboards/RLS/alerts.
@@ -24,11 +24,17 @@
 
 ## 2. Goals
 - Objective: Author a trustworthy, typed, parameterised dataset with derived fields that downstream BI can consume safely.
-- Current focus: — none active.
+- Current focus: — none active (parity + live verification outstanding).
 - Next up: wire the dead field-metadata engine to the BE query builder (role→dimension/measure auto-split, isVisible column hiding, formatHint on data labels) — the biggest open parity gap.
 - Out of scope: chart authoring (analyses), raw ad-hoc SQL runs (query-runner).
 
 ## 3. Progress (newest first)
+### 2026-07-27 — Two calc-field concepts merged into one
+- Done: **ONE dialog, ONE language.** `add-custom-field-dialog` + `calculated-fields-dialog` collapsed into `components/formula-field-dialog` (same three-pane shell, same `app-custom-*` controls, same tokens — no new visual language). Palette + Monaco IntelliSense now render from `GET /datasets/formula/catalog` via new `services/formula-catalog.service.ts`, so **the UI holds no formula knowledge**: the 962-line `constants/functions-reference.ts` is deleted, along with `calculated-fields-dialog/`, `services/calculated-fields.service.ts` and `shared/validators/calculatedFields.ts`. Added an execution-tier badge (`app-chip`) reading the validator's `stage`/`pushdownable` — "Computed at source — filterable, sortable, aggregatable" vs "Computed after query — display only" — so the author sees the consequence instead of choosing an engine. Validation errors now place a Monaco marker at the engine's source offset. New `services/dataset-fields.store.ts` (signals) + `components/field-sidebar` give a **live field list with no refetch**: every `loadDatasetData()` on dialog close is replaced by `fieldsStore.upsert(field)`, so a field created a moment ago is immediately referenceable as `{newField}` in the next formula. Category icons stay in the UI (presentation); everything else comes from the API. New i18n keys across all 10 locales; retired `DATASET.CALC_FIELDS_TITLE`.
+- Wired in: `view-dataset` (create + edit + metadata dialogs all patch the store), `edit-dataset` (authoring while writing SQL), `edit-analyses` and `view-analyses`. **`add-dataset` is deliberately excluded** — the dataset has no id until first save, so `POST /datasets/:id/fields` has nothing to target.
+- In progress / Known issues: **behavioural parity for the 137 functions is unverified** — the legacy 2576-line suite was not ported because testing was descoped by request. No live browser verification yet. `field-sidebar` is built and declared but only `view-dataset`/`edit-dataset` host a visible list so far; the analyses screens patch the store without rendering the sidebar panel.
+- Next: live-verify the create → pick → create loop and both tier badges; render the sidebar panel in the analyses screens.
+- Files touched: `components/formula-field-dialog/**`, `components/field-sidebar/**`, `services/{formula-catalog.service,dataset-fields.store}.ts`, `components/{view-dataset,edit-dataset}/**`, `analyses/components/{view-analyses,edit-analyses}/**`, `shared/shared.module.ts`, `core/constants/api.constant.ts`, `assets/i18n/*.json`
 ### 2026-07-24 — Current state captured
 - Done: Full dataset editor (Monaco + IntelliSense + dialect configs + diff-before-save + save-and-run + profiling + export). **Both calc engines shipped + hardened** to version_261: Engine 1 SQL `[bracket]` AST compiler (`- -a`→`-(-"a")` fix), Engine 2 JS `{brace}` FormulaCompiler (~137 fns) with save-path formula validation + deep-nesting DoS guard + 4000-char cap (BE 09e88f9, FE ce697cf). add-custom-field-dialog fixes: validate-state race + reserved-name Save bypass + Monaco leak (a3e5afae). Rich column-metadata editor + `{{name}}` params + view trust surface (dataset-analyses-completion FE 396442b1 / BE 10242b0). Migration export/import on list rows (c1bf1cc1). Asset-share action on list + view (1900064c). Reference-data DB-driven dropdowns (3d27b282). live-verified end-to-end (5-table JOIN, 5000 rows, 8 calc fields).
 - In progress / Known issues: field-metadata columns are UI-only/dead (see gotcha); Engine-2 per-row re-parse is the known perf hotspot; COUNT-DISTINCT alias collision + no numeric-type guard on SUM(text) are open BE aggregation bugs.

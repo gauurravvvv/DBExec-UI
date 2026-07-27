@@ -1010,7 +1010,6 @@
       "AVG": "Méd",
       "BASED_ON_PREVIEW": "Com base nas linhas de prévia"
     },
-    "CALC_FIELDS_TITLE": "Campos calculados",
     "CALC_FIELDS_SUBTITLE": "Derive novas colunas a partir de uma expressão de fórmula segura",
     "CALC_FIELDS_COUNT": "{{count}} campo(s) calculado(s)",
     "CALC_FIELDS_EMPTY": "Ainda não há campos calculados. Adicione um para derivar uma nova coluna.",
@@ -1032,7 +1031,14 @@
     "CALC_FIELD_TYPE_NUMERIC": "Numérico",
     "CALC_FIELD_TYPE_TEXT": "Texto",
     "CALC_FIELD_TYPE_DATE": "Data",
-    "CALC_FIELD_TYPE_BOOLEAN": "Booleano"
+    "CALC_FIELD_TYPE_BOOLEAN": "Booleano",
+    "FORMULA_AT_SOURCE": "Calculado na origem — filtrável, ordenável, agregável",
+    "FORMULA_AFTER_QUERY": "Calculado após a consulta — somente exibição",
+    "FIELDS_TITLE": "Campos",
+    "NEW_FIELD": "Novo campo",
+    "FORMULA_FIELD": "Campo de fórmula",
+    "BASE_COLUMN": "Coluna",
+    "NO_FIELDS_YET": "Nenhum campo ainda"
   },
   "ANALYSES": {
     "CREATE_MISSING_DATASET": "Não é possível criar a análise: o conjunto de dados de origem está ausente. Tente novamente a partir de um dataset.",

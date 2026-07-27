@@ -291,14 +291,14 @@
 </div>
 
 <!-- Add Custom Field Dialog -->
-<app-add-custom-field-dialog
+<app-formula-field-dialog
   *ngIf="showAddCustomFieldDialog"
   [visible]="true"
   [datasetId]="analysisDetails?.datasetId"
   [analysisId]="analysisId"
   [datasetFields]="datasetDetails?.datasetFields || []"
   (close)="onAddCustomFieldDialogClose($event)"
-></app-add-custom-field-dialog>
+></app-formula-field-dialog>
 
 <!-- Delete Confirmation Popup -->
 <div class="confirmation-popup" *ngIf="showDeleteConfirm">

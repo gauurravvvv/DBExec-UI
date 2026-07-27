@@ -1010,7 +1010,6 @@
       "AVG": "Moy",
       "BASED_ON_PREVIEW": "D'après les lignes d'aperçu"
     },
-    "CALC_FIELDS_TITLE": "Champs calculés",
     "CALC_FIELDS_SUBTITLE": "Dérivez de nouvelles colonnes à partir d'une expression de formule sécurisée",
     "CALC_FIELDS_COUNT": "{{count}} champ(s) calculé(s)",
     "CALC_FIELDS_EMPTY": "Aucun champ calculé pour l'instant. Ajoutez-en un pour dériver une nouvelle colonne.",
@@ -1032,7 +1031,14 @@
     "CALC_FIELD_TYPE_NUMERIC": "Numérique",
     "CALC_FIELD_TYPE_TEXT": "Texte",
     "CALC_FIELD_TYPE_DATE": "Date",
-    "CALC_FIELD_TYPE_BOOLEAN": "Booléen"
+    "CALC_FIELD_TYPE_BOOLEAN": "Booléen",
+    "FORMULA_AT_SOURCE": "Calculé à la source — filtrable, triable, agrégeable",
+    "FORMULA_AFTER_QUERY": "Calculé après la requête — affichage uniquement",
+    "FIELDS_TITLE": "Champs",
+    "NEW_FIELD": "Nouveau champ",
+    "FORMULA_FIELD": "Champ de formule",
+    "BASE_COLUMN": "Colonne",
+    "NO_FIELDS_YET": "Aucun champ pour le moment"
   },
   "ANALYSES": {
     "CREATE_MISSING_DATASET": "Impossible de créer l'analyse : le jeu de données source est manquant. Réessayez à partir d'un dataset.",

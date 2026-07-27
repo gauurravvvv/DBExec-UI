@@ -1037,3 +1037,15 @@
     }
   }
 }
+
+/* Execution-tier badge, shown under the validation banner. */
+.acf-tier {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+
+  i {
+    font-size: var(--fs-micro);
+  }
+}

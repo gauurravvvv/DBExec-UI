@@ -14,3 +14,13 @@
 - Decisions: Module list DERIVED FROM CODE (src/app/modules/ = 26 folders), not the stale seed in claude-arch.md. The Query Executor lives inside query-runner/executor/ (documented within the query-runner module file), not as a separate top-level module. ARCHITECTURE.md reconciled against the actual code via a full repo audit.
 - Modules updated: all (initialized).
 - Open for next session: Module files carry accurate Context/Goals scaffolds; enrich individual files with deeper specifics as work touches them. Follow the session-end protocol on every future change.
+
+## 2026-07-27 — Unified calc-field dialog + live field sidebar
+Merged `add-custom-field-dialog` and `calculated-fields-dialog` into one
+`formula-field-dialog`. Palette and IntelliSense now come from the API catalog,
+so the UI owns no function list; `constants/functions-reference.ts` (962 lines)
+deleted. Added an execution-tier badge and positioned validation errors. New
+signal-backed `dataset-fields.store` + `field-sidebar` remove refetch-on-save so
+create -> pick -> create needs no reload. i18n across 10 locales.
+NOT done: behavioural parity verification and live browser testing.
+
