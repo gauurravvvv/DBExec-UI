@@ -15,6 +15,13 @@
 - Modules updated: all (initialized).
 - Open for next session: Module files carry accurate Context/Goals scaffolds; enrich individual files with deeper specifics as work touches them. Follow the session-end protocol on every future change.
 
+## 2026-07-27 — Pushdown removed from the formula UI
+Derived fields are computed on the API, always. The execution-tier badge is
+replaced by a calculation-kind badge (Row / Aggregate / Window) plus a note
+telling the author to put the expression in the dataset SQL if they need it
+filtered or aggregated at the database. pushdownable dropped throughout; 4 new
+i18n keys across 10 locales, 2 retired.
+
 ## 2026-07-27 — Unified calc-field dialog + live field sidebar
 Merged `add-custom-field-dialog` and `calculated-fields-dialog` into one
 `formula-field-dialog`. Palette and IntelliSense now come from the API catalog,

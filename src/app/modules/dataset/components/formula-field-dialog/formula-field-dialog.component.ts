@@ -71,11 +71,8 @@ export class FormulaFieldDialogComponent
   isSubmitting = false;
   isValidating = false;
 
-  /** Where the validated formula will run — drives the tier badge. */
+  /** What kind of calculation the validated formula is — drives the badge. */
   resolvedStage: 'ROW' | 'AGG' | 'WINDOW' | null = null;
-
-  /** Whether it is computed at the data source rather than after the query. */
-  resolvedPushdownable: boolean | null = null;
   isValidated = false;
   validationResult: { valid: boolean; message: string } | null = null;
   fieldNameError: string | null = null;
@@ -852,12 +849,11 @@ export class FormulaFieldDialogComponent
               response.message ||
               this.translate.instant('DATASET.FORMULA_VALIDATED'),
           };
-          // The engine reports where this formula will run. Surfaced as a badge
-          // so the author knows what the field can do: a pushed-down field is a
-          // real warehouse column (filterable, sortable, aggregatable), while an
-          // aggregate or window field is computed after the query.
+          // The engine reports what kind of calculation this is. Surfaced as a
+          // badge because the three kinds behave differently: a row calculation
+          // is per row, an aggregate collapses the column, and a window
+          // calculation depends on row order or partition.
           this.resolvedStage = response?.data?.stage ?? null;
-          this.resolvedPushdownable = response?.data?.pushdownable ?? null;
           // Enable Save only when name + formula are present AND there is no
           // outstanding inline name error (e.g. a reserved function name).
           // Without the !fieldNameError guard, validating re-enabled Save
@@ -870,7 +866,6 @@ export class FormulaFieldDialogComponent
           this.isValidating = false;
           this.isValidated = false;
           this.resolvedStage = null;
-          this.resolvedPushdownable = null;
           this.validationResult = {
             valid: false,
             message:
@@ -886,7 +881,6 @@ export class FormulaFieldDialogComponent
         this.isValidating = false;
         this.isValidated = false;
         this.resolvedStage = null;
-        this.resolvedPushdownable = null;
         // The engine returns a source offset with its message, so point the
         // caret at the offending token rather than only printing the text.
         const position = error?.error?.data?.position;
@@ -901,12 +895,23 @@ export class FormulaFieldDialogComponent
       });
   }
 
-  /** i18n key for the tier badge, or null when there is nothing to show. */
-  get tierBadgeKey(): string | null {
-    if (!this.isValidated || this.resolvedPushdownable === null) return null;
-    return this.resolvedPushdownable
-      ? 'DATASET.FORMULA_AT_SOURCE'
-      : 'DATASET.FORMULA_AFTER_QUERY';
+  /** i18n key for the stage badge, or null when there is nothing to show. */
+  get stageBadgeKey(): string | null {
+    if (!this.isValidated || !this.resolvedStage) return null;
+    switch (this.resolvedStage) {
+      case 'AGG':
+        return 'DATASET.STAGE_AGGREGATE';
+      case 'WINDOW':
+        return 'DATASET.STAGE_WINDOW';
+      default:
+        return 'DATASET.STAGE_ROW';
+    }
+  }
+
+  get stageBadgeIcon(): string {
+    if (this.resolvedStage === 'AGG') return 'pi-chart-bar';
+    if (this.resolvedStage === 'WINDOW') return 'pi-sort-amount-down';
+    return 'pi-list';
   }
 
   /**

@@ -1032,13 +1032,15 @@
     "CALC_FIELD_TYPE_TEXT": "Texte",
     "CALC_FIELD_TYPE_DATE": "Date",
     "CALC_FIELD_TYPE_BOOLEAN": "Booléen",
-    "FORMULA_AT_SOURCE": "Calculé à la source — filtrable, triable, agrégeable",
-    "FORMULA_AFTER_QUERY": "Calculé après la requête — affichage uniquement",
     "FIELDS_TITLE": "Champs",
     "NEW_FIELD": "Nouveau champ",
     "FORMULA_FIELD": "Champ de formule",
     "BASE_COLUMN": "Colonne",
-    "NO_FIELDS_YET": "Aucun champ pour le moment"
+    "NO_FIELDS_YET": "Aucun champ pour le moment",
+    "STAGE_ROW": "Calcul par ligne",
+    "STAGE_AGGREGATE": "Agrégat",
+    "STAGE_WINDOW": "Calcul de fenêtre",
+    "FORMULA_COMPUTED_ON_SERVER": "Calculé sur le serveur après la requête. Pour filtrer ou agréger une valeur calculée dans la base de données, placez l’expression dans le SQL du jeu de données."
   },
   "ANALYSES": {
     "CREATE_MISSING_DATASET": "Impossible de créer l'analyse : le jeu de données source est manquant. Réessayez à partir d'un dataset.",

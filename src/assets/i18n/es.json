@@ -1032,13 +1032,15 @@
     "CALC_FIELD_TYPE_TEXT": "Texto",
     "CALC_FIELD_TYPE_DATE": "Fecha",
     "CALC_FIELD_TYPE_BOOLEAN": "Booleano",
-    "FORMULA_AT_SOURCE": "Calculado en el origen — filtrable, ordenable, agregable",
-    "FORMULA_AFTER_QUERY": "Calculado tras la consulta — solo visualización",
     "FIELDS_TITLE": "Campos",
     "NEW_FIELD": "Nuevo campo",
     "FORMULA_FIELD": "Campo de fórmula",
     "BASE_COLUMN": "Columna",
-    "NO_FIELDS_YET": "Aún no hay campos"
+    "NO_FIELDS_YET": "Aún no hay campos",
+    "STAGE_ROW": "Cálculo por fila",
+    "STAGE_AGGREGATE": "Agregado",
+    "STAGE_WINDOW": "Cálculo de ventana",
+    "FORMULA_COMPUTED_ON_SERVER": "Se calcula en el servidor después de la consulta. Para filtrar o agregar un valor calculado en la base de datos, incluya la expresión en el SQL del conjunto de datos."
   },
   "ANALYSES": {
     "CREATE_MISSING_DATASET": "No se puede crear el análisis: falta el conjunto de datos de origen. Inténtelo de nuevo desde un dataset.",

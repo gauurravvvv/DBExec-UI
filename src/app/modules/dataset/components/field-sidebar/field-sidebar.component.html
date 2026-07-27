@@ -50,11 +50,11 @@
       </span>
 
       <app-chip
-        *ngIf="tierKey(field) as key"
-        [variant]="field.pushdownable ? 'status' : 'tag'"
+        *ngIf="stageKey(field) as key"
+        [variant]="field.stage === 'ROW' ? 'status' : 'tag'"
         [title]="key | translate"
       >
-        <i class="pi" [ngClass]="tierIcon(field)"></i>
+        <i [ngClass]="stageIcon(field)"></i>
       </app-chip>
     </li>
   </ul>

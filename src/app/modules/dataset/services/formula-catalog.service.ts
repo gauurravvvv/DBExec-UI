@@ -27,8 +27,6 @@ export interface FormulaFunction {
   usage: string;
   description: string;
   stage: FormulaStage;
-  /** Whether this function can be compiled to SQL and run at the data source. */
-  pushdownable: boolean;
   minArgs: number;
   maxArgs: number | null;
   argTypes: string[];

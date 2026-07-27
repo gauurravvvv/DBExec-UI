@@ -263,20 +263,18 @@
         </div>
 
         <!--
-          Execution-tier badge. Tells the author what the field can do rather
-          than making them choose an engine: a field computed at the source is a
-          real warehouse column, so it can be filtered, sorted and aggregated;
-          one computed after the query is display-only.
+          Calculation-kind badge. The three kinds behave differently, so the
+          author needs to know which one they have written.
         -->
-        <div class="acf-tier" *ngIf="tierBadgeKey as tierKey">
-          <app-chip [variant]="resolvedPushdownable ? 'status' : 'tag'">
-            <i
-              class="pi"
-              [ngClass]="resolvedPushdownable ? 'pi-database' : 'pi-calculator'"
-            ></i>
-            {{ tierKey | translate }}
+        <div class="acf-tier" *ngIf="stageBadgeKey as stageKey">
+          <app-chip [variant]="resolvedStage === 'ROW' ? 'status' : 'tag'">
+            <i class="pi" [ngClass]="stageBadgeIcon"></i>
+            {{ stageKey | translate }}
           </app-chip>
         </div>
+        <p class="acf-tier-note">
+          {{ 'DATASET.FORMULA_COMPUTED_ON_SERVER' | translate }}
+        </p>
       </div>
     </section>
 

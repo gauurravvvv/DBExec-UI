@@ -1032,13 +1032,15 @@
     "CALC_FIELD_TYPE_TEXT": "テキスト",
     "CALC_FIELD_TYPE_DATE": "日付",
     "CALC_FIELD_TYPE_BOOLEAN": "ブール値",
-    "FORMULA_AT_SOURCE": "ソースで計算 — フィルター・並べ替え・集計が可能",
-    "FORMULA_AFTER_QUERY": "クエリ後に計算 — 表示のみ",
     "FIELDS_TITLE": "フィールド",
     "NEW_FIELD": "新しいフィールド",
     "FORMULA_FIELD": "数式フィールド",
     "BASE_COLUMN": "列",
-    "NO_FIELDS_YET": "フィールドがありません"
+    "NO_FIELDS_YET": "フィールドがありません",
+    "STAGE_ROW": "行単位の計算",
+    "STAGE_AGGREGATE": "集計",
+    "STAGE_WINDOW": "ウィンドウ計算",
+    "FORMULA_COMPUTED_ON_SERVER": "クエリ後にサーバーで計算されます。計算値をデータベースで絞り込み・集計するには、式をデータセットの SQL に記述してください。"
   },
   "ANALYSES": {
     "CREATE_MISSING_DATASET": "分析を作成できません:元のデータセットがありません。データセットから再試行してください。",

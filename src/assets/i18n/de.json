@@ -1032,13 +1032,15 @@
     "CALC_FIELD_TYPE_TEXT": "Text",
     "CALC_FIELD_TYPE_DATE": "Datum",
     "CALC_FIELD_TYPE_BOOLEAN": "Boolescher Wert",
-    "FORMULA_AT_SOURCE": "An der Quelle berechnet — filterbar, sortierbar, aggregierbar",
-    "FORMULA_AFTER_QUERY": "Nach der Abfrage berechnet — nur Anzeige",
     "FIELDS_TITLE": "Felder",
     "NEW_FIELD": "Neues Feld",
     "FORMULA_FIELD": "Formelfeld",
     "BASE_COLUMN": "Spalte",
-    "NO_FIELDS_YET": "Noch keine Felder"
+    "NO_FIELDS_YET": "Noch keine Felder",
+    "STAGE_ROW": "Zeilenberechnung",
+    "STAGE_AGGREGATE": "Aggregat",
+    "STAGE_WINDOW": "Fensterberechnung",
+    "FORMULA_COMPUTED_ON_SERVER": "Wird nach der Abfrage auf dem Server berechnet. Um einen berechneten Wert in der Datenbank zu filtern oder zu aggregieren, nehmen Sie den Ausdruck in das Dataset-SQL auf."
   },
   "ANALYSES": {
     "CREATE_MISSING_DATASET": "Analyse kann nicht erstellt werden: Der Quelldatensatz fehlt. Bitte erneut über ein Dataset versuchen.",

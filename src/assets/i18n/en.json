@@ -1036,13 +1036,15 @@
     "CALC_FIELD_TYPE_TEXT": "Text",
     "CALC_FIELD_TYPE_DATE": "Date",
     "CALC_FIELD_TYPE_BOOLEAN": "Boolean",
-    "FORMULA_AT_SOURCE": "Computed at source — filterable, sortable, aggregatable",
-    "FORMULA_AFTER_QUERY": "Computed after query — display only",
     "FIELDS_TITLE": "Fields",
     "NEW_FIELD": "New field",
     "FORMULA_FIELD": "Formula field",
     "BASE_COLUMN": "Column",
-    "NO_FIELDS_YET": "No fields yet"
+    "NO_FIELDS_YET": "No fields yet",
+    "STAGE_ROW": "Row calculation",
+    "STAGE_AGGREGATE": "Aggregate",
+    "STAGE_WINDOW": "Window calculation",
+    "FORMULA_COMPUTED_ON_SERVER": "Computed on the server after the query. To filter or aggregate on a computed value at the database, put the expression in your dataset SQL."
   },
   "ANALYSES": {
     "CREATE_MISSING_DATASET": "Cannot create analysis: the source dataset is missing. Please retry from a dataset.",

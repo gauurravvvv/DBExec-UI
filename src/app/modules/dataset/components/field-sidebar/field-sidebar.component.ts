@@ -45,19 +45,26 @@ export class FieldSidebarComponent {
   constructor(private store: DatasetFieldsStore) {}
 
   /**
-   * Tier label for a formula field. Null for a plain column and for a formula
-   * whose tier has not been resolved yet (a legacy row saved before the engine
-   * recorded it), so the badge simply does not render rather than guessing.
+   * Calculation-kind label for a formula field. Null for a plain column, and for
+   * a formula whose stage was never recorded (a legacy row saved before the
+   * engine tracked it) — the badge simply does not render rather than guessing.
    */
-  tierKey(field: DatasetFieldVm): string | null {
-    if (!field.isCustom || field.pushdownable === null) return null;
-    return field.pushdownable
-      ? 'DATASET.FORMULA_AT_SOURCE'
-      : 'DATASET.FORMULA_AFTER_QUERY';
+  stageKey(field: DatasetFieldVm): string | null {
+    if (!field.isCustom || !field.stage) return null;
+    switch (field.stage) {
+      case 'AGG':
+        return 'DATASET.STAGE_AGGREGATE';
+      case 'WINDOW':
+        return 'DATASET.STAGE_WINDOW';
+      default:
+        return 'DATASET.STAGE_ROW';
+    }
   }
 
-  tierIcon(field: DatasetFieldVm): string {
-    return field.pushdownable ? 'pi pi-database' : 'pi pi-calculator';
+  stageIcon(field: DatasetFieldVm): string {
+    if (field.stage === 'AGG') return 'pi pi-chart-bar';
+    if (field.stage === 'WINDOW') return 'pi pi-sort-amount-down';
+    return 'pi pi-list';
   }
 
   trackById(_index: number, field: DatasetFieldVm): string {

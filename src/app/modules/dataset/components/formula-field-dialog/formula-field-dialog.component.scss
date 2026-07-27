@@ -1049,3 +1049,11 @@
     font-size: var(--fs-micro);
   }
 }
+
+/* Note under the calculation-kind badge explaining where evaluation happens. */
+.acf-tier-note {
+  margin: var(--space-2) 0 0;
+  font-size: var(--fs-micro);
+  color: var(--text-color-secondary);
+  line-height: 1.5;
+}

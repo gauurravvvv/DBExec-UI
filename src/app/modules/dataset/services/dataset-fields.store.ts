@@ -22,13 +22,12 @@ export interface DatasetFieldVm {
   /** Formula source for a derived field; null for an introspected column. */
   formula: string | null;
   dataType: string | null;
-  /** Resolved execution tier for a derived field. */
-  stage: FormulaStage | null;
   /**
-   * Whether the field is computed at the data source (so it is filterable,
-   * sortable and aggregatable) rather than after the query.
+   * What kind of calculation a derived field is: ROW (per row), AGG (collapses
+   * the column) or WINDOW (depends on row order or partition). All are computed
+   * on the API server.
    */
-  pushdownable: boolean | null;
+  stage: FormulaStage | null;
   isCustom: boolean;
 }
 
@@ -42,7 +41,6 @@ export function toFieldVm(row: any): DatasetFieldVm {
     formula: row?.customLogic ?? null,
     dataType: row?.typeOverride ?? row?.dataType ?? null,
     stage: (row?.stage as FormulaStage) ?? null,
-    pushdownable: row?.pushdownable ?? null,
     isCustom: !!row?.customLogic,
   };
 }

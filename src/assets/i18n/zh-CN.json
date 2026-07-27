@@ -1032,13 +1032,15 @@
     "CALC_FIELD_TYPE_TEXT": "文本",
     "CALC_FIELD_TYPE_DATE": "日期",
     "CALC_FIELD_TYPE_BOOLEAN": "布尔值",
-    "FORMULA_AT_SOURCE": "在数据源计算 — 可筛选、可排序、可聚合",
-    "FORMULA_AFTER_QUERY": "查询后计算 — 仅用于显示",
     "FIELDS_TITLE": "字段",
     "NEW_FIELD": "新建字段",
     "FORMULA_FIELD": "公式字段",
     "BASE_COLUMN": "列",
-    "NO_FIELDS_YET": "尚无字段"
+    "NO_FIELDS_YET": "尚无字段",
+    "STAGE_ROW": "行级计算",
+    "STAGE_AGGREGATE": "聚合",
+    "STAGE_WINDOW": "窗口计算",
+    "FORMULA_COMPUTED_ON_SERVER": "在查询之后由服务器计算。若需在数据库中对计算值进行筛选或聚合，请将表达式写入数据集 SQL。"
   },
   "ANALYSES": {
     "CREATE_MISSING_DATASET": "无法创建分析：缺少源数据集。请从数据集重试。",

@@ -1032,13 +1032,15 @@
     "CALC_FIELD_TYPE_TEXT": "Testo",
     "CALC_FIELD_TYPE_DATE": "Data",
     "CALC_FIELD_TYPE_BOOLEAN": "Booleano",
-    "FORMULA_AT_SOURCE": "Calcolato alla sorgente — filtrabile, ordinabile, aggregabile",
-    "FORMULA_AFTER_QUERY": "Calcolato dopo la query — solo visualizzazione",
     "FIELDS_TITLE": "Campi",
     "NEW_FIELD": "Nuovo campo",
     "FORMULA_FIELD": "Campo formula",
     "BASE_COLUMN": "Colonna",
-    "NO_FIELDS_YET": "Nessun campo finora"
+    "NO_FIELDS_YET": "Nessun campo finora",
+    "STAGE_ROW": "Calcolo per riga",
+    "STAGE_AGGREGATE": "Aggregato",
+    "STAGE_WINDOW": "Calcolo finestra",
+    "FORMULA_COMPUTED_ON_SERVER": "Calcolato sul server dopo la query. Per filtrare o aggregare un valore calcolato nel database, inserisci l’espressione nell’SQL del dataset."
   },
   "ANALYSES": {
     "CREATE_MISSING_DATASET": "Impossibile creare l'analisi: il set di dati di origine è mancante. Riprova da un dataset.",

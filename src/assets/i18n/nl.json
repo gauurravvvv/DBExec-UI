@@ -1032,13 +1032,15 @@
     "CALC_FIELD_TYPE_TEXT": "Tekst",
     "CALC_FIELD_TYPE_DATE": "Datum",
     "CALC_FIELD_TYPE_BOOLEAN": "Booleaans",
-    "FORMULA_AT_SOURCE": "Berekend bij de bron — filterbaar, sorteerbaar, aggregeerbaar",
-    "FORMULA_AFTER_QUERY": "Berekend na de query — alleen weergave",
     "FIELDS_TITLE": "Velden",
     "NEW_FIELD": "Nieuw veld",
     "FORMULA_FIELD": "Formuleveld",
     "BASE_COLUMN": "Kolom",
-    "NO_FIELDS_YET": "Nog geen velden"
+    "NO_FIELDS_YET": "Nog geen velden",
+    "STAGE_ROW": "Rijberekening",
+    "STAGE_AGGREGATE": "Aggregaat",
+    "STAGE_WINDOW": "Vensterberekening",
+    "FORMULA_COMPUTED_ON_SERVER": "Wordt na de query op de server berekend. Zet de expressie in de dataset-SQL om op een berekende waarde te filteren of aggregeren in de database."
   },
   "ANALYSES": {
     "CREATE_MISSING_DATASET": "Kan analyse niet maken: de brondataset ontbreekt. Probeer het opnieuw vanuit een dataset.",
