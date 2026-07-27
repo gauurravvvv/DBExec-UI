@@ -14,7 +14,7 @@
  */
 import { Injectable, computed, signal } from '@angular/core';
 import { Observable, of } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { shareReplay, tap } from 'rxjs/operators';
 import { DATASET } from 'src/app/core/constants/api.constant';
 import { HttpClientService } from 'src/app/core/services/http-client.service';
 
@@ -52,6 +52,14 @@ export class FormulaCatalogService {
   private _dateUnits = signal<string[]>([]);
   private _loading = signal(false);
   private _loaded = false;
+  /**
+   * The in-flight request, shared.
+   *
+   * Without this, a second caller arriving while the first was still loading got
+   * `of(this._categories())` — an empty array at that moment — and set its
+   * palette to nothing. Two dialogs opening together was enough to trigger it.
+   */
+  private _inFlight: Observable<FormulaCategory[]> | null = null;
 
   readonly categories = this._categories.asReadonly();
   readonly limits = this._limits.asReadonly();
@@ -76,10 +84,10 @@ export class FormulaCatalogService {
    */
   load(): Observable<FormulaCategory[]> {
     if (this._loaded) return of(this._categories());
-    if (this._loading()) return of(this._categories());
+    if (this._inFlight) return this._inFlight;
 
     this._loading.set(true);
-    return this.http
+    this._inFlight = this.http
       .apiGet(DATASET.FORMULA_CATALOG, { skipLoader: true })
       .pipe(
         tap({
@@ -91,9 +99,18 @@ export class FormulaCatalogService {
             this._loaded = true;
             this._loading.set(false);
           },
-          error: () => this._loading.set(false),
+          error: () => {
+            this._loading.set(false);
+            // Allow a retry on the next open rather than caching the failure.
+            this._inFlight = null;
+          },
         }),
+        // Late subscribers get the same response instead of firing a second
+        // request or, worse, an empty snapshot.
+        shareReplay({ bufferSize: 1, refCount: false }),
       ) as unknown as Observable<FormulaCategory[]>;
+
+    return this._inFlight;
   }
 
   find(name: string): FormulaFunction | undefined {

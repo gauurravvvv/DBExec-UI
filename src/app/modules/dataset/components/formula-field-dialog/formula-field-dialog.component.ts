@@ -413,20 +413,17 @@ export class FormulaFieldDialogComponent
       this.completionProviderDisposable.dispose();
     }
 
-    const allFunctions = this.getAllFunctions();
-
-    // Filter out current field in edit mode to prevent self-reference
-    let availableFields = this.datasetFields || [];
-    if (this.editMode && this.editFieldData) {
-      availableFields = availableFields.filter(
-        (field: any) => field.id !== this.editFieldData.id,
-      );
-    }
-
     this.completionProviderDisposable =
       monaco.languages.registerCompletionItemProvider('formulaLang', {
         triggerCharacters: ['{', '(', ',', ' '],
         provideCompletionItems: (model: any, position: any) => {
+          // Resolved on EVERY keystroke, not captured when the provider was
+          // registered. An earlier version snapshotted both lists here, so a
+          // field created moments ago did not appear in the next formula's
+          // suggestions until the dialog was reopened — the opposite of the
+          // seamless create -> pick -> create loop the store exists to give.
+          const allFunctions = this.getAllFunctions();
+          const availableFields = this.suggestableFields();
           const textUntilPosition = model.getValueInRange({
             startLineNumber: 1,
             startColumn: 1,
@@ -471,6 +468,40 @@ export class FormulaFieldDialogComponent
           return { suggestions };
         },
       });
+  }
+
+  /**
+   * Fields offerable as `{name}` right now.
+   *
+   * Union of the live store (so a field saved seconds ago is immediately
+   * suggestable, regardless of how the host screen wires its @Input) and the
+   * @Input itself (so a host that has not adopted the store still works).
+   * The field being edited is excluded — a formula cannot reference itself, and
+   * the backend rejects it, so offering it would only invite a 400.
+   */
+  private suggestableFields(): any[] {
+    const byName = new Map<string, any>();
+
+    for (const f of this.datasetFields ?? []) {
+      const name = (f?.columnToUse || f?.columnToView || '').trim();
+      if (name) byName.set(name, f);
+    }
+    for (const f of this.fieldsStore.fields()) {
+      if (f.name && !byName.has(f.name)) {
+        byName.set(f.name, { columnToUse: f.name, columnToView: f.label, dataType: f.dataType });
+      }
+    }
+
+    const selfName = this.editMode
+      ? (this.editFieldData?.columnToUse || this.editFieldData?.columnToView || '').trim()
+      : '';
+    const selfId = this.editMode ? this.editFieldData?.id : null;
+
+    return [...byName.values()].filter(f => {
+      if (selfId && f.id === selfId) return false;
+      const name = (f?.columnToUse || f?.columnToView || '').trim();
+      return !(selfName && name === selfName);
+    });
   }
 
   /** Flat function list, from the catalog. */
