@@ -15,6 +15,18 @@
 - Modules updated: all (initialized).
 - Open for next session: Module files carry accurate Context/Goals scaffolds; enrich individual files with deeper specifics as work touches them. Follow the session-end protocol on every future change.
 
+## 2026-07-27 — Formula UI verified in a browser (Playwright 16/16)
+Added e2e/formula-fields.e2e.ts (npm run test:e2e:formula) with a test-cases doc.
+All 16 green against the live stack, covering the catalog palette, live
+suggestions, the three stage badges, validation errors, save-without-navigation
+and the sidebar.
+Found two app defects: the sidebar badge was icon-only and unreadable, and a
+stray `&__stage` at the root of the sidebar SCSS broke the bundle while ng serve
+kept serving it silently.
+Automation notes: never wait on networkidle (open SSE stream); set Monaco values
+via its model API, not keystrokes (auto-closing brackets and dropped early keys);
+the suggest list is virtualised so filter by prefix.
+
 ## 2026-07-27 — Formula suggestions made live
 The Monaco completion provider snapshotted its function and field lists when the
 dialog opened, so a just-created field was not suggestable until reopen. Both are
