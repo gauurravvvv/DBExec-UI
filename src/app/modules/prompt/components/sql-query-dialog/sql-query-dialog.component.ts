@@ -5,6 +5,7 @@ import {
   ElementRef,
   EventEmitter,
   HostListener,
+  inject,
   Input,
   OnChanges,
   OnDestroy,
@@ -15,9 +16,9 @@ import {
 import { MonacoLoaderService } from 'src/app/core/services/monaco-loader.service';
 import { MonacoIntelliSenseService } from '../../../dataset/services/monaco-intellisense.service';
 import {
-  currentDbexecTheme,
-  defineDbexecThemes,
-} from '../../../../shared/editor/monaco-theme';
+  CodeEditorService,
+  EditorHandle,
+} from 'src/app/shared/editor/code-editor.service';
 
 declare const monaco: any;
 declare const window: any;
@@ -130,15 +131,15 @@ export class SqlQueryDialogComponent
 
   // Monaco Editor
   editor: any = null;
+  /** Owns the editor lifetime; see CodeEditorService. */
+  private handle: EditorHandle | null = null;
+  private codeEditor = inject(CodeEditorService);
   private completionProviderDisposable: any = null;
   private hoverProviderDisposable: any = null;
   private signatureHelpDisposable: any = null;
   isLoadingEditor = true;
   monacoLoadFailed = false;
   // Light default — Monaco's setTheme is global; a dark default could
-  // leak into other editors. getCurrentTheme() corrects at init.
-  private currentTheme: string = 'vs';
-  private themeObserver: MutationObserver | null = null;
 
   constructor(
     private monacoIntelliSenseService: MonacoIntelliSenseService,
@@ -158,7 +159,10 @@ export class SqlQueryDialogComponent
 
   ngOnDestroy() {
     if (this.editor) {
-      this.editor.dispose();
+      // Through the handle: it disposes the editor plus every listener and
+      // overlay registered against it, so nothing is left behind.
+      this.handle?.dispose();
+      this.handle = null;
     }
 
     // Dispose IntelliSense providers
@@ -173,10 +177,6 @@ export class SqlQueryDialogComponent
     }
 
     // Cleanup theme observer
-    if (this.themeObserver) {
-      this.themeObserver.disconnect();
-      this.themeObserver = null;
-    }
   }
 
   ngOnChanges(changes: SimpleChanges) {
@@ -191,59 +191,26 @@ export class SqlQueryDialogComponent
       } else {
         // Dispose editor when dialog closes
         if (this.editor) {
-          this.editor.dispose();
+          // Through the handle: it disposes the editor plus every listener and
+          // overlay registered against it, so nothing is left behind.
+          this.handle?.dispose();
+          this.handle = null;
           this.editor = null;
         }
       }
     }
   }
 
-  /**
-   * The app-wide Monaco theme.
-   *
-   * This used to branch on a `dark-theme` body class that nothing in the app
-   * ever adds, so the dark arm could never fire and Monaco always rendered
-   * light. There is now one theme, built from the live design tokens, so it
-   * follows an organisation's brand colour instead of hard-coding blue.
-   */
-  private getCurrentTheme(): string {
-    return currentDbexecTheme();
-  }
 
   /**
    * Setup MutationObserver to watch for theme changes
    */
-  private setupThemeObserver(): void {
-    this.currentTheme = this.getCurrentTheme();
-
-    // Watch for theme changes on body element
-    this.themeObserver = new MutationObserver(mutations => {
-      mutations.forEach(mutation => {
-        if (
-          mutation.type === 'attributes' &&
-          mutation.attributeName === 'class'
-        ) {
-          const newTheme = this.getCurrentTheme();
-          if (newTheme !== this.currentTheme) {
-            this.currentTheme = newTheme;
-            this.updateEditorTheme();
-          }
-        }
-      });
-    });
-
-    this.themeObserver.observe(document.body, {
-      attributes: true,
-      attributeFilter: ['class'],
-    });
-  }
 
   /**
    * Update Monaco Editor theme
    */
   private updateEditorTheme(): void {
     if (this.editor) {
-      monaco.editor.setTheme(this.currentTheme);
     }
   }
 
@@ -267,7 +234,7 @@ export class SqlQueryDialogComponent
 
   private initMonaco(): void {
     // Wait for the DOM to be ready
-    setTimeout(() => {
+    setTimeout(async () => {
       const container = this.sqlQueryEditorContainer?.nativeElement;
       if (!container) {
         this.isLoadingEditor = false;
@@ -276,30 +243,27 @@ export class SqlQueryDialogComponent
 
       try {
         // Setup theme monitoring
-        this.setupThemeObserver();
 
         // Dispose previous editor if exists
         if (this.editor) {
-          this.editor.dispose();
+          // Through the handle: it disposes the editor plus every listener and
+          // overlay registered against it, so nothing is left behind.
+          this.handle?.dispose();
+          this.handle = null;
         }
-
-        // Re-read the live theme right before create (Monaco theme is
-        // global; avoids inheriting a stale theme from another editor).
-        this.currentTheme = this.getCurrentTheme();
-
-        // Create Monaco Editor instance
-        // Register the app theme from the live design tokens before create —
-        // Monaco throws on setTheme for a name it does not know, and re-running
-        // this is how the editor picks up an organisation's brand colour.
-        defineDbexecThemes();
-        this.editor = monaco.editor.create(container, {
-          ...MONACO_EDITOR_OPTIONS,
+        // One call replaces load → register language → define theme → create →
+        // re-assert the global theme → focus. CodeEditorService owns that sequence
+        // for every editor in the app, so this screen cannot drift from the others.
+        const handle = await this.codeEditor.create({
+          host: container,
+          flavour: 'sql',
           value: this.sqlQuery || '',
-          theme: this.currentTheme,
+                  autoFocus: true,
         });
-
-        // Assert the global theme after create to correct any leak.
-        monaco.editor.setTheme(this.currentTheme);
+        this.handle = handle;
+        // Existing call sites keep using this.editor; the handle is what
+        // disposal goes through.
+        this.editor = handle.editor;
 
         // Setup content change listener
         this.editor.onDidChangeModelContent(() => {

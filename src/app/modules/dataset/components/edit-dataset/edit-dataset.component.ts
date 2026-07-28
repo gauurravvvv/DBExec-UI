@@ -78,9 +78,9 @@ import {
   rowsToJson,
 } from '../add-dataset/dataset-result-tools.helper';
 import {
-  currentDbexecTheme,
-  defineDbexecThemes,
-} from '../../../../shared/editor/monaco-theme';
+  CodeEditorService,
+  EditorHandle,
+} from 'src/app/shared/editor/code-editor.service';
 
 // Declare Monaco and window for TypeScript
 declare const monaco: any;
@@ -111,6 +111,9 @@ export class EditDatasetComponent
   originalQuery: string = ''; // Store original query from dataset
 
   editor: any;
+  /** Owns the editor lifetime; see CodeEditorService. */
+  private handle: EditorHandle | null = null;
+  private codeEditor = inject(CodeEditorService);
   isLoadingEditor = true;
   isLoadingSchema = false;
   isExecutingQuery = false;
@@ -134,10 +137,7 @@ export class EditDatasetComponent
   // 'vs-dark' — Monaco's setTheme is GLOBAL, so a stale dark default
   // here could leak into the editor when it re-creates on a
   // navigate-away-and-back (the editor mounts before the theme is
-  // re-asserted). getCurrentTheme() corrects this at create time, but
   // the safe default avoids a dark flash / stuck-dark editor.
-  private themeObserver: MutationObserver | null = null;
-  private currentTheme: string = 'vs';
 
   // Database sidebar
   showDatasourceSidebar = true;
@@ -455,7 +455,6 @@ export class EditDatasetComponent
 
   private initializeComponent(): void {
     // Setup theme monitoring
-    this.setupThemeObserver();
 
     // Close context menus on click outside
     document.addEventListener('click', this.boundCloseContextMenu);
@@ -494,52 +493,16 @@ export class EditDatasetComponent
     this.refreshSingleDatasource(this.selectedDatasourceObj.id);
   }
 
-  /**
-   * The app-wide Monaco theme.
-   *
-   * This used to branch on a `dark-theme` body class that nothing in the app
-   * ever adds, so the dark arm could never fire and Monaco always rendered
-   * light. There is now one theme, built from the live design tokens, so it
-   * follows an organisation's brand colour instead of hard-coding blue.
-   */
-  private getCurrentTheme(): string {
-    return currentDbexecTheme();
-  }
 
   /**
    * Setup MutationObserver to watch for theme changes
    */
-  private setupThemeObserver(): void {
-    this.currentTheme = this.getCurrentTheme();
-
-    // Watch for theme changes on body element
-    this.themeObserver = new MutationObserver(mutations => {
-      mutations.forEach(mutation => {
-        if (
-          mutation.type === 'attributes' &&
-          mutation.attributeName === 'class'
-        ) {
-          const newTheme = this.getCurrentTheme();
-          if (newTheme !== this.currentTheme) {
-            this.currentTheme = newTheme;
-            this.updateEditorTheme();
-          }
-        }
-      });
-    });
-
-    this.themeObserver.observe(document.body, {
-      attributes: true,
-      attributeFilter: ['class'],
-    });
-  }
 
   /**
    * Update Monaco Editor theme
    */
   private updateEditorTheme(): void {
     if (this.editor) {
-      monaco.editor.setTheme(this.currentTheme);
     }
   }
 
@@ -561,7 +524,10 @@ export class EditDatasetComponent
     }
 
     if (this.editor) {
-      this.editor.dispose();
+      // Through the handle: it disposes the editor plus every listener and
+      // overlay registered against it, so nothing is left behind.
+      this.handle?.dispose();
+      this.handle = null;
     }
 
     // Dispose IntelliSense providers
@@ -582,10 +548,6 @@ export class EditDatasetComponent
     }
 
     // Cleanup theme observer
-    if (this.themeObserver) {
-      this.themeObserver.disconnect();
-      this.themeObserver = null;
-    }
 
     // Remove context menu listener
     document.removeEventListener('click', this.boundCloseContextMenu);
@@ -628,7 +590,7 @@ export class EditDatasetComponent
     );
 
     // Wait for the DOM to be ready
-    setTimeout(() => {
+    setTimeout(async () => {
       const container = this.sqlEditorContainer?.nativeElement;
       if (!container) {
         this.isLoadingEditor = false;
@@ -639,34 +601,31 @@ export class EditDatasetComponent
       try {
         // Dispose previous editor if exists
         if (this.editor) {
-          this.editor.dispose();
+          // Through the handle: it disposes the editor plus every listener and
+          // overlay registered against it, so nothing is left behind.
+          this.handle?.dispose();
+          this.handle = null;
         }
 
         const initialValue = this.initialQuery || SQL_EDITOR_PLACEHOLDER;
-
-        // Re-read the live theme right before creating. Monaco's theme
-        // is global state, so on a navigate-away-and-back the editor
-        // can otherwise inherit whatever theme the last-created editor
-        // (on another screen) left behind. Recomputing here + asserting
-        // setTheme below keeps the editor in sync with the app.
-        this.currentTheme = this.getCurrentTheme();
-
-        // Create Monaco Editor instance
-        // Register the app theme from the live design tokens before create —
-        // Monaco throws on setTheme for a name it does not know, and re-running
-        // this is how the editor picks up an organisation's brand colour.
-        defineDbexecThemes();
-        this.editor = monaco.editor.create(container, {
-          ...MONACO_EDITOR_OPTIONS,
+        // One call replaces load → register language → define theme → create →
+        // re-assert the global theme → focus. CodeEditorService owns that sequence
+        // for every editor in the app, so this screen cannot drift from the others.
+        const handle = await this.codeEditor.create({
+          host: container,
+          flavour: 'sql',
           value: initialValue,
-          theme: this.currentTheme,
+                  autoFocus: true,
         });
+        this.handle = handle;
+        // Existing call sites keep using this.editor; the handle is what
+        // disposal goes through.
+        this.editor = handle.editor;
 
         // Assert the theme globally after create. `create()`'s `theme`
         // option sets the global theme, but doing it explicitly here
         // makes the intent obvious and corrects any leak from another
         // Monaco instance mounted on a previously-visited screen.
-        monaco.editor.setTheme(this.currentTheme);
         this.currentQuery = initialValue;
 
         // Add Ctrl+Enter handler for query execution

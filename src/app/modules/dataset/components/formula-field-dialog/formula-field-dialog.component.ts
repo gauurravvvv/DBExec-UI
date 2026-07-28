@@ -16,8 +16,10 @@ import {
 } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import { GlobalService } from 'src/app/core/services/global.service';
-import { MonacoLoaderService } from 'src/app/core/services/monaco-loader.service';
-import { FORMULA_EDITOR_OPTIONS } from '../../config/formula-editor.config';
+import {
+  CodeEditorService,
+  EditorHandle,
+} from 'src/app/shared/editor/code-editor.service';
 import {
   FormulaCatalogService,
   FormulaCategory,
@@ -29,12 +31,9 @@ import { ANALYTICAL_TYPES } from '../edit-dataset-fields-dialog/edit-dataset-fie
 import {
   createFieldCompletionItem,
   createFunctionCompletionItem,
-  createThemeObserver,
   CustomFieldData,
   FORMULA_LANGUAGE_CONFIG,
   FORMULA_TOKENIZER,
-  defineDbexecThemes,
-  getCurrentMonacoTheme,
 } from './formula-monaco.helper';
 
 // Declare Monaco for TypeScript
@@ -123,13 +122,11 @@ export class FormulaFieldDialogComponent
 
   // Monaco Editor
   private editor: any = null;
+  /** Owns the editor's lifetime; see CodeEditorService. */
+  private handle: EditorHandle | null = null;
   private completionProviderDisposable: any = null;
   isLoadingEditor = false;
   monacoLoadFailed = false;
-  // Light default — Monaco's setTheme is global; a dark default could
-  // leak into other editors. getCurrentMonacoTheme() corrects at init.
-  private currentTheme: string = 'vs';
-  private themeObserver: MutationObserver | null = null;
   private languageRegistered = false;
 
   trackById(index: number, item: any): any {
@@ -146,7 +143,7 @@ export class FormulaFieldDialogComponent
     private datasetService: DatasetService,
     private globalService: GlobalService,
     private cdr: ChangeDetectorRef,
-    private monacoLoader: MonacoLoaderService,
+    private codeEditor: CodeEditorService,
     private translate: TranslateService,
     private catalog: FormulaCatalogService,
     private fieldsStore: DatasetFieldsStore,
@@ -183,10 +180,6 @@ export class FormulaFieldDialogComponent
 
   ngOnDestroy() {
     this.disposeEditor();
-    if (this.themeObserver) {
-      this.themeObserver.disconnect();
-      this.themeObserver = null;
-    }
   }
 
   ngOnChanges(changes: SimpleChanges) {
@@ -292,29 +285,40 @@ export class FormulaFieldDialogComponent
     this.close.emit(null);
   }
 
-  private setupThemeObserver(): void {
-    this.currentTheme = getCurrentMonacoTheme();
-
-    if (this.themeObserver) {
-      this.themeObserver.disconnect();
-    }
-
-    this.themeObserver = createThemeObserver((newTheme: string) => {
-      if (newTheme !== this.currentTheme) {
-        this.currentTheme = newTheme;
-        if (this.editor) {
-          monaco.editor.setTheme(this.currentTheme);
-        }
-      }
-    });
-  }
-
   private initializeMonacoEditor(): void {
+    const container = this.formulaEditorContainer?.nativeElement;
+    if (!container) {
+      this.isLoadingEditor = false;
+      return;
+    }
     this.isLoadingEditor = true;
-    this.monacoLoader
-      .load()
-      .then(() => {
-        this.createEditor();
+
+    // One call replaces load → register language → define theme → create →
+    // re-assert theme → focus. CodeEditorService owns that sequence for every
+    // editor in the app, so this screen cannot drift from the others.
+    this.disposeEditor();
+    this.codeEditor
+      .create({
+        host: container,
+        flavour: 'formula',
+        value: this.customField.columnToUse || '',
+        autoFocus: true,
+      })
+      .then(handle => {
+        this.handle = handle;
+        // Existing call sites (insertTextAtCursor, validation markers, …) keep
+        // using this.editor; the handle is what disposal goes through.
+        this.editor = handle.editor;
+
+        handle.onChange(value => {
+          this.customField.columnToUse = value;
+          this.onFormulaChange();
+        });
+
+        this.registerCompletionProvider();
+
+        this.isLoadingEditor = false;
+        this.cdr.markForCheck();
       })
       .catch(() => {
         this.isLoadingEditor = false;
@@ -353,63 +357,6 @@ export class FormulaFieldDialogComponent
     monaco.languages.setMonarchTokensProvider('formulaLang', FORMULA_TOKENIZER);
 
     this.languageRegistered = true;
-  }
-
-  private createEditor(): void {
-    const container = this.formulaEditorContainer?.nativeElement;
-    if (!container) {
-      this.isLoadingEditor = false;
-      return;
-    }
-
-    try {
-      // Register custom language
-      this.registerFormulaLanguage();
-
-      // Register the app-matched themes BEFORE any theme is read or applied —
-      // getCurrentMonacoTheme falls back to the stock names until they exist.
-      defineDbexecThemes();
-
-      // Setup theme observer
-      this.setupThemeObserver();
-
-      // Dispose previous editor if exists
-      if (this.editor) {
-        this.editor.dispose();
-      }
-
-      // Re-read the live theme right before create (Monaco theme is
-      // global; avoids inheriting a stale theme from another editor).
-      this.currentTheme = getCurrentMonacoTheme();
-
-      // Create Monaco Editor instance
-      this.editor = monaco.editor.create(container, {
-        ...FORMULA_EDITOR_OPTIONS,
-        value: this.customField.columnToUse || '',
-        theme: this.currentTheme,
-      });
-
-      // Assert the global theme after create to correct any leak.
-      monaco.editor.setTheme(this.currentTheme);
-
-      // Setup content change listener
-      this.editor.onDidChangeModelContent(() => {
-        this.customField.columnToUse = this.editor.getValue();
-        this.onFormulaChange();
-      });
-
-      // Register IntelliSense
-      this.registerCompletionProvider();
-
-      // Focus the editor
-      this.editor.focus();
-
-      this.isLoadingEditor = false;
-    } catch (error) {
-      console.error('Error creating Monaco editor:', error);
-      this.isLoadingEditor = false;
-      this.monacoLoadFailed = true;
-    }
   }
 
   private registerCompletionProvider(): void {
@@ -523,17 +470,11 @@ export class FormulaFieldDialogComponent
       this.completionProviderDisposable.dispose();
       this.completionProviderDisposable = null;
     }
-    if (this.editor) {
-      this.editor.dispose();
-      this.editor = null;
-    }
-    // Disconnect the body-class theme observer on close too, not only on
-    // destroy — a persistent ([visible]) mount would otherwise keep an idle
-    // MutationObserver firing on every theme toggle while the dialog is shut.
-    if (this.themeObserver) {
-      this.themeObserver.disconnect();
-      this.themeObserver = null;
-    }
+    // The handle disposes the editor plus every listener and overlay registered
+    // against it, so there is one thing to call and nothing to forget.
+    this.handle?.dispose();
+    this.handle = null;
+    this.editor = null;
     this.isLoadingEditor = false;
     this.monacoLoadFailed = false;
   }

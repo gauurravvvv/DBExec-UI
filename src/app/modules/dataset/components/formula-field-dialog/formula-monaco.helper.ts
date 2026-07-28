@@ -49,35 +49,15 @@ import {
   defineDbexecThemes,
 } from '../../../../shared/editor/monaco-theme';
 
+// createThemeObserver used to live here. It watched the body class to swap
+// between Monaco's vs and vs-dark themes; with one token-driven theme it could
+// only ever re-apply the same name, so every caller was doing nothing. Use
+// CodeEditorService.refreshTheme() if a brand change has to reach open editors.
+
 // `getCurrentMonacoTheme` is kept as an alias so existing call sites read the
 // same; both names resolve to the one shared theme.
 export { defineDbexecThemes, currentDbexecTheme as getCurrentMonacoTheme };
 
-/**
- * Create a theme observer that updates Monaco editor theme when app theme changes
- */
-export function createThemeObserver(
-  onThemeChange: (theme: string) => void,
-): MutationObserver {
-  const observer = new MutationObserver(mutations => {
-    mutations.forEach(mutation => {
-      if (
-        mutation.type === 'attributes' &&
-        mutation.attributeName === 'class'
-      ) {
-        const newTheme = currentDbexecTheme();
-        onThemeChange(newTheme);
-      }
-    });
-  });
-
-  observer.observe(document.body, {
-    attributes: true,
-    attributeFilter: ['class'],
-  });
-
-  return observer;
-}
 
 /**
  * Generate completion items for functions
