@@ -52,6 +52,7 @@
     // Shared with the object explorers' rows, so a field row and a column row
     // read the same. align-items is centre now that the type is on one line.
     @include editor-side-row(true);
+    @include editor-explorer-reveals-type('.field-sidebar__type');
 
     &.is-formula {
       cursor: pointer;

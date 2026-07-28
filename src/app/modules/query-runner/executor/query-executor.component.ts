@@ -520,6 +520,15 @@ export class QueryExecutorComponent
    */
   schemaSearchText = '';
 
+  /** True when `t`'s name matches, or one of its LOADED columns does. */
+  private tableMatches(t: TreeTable, q: string): boolean {
+    if (t.name.toLowerCase().includes(q)) return true;
+    // Columns only exist here once the table has been expanded or completion
+    // fetched them — the tree loads lazily. So a column search reaches what is
+    // loaded, which is why the placeholder says "tables and loaded columns".
+    return (t.columns ?? []).some(c => c.name.toLowerCase().includes(q));
+  }
+
   /** Schemas to render: all of them, or those matching the filter. */
   get filteredSchemas(): TreeSchema[] {
     const q = this.schemaSearchText.trim().toLowerCase();
@@ -527,7 +536,7 @@ export class QueryExecutorComponent
     return this.browser.filter(
       s =>
         s.schema.toLowerCase().includes(q) ||
-        s.tables.some(t => t.name.toLowerCase().includes(q)),
+        s.tables.some(t => this.tableMatches(t, q)),
     );
   }
 
@@ -540,7 +549,18 @@ export class QueryExecutorComponent
   tablesFor(s: TreeSchema): TreeTable[] {
     const q = this.schemaSearchText.trim().toLowerCase();
     if (!q || s.schema.toLowerCase().includes(q)) return s.tables;
-    return s.tables.filter(t => t.name.toLowerCase().includes(q));
+    return s.tables.filter(t => this.tableMatches(t, q));
+  }
+
+  /** Columns of `t` to render under the filter. */
+  columnsFor(t: TreeTable): TreeTable['columns'] {
+    const q = this.schemaSearchText.trim().toLowerCase();
+    const cols = t.columns ?? [];
+    if (!q || t.name.toLowerCase().includes(q)) return cols;
+    const hits = cols.filter(c => c.name.toLowerCase().includes(q));
+    // A table kept only because its NAME matched shows all its columns; a table
+    // kept because a column matched shows just the matches.
+    return hits.length ? hits : cols;
   }
 
   toggleGroup(s: TreeSchema, group: keyof TreeSchema['g']): void {

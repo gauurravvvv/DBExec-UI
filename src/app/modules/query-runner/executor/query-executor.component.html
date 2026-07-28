@@ -187,7 +187,7 @@
           type="text"
           autocomplete="off"
           [(ngModel)]="schemaSearchText"
-          [placeholder]="'DATASET.SEARCH_TABLES' | translate"
+          [placeholder]="'DATASET.SEARCH_EXPLORER' | translate"
         />
       </div>
       <div class="qx-tree">
@@ -268,7 +268,7 @@
                   <div class="qx-cols" *ngIf="t.open">
                     <div
                       class="qx-col"
-                      *ngFor="let c of t.columns"
+                      *ngFor="let c of columnsFor(t)"
                       (click)="insertText(c.name)"
                     >
                       <i

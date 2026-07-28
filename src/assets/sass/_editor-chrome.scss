@@ -250,7 +250,10 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  font-size: var(--fs-control);
+  // --fs-body, not --fs-control. The token comments assume a 16px root; this app
+  // sets 14px, so --fs-control renders at 11.375px — measurably too small for a
+  // tree the user reads down. --fs-body gives 12.25px.
+  font-size: var(--fs-body);
   border-left: 3px solid transparent;
   transition:
     background var(--motion-base) ease,
@@ -331,6 +334,12 @@
 
 /** The identifier itself. Truncates rather than wrapping: a tree row is one line. */
 @mixin editor-explorer-name {
+  // Pinned rather than inherited: the executor's tree was picking up a monospace
+  // stack from an ancestor while the dataset sidebar used the UI font, so the same
+  // column name looked different on the two screens. Identifiers use the UI font;
+  // only TYPES and formulas are monospaced.
+  font-family: var(--font-ui);
+  font-size: var(--fs-body);
   color: var(--text-color);
   overflow: hidden;
   text-overflow: ellipsis;
@@ -350,10 +359,31 @@
   margin-left: auto;
   padding-left: var(--space-3);
   font-family: var(--font-mono);
-  font-size: var(--fs-micro);
+  font-size: var(--fs-label);
   color: var(--text-muted);
   flex-shrink: 0;
   white-space: nowrap;
+
+  // Hidden at rest, revealed on hover.
+  //
+  // At rest the type is noise: `character varying` is longer than most of the
+  // column names beside it, so a column list reads as two competing columns of
+  // text. Opacity rather than display:none keeps the row's width reserved, so
+  // nothing reflows when it appears.
+  opacity: 0;
+  transition: opacity var(--motion-base) ease;
+}
+
+/**
+ * Apply to the ROW that contains a type label, so hovering the row reveals it.
+ * Kept separate from editor-explorer-type because the row and the label are
+ * styled in different blocks.
+ */
+@mixin editor-explorer-reveals-type($type-selector) {
+  &:hover #{$type-selector},
+  &:focus-within #{$type-selector} {
+    opacity: 1;
+  }
 }
 
 /** Chevrons and object icons ahead of the name. */
@@ -454,4 +484,75 @@
   font-size: var(--fs-body);
   color: var(--warning-color);
   flex-shrink: 0;
+}
+
+// ── Dialog header ────────────────────────────────────────────────────────────
+// The composition every popup on these screens uses: an icon in a rounded tinted
+// square, a title, an optional subtitle, and a ghost close button on the right.
+// Lifted from the Field Creator dialog, which is the reference look.
+@mixin editor-dialog-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: var(--space-5) var(--space-6);
+  background: var(--card-background);
+  border-bottom: 1px solid var(--border-color);
+
+  // The icon chip. A bare glyph beside the title reads as decoration; the tinted
+  // square reads as part of the app's dialog language.
+  .dbx-dialog-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: var(--radius-md);
+    background: var(--primary-color-transparent);
+    color: var(--primary-color);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+
+    i {
+      font-size: 1.05rem;
+    }
+  }
+
+  .dbx-dialog-title {
+    font-size: var(--fs-h2);
+    font-weight: var(--fw-semibold);
+    color: var(--text-color);
+    line-height: var(--lh-tight);
+    margin: 0;
+  }
+
+  .dbx-dialog-subtitle {
+    font-size: var(--fs-label);
+    color: var(--secondary-color);
+    line-height: var(--lh-snug);
+    margin: 0;
+  }
+}
+
+/** The ghost close button in a dialog header. */
+@mixin editor-dialog-close {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-md);
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background var(--motion-base) ease;
+
+  &:hover {
+    background: var(--hover-background);
+    color: var(--text-color);
+  }
+
+  i {
+    font-size: var(--fs-control);
+  }
 }

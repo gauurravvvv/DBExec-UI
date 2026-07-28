@@ -737,6 +737,7 @@ $qx-btn-h: 34px;
 }
 .qx-col {
   @include editor-explorer-column-row;
+  @include editor-explorer-reveals-type('.qx-col-type');
   // Shared with the Dataset Creator's .column-icon, so a primary key is the same
   // colour in both trees. The executor previously used --warning-color here while
   // the dataset used --pk-color.

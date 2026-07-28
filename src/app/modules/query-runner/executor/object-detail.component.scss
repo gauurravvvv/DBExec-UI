@@ -1,3 +1,5 @@
+@import '../../../../assets/sass/editor-chrome';
+
 :host {
   // Aliases resolve to app tokens; fallbacks retoned OFF the old bespoke teal
   // palette so no teal accent / darker-than-app text can ever surface.
@@ -35,6 +37,8 @@
 }
 
 .od-head {
+  // Shared with every other popup on these screens.
+  @include editor-dialog-head;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -96,14 +100,8 @@
   }
 }
 .od-close {
-  border: none;
-  background: transparent;
-  color: var(--od-muted);
-  cursor: pointer;
-  font-size: 1rem;
-  &:hover {
-    color: var(--od-text);
-  }
+  // Shared ghost close button.
+  @include editor-dialog-close;
 }
 
 // Segmented tab strip — matches the app's .priv-tabs pattern: a subtle track

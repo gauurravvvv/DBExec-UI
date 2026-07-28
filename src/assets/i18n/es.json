@@ -1043,7 +1043,8 @@
     "FORMULA_COMPUTED_ON_SERVER": "Se calcula en el servidor después de la consulta. Para filtrar o agregar un valor calculado en la base de datos, incluya la expresión en el SQL del conjunto de datos.",
     "STAGE_ROW_SHORT": "Fila",
     "STAGE_AGGREGATE_SHORT": "Agregado",
-    "STAGE_WINDOW_SHORT": "Ventana"
+    "STAGE_WINDOW_SHORT": "Ventana",
+    "SEARCH_EXPLORER": "Buscar tablas y columnas..."
   },
   "ANALYSES": {
     "CREATE_MISSING_DATASET": "No se puede crear el análisis: falta el conjunto de datos de origen. Inténtelo de nuevo desde un dataset.",

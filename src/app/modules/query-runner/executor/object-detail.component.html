@@ -3,6 +3,9 @@
     <!-- Header -->
     <div class="od-head">
       <div class="od-title">
+        <!-- Icon chip + title, the same composition every other popup on these
+             screens uses. -->
+        <span class="dbx-dialog-icon">
         <i
           class="pi"
           [ngClass]="{
@@ -13,7 +16,8 @@
             'pi-sort-numeric-up': kind === 'sequence',
           }"
         ></i>
-        <span class="od-name">{{ schema }}.{{ name }}</span>
+        </span>
+        <span class="od-name dbx-dialog-title">{{ schema }}.{{ name }}</span>
         <span class="od-kind">{{
           'QUERY_RUNNER.KIND_' + (kind || '') | uppercase | translate
         }}</span>

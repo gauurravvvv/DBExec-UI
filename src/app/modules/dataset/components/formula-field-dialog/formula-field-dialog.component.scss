@@ -1003,6 +1003,38 @@
       display: flex;
       justify-content: flex-end;
       gap: var(--space-3);
+
+      // The buttons were rendering as browser defaults — square, hairline
+      // borders, no fill. `.acf-btn` is declared further up under the main
+      // dialog's own nesting, so it never reached this separate p-dialog, and the
+      // confirm dialog looked nothing like the app. Styled from the shared mixin,
+      // which is also what the main footer uses.
+      .acf-btn {
+        @include editor-button;
+      }
+
+      .acf-btn--ghost {
+        background: transparent;
+        border-color: var(--border-color);
+        color: var(--text-color);
+
+        &:hover:not(:disabled) {
+          background: var(--hover-background);
+        }
+      }
+
+      // Discarding work is destructive, so it reads as destructive rather than
+      // as the neutral twin of "Keep Editing".
+      .acf-btn--danger {
+        background: var(--error-color);
+        border-color: var(--error-color);
+        color: #fff;
+
+        &:hover:not(:disabled) {
+          background: var(--error-hover, var(--error-color));
+          border-color: var(--error-hover, var(--error-color));
+        }
+      }
     }
   }
 }

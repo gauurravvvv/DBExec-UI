@@ -142,6 +142,8 @@ export class CodeEditorService {
       disposables.push(attachPlaceholder(editor, cfg.host, cfg.placeholder));
     }
 
+    this.unstickSuggestDetails(editor, disposables);
+
     const handle: EditorHandle = {
       editor,
       getValue: () => editor.getValue(),
@@ -175,6 +177,53 @@ export class CodeEditorService {
     };
 
     return handle;
+  }
+
+  /**
+   * Stop the suggestion DETAILS pane from being sticky.
+   *
+   * Monaco remembers whether the details pane was expanded and restores it on
+   * every later suggestion — for the rest of the session, across editors, with no
+   * option to turn it off. Measured: open the list, expand the description,
+   * dismiss it, type again, and the description is expanded before you ask for it,
+   * covering the code you are writing.
+   *
+   * That is a preference Monaco keeps for a code IDE, where a developer wants
+   * documentation pinned. Here the list is mostly column and table names, and a
+   * pane that reappears unbidden reads as a stray popup that will not close.
+   *
+   * So the pane is normalised to collapsed each time the list OPENS. Expanding it
+   * still works and still shows the description for as long as the list is open;
+   * it simply does not carry over. Implemented against `toggleSuggestionDetails`,
+   * a public command, rather than Monaco's private storage.
+   */
+  private unstickSuggestDetails(
+    editor: any,
+    disposables: Array<{ dispose: () => void } | (() => void)>,
+  ): void {
+    const dom: HTMLElement | null = editor.getDomNode?.() ?? null;
+    if (!dom || typeof MutationObserver === 'undefined') return;
+
+    let wasOpen = false;
+    const observer = new MutationObserver(() => {
+      const widget = dom.querySelector('.suggest-widget');
+      const isOpen = !!widget && widget.classList.contains('visible');
+
+      // Only on the transition into open: doing it continuously would fight the
+      // user the moment they expanded the pane themselves.
+      if (isOpen && !wasOpen && dom.querySelector('.suggest-details-container')) {
+        editor.trigger('dbexec', 'toggleSuggestionDetails', {});
+      }
+      wasOpen = isOpen;
+    });
+
+    observer.observe(dom, {
+      subtree: true,
+      childList: true,
+      attributes: true,
+      attributeFilter: ['class'],
+    });
+    disposables.push(() => observer.disconnect());
   }
 
   /**

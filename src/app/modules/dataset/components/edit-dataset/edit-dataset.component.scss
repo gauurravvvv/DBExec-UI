@@ -658,6 +658,7 @@
   .column-item {
     // Shared with the executor's .qx-col.
     @include editor-explorer-column-row;
+    @include editor-explorer-reveals-type('.column-type');
 
     &:hover .column-name {
       color: var(--primary-color);
