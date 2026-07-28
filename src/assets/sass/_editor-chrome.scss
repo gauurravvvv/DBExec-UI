@@ -227,3 +227,76 @@
     transition: background var(--motion-base) ease;
   }
 }
+
+// ── Dense tree row ───────────────────────────────────────────────────────────
+// A second row variant, for lists that are hundreds of rows long: the object
+// browser's schemas, tables and columns.
+//
+// `editor-side-row` gives each row its own border and radius, which reads well
+// for the Field Creator's ~30 fields and functions. A schema tree rendered as
+// cards is a different matter — it becomes far taller, and the nesting that makes
+// a tree legible is lost. So the dense variant shares the SELECTION and HOVER
+// language (the thing a user actually reads as "same app") while keeping the
+// compact tree geometry.
+@mixin editor-tree-row($indent: 0) {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-1) var(--space-4);
+  @if $indent != 0 {
+    padding-left: $indent;
+  }
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: var(--fs-control);
+  border-left: 3px solid transparent;
+  transition:
+    background var(--motion-base) ease,
+    border-color var(--motion-base) ease;
+
+  &:hover {
+    background: var(--hover-background);
+  }
+
+  // Same cue as editor-side-row: a primary-tinted fill plus a primary bar on the
+  // leading edge. Here the bar is a real border rather than an inset shadow,
+  // because a dense row has no radius to inset against.
+  &.is-selected,
+  &.is-active {
+    background: var(--primary-color-transparent);
+    border-left-color: var(--primary-color);
+  }
+}
+
+// ── Toolbar button ───────────────────────────────────────────────────────────
+// Lifted from the Field Creator's `.acf-btn`, which is the reference look, so
+// every editor screen's buttons share one shape. Variant colours stay with the
+// component — only geometry and motion are shared.
+@mixin editor-button {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: 0.55rem 1.1rem;
+  border-radius: var(--radius-sm);
+  font-weight: var(--fw-semibold);
+  font-size: var(--fs-body);
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition:
+    background var(--motion-base) ease,
+    border-color var(--motion-base) ease,
+    color var(--motion-base) ease,
+    box-shadow var(--motion-base) ease;
+
+  i {
+    font-size: var(--fs-control);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    box-shadow: none;
+  }
+}

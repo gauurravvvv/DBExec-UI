@@ -1,5 +1,8 @@
 @use '../../db-access/styles/db-access-shared' as db;
 
+// Shared editor chrome — @use must precede @import, hence the position.
+@import '../../../../assets/sass/editor-chrome';
+
 /* Canonical confirmation-popup chrome (backdrop, card, header, body, actions)
    for the Save Query prompt — same dialog pattern as the New Query popup and
    every other app dialog, instead of the executor's bespoke go-to-line box. */
@@ -114,6 +117,9 @@ $qx-btn-h: 34px;
   // `.qx-toolbar` and never match).
   ::ng-deep .modern-button.p-button,
   .modern-button {
+    // Geometry and motion from the shared button mixin, so the executor's
+    // toolbar buttons match the Field Creator's footer buttons.
+    @include editor-button;
     height: $qx-btn-h;
     min-width: $qx-btn-h;
     border-radius: var(--radius-sm) !important;
@@ -624,16 +630,10 @@ $qx-btn-h: 34px;
   min-height: 0;
 }
 .qx-browser-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0.5rem 0.75rem;
-  font-size: var(--fs-label);
-  font-weight: var(--fw-bold);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--qx-muted);
-  border-bottom: 1px solid var(--qx-border);
+  // Shared with the Field Creator's panel headers. Replaces a bespoke
+  // uppercase/letter-spaced treatment that was the most obvious sign these two
+  // screens were styled independently.
+  @include editor-panel-head;
 }
 .qx-icon {
   border: none;
@@ -656,19 +656,9 @@ $qx-btn-h: 34px;
   font-size: var(--fs-control);
 }
 .qx-node {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  padding: 3px 0.75rem;
-  cursor: pointer;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  &:hover {
-    background: var(--qx-bg);
-  }
+  @include editor-tree-row;
   &.indent {
-    padding-left: 1.4rem;
+    padding-left: var(--space-8);
   }
   > .pi:first-child {
     font-size: 0.6rem;
@@ -728,15 +718,7 @@ $qx-btn-h: 34px;
   padding-left: 0.4rem;
 }
 .qx-col {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  padding: 2px 0.75rem 2px 2.4rem;
-  cursor: pointer;
-  font-size: var(--fs-control);
-  &:hover {
-    background: var(--qx-bg);
-  }
+  @include editor-tree-row(var(--space-10));
   .pi {
     font-size: 0.55rem;
     color: var(--qx-muted);

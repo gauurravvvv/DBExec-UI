@@ -851,30 +851,9 @@
     }
 
     .acf-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: var(--space-3);
-      padding: 0.55rem 1.1rem;
-      border-radius: var(--radius-sm);
-      font-weight: var(--fw-semibold);
-      font-size: var(--fs-body);
-      border: 1px solid transparent;
-      cursor: pointer;
-      transition:
-        background var(--motion-base) ease,
-        border-color var(--motion-base) ease,
-        color var(--motion-base) ease,
-        box-shadow var(--motion-base) ease;
-
-      i {
-        font-size: var(--fs-control);
-      }
-
-      &:disabled {
-        opacity: 0.5;
-        cursor: not-allowed;
-        box-shadow: none;
-      }
+      // This dialog is the reference look, so the geometry now lives in
+      // _editor-chrome.scss and the executor includes the same mixin.
+      @include editor-button;
 
       &--ghost {
         background: transparent;
