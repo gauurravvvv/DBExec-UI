@@ -34,20 +34,26 @@
       <span class="field-sidebar__icon">
         <i
           class="pi"
-          [ngClass]="field.isCustom ? 'pi-code' : 'pi-table'"
+          [ngClass]="fieldIcon(field)"
           [attr.aria-hidden]="true"
         ></i>
       </span>
 
       <span class="field-sidebar__body">
         <span class="field-sidebar__name">{{ field.label || field.name }}</span>
+        <!-- A formula still needs its own line: it can be long, and truncating it
+             to a corner would make it unreadable. -->
         <code class="field-sidebar__formula" *ngIf="field.formula">{{
           field.formula
         }}</code>
-        <span class="field-sidebar__type" *ngIf="!field.formula && field.dataType">{{
-          field.dataType
-        }}</span>
       </span>
+
+      <!-- The type sits on the SAME line, right-aligned and monospaced, exactly as
+           in the object explorers. On its own second line it doubled every row's
+           height, which for twenty-six fields is a lot of scrolling for one word. -->
+      <span class="field-sidebar__type" *ngIf="!field.formula && field.dataType">{{
+        field.dataType
+      }}</span>
 
       <app-chip
         *ngIf="stageKey(field) as key"

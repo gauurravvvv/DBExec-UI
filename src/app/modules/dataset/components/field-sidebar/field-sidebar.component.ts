@@ -19,6 +19,7 @@ import {
   computed,
 } from '@angular/core';
 import { DatasetFieldsStore, DatasetFieldVm } from '../../services/dataset-fields.store';
+import { dataTypeIcon } from 'src/app/shared/helpers/data-type-icon';
 
 @Component({
   selector: 'app-field-sidebar',
@@ -59,6 +60,23 @@ export class FieldSidebarComponent {
       default:
         return 'DATASET.STAGE_ROW';
     }
+  }
+
+  /**
+   * Icon for a field row, from its data type.
+   *
+   * This used to be `pi-table` for every non-computed field, so a list of
+   * twenty-six columns showed the same glyph twenty-six times and the icon column
+   * carried no information at all. It now uses the app-wide data-type vocabulary,
+   * so an integer, a date and a text column are distinguishable at a glance —
+   * matching the dataset details page and the object explorers.
+   *
+   * A computed field keeps `pi-code`: what matters about it is that it is a
+   * formula, not what the formula returns.
+   */
+  fieldIcon(field: DatasetFieldVm): string {
+    if (field.isCustom) return 'pi-code';
+    return dataTypeIcon(field.dataType ?? '');
   }
 
   stageIcon(field: DatasetFieldVm): string {

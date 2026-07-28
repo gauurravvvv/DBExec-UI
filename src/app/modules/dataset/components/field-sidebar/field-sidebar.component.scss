@@ -1,3 +1,4 @@
+@import '../../../../../assets/sass/editor-chrome';
 /* Tokens only — no hard-coded colours, spacing or font sizes. */
 .field-sidebar {
   display: flex;
@@ -48,12 +49,9 @@
   }
 
   &__item {
-    display: flex;
-    align-items: flex-start;
-    gap: var(--space-2);
-    padding: var(--space-2);
-    border-radius: var(--space-2);
-    border: 1px solid transparent;
+    // Shared with the object explorers' rows, so a field row and a column row
+    // read the same. align-items is centre now that the type is on one line.
+    @include editor-side-row(true);
 
     &.is-formula {
       cursor: pointer;
@@ -97,8 +95,8 @@
   }
 
   &__type {
-    font-size: var(--fs-micro);
-    color: var(--text-color-secondary);
+    // Same treatment as a column's type in the object explorers.
+    @include editor-explorer-type;
   }
 
   /* Short stage label beside the badge icon — an icon alone is not readable. */

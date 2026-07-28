@@ -125,6 +125,28 @@ test.describe('editor showcase', () => {
       await page.keyboard.type('pu', { delay: 90 });
       await page.waitForTimeout(1800);
       await page.screenshot({ path: `${OUT}/77-dataset-editor-intellisense.png` });
+
+      // The live field sidebar. Its icons come from the app-wide data-type
+      // vocabulary, so a list of columns is scannable rather than the same glyph
+      // repeated once per row.
+      const sidebar = page.locator('app-field-sidebar');
+      if (await sidebar.isVisible().catch(() => false)) {
+        await sidebar.screenshot({ path: `${OUT}/80-field-sidebar.png` });
+        const icons = await page
+          .locator('.field-sidebar__item .pi')
+          .evaluateAll(els => [
+            ...new Set(
+              els.map(e => [...e.classList].find(c => c.startsWith('pi-'))),
+            ),
+          ]);
+        console.log('field sidebar distinct icons:', JSON.stringify(icons));
+        // One icon for every row means the icon column carries no information —
+        // which is exactly what pi-table-for-everything did.
+        expect(
+          icons.length,
+          'the field sidebar is rendering a single icon for every type',
+        ).toBeGreaterThan(3);
+      }
     }
 
     await page.goto('/app/datasets/new', { waitUntil: 'domcontentloaded' });
