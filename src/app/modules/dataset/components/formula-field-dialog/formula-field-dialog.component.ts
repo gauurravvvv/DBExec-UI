@@ -33,6 +33,7 @@ import {
   CustomFieldData,
   FORMULA_LANGUAGE_CONFIG,
   FORMULA_TOKENIZER,
+  defineFormulaThemes,
   getCurrentMonacoTheme,
 } from './formula-monaco.helper';
 
@@ -364,6 +365,10 @@ export class FormulaFieldDialogComponent
     try {
       // Register custom language
       this.registerFormulaLanguage();
+
+      // Register the app-matched themes BEFORE any theme is read or applied —
+      // getCurrentMonacoTheme falls back to the stock names until they exist.
+      defineFormulaThemes();
 
       // Setup theme observer
       this.setupThemeObserver();
