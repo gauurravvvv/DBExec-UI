@@ -15,6 +15,16 @@
 - Modules updated: all (initialized).
 - Open for next session: Module files carry accurate Context/Goals scaffolds; enrich individual files with deeper specifics as work touches them. Follow the session-end protocol on every future change.
 
+## 2026-07-28 — Formula dialog screenshot suite + suggest-widget theming
+34 live captures into screenshots/ covering palette, usage docs, IntelliSense and
+12 valid / 12 invalid formulas, with each case asserting its own filename. That
+assertion immediately caught three screenshots mislabelled "valid" that actually
+showed rejections (lpad and toText do not exist; there is no padding function in
+the catalog). Styling fix: the editor ran stock `vs`, so the highlighted
+suggestion row was saturated blue; added formula-light/dark themes overriding only
+editorSuggestWidget colours. A suspected detached details-panel defect turned out
+to be a test artifact of a redundant Ctrl+Space.
+
 ## 2026-07-27 — Formula UI verified in a browser (Playwright 16/16)
 Added e2e/formula-fields.e2e.ts (npm run test:e2e:formula) with a test-cases doc.
 All 16 green against the live stack, covering the catalog palette, live
