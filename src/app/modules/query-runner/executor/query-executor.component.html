@@ -163,7 +163,7 @@
     <!-- Object browser (lazy) -->
     <aside class="qx-browser">
       <div class="qx-browser-head">
-        <span>{{ 'QUERY_RUNNER.OBJECTS' | translate }}</span>
+        <span>{{ 'DATASET.DATABASE_EXPLORER' | translate }}</span>
         <button
           class="qx-icon"
           (click)="refreshSchemas()"
@@ -177,11 +177,24 @@
           ></i>
         </button>
       </div>
+      <!-- Same search the Dataset Creator's sidebar has, same placeholder. A
+           plain input rather than app-custom-input because this component is
+           standalone and that control lives in SharedModule; the shared mixin
+           gives it the same metrics. -->
+      <div class="qx-browser-search">
+        <i class="pi pi-search"></i>
+        <input
+          type="text"
+          autocomplete="off"
+          [(ngModel)]="schemaSearchText"
+          [placeholder]="'DATASET.SEARCH_TABLES' | translate"
+        />
+      </div>
       <div class="qx-tree">
         <div class="qx-empty" *ngIf="!schemasLoading && browser.length === 0">
           {{ 'QUERY_RUNNER.NO_OBJECTS' | translate }}
         </div>
-        <div class="qx-schema" *ngFor="let s of browser">
+        <div class="qx-schema" *ngFor="let s of filteredSchemas">
           <div class="qx-node" (click)="toggleSchema(s)">
             <i
               class="pi"
@@ -189,6 +202,9 @@
             ></i>
             <i class="pi pi-folder"></i>
             <span>{{ s.schema }}</span>
+            <span class="qx-table-count" *ngIf="s.loaded && s.tables.length"
+              >{{ s.tables.length }} {{ 'DATASET.TABLES' | translate }}</span
+            >
             <i class="pi pi-spin pi-spinner qx-node-spin" *ngIf="s.loading"></i>
             <button
               class="qx-node-refresh"
@@ -204,32 +220,16 @@
           <div class="qx-groups" *ngIf="s.open && s.loaded">
             <!-- TABLES -->
             <div class="qx-group">
-              <!-- Group header only when a schema holds more than one KIND of
-                   object. A schema of nothing but tables shows them directly, so
-                   this tree matches the Dataset Creator's schema → table → column
-                   shape instead of wrapping everything in a lone TABLES node. -->
-              <div
-                class="qx-node group"
-                *ngIf="showObjectGroups(s)"
-                (click)="toggleGroup(s, 'tables')"
-              >
-                <i
-                  class="pi"
-                  [ngClass]="
-                    s.g.tables ? 'pi-chevron-down' : 'pi-chevron-right'
-                  "
-                ></i>
-                <i class="pi pi-table"></i
-                ><span>{{ 'QUERY_RUNNER.GRP_TABLES' | translate }}</span>
-                <span class="qx-count">{{ s.tables.length }}</span>
-              </div>
-              <div *ngIf="s.g.tables || !showObjectGroups(s)">
-                <div class="qx-table-group" *ngFor="let t of s.tables">
-                  <div
-                    class="qx-node qx-has-actions"
-                    [class.indent2]="showObjectGroups(s)"
-                    [class.indent]="!showObjectGroups(s)"
-                  >
+              <!-- Tables render directly under the schema, with NO group header.
+                   They are the objects BOTH explorers show, so they must sit at the
+                   same depth as the Dataset Creator's .table-header. A TABLES
+                   wrapper put them a level deeper and was why the two trees still
+                   did not match. Views, functions, sequences and triggers keep
+                   their group headers below — a capability the dataset explorer has
+                   no data for, not a styling difference. -->
+              <div>
+                <div class="qx-table-group" *ngFor="let t of tablesFor(s)">
+                  <div class="qx-node indent qx-has-actions">
                     <i
                       class="pi qx-twist"
                       [ngClass]="

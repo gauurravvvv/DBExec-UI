@@ -563,8 +563,7 @@
       }
 
       i.pi-folder {
-        font-size: var(--fs-body);
-        color: var(--warning-color);
+        @include editor-explorer-folder-icon;
       }
 
       .schema-name {
@@ -575,6 +574,7 @@
       }
 
       .table-count {
+      @include editor-explorer-count;
         font-size: var(--fs-micro);
         color: var(--secondary-color);
       }
@@ -616,16 +616,9 @@
 
   .table-item {
     .table-header {
-      display: flex;
-      align-items: center;
-      gap: var(--space-4);
-      padding: 8px 12px 8px 24px;
-      cursor: pointer;
-      transition: background-color var(--motion-fast) ease;
-
-      &:hover {
-        background-color: var(--hover-background);
-      }
+      // Same mixin and depth as the executor's table row, so a table sits at the
+      // same offset in both explorers. Replaces hard-coded 8px/12px/24px.
+      @include editor-explorer-row(var(--space-8));
 
       i.pi-chevron-right,
       i.pi-chevron-down {

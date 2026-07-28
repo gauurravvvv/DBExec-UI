@@ -511,27 +511,36 @@ export class QueryExecutorComponent
 
   /** Group folder toggle (Tables / Views / …). */
   /**
-   * Whether a schema needs the TABLES / VIEWS / FUNCTIONS grouping level.
+   * Object-explorer filter text.
    *
-   * The Dataset Creator's schema tree is schema → table → column. This one used to
-   * always insert a category level, which made the two explorers look different at
-   * a glance even though every row was styled identically.
-   *
-   * A schema holding nothing but tables gains nothing from a lone "TABLES" node
-   * wrapping everything, so the level collapses and the two trees match. It
-   * appears only when there is genuinely more than one kind of object to separate
-   * — a capability the dataset explorer has no data for, not a styling difference.
+   * The Dataset Creator's schema sidebar has always had a search box; this tree
+   * did not, which was one of the last visible differences between the two
+   * explorers. Same placeholder, same behaviour: match a schema by its own name,
+   * or keep it because one of its tables matches.
    */
-  showObjectGroups(s: TreeSchema): boolean {
-    const kinds = [
-      s.tables.length,
-      s.views.length,
-      s.matviews.length,
-      s.functions.length,
-      s.sequences.length,
-      s.triggers.length,
-    ].filter(n => n > 0).length;
-    return kinds > 1;
+  schemaSearchText = '';
+
+  /** Schemas to render: all of them, or those matching the filter. */
+  get filteredSchemas(): TreeSchema[] {
+    const q = this.schemaSearchText.trim().toLowerCase();
+    if (!q) return this.browser;
+    return this.browser.filter(
+      s =>
+        s.schema.toLowerCase().includes(q) ||
+        s.tables.some(t => t.name.toLowerCase().includes(q)),
+    );
+  }
+
+  /**
+   * Tables of `s` to render under the filter.
+   *
+   * A schema whose OWN name matches keeps all its tables — searching for a schema
+   * should show what is in it, not hide everything because the table names differ.
+   */
+  tablesFor(s: TreeSchema): TreeTable[] {
+    const q = this.schemaSearchText.trim().toLowerCase();
+    if (!q || s.schema.toLowerCase().includes(q)) return s.tables;
+    return s.tables.filter(t => t.name.toLowerCase().includes(q));
   }
 
   toggleGroup(s: TreeSchema, group: keyof TreeSchema['g']): void {

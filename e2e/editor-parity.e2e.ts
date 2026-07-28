@@ -155,6 +155,7 @@ async function sampleExplorer(
 test.describe('editor parity across the three modules', () => {
   test('all five editor screens report identical editor styling', async ({ page }) => {
     const samples: Sample[] = [];
+    const explorers: Record<string, Record<string, string> | null> = {};
 
     await login(page);
     const tok = await authToken(page);
@@ -167,6 +168,15 @@ test.describe('editor parity across the three modules', () => {
     });
     await waitForMonaco(page);
     samples.push(await sample(page, 'query-executor'));
+    // Expand a schema so the tree rows exist before sampling them.
+    await page.locator('.qx-node').first().click().catch(() => undefined);
+    await page.waitForTimeout(2000);
+    explorers['query-executor'] = await sampleExplorer(
+      page,
+      'query-executor',
+      '.qx-node',
+      '.qx-col',
+    );
     await page.screenshot({ path: `${OUT}/60-parity-query-executor.png` });
 
     // ── 2. Dataset Creator ─────────────────────────────────────────────────
@@ -197,6 +207,14 @@ test.describe('editor parity across the three modules', () => {
     if (await page.locator('.monaco-editor').first().isVisible().catch(() => false)) {
       await waitForMonaco(page);
       samples.push(await sample(page, 'dataset-edit'));
+      await page.locator('.schema-header').first().click().catch(() => undefined);
+      await page.waitForTimeout(2500);
+      explorers['dataset-edit'] = await sampleExplorer(
+        page,
+        'dataset-edit',
+        '.schema-header',
+        '.column-item',
+      );
       await page.screenshot({ path: `${OUT}/62-parity-dataset-edit.png` });
     } else {
       console.log('dataset-edit: editor did not mount — skipped');
@@ -234,6 +252,28 @@ test.describe('editor parity across the three modules', () => {
       samples.map(s => s.screen),
       'a screen failed to mount, so parity was not measured across all four',
     ).toEqual(['query-executor', 'dataset-add', 'dataset-edit', 'field-add']);
+
+    // The object explorers, reported side by side. Both are schema trees, so
+    // every property here should match.
+    console.log('\n=== object explorer rows ===');
+    for (const [screen, vals] of Object.entries(explorers)) {
+      console.log(`${screen.padEnd(16)} ${vals ? JSON.stringify(vals) : '(no rows found)'}`);
+    }
+    const exRows = explorers['query-executor'];
+    const dsRows = explorers['dataset-edit'];
+    if (exRows && dsRows) {
+      const bad = Object.keys(exRows).filter(k => exRows[k] !== dsRows[k]);
+      if (bad.length) {
+        console.log(
+          'EXPLORER DIVERGENCES:\n  ' +
+            bad
+              .map(k => `${k}: executor=${exRows[k]} dataset=${dsRows[k]}`)
+              .join('\n  '),
+        );
+      } else {
+        console.log('explorer rows: identical');
+      }
+    }
 
     const diffs = divergences(samples);
     if (diffs.length) console.log('\nDIVERGENCES:\n  ' + diffs.join('\n  '));

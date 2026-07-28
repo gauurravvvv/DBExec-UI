@@ -646,6 +646,14 @@ $qx-btn-h: 34px;
     color: var(--qx-accent);
   }
 }
+// Same search field as the Dataset Creator's sidebar.
+.qx-browser-search {
+  @include editor-explorer-search;
+}
+// Same "N tables" label as the dataset sidebar's .table-count.
+.qx-table-count {
+  @include editor-explorer-count;
+}
 .qx-tree {
   flex: 1;
   overflow: auto;
@@ -665,8 +673,14 @@ $qx-btn-h: 34px;
     padding-left: var(--space-8);
   }
   > .pi:first-child {
-    font-size: 0.6rem;
-    color: var(--qx-muted);
+    font-size: var(--fs-micro);
+    color: var(--text-subtle);
+  }
+
+  // Amber folder, same as the Dataset Creator's schema rows — the executor's was
+  // grey, which read as a different tree at a glance.
+  .pi-folder {
+    @include editor-explorer-folder-icon;
   }
   .qx-node-spin {
     margin-left: auto;
