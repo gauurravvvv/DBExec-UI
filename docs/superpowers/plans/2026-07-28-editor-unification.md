@@ -156,15 +156,15 @@ No visible change is intended. This task exists to make Tasks 2–8 edit one fil
 - Produces: `defineDbexecThemes(): void`; `currentDbexecTheme(): 'dbexec-light' | 'dbexec-dark'`; `BASE_EDITOR_OPTIONS`; `sqlEditorOptions(overrides?)`; `formulaEditorOptions(overrides?)`.
 - Consumes: nothing new.
 
-- [ ] **Step 1** Write `monaco-theme.ts`. Generalise the `formula-light`/`formula-dark` themes already in `formula-monaco.helper.ts` into `dbexec-light`/`dbexec-dark`, `inherit: true` from `vs`/`vs-dark`, covering: `editor.background`, `editor.foreground`, `editorLineNumber.foreground`/`activeForeground`, `editor.lineHighlightBackground`, `editor.selectionBackground`, `editor.selectionHighlightBackground`, `editorCursor.foreground`, `editorIndentGuide.*`, `editorBracketMatch.*`, `editorGutter.background`, `editorError./editorWarning.foreground`, the full `editorSuggestWidget.*` set, `editorHoverWidget.*`, and `editorWidget.*` + `input.*` (the find widget). Each value carries a comment naming the token it mirrors.
-- [ ] **Step 2** Write `monaco-options.ts`. `BASE_EDITOR_OPTIONS` = the 32 shared keys plus the 22 the field creator adds. `sqlEditorOptions()` layers `{ language: 'sql', minimap: { enabled: true }, fontLigatures: true, mouseWheelZoom: true, wordBasedSuggestions: false }`; `formulaEditorOptions()` layers `{ language: 'formulaLang', minimap: { enabled: false }, fontLigatures: false, mouseWheelZoom: false, wordBasedSuggestions: 'currentDocument' }`. Comment each divergence with why it is context-appropriate rather than an oversight.
-- [ ] **Step 3** Write `_editor-chrome.scss` with mixins `editor-frame()`, `editor-toolbar()`, `editor-panel-head()`, `editor-side-row()`, `editor-status-bar()`, extracted from the field-creator SCSS (`.acf-editor` frame: `1px solid var(--border-color)`, `var(--radius-sm)`, `var(--card-background)`, `:focus-within` → `--primary-color` border + `0 0 0 2px var(--primary-color-transparent)`).
-- [ ] **Step 4** Turn `sql-editor.config.ts` and `formula-editor.config.ts` into thin re-exports (`export const MONACO_EDITOR_OPTIONS = sqlEditorOptions();`) so the many existing import sites keep working.
-- [ ] **Step 5** Repoint the three Monaco components at `defineDbexecThemes()` / `currentDbexecTheme()`; delete the local `formula-light`/`formula-dark` definitions from `formula-monaco.helper.ts`, keeping `registerFormulaLanguage` and `FORMULA_TOKENIZER`.
-- [ ] **Step 6** Apply `@include editor-frame()` to `.acf-editor` and to the dataset creator/editor SQL editor frames.
-- [ ] **Step 7** Gate: `tsc` → `ngc` → prod build.
-- [ ] **Step 8** Playwright: `formula-fields` (16) and `formula-screenshots` (37) must both pass unchanged — this task must not alter behaviour or appearance in the field creator.
-- [ ] **Step 9** Commit `refactor(editor): single Monaco theme, options and chrome for the dataset editors`.
+- [x] **Step 1** Write `monaco-theme.ts`. Generalise the `formula-light`/`formula-dark` themes already in `formula-monaco.helper.ts` into `dbexec-light`/`dbexec-dark`, `inherit: true` from `vs`/`vs-dark`, covering: `editor.background`, `editor.foreground`, `editorLineNumber.foreground`/`activeForeground`, `editor.lineHighlightBackground`, `editor.selectionBackground`, `editor.selectionHighlightBackground`, `editorCursor.foreground`, `editorIndentGuide.*`, `editorBracketMatch.*`, `editorGutter.background`, `editorError./editorWarning.foreground`, the full `editorSuggestWidget.*` set, `editorHoverWidget.*`, and `editorWidget.*` + `input.*` (the find widget). Each value carries a comment naming the token it mirrors.
+- [x] **Step 2** Write `monaco-options.ts`. `BASE_EDITOR_OPTIONS` = the 32 shared keys plus the 22 the field creator adds. `sqlEditorOptions()` layers `{ language: 'sql', minimap: { enabled: true }, fontLigatures: true, mouseWheelZoom: true, wordBasedSuggestions: false }`; `formulaEditorOptions()` layers `{ language: 'formulaLang', minimap: { enabled: false }, fontLigatures: false, mouseWheelZoom: false, wordBasedSuggestions: 'currentDocument' }`. Comment each divergence with why it is context-appropriate rather than an oversight.
+- [x] **Step 3** Write `_editor-chrome.scss` with mixins `editor-frame()`, `editor-toolbar()`, `editor-panel-head()`, `editor-side-row()`, `editor-status-bar()`, extracted from the field-creator SCSS (`.acf-editor` frame: `1px solid var(--border-color)`, `var(--radius-sm)`, `var(--card-background)`, `:focus-within` → `--primary-color` border + `0 0 0 2px var(--primary-color-transparent)`).
+- [x] **Step 4** Turn `sql-editor.config.ts` and `formula-editor.config.ts` into thin re-exports (`export const MONACO_EDITOR_OPTIONS = sqlEditorOptions();`) so the many existing import sites keep working.
+- [x] **Step 5** Repoint the three Monaco components at `defineDbexecThemes()` / `currentDbexecTheme()`; delete the local `formula-light`/`formula-dark` definitions from `formula-monaco.helper.ts`, keeping `registerFormulaLanguage` and `FORMULA_TOKENIZER`.
+- [x] **Step 6** Apply `@include editor-frame()` to `.acf-editor` and to the dataset creator/editor SQL editor frames.
+- [x] **Step 7** Gate: `tsc` → `ngc` → prod build.
+- [x] **Step 8** Playwright: `formula-fields` (16) and `formula-screenshots` (37) must both pass unchanged — this task must not alter behaviour or appearance in the field creator.
+- [x] **Step 9** Commit `refactor(editor): single Monaco theme, options and chrome for the dataset editors`.
 
 ### Task 2: Query Executor on Monaco — mount, options, keys, flash, placeholder
 
@@ -178,15 +178,15 @@ Editing and running SQL must work end to end before IntelliSense is touched.
 - Consumes: `sqlEditorOptions()`, `defineDbexecThemes()`, `currentDbexecTheme()`, `MonacoLoaderService`, existing `splitStatements`/`statementAtCursor`.
 - Produces: `attachPlaceholder(editor, text): () => void`; `flashRange(editor, range): void`.
 
-- [ ] **Step 1** Replace the `EditorView`/`EditorState` construction with `monaco.editor.create(host, { ...sqlEditorOptions(), value, theme })`, mirroring add-dataset's init (loader → register language → define themes → create → assert theme).
-- [ ] **Step 2** Re-wire the model-content subscription: `onDidChangeModelContent` → `currentQuery`, autosave draft, `cdr.markForCheck()` (Monaco fires outside Angular's zone; OnPush will not notice otherwise — the same trap add-dataset documents).
-- [ ] **Step 3** Port the keybindings with `editor.addCommand`: `CtrlCmd+Enter` → `run('smart')`, `CtrlCmd+Shift+Enter` → `run('all')`, each wrapped in `zone.run`.
-- [ ] **Step 4** Replace `wrapCompartment` / `minimapCompartment` toggles with `editor.updateOptions({ wordWrap, minimap })`.
-- [ ] **Step 5** Write `run-flash.ts` using a decorations collection and a timed clear; call it where `runFlashField` was dispatched.
-- [ ] **Step 6** Write `editor-placeholder.ts` — an absolutely-positioned element inside the frame, shown while the model is empty and unfocused, using `--text-color-secondary` and `--fs-control`. String comes from an i18n key added to all 10 locales.
-- [ ] **Step 7** Gate: `tsc` → `ngc` → prod build.
-- [ ] **Step 8** Playwright `e2e/query-executor.e2e.ts`: editor renders; typing updates the Run button's enabled state; `Ctrl+Enter` runs the statement at the cursor; `Ctrl+Shift+Enter` runs all; word-wrap and minimap toggles take effect; placeholder shows when empty and hides on input.
-- [ ] **Step 9** Commit `feat(query-runner): move the executor editor to Monaco`.
+- [x] **Step 1** Replace the `EditorView`/`EditorState` construction with `monaco.editor.create(host, { ...sqlEditorOptions(), value, theme })`, mirroring add-dataset's init (loader → register language → define themes → create → assert theme).
+- [x] **Step 2** Re-wire the model-content subscription: `onDidChangeModelContent` → `currentQuery`, autosave draft, `cdr.markForCheck()` (Monaco fires outside Angular's zone; OnPush will not notice otherwise — the same trap add-dataset documents).
+- [x] **Step 3** Port the keybindings with `editor.addCommand`: `CtrlCmd+Enter` → `run('smart')`, `CtrlCmd+Shift+Enter` → `run('all')`, each wrapped in `zone.run`.
+- [x] **Step 4** Replace `wrapCompartment` / `minimapCompartment` toggles with `editor.updateOptions({ wordWrap, minimap })`.
+- [x] **Step 5** Write `run-flash.ts` using a decorations collection and a timed clear; call it where `runFlashField` was dispatched.
+- [x] **Step 6** Write `editor-placeholder.ts` — an absolutely-positioned element inside the frame, shown while the model is empty and unfocused, using `--text-color-secondary` and `--fs-control`. String comes from an i18n key added to all 10 locales.
+- [x] **Step 7** Gate: `tsc` → `ngc` → prod build.
+- [x] **Step 8** Playwright `e2e/query-executor.e2e.ts`: editor renders; typing updates the Run button's enabled state; `Ctrl+Enter` runs the statement at the cursor; `Ctrl+Shift+Enter` runs all; word-wrap and minimap toggles take effect; placeholder shows when empty and hides on input.
+- [x] **Step 9** Commit `feat(query-runner): move the executor editor to Monaco`.
 
 ### Task 3: IntelliSense — schema, table and column suggestions, lazily
 
@@ -201,12 +201,12 @@ The task the user singled out. Success is measured against the executor's curren
 - Produces: `catalogToDatasourceSchema(name: string, dbType: string, cat: SchemaCatalog): DatasourceSchema[]`; `MonacoIntelliSenseService.setColumnRequestHandler(fn: (schema: string | undefined, table: string) => void): void`.
 - Consumes: `SchemaCatalog`, `registerSQLCompletions`, `setActiveDbType`.
 
-- [ ] **Step 1** Write `schema-bridge.ts` mapping `SchemaCatalog` → `DatasourceSchema[]`: one datasource, `schemas` from `cat.schemas`, each schema's `tables` from `tablesInSchema`, each table's columns from `cat.columns(schema, name)` — empty array when not yet fetched. Preserve `isPrimaryKey`, `dataType`, `nullable`, since the completion detail and PK boost depend on them.
-- [ ] **Step 2** Add `setColumnRequestHandler` plus a private `requestColumns(schema, table)` to `MonacoIntelliSenseService`, called wherever it finds no cached columns for a referenced table. Guard against repeat requests for the same key in flight.
-- [ ] **Step 3** In the executor, call `setActiveDbType(connection.dbType)`, register completions once, install the request handler to hit the existing lazy column fetch, and re-call `setDatasources(catalogToDatasourceSchema(...))` after every catalog growth — mirroring add-dataset.
-- [ ] **Step 4** Delete `completion.ts` and its import.
-- [ ] **Step 5** Gate: `tsc` → `ngc` → prod build.
-- [ ] **Step 6** Playwright, extending `query-executor.e2e.ts` — assert each behaviour by reading the suggest widget rows:
+- [x] **Step 1** Write `schema-bridge.ts` mapping `SchemaCatalog` → `DatasourceSchema[]`: one datasource, `schemas` from `cat.schemas`, each schema's `tables` from `tablesInSchema`, each table's columns from `cat.columns(schema, name)` — empty array when not yet fetched. Preserve `isPrimaryKey`, `dataType`, `nullable`, since the completion detail and PK boost depend on them.
+- [x] **Step 2** Add `setColumnRequestHandler` plus a private `requestColumns(schema, table)` to `MonacoIntelliSenseService`, called wherever it finds no cached columns for a referenced table. Guard against repeat requests for the same key in flight.
+- [x] **Step 3** In the executor, call `setActiveDbType(connection.dbType)`, register completions once, install the request handler to hit the existing lazy column fetch, and re-call `setDatasources(catalogToDatasourceSchema(...))` after every catalog growth — mirroring add-dataset.
+- [x] **Step 4** Delete `completion.ts` and its import.
+- [x] **Step 5** Gate: `tsc` → `ngc` → prod build.
+- [x] **Step 6** Playwright, extending `query-executor.e2e.ts` — assert each behaviour by reading the suggest widget rows:
   - after `SELECT * FROM ` → schemas **and** tables offered
   - `public.` → that schema's tables
   - `FROM users u WHERE u.` → users' columns, PK first, type shown as detail
@@ -214,7 +214,16 @@ The task the user singled out. Success is measured against the executor's curren
   - a table whose columns were never fetched → suggestions appear after the lazy fetch resolves (the regression risk of this whole task)
   - a CTE name → its projected columns (new capability, absent before)
   - dialect check: switching a MySQL connection offers MySQL-only functions
-- [ ] **Step 7** Commit `feat(query-runner): shared Monaco SQL IntelliSense with lazy column loading`.
+- [x] **Step 7** Commit `feat(query-runner): shared Monaco SQL IntelliSense with lazy column loading`.
+
+### Task 5b: Adopt CodeEditorService in the remaining four editors
+
+Only the executor creates its editor through the service. `add-dataset`,
+`edit-dataset`, `formula-field-dialog` and `prompt/sql-query-dialog` still call
+`monaco.editor.create` directly — they share the theme and the options, but not
+the lifecycle, so they miss zone-safe `onChange`, single-call disposal and the
+placeholder. Migrate each to `codeEditor.create({ flavour })` + `EditorHandle`,
+then re-run `formula-fields` (16) and `formula-screenshots` (37).
 
 ### Task 4: Diagnostics and formatting
 
@@ -226,13 +235,13 @@ The task the user singled out. Success is measured against the executor's curren
 
 ### Task 5: Find/replace, then remove CodeMirror
 
-- [ ] **Step 1** Delete `search-panel.ts`; rely on Monaco's find widget with `find: { addExtraSpaceOnTop: false, autoFindInSelection: 'never', seedSearchStringFromSelection: 'selection' }` — already in `BASE_EDITOR_OPTIONS`.
-- [ ] **Step 2** Style the find widget as a floating card (`.monaco-editor .find-widget`) via `_editor-chrome.scss`, matching the compact card the custom panel had, using tokens only.
-- [ ] **Step 3** Remove every remaining `@codemirror/*` editor import from the executor; delete `_codemirror-theme.scss` and its `@use`/`@import`.
-- [ ] **Step 4** Uninstall `@codemirror/{view,state,commands,autocomplete,search,lint,language,theme-one-dark}`, `codemirror`, `@replit/codemirror-minimap`. **Keep `@codemirror/lang-sql`** and add a comment in `sql-dialects/index.ts` recording that it is retained for keyword data, not as an editor, so nobody removes it later.
-- [ ] **Step 5** Gate: `tsc` → `ngc` → prod build; confirm the bundle shrank.
-- [ ] **Step 6** Playwright: `Ctrl+F` opens the styled find widget; find-next highlights; replace works; the whole executor spec still passes.
-- [ ] **Step 7** Commit `refactor(query-runner): drop CodeMirror for Monaco's find widget`.
+- [x] **Step 1** Delete `search-panel.ts`; rely on Monaco's find widget with `find: { addExtraSpaceOnTop: false, autoFindInSelection: 'never', seedSearchStringFromSelection: 'selection' }` — already in `BASE_EDITOR_OPTIONS`.
+- [x] **Step 2** Style the find widget as a floating card (`.monaco-editor .find-widget`) via `_editor-chrome.scss`, matching the compact card the custom panel had, using tokens only.
+- [x] **Step 3** Remove every remaining `@codemirror/*` editor import from the executor; delete `_codemirror-theme.scss` and its `@use`/`@import`.
+- [x] **Step 4** Uninstall `@codemirror/{view,state,commands,autocomplete,search,lint,language,theme-one-dark}`, `codemirror`, `@replit/codemirror-minimap`. **Keep `@codemirror/lang-sql`** and add a comment in `sql-dialects/index.ts` recording that it is retained for keyword data, not as an editor, so nobody removes it later.
+- [x] **Step 5** Gate: `tsc` → `ngc` → prod build; confirm the bundle shrank.
+- [x] **Step 6** Playwright: `Ctrl+F` opens the styled find widget; find-next highlights; replace works; the whole executor spec still passes.
+- [x] **Step 7** Commit `refactor(query-runner): drop CodeMirror for Monaco's find widget`.
 
 ### Task 6: Chrome convergence — toolbars, headers, buttons
 
