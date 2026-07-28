@@ -19,6 +19,8 @@ import { CodeEditorService, EditorHandle } from 'src/app/shared/editor/code-edit
 import { EditorDoc } from 'src/app/shared/editor/editor-doc';
 import { catalogToDatasourceSchema } from 'src/app/shared/editor/schema-bridge';
 import { MonacoIntelliSenseService } from 'src/app/modules/dataset/services/monaco-intellisense.service';
+import { SqlValidatorService } from 'src/app/modules/dataset/services/sql-validator.service';
+import { SqlFormatterService } from 'src/app/modules/dataset/services/sql-formatter.service';
 
 import { AgGridAngular } from 'ag-grid-angular';
 import {
@@ -31,7 +33,6 @@ import {
   themeQuartz,
   colorSchemeLightWarm,
 } from 'ag-grid-community';
-import { format as formatSql } from 'sql-formatter';
 
 import { ButtonModule } from 'primeng/button';
 import { TooltipModule } from 'primeng/tooltip';
@@ -313,6 +314,8 @@ export class QueryExecutorComponent
     private title: Title,
     private codeEditor: CodeEditorService,
     private intelliSense: MonacoIntelliSenseService,
+    private sqlValidator: SqlValidatorService,
+    private sqlFormatter: SqlFormatterService,
   ) {}
 
   ngOnInit(): void {
@@ -738,6 +741,11 @@ export class QueryExecutorComponent
         handle.onChange(() => {
           this.scheduleAutosave();
           this.updateCursorInfo();
+          // Same real-time syntax validation the Dataset Creator runs, so an
+          // error looks and reads identically on both screens. The validator
+          // owns its own marker key, separate from the run-failure markers
+          // this component sets, so neither wipes the other.
+          this.sqlValidator.validateDebounced(handle.editor.getModel());
         });
         handle.track(
           handle.editor.onDidChangeCursorPosition(() =>
@@ -773,6 +781,17 @@ export class QueryExecutorComponent
         );
 
         this.registerCompletions();
+
+        // Formatting through the shared service rather than a local call into
+        // sql-formatter: the options (dialect, keyword case, indent) then match
+        // the Dataset Creator exactly, instead of two screens formatting the
+        // same SQL two ways.
+        const fmt = this.sqlFormatter.registerFormattingProvider();
+        if (fmt) handle.track(fmt);
+        this.sqlFormatter.registerContextMenuActions(handle.editor);
+
+        // Validate what was restored from the draft or the saved query.
+        this.sqlValidator.validate(handle.editor.getModel());
 
         this.editorReady = true;
         this.updateCursorInfo();
@@ -1492,16 +1511,15 @@ export class QueryExecutorComponent
   format(): void {
     if (!this.doc) return;
     try {
-      const opts = {
-        language: 'postgresql' as const,
-        keywordCase: 'upper' as const,
-        tabWidth: 2,
-      };
       const sel = this.getSelection();
       if (sel) {
-        this.doc.replaceRange(sel.from, sel.to, formatSql(sel.text, opts));
+        this.doc.replaceRange(
+          sel.from,
+          sel.to,
+          this.sqlFormatter.formatSql(sel.text),
+        );
       } else {
-        this.replaceAll(formatSql(this.getAll(), opts));
+        this.replaceAll(this.sqlFormatter.formatSql(this.getAll()));
       }
     } catch {
       /* unparseable → leave as-is */

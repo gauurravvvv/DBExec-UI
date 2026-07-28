@@ -252,6 +252,66 @@ test.describe('Query Executor · Monaco', () => {
     expect(miniAfter, 'toggleMinimap did not change Monaco minimap').not.toBe(miniBefore);
   });
 
+  test('F · a syntax error paints a marker, and formatting reindents', async ({
+    page,
+  }) => {
+    await openExecutor(page);
+
+    // Unclosed parenthesis — the shared validator's territory.
+    await setSql(page, 'select count( from public.chart_demo');
+    await page.waitForTimeout(2000);
+    const markers = await page.evaluate(() => {
+      const m = (window as any).monaco;
+      const model = m.editor.getModels()[0];
+      return m.editor
+        .getModelMarkers({ resource: model.uri })
+        .map((k: any) => ({ owner: k.owner, message: k.message, severity: k.severity }));
+    });
+    console.log('F markers:', JSON.stringify(markers).slice(0, 260));
+    expect(
+      markers.length,
+      'a syntax error produced no marker — the shared validator is not wired',
+    ).toBeGreaterThan(0);
+
+    expect(
+      markers.some((k: any) => k.severity === 8),
+      'no ERROR-severity marker for an unclosed parenthesis',
+    ).toBe(true);
+
+    // Correcting the SQL clears the ERRORS. Not all markers: the validator also
+    // emits a "should end with semicolon" hint (severity 2) which is still
+    // legitimately true, so asserting zero markers would be asserting a bug.
+    await setSql(page, 'select count(*) from public.chart_demo');
+    await page.waitForTimeout(2000);
+    const after = await page.evaluate(() => {
+      const m = (window as any).monaco;
+      const model = m.editor.getModels()[0];
+      return m.editor
+        .getModelMarkers({ resource: model.uri })
+        .map((k: any) => ({ message: k.message, severity: k.severity }));
+    });
+    console.log('F markers after fix:', JSON.stringify(after));
+    expect(
+      after.filter((k: any) => k.severity === 8),
+      'error markers were not cleared once the SQL parsed',
+    ).toEqual([]);
+
+    // Formatting goes through the shared service, so it must actually change
+    // sloppy SQL rather than silently no-op.
+    await setSql(page, 'select a,b from t where a=1');
+    await page.evaluate(() => {
+      const host = document.querySelector('app-query-executor');
+      (window as any).ng?.getComponent?.(host)?.format?.();
+    });
+    await page.waitForTimeout(900);
+    const formatted = await page.evaluate(() =>
+      (window as any).monaco.editor.getModels()[0].getValue(),
+    );
+    console.log('F formatted:', JSON.stringify(formatted));
+    expect(formatted, 'format() did not reformat').not.toBe('select a,b from t where a=1');
+    expect(formatted, 'formatting did not upper-case keywords').toMatch(/SELECT/);
+  });
+
   test('E · Monaco find widget opens and is styled as a card', async ({ page }) => {
     await openExecutor(page);
     await setSql(page, 'select alpha, beta from gamma where alpha = 1');
