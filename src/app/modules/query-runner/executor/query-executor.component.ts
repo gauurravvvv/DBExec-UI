@@ -510,6 +510,30 @@ export class QueryExecutorComponent
   }
 
   /** Group folder toggle (Tables / Views / …). */
+  /**
+   * Whether a schema needs the TABLES / VIEWS / FUNCTIONS grouping level.
+   *
+   * The Dataset Creator's schema tree is schema → table → column. This one used to
+   * always insert a category level, which made the two explorers look different at
+   * a glance even though every row was styled identically.
+   *
+   * A schema holding nothing but tables gains nothing from a lone "TABLES" node
+   * wrapping everything, so the level collapses and the two trees match. It
+   * appears only when there is genuinely more than one kind of object to separate
+   * — a capability the dataset explorer has no data for, not a styling difference.
+   */
+  showObjectGroups(s: TreeSchema): boolean {
+    const kinds = [
+      s.tables.length,
+      s.views.length,
+      s.matviews.length,
+      s.functions.length,
+      s.sequences.length,
+      s.triggers.length,
+    ].filter(n => n > 0).length;
+    return kinds > 1;
+  }
+
   toggleGroup(s: TreeSchema, group: keyof TreeSchema['g']): void {
     s.g[group] = !s.g[group];
   }

@@ -678,8 +678,8 @@
 
     // PK/FK column markers — colors live in the theme so dark-mode and any
     // brand tweaks stay in one place.
-    .column-icon.is-pk {
-      color: var(--pk-color);
+    .column-icon {
+      @include editor-explorer-key-icon;
     }
     .column-icon.is-fk {
       color: var(--fk-color);

@@ -204,7 +204,15 @@
           <div class="qx-groups" *ngIf="s.open && s.loaded">
             <!-- TABLES -->
             <div class="qx-group">
-              <div class="qx-node group" (click)="toggleGroup(s, 'tables')">
+              <!-- Group header only when a schema holds more than one KIND of
+                   object. A schema of nothing but tables shows them directly, so
+                   this tree matches the Dataset Creator's schema → table → column
+                   shape instead of wrapping everything in a lone TABLES node. -->
+              <div
+                class="qx-node group"
+                *ngIf="showObjectGroups(s)"
+                (click)="toggleGroup(s, 'tables')"
+              >
                 <i
                   class="pi"
                   [ngClass]="
@@ -215,9 +223,13 @@
                 ><span>{{ 'QUERY_RUNNER.GRP_TABLES' | translate }}</span>
                 <span class="qx-count">{{ s.tables.length }}</span>
               </div>
-              <div *ngIf="s.g.tables">
+              <div *ngIf="s.g.tables || !showObjectGroups(s)">
                 <div class="qx-table-group" *ngFor="let t of s.tables">
-                  <div class="qx-node indent2 qx-has-actions">
+                  <div
+                    class="qx-node qx-has-actions"
+                    [class.indent2]="showObjectGroups(s)"
+                    [class.indent]="!showObjectGroups(s)"
+                  >
                     <i
                       class="pi qx-twist"
                       [ngClass]="
@@ -260,8 +272,12 @@
                       (click)="insertText(c.name)"
                     >
                       <i
-                        class="pi"
-                        [ngClass]="c.isPrimaryKey ? 'pi-key' : 'pi-circle'"
+                        class="pi column-icon"
+                        [ngClass]="{
+                          'pi-key': c.isPrimaryKey,
+                          'pi-circle': !c.isPrimaryKey,
+                          'is-pk': c.isPrimaryKey
+                        }"
                       ></i>
                       <span class="qx-col-name">{{ c.name }}</span>
                       <span class="qx-col-type">{{ c.dataType }}</span>

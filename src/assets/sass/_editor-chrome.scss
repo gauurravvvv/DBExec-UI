@@ -362,3 +362,26 @@
   color: var(--text-subtle);
   flex-shrink: 0;
 }
+
+/**
+ * Key markers on a column row.
+ *
+ * Both explorers mark primary keys, and the Dataset Creator also marks foreign
+ * keys. Colours come from `--pk-color` / `--fk-color` so a brand or theme change
+ * moves them in one place — the executor previously rendered its key icon
+ * uncoloured, which is the most visible difference between the two trees.
+ */
+@mixin editor-explorer-key-icon {
+  font-size: var(--fs-micro);
+  width: 14px;
+  flex-shrink: 0;
+  color: var(--text-subtle);
+
+  &.is-pk {
+    color: var(--pk-color);
+  }
+
+  &.is-fk {
+    color: var(--fk-color);
+  }
+}
