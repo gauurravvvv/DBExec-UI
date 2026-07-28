@@ -300,3 +300,65 @@
     box-shadow: none;
   }
 }
+
+// ── Object explorer ──────────────────────────────────────────────────────────
+// The schema tree that both the Dataset Creator/Editor and the Query Executor
+// put on the left. These two ARE the same thing — schema → table → column — so
+// unlike the Field Creator's field list they converge completely.
+//
+// Row geometry comes from editor-tree-row; these add the parts a schema tree has
+// that a flat list does not: the name, the data-type label and the count pill.
+
+/** The panel itself. */
+@mixin editor-explorer-panel {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  background: var(--card-background);
+  border-right: 1px solid var(--border-color);
+  overflow: hidden;
+}
+
+/** A schema or table row. `$depth` indents nested levels. */
+@mixin editor-explorer-row($depth: 0) {
+  @include editor-tree-row($depth);
+}
+
+/** A column row — one level deeper than its table. */
+@mixin editor-explorer-column-row {
+  @include editor-tree-row(var(--space-10));
+}
+
+/** The identifier itself. Truncates rather than wrapping: a tree row is one line. */
+@mixin editor-explorer-name {
+  color: var(--text-color);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+
+/**
+ * The data type, right-aligned.
+ *
+ * Monospaced deliberately: `character varying(20)` and `numeric(12,2)` are read
+ * character by character, and a proportional font makes them harder to scan. The
+ * two explorers previously disagreed on all four properties — size, colour,
+ * family and alignment.
+ */
+@mixin editor-explorer-type {
+  margin-left: auto;
+  padding-left: var(--space-3);
+  font-family: var(--font-mono);
+  font-size: var(--fs-micro);
+  color: var(--text-muted);
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+/** Chevrons and object icons ahead of the name. */
+@mixin editor-explorer-icon {
+  font-size: var(--fs-micro);
+  color: var(--text-subtle);
+  flex-shrink: 0;
+}

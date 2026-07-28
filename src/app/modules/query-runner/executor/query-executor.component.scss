@@ -621,6 +621,8 @@ $qx-btn-h: 34px;
 
 /* object browser */
 .qx-browser {
+  // Shared with the Dataset Creator's .datasource-sidebar.
+  @include editor-explorer-panel;
   width: 260px;
   flex-shrink: 0;
   background: var(--qx-elev);
@@ -656,7 +658,9 @@ $qx-btn-h: 34px;
   font-size: var(--fs-control);
 }
 .qx-node {
-  @include editor-tree-row;
+  // Same mixin the Dataset Creator's .schema-header uses, with the same indent
+  // step, so a schema row is the same height and offset in both explorers.
+  @include editor-explorer-row(var(--space-6));
   &.indent {
     padding-left: var(--space-8);
   }
@@ -718,7 +722,7 @@ $qx-btn-h: 34px;
   padding-left: 0.4rem;
 }
 .qx-col {
-  @include editor-tree-row(var(--space-10));
+  @include editor-explorer-column-row;
   .pi {
     font-size: 0.55rem;
     color: var(--qx-muted);
@@ -727,12 +731,12 @@ $qx-btn-h: 34px;
     color: var(--warning-color);
   }
   .qx-col-name {
-    color: var(--qx-text);
+    @include editor-explorer-name;
   }
+  // Shared with the Dataset Creator's .column-type. The two explorers previously
+  // disagreed on all four properties: size, colour, family and alignment.
   .qx-col-type {
-    margin-left: auto;
-    color: var(--qx-muted);
-    font-size: var(--fs-label);
+    @include editor-explorer-type;
   }
 }
 

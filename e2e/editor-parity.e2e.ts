@@ -118,6 +118,40 @@ function divergences(samples: Sample[]): string[] {
   return out;
 }
 
+/**
+ * Object-explorer rows, sampled per screen.
+ *
+ * The Dataset Creator's schema tree and the Query Executor's object browser are
+ * the same thing — schema → table → column — so unlike the Field Creator's flat
+ * field list they must converge completely. `.schema-header`/`.column-item` and
+ * `.qx-node`/`.qx-col` now include the same mixins; this proves it.
+ */
+const EXPLORER_PROPS = ['paddingTop', 'paddingBottom', 'fontSize', 'gap'] as const;
+
+async function sampleExplorer(
+  page: Page,
+  screen: string,
+  rowSelector: string,
+  colSelector: string,
+): Promise<Record<string, string> | null> {
+  return page.evaluate(
+    ({ rowSelector, colSelector, props }) => {
+      const row = document.querySelector(rowSelector);
+      const col = document.querySelector(colSelector);
+      if (!row) return null;
+      const out: Record<string, string> = {};
+      const rcs = getComputedStyle(row);
+      for (const p of props) out[`row.${p}`] = (rcs as any)[p];
+      if (col) {
+        const ccs = getComputedStyle(col);
+        for (const p of props) out[`col.${p}`] = (ccs as any)[p];
+      }
+      return out;
+    },
+    { rowSelector, colSelector, props: EXPLORER_PROPS as unknown as string[] },
+  );
+}
+
 test.describe('editor parity across the three modules', () => {
   test('all five editor screens report identical editor styling', async ({ page }) => {
     const samples: Sample[] = [];
