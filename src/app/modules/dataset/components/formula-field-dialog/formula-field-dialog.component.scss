@@ -1,3 +1,4 @@
+@import '../../../../../assets/sass/editor-chrome';
 // =====================================================================
 // Custom-field builder dialog
 // ---------------------------------------------------------------------
@@ -563,21 +564,10 @@
 
     // ── Editor (Monaco / loading / fallback) ───────────────────────
     .acf-editor {
-      flex: 1;
-      border: 1px solid var(--border-color);
-      border-radius: var(--radius-sm);
-      overflow: hidden;
-      background: var(--card-background);
-      transition:
-        border-color var(--motion-base) ease,
-        box-shadow var(--motion-base) ease;
-      min-height: 280px;
-      display: flex;
-
-      &:focus-within {
-        border-color: var(--primary-color);
-        box-shadow: 0 0 0 2px var(--primary-color-transparent);
-      }
+      // The shared frame — this dialog is the reference look, so the values now
+      // live in _editor-chrome.scss and every other editor screen includes the
+      // same mixin instead of restating them.
+      @include editor-frame(280px);
 
       &__monaco {
         flex: 1;

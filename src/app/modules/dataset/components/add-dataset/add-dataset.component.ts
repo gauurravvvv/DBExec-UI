@@ -81,6 +81,10 @@ declare const monaco: any;
 declare const window: any;
 
 import { expandAnimation } from '../../animations/expand.animation';
+import {
+  currentDbexecTheme,
+  defineDbexecThemes,
+} from '../../../../shared/editor/monaco-theme';
 
 @Component({
   selector: 'app-add-dataset',
@@ -791,11 +795,15 @@ export class AddDatasetComponent
   }
 
   /**
-   * Get current theme based on body class
+   * The app-wide Monaco theme.
+   *
+   * This used to branch on a `dark-theme` body class that nothing in the app
+   * ever adds, so the dark arm could never fire and Monaco always rendered
+   * light. There is now one theme, built from the live design tokens, so it
+   * follows an organisation's brand colour instead of hard-coding blue.
    */
   private getCurrentTheme(): string {
-    const isDarkTheme = document.body.classList.contains('dark-theme');
-    return isDarkTheme ? 'vs-dark' : 'vs';
+    return currentDbexecTheme();
   }
 
   /**
@@ -955,6 +963,10 @@ export class AddDatasetComponent
         // left by an editor on a previously-visited screen.
         this.currentTheme = this.getCurrentTheme();
 
+        // Register the app theme from the live design tokens before create —
+        // Monaco throws on setTheme for a name it does not know, and re-running
+        // this is how the editor picks up an organisation's brand colour.
+        defineDbexecThemes();
         this.editor = monaco.editor.create(container, {
           ...MONACO_EDITOR_OPTIONS,
           value: initialValue,

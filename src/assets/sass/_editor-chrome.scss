@@ -1,0 +1,229 @@
+// Shared chrome for every code-editor screen.
+//
+// Query Executor, Dataset Creator and Field Creator (and their edit screens)
+// include these mixins instead of restating the same borders, radii and
+// paddings, so the three cannot drift apart. Values were lifted verbatim from
+// the Field Creator dialog, which is the agreed reference look.
+//
+// Tokens only — no literal colours, sizes or spacing. `--primary-color` and its
+// siblings are rewritten at runtime per organisation by ThemeService, so a
+// hard-coded value here would break branding.
+//
+// Usage — this project's stylesheets use @import, which shares one global
+// namespace, so every mixin here is prefixed `editor-` to avoid colliding with
+// component-local names:
+//   @import '../../../../assets/sass/editor-chrome';
+//   .qx-editor { @include editor-frame; }
+// The relative depth differs per component; adjust the path, not the mixin.
+
+// ── Thin scrollbar, used by every scrollable panel ────────────────────────────
+@mixin editor-scrollbar {
+  &::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: var(--radius-xs);
+
+    &:hover {
+      background: var(--border-strong, var(--secondary-color));
+    }
+  }
+}
+
+// ── The editor frame ─────────────────────────────────────────────────────────
+// The bordered box the Monaco instance sits inside. `overflow: hidden` is what
+// keeps Monaco's own square corners from poking through the rounded frame.
+@mixin editor-frame($min-height: 280px) {
+  flex: 1;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  background: var(--card-background);
+  transition:
+    border-color var(--motion-base) ease,
+    box-shadow var(--motion-base) ease;
+  min-height: $min-height;
+  display: flex;
+
+  // focus-within, not :focus — the focusable node is Monaco's inner textarea,
+  // so the frame would never light up on :focus alone.
+  &:focus-within {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px var(--primary-color-transparent);
+  }
+}
+
+// ── Panel header ─────────────────────────────────────────────────────────────
+// The strip above a side panel or an editor pane: icon + title on the left,
+// count pill or actions on the right.
+@mixin editor-panel-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-5);
+  background: var(--card-background);
+  border-bottom: 1px solid var(--border-color);
+
+  h3,
+  h4 {
+    margin: 0;
+    font-size: var(--fs-control);
+    font-weight: var(--fw-semibold);
+    color: var(--text-color);
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    min-width: 0;
+
+    i {
+      color: var(--primary-color);
+      font-size: var(--fs-body);
+    }
+  }
+}
+
+// A search field docked directly under a panel header.
+@mixin editor-panel-search {
+  padding: var(--space-3) var(--space-4);
+  background: var(--card-background);
+  border-bottom: 1px solid var(--border-color);
+}
+
+// ── Count pill ───────────────────────────────────────────────────────────────
+@mixin editor-count-pill {
+  font-size: var(--fs-micro);
+  color: var(--secondary-color);
+  background: var(--hover-background);
+  border-radius: var(--radius-xs);
+  padding: 0 var(--space-2);
+  flex-shrink: 0;
+}
+
+// ── Side-panel row ───────────────────────────────────────────────────────────
+// A selectable row in a list: schema/table/column in the executor's browser,
+// a dataset field or a function in the Field Creator.
+//
+// $compact suits dense lists (functions, columns); the default suits the
+// roomier field list.
+@mixin editor-side-row($compact: false) {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: if($compact, var(--space-2), var(--space-3));
+  padding: if($compact, var(--space-2) var(--space-3), var(--space-3) var(--space-4));
+  background: var(--card-background);
+  border: 1px solid if($compact, transparent, var(--border-color));
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition:
+    border-color var(--motion-base) ease,
+    background var(--motion-base) ease;
+
+  &:hover {
+    border-color: var(--primary-color);
+  }
+
+  // The inset bar marks the selection without shifting layout, which a real
+  // left border would.
+  &.is-selected,
+  &.is-active {
+    border-color: var(--primary-color);
+    background: var(--primary-color-transparent);
+    box-shadow: inset 3px 0 0 0 var(--primary-color);
+  }
+}
+
+// ── Status / validation bar ──────────────────────────────────────────────────
+// The strip under an editor carrying a validation verdict or a run result.
+// Colour comes from a state class the component adds, so the shape is shared
+// while the semantics stay local.
+@mixin editor-status-bar {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-sm);
+  font-size: var(--fs-label);
+  border: 1px solid transparent;
+
+  i {
+    font-size: var(--fs-body);
+    margin-top: 1px;
+    flex-shrink: 0;
+  }
+
+  span {
+    flex: 1;
+    min-width: 0;
+  }
+}
+
+// ── Toolbar ──────────────────────────────────────────────────────────────────
+// A row of actions above an editor.
+@mixin editor-toolbar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  background: var(--card-background);
+  border-bottom: 1px solid var(--border-color);
+  flex-wrap: wrap;
+}
+
+// ── Monaco's own widgets ─────────────────────────────────────────────────────
+// Monaco's find widget replaced the executor's hand-built CodeMirror search
+// panel. Its colours come from the runtime theme in monaco-theme.ts; only shape
+// belongs in CSS, since Monaco has no theme keys for radius or shadow.
+//
+// Include ONCE at a global level (styles.scss), not per component: these widgets
+// are rendered into Monaco's own overflow container, which sits outside any
+// component's view encapsulation.
+@mixin editor-monaco-widgets {
+  .monaco-editor {
+    .find-widget {
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-color);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+      // Stock Monaco pins the find widget flush to the top edge; inset it so it
+      // reads as a floating card, matching the compact panel it replaced.
+      top: var(--space-2) !important;
+      right: var(--space-3) !important;
+    }
+
+    .suggest-widget,
+    .monaco-hover {
+      border-radius: var(--radius-sm);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    }
+
+    // Monaco renders its suggestion rows at its own font size; align them with
+    // the app's control scale so the list matches every other dropdown.
+    .suggest-widget .monaco-list-row {
+      font-size: var(--fs-label);
+    }
+  }
+}
+
+// ── Editor overlays owned by shared/editor/ ──────────────────────────────────
+// Include ONCE globally alongside `monaco-widgets` — both target elements that
+// Monaco owns, outside any component's view encapsulation.
+@mixin editor-overlays {
+  // Placeholder for an empty editor (Monaco has no placeholder option).
+  .dbx-editor-placeholder {
+    font-family: var(--font-mono);
+    font-size: var(--fs-control);
+    color: var(--text-subtle);
+    white-space: pre;
+    user-select: none;
+  }
+
+  // The lines that just ran, flashed briefly by run-flash.ts.
+  .dbx-run-flash {
+    background: var(--primary-color-transparent);
+    transition: background var(--motion-base) ease;
+  }
+}

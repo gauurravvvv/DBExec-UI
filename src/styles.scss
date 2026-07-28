@@ -7,6 +7,14 @@
 // theme variables so the design tokens resolve. Un-scoped on purpose — CM
 // appends its autocomplete/search layers to document.body.
 @import './assets/sass/codemirror-theme';
+// Shared code-editor chrome. Must load after the theme variables so the design
+// tokens resolve. The two mixins included below target elements Monaco renders
+// into its OWN overflow container, outside any component's view encapsulation,
+// so they have to be global — every other mixin in the file is included by the
+// component that needs it.
+@import './assets/sass/editor-chrome';
+@include editor-monaco-widgets;
+@include editor-overlays;
 // Analyses Wave 7 authoring UX — body-level overlay styles (tab context menu +
 // on-pill encoding menu render appendTo=body; Present mode is a fixed layer).
 // Global on purpose; Wave-7-unique class names, token-driven.

@@ -1,0 +1,190 @@
+/**
+ * CodeEditorService — the one way to create a code editor in this app.
+ *
+ * Query Executor, Dataset Creator, Field Creator, their edit screens and the
+ * prompt SQL dialog all mount Monaco. Before this service each repeated the
+ * same fragile sequence by hand:
+ *
+ *     loader.load() → register language → read theme → defineTheme → create
+ *     → setTheme again (Monaco's theme is GLOBAL and leaks between editors)
+ *     → focus → wire onDidChangeModelContent → remember to dispose
+ *
+ * Five copies meant five chances to get it wrong, and they did diverge: three
+ * carried an identical dead `dark-theme` branch, and two leaked a completion
+ * provider because disposal was partial. Everything below exists to make the
+ * correct sequence the only one available.
+ *
+ * Two traps it closes for every caller:
+ *
+ *  1. **Zone escape.** Monaco's events fire outside Angular's zone, so an
+ *     OnPush component never re-renders on them — the symptom was a Run button
+ *     staying greyed out while the user typed. `onChange` re-enters the zone.
+ *  2. **Leaks.** Completion providers, theme observers and the editor itself all
+ *     need disposing. `EditorHandle.dispose()` drops every disposable the handle
+ *     collected, so a component only has to call one method.
+ */
+import { Injectable, NgZone } from '@angular/core';
+
+import { MonacoLoaderService } from '../../core/services/monaco-loader.service';
+import { registerFormulaLanguage } from './formula-language';
+import { attachPlaceholder } from './editor-placeholder';
+import { formulaEditorOptions, sqlEditorOptions } from './monaco-options';
+import { currentDbexecTheme, defineDbexecThemes } from './monaco-theme';
+import { flashRange } from './run-flash';
+
+declare const monaco: any;
+
+/**
+ * Which editor this is.
+ *
+ * The flavour picks the language and the handful of options that legitimately
+ * differ (minimap, ligatures, word-based suggestions) — see monaco-options.ts
+ * for why each differs. Everything else is shared.
+ */
+export type EditorFlavour = 'sql' | 'formula';
+
+export interface CreateEditorConfig {
+  /** The element Monaco mounts into. */
+  host: HTMLElement;
+  flavour: EditorFlavour;
+  value?: string;
+  readOnly?: boolean;
+  /** Shown while the model is empty; Monaco has no placeholder of its own. */
+  placeholder?: string;
+  /** Focus once created. Off by default so dialogs don't steal focus. */
+  autoFocus?: boolean;
+  /**
+   * Escape hatch for genuinely per-screen options. Prefer changing the shared
+   * options over passing overrides — an override is how three configs drifted
+   * apart in the first place.
+   */
+  overrides?: Record<string, any>;
+}
+
+export interface EditorHandle {
+  /** The raw Monaco instance, for APIs this handle deliberately does not wrap. */
+  readonly editor: any;
+  getValue(): string;
+  setValue(value: string): void;
+  /** Content changes, already back inside Angular's zone. */
+  onChange(cb: (value: string) => void): void;
+  updateOptions(options: Record<string, any>): void;
+  /** Briefly highlight a range — used to show which statement just ran. */
+  flash(startLine: number, endLine: number): void;
+  focus(): void;
+  /** Register anything that must be cleaned up with the editor. */
+  track(disposable: { dispose: () => void } | (() => void)): void;
+  dispose(): void;
+}
+
+@Injectable({ providedIn: 'root' })
+export class CodeEditorService {
+  constructor(
+    private readonly loader: MonacoLoaderService,
+    private readonly zone: NgZone,
+  ) {}
+
+  /** True once Monaco's global object is available. */
+  get isLoaded(): boolean {
+    return typeof monaco !== 'undefined' && !!monaco?.editor;
+  }
+
+  /**
+   * Load Monaco, register what the flavour needs, and create the editor.
+   *
+   * Rejects if Monaco cannot be loaded, so a caller can show its own
+   * "editor unavailable" state rather than a blank box.
+   */
+  async create(cfg: CreateEditorConfig): Promise<EditorHandle> {
+    await this.loader.load();
+    if (!this.isLoaded) throw new Error('Monaco failed to load');
+
+    if (cfg.flavour === 'formula') registerFormulaLanguage();
+
+    // Register the theme from the live tokens BEFORE create: Monaco throws on a
+    // theme name it does not know, and re-running this is how an editor picks up
+    // an organisation's brand colour.
+    defineDbexecThemes();
+    const theme = currentDbexecTheme();
+
+    const base =
+      cfg.flavour === 'sql' ? sqlEditorOptions() : formulaEditorOptions();
+
+    const editor = monaco.editor.create(cfg.host, {
+      ...base,
+      ...(cfg.overrides ?? {}),
+      value: cfg.value ?? '',
+      theme,
+      readOnly: cfg.readOnly ?? false,
+    });
+
+    // Monaco's theme is global, so an editor created on a previously-visited
+    // screen can leave a different theme in force. Assert ours after create.
+    monaco.editor.setTheme(theme);
+
+    if (cfg.autoFocus) editor.focus();
+
+    const disposables: Array<{ dispose: () => void } | (() => void)> = [];
+
+    if (cfg.placeholder) {
+      disposables.push(attachPlaceholder(editor, cfg.host, cfg.placeholder));
+    }
+
+    const handle: EditorHandle = {
+      editor,
+      getValue: () => editor.getValue(),
+      setValue: (value: string) => editor.setValue(value ?? ''),
+      onChange: (cb: (value: string) => void) => {
+        disposables.push(
+          editor.onDidChangeModelContent(() => {
+            // Back into the zone: Monaco fires outside it, and an OnPush
+            // component will not re-render otherwise.
+            this.zone.run(() => cb(editor.getValue()));
+          }),
+        );
+      },
+      updateOptions: (options: Record<string, any>) =>
+        editor.updateOptions(options),
+      flash: (startLine: number, endLine: number) =>
+        flashRange(editor, startLine, endLine),
+      focus: () => editor.focus(),
+      track: d => disposables.push(d),
+      dispose: () => {
+        for (const d of disposables) {
+          try {
+            typeof d === 'function' ? d() : d.dispose();
+          } catch {
+            // A disposable that throws must not strand the ones after it.
+          }
+        }
+        disposables.length = 0;
+        editor.dispose();
+      },
+    };
+
+    return handle;
+  }
+
+  /**
+   * Re-apply the theme from the tokens currently in force.
+   *
+   * Call after an organisation's branding changes so open editors follow the new
+   * primary colour instead of keeping the one captured at create.
+   */
+  refreshTheme(): void {
+    if (!this.isLoaded) return;
+    defineDbexecThemes();
+    monaco.editor.setTheme(currentDbexecTheme());
+  }
+
+  /**
+   * Bind a command to the editor, re-entering Angular's zone.
+   *
+   * Wrapping here rather than at each call site: a keybinding that runs a query
+   * outside the zone leaves the results pane un-rendered until the next
+   * unrelated event, which reads as "the shortcut did nothing".
+   */
+  addCommand(handle: EditorHandle, keybinding: number, run: () => void): void {
+    handle.editor.addCommand(keybinding, () => this.zone.run(run));
+  }
+}

@@ -9,6 +9,7 @@
  * lists to this file — they belong in the dialect modules so they stay
  * scoped to one engine at a time.
  */
+import { sqlEditorOptions } from '../../../shared/editor/monaco-options';
 
 /**
  * "Empty" content for the SQL editor. Originally a comment placeholder
@@ -25,95 +26,14 @@ export const SQL_EDITOR_PLACEHOLDER = '';
 /**
  * Monaco Editor configuration options
  */
-export const MONACO_EDITOR_OPTIONS = {
-  language: 'sql',
-  automaticLayout: true,
-
-  // IntelliSense & Autocomplete
-  quickSuggestions: {
-    other: true,
-    comments: false,
-    strings: false,
-  },
-  suggestOnTriggerCharacters: true,
-  acceptSuggestionOnEnter: 'on' as const,
-  acceptSuggestionOnCommitCharacter: true,
-  wordBasedSuggestions: false,
-  tabCompletion: 'on' as const,
-  suggest: {
-    // showKeywords gates ALL items with kind === Keyword in the suggest
-    // widget — including ones our own provider emits. Was previously false
-    // (intent: silence Monaco's built-in SQL keyword list), but that also
-    // dropped DISTINCT, ASC, DESC, IS NULL, etc. that we explicitly add.
-    // wordBasedSuggestions: false below already handles the built-in noise.
-    showKeywords: true,
-    showSnippets: true,
-    showFunctions: true,
-    showWords: false,
-    insertMode: 'insert' as const,
-    filterGraceful: true,
-    snippetsPreventQuickSuggestions: false,
-    localityBonus: true,
-    shareSuggestSelections: true,
-    showIcons: true,
-    maxVisibleSuggestions: 15,
-  },
-  quickSuggestionsDelay: 50,
-
-  // UI Features
-  minimap: { enabled: true },
-  folding: true,
-  lineNumbers: 'on' as const,
-  renderLineHighlight: 'all' as const,
-  scrollBeyondLastLine: false,
-  cursorBlinking: 'smooth' as const,
-  cursorSmoothCaretAnimation: 'on' as const,
-  smoothScrolling: true,
-  mouseWheelZoom: true,
-  // Match the rest of the app: JetBrains Mono with ui-monospace fallback so
-  // the editor reads with the same family as inline code chips and version
-  // chips. Monaco reads fontFamily as a literal CSS list and does not
-  // resolve var(...), so the stack is duplicated here from --font-mono.
-  fontSize: 14,
-  fontFamily:
-    "'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace",
-  fontLigatures: true,
-
-  // Bracket Features
-  bracketPairColorization: { enabled: true },
-  guides: {
-    bracketPairs: true,
-    indentation: true,
-  },
-
-  // Editing Features
-  formatOnPaste: false,
-  formatOnType: false,
-  autoClosingBrackets: 'always' as const,
-  autoClosingQuotes: 'always' as const,
-  autoIndent: 'full' as const,
-  multiCursorModifier: 'alt' as const,
-
-  // Context Menu - Hide unnecessary items for SQL editor
-  contextmenu: true,
-
-  // Scrollbar
-  //
-  // 3px to match the result-table scrollbars (defined in styles.scss).
-  // The visual rhythm across editor + result table stays consistent —
-  // both surfaces use the same hairline rounded pill. Shadows off
-  // because they add no value on a 3px slider (the fade gradient
-  // would overpower the bar itself).
-  scrollbar: {
-    vertical: 'visible' as const,
-    horizontal: 'visible' as const,
-    useShadows: false,
-    verticalHasArrows: false,
-    horizontalHasArrows: false,
-    verticalScrollbarSize: 3,
-    horizontalScrollbarSize: 3,
-  },
-};
+/**
+ * Monaco options for the SQL editors.
+ *
+ * Re-exported from the app-wide definition so there is ONE options object. The
+ * name is kept because several components import it; the body moved to
+ * `shared/editor/monaco-options.ts`, which the Query Executor now shares.
+ */
+export const MONACO_EDITOR_OPTIONS = sqlEditorOptions();
 
 /**
  * Context analysis patterns for intelligent autocomplete
@@ -126,15 +46,6 @@ export const CONTEXT_PATTERNS = {
   inWhereClause: /WHERE[\s\S]*?(?:GROUP BY|ORDER BY|LIMIT|$)/i,
   inJoinClause: /JOIN[\s\S]*?(?:WHERE|GROUP BY|ORDER BY|$)/i,
 };
-
-/**
- * Monaco Editor theme names
- */
-export const MONACO_THEMES = {
-  LIGHT: 'vs',
-  DARK: 'vs-dark',
-  HIGH_CONTRAST: 'hc-black',
-} as const;
 
 /**
  * Editor loading configuration
