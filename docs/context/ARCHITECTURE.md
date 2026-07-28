@@ -33,3 +33,49 @@
 - Never commit `environment*.ts` / `.env`.
 - Dates `YYYY-MM-DD` · Progress logs append-only, newest first · every change updates the module file + INDEX + SESSION_LOG.
 - **Code is truth.** If these docs disagree with the code, fix the docs and log the correction.
+
+## Code editors — one library, one theme (2026-07-28)
+
+**Monaco is the only code editor.** CodeMirror 6 was retired when the Query
+Executor migrated; nine `@codemirror/*` packages plus
+`@replit/codemirror-minimap` were uninstalled. `@codemirror/lang-sql` remains as a
+DATA dependency only — the six dialect specs harvest keyword and type word lists
+from it, and it also supplies a Lezer parser used solely by the currently-disabled
+dialect lint (`ENABLE_DIALECT_LINT = false`). No editor code imports it.
+
+`src/app/shared/editor/` owns everything shared:
+
+- **`CodeEditorService`** — the ONLY place `monaco.editor.create` is called. Every
+  screen passes a flavour (`sql` | `formula`) and gets an `EditorHandle`. It owns
+  load → register language → define theme → create → re-assert the global theme
+  (Monaco's theme is global and leaks between editors) → focus → dispose, and it
+  re-enters Angular's zone on change events, because Monaco fires outside the zone
+  and OnPush components otherwise never re-render.
+- `monaco-theme.ts` — ONE theme, built at runtime from the **computed** design
+  tokens. Not hard-coded hex: `ThemeService` rewrites `--primary-color` and
+  siblings per organisation, so literal values give a branded org a stock editor.
+  Monaco rejects `rgb()`/`rgba()`, so values are converted to `#rrggbb[aa]`.
+- `monaco-options.ts` — one options object. Only five options differ by context
+  (language, minimap, ligatures, wheel zoom, word-based suggestions), each
+  documented with its reason.
+- `editor-doc.ts` — offset-oriented access to a Monaco model, because
+  `splitStatements` works in character offsets to mirror the backend splitter.
+- `editor-placeholder.ts`, `run-flash.ts` — the two things Monaco has no
+  equivalent for.
+- `schema-bridge.ts` — projects the executor's lazy `SchemaCatalog` into the tree
+  `MonacoIntelliSenseService` consumes.
+
+`assets/sass/_editor-chrome.scss` holds the shared frame, panel header, rows,
+buttons, status bar and Monaco-widget styling. Mixins are prefixed `editor-`
+because the project's stylesheets use `@import`, which shares one global
+namespace. Two mixins (`editor-monaco-widgets`, `editor-overlays`) are included
+once globally in `styles.scss`, because Monaco renders those widgets into its own
+overflow container, outside any component's view encapsulation.
+
+**There is no dark mode.** Four components used to branch on a `dark-theme` body
+class that nothing in the app ever adds. If dark mode is added, give the tokens
+dark values — the theme reads computed values, so it follows automatically.
+
+Parity is enforced by `e2e/editor-parity.e2e.ts`, which compares computed styles
+across the four components that mount an editor and fails naming any property
+that differs.

@@ -180,6 +180,27 @@ Legacy `us-data-grid` / AG Grid are **retired** for lists (replaced by
 `app-custom-table`); AG Grid remains only inside the Query Executor result
 grid. `us-server-list-adapter` is kept (it feeds `app-custom-table`).
 
+### Code editors — always via `CodeEditorService`
+
+**Monaco is the only code editor.** CodeMirror was retired. Never call
+`monaco.editor.create` directly: inject
+`shared/editor/code-editor.service.ts` and call
+`create({ host, flavour: 'sql' | 'formula' })`, which returns an `EditorHandle`.
+The service owns the load/register/theme/create/dispose sequence, re-enters
+Angular's zone on change events (Monaco fires outside it, so OnPush components
+otherwise never re-render), and disposes every listener through one
+`handle.dispose()`.
+
+- Theme and options: `shared/editor/monaco-theme.ts` and `monaco-options.ts` —
+  one definition each. The theme is built at runtime from the **computed** design
+  tokens, because `ThemeService` rewrites the brand colour per organisation.
+- Chrome: `@import 'assets/sass/editor-chrome'` and use the `editor-*` mixins.
+- There is **no dark mode**; don't add a `dark-theme` branch.
+- `@codemirror/lang-sql` is still installed but is a **data** dependency (dialect
+  keyword lists + a Lezer parser for the disabled dialect lint). Don't import it
+  as an editor, and don't remove it without reading
+  `modules/dataset/config/sql-dialects/index.ts`.
+
 ### Design tokens (theming)
 
 CSS custom properties are the single styling source, defined in

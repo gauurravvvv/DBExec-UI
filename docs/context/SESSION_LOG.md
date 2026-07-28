@@ -15,6 +15,19 @@
 - Modules updated: all (initialized).
 - Open for next session: Module files carry accurate Context/Goals scaffolds; enrich individual files with deeper specifics as work touches them. Follow the session-end protocol on every future change.
 
+## 2026-07-28 — Editor unification: one Monaco editor across the three modules
+Query Executor migrated off CodeMirror 6; every editor now mounts through
+shared/editor/CodeEditorService, the single place monaco.editor.create is called.
+Nine CodeMirror packages removed. The executor's 237-line completion source was
+replaced by the dataset module's 2,272-line IntelliSense, with a schema bridge and
+a new setColumnRequestHandler hook preserving its lazy column loading. Found no
+dark mode exists (a dead body-class branch in four components) and that the theme
+must be built from computed tokens because ThemeService rewrites the brand colour
+per org. Six real bugs found by the new suites, each having first passed a weaker
+assertion. Parity is asserted by comparing computed styles across four screens.
+Chrome converged onto shared mixins. The component file-size work is analysed and
+mapped but blocked on functional e2e for dataset create/edit.
+
 ## 2026-07-28 — Formula dialog screenshot suite + suggest-widget theming
 34 live captures into screenshots/ covering palette, usage docs, IntelliSense and
 12 valid / 12 invalid formulas, with each case asserting its own filename. That
