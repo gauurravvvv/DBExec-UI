@@ -18,50 +18,16 @@
  */
 import { expect, Page, test } from '@playwright/test';
 
-const ORG = 'AIOrg';
-const USER = 'admin_gaurav';
-const PASS = 'Pass@1234';
-const API = 'http://localhost:3000/api/v1';
+import { authToken, firstConnection, login } from './_auth';
+
 
 test.use({ viewport: { width: 1680, height: 1050 } });
-
-/** Resolve the auth token the app stored, so the spec can call the API directly. */
-async function authToken(page: Page): Promise<string> {
-  const token = await page.evaluate(() => {
-    for (const k of Object.keys(localStorage)) {
-      const v = localStorage.getItem(k) || '';
-      // The login response stores `accessToken`; a naive /"token"/ match picks
-      // up `refreshToken` first and every API call 401s.
-      const m = v.match(/"accessToken"\s*:\s*"([^"]+)"/);
-      if (m) return m[1];
-      if (v.startsWith('ey') && v.split('.').length === 3) return v;
-    }
-    return '';
-  });
-  expect(token, 'could not resolve an auth token from localStorage').toBeTruthy();
-  return token;
-}
-
-async function login(page: Page): Promise<void> {
-  await page.goto('/login', { waitUntil: 'domcontentloaded' });
-  await page.locator('#auth-account').fill(ORG);
-  await page.locator('#auth-username').fill(USER);
-  await page.locator('#auth-password').fill(PASS);
-  await page.locator('button[type="submit"]').click();
-  await page.waitForURL(/\/app\//, { timeout: 45_000 });
-}
 
 /** Open the standalone executor against the first available connection. */
 async function openExecutor(page: Page): Promise<void> {
   await login(page);
   const token = await authToken(page);
-  const res = await page.request.get(`${API}/query-runner/connections`, {
-    headers: { 'x-auth-token': token },
-  });
-  const body = await res.json();
-  const list = body?.data?.rows ?? body?.data?.connections ?? body?.data ?? [];
-  const conn = (Array.isArray(list) ? list : [])[0];
-  expect(conn, 'no query-runner connection exists — seed one first').toBeTruthy();
+  const conn = await firstConnection(page, token);
 
   await page.goto(`/query-runner/exec?conn=${conn.id}`, {
     // Never networkidle: the app holds an open SSE stream, so it never settles.
