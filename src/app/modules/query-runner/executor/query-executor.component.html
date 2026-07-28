@@ -269,6 +269,8 @@
                     <div
                       class="qx-col"
                       *ngFor="let c of columnsFor(t)"
+                      [pTooltip]="c.name + ' · ' + c.dataType"
+                      tooltipPosition="right"
                       (click)="insertText(c.name)"
                     >
                       <i

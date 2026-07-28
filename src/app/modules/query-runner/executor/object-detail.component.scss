@@ -25,8 +25,12 @@
   // Canonical app modal chrome — --shadow-xl + 1px ring, --radius-lg (was a
   // bespoke 10px + heavy 0 20px 60px shadow).
   border-radius: var(--radius-lg, 12px);
-  width: min(920px, 96vw);
-  max-height: 88vh;
+  width: min(1100px, 96vw);
+  // A FIXED height, not max-height. With max-height the dialog grew and shrank
+  // with the row count, so the tab strip sat at a different y for every object
+  // the user inspected. A stable frame means the tabs are always in the same
+  // place and only the body scrolls.
+  height: min(88vh, 860px);
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -39,6 +43,7 @@
 .od-head {
   // Shared with every other popup on these screens.
   @include editor-dialog-head;
+  flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -112,7 +117,14 @@
   gap: var(--space-2);
   padding: var(--space-4) var(--space-6);
   border-bottom: 1px solid var(--od-border);
+  // Measured at 22px tall against a 28px scrollHeight: as a flex child with no
+  // shrink guard, the strip was being compressed by the flexing body and its
+  // labels were clipped in half. Pin it and let only the body give way.
+  flex-shrink: 0;
   overflow-x: auto;
+  // Horizontal only. `overflow-x: auto` alone makes the element a scroll
+  // container on BOTH axes, which is what let the labels be cut off.
+  overflow-y: hidden;
 
   button {
     border: 1px solid transparent;
@@ -163,6 +175,26 @@
   width: 100%;
   border-collapse: collapse;
   font-size: var(--fs-control);
+  // Fixed layout so columns get predictable widths instead of bidding for space
+  // by content. Under auto layout a long unbreakable token like
+  // `uuid_generate_v4()` claimed width and squeezed Comment to about 100px, where
+  // prose wrapped one or two characters per line and a single row grew taller
+  // than the dialog.
+  table-layout: fixed;
+
+  th,
+  td {
+    // Break inside a word only when the word cannot fit at all — long identifiers
+    // and type names still wrap, ordinary prose does not shatter per character.
+    overflow-wrap: break-word;
+    word-break: normal;
+  }
+
+  // Comment and DDL-style prose needs the room; the narrow flags do not.
+  th:last-child,
+  td:last-child {
+    width: 26%;
+  }
 
   th {
     text-align: left;

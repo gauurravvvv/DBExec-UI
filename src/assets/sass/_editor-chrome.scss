@@ -364,26 +364,26 @@
   flex-shrink: 0;
   white-space: nowrap;
 
-  // Hidden at rest, revealed on hover.
+  // Removed from LAYOUT at rest, not merely made transparent.
   //
   // At rest the type is noise: `character varying` is longer than most of the
-  // column names beside it, so a column list reads as two competing columns of
-  // text. Opacity rather than display:none keeps the row's width reserved, so
-  // nothing reflows when it appears.
-  opacity: 0;
-  transition: opacity var(--motion-base) ease;
+  // column names beside it. The first attempt used `opacity: 0`, which avoided
+  // reflow but kept the label's box — so the name lost that width permanently and
+  // `organisationName` truncated to `organisat...`. The type now lives in a
+  // tooltip on the row, and the name gets the full width.
+  display: none;
 }
 
 /**
- * Apply to the ROW that contains a type label, so hovering the row reveals it.
- * Kept separate from editor-explorer-type because the row and the label are
- * styled in different blocks.
+ * Retained as a no-op so existing includes keep compiling.
+ *
+ * The type is no longer revealed by hovering the row — it is in a tooltip, which
+ * is what a user asked for after the hover version cost the column name its
+ * width. Kept rather than deleted so a stale include cannot fail the build; new
+ * code should not use it.
  */
 @mixin editor-explorer-reveals-type($type-selector) {
-  &:hover #{$type-selector},
-  &:focus-within #{$type-selector} {
-    opacity: 1;
-  }
+  // intentionally empty
 }
 
 /** Chevrons and object icons ahead of the name. */

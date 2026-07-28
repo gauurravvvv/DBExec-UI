@@ -28,6 +28,8 @@
     <li
       class="field-sidebar__item"
       *ngFor="let field of fields(); trackBy: trackById"
+      [pTooltip]="fieldTooltip(field)"
+      tooltipPosition="right"
       [class.is-formula]="field.isCustom"
       (click)="field.isCustom ? editRequested.emit(field) : null"
     >

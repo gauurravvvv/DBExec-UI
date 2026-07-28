@@ -74,6 +74,19 @@ export class FieldSidebarComponent {
    * A computed field keeps `pi-code`: what matters about it is that it is a
    * formula, not what the formula returns.
    */
+  /**
+   * Row tooltip: the name plus its type, or its formula.
+   *
+   * The type used to sit inline. Hidden at rest it still reserved width, so long
+   * names truncated — `organisationName` became `organisat...`. The tooltip gives
+   * the name the full row and still puts the type one hover away.
+   */
+  fieldTooltip(field: DatasetFieldVm): string {
+    const name = field.label || field.name;
+    if (field.formula) return `${name} · ${field.formula}`;
+    return field.dataType ? `${name} · ${field.dataType}` : name;
+  }
+
   fieldIcon(field: DatasetFieldVm): string {
     if (field.isCustom) return 'pi-code';
     return dataTypeIcon(field.dataType ?? '');

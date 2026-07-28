@@ -397,6 +397,8 @@
                     <div
                       *ngFor="let column of table.columns; trackBy: trackByName"
                       class="column-item"
+                      [pTooltip]="column.name + ' · ' + column.type"
+                      tooltipPosition="right"
                       (click)="
                         insertColumnName(
                           selectedDatasourceObj.id,

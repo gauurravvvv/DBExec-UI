@@ -102,6 +102,38 @@ test.describe('editor showcase', () => {
     await page.keyboard.type('region', { delay: 80 });
     await page.waitForTimeout(700);
     await page.screenshot({ path: `${OUT}/75-executor-find-widget.png` });
+
+    // Object detail. Two faults are asserted here because both were invisible
+    // until measured: the tab strip was being squeezed by the flexing body and its
+    // labels clipped, and the dialog's height tracked the row count so the tabs
+    // sat at a different y for every object.
+    await page.keyboard.press('Escape');
+    await page.evaluate(() => {
+      const host = document.querySelector('app-query-executor');
+      (window as any).ng
+        ?.getComponent?.(host)
+        ?.openObject?.('table', 'schema_001', 'access_level');
+    });
+    const modal = page.locator('.od-modal');
+    if (await modal.isVisible({ timeout: 15_000 }).catch(() => false)) {
+      await page.waitForTimeout(2500);
+      const geom = await page.evaluate(() => {
+        const el = (s: string) => document.querySelector(s) as HTMLElement | null;
+        const tabs = el('.od-tabs');
+        const m = el('.od-modal');
+        return {
+          modalHeight: m ? Math.round(m.getBoundingClientRect().height) : 0,
+          tabsHeight: tabs ? Math.round(tabs.getBoundingClientRect().height) : 0,
+          tabsScrollHeight: tabs ? tabs.scrollHeight : 0,
+        };
+      });
+      console.log('object detail geometry:', JSON.stringify(geom));
+      expect(
+        geom.tabsHeight,
+        'the tab strip is being clipped — it needs flex-shrink: 0',
+      ).toBeGreaterThanOrEqual(geom.tabsScrollHeight);
+      await modal.screenshot({ path: `${OUT}/81-object-detail.png` });
+    }
   });
 
   test('Dataset Creator and Editor — the same editor', async ({ page }) => {
