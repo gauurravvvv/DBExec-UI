@@ -18,6 +18,31 @@
  * loading state with no win. Live schema (tables/columns) keeps its
  * existing BE-driven pipeline; only the dialect dictionary lives here.
  */
+/**
+ * NOTE ON THE `@codemirror/lang-sql` DEPENDENCY.
+ *
+ * The app's editors are all Monaco; CodeMirror was retired when the Query
+ * Executor migrated, and every other @codemirror/* package plus
+ * @replit/codemirror-minimap was uninstalled. This one is kept, for two
+ * different reasons — worth separating, because only the first is free:
+ *
+ *  1. **Keyword and type word lists.** Each dialect below harvests
+ *     `spec.keywords` / `spec.types` — plain whitespace-separated strings — from
+ *     lang-sql's bundled PostgreSQL / MySQL / MariaSQL / MSSQL / PLSQL specs.
+ *     More complete and better maintained than a hand-written list.
+ *
+ *  2. **A Lezer parser**, via `<Dialect>.language.parser`, exposed as
+ *     `DialectSpec.parser` and used ONLY by SqlLinterService's dialect lint —
+ *     which is currently disabled (`ENABLE_DIALECT_LINT = false` in
+ *     sql-editor.config.ts).
+ *
+ * Reason 2 is what keeps CodeMirror's runtime (`@codemirror/state`, `@lezer/*`)
+ * in the dataset bundle. If the dialect lint is abandoned, dropping `parser`
+ * would let the word lists survive as strings and take the runtime out with it.
+ * If it is finished, the parser is needed and the cost is justified. Either way
+ * the decision belongs with that feature, not with the editor migration, so
+ * nothing here was changed on its behalf.
+ */
 import type { LRParser } from '@lezer/lr';
 import { DatabaseTypeValue } from '../../../datasource/constants/database-types.constant';
 

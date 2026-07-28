@@ -4803,7 +4803,8 @@
     "SAVE_UPDATE": "Save",
     "SAVE_AS_NEW": "Save as new",
     "ROW_LIMIT": "Limite de linhas",
-    "LAST_RUN": "Última execução"
+    "LAST_RUN": "Última execução",
+    "EDITOR_PLACEHOLDER": "-- Escreva SQL. Ctrl/Cmd+Enter executa a instrução no cursor."
   },
   "DB_ACCESS": {
     "TITLE": "Gerenciamento de acesso ao banco de dados",

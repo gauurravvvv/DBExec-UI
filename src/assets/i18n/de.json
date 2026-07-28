@@ -4803,7 +4803,8 @@
     "SAVE_UPDATE": "Save",
     "SAVE_AS_NEW": "Save as new",
     "ROW_LIMIT": "Zeilenlimit",
-    "LAST_RUN": "Letzte Ausführung"
+    "LAST_RUN": "Letzte Ausführung",
+    "EDITOR_PLACEHOLDER": "-- SQL schreiben. Strg/Cmd+Enter führt die Anweisung am Cursor aus."
   },
   "DB_ACCESS": {
     "TITLE": "Datenbankzugriffsverwaltung",

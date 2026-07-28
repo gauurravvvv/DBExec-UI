@@ -15,55 +15,10 @@ import { ActivatedRoute } from '@angular/router';
 import { Title } from '@angular/platform-browser';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
-import {
-  autocompletion,
-  closeBrackets,
-  closeBracketsKeymap,
-  completionKeymap,
-  startCompletion,
-} from '@codemirror/autocomplete';
-import {
-  copyLineDown,
-  defaultKeymap,
-  history,
-  historyKeymap,
-  indentWithTab,
-  moveLineDown,
-  moveLineUp,
-  toggleComment,
-} from '@codemirror/commands';
-import { PostgreSQL, sql, keywordCompletionSource } from '@codemirror/lang-sql';
-import {
-  bracketMatching,
-  defaultHighlightStyle,
-  foldGutter,
-  foldKeymap,
-  indentOnInput,
-  syntaxHighlighting,
-} from '@codemirror/language';
-import { lintGutter, setDiagnostics, Diagnostic } from '@codemirror/lint';
-import {
-  search,
-  searchKeymap,
-  highlightSelectionMatches,
-} from '@codemirror/search';
-import { Compartment, EditorState } from '@codemirror/state';
-import {
-  Decoration,
-  DecorationSet,
-  EditorView,
-  drawSelection,
-  highlightActiveLine,
-  highlightActiveLineGutter,
-  keymap,
-  lineNumbers,
-  placeholder,
-  rectangularSelection,
-} from '@codemirror/view';
-import { StateEffect, StateField } from '@codemirror/state';
-import { showMinimap } from '@replit/codemirror-minimap';
-
-import { buildSearchPanel, SearchPanelLabels } from './search-panel';
+import { CodeEditorService, EditorHandle } from 'src/app/shared/editor/code-editor.service';
+import { EditorDoc } from 'src/app/shared/editor/editor-doc';
+import { catalogToDatasourceSchema } from 'src/app/shared/editor/schema-bridge';
+import { MonacoIntelliSenseService } from 'src/app/modules/dataset/services/monaco-intellisense.service';
 
 import { AgGridAngular } from 'ag-grid-angular';
 import {
@@ -91,7 +46,6 @@ import {
 } from '../services/saved-queries.service';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { SchemaCatalog } from './schema-catalog';
-import { dbexecCompletionSource } from './completion';
 import { TypedCellComponent } from './typed-cell.component';
 import { splitStatements, statementAtCursor } from './split-statements';
 import { ObjectDetailComponent, ObjectKind } from './object-detail.component';
@@ -175,29 +129,6 @@ interface TreeSchema {
   };
 }
 
-/** CM effect + field: transient highlight of the range that just ran. */
-const setRunFlash = StateEffect.define<{ from: number; to: number } | null>();
-const runFlashField = StateField.define<DecorationSet>({
-  create: () => Decoration.none,
-  update(value, tr) {
-    value = value.map(tr.changes);
-    for (const e of tr.effects) {
-      if (e.is(setRunFlash)) {
-        value = e.value
-          ? Decoration.set([
-              Decoration.mark({ class: 'qx-run-flash' }).range(
-                e.value.from,
-                e.value.to,
-              ),
-            ])
-          : Decoration.none;
-      }
-    }
-    return value;
-  },
-  provide: f => EditorView.decorations.from(f),
-});
-
 /**
  * QueryExecutorComponent — the standalone Query Runner workspace. Full
  * SQL editor: lazy schema tree, CodeMirror with IntelliSense + find/
@@ -258,10 +189,18 @@ export class QueryExecutorComponent
   savePromptDescription = '';
 
   // Editor
-  private view!: EditorView;
-  private langCompartment = new Compartment();
-  private wrapCompartment = new Compartment();
-  private minimapCompartment = new Compartment();
+  /**
+   * The editor, created through CodeEditorService so this screen shares the
+   * app's one theme, options and disposal path.
+   */
+  private handle: EditorHandle | null = null;
+  /**
+   * Offset-oriented view of the model. The statement splitter works in character
+   * offsets (it mirrors the backend splitter so "run statement at cursor" sends
+   * exactly the range the server runs), so offsets are the natural currency here
+   * and EditorDoc does the line/column conversion once.
+   */
+  private doc: EditorDoc | null = null;
   private catalog = new SchemaCatalog();
   editorReady = false;
   wordWrap = false;
@@ -372,6 +311,8 @@ export class QueryExecutorComponent
     private savedQueries: SavedQueriesService,
     private globalService: GlobalService,
     private title: Title,
+    private codeEditor: CodeEditorService,
+    private intelliSense: MonacoIntelliSenseService,
   ) {}
 
   ngOnInit(): void {
@@ -422,7 +363,7 @@ export class QueryExecutorComponent
           this.savedQueryDescription = d.description ?? '';
           if (d.rowLimit != null) this.rowLimit = this.clampLimit(d.rowLimit);
           const sql = d.sql ?? '';
-          if (this.view) {
+          if (this.doc) {
             this.replaceAll(sql);
           } else {
             this.pendingSavedSql = sql;
@@ -441,7 +382,11 @@ export class QueryExecutorComponent
   }
 
   ngOnDestroy(): void {
-    this.view?.destroy();
+    // One call: the handle disposes the editor plus every listener, provider and
+    // overlay registered against it.
+    this.handle?.dispose();
+    this.handle = null;
+    this.doc = null;
   }
 
   // ── metadata + lazy catalog ────────────────────────────────────────
@@ -498,7 +443,7 @@ export class QueryExecutorComponent
             triggers: false,
           },
         }));
-        this.reconfigureCatalog();
+        this.refreshCompletions();
       })
       .catch(() => {})
       .finally(() => {
@@ -552,7 +497,7 @@ export class QueryExecutorComponent
           ...s.views.map(v => ({ name: v.name, type: 'view' })),
           ...s.matviews.map(v => ({ name: v.name, type: 'matview' })),
         ]);
-        this.reconfigureCatalog();
+        this.refreshCompletions();
       })
       .catch(() => {})
       .finally(() => {
@@ -653,8 +598,10 @@ export class QueryExecutorComponent
               nullable: c.isNullable,
             })),
           );
-          // Re-fire completion so the freshly-loaded columns show.
-          if (this.view) startCompletion(this.view);
+          // Re-feed the catalog and re-fire completion so the freshly loaded
+          // columns appear in the list the user is already looking at.
+          this.refreshCompletions();
+          this.doc?.triggerSuggest();
         }
       })
       .catch(() => {});
@@ -665,10 +612,7 @@ export class QueryExecutorComponent
   }
 
   insertText(text: string): void {
-    if (!this.view) return;
-    const { from, to } = this.view.state.selection.main;
-    this.view.dispatch({ changes: { from, to, insert: text } });
-    this.view.focus();
+    this.doc?.insertAtCursor(text);
   }
 
   /** Open the read-only detail modal for any object node. */
@@ -698,38 +642,67 @@ export class QueryExecutorComponent
 
   // ── editor ────────────────────────────────────────────────────────
 
-  private buildLanguage() {
-    return [
-      sql({ dialect: PostgreSQL }),
-      autocompletion({
-        activateOnTyping: true,
-        override: [
-          dbexecCompletionSource(
-            this.catalog,
-            this.requestColumnsForCompletion,
-          ),
-          keywordCompletionSource(PostgreSQL, false),
-        ],
-      }),
-    ];
+  /**
+   * Point the shared SQL IntelliSense at this connection.
+   *
+   * The executor used to carry its own 237-line CodeMirror completion source.
+   * This is the same three behaviours — dot completion, clause-scoped columns,
+   * tables after FROM/JOIN — plus what that source never had: CTE scope
+   * tracking, alias generation, INSERT column lists and dialect-scoped keywords
+   * and functions, from a 2,272-line implementation the dataset module already
+   * relies on.
+   *
+   * The one capability the shared service lacked is lazy column loading, added
+   * as `setColumnRequestHandler`: the executor browses arbitrary databases, so it
+   * must not materialise every column up front.
+   */
+  private registerCompletions(): void {
+    if (!this.handle) return;
+    this.intelliSense.setActiveDbType(this.engine || undefined);
+    this.intelliSense.setColumnRequestHandler((schema, table) =>
+      this.requestColumnsForCompletion(schema ?? undefined, table),
+    );
+    // Registering returns a disposable; tracking it on the handle is what stops
+    // the provider outliving this screen. A leaked provider is why the same
+    // suggestions used to appear twice after revisiting an editor.
+    const disposable = this.intelliSense.registerSQLCompletions(
+      this.bridgedSchema() as any,
+      this.handle.editor,
+    );
+    if (disposable) this.handle.track(disposable);
+    this.handle.track(() => this.intelliSense.setColumnRequestHandler(null));
   }
 
-  // Resolve the find/replace panel's static labels once (panel is plain DOM).
-  private searchLabels(): SearchPanelLabels {
-    const t = (k: string) => this.translate.instant(k);
-    return {
-      find: t('QUERY_RUNNER.FIND_PLACEHOLDER'),
-      replace: t('QUERY_RUNNER.REPLACE_PLACEHOLDER'),
-      matchCase: t('QUERY_RUNNER.MATCH_CASE'),
-      useRegex: t('QUERY_RUNNER.USE_REGEX'),
-      wholeWord: t('QUERY_RUNNER.WHOLE_WORD'),
-      next: t('QUERY_RUNNER.FIND_NEXT'),
-      prev: t('QUERY_RUNNER.FIND_PREV'),
-      close: t('QUERY_RUNNER.CLOSE'),
-      replaceOne: t('QUERY_RUNNER.REPLACE'),
-      replaceAll: t('QUERY_RUNNER.REPLACE_ALL'),
-      noMatches: t('QUERY_RUNNER.NO_MATCHES'),
-    };
+  /**
+   * Re-feed the schema after the catalog grows.
+   *
+   * The service reads from a cache primed by setDatasources(), so registration
+   * itself never has to be redone — exactly how add-dataset re-feeds its tree as
+   * lazy loads land.
+   */
+  private refreshCompletions(): void {
+    this.intelliSense.setDatasources(this.bridgedSchema() as any);
+  }
+
+  private bridgedSchema() {
+    return catalogToDatasourceSchema(
+      this.connectionName || 'connection',
+      this.engine || undefined,
+      this.catalog,
+    );
+  }
+
+  /**
+   * Error markers from a failed run.
+   *
+   * Owned separately from the editor's own validation markers: `setModelMarkers`
+   * replaces all markers for one owner, so sharing an owner string would make a
+   * run failure wipe the syntax diagnostics and vice versa.
+   */
+  private setRunMarkers(markers: any[]): void {
+    const model = this.handle?.editor?.getModel?.();
+    if (!model) return;
+    (window as any).monaco.editor.setModelMarkers(model, 'dbexec-run', markers);
   }
 
   private initEditor(): void {
@@ -743,157 +716,89 @@ export class QueryExecutorComponent
       ? (this.pendingSavedSql ?? '')
       : (this.pendingSavedSql ?? this.loadDraft() ?? '');
     this.pendingSavedSql = null;
-    this.zone.runOutsideAngular(() => {
-      this.view = new EditorView({
-        parent: this.editorHost.nativeElement,
-        state: EditorState.create({
-          doc: initialDoc,
-          extensions: [
-            lineNumbers(),
-            highlightActiveLine(),
-            highlightActiveLineGutter(),
-            drawSelection(),
-            rectangularSelection(),
-            history(),
-            foldGutter(),
-            bracketMatching(),
-            closeBrackets(),
-            indentOnInput(),
-            highlightSelectionMatches(),
-            // Compact floating find/replace card (custom panel) instead of the
-            // stock full-width strip. Labels resolved once at init — the panel
-            // is plain DOM (editor runs outside Angular).
-            search({
-              top: true,
-              createPanel: buildSearchPanel(this.searchLabels()),
-            }),
-            lintGutter(),
-            runFlashField,
-            placeholder(
-              '-- Write SQL. Ctrl/Cmd+Enter runs the statement at the cursor.',
-            ),
-            syntaxHighlighting(defaultHighlightStyle, { fallback: true }),
-            this.wrapCompartment.of([]),
-            this.minimapCompartment.of(
-              this.minimapOn ? this.minimapExtension() : [],
-            ),
-            this.langCompartment.of(this.buildLanguage()),
-            keymap.of([
-              {
-                key: 'Mod-Enter',
-                preventDefault: true,
-                run: () => {
-                  this.zone.run(() => this.run('smart'));
-                  return true;
-                },
-              },
-              {
-                key: 'Mod-Shift-Enter',
-                preventDefault: true,
-                run: () => {
-                  this.zone.run(() => this.run('all'));
-                  return true;
-                },
-              },
-              {
-                key: 'Mod-/',
-                preventDefault: true,
-                run: toggleComment,
-              },
-              {
-                key: 'Mod-Shift-p',
-                preventDefault: true,
-                run: () => {
-                  this.zone.run(() => this.openPalette());
-                  return true;
-                },
-              },
-              {
-                key: 'Mod-g',
-                preventDefault: true,
-                run: () => {
-                  this.zone.run(() => this.openGoto());
-                  return true;
-                },
-              },
-              // Duplicate line ↓ and move line ↑/↓ — VSCode parity.
-              { key: 'Shift-Alt-ArrowDown', run: copyLineDown },
-              { key: 'Alt-ArrowUp', run: moveLineUp },
-              { key: 'Alt-ArrowDown', run: moveLineDown },
-              indentWithTab,
-              ...closeBracketsKeymap,
-              ...defaultKeymap,
-              ...historyKeymap,
-              ...foldKeymap,
-              ...completionKeymap,
-              ...searchKeymap,
-            ]),
-            EditorView.updateListener.of(u => {
-              if (u.docChanged) this.scheduleAutosave();
-              if (u.selectionSet || u.docChanged) this.updateCursorInfo();
-            }),
-            EditorView.theme({
-              '&': { height: '100%' },
-              // Match the app's mono stack + a comfortable, readable editor
-              // size (14px / 1.6). Fuller chrome theming (gutters, selection,
-              // autocomplete, find panel) lives in the GLOBAL
-              // _codemirror-theme.scss — CM appends those layers to body.
-              '.cm-scroller': {
-                fontFamily: 'var(--font-mono)',
-                // Explicit px (not a rem token): the app root font-size is
-                // 14px, so rem tokens render ~12px in the editor — too small
-                // for code. 14px absolute keeps it comfortable everywhere.
-                fontSize: '14px',
-                lineHeight: '1.65',
-              },
-            }),
-          ],
-        }),
-      });
-    });
-    this.editorReady = true;
-    this.updateCursorInfo();
-    this.cdr.markForCheck();
-  }
 
-  private reconfigureCatalog(): void {
-    if (!this.view) return;
-    this.view.dispatch({
-      effects: this.langCompartment.reconfigure(this.buildLanguage()),
-    });
+    this.codeEditor
+      .create({
+        host: this.editorHost.nativeElement,
+        flavour: 'sql',
+        value: initialDoc,
+        // Monaco has no placeholder option; the shared overlay reproduces the
+        // hint CodeMirror's placeholder() extension used to render.
+        placeholder: this.translate.instant('QUERY_RUNNER.EDITOR_PLACEHOLDER'),
+        overrides: { minimap: { enabled: this.minimapOn } },
+      })
+      .then((handle: EditorHandle) => {
+        this.handle = handle;
+        this.doc = new EditorDoc(handle.editor);
+
+        // Word wrap is a user toggle, so apply the persisted state now rather
+        // than baking it into the shared options.
+        handle.updateOptions({ wordWrap: this.wordWrap ? 'on' : 'off' });
+
+        handle.onChange(() => {
+          this.scheduleAutosave();
+          this.updateCursorInfo();
+        });
+        handle.track(
+          handle.editor.onDidChangeCursorPosition(() =>
+            this.zone.run(() => this.updateCursorInfo()),
+          ),
+        );
+
+        // Only the app's own shortcuts need binding. Monaco already ships
+        // comment toggle (Ctrl+/), duplicate line (Shift+Alt+Down), move line
+        // (Alt+Up/Down), folding, find/replace and history on the same keys the
+        // CodeMirror keymaps provided, so re-registering them would only risk
+        // diverging from what users expect elsewhere in the editor.
+        const KeyCode = (window as any).monaco.KeyCode;
+        this.codeEditor.addShortcut(
+          handle,
+          { key: KeyCode.Enter, ctrlCmd: true },
+          () => this.run('smart'),
+        );
+        this.codeEditor.addShortcut(
+          handle,
+          { key: KeyCode.Enter, ctrlCmd: true, shift: true },
+          () => this.run('all'),
+        );
+        this.codeEditor.addShortcut(
+          handle,
+          { key: KeyCode.KeyP, ctrlCmd: true, shift: true },
+          () => this.openPalette(),
+        );
+        this.codeEditor.addShortcut(
+          handle,
+          { key: KeyCode.KeyG, ctrlCmd: true },
+          () => this.openGoto(),
+        );
+
+        this.registerCompletions();
+
+        this.editorReady = true;
+        this.updateCursorInfo();
+        this.cdr.markForCheck();
+      })
+      .catch(() => {
+        // Surface the failure rather than leaving an empty box: the toolbar
+        // reads editorReady to decide whether Run can be enabled.
+        this.editorReady = false;
+        this.cdr.markForCheck();
+      });
   }
 
   toggleWrap(): void {
     this.wordWrap = !this.wordWrap;
-    this.view?.dispatch({
-      effects: this.wrapCompartment.reconfigure(
-        this.wordWrap ? EditorView.lineWrapping : [],
-      ),
-    });
+    // A live option change, where CodeMirror needed a Compartment reconfigure.
+    this.handle?.updateOptions({ wordWrap: this.wordWrap ? 'on' : 'off' });
   }
 
-  // ── minimap (VSCode-style) ──────────────────────────────────────────
-
-  /** Build the minimap facet extension, themed via the container's class. */
-  private minimapExtension() {
-    return showMinimap.compute([], () => ({
-      create: () => {
-        const dom = document.createElement('div');
-        dom.className = 'qx-minimap';
-        return { dom };
-      },
-      displayText: 'blocks',
-      showOverlay: 'always',
-    }));
-  }
+  // ── minimap ─────────────────────────────────────────────────────────
 
   toggleMinimap(): void {
     this.minimapOn = !this.minimapOn;
-    this.view?.dispatch({
-      effects: this.minimapCompartment.reconfigure(
-        this.minimapOn ? this.minimapExtension() : [],
-      ),
-    });
+    // Monaco's minimap is built in, so the @replit/codemirror-minimap
+    // dependency and its hand-built container went away with the migration.
+    this.handle?.updateOptions({ minimap: { enabled: this.minimapOn } });
     try {
       localStorage.setItem('qx-minimap', this.minimapOn ? '1' : '0');
     } catch {
@@ -1050,13 +955,13 @@ export class QueryExecutorComponent
     this.paletteOpen = false;
     this.cdr.markForCheck();
     action?.run();
-    setTimeout(() => this.view?.focus(), 0);
+    setTimeout(() => this.doc?.focus(), 0);
   }
 
   closePalette(): void {
     this.paletteOpen = false;
     this.cdr.markForCheck();
-    this.view?.focus();
+    this.doc?.focus();
   }
 
   // ── go to line ──────────────────────────────────────────────────────
@@ -1071,24 +976,17 @@ export class QueryExecutorComponent
     const n = parseInt(this.gotoValue, 10);
     this.gotoOpen = false;
     this.cdr.markForCheck();
-    if (!this.view || Number.isNaN(n)) {
-      this.view?.focus();
+    if (!this.doc || Number.isNaN(n)) {
+      this.doc?.focus();
       return;
     }
-    const total = this.view.state.doc.lines;
-    const lineNo = Math.min(Math.max(1, n), total);
-    const line = this.view.state.doc.line(lineNo);
-    this.view.dispatch({
-      selection: { anchor: line.from },
-      scrollIntoView: true,
-    });
-    this.view.focus();
+    this.doc.goToLine(n);
   }
 
   closeGoto(): void {
     this.gotoOpen = false;
     this.cdr.markForCheck();
-    this.view?.focus();
+    this.doc?.focus();
   }
 
   // ── shortcuts help ──────────────────────────────────────────────────
@@ -1106,17 +1004,15 @@ export class QueryExecutorComponent
 
   private transformCase(mode: 'upper' | 'lower'): void {
     const sel = this.getSelection();
-    if (!this.view || !sel) return;
+    if (!this.doc || !sel) return;
     const out =
       mode === 'upper' ? sel.text.toUpperCase() : sel.text.toLowerCase();
-    this.view.dispatch({
-      changes: { from: sel.from, to: sel.to, insert: out },
-    });
+    this.doc.replaceRange(sel.from, sel.to, out);
   }
 
   clearEditor(): void {
     this.replaceAll('');
-    this.view?.focus();
+    this.doc?.focus();
   }
 
   copyAll(): void {
@@ -1179,7 +1075,7 @@ export class QueryExecutorComponent
   /** Resolve the replace/append choice (or the auto path for an empty editor). */
   applyLoadedFile(mode: 'replace' | 'append'): void {
     const text = this.pendingFileSql ?? '';
-    if (this.view) {
+    if (this.doc) {
       if (mode === 'replace') {
         this.replaceAll(text);
       } else {
@@ -1193,7 +1089,7 @@ export class QueryExecutorComponent
     this.pendingFileName = '';
     this.loadChoiceOpen = false;
     this.cdr.markForCheck();
-    this.view?.focus();
+    this.doc?.focus();
   }
 
   cancelLoadChoice(): void {
@@ -1201,7 +1097,7 @@ export class QueryExecutorComponent
     this.pendingFileName = '';
     this.loadChoiceOpen = false;
     this.cdr.markForCheck();
-    this.view?.focus();
+    this.doc?.focus();
   }
 
   // Drag-drop a .sql onto the editor. Only react when files are dragged.
@@ -1302,9 +1198,9 @@ export class QueryExecutorComponent
   }
 
   private updateCursorInfo(): void {
-    if (!this.view) return;
-    const pos = this.view.state.selection.main.head;
-    const line = this.view.state.doc.lineAt(pos);
+    if (!this.doc) return;
+    const pos = this.doc.selection().head;
+    const line = this.doc.lineAt(pos);
     this.zone.run(() => {
       this.cursorInfo = `Ln ${line.number}, Col ${pos - line.from + 1}`;
       this.cdr.markForCheck();
@@ -1312,20 +1208,17 @@ export class QueryExecutorComponent
   }
 
   private getAll(): string {
-    return this.view ? this.view.state.doc.toString() : '';
+    return this.doc?.text() ?? '';
   }
   private getSelection(): { text: string; from: number; to: number } | null {
-    if (!this.view) return null;
-    const { from, to } = this.view.state.selection.main;
+    if (!this.doc) return null;
+    const { from, to } = this.doc.selection();
     return from === to
       ? null
-      : { text: this.view.state.sliceDoc(from, to), from, to };
+      : { text: this.doc.sliceDoc(from, to), from, to };
   }
   private replaceAll(text: string): void {
-    if (!this.view) return;
-    this.view.dispatch({
-      changes: { from: 0, to: this.view.state.doc.length, insert: text },
-    });
+    this.doc?.setText(text);
   }
 
   // ── autosave (localStorage, per connection) ─────────────────────────
@@ -1362,7 +1255,7 @@ export class QueryExecutorComponent
    * mode 'all'   = the whole editor.
    */
   run(mode: 'smart' | 'all' = 'smart'): void {
-    if (this.running || !this.view) return;
+    if (this.running || !this.doc) return;
 
     let sqlText: string;
     let range: { from: number; to: number } | null = null;
@@ -1374,7 +1267,7 @@ export class QueryExecutorComponent
         sqlText = sel.text;
         range = { from: sel.from, to: sel.to };
       } else {
-        const pos = this.view.state.selection.main.head;
+        const pos = this.doc.selection().head;
         const stmt = statementAtCursor(this.getAll(), pos);
         if (!stmt) return;
         sqlText = stmt.sql;
@@ -1383,16 +1276,18 @@ export class QueryExecutorComponent
     }
     if (!sqlText.trim()) return;
 
-    // Flash the range that will run (~500ms).
+    // Flash the lines that will run, so a multi-statement script shows which
+    // one went. Whole lines rather than the exact character range the CodeMirror
+    // decoration used: Monaco's line decoration is what editors use for this and
+    // it reads more clearly at a glance.
     if (range) {
-      this.view.dispatch({ effects: setRunFlash.of(range) });
-      setTimeout(
-        () => this.view?.dispatch({ effects: setRunFlash.of(null) }),
-        500,
+      this.handle?.flash(
+        this.doc.lineAt(range.from).number,
+        this.doc.lineAt(range.to).number,
       );
     }
-    // Clear any prior error diagnostics.
-    this.view.dispatch(setDiagnostics(this.view.state, []));
+    // Clear any prior error markers.
+    this.setRunMarkers([]);
 
     this.running = true;
     this.results = [];
@@ -1464,32 +1359,34 @@ export class QueryExecutorComponent
 
   /** If a result is an error with an offset, drop a lint marker + jump. */
   private maybeMarkError(base: number): void {
-    if (!this.view) return;
+    if (!this.doc) return;
     const err = this.results.find(r => r.kind === 'error') as
       { kind: 'error'; message: string; offset?: number } | undefined;
     if (!err || err.offset == null) return;
-    const pos = Math.min(
-      Math.max(0, base + err.offset),
-      this.view.state.doc.length,
-    );
-    const diag: Diagnostic = {
-      from: pos,
-      to: Math.min(pos + 1, this.view.state.doc.length),
-      severity: 'error',
-      message: err.message,
-    };
-    this.view.dispatch(setDiagnostics(this.view.state, [diag]));
+    const pos = Math.min(Math.max(0, base + err.offset), this.doc.length());
+    const from = this.doc.offsetToPosition(pos);
+    const to = this.doc.offsetToPosition(Math.min(pos + 1, this.doc.length()));
+    this.setRunMarkers([
+      {
+        severity: (window as any).monaco.MarkerSeverity.Error,
+        message: err.message,
+        startLineNumber: from.lineNumber,
+        startColumn: from.column,
+        endLineNumber: to.lineNumber,
+        endColumn: to.column,
+      },
+    ]);
   }
 
   /** Jump the cursor to the failing offset. */
   goToError(): void {
-    if (!this.view) return;
+    if (!this.doc) return;
     const err = this.results[this.activeResult] as
       { kind: 'error'; offset?: number } | undefined;
     if (!err || err.offset == null) return;
-    const pos = Math.min(Math.max(0, err.offset), this.view.state.doc.length);
-    this.view.dispatch({ selection: { anchor: pos }, scrollIntoView: true });
-    this.view.focus();
+    const pos = Math.min(Math.max(0, err.offset), this.doc.length());
+    this.doc.setCursor(pos);
+    this.doc.focus();
   }
 
   cancel(): void {
@@ -1527,7 +1424,7 @@ export class QueryExecutorComponent
   closeSavePrompt(): void {
     this.savePromptOpen = false;
     this.cdr.markForCheck();
-    this.view?.focus();
+    this.doc?.focus();
   }
 
   /**
@@ -1588,12 +1485,12 @@ export class QueryExecutorComponent
       .finally(() => {
         this.saving = false;
         this.cdr.markForCheck();
-        this.view?.focus();
+        this.doc?.focus();
       });
   }
 
   format(): void {
-    if (!this.view) return;
+    if (!this.doc) return;
     try {
       const opts = {
         language: 'postgresql' as const,
@@ -1602,13 +1499,7 @@ export class QueryExecutorComponent
       };
       const sel = this.getSelection();
       if (sel) {
-        this.view.dispatch({
-          changes: {
-            from: sel.from,
-            to: sel.to,
-            insert: formatSql(sel.text, opts),
-          },
-        });
+        this.doc.replaceRange(sel.from, sel.to, formatSql(sel.text, opts));
       } else {
         this.replaceAll(formatSql(this.getAll(), opts));
       }

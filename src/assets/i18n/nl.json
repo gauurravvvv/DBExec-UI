@@ -4803,7 +4803,8 @@
     "SAVE_UPDATE": "Save",
     "SAVE_AS_NEW": "Save as new",
     "ROW_LIMIT": "Rijlimiet",
-    "LAST_RUN": "Laatst uitgevoerd"
+    "LAST_RUN": "Laatst uitgevoerd",
+    "EDITOR_PLACEHOLDER": "-- Schrijf SQL. Ctrl/Cmd+Enter voert de instructie bij de cursor uit."
   },
   "DB_ACCESS": {
     "TITLE": "Databasetoegangsbeheer",

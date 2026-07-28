@@ -4803,7 +4803,8 @@
     "SAVE_UPDATE": "Save",
     "SAVE_AS_NEW": "Save as new",
     "ROW_LIMIT": "행 제한",
-    "LAST_RUN": "마지막 실행"
+    "LAST_RUN": "마지막 실행",
+    "EDITOR_PLACEHOLDER": "-- SQL을 입력하세요. Ctrl/Cmd+Enter로 커서 위치의 문을 실행합니다."
   },
   "DB_ACCESS": {
     "TITLE": "데이터베이스 접근 관리",

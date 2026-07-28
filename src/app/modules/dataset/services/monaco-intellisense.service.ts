@@ -131,6 +131,29 @@ export class MonacoIntelliSenseService {
   private currentDatasources: DatasourceSchema[] = [];
 
   /**
+   * Optional hook for consumers whose schema loads lazily.
+   *
+   * The dataset creator hands over a tree that already holds every column it
+   * knows about. The Query Executor cannot: it browses arbitrary databases and
+   * fetches a table's columns only when something needs them, because
+   * materialising a warehouse with thousands of tables up front is unusable.
+   *
+   * When a table reference resolves to a table whose `columns` array is empty,
+   * this is called so the consumer can fetch them, grow its catalog and re-feed
+   * setDatasources(). Left unset, behaviour is exactly as before.
+   */
+  private columnRequestHandler:
+    | ((schema: string | null, table: string) => void)
+    | null = null;
+
+  /**
+   * Tables already requested, so a cache miss on every keystroke does not
+   * become a request per keystroke. Cleared by setDatasources(), since a new
+   * tree is the signal that a previous request landed.
+   */
+  private requestedColumns = new Set<string>();
+
+  /**
    * Active dbType for completion / hover / signature-help. Drives which
    * dialect spec (keyword + function lists, parser) the providers read
    * from. Defaults to undefined → getDialectSpec falls back to Postgres
@@ -183,6 +206,10 @@ export class MonacoIntelliSenseService {
     this.lookupsCacheVersion = -1;
     this.tableRefsCache = null;
     this.cteRefsCache = null;
+    // A fresh tree means any pending column fetch has landed (or been
+    // superseded), so allow requests again — otherwise a table requested once
+    // and later invalidated would never be asked for a second time.
+    this.requestedColumns.clear();
   }
 
   /**
@@ -194,6 +221,19 @@ export class MonacoIntelliSenseService {
    * Pass null/undefined to fall back to the Postgres default (used when
    * the component hasn't resolved a dbType yet).
    */
+  /**
+   * Install the lazy-column hook. See `columnRequestHandler`.
+   *
+   * Pass null to detach — a component must do this on destroy, or a closure over
+   * a dead component keeps firing fetches against it.
+   */
+  setColumnRequestHandler(
+    fn: ((schema: string | null, table: string) => void) | null,
+  ): void {
+    this.columnRequestHandler = fn;
+    this.requestedColumns.clear();
+  }
+
   setActiveDbType(dbType: DatabaseTypeValue | string | null | undefined): void {
     this.activeDbType = dbType ?? null;
   }
@@ -1006,6 +1046,14 @@ export class MonacoIntelliSenseService {
         tableByName.get(lookupKey) ||
         tableByName.get(r.tableName.toLowerCase()) ||
         null;
+      // Resolved, but with no columns loaded yet: ask the consumer to fetch
+      // them. This is the single choke point where a reference in the SQL becomes
+      // a table schema, so hooking here covers dot completion, clause-scoped
+      // columns and alias resolution alike.
+      if (!tableSchema?.columns?.length) {
+        this.requestColumns(r.schemaName, r.tableName);
+      }
+
       out.push({
         schemaName: r.schemaName,
         tableName: r.tableName,
@@ -1014,6 +1062,15 @@ export class MonacoIntelliSenseService {
       });
     }
     return out;
+  }
+
+  /** Ask the consumer for a table's columns, at most once per table per tree. */
+  private requestColumns(schema: string | null, table: string): void {
+    if (!this.columnRequestHandler) return;
+    const key = `${(schema ?? '').toLowerCase()}.${table.toLowerCase()}`;
+    if (this.requestedColumns.has(key)) return;
+    this.requestedColumns.add(key);
+    this.columnRequestHandler(schema, table);
   }
 
   // ─── STRING/COMMENT AWARENESS ────────────────────────────────

@@ -61,6 +61,18 @@ export interface CreateEditorConfig {
   overrides?: Record<string, any>;
 }
 
+/**
+ * An application shortcut, described in Monaco's own vocabulary.
+ *
+ * `key` is a `monaco.KeyCode`; `ctrlCmd` means Cmd on macOS and Ctrl elsewhere.
+ */
+export interface EditorShortcut {
+  key: number;
+  ctrlCmd?: boolean;
+  shift?: boolean;
+  alt?: boolean;
+}
+
 export interface EditorHandle {
   /** The raw Monaco instance, for APIs this handle deliberately does not wrap. */
   readonly editor: any;
@@ -178,13 +190,47 @@ export class CodeEditorService {
   }
 
   /**
-   * Bind a command to the editor, re-entering Angular's zone.
+   * Bind an application shortcut on the editor.
    *
-   * Wrapping here rather than at each call site: a keybinding that runs a query
-   * outside the zone leaves the results pane un-rendered until the next
-   * unrelated event, which reads as "the shortcut did nothing".
+   * Implemented on `onKeyDown` rather than Monaco's `addCommand` / `addAction`,
+   * because in this app neither of those actually binds. Measured in the browser:
+   * a command registered through either API never fires — not with CtrlCmd, not
+   * with WinCtrl, not with Alt — while Monaco's OWN built-ins (Cmd+A select-all)
+   * respond to the very same synthetic keystrokes, and `onKeyDown` reports the
+   * events correctly. So the keystrokes reach Monaco; only its dynamic keybinding
+   * registration fails to resolve them. The root cause is not established, which
+   * is exactly why this does not depend on it: `onKeyDown` plus explicit matching
+   * is deterministic and entirely under our control.
+   *
+   * The handler re-enters Angular's zone. Without that, a shortcut that runs a
+   * query leaves the results pane un-rendered until some unrelated event ticks
+   * change detection, which reads to the user as "the shortcut did nothing".
+   *
+   * The listener is tracked on the handle, so it dies with the editor.
    */
-  addCommand(handle: EditorHandle, keybinding: number, run: () => void): void {
-    handle.editor.addCommand(keybinding, () => this.zone.run(run));
+  addShortcut(
+    handle: EditorHandle,
+    shortcut: EditorShortcut,
+    run: () => void,
+  ): void {
+    // CtrlCmd means Cmd on macOS and Ctrl elsewhere, matching how Monaco and the
+    // rest of the app describe their shortcuts to the user.
+    const isMac = /Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent);
+
+    handle.track(
+      handle.editor.onKeyDown((e: any) => {
+        const cmdPressed = isMac ? e.metaKey : e.ctrlKey;
+        if (!!shortcut.ctrlCmd !== cmdPressed) return;
+        if (!!shortcut.shift !== e.shiftKey) return;
+        if (!!shortcut.alt !== e.altKey) return;
+        if (e.keyCode !== shortcut.key) return;
+
+        // Stop Monaco inserting a newline for Enter, and stop the browser
+        // claiming combinations like Cmd+G.
+        e.preventDefault();
+        e.stopPropagation();
+        this.zone.run(run);
+      }),
+    );
   }
 }

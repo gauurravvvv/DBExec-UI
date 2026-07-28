@@ -4803,7 +4803,8 @@
     "SAVE_UPDATE": "Save",
     "SAVE_AS_NEW": "Save as new",
     "ROW_LIMIT": "行数制限",
-    "LAST_RUN": "最終実行"
+    "LAST_RUN": "最終実行",
+    "EDITOR_PLACEHOLDER": "-- SQL を入力します。Ctrl/Cmd+Enter でカーソル位置の文を実行します。"
   },
   "DB_ACCESS": {
     "TITLE": "データベースアクセス管理",

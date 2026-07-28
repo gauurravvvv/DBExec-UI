@@ -83,6 +83,35 @@ export class SchemaCatalog {
     return [...this.tablesBySchema.values()].flat();
   }
 
+  /**
+   * Tables we hold COLUMNS for, which is not the same set as `allTables()`.
+   *
+   * `tablesBySchema` is filled by expanding a schema in the object browser.
+   * `byTable` is filled by a completion-driven column fetch. Typing
+   * `select * from public.chart_demo t where t.` loads that one table's columns
+   * without ever expanding `public`, so the table is in `byTable` and absent
+   * from `tablesBySchema`.
+   *
+   * Anything projecting the catalog for IntelliSense has to union both, or a
+   * lazily-fetched table's columns are in the catalog yet invisible to
+   * suggestions — which is exactly the bug this method was added to fix.
+   */
+  tablesWithColumns(): TblInfo[] {
+    const out: TblInfo[] = [];
+    for (const key of this.byTable.keys()) {
+      const dot = key.lastIndexOf('.');
+      if (dot <= 0) continue;
+      out.push({
+        schema: key.slice(0, dot),
+        name: key.slice(dot + 1),
+        // The kind is unknown on this path — columns were fetched directly,
+        // without the table listing that carries it.
+        type: 'table',
+      });
+    }
+    return out;
+  }
+
   isSchema(name: string): boolean {
     return this.schemas.includes(name);
   }

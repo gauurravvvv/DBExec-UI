@@ -5073,7 +5073,8 @@
     "SAVE_UPDATE": "Save",
     "SAVE_AS_NEW": "Save as new",
     "ROW_LIMIT": "Row limit",
-    "LAST_RUN": "Last run"
+    "LAST_RUN": "Last run",
+    "EDITOR_PLACEHOLDER": "-- Write SQL. Ctrl/Cmd+Enter runs the statement at the cursor."
   },
   "FOLDER": {
     "TITLE": "Folders",
