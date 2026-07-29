@@ -1,5 +1,9 @@
 # Handoff — current state (2026-07-29)
 
+> Onboarding a fresh agent? `COWORK-BRIEF.md` at the workspace root is the
+> paste-ready version of this: how to run, how to verify, where screenshots go,
+> commit rules, and the traps. This file is the repo-specific detail behind it.
+
 Read this first, then `INDEX.md` → the module file(s) you're touching →
 `ARCHITECTURE.md` if the change is cross-cutting.
 
