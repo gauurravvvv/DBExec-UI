@@ -1,11 +1,12 @@
 # query-runner
 > Update the Progress log on every change.
-> Code path: `src/app/modules/query-runner` · Status: 🟢 · Last updated: 2026-07-24
+> Code path: `src/app/modules/query-runner` · Status: 🟢 · Last updated: 2026-07-29
 
 ## 1. Context
-- Responsibility: The "SQL Workspace" — owner-private saved queries (home list + CRUD), private connection profiles CRUD, and a full-screen SQL executor (CodeMirror 6 editor + IntelliSense + server-side result grid + object explorer). This is the most complex FE module.
+- Responsibility: The "SQL Workspace" — owner-private saved queries (home list + CRUD), private connection profiles CRUD, and a full-screen SQL executor (**Monaco** editor + shared SQL IntelliSense + server-side result grid + object explorer). This is the most complex FE module.
 - Key files:
-  - `executor/query-executor.component.ts` — the editor. CodeMirror 6 (SQL lang, minimap, find/replace, fold, lint gutter, autocomplete). `schema-catalog.ts` (lazy `${schema}.${table}` catalog cache + IntelliSense source), `completion.ts`, `split-statements.ts` (run selection / statement-at-cursor), `search-panel.ts`, `typed-cell.component.ts` (result cell rendering).
+  - `executor/query-executor.component.ts` — the editor, mounted through **`shared/editor/CodeEditorService`** (`flavour: 'sql'`). Monaco supplies line numbers, folding, bracket matching, minimap, find/replace and history; `shared/editor/` supplies the placeholder, the run-flash and offset-based document access (`editor-doc.ts`). `schema-catalog.ts` is the lazy `${schema}.${table}` catalog, bridged into the shared IntelliSense by `shared/editor/schema-bridge.ts`. `split-statements.ts` (run selection / statement-at-cursor) is unchanged and pure.
+  - **Gone with the Monaco migration:** `completion.ts` (superseded by `MonacoIntelliSenseService`) and `search-panel.ts` (superseded by Monaco's find widget, restyled).
   - `executor/object-detail.component.ts` — read-only object inspection (table/view/matview/function/sequence/trigger DDL + columns).
   - `services/query-runner.service.ts` — connection CRUD + catalog/execute/cancel. `services/saved-queries.service.ts` — owner-private saved-query CRUD.
   - `saved-queries/` — `list-saved-queries` (the module home), `new-query-dialog` (datasource→connection popup), add/edit/view saved-query forms.

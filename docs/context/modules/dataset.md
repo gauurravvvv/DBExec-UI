@@ -1,31 +1,38 @@
 # dataset
 > Update the Progress log on every change.
-> Code path: `src/app/modules/dataset` · Status: 🟢 · Last updated: 2026-07-27
+> Code path: `src/app/modules/dataset` · Status: 🟢 · Last updated: 2026-07-29
 
 ## 1. Context
 - Responsibility: The semantic layer. A dataset = a saved SQL query against a datasource + typed field metadata + calculated fields + `{{name}}` query params. It's the source for analyses/dashboards/RLS/alerts.
 - Key files:
   - `components/add-dataset` + `edit-dataset` — the editor: **Monaco** SQL editor (`MonacoLoaderService` + `MonacoIntelliSenseService`, lazy schema tree pre-warm), result grid (p-table, not AG Grid), diff-before-save (`preview-columns`), save-and-run, column profiling + CSV/JSON export.
-  - `components/calculated-fields-dialog` — **Engine 1** UI (SQL `[bracket]` compiler; no function palette; entity `CalculatedField`).
-  - `components/add-custom-field-dialog` — **Engine 2** UI (JS `{brace}` FormulaCompiler; Monaco `formulaLang`; `constants/functions-reference.ts` = ~137-function QuickSight-style palette; writes `DatasetField.customLogic`).
+  - `components/formula-field-dialog` — the **ONE** derived-field UI (renamed from `add-custom-field-dialog`). Monaco `formulaLang`, 137-function palette **served by the API** (`GET /datasets/formula/catalog` via `services/formula-catalog.service.ts`) — the FE holds no formula knowledge of its own. Writes `DatasetField.customLogic`. `services/dataset-fields.store.ts` is a signal store so a saved field is suggestable immediately with no refetch.
+  - `components/field-sidebar` — the live field list, with ROW/AGG/WINDOW stage badges and type-derived icons from `shared/helpers/data-type-icon.ts`.
+  - **Gone:** `calculated-fields-dialog`, `calculated-fields.service.ts`, `constants/functions-reference.ts` (962 lines) — the second engine and its UI were removed when the two merged.
   - `components/dataset-params-panel` + `helpers/param-tokens.helper.ts` — `{{name}}` param tokenizer (ignores string-literals/comments; mirrored BE `datasetParams.ts`), static + query-based dropdown options.
   - `components/edit-dataset-fields-dialog` — rich column metadata editor (description/role/defaultAggregation/formatHint/isVisible/typeOverride).
-  - `services/dataset.service.ts` (HTTP+signals), `calculated-fields.service.ts`, plus SQL helper services (formatter/linter/validator/scope-tracker) and `config/sql-dialects/` (postgres/mysql/mariadb/mssql/oracle/snowflake).
+  - `services/dataset.service.ts` (HTTP+signals), plus SQL helper services (formatter/linter/validator/scope-tracker), `services/monaco-intellisense.service.ts` (2,272 lines — now shared with the Query Executor) and `config/sql-dialects/` (postgres/mysql/mariadb/mssql/oracle/snowflake).
+  - **Editors are created ONLY via `shared/editor/CodeEditorService`** — never `monaco.editor.create` directly. One theme, one options set, one chrome stylesheet, shared with the Query Executor. See ARCHITECTURE.md.
 - Depends on: **datasource** (schema introspection + runQuery). `DATASET` api/routes constants. Mirrored Zod `validators/datasets.ts` + `calculatedFields.ts` (byte-identical FE↔BE).
 - Depended on by: **analyses** (dataset picker + fields), **dashboard**, **rls-rules** (rules bind to a dataset), **alerts**, **migration** (export/import + dependency inclusion).
 - How it works: List (`app-custom-table`, Datasource column + optional filter). Add/Edit: pick datasource → write SQL (params tokenized) → run preview → map/type fields → add calc fields (either engine) → Save (versioned on BE). View: freshness, field metadata, delete-dependency guard via lineage.
-- Decisions: **TWO calc-field engines, do not confuse them** (see [calc-field-engines memory]): Engine 1 = SQL `[bracket]`, pushed DOWN to warehouse as SQL, AST-compiled + whitelisted. Engine 2 = JS `{brace}`, runs per-row in Node AFTER the query (enrichment). `concat({a},{b})` uses Engine 2. Result section deliberately uses p-table (us-data-grid reverted). See [ARCHITECTURE.md](../ARCHITECTURE.md).
+- Decisions: **ONE derived-field engine.** The two were merged 2026-07-27 — the SQL `[bracket]` compiler and its `CalculatedField` entity are deleted. The surviving syntax is `{brace}`, and **every formula is computed on the API** after the query; SQL pushdown was built and then deliberately removed, because a dataset is a hand-written SELECT, so anyone needing DB-side computation puts the expression in the dataset SQL. A single `=` is equality (Excel/Tableau convention). Result section deliberately uses p-table (us-data-grid reverted). See [ARCHITECTURE.md](../ARCHITECTURE.md).
 - Gotchas / constraints:
   - **Save is VERSIONED** — each save clones into a new-version row (new id, same `lineageId`) and returns the new id; the analysis-save-persistence "bug" was a stale-id test artifact, not data loss.
   - **Field metadata is mostly DEAD/UI-only** (aggregation-field-audit): `role`/`defaultAggregation`/`formatHint`/`isVisible`/`typeOverride` are stored+returned but the BE has ~zero consumers — the editor writes columns the backend never reads. Don't assume `isVisible` hides columns or `defaultAggregation` auto-picks.
-  - Engine 2 `add-custom-field-dialog` naming is confusing: formula stored in `customField.columnToUse`, display name in `columnToView`.
+  - `formula-field-dialog` naming is confusing: formula stored in `customField.columnToUse`, display name in `columnToView`.
   - Save `/datasets/:id/fields` needs `datasetId` in the BODY too (not just URL) or 400.
-  - Engine 2 enrichment re-parses the formula per-row (O(rows × parse)); length cap 4000 + max-paren-depth 32 bound the worst case (DoS fix).
+  - Enrichment no longer re-parses per row: the AST is built once by `compileFormula` and only `evaluate` runs per row. Bounds still apply (length 4000, depth 32, nodes 2000, calls 200, args 100).
+  - `view-dataset` still renders its OWN inline field list instead of `app-field-sidebar` — two implementations of the same thing. Known, not yet unified.
 
 ## 2. Goals
 - Objective: Author a trustworthy, typed, parameterised dataset with derived fields that downstream BI can consume safely.
-- Current focus: — none active (parity + live verification outstanding).
-- Next up: wire the dead field-metadata engine to the BE query builder (role→dimension/measure auto-split, isVisible column hiding, formatHint on data labels) — the biggest open parity gap.
+- Current focus: — none active. The formula-engine merge, the editor unification and the explorer/dialog review round are all landed and verified.
+- Next up, in the order they should be taken:
+  1. **Datasource connection blocker** — `formula-fields` e2e fails 8/16 with "Failed to connect to the datasource" from the validate endpoint. Verified environmental (reproduces with all FE changes stashed; a single validate returns 200; Postgres 11/100 connections). Looks like pool exhaustion under ~10 rapid validates, which a real user would hit too.
+  2. **Component decomposition** — mapped in `docs/superpowers/plans/2026-07-28-dataset-component-decomposition.md`. 84 of 96 methods are shared between add- and edit-dataset: 35 byte-identical (~714 lines), **49 drifted** (the same feature behaving differently when creating vs editing). Blocked on there being no functional e2e for dataset create/edit — write that first.
+  3. Wire the dead field-metadata engine to the BE query builder (role→dimension/measure, isVisible hiding, formatHint on labels) — still the biggest parity gap.
+  4. Unify `view-dataset` onto `app-field-sidebar`; add FK markers to the executor's columns once the BE returns `isForeignKey`.
 - Out of scope: chart authoring (analyses), raw ad-hoc SQL runs (query-runner).
 
 ## 3. Progress (newest first)

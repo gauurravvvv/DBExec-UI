@@ -5,7 +5,7 @@
 ## Stack (verified from package.json + angular.json)
 - **Angular 18.2** (strict, **module-based** — NOT standalone; every feature is a lazy `NgModule`). TypeScript ~5.4. RxJS 7.8 + **signals** (signals preferred for new state).
 - **UI:** PrimeNG 17.18 + PrimeFlex 3.3 + PrimeIcons 7.
-- **Editors/data:** CodeMirror 6 (`@codemirror/*`, SQL, minimap, search) in the Query Executor; Monaco 0.52 (legacy, dataset editor); AG Grid 32 (**executor result grid ONLY** — retired for lists); pgsql-ast-parser, sql-formatter.
+- **Editors/data:** **Monaco 0.52 — the only code editor, everywhere**, created solely through `shared/editor/CodeEditorService` (see the section below). CodeMirror was retired 2026-07-28; `@codemirror/lang-sql` remains as keyword DATA for the six dialect specs, not as an editor. AG Grid 32 (**executor result grid ONLY** — retired for lists); pgsql-ast-parser, sql-formatter.
 - **Charts:** ECharts 5.6 + echarts-gl + ngx-echarts 18. (Chart.js legacy/minimal.)
 - **Validation:** Zod 4.4 — schemas in `src/app/shared/validators/` **byte-identical** with `DBExec-API/src/shared/validators/`.
 - **State:** signals (new), NgRx 18 (analyses/filters store), BehaviorSubject (legacy).
@@ -22,7 +22,7 @@
 - **Design tokens only** — CSS custom properties in `assets/sass/variables/_theme-variables.scss` (+ `_theme_dark.scss`). Never hard-code color/spacing/font-size. `--fs-*`, `--space-*`, `--primary-color`, weights `--fw-*`; fonts Inter (`--font-ui`) + JetBrains Mono. `theme.service` injects at runtime.
 - **HTTP only through `HttpClientService`** (never inject `HttpClient`); endpoints from `core/constants/api.constant.ts`; routes from `routes.constant.ts`. Interceptor DI cycle broken via deferred `Injector.get()` (NG0200 fix).
 - **Dex AI = bubble only.** The shared `ai-launcher` (+ `ai-tool-step`, `ai-subagents`) is the entry — no sidebar item, no full page. `ai-chat.service` reduces a WebSocket step-stream into a nested step tree; `confirm()` posts to `POST /ai/confirm` (never the target endpoint directly). `screen-context.service` was removed (backend is not screen-aware).
-- **Query Executor is a standalone lazy module OUTSIDE the `/app` shell** at `/query-runner/exec` — isolates the heavy CodeMirror + AG Grid bundle. `/app/query-runner` is the saved-queries home.
+- **Query Executor is a standalone lazy module OUTSIDE the `/app` shell** at `/query-runner/exec` — isolates the heavy AG Grid bundle (Monaco itself loads from a CDN via `MonacoLoaderService`). `/app/query-runner` is the saved-queries home.
 - **`embed` module renders a public, chrome-less, token-gated dashboard OUTSIDE the shell** (no auth guard, no sidebar/header) — the precedent for a future host-controlled embedded mode.
 
 ## Conventions
