@@ -84,6 +84,7 @@ import {
   EnsureTablesOptions,
   SchemaTreeHost,
 } from '../../services/dataset-schema-tree.service';
+import { DatasetSqlWorkbenchBase } from '../dataset-sql-workbench.base';
 import {
   CodeEditorService,
   EditorHandle,
@@ -108,6 +109,7 @@ declare const window: any;
   ],
 })
 export class EditDatasetComponent
+  extends DatasetSqlWorkbenchBase
   implements
     OnInit,
     OnDestroy,
@@ -127,11 +129,6 @@ export class EditDatasetComponent
    */
   private static readonly SQL_UPLOAD_MAX_MB = 22;
 
-  // ViewChild for file input
-  @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
-  @ViewChild('sqlEditorContainer')
-  sqlEditorContainer!: ElementRef<HTMLDivElement>;
-
   // Dataset ID from route
   datasetId?: string;
   isLoadingDataset = false;
@@ -142,33 +139,12 @@ export class EditDatasetComponent
   originalQuery: string = ''; // Store original query from dataset
 
   editor: any;
-  /** Owns the editor lifetime; see CodeEditorService. */
-  private handle: EditorHandle | null = null;
-  private codeEditor = inject(CodeEditorService);
-  isLoadingEditor = true;
-  isLoadingSchema = false;
-  isExecutingQuery = false;
-  monacoLoadFailed = false;
-  queryResult: QueryResult | null = null;
-  /** IntelliSense-facing projection of the loaded trees; held by the tree service. */
-  get datasources(): DatasourceSchema[] {
-    return this.tree.datasources;
-  }
-  set datasources(list: DatasourceSchema[]) {
-    this.tree.datasources = list;
-  }
-  currentQuery = '';
 
   // ── Query parameters ({{name}}) ───────────────────────────────────
-  /** Debounced SQL snapshot fed to the params panel for token scanning. */
-  paramsSql = '';
-  /** Configured params (seeded from the dataset, edited via the panel). */
-  paramsConfig: DatasetParamConfig[] = [];
   /** Last-run param error (MISSING_REQUIRED_PARAM / UNKNOWN_PARAM). */
   paramRunError: DatasetParamRunError | null = null;
   /** True while a run-with-params request is in flight. */
   isRunningWithParams = false;
-  private sqlParamScan$ = new Subject<string>();
 
   // Theme monitoring. Default to the app's light theme ('vs'), not
   // 'vs-dark' — Monaco's setTheme is GLOBAL, so a stale dark default
@@ -176,31 +152,6 @@ export class EditDatasetComponent
   // navigate-away-and-back (the editor mounts before the theme is
   // the safe default avoids a dark flash / stuck-dark editor.
 
-  // Database sidebar
-  showDatasourceSidebar = true;
-  /**
-   * Single set of expanded tree paths (`dbId`, `dbId.schemaName`,
-   * `dbId.schemaName.tableName`). Replaces three parallel dictionaries.
-   */
-  get expandedPaths(): Set<string> {
-    return this.tree.expandedPaths;
-  }
-
-  get schemaSearchText(): string {
-    return this.tree.schemaSearchText;
-  }
-  set schemaSearchText(text: string) {
-    this.tree.schemaSearchText = text;
-  }
-
-  // Context Menu
-  showContextMenu = false;
-  contextMenuPosition: ContextMenuPosition = { x: 0, y: 0 };
-  contextMenuItems: ContextMenuItem[] = [];
-  contextMenuDatasource: any | null = null;
-
-  // Save as Dataset Dialog
-  showDatasetDialog = false;
 
   // ── Diff-before-save (Slice 3) ────────────────────────────────────
   /** Saved dataset columns (columnToUse + dataType), captured on load,
@@ -259,56 +210,18 @@ export class EditDatasetComponent
   private pendingSaveAndRun = false;
 
   // ── Result export + profiling (Slice 4) ───────────────────────────
-  /** Toggle for the client-side column-profiling strip. */
-  get showColumnProfile(): boolean {
-    return this.grid.showColumnProfile;
-  }
-  /** Cached profiles for the current preview rows. */
-  get columnProfiles(): ColumnProfile[] {
-    return this.grid.columnProfiles;
-  }
 
-  // Results Popup
-  showResultsPopup = false;
-  resultRows = 25;
-  resultPage = 1;
-  isExportingResults = false;
-  resultFilterValues: { [key: string]: string } = {};
-  private resultFilterSubject = new Subject<void>();
-  private lastExecutedQuery = '';
-  private lastResultsLazyEvent: any = null;
-
-  get isPaginationEnabled(): boolean {
-    return !!this.queryResult;
-  }
 
   // (Removed: isPaginatorNeeded — see add-dataset for the same
   // change. Paginator is now always-on so the footer doesn't pop
   // in when a result spills past one page.)
 
-  /** True when the BE supplied any column type information. */
-  get hasAnyColumnType(): boolean {
-    return this.grid.hasAnyColumnType();
-  }
 
   // ── Bottom-sheet + result-grid state ──────────────────────────────
   //
   // Held by ResultSheetLayoutService and ResultGridToolsService; these proxies
   // keep the template bindings working unchanged.
 
-  get resultSheetHeightPx(): number {
-    return this.sheet.heightPx;
-  }
-  set resultSheetHeightPx(px: number) {
-    this.sheet.heightPx = px;
-  }
-
-  get isResultSheetCollapsed(): boolean {
-    return this.sheet.isCollapsed;
-  }
-  set isResultSheetCollapsed(collapsed: boolean) {
-    this.sheet.isCollapsed = collapsed;
-  }
 
   /**
    * Per-column pixel width applied to the result grid's <colgroup>.
@@ -323,102 +236,9 @@ export class EditDatasetComponent
     this.grid.columnWidths = widths;
   }
 
-  /** Expanded JSON-cell tracking for the result grid. */
-  get expandedJsonCells(): Set<string> {
-    return this.grid.expandedJsonCells;
-  }
-  set expandedJsonCells(cells: Set<string>) {
-    this.grid.expandedJsonCells = cells;
-  }
 
-  /** Cell-level right-click context menu state. */
-  get showCellContextMenu(): boolean {
-    return this.grid.showCellContextMenu;
-  }
-  get cellContextMenuTop(): number {
-    return this.grid.cellContextMenuTop;
-  }
-  get cellContextMenuLeft(): number {
-    return this.grid.cellContextMenuLeft;
-  }
-
-  /** PrimeNG <p-table> ref so we can reset `.first` between
-   *  successive queries (prevents stale paginator state). */
-  @ViewChild('resultsTable') resultsTable: any;
-
-  // IntelliSense provider disposables
-  private completionProviderDisposable: any = null;
-  private hoverProviderDisposable: any = null;
-  private signatureHelpDisposable: any = null;
-
-  /** Debounce handle for dialect lint. Cleared in ngOnDestroy. */
-  private dialectLintTimer: ReturnType<typeof setTimeout> | null = null;
-  /** Monaco markers owner-id for the lint pass. */
-  private static readonly DIALECT_LINT_OWNER = 'sql-dialect-lint';
-
-  // Stable bound reference for context menu listener
-  private boundCloseContextMenu = this.closeContextMenu.bind(this);
-
-  selectedDatasourceObj: any = null;
   selectedDatasourceName: string = '';
 
-  /**
-   * DatabaseTypeOption for the dataset's owning datasource. Drives the
-   * dbType badge next to the read-only datasource input. Edit mode
-   * never lets the user change datasources, so this is fixed once
-   * `selectedDatasourceObj` resolves from the dataset record.
-   */
-  get selectedDbTypeOption(): DatabaseTypeOption | null {
-    const dbType = this.selectedDatasourceObj?.config?.dbType;
-    if (!dbType) return null;
-    return (
-      DATABASE_TYPES.find(t => t.value === dbType) ??
-      DATABASE_TYPES.find(t => t.value === 'postgres') ??
-      null
-    );
-  }
-
-  // Database Schema Management
-  get datasourceSchemas(): { [dbId: string]: DatasourceSchema } {
-    return this.tree.datasourceSchemas;
-  }
-  set datasourceSchemas(map: { [dbId: string]: DatasourceSchema }) {
-    this.tree.datasourceSchemas = map;
-  }
-  get loadingDatasources(): { [dbId: string]: boolean } {
-    return this.tree.loadingDatasources;
-  }
-  set loadingDatasources(map: { [dbId: string]: boolean }) {
-    this.tree.loadingDatasources = map;
-  }
-  // Sequence counter incremented on every datasource switch. Async schema
-  // load callbacks compare against this to discard stale state writes.
-  private get schemaSelectionToken(): number {
-    return this.tree.schemaSelectionToken;
-  }
-  private set schemaSelectionToken(token: number) {
-    this.tree.schemaSelectionToken = token;
-  }
-
-  /**
-   * Per-datasource mode flag the BE returns with the bulk schema
-   * payload. Matches the add-dataset pattern:
-   *   `eager` = small/medium database, BE shipped the full tree
-   *             (schemas + tables + columns) in one round-trip.
-   *   `lazy`  = warehouse-scale database, BE auto-degraded to schemas
-   *             + tables only. Per-table column fetch fires on first
-   *             expand / IntelliSense reference.
-   */
-  get schemaTreeMode(): { [dbId: string]: 'eager' | 'lazy' } {
-    return this.tree.schemaTreeMode;
-  }
-
-
-  get isQueryEmpty(): boolean {
-    const query = this.currentQuery.trim();
-    const defaultQuery = SQL_EDITOR_PLACEHOLDER;
-    return !query || query === defaultQuery;
-  }
 
   get hasQueryChanged(): boolean {
     if (!this.editor) return false;
@@ -431,44 +251,15 @@ export class EditDatasetComponent
     return this.hasQueryChanged;
   }
 
-  getFilteredTables(tables: any[]): any[] {
-    return this.tree.getFilteredTables(tables);
-  }
-
-  getFilteredSchemas(schemas: any[] | undefined): any[] {
-    return this.tree.getFilteredSchemas(schemas);
-  }
-  trackByName(index: number, item: any): any {
-    return item.name;
-  }
-
-  trackByIndex(index: number): number {
-    return index;
-  }
-
-  private destroyRef = inject(DestroyRef);
-  saving = this.datasetService.saving;
 
   constructor(
-    private queryService: QueryService,
     private datasourceService: DatasourceService,
-    private monacoIntelliSenseService: MonacoIntelliSenseService,
-    private sqlLinterService: SqlLinterService,
-    private globalService: GlobalService,
-    private datasetService: DatasetService,
     private router: Router,
     private route: ActivatedRoute,
-    private messageService: MessageService,
-    private store: Store,
-    private cdr: ChangeDetectorRef,
-    private monacoLoader: MonacoLoaderService,
-    private translate: TranslateService,
-    private elementRef: ElementRef<HTMLElement>,
     private fieldsStore: DatasetFieldsStore,
-    private readonly sheet: ResultSheetLayoutService,
-    private readonly grid: ResultGridToolsService,
-    private readonly tree: DatasetSchemaTreeService,
-  ) {}
+  ) {
+    super();
+  }
 
   // ── ResultSheetHost / ResultGridHost ────────────────────────────
   //
@@ -476,30 +267,6 @@ export class EditDatasetComponent
   // ElementRef or a ChangeDetectorRef of their own, which keeps them free of any
   // dependency on this screen in particular.
 
-  /** The pane the sheet lives in; height is clamped against it, not the viewport. */
-  sheetPaneElement(): HTMLElement | null {
-    return this.elementRef.nativeElement.querySelector(
-      '.editor-results-area',
-    ) as HTMLElement | null;
-  }
-
-  requestRender(): void {
-    this.cdr.markForCheck();
-  }
-
-  /** Pane width changed materially — re-measure the result grid's columns. */
-  onPaneWidthChanged(): void {
-    this.grid.recalculateColumnWidths();
-  }
-
-  currentResult(): QueryResult | null {
-    return this.queryResult;
-  }
-
-  /** Close the datasource tree menu so two menus are never open at once. */
-  closeOtherMenus(): void {
-    this.showContextMenu = false;
-  }
 
   // ── SchemaTreeHost ──────────────────────────────────────────────
 
@@ -516,13 +283,6 @@ export class EditDatasetComponent
     markLoading: false,
   };
 
-  editorInstance(): any {
-    return this.editor;
-  }
-
-  selectedDatasourceRecord(): any | null {
-    return this.selectedDatasourceObj;
-  }
 
   /**
    * Empty by design: this screen never searched a datasource list to resolve a
@@ -596,39 +356,6 @@ export class EditDatasetComponent
       });
   }
 
-  private initializeComponent(): void {
-    // Setup theme monitoring
-
-    // Close context menus on click outside
-    document.addEventListener('click', this.boundCloseContextMenu);
-  }
-
-  refreshSingleDatasource(dbId: string): void {
-    this.tree.refreshSingleDatasource(dbId);
-  }
-
-  refreshSelectedDatasource(): void {
-    if (!this.selectedDatasourceObj || !this.selectedDatasourceObj.id) return;
-    this.refreshSingleDatasource(this.selectedDatasourceObj.id);
-  }
-
-
-  /**
-   * Setup MutationObserver to watch for theme changes
-   */
-
-  /**
-   * Update Monaco Editor theme
-   */
-  private updateEditorTheme(): void {
-    if (this.editor) {
-    }
-  }
-
-  ngAfterViewInit(): void {
-    this.loadMonacoEditor();
-    this.sheet.installResizeObserver();
-  }
 
   ngOnDestroy(): void {
     this.resultFilterSubject.complete();
@@ -666,29 +393,8 @@ export class EditDatasetComponent
     document.removeEventListener('click', this.boundCloseContextMenu);
   }
 
-  private loadMonacoEditor(): void {
-    this.monacoLoader
-      .load()
-      .then(() => {
-        this.initMonaco();
-      })
-      .catch(() => {
-        this.isLoadingEditor = false;
-        this.monacoLoadFailed = true;
-        this.showMonacoLoadError();
-        this.cdr.markForCheck();
-      });
-  }
 
-  private showMonacoLoadError(): void {}
-
-  retryLoadMonaco(): void {
-    this.monacoLoadFailed = false;
-    this.isLoadingEditor = true;
-    this.loadMonacoEditor();
-  }
-
-  private initMonaco(): void {
+  protected initMonaco(): void {
     if (!this.selectedDatasourceObj) {
       this.isLoadingEditor = false;
       this.cdr.markForCheck();
@@ -812,140 +518,6 @@ export class EditDatasetComponent
     }, 100);
   }
 
-  /**
-   * Register IntelliSense providers
-   */
-  /**
-   * Debounced dialect-aware lint pass. Re-parses the model with the
-   * active dialect's grammar, surfaces error nodes as Monaco markers.
-   * No-op when ENABLE_DIALECT_LINT is false.
-   */
-  private scheduleDialectLint(): void {
-    if (!ENABLE_DIALECT_LINT) return;
-    if (!this.editor) return;
-    if (this.dialectLintTimer) clearTimeout(this.dialectLintTimer);
-    this.dialectLintTimer = setTimeout(() => {
-      this.dialectLintTimer = null;
-      this.runDialectLint();
-    }, DIALECT_LINT_DEBOUNCE_MS);
-  }
-
-  private runDialectLint(): void {
-    if (!this.editor) return;
-    const model = this.editor.getModel();
-    if (!model) return;
-    const dbType = this.selectedDatasourceObj?.config?.dbType ?? null;
-    const markers = this.sqlLinterService.lint(model.getValue(), dbType);
-    monaco.editor.setModelMarkers(
-      model,
-      EditDatasetComponent.DIALECT_LINT_OWNER,
-      markers,
-    );
-  }
-
-  private registerIntelliSenseProviders(): void {
-    // Dispose previous providers if they exist
-    if (this.completionProviderDisposable) {
-      this.completionProviderDisposable.dispose();
-    }
-    if (this.hoverProviderDisposable) {
-      this.hoverProviderDisposable.dispose();
-    }
-    if (this.signatureHelpDisposable) {
-      this.signatureHelpDisposable.dispose();
-    }
-
-    // Register new providers and store disposables
-    if (this.editor) {
-      this.completionProviderDisposable =
-        this.monacoIntelliSenseService.registerSQLCompletions(
-          this.datasources,
-          this.editor,
-        );
-      this.hoverProviderDisposable =
-        this.monacoIntelliSenseService.registerHoverProvider(this.datasources);
-      this.signatureHelpDisposable =
-        this.monacoIntelliSenseService.registerSignatureHelpProvider();
-    }
-  }
-
-
-
-
-
-
-
-  /**
-   * Execute query - Smart execution based on selection
-   * If text is selected, runs selected SQL
-   * If no selection, runs current statement at cursor
-   */
-  executeQuery(): void {
-    if (!this.editor) return;
-    // Re-entry guard against double-firing while a query is in
-    // flight. The previous `showResultsPopup ||` clause was a
-    // modal-era leftover; with the docked sheet, Run is expected
-    // to work whether the sheet is open or not.
-    if (this.isExecutingQuery) return;
-
-    const selection = this.editor.getSelection();
-    const hasSelection = selection && !selection.isEmpty();
-
-    if (hasSelection) {
-      // Execute selected text
-      const selectedText = this.editor.getModel().getValueInRange(selection);
-      if (selectedText.trim()) {
-        this.executeSelectedQuery(selectedText);
-        return;
-      }
-    }
-
-    // No selection, execute complete query
-    this.executeCompleteQuery();
-  }
-
-  /**
-   * Execute complete SQL query from editor
-   */
-  executeCompleteQuery(): void {
-    if (this.isExecutingQuery) return;
-    const query = this.editor?.getValue() || this.currentQuery;
-    this.resultPage = 1;
-    this.resultFilterValues = {};
-    // Leave queryResult in place until the new result lands —
-    // avoids the *ngIf flicker that would otherwise unmount the
-    // sheet between queries.
-    this.executeQueryForDatasource(query);
-  }
-
-  /**
-   * Execute selected SQL text from editor
-   * @param selectedText The selected SQL text to execute
-   */
-  executeSelectedQuery(selectedText: string): void {
-    if (this.isExecutingQuery) return;
-    this.resultPage = 1;
-    this.resultFilterValues = {};
-    // See executeCompleteQuery — same anti-flicker reasoning.
-    this.executeQueryForDatasource(selectedText);
-  }
-
-  clearEditor(): void {
-    if (this.editor) {
-      this.editor.setValue('');
-    }
-  }
-
-  exportCurrentScript(): void {
-    if (!this.editor || !this.selectedDatasourceObj) return;
-
-    const datasourceName = this.selectedDatasourceObj.name || 'datasource';
-    downloadTextFile(
-      this.editor.getValue(),
-      `${datasourceName}_script.sql`,
-      'text/plain',
-    );
-  }
 
   resetToOriginal(): void {
     if (!this.editor) return;
@@ -955,11 +527,6 @@ export class EditDatasetComponent
     this.currentQuery = this.originalQuery;
   }
 
-  triggerFileInput(): void {
-    if (this.fileInput) {
-      this.fileInput.nativeElement.click();
-    }
-  }
 
   /**
    * Import a .sql / .txt file into the editor.
@@ -1016,81 +583,6 @@ export class EditDatasetComponent
     });
   }
 
-  saveAsDataset(): void {
-    if (!this.selectedDatasourceObj) return;
-
-    // Show dialog
-    this.showDatasetDialog = true;
-  }
-
-  private resetEditor(): void {
-    // Clear query result
-    this.queryResult = null;
-
-    // Reset editor content if it exists
-    if (this.editor) {
-      this.editor.setValue(SQL_EDITOR_PLACEHOLDER);
-    }
-
-    // Reset current query
-    this.currentQuery = '';
-  }
-
-  onResultFilterChange(): void {
-    this.resultFilterSubject.next();
-  }
-
-  clearResultFilters(): void {
-    this.resultFilterValues = {};
-    this.resultPage = 1;
-    if (this.lastExecutedQuery) {
-      this.executeQueryForDatasource(
-        this.lastExecutedQuery,
-        1,
-        this.resultRows,
-      );
-    }
-  }
-
-  exportResultsAsCsv(): void {
-    if (!this.lastExecutedQuery || !this.selectedDatasourceObj?.id) return;
-
-    this.isExportingResults = true;
-
-    const payload = buildResultExportPayload(
-      this.selectedDatasourceObj.id,
-      this.lastExecutedQuery,
-      this.resultFilterValues,
-    );
-
-    this.queryService.exportQueryResults(payload).subscribe({
-      next: (blob: Blob) => {
-        const datasourceName = this.selectedDatasourceObj.name || 'datasource';
-        downloadBlob(blob, `${datasourceName}_query_results.csv`);
-        this.isExportingResults = false;
-        this.cdr.markForCheck();
-      },
-      error: (error: any) => {
-        this.isExportingResults = false;
-        this.cdr.markForCheck();
-        this.messageService.add({
-          severity: 'error',
-          summary: this.translate.instant('DATASET.EXPORT_FAILED'),
-          detail:
-            error.error?.message ||
-            error.message ||
-            this.translate.instant('DATASET.EXPORT_FAILED_DESC'),
-          key: 'topRight',
-          life: 3000,
-          styleClass: 'custom-toast',
-        });
-      },
-    });
-  }
-
-  get isResultFilterActive(): boolean {
-    return Object.values(this.resultFilterValues).some(v => !!v);
-  }
 
   onResultsLazyLoad(event: any): void {
     this.lastResultsLazyEvent = event;
@@ -1114,7 +606,7 @@ export class EditDatasetComponent
     this.executeQueryForDatasource(this.lastExecutedQuery, page, limit, filter);
   }
 
-  private executeQueryForDatasource(
+  protected executeQueryForDatasource(
     query: string,
     page: number = 1,
     limit: number = this.resultRows,
@@ -1264,69 +756,10 @@ export class EditDatasetComponent
   private static readonly SHEET_MAX_HEIGHT_PADDING = 120;
 
 
-  /** Toggle the sheet between expanded and collapsed. */
-  toggleResultSheet(): void {
-    this.sheet.toggle();
-  }
-
-  dismissResultSheet(): void {
-    this.showResultsPopup = false;
-    this.queryResult = null;
-    this.grid.resetExpandedCells();
-  }
-
-  private surfaceResultSheet(): void {
-    this.showResultsPopup = true;
-    this.sheet.expand();
-    if (this.resultsTable) {
-      this.resultsTable.first = 0;
-    }
-    this.resultPage = 1;
-  }
-
-  onSheetDragStart(event: MouseEvent): void {
-    this.sheet.onDragStart(event);
-  }
-
-  onSheetHandleKeydown(event: KeyboardEvent): void {
-    this.sheet.onHandleKeydown(event);
-  }
-
-  /** Height for the host's `--sheet-height` CSS variable. */
-  get effectiveSheetHeightPx(): number {
-    return this.sheet.effectiveHeightPx(
-      this.showResultsPopup,
-      !!this.queryResult,
-    );
-  }
-
-  jsonCellKey(rowIndex: number, col: string): string {
-    return this.grid.jsonCellKey(rowIndex, col);
-  }
-
-  toggleJsonCell(rowIndex: number, col: string): void {
-    this.grid.toggleJsonCell(rowIndex, col);
-  }
-
-  onCellContextMenu(event: MouseEvent, rowIndex: number, col: string): void {
-    this.grid.onCellContextMenu(event, rowIndex, col);
-  }
-
-  /** Copy the right-clicked cell as displayed. */
-  async copyCellValue(): Promise<void> {
-    await this.grid.copyCellValue();
-  }
-
-  /** Copy every row's value for the right-clicked column. */
-  async copyColumnValues(): Promise<void> {
-    await this.grid.copyColumnValues();
-  }
-
-
   // ── Client-side result export + profiling (Slice 4) ───────────────
 
   /** Base file name for exports — derived from the dataset/datasource. */
-  private exportBaseName(): string {
+  protected exportBaseName(): string {
     return buildExportBaseName([
       this.datasetName,
       this.selectedDatasourceName,
@@ -1334,47 +767,6 @@ export class EditDatasetComponent
     ]);
   }
 
-  /**
-   * Export the CURRENT in-memory preview rows to CSV, client-side. No
-   * BE call — mirrors exactly what the grid shows (visible columns,
-   * current order). Distinct from `exportResultsAsCsv`, which streams
-   * the full server-side result set.
-   */
-  exportResultsCsvClient(): void {
-    if (!this.queryResult?.columns?.length) return;
-    const csv = rowsToCsv(this.queryResult.columns, this.queryResult.rows);
-    downloadTextFile(
-      csv,
-      `${this.exportBaseName()}_preview.csv`,
-      'text/csv;charset=utf-8;',
-    );
-  }
-
-  /** Export the current in-memory preview rows to JSON, client-side. */
-  exportResultsJsonClient(): void {
-    if (!this.queryResult?.columns?.length) return;
-    const json = rowsToJson(this.queryResult.columns, this.queryResult.rows);
-    downloadTextFile(
-      json,
-      `${this.exportBaseName()}_preview.json`,
-      'application/json;charset=utf-8;',
-    );
-  }
-
-  /** Copy the current SQL editor content to the clipboard. */
-  async copySql(): Promise<void> {
-    const sql = this.editor?.getValue() || this.currentQuery || '';
-    await this.grid.writeToClipboard(sql);
-  }
-
-  toggleColumnProfile(): void {
-    this.grid.toggleColumnProfile();
-  }
-
-
-  nullSeverity(pct: number): 'good' | 'warn' | 'bad' {
-    return this.grid.nullSeverity(pct);
-  }
 
   // ── Result-grid column-state persistence (Slice 4) ────────────────
   private columnStateStorageKey(): string | null {
@@ -1612,11 +1004,6 @@ export class EditDatasetComponent
     this.showDatasetDialog = true;
   }
 
-  /** Params panel emitted an updated config; keep it for the next save. */
-  onParamsConfigChange(config: DatasetParamConfig[]): void {
-    this.paramsConfig = config;
-    this.cdr.markForCheck();
-  }
 
   /**
    * Run the SAVED dataset with the current parameter values via
@@ -1715,53 +1102,6 @@ export class EditDatasetComponent
       });
   }
 
-  toggleDatasourceSidebar(): void {
-    this.showDatasourceSidebar = !this.showDatasourceSidebar;
-    // Trigger Monaco editor resize after sidebar animation
-    setTimeout(() => {
-      if (this.editor) {
-        this.editor.layout();
-      }
-    }, 300);
-  }
-
-  schemaPath(dbId: string, schemaName: string): string {
-    return this.tree.schemaPath(dbId, schemaName);
-  }
-
-  tablePath(dbId: string, schemaName: string, tableName: string): string {
-    return this.tree.tablePath(dbId, schemaName, tableName);
-  }
-
-  isExpanded(path: string): boolean {
-    return this.tree.isExpanded(path);
-  }
-
-
-
-  toggleDatasource(db: any): void {
-    this.tree.toggleDatasource(db);
-  }
-
-  toggleSchema(dbId: string, schemaName: string): void {
-    this.tree.toggleSchema(dbId, schemaName);
-  }
-
-  toggleTable(dbId: string, schemaName: string, tableName: string): void {
-    this.tree.toggleTable(dbId, schemaName, tableName);
-  }
-
-
-
-
-
-  isTableExpanded(
-    dbId: string,
-    schemaName: string,
-    tableName: string,
-  ): boolean {
-    return this.tree.isTableExpanded(dbId, schemaName, tableName);
-  }
 
   insertColumnName(
     dbId: string,
@@ -1785,54 +1125,6 @@ export class EditDatasetComponent
     this.editor.focus();
   }
 
-  onDatasourceContextMenu(event: MouseEvent, datasource: any): void {
-    event.preventDefault();
-    event.stopPropagation();
-
-    this.contextMenuDatasource = datasource;
-    this.contextMenuPosition = { x: event.clientX, y: event.clientY };
-
-    this.contextMenuItems = [
-      {
-        label: this.translate.instant('DATASET.REFRESH_SCHEMA'),
-        icon: 'pi pi-refresh',
-        command: () => this.refreshDatasourceFromContext(),
-      },
-    ];
-
-    this.showContextMenu = true;
-  }
-
-  closeContextMenu(): void {
-    this.showContextMenu = false;
-    this.contextMenuDatasource = null;
-    // The cell-level menu shares the global outside-click listener, so it
-    // closes from here too.
-    this.grid.closeCellContextMenu();
-  }
-
-  refreshDatasourceFromContext(): void {
-    if (!this.contextMenuDatasource) return;
-
-    // Refresh schema for this specific database
-    this.refreshSingleDatasource(this.contextMenuDatasource.id);
-
-    this.closeContextMenu();
-  }
-
-  /**
-   * Esc dismisses transient overlays only. The docked result
-   * sheet is intentionally NOT bound to Esc — accidental Esc
-   * dropping the result would be a footgun. Use the sheet's
-   * chevron (collapse) or × (dismiss) buttons.
-   */
-  @HostListener('document:keydown.escape')
-  onEscape(): void {
-    if (this.showContextMenu) {
-      this.closeContextMenu();
-      this.cdr.markForCheck();
-    }
-  }
 
   /**
    * Fetch dataset data by ID and populate the form

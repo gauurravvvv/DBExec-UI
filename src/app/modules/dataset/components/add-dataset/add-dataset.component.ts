@@ -81,6 +81,7 @@ import {
   EnsureTablesOptions,
   SchemaTreeHost,
 } from '../../services/dataset-schema-tree.service';
+import { DatasetSqlWorkbenchBase } from '../dataset-sql-workbench.base';
 
 // Declare Monaco and window for TypeScript
 declare const monaco: any;
@@ -107,6 +108,7 @@ import {
   ],
 })
 export class AddDatasetComponent
+  extends DatasetSqlWorkbenchBase
   implements
     OnInit,
     OnDestroy,
@@ -126,63 +128,10 @@ export class AddDatasetComponent
    */
   private static readonly SQL_UPLOAD_MAX_MB = 2;
 
-  // ViewChild for file input
-  @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
-  @ViewChild('sqlEditorContainer')
-  sqlEditorContainer!: ElementRef<HTMLDivElement>;
-  /**
-   * Reference to the PrimeNG result-grid Table so we can call its
-   * `.reset()` between queries. Without this, PrimeNG keeps its
-   * internal "first row index" state across `queryResult` changes,
-   * so running query A (200 rows, viewing page 4) then query B (7
-   * rows) leaves the table pointing at row 75 of a 7-row result —
-   * the grid renders empty until the user clicks page 1. Typed as
-   * any so we don't pull primeng/table into this controller's
-   * import surface (the component already has plenty).
-   */
-  @ViewChild('resultsTable') resultsTable: any;
-
   // Removed ViewChild as we now use dynamic containers per tab
   @Input() datasourceId?: string;
   @Input() initialQuery?: string;
 
-  editor: any;
-  /** Owns the editor lifetime; see CodeEditorService. */
-  private handle: EditorHandle | null = null;
-  private codeEditor = inject(CodeEditorService);
-  isLoadingEditor = true;
-  isLoadingSchema = false;
-  isExecutingQuery = false;
-  monacoLoadFailed = false;
-  queryResult: QueryResult | null = null;
-
-  /**
-   * True when the BE was able to discover types for at least one
-   * column in the current result. Postgres always returns types
-   * via pg_typeof; other dialects ship an empty `columnTypes` map
-   * (driver field-metadata wiring is a follow-up). Hides the type
-   * chip row in the results popup when no types are available so
-   * the header doesn't read as a wall of em-dashes.
-   */
-  get hasAnyColumnType(): boolean {
-    return this.grid.hasAnyColumnType();
-  }
-
-  /**
-   * Tracks which JSON cells in the result grid the user has
-   * expanded. JSON cells render as a single-line summary by
-   * default so one fat document doesn't make every row in the
-   * grid 6em tall; clicking the expand chevron flips the cell
-   * into a pre-wrapped multi-line view. Key = `${rowIndex}-${col}`
-   * because column names alone aren't unique across rows.
-   * Cleared on each new query result (see executeQuery handlers).
-   */
-  get expandedJsonCells(): Set<string> {
-    return this.grid.expandedJsonCells;
-  }
-  set expandedJsonCells(cells: Set<string>) {
-    this.grid.expandedJsonCells = cells;
-  }
 
   /**
    * Per-column pixel width for the result grid's <colgroup>, measured by
@@ -196,85 +145,14 @@ export class AddDatasetComponent
   // The pane ResizeObserver, its debounce timer and the last observed width live
   // on ResultSheetLayoutService, which also disposes them.
 
-  /**
-   * Cell-level right-click context menu state. Standard fare in
-   * every database GUI (DBeaver, DataGrip, pgAdmin, TablePlus) —
-   * users reach for it within seconds of trying to grab a value
-   * out of the grid.
-   *
-   * The menu offers two actions:
-   *   - Copy cell    — the displayed value of the right-clicked
-   *                    cell, via formatCellValue so what the user
-   *                    sees on screen is what lands on the clipboard
-   *                    (the BIGINT preserved as string, the ISO
-   *                    date, the JSON pretty-printed body).
-   *   - Copy column  — the displayed values for all rows on the
-   *                    current page, joined with newlines. Useful
-   *                    for "grab all the email addresses out of
-   *                    this query" workflows.
-   *
-   * Position is captured at click time; menu closes on any outside
-   * click (handled by the existing boundCloseContextMenu listener)
-   * or after a menu item is invoked.
-   */
-  get showCellContextMenu(): boolean {
-    return this.grid.showCellContextMenu;
-  }
-  get cellContextMenuTop(): number {
-    return this.grid.cellContextMenuTop;
-  }
-  get cellContextMenuLeft(): number {
-    return this.grid.cellContextMenuLeft;
-  }
-
-  /** Stable key for the expanded-set above. */
-  jsonCellKey(rowIndex: number, col: string): string {
-    return this.grid.jsonCellKey(rowIndex, col);
-  }
-
-  /** Toggle the expanded state for one JSON cell. The template
-   *  reads `expandedJsonCells.has(key)` to decide between the
-   *  summary line and the multi-line `<pre>`. */
-  toggleJsonCell(rowIndex: number, col: string): void {
-    this.grid.toggleJsonCell(rowIndex, col);
-  }
-
-  /** IntelliSense-facing projection of the loaded trees; held by the tree service. */
-  get datasources(): DatasourceSchema[] {
-    return this.tree.datasources;
-  }
-  set datasources(list: DatasourceSchema[]) {
-    this.tree.datasources = list;
-  }
-  currentQuery = '';
 
   // ── Query parameters ({{name}}) ───────────────────────────────────
-  /** Debounced SQL snapshot fed to the params panel for token scanning. */
-  paramsSql = '';
-  /** Configured params, collected from the panel; saved as paramsConfig. */
-  paramsConfig: DatasetParamConfig[] = [];
-  private sqlParamScan$ = new Subject<string>();
 
   // Theme monitoring. Default to the app's light theme ('vs'), not
   // 'vs-dark' — Monaco's setTheme is GLOBAL, so a stale dark default
   // corrects this at create time; the light default avoids a flash.
 
-  // Bound listener reference (for proper removeEventListener)
-  private boundCloseContextMenu = this.closeContextMenu.bind(this);
 
-  // Database sidebar
-  showDatasourceSidebar = true;
-  /**
-   * Single set of expanded tree paths, keyed by composite strings:
-   *   `${dbId}` for datasource rows
-   *   `${dbId}.${schemaName}` for schema rows
-   *   `${dbId}.${schemaName}.${tableName}` for table rows
-   * Replaces the previous three separate dictionaries — one source of truth
-   * means collapse cascades and refreshes don't fall out of sync.
-   */
-  get expandedPaths(): Set<string> {
-    return this.tree.expandedPaths;
-  }
   /**
    * When the user opens add-dataset via the list-page popup we pass
    * a `schema` query param. The sidebar filter pipe (filterSchemas)
@@ -318,65 +196,12 @@ export class AddDatasetComponent
     ) as any;
     return schema?.tablesError || null;
   }
-  get schemaSearchText(): string {
-    return this.tree.schemaSearchText;
-  }
-  set schemaSearchText(text: string) {
-    this.tree.schemaSearchText = text;
-  }
   selectedDatasource: string = '';
   selectedSchema: string = '';
 
-  // Context Menu
-  showContextMenu = false;
-  contextMenuPosition: ContextMenuPosition = { x: 0, y: 0 };
-  contextMenuItems: ContextMenuItem[] = [];
-  contextMenuDatasource: any | null = null;
-
-  // Save as Dataset Dialog
-  showDatasetDialog = false;
 
   // ── Result export + profiling (Slice 4) ───────────────────────────
-  /** Toggle for the client-side column-profiling strip. */
-  get showColumnProfile(): boolean {
-    return this.grid.showColumnProfile;
-  }
-  /** Cached profiles for the current preview rows. */
-  get columnProfiles(): ColumnProfile[] {
-    return this.grid.columnProfiles;
-  }
 
-  // Results bottom sheet
-  showResultsPopup = false;
-  resultRows = 25;
-  resultPage = 1;
-  isExportingResults = false;
-  resultFilterValues: { [key: string]: string } = {};
-  private resultFilterSubject = new Subject<void>();
-  private lastExecutedQuery = '';
-  private lastResultsLazyEvent: any = null;
-
-  /**
-   * Sheet height and collapsed state live on ResultSheetLayoutService; these
-   * proxies keep the template bindings working unchanged.
-   */
-  get resultSheetHeightPx(): number {
-    return this.sheet.heightPx;
-  }
-  set resultSheetHeightPx(px: number) {
-    this.sheet.heightPx = px;
-  }
-
-  get isResultSheetCollapsed(): boolean {
-    return this.sheet.isCollapsed;
-  }
-  set isResultSheetCollapsed(collapsed: boolean) {
-    this.sheet.isCollapsed = collapsed;
-  }
-
-  get isPaginationEnabled(): boolean {
-    return !!this.queryResult;
-  }
 
   // (Removed: isPaginatorNeeded getter that conditionally hid the
   // paginator on single-page results. With the docked sheet, the
@@ -390,71 +215,13 @@ export class AddDatasetComponent
   showChangeConfirmDialog = false;
   pendingDatasourceChange: any = null;
 
-  // IntelliSense provider disposables
-  private completionProviderDisposable: any = null;
-  private hoverProviderDisposable: any = null;
-  private signatureHelpDisposable: any = null;
-  /** Debounce handle for dialect lint. Cleared in ngOnDestroy. */
-  private dialectLintTimer: ReturnType<typeof setTimeout> | null = null;
-  /** Monaco markers owner-id for the lint pass. Stable string so
-   *  successive setModelMarkers() calls replace the previous batch. */
-  private static readonly DIALECT_LINT_OWNER = 'sql-dialect-lint';
 
   availableDatasources: any[] = [];
   preloadedDatasources: any[] | null = null;
   preloadedDatasourcesTotal: number | null = null;
-  selectedDatasourceObj: any = null;
 
-  /**
-   * Resolves the active datasource's engine to a DatabaseTypeOption so
-   * the template can render the dbType badge (icon + label) next to the
-   * datasource dropdown. Null when no datasource is selected. Falls back
-   * to the Postgres entry for unknown / missing dbType (legacy rows).
-   */
-  get selectedDbTypeOption(): DatabaseTypeOption | null {
-    const dbType = this.selectedDatasourceObj?.config?.dbType;
-    if (!dbType) return null;
-    return (
-      DATABASE_TYPES.find(t => t.value === dbType) ??
-      DATABASE_TYPES.find(t => t.value === 'postgres') ??
-      null
-    );
-  }
 
-  // Database Schema Management
-  get datasourceSchemas(): { [dbId: string]: DatasourceSchema } {
-    return this.tree.datasourceSchemas;
-  }
-  set datasourceSchemas(map: { [dbId: string]: DatasourceSchema }) {
-    this.tree.datasourceSchemas = map;
-  }
-  get loadingDatasources(): { [dbId: string]: boolean } {
-    return this.tree.loadingDatasources;
-  }
-  set loadingDatasources(map: { [dbId: string]: boolean }) {
-    this.tree.loadingDatasources = map;
-  }
   isLoadingDatasources: boolean = false;
-  /**
-   * Per-datasource mode flag the BE returns with the bulk schema
-   * tree. `eager` = columns shipped inline (typical case);
-   * `lazy` = warehouse-scale database, BE auto-degraded to schemas
-   * + tables only, columns fetched per-table on first use. Lets
-   * the sidebar tell the user why their first column reference
-   * takes a beat to resolve.
-   */
-  get schemaTreeMode(): { [dbId: string]: 'eager' | 'lazy' } {
-    return this.tree.schemaTreeMode;
-  }
-  // Sequence counter incremented on every datasource/org switch. Async schema
-  // load callbacks compare against this to discard responses for selections the
-  // user has already moved away from. Owned by the tree service.
-  private get schemaSelectionToken(): number {
-    return this.tree.schemaSelectionToken;
-  }
-  private set schemaSelectionToken(token: number) {
-    this.tree.schemaSelectionToken = token;
-  }
 
 
   get filteredAvailableDatasources(): any[] {
@@ -467,11 +234,6 @@ export class AddDatasetComponent
     );
   }
 
-  get isQueryEmpty(): boolean {
-    const query = this.currentQuery.trim();
-    const defaultQuery = SQL_EDITOR_PLACEHOLDER;
-    return !query || query === defaultQuery;
-  }
 
   private _saved = false;
 
@@ -479,46 +241,16 @@ export class AddDatasetComponent
     return !this.isQueryEmpty && !this._saved;
   }
 
-  getFilteredTables(tables: any[]): any[] {
-    return this.tree.getFilteredTables(tables);
-  }
-
-  getFilteredSchemas(schemas: any[] | undefined): any[] {
-    return this.tree.getFilteredSchemas(schemas);
-  }
-
-  trackByName(index: number, item: any): any {
-    return item.name;
-  }
-
-  trackByIndex(index: number): number {
-    return index;
-  }
-
-  private destroyRef = inject(DestroyRef);
-  saving = this.datasetService.saving;
 
   constructor(
-    private queryService: QueryService,
     private datasourceService: DatasourceService,
-    private monacoIntelliSenseService: MonacoIntelliSenseService,
     private sqlFormatterService: SqlFormatterService,
-    private sqlLinterService: SqlLinterService,
     private sqlValidatorService: SqlValidatorService,
-    private globalService: GlobalService,
-    private datasetService: DatasetService,
     private router: Router,
     private route: ActivatedRoute,
-    private messageService: MessageService,
-    private store: Store,
-    private cdr: ChangeDetectorRef,
-    private monacoLoader: MonacoLoaderService,
-    private translate: TranslateService,
-    private elementRef: ElementRef<HTMLElement>,
-    private readonly sheet: ResultSheetLayoutService,
-    private readonly grid: ResultGridToolsService,
-    private readonly tree: DatasetSchemaTreeService,
-  ) {}
+  ) {
+    super();
+  }
 
   /**
    * Lazy-fetch behaviour this screen asks for: skip a fetch already in flight,
@@ -531,13 +263,6 @@ export class AddDatasetComponent
 
   // ── SchemaTreeHost ──────────────────────────────────────────────
 
-  editorInstance(): any {
-    return this.editor;
-  }
-
-  selectedDatasourceRecord(): any | null {
-    return this.selectedDatasourceObj;
-  }
 
   /** Loaded list first, then preloaded — the order this screen already used. */
   dbTypeCandidates(): any[] {
@@ -567,30 +292,6 @@ export class AddDatasetComponent
   // ElementRef or a ChangeDetectorRef of their own, which keeps them free of any
   // dependency on this screen in particular.
 
-  /** The pane the sheet lives in; height is clamped against it, not the viewport. */
-  sheetPaneElement(): HTMLElement | null {
-    return this.elementRef.nativeElement.querySelector(
-      '.editor-results-area',
-    ) as HTMLElement | null;
-  }
-
-  requestRender(): void {
-    this.cdr.markForCheck();
-  }
-
-  /** Pane width changed materially — re-measure the result grid's columns. */
-  onPaneWidthChanged(): void {
-    this.grid.recalculateColumnWidths();
-  }
-
-  currentResult(): QueryResult | null {
-    return this.queryResult;
-  }
-
-  /** Close the datasource tree menu so two menus are never open at once. */
-  closeOtherMenus(): void {
-    this.showContextMenu = false;
-  }
 
   ngOnInit(): void {
     // Restore the user's preferred result-grid page size so a
@@ -726,12 +427,6 @@ export class AddDatasetComponent
     this.proceedWithDatasourceChange(ds);
   }
 
-  private initializeComponent(): void {
-    // Setup theme monitoring
-
-    // Close context menus on click outside
-    document.addEventListener('click', this.boundCloseContextMenu);
-  }
 
   onDatasourceChange(event: any): void {
     const selectedDb = event.value;
@@ -866,32 +561,6 @@ export class AddDatasetComponent
     this.loadDatasources();
   }
 
-  refreshSingleDatasource(dbId: string): void {
-    this.tree.refreshSingleDatasource(dbId);
-  }
-
-  refreshSelectedDatasource(): void {
-    if (!this.selectedDatasourceObj || !this.selectedDatasourceObj.id) return;
-    this.refreshSingleDatasource(this.selectedDatasourceObj.id);
-  }
-
-
-  /**
-   * Setup MutationObserver to watch for theme changes
-   */
-
-  /**
-   * Update Monaco Editor theme
-   */
-  private updateEditorTheme(): void {
-    if (this.editor) {
-    }
-  }
-
-  ngAfterViewInit(): void {
-    this.loadMonacoEditor();
-    this.sheet.installResizeObserver();
-  }
 
   ngOnChanges(changes: SimpleChanges): void {
     // Update editor content if initialQuery changes
@@ -945,29 +614,8 @@ export class AddDatasetComponent
     document.removeEventListener('click', this.boundCloseContextMenu);
   }
 
-  private loadMonacoEditor(): void {
-    this.monacoLoader
-      .load()
-      .then(() => {
-        this.initMonaco();
-      })
-      .catch(() => {
-        this.isLoadingEditor = false;
-        this.monacoLoadFailed = true;
-        this.showMonacoLoadError();
-        this.cdr.markForCheck();
-      });
-  }
 
-  private showMonacoLoadError(): void {}
-
-  retryLoadMonaco(): void {
-    this.monacoLoadFailed = false;
-    this.isLoadingEditor = true;
-    this.loadMonacoEditor();
-  }
-
-  private initMonaco(): void {
+  protected initMonaco(): void {
     if (!this.selectedDatasourceObj) {
       this.isLoadingEditor = false;
       this.cdr.markForCheck();
@@ -1080,149 +728,6 @@ export class AddDatasetComponent
     }, 100);
   }
 
-  /**
-   * Debounced dialect-aware lint pass. Re-parses the model with the
-   * active dialect's grammar, surfaces error nodes as Monaco markers.
-   * No-op when the feature flag is off so the rest of Phase 2 can ship
-   * without exposing this surface to users.
-   */
-  private scheduleDialectLint(): void {
-    if (!ENABLE_DIALECT_LINT) return;
-    if (!this.editor) return;
-    if (this.dialectLintTimer) clearTimeout(this.dialectLintTimer);
-    this.dialectLintTimer = setTimeout(() => {
-      this.dialectLintTimer = null;
-      this.runDialectLint();
-    }, DIALECT_LINT_DEBOUNCE_MS);
-  }
-
-  private runDialectLint(): void {
-    if (!this.editor) return;
-    const model = this.editor.getModel();
-    if (!model) return;
-    const dbType = this.selectedDatasourceObj?.config?.dbType ?? null;
-    const markers = this.sqlLinterService.lint(model.getValue(), dbType);
-    monaco.editor.setModelMarkers(
-      model,
-      AddDatasetComponent.DIALECT_LINT_OWNER,
-      markers,
-    );
-  }
-
-  /**
-   * Register IntelliSense providers
-   */
-  private registerIntelliSenseProviders(): void {
-    // Dispose previous providers if they exist
-    if (this.completionProviderDisposable) {
-      this.completionProviderDisposable.dispose();
-    }
-    if (this.hoverProviderDisposable) {
-      this.hoverProviderDisposable.dispose();
-    }
-    if (this.signatureHelpDisposable) {
-      this.signatureHelpDisposable.dispose();
-    }
-
-    // Register new providers and store disposables
-    if (this.editor) {
-      this.completionProviderDisposable =
-        this.monacoIntelliSenseService.registerSQLCompletions(
-          this.datasources,
-          this.editor,
-        );
-      this.hoverProviderDisposable =
-        this.monacoIntelliSenseService.registerHoverProvider(this.datasources);
-      this.signatureHelpDisposable =
-        this.monacoIntelliSenseService.registerSignatureHelpProvider();
-    }
-  }
-
-
-
-
-
-  /**
-   * Execute query - Smart execution based on selection
-   * If text is selected, runs selected SQL
-   * If no selection, runs current statement at cursor
-   */
-  executeQuery(): void {
-    if (!this.editor) return;
-    // Re-entry guard against double-firing while a query is already
-    // in flight. The previous version also bailed when
-    // `showResultsPopup` was true — a leftover from the modal era
-    // when the popup stole focus from Monaco. The docked sheet
-    // doesn't steal focus, so users expect Run / Ctrl+Enter to fire
-    // a fresh query whether or not the sheet is open.
-    if (this.isExecutingQuery) return;
-
-    const selection = this.editor.getSelection();
-    const hasSelection = selection && !selection.isEmpty();
-
-    if (hasSelection) {
-      // Execute selected text
-      const selectedText = this.editor.getModel().getValueInRange(selection);
-      if (selectedText.trim()) {
-        this.executeSelectedQuery(selectedText);
-        return;
-      }
-    }
-
-    // No selection, execute complete query
-    this.executeCompleteQuery();
-  }
-
-  /**
-   * Execute complete SQL query from editor
-   */
-  executeCompleteQuery(): void {
-    if (this.isExecutingQuery) return;
-    const query = this.editor?.getValue() || this.currentQuery;
-    this.resultPage = 1;
-    this.resultFilterValues = {};
-    // Deliberately leave `queryResult` in place until the new
-    // result lands. Nulling it would unmount the sheet (the
-    // *ngIf="queryResult" branch flips), flicker for the duration
-    // of the round-trip, then mount again. The pre-existing rows
-    // are correctly replaced when the new response arrives.
-    this.executeQueryForDatasource(query);
-  }
-
-  /**
-   * Execute selected SQL text from editor
-   * @param selectedText The selected SQL text to execute
-   */
-  executeSelectedQuery(selectedText: string): void {
-    if (this.isExecutingQuery) return;
-    this.resultPage = 1;
-    this.resultFilterValues = {};
-    // See executeCompleteQuery — same anti-flicker reasoning.
-    this.executeQueryForDatasource(selectedText);
-  }
-
-  clearEditor(): void {
-    if (this.editor) {
-      this.editor.setValue('');
-    }
-  }
-
-  exportCurrentScript(): void {
-    if (!this.editor || !this.selectedDatasourceObj) return;
-
-    const datasourceName = this.selectedDatasourceObj.name || 'datasource';
-    downloadTextFile(
-      this.editor.getValue(),
-      `${datasourceName}_script.sql`,
-      'text/plain',
-    );
-  }
-
-  triggerFileInput(): void {
-    if (this.fileInput) {
-      this.fileInput.nativeElement.click();
-    }
-  }
 
   /**
    * Import a .sql / .txt file into the editor.
@@ -1276,12 +781,6 @@ export class AddDatasetComponent
     });
   }
 
-  saveAsDataset(): void {
-    if (!this.selectedDatasourceObj) return;
-
-    // Show dialog
-    this.showDatasetDialog = true;
-  }
 
   onConfirmChange(saveFirst: boolean): void {
     if (saveFirst) {
@@ -1305,74 +804,6 @@ export class AddDatasetComponent
     this.pendingDatasourceChange = null;
   }
 
-  private resetEditor(): void {
-    // Clear query result
-    this.queryResult = null;
-
-    // Reset editor content if it exists
-    if (this.editor) {
-      this.editor.setValue(SQL_EDITOR_PLACEHOLDER);
-    }
-
-    // Reset current query
-    this.currentQuery = '';
-  }
-
-  onResultFilterChange(): void {
-    this.resultFilterSubject.next();
-  }
-
-  clearResultFilters(): void {
-    this.resultFilterValues = {};
-    this.resultPage = 1;
-    if (this.lastExecutedQuery) {
-      this.executeQueryForDatasource(
-        this.lastExecutedQuery,
-        1,
-        this.resultRows,
-      );
-    }
-  }
-
-  exportResultsAsCsv(): void {
-    if (!this.lastExecutedQuery || !this.selectedDatasourceObj?.id) return;
-
-    this.isExportingResults = true;
-
-    const payload = buildResultExportPayload(
-      this.selectedDatasourceObj.id,
-      this.lastExecutedQuery,
-      this.resultFilterValues,
-    );
-
-    this.queryService.exportQueryResults(payload).subscribe({
-      next: (blob: Blob) => {
-        const datasourceName = this.selectedDatasourceObj.name || 'datasource';
-        downloadBlob(blob, `${datasourceName}_query_results.csv`);
-        this.isExportingResults = false;
-        this.cdr.markForCheck();
-      },
-      error: (error: any) => {
-        this.isExportingResults = false;
-        this.cdr.markForCheck();
-        this.messageService.add({
-          severity: 'error',
-          summary: this.translate.instant('DATASET.EXPORT_FAILED'),
-          detail:
-            error.error?.message ||
-            error.message ||
-            this.translate.instant('DATASET.EXPORT_FAILED_DESC'),
-          key: 'topRight',
-          life: 3000,
-          styleClass: 'custom-toast',
-        });
-      },
-    });
-  }
-
-  get isResultFilterActive(): boolean {
-    return Object.values(this.resultFilterValues).some(v => !!v);
-  }
 
   onResultsLazyLoad(event: any): void {
     this.lastResultsLazyEvent = event;
@@ -1443,95 +874,7 @@ export class AddDatasetComponent
   }
 
 
-  /** Toggle the sheet between expanded and collapsed. */
-  toggleResultSheet(): void {
-    this.sheet.toggle();
-  }
-
-  /**
-   * Dismiss the sheet entirely. Clears the result so neither the
-   * expanded sheet nor the collapsed strip render. Distinct from
-   * `toggleResultSheet` which keeps the data alive and just hides
-   * the body. Re-running the query brings everything back; until
-   * then the editor pane reclaims the full pane height.
-   *
-   * Doesn't touch the persisted height / collapsed prefs — the
-   * user's preferred LAYOUT survives, only the current data is
-   * cleared.
-   */
-  dismissResultSheet(): void {
-    this.showResultsPopup = false;
-    this.queryResult = null;
-    // expandedJsonCells references row indices in queryResult; drop
-    // them so a fresh result starts with no expanded JSON cells.
-    this.grid.resetExpandedCells();
-  }
-
-  /**
-   * Surface the sheet for any new result — success, error, or
-   * empty / message-only. The previous code only auto-opened on
-   * the success branch, which meant a failed query produced no
-   * visible feedback when run from a closed sheet, and a query
-   * that returned a status message (DDL etc.) flashed nothing.
-   *
-   * Also flips the collapsed flag back to expanded — and writes
-   * the expand to localStorage so the user's preference syncs
-   * with their actual usage. The reasoning: a user who ran Run
-   * is asking to see the result. Honouring an older "collapsed"
-   * pref over that explicit action would be surprising. They can
-   * still collapse afterwards.
-   */
-  private surfaceResultSheet(): void {
-    this.showResultsPopup = true;
-    this.sheet.expand();
-    // Snap the table's internal "first row index" back to 0 so a
-    // 200-row → 7-row result transition doesn't leave the grid
-    // showing page 4 of nothing. PrimeNG's <p-table>.first is the
-    // index of the first row of the current page; setting it to 0
-    // is the minimal reset (filter inputs + sort survive — see
-    // .reset() if a fuller wipe is ever wanted).
-    if (this.resultsTable) {
-      this.resultsTable.first = 0;
-    }
-    this.resultPage = 1;
-  }
-
-  /**
-   * Effective sheet height in pixels. Collapsed state returns the
-   * stub height; otherwise the user-configured / persisted value.
-   * Templated into the host element's `--sheet-height` CSS variable
-   * so the editor pane can reserve matching `padding-bottom` and
-   * keep the SQL editor visible above the sheet.
-   */
-  get effectiveSheetHeightPx(): number {
-    return this.sheet.effectiveHeightPx(
-      this.showResultsPopup,
-      !!this.queryResult,
-    );
-  }
-
-  /**
-   * mousedown on the drag handle. Captures the starting Y +
-   * height so mousemove can compute the new height relative to
-   * the drag, not the absolute cursor position. The listeners
-   * attach to the document so dragging past the handle's bounds
-   * (which happens constantly with a 6px-tall target) still works.
-   */
-  onSheetDragStart(event: MouseEvent): void {
-    this.sheet.onDragStart(event);
-  }
-
-  /**
-   * Keyboard a11y for the drag handle. Arrow keys nudge the
-   * height; shift modifier is a larger step so power users can
-   * resize without flailing the arrow key. Persists on each
-   * keypress since there's no clear "release" moment.
-   */
-  onSheetHandleKeydown(event: KeyboardEvent): void {
-    this.sheet.onHandleKeydown(event);
-  }
-
-  private executeQueryForDatasource(
+  protected executeQueryForDatasource(
     query: string,
     page: number = 1,
     limit: number = this.resultRows,
@@ -1716,55 +1059,6 @@ export class AddDatasetComponent
     }
   }
 
-  /**
-   * Params panel emitted an updated config (a token was added/removed
-   * or a row's type/label/default/source changed). Store it so it rides
-   * along on the next save.
-   */
-  onParamsConfigChange(config: DatasetParamConfig[]): void {
-    this.paramsConfig = config;
-    this.cdr.markForCheck();
-  }
-
-  toggleDatasourceSidebar(): void {
-    this.showDatasourceSidebar = !this.showDatasourceSidebar;
-    // Trigger Monaco editor resize after sidebar animation
-    setTimeout(() => {
-      if (this.editor) {
-        this.editor.layout();
-      }
-    }, 300);
-  }
-
-  schemaPath(dbId: string, schemaName: string): string {
-    return this.tree.schemaPath(dbId, schemaName);
-  }
-
-  tablePath(dbId: string, schemaName: string, tableName: string): string {
-    return this.tree.tablePath(dbId, schemaName, tableName);
-  }
-
-  isExpanded(path: string): boolean {
-    return this.tree.isExpanded(path);
-  }
-
-
-
-  toggleDatasource(db: any): void {
-    this.tree.toggleDatasource(db);
-  }
-
-  toggleSchema(dbId: string, schemaName: string): void {
-    this.tree.toggleSchema(dbId, schemaName);
-  }
-
-  toggleTable(dbId: string, schemaName: string, tableName: string): void {
-    this.tree.toggleTable(dbId, schemaName, tableName);
-  }
-
-
-
-
 
   /**
    * Push the current `scopedSchemaUnavailable` state into Monaco's
@@ -1779,16 +1073,6 @@ export class AddDatasetComponent
     this.editor.updateOptions({ readOnly });
   }
 
-
-
-
-  isTableExpanded(
-    dbId: string,
-    schemaName: string,
-    tableName: string,
-  ): boolean {
-    return this.tree.isTableExpanded(dbId, schemaName, tableName);
-  }
 
   insertColumnName(
     dbId: string,
@@ -1815,147 +1099,13 @@ export class AddDatasetComponent
     this.editor.focus();
   }
 
-  onDatasourceContextMenu(event: MouseEvent, datasource: any): void {
-    event.preventDefault();
-    event.stopPropagation();
-
-    this.contextMenuDatasource = datasource;
-    this.contextMenuPosition = { x: event.clientX, y: event.clientY };
-
-    this.contextMenuItems = [
-      {
-        label: this.translate.instant('DATASET.REFRESH_SCHEMA'),
-        icon: 'pi pi-refresh',
-        command: () => this.refreshDatasourceFromContext(),
-      },
-    ];
-
-    this.showContextMenu = true;
-  }
-
-  closeContextMenu(): void {
-    this.showContextMenu = false;
-    this.contextMenuDatasource = null;
-    // The cell-level menu shares the global outside-click listener
-    // (see boundCloseContextMenu), so it closes from here too.
-    this.grid.closeCellContextMenu();
-  }
-
-  /**
-   * Right-click on a result-grid cell. Stashes which cell was
-   * targeted and positions the menu under the cursor. Stops the
-   * event from bubbling so the document-level click handler that
-   * dismisses other menus doesn't fire on this open event.
-   */
-  onCellContextMenu(event: MouseEvent, rowIndex: number, col: string): void {
-    this.grid.onCellContextMenu(event, rowIndex, col);
-  }
-
-  /**
-   * Copy the displayed value of the right-clicked cell to the
-   * clipboard. Uses formatCellValue so what gets copied matches
-   * what the user sees — BIGINT as the preserved string, dates
-   * in ISO 8601, JSON pretty-printed, NULL as the literal word
-   * "NULL". Skips the navigator.clipboard.writeText permission
-   * dance because the click handler runs inside a user gesture.
-   */
-  async copyCellValue(): Promise<void> {
-    await this.grid.copyCellValue();
-  }
-
-  /**
-   * Copy every value in the right-clicked column for the current
-   * page, joined with newlines. Common workflow: "grab all the
-   * email addresses out of this query result" — paste into a
-   * spreadsheet, done.
-   */
-  async copyColumnValues(): Promise<void> {
-    await this.grid.copyColumnValues();
-  }
-
-  /**
-   * Wrapper around navigator.clipboard.writeText that handles the
-   * "I'm in an insecure context" fallback (rare in this app since
-   * it ships HTTPS, but cheap to keep). Toasts the result either
-   * way so users know whether the action succeeded.
-   */
-
 
   // ── Client-side result export + profiling (Slice 4) ───────────────
 
   /** Base file name for exports — derived from the datasource. */
-  private exportBaseName(): string {
+  protected exportBaseName(): string {
     return buildExportBaseName([this.selectedDatasourceObj?.name]);
   }
 
-  /**
-   * Export the CURRENT in-memory preview rows to CSV, client-side. No
-   * BE call — mirrors what the grid shows. Distinct from
-   * `exportResultsAsCsv`, which streams the full server-side result.
-   */
-  exportResultsCsvClient(): void {
-    if (!this.queryResult?.columns?.length) return;
-    const csv = rowsToCsv(this.queryResult.columns, this.queryResult.rows);
-    downloadTextFile(
-      csv,
-      `${this.exportBaseName()}_preview.csv`,
-      'text/csv;charset=utf-8;',
-    );
-  }
 
-  /** Export the current in-memory preview rows to JSON, client-side. */
-  exportResultsJsonClient(): void {
-    if (!this.queryResult?.columns?.length) return;
-    const json = rowsToJson(this.queryResult.columns, this.queryResult.rows);
-    downloadTextFile(
-      json,
-      `${this.exportBaseName()}_preview.json`,
-      'application/json;charset=utf-8;',
-    );
-  }
-
-  /** Copy the current SQL editor content to the clipboard. */
-  async copySql(): Promise<void> {
-    const sql = this.editor?.getValue() || this.currentQuery || '';
-    await this.grid.writeToClipboard(sql);
-  }
-
-  /** Toggle the column-profiling strip; (re)compute on show. */
-  toggleColumnProfile(): void {
-    this.grid.toggleColumnProfile();
-  }
-
-  /** Recompute per-column profiles over the loaded preview rows. */
-
-
-  /** Template helper — traffic-light class for a null-% bar. */
-  nullSeverity(pct: number): 'good' | 'warn' | 'bad' {
-    return this.grid.nullSeverity(pct);
-  }
-
-  refreshDatasourceFromContext(): void {
-    if (!this.contextMenuDatasource) return;
-
-    // Refresh schema for this specific database
-    this.refreshSingleDatasource(this.contextMenuDatasource.id);
-
-    this.closeContextMenu();
-  }
-
-  /**
-   * Esc dismisses transient overlays (context menus, popovers).
-   * The docked result sheet is intentionally NOT in this list —
-   * with the modal-era popup, Esc made sense as "close the
-   * overlay above the editor"; in the docked sheet world the
-   * panel is part of the page layout, and an accidental Esc
-   * tap losing the result would be a footgun. Use the chevron
-   * (collapse) or × (dismiss) buttons in the sheet header.
-   */
-  @HostListener('document:keydown.escape')
-  onEscape(): void {
-    if (this.showContextMenu) {
-      this.closeContextMenu();
-      this.cdr.markForCheck();
-    }
-  }
 }
