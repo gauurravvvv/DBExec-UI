@@ -141,3 +141,57 @@ steps 2–4 there is no automated signal at all until
 `e2e/dataset-workbench.e2e.ts` exists. That suite is listed as step 1 of the
 2026-07-28 plan and remains the honest prerequisite: it is what makes a wrong
 winner fail loudly instead of silently.
+
+---
+
+## Addendum, 2026-07-29 — found while extracting the services
+
+### D7 — `initMonaco` must NOT be merged, and it hides three real gaps
+
+The decomposition deliberately left `initMonaco` (add 112 lines, edit 123) in both
+components. Its drift is not one difference behind a flag but roughly eight, and
+expressing them as options would obscure rather than clarify. More importantly,
+three of them are **defects in edit-dataset, not stylistic divergence**:
+
+| | add-dataset | edit-dataset |
+|---|---|---|
+| `sqlValidatorService` references | **4** | **0** |
+| `sqlFormatterService` references | **4** | **0** |
+| Ctrl+Enter to run | `CodeEditorService.addShortcut` | `editor.addCommand` |
+
+So on the **edit** screen:
+
+1. **There is no SQL validation.** `validate` / `validateDebounced` are never
+   called, so a syntax error draws no marker. Creating a dataset marks it;
+   editing one does not.
+2. **The formatter is never registered** — no formatting provider, no
+   format action in the editor's context menu.
+3. **Ctrl+Enter is dead.** It is bound through `editor.addCommand`, which was
+   measured during the Monaco migration as never binding in this app; that is
+   precisely why `CodeEditorService.addShortcut` exists and is implemented on
+   `onKeyDown` instead. add-dataset goes through the service; edit-dataset does not.
+
+Also add-only in that method: `readOnly: this.scopedSchemaUnavailable` (scoped
+launch) and seeding `paramsSql` from the initial query.
+
+**Recommended fix (a behaviour change, hence not done here):** bring edit-dataset
+up to add-dataset — register the validator and formatter, and move Ctrl+Enter onto
+`addShortcut`. Verify with the editor-parity suite plus a new leg asserting a
+marker appears for bad SQL on *both* screens.
+
+### D8 — the remaining identical members belong on a base class, not a helper
+
+After the service extractions, the members still shared by both components and
+byte-identical are `registerIntelliSenseProviders` (25), `scheduleDialectLint` (9),
+`runDialectLint` (12), `loadMonacoEditor` (13), `retryLoadMonaco` (5),
+`updateEditorTheme` (4), `showMonacoLoadError` (1), `onResultFilterChange` (3),
+`clearResultFilters` (11), `isResultFilterActive` (3), `isPaginationEnabled` (3) —
+plus all ~26 service proxies and host methods, which the extraction made identical.
+
+These are stateful (they touch `editor`, `cdr` and injected services), so they
+cannot become free functions. Extracting them into a "monaco setup helper" would
+mean threading five or six callbacks through it for no comprehension gain. The
+correct home is the shared abstract base component, which is now a much better
+proposition than it was before the services landed — the two screens are far more
+alike. That is the next task, and it should be done **after** the functional e2e
+exists.
