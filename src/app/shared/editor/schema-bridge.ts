@@ -29,10 +29,10 @@ import {
 /**
  * Minimal structural types, declared here rather than imported.
  *
- * The dataset module's equivalents live in a `dummy-data.helper`, and importing
- * from a feature module into `shared/` is the layering violation this file
- * exists to avoid. Structural typing means the projection is still assignable
- * wherever the service expects its own interface.
+ * The dataset module's equivalents live in `dataset/models/dataset-schema.model`,
+ * and importing from a feature module into `shared/` is the layering violation
+ * this file exists to avoid. Structural typing means the projection is still
+ * assignable wherever the service expects its own interface.
  */
 /**
  * Must match the dataset module's `TableColumn` field-for-field.

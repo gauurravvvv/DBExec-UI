@@ -43,7 +43,7 @@ import {
   DatasourceSchema,
   QueryExecuteData,
   QueryResult,
-} from '../../helpers/dummy-data.helper';
+} from '../../models/dataset-schema.model';
 import {
   formatCellValue,
   measureColumnWidths,

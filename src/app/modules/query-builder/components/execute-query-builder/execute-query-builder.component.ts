@@ -25,7 +25,7 @@ import { DATASET, QUERY_BUILDER } from 'src/app/core/constants/routes.constant';
 
 import { TranslateService } from '@ngx-translate/core';
 import { GlobalService } from 'src/app/core/services/global.service';
-import { QueryResult } from '../../../dataset/helpers/dummy-data.helper';
+import { QueryResult } from '../../../dataset/models/dataset-schema.model';
 import { DatasetService } from '../../../dataset/services/dataset.service';
 import { QueryService } from '../../../dataset/services/query.service';
 import { QueryBuilderService } from '../../services/query-builder.service';

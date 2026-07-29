@@ -20,7 +20,7 @@
  *    context detection and diagnostics ranges.
  */
 
-import { TableSchema } from '../helpers/dummy-data.helper';
+import { TableSchema } from '../models/dataset-schema.model';
 
 /** Resolved table reference from the query text */
 export interface TableRef {

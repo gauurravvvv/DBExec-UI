@@ -5,7 +5,7 @@ import {
   DatasourceSchema,
   TableColumn,
   TableSchema,
-} from '../helpers/dummy-data.helper';
+} from '../models/dataset-schema.model';
 import { CursorScope, findScopeAt } from './sql-scope-tracker';
 import {
   RESERVED_WORDS,

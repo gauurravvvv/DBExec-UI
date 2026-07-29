@@ -4,7 +4,7 @@ import {
   SchemaGroup,
   TableColumn,
   TableSchema,
-} from './dummy-data.helper';
+} from '../models/dataset-schema.model';
 
 /**
  * Shape of a single column entry as returned by POST /api/v1/queries/structure.
