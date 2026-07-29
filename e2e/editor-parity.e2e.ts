@@ -26,7 +26,12 @@
  */
 import { expect, Page, test } from '@playwright/test';
 
-import { authToken, firstConnection, login } from './_auth';
+import {
+  authToken,
+  connectableDatasourceId,
+  firstConnection,
+  login,
+} from './_auth';
 
 const DATASET_ID = '929bdfcc-cc8c-43e2-a18d-b24fb1247cc3';
 const OUT = '/Users/gaurav.goel/code/Personal/DBExec/screenshots';
@@ -183,20 +188,28 @@ test.describe('editor parity across the three modules', () => {
     // The create route is /new and edit is /:id/edit — not /add and /edit/:id.
     await page.goto('/app/datasets/new', { waitUntil: 'domcontentloaded' });
     await page.waitForTimeout(2500);
-    // The SQL editor only mounts once a datasource is chosen.
-    const ds = page.locator('app-custom-dropdown').first();
-    if (await ds.isVisible().catch(() => false)) {
-      await ds.click();
-      await page.waitForTimeout(900);
-      await page.locator('.p-dropdown-item, li[role="option"]').first().click().catch(() => undefined);
-      await page.waitForTimeout(2500);
+    // The SQL editor only mounts once a datasource is chosen — and it must be one
+    // that can actually connect. Picking the first dropdown option selects the
+    // newest datasource, which in this environment is often a migration-import
+    // stub whose schema call answers 500; the editor then never mounts and this
+    // spec reports a styling regression that isn't one.
+    const goodDs = await connectableDatasourceId(page, await authToken(page));
+    if (goodDs) {
+      await page.goto(`/app/datasets/new?datasourceId=${goodDs}`, {
+        waitUntil: 'domcontentloaded',
+      });
+      await page.waitForTimeout(3000);
     }
     if (await page.locator('.monaco-editor').first().isVisible().catch(() => false)) {
       await waitForMonaco(page);
       samples.push(await sample(page, 'dataset-add'));
       await page.screenshot({ path: `${OUT}/61-parity-dataset-add.png` });
     } else {
-      console.log('dataset-add: editor did not mount (no datasource selectable) — skipped');
+      console.log(
+        goodDs
+          ? 'dataset-add: editor did not mount despite a connectable datasource'
+          : 'dataset-add: skipped — no datasource in this environment can connect',
+      );
     }
 
     // ── 3. Dataset Editor ──────────────────────────────────────────────────
