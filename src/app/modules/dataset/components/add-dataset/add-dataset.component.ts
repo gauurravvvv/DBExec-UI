@@ -44,10 +44,6 @@ import {
   QueryExecuteData,
   QueryResult,
 } from '../../models/dataset-schema.model';
-import {
-  formatCellValue,
-  measureColumnWidths,
-} from '../../helpers/cell-formatter.helper';
 import { SchemaTransformerHelper } from '../../helpers/schema-transformer.helper';
 import {
   ContextMenuItem,
@@ -70,8 +66,6 @@ import { DatasetParamConfig } from '../../helpers/param-tokens.helper';
 import {
   ColumnProfile,
   downloadTextFile,
-  nullPctSeverity,
-  profileColumns,
   rowsToCsv,
   rowsToJson,
 } from '../../helpers/dataset-result-tools.helper';
@@ -81,6 +75,14 @@ import {
   exportBaseName as buildExportBaseName,
   readSqlFile,
 } from '../../helpers/dataset-export.helper';
+import {
+  ResultSheetHost,
+  ResultSheetLayoutService,
+} from '../../services/result-sheet-layout.service';
+import {
+  ResultGridHost,
+  ResultGridToolsService,
+} from '../../services/result-grid-tools.service';
 
 // Declare Monaco and window for TypeScript
 declare const monaco: any;
@@ -98,9 +100,19 @@ import {
   styleUrls: ['./add-dataset.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
   animations: [expandAnimation],
+  // Component-scoped: the sheet height, the drag in progress and the grid's
+  // expanded cells all belong to THIS screen's result pane, never shared.
+  providers: [ResultSheetLayoutService, ResultGridToolsService],
 })
 export class AddDatasetComponent
-  implements OnInit, OnDestroy, AfterViewInit, OnChanges, HasUnsavedChanges
+  implements
+    OnInit,
+    OnDestroy,
+    AfterViewInit,
+    OnChanges,
+    HasUnsavedChanges,
+    ResultSheetHost,
+    ResultGridHost
 {
   /**
    * Size cap for an imported .sql / .txt script.
@@ -150,8 +162,7 @@ export class AddDatasetComponent
    * the header doesn't read as a wall of em-dashes.
    */
   get hasAnyColumnType(): boolean {
-    const types = this.queryResult?.columnTypes;
-    return !!types && Object.keys(types).length > 0;
+    return this.grid.hasAnyColumnType();
   }
 
   /**
@@ -163,30 +174,24 @@ export class AddDatasetComponent
    * because column names alone aren't unique across rows.
    * Cleared on each new query result (see executeQuery handlers).
    */
-  expandedJsonCells = new Set<string>();
+  get expandedJsonCells(): Set<string> {
+    return this.grid.expandedJsonCells;
+  }
+  set expandedJsonCells(cells: Set<string>) {
+    this.grid.expandedJsonCells = cells;
+  }
 
   /**
-   * Per-column pixel width applied to the result grid's <colgroup>.
-   * Computed once per result via measureColumnWidths so columns
-   * auto-fit their content instead of all sharing equal width.
-   * Once applied, PrimeNG's [resizableColumns] lets the user drag
-   * column borders to adjust; we don't write back to this map
-   * during drag (PrimeNG manages the live width via the DOM).
-   * Reset on every new query so stale widths don't bleed across
-   * result sets.
+   * Per-column pixel width for the result grid's <colgroup>, measured by
+   * ResultGridToolsService. PrimeNG's [resizableColumns] then lets the user drag
+   * borders; the live width during a drag is PrimeNG's own DOM state, not this map.
    */
-  columnWidths: Record<string, number> = {};
+  get columnWidths(): Record<string, number> {
+    return this.grid.columnWidths;
+  }
 
-  /**
-   * ResizeObserver watching the editor-results-area so the result
-   * grid's column widths re-flow when the pane resizes (sidebar
-   * toggle, browser window, sheet drag). Set in ngAfterViewInit,
-   * disconnected in ngOnDestroy. Debounced via a small timer to
-   * avoid thrashing on a live drag.
-   */
-  private paneResizeObserver: ResizeObserver | null = null;
-  private paneResizeTimer: any = null;
-  private lastObservedPaneWidth = 0;
+  // The pane ResizeObserver, its debounce timer and the last observed width live
+  // on ResultSheetLayoutService, which also disposes them.
 
   /**
    * Cell-level right-click context menu state. Standard fare in
@@ -209,30 +214,26 @@ export class AddDatasetComponent
    * click (handled by the existing boundCloseContextMenu listener)
    * or after a menu item is invoked.
    */
-  showCellContextMenu = false;
-  cellContextMenuTop = 0;
-  cellContextMenuLeft = 0;
-  private cellContextTarget: { rowIndex: number; col: string } | null = null;
+  get showCellContextMenu(): boolean {
+    return this.grid.showCellContextMenu;
+  }
+  get cellContextMenuTop(): number {
+    return this.grid.cellContextMenuTop;
+  }
+  get cellContextMenuLeft(): number {
+    return this.grid.cellContextMenuLeft;
+  }
 
   /** Stable key for the expanded-set above. */
   jsonCellKey(rowIndex: number, col: string): string {
-    return `${rowIndex}-${col}`;
+    return this.grid.jsonCellKey(rowIndex, col);
   }
 
   /** Toggle the expanded state for one JSON cell. The template
    *  reads `expandedJsonCells.has(key)` to decide between the
    *  summary line and the multi-line `<pre>`. */
   toggleJsonCell(rowIndex: number, col: string): void {
-    const key = this.jsonCellKey(rowIndex, col);
-    if (this.expandedJsonCells.has(key)) {
-      this.expandedJsonCells.delete(key);
-    } else {
-      this.expandedJsonCells.add(key);
-    }
-    // Mutating the Set in place doesn't trip OnPush — re-assign
-    // so the @Input-style equality checks fire. (Cheap; Set
-    // construction over a tiny set is negligible.)
-    this.expandedJsonCells = new Set(this.expandedJsonCells);
+    this.grid.toggleJsonCell(rowIndex, col);
   }
 
   datasources: DatasourceSchema[] = [];
@@ -316,9 +317,13 @@ export class AddDatasetComponent
 
   // ── Result export + profiling (Slice 4) ───────────────────────────
   /** Toggle for the client-side column-profiling strip. */
-  showColumnProfile = false;
+  get showColumnProfile(): boolean {
+    return this.grid.showColumnProfile;
+  }
   /** Cached profiles for the current preview rows. */
-  columnProfiles: ColumnProfile[] = [];
+  get columnProfiles(): ColumnProfile[] {
+    return this.grid.columnProfiles;
+  }
 
   // Results bottom sheet
   showResultsPopup = false;
@@ -331,29 +336,22 @@ export class AddDatasetComponent
   private lastResultsLazyEvent: any = null;
 
   /**
-   * Sheet height in pixels. Default lands at ~45% of viewport but
-   * never tinier than 240px (single row + paginator + header) nor
-   * larger than viewport - 100px (keep some editor visible). Drag
-   * handle clamps to the same range. Persisted across sessions
-   * once the user adjusts it.
+   * Sheet height and collapsed state live on ResultSheetLayoutService; these
+   * proxies keep the template bindings working unchanged.
    */
-  resultSheetHeightPx = 420;
+  get resultSheetHeightPx(): number {
+    return this.sheet.heightPx;
+  }
+  set resultSheetHeightPx(px: number) {
+    this.sheet.heightPx = px;
+  }
 
-  /**
-   * When true the sheet collapses to its 40px-tall header strip
-   * — the user can still see row count + Export + Show button.
-   * Re-running the query auto-expands. Persisted across sessions.
-   */
-  isResultSheetCollapsed = false;
-
-  /** Active drag state. While truthy, mousemove updates the
-   *  height live and mouseup persists. */
-  private sheetDragState: {
-    startY: number;
-    startHeight: number;
-    onMove: (ev: MouseEvent) => void;
-    onUp: () => void;
-  } | null = null;
+  get isResultSheetCollapsed(): boolean {
+    return this.sheet.isCollapsed;
+  }
+  set isResultSheetCollapsed(collapsed: boolean) {
+    this.sheet.isCollapsed = collapsed;
+  }
 
   get isPaginationEnabled(): boolean {
     return !!this.queryResult;
@@ -501,7 +499,40 @@ export class AddDatasetComponent
     private monacoLoader: MonacoLoaderService,
     private translate: TranslateService,
     private elementRef: ElementRef<HTMLElement>,
+    private readonly sheet: ResultSheetLayoutService,
+    private readonly grid: ResultGridToolsService,
   ) {}
+
+  // ── ResultSheetHost / ResultGridHost ────────────────────────────
+  //
+  // The two result-pane services reach back through these rather than taking an
+  // ElementRef or a ChangeDetectorRef of their own, which keeps them free of any
+  // dependency on this screen in particular.
+
+  /** The pane the sheet lives in; height is clamped against it, not the viewport. */
+  sheetPaneElement(): HTMLElement | null {
+    return this.elementRef.nativeElement.querySelector(
+      '.editor-results-area',
+    ) as HTMLElement | null;
+  }
+
+  requestRender(): void {
+    this.cdr.markForCheck();
+  }
+
+  /** Pane width changed materially — re-measure the result grid's columns. */
+  onPaneWidthChanged(): void {
+    this.grid.recalculateColumnWidths();
+  }
+
+  currentResult(): QueryResult | null {
+    return this.queryResult;
+  }
+
+  /** Close the datasource tree menu so two menus are never open at once. */
+  closeOtherMenus(): void {
+    this.showContextMenu = false;
+  }
 
   ngOnInit(): void {
     // Restore the user's preferred result-grid page size so a
@@ -511,7 +542,9 @@ export class AddDatasetComponent
     this.loadPersistedPageSize();
     // Same idea for the bottom sheet's height + collapsed state.
     // First-run users get a sensible 45vh default.
-    this.loadPersistedSheetState();
+    this.sheet.attach(this);
+    this.grid.attach(this);
+    this.sheet.loadPersisted();
 
     // Setup debounce for result filter changes
     this.resultFilterSubject
@@ -823,7 +856,7 @@ export class AddDatasetComponent
 
   ngAfterViewInit(): void {
     this.loadMonacoEditor();
-    this.installResultPaneResizeObserver();
+    this.sheet.installResizeObserver();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -839,15 +872,9 @@ export class AddDatasetComponent
 
   ngOnDestroy(): void {
     this.resultFilterSubject.complete();
-
-    if (this.paneResizeObserver) {
-      this.paneResizeObserver.disconnect();
-      this.paneResizeObserver = null;
-    }
-    if (this.paneResizeTimer) {
-      clearTimeout(this.paneResizeTimer);
-      this.paneResizeTimer = null;
-    }
+    // The pane observer, its debounce timer and any in-flight sheet drag are
+    // disposed by ResultSheetLayoutService's own ngOnDestroy, which Angular runs
+    // for a component-provided service.
 
     if (this.editor) {
       // Through the handle: it disposes the editor plus every listener and
@@ -1604,93 +1631,10 @@ export class AddDatasetComponent
     }
   }
 
-  // ── Bottom-sheet drag + persistence ─────────────────────────────
-  private static readonly SHEET_HEIGHT_STORAGE_KEY =
-    'dbexec.queryResult.sheetHeightPx';
-  private static readonly SHEET_COLLAPSED_STORAGE_KEY =
-    'dbexec.queryResult.sheetCollapsed';
-  private static readonly SHEET_MIN_HEIGHT = 240;
-  /** Reserve at least this many pixels of editor visible above the
-   *  sheet so a maximised sheet doesn't hide the SQL the user is
-   *  iterating on. */
-  private static readonly SHEET_MAX_HEIGHT_PADDING = 120;
 
-  private clampSheetHeight(px: number): number {
-    // Clamp the sheet to the editor-results-area's available
-    // height, not the viewport, since the sheet lives inside that
-    // pane. Fall back to viewport - padding if we can't measure
-    // (initial render before the host is mounted).
-    const host = this.elementRef.nativeElement.querySelector(
-      '.editor-results-area',
-    ) as HTMLElement | null;
-    const containerHeight =
-      host?.getBoundingClientRect().height ?? window.innerHeight;
-    const max = Math.max(
-      AddDatasetComponent.SHEET_MIN_HEIGHT,
-      containerHeight - AddDatasetComponent.SHEET_MAX_HEIGHT_PADDING,
-    );
-    return Math.min(max, Math.max(AddDatasetComponent.SHEET_MIN_HEIGHT, px));
-  }
-
-  /** Read persisted sheet height + collapsed state on init. */
-  private loadPersistedSheetState(): void {
-    try {
-      const raw = localStorage.getItem(
-        AddDatasetComponent.SHEET_HEIGHT_STORAGE_KEY,
-      );
-      if (raw) {
-        const parsed = parseInt(raw, 10);
-        if (Number.isFinite(parsed)) {
-          this.resultSheetHeightPx = this.clampSheetHeight(parsed);
-        }
-      } else {
-        // No persisted value yet — pick a sensible default
-        // (45% of viewport, clamped) so the first-time experience
-        // looks intentional rather than tiny or huge.
-        this.resultSheetHeightPx = this.clampSheetHeight(
-          Math.round(window.innerHeight * 0.45),
-        );
-      }
-      const collapsedRaw = localStorage.getItem(
-        AddDatasetComponent.SHEET_COLLAPSED_STORAGE_KEY,
-      );
-      this.isResultSheetCollapsed = collapsedRaw === 'true';
-    } catch (_) {
-      // Same defensive fallback as page-size persistence.
-    }
-  }
-
-  private persistSheetHeight(px: number): void {
-    try {
-      localStorage.setItem(
-        AddDatasetComponent.SHEET_HEIGHT_STORAGE_KEY,
-        String(Math.round(px)),
-      );
-    } catch (_) {
-      /* localStorage may be unavailable */
-    }
-  }
-
-  private persistSheetCollapsed(collapsed: boolean): void {
-    try {
-      localStorage.setItem(
-        AddDatasetComponent.SHEET_COLLAPSED_STORAGE_KEY,
-        collapsed ? 'true' : 'false',
-      );
-    } catch (_) {
-      /* localStorage may be unavailable */
-    }
-  }
-
-  /**
-   * Toggle expanded/collapsed. Closing the modal-style × used to
-   * unmount the entire result set; the bottom-sheet pattern keeps
-   * the data around so users can iterate on their SQL without
-   * watching the result panel flash in and out.
-   */
+  /** Toggle the sheet between expanded and collapsed. */
   toggleResultSheet(): void {
-    this.isResultSheetCollapsed = !this.isResultSheetCollapsed;
-    this.persistSheetCollapsed(this.isResultSheetCollapsed);
+    this.sheet.toggle();
   }
 
   /**
@@ -1709,9 +1653,7 @@ export class AddDatasetComponent
     this.queryResult = null;
     // expandedJsonCells references row indices in queryResult; drop
     // them so a fresh result starts with no expanded JSON cells.
-    if (this.expandedJsonCells.size > 0) {
-      this.expandedJsonCells = new Set();
-    }
+    this.grid.resetExpandedCells();
   }
 
   /**
@@ -1728,62 +1670,9 @@ export class AddDatasetComponent
    * pref over that explicit action would be surprising. They can
    * still collapse afterwards.
    */
-  /**
-   * Hook up a ResizeObserver on .editor-results-area so the
-   * result grid's column widths re-flow when the pane resizes.
-   * Triggers on sidebar toggle, window resize, and sheet drag —
-   * all the cases where the available container width changes.
-   *
-   * Debounced (80ms) so a live drag doesn't recompute widths 60
-   * times a second. Skips work when there's no queryResult OR
-   * when the width hasn't changed by at least 50px (avoids
-   * micro-jitter from sub-pixel layout shifts).
-   */
-  private installResultPaneResizeObserver(): void {
-    if (typeof ResizeObserver === 'undefined') return;
-    const pane = this.elementRef.nativeElement.querySelector(
-      '.editor-results-area',
-    ) as HTMLElement | null;
-    if (!pane) return;
-    this.lastObservedPaneWidth = pane.getBoundingClientRect().width;
-    this.paneResizeObserver = new ResizeObserver(entries => {
-      const entry = entries[0];
-      if (!entry) return;
-      const width = entry.contentRect.width;
-      if (Math.abs(width - this.lastObservedPaneWidth) < 50) return;
-      this.lastObservedPaneWidth = width;
-      if (this.paneResizeTimer) clearTimeout(this.paneResizeTimer);
-      this.paneResizeTimer = setTimeout(() => {
-        this.recalculateColumnWidths();
-        this.paneResizeTimer = null;
-      }, 80);
-    });
-    this.paneResizeObserver.observe(pane);
-  }
-
-  /**
-   * Re-run measureColumnWidths against the current data. Columns sit
-   * at their natural measured widths — if total < container, the
-   * trailing strip is empty (matches DBeaver / DataGrip). No
-   * last-column inflation: that produced a multi-hundred-px "location"
-   * column when other columns were narrow, which read as broken.
-   */
-  private recalculateColumnWidths(): void {
-    if (!this.queryResult || !this.queryResult.columns?.length) return;
-    this.columnWidths = measureColumnWidths(
-      this.queryResult.columns,
-      this.queryResult.rows,
-      this.queryResult.columnTypes,
-    );
-    this.cdr.markForCheck();
-  }
-
   private surfaceResultSheet(): void {
     this.showResultsPopup = true;
-    if (this.isResultSheetCollapsed) {
-      this.isResultSheetCollapsed = false;
-      this.persistSheetCollapsed(false);
-    }
+    this.sheet.expand();
     // Snap the table's internal "first row index" back to 0 so a
     // 200-row → 7-row result transition doesn't leave the grid
     // showing page 4 of nothing. PrimeNG's <p-table>.first is the
@@ -1804,8 +1693,10 @@ export class AddDatasetComponent
    * keep the SQL editor visible above the sheet.
    */
   get effectiveSheetHeightPx(): number {
-    if (!this.showResultsPopup || !this.queryResult) return 0;
-    return this.isResultSheetCollapsed ? 44 : this.resultSheetHeightPx;
+    return this.sheet.effectiveHeightPx(
+      this.showResultsPopup,
+      !!this.queryResult,
+    );
   }
 
   /**
@@ -1816,31 +1707,7 @@ export class AddDatasetComponent
    * (which happens constantly with a 6px-tall target) still works.
    */
   onSheetDragStart(event: MouseEvent): void {
-    event.preventDefault();
-    if (this.isResultSheetCollapsed) return;
-    const startY = event.clientY;
-    const startHeight = this.resultSheetHeightPx;
-
-    const onMove = (ev: MouseEvent) => {
-      // Dragging the handle UP grows the sheet; DOWN shrinks it.
-      const delta = startY - ev.clientY;
-      this.resultSheetHeightPx = this.clampSheetHeight(startHeight + delta);
-      this.cdr.markForCheck();
-    };
-
-    const onUp = () => {
-      document.removeEventListener('mousemove', onMove);
-      document.removeEventListener('mouseup', onUp);
-      this.persistSheetHeight(this.resultSheetHeightPx);
-      this.sheetDragState = null;
-      // Remove the cursor override + body class.
-      document.body.classList.remove('ds-sheet-dragging');
-    };
-
-    this.sheetDragState = { startY, startHeight, onMove, onUp };
-    document.body.classList.add('ds-sheet-dragging');
-    document.addEventListener('mousemove', onMove);
-    document.addEventListener('mouseup', onUp);
+    this.sheet.onDragStart(event);
   }
 
   /**
@@ -1850,19 +1717,7 @@ export class AddDatasetComponent
    * keypress since there's no clear "release" moment.
    */
   onSheetHandleKeydown(event: KeyboardEvent): void {
-    if (this.isResultSheetCollapsed) return;
-    const step = event.shiftKey ? 80 : 20;
-    let next = this.resultSheetHeightPx;
-    if (event.key === 'ArrowUp') {
-      next = this.resultSheetHeightPx + step;
-    } else if (event.key === 'ArrowDown') {
-      next = this.resultSheetHeightPx - step;
-    } else {
-      return;
-    }
-    event.preventDefault();
-    this.resultSheetHeightPx = this.clampSheetHeight(next);
-    this.persistSheetHeight(this.resultSheetHeightPx);
+    this.sheet.onHandleKeydown(event);
   }
 
   private executeQueryForDatasource(
@@ -1955,23 +1810,12 @@ export class AddDatasetComponent
             query: data.query,
           };
 
-          // Auto-fit column widths to the content of this result,
-          // then flex the last column to absorb leftover container
-          // Columns sit at their natural measured widths. If the
-          // total is narrower than the container, the trailing strip
-          // stays blank — same as DBeaver / DataGrip. The previous
-          // flexLastColumn step inflated the rightmost column to
-          // absorb leftover space, which read as broken when the
-          // other columns were narrow (e.g. id + name + location).
-          this.columnWidths = measureColumnWidths(
-            this.queryResult.columns,
-            this.queryResult.rows,
-            this.queryResult.columnTypes,
-          );
+          // Auto-fit column widths to this result's content.
+          this.grid.recalculateColumnWidths();
 
           // Refresh the profiling strip against the new rows (only when
           // it's currently visible — otherwise it recomputes on open).
-          if (this.showColumnProfile) this.recomputeColumnProfiles();
+          if (this.showColumnProfile) this.grid.recomputeColumnProfiles();
 
           if (this.queryResult.columns.length > 0) {
             this.surfaceResultSheet();
@@ -2574,10 +2418,9 @@ export class AddDatasetComponent
   closeContextMenu(): void {
     this.showContextMenu = false;
     this.contextMenuDatasource = null;
-    // Cell-level menu shares the global outside-click listener
-    // (see boundCloseContextMenu) so we close it from here too.
-    this.showCellContextMenu = false;
-    this.cellContextTarget = null;
+    // The cell-level menu shares the global outside-click listener
+    // (see boundCloseContextMenu), so it closes from here too.
+    this.grid.closeCellContextMenu();
   }
 
   /**
@@ -2587,15 +2430,7 @@ export class AddDatasetComponent
    * dismisses other menus doesn't fire on this open event.
    */
   onCellContextMenu(event: MouseEvent, rowIndex: number, col: string): void {
-    if (!this.queryResult) return;
-    event.preventDefault();
-    event.stopPropagation();
-    // Close any other menu first so we don't end up with two open.
-    this.showContextMenu = false;
-    this.cellContextTarget = { rowIndex, col };
-    this.cellContextMenuLeft = event.clientX;
-    this.cellContextMenuTop = event.clientY;
-    this.showCellContextMenu = true;
+    this.grid.onCellContextMenu(event, rowIndex, col);
   }
 
   /**
@@ -2607,16 +2442,7 @@ export class AddDatasetComponent
    * dance because the click handler runs inside a user gesture.
    */
   async copyCellValue(): Promise<void> {
-    if (!this.cellContextTarget || !this.queryResult) return;
-    const { rowIndex, col } = this.cellContextTarget;
-    const raw = this.queryResult.rows?.[rowIndex]?.[col];
-    const cell = formatCellValue(raw, this.queryResult.columnTypes?.[col]);
-    const text =
-      cell.kind === 'null'
-        ? this.translate.instant('DATASET.CELL_NULL')
-        : cell.display;
-    await this.writeToClipboard(text);
-    this.closeContextMenu();
+    await this.grid.copyCellValue();
   }
 
   /**
@@ -2626,17 +2452,7 @@ export class AddDatasetComponent
    * spreadsheet, done.
    */
   async copyColumnValues(): Promise<void> {
-    if (!this.cellContextTarget || !this.queryResult) return;
-    const { col } = this.cellContextTarget;
-    const lines = (this.queryResult.rows || []).map(row => {
-      const cell = formatCellValue(
-        row?.[col],
-        this.queryResult?.columnTypes?.[col],
-      );
-      return cell.kind === 'null' ? '' : cell.display;
-    });
-    await this.writeToClipboard(lines.join('\n'));
-    this.closeContextMenu();
+    await this.grid.copyColumnValues();
   }
 
   /**
@@ -2645,34 +2461,7 @@ export class AddDatasetComponent
    * it ships HTTPS, but cheap to keep). Toasts the result either
    * way so users know whether the action succeeded.
    */
-  private async writeToClipboard(text: string): Promise<void> {
-    try {
-      if (navigator.clipboard?.writeText) {
-        await navigator.clipboard.writeText(text);
-      } else {
-        // Fallback for non-secure contexts. Creates a hidden
-        // textarea, selects it, runs document.execCommand('copy').
-        const ta = document.createElement('textarea');
-        ta.value = text;
-        ta.setAttribute('readonly', '');
-        ta.style.position = 'absolute';
-        ta.style.left = '-9999px';
-        document.body.appendChild(ta);
-        ta.select();
-        document.execCommand('copy');
-        document.body.removeChild(ta);
-      }
-      // showInfo is the quiet toast — copy is a frequent action,
-      // a success-coloured banner would be obnoxious.
-      this.globalService.showInfo(this.translate.instant('DATASET.COPIED'));
-    } catch (_) {
-      // Clipboard write can throw on permission denial — surface
-      // the failure rather than silently swallowing.
-      this.globalService.showWarn(
-        this.translate.instant('DATASET.COPY_FAILED'),
-      );
-    }
-  }
+
 
   // ── Client-side result export + profiling (Slice 4) ───────────────
 
@@ -2710,31 +2499,20 @@ export class AddDatasetComponent
   /** Copy the current SQL editor content to the clipboard. */
   async copySql(): Promise<void> {
     const sql = this.editor?.getValue() || this.currentQuery || '';
-    await this.writeToClipboard(sql);
+    await this.grid.writeToClipboard(sql);
   }
 
   /** Toggle the column-profiling strip; (re)compute on show. */
   toggleColumnProfile(): void {
-    this.showColumnProfile = !this.showColumnProfile;
-    if (this.showColumnProfile) this.recomputeColumnProfiles();
-    this.cdr.markForCheck();
+    this.grid.toggleColumnProfile();
   }
 
   /** Recompute per-column profiles over the loaded preview rows. */
-  private recomputeColumnProfiles(): void {
-    if (!this.queryResult?.columns?.length) {
-      this.columnProfiles = [];
-      return;
-    }
-    this.columnProfiles = profileColumns(
-      this.queryResult.columns,
-      this.queryResult.rows,
-    );
-  }
+
 
   /** Template helper — traffic-light class for a null-% bar. */
   nullSeverity(pct: number): 'good' | 'warn' | 'bad' {
-    return nullPctSeverity(pct);
+    return this.grid.nullSeverity(pct);
   }
 
   refreshDatasourceFromContext(): void {

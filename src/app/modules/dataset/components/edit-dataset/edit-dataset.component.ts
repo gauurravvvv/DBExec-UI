@@ -37,10 +37,7 @@ import {
   QueryExecuteData,
   QueryResult,
 } from '../../models/dataset-schema.model';
-import {
-  formatCellValue,
-  measureColumnWidths,
-} from '../../helpers/cell-formatter.helper';
+import { measureColumnWidths } from '../../helpers/cell-formatter.helper';
 import { SchemaTransformerHelper } from '../../helpers/schema-transformer.helper';
 import {
   ContextMenuItem,
@@ -72,8 +69,6 @@ import {
   diffColumns,
   diffSqlLines,
   downloadTextFile,
-  nullPctSeverity,
-  profileColumns,
   rowsToCsv,
   rowsToJson,
 } from '../../helpers/dataset-result-tools.helper';
@@ -83,6 +78,14 @@ import {
   exportBaseName as buildExportBaseName,
   readSqlFile,
 } from '../../helpers/dataset-export.helper';
+import {
+  ResultSheetHost,
+  ResultSheetLayoutService,
+} from '../../services/result-sheet-layout.service';
+import {
+  ResultGridHost,
+  ResultGridToolsService,
+} from '../../services/result-grid-tools.service';
 import {
   CodeEditorService,
   EditorHandle,
@@ -98,9 +101,18 @@ declare const window: any;
   styleUrls: ['./edit-dataset.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
   animations: [expandAnimation],
+  // Component-scoped: the sheet height, the drag in progress and the grid's
+  // expanded cells all belong to THIS screen's result pane, never shared.
+  providers: [ResultSheetLayoutService, ResultGridToolsService],
 })
 export class EditDatasetComponent
-  implements OnInit, OnDestroy, AfterViewInit, HasUnsavedChanges
+  implements
+    OnInit,
+    OnDestroy,
+    AfterViewInit,
+    HasUnsavedChanges,
+    ResultSheetHost,
+    ResultGridHost
 {
   /**
    * Size cap for an imported .sql / .txt script.
@@ -231,9 +243,13 @@ export class EditDatasetComponent
 
   // ── Result export + profiling (Slice 4) ───────────────────────────
   /** Toggle for the client-side column-profiling strip. */
-  showColumnProfile = false;
+  get showColumnProfile(): boolean {
+    return this.grid.showColumnProfile;
+  }
   /** Cached profiles for the current preview rows. */
-  columnProfiles: ColumnProfile[] = [];
+  get columnProfiles(): ColumnProfile[] {
+    return this.grid.columnProfiles;
+  }
 
   // Results Popup
   showResultsPopup = false;
@@ -253,40 +269,61 @@ export class EditDatasetComponent
   // change. Paginator is now always-on so the footer doesn't pop
   // in when a result spills past one page.)
 
-  /** True when at least one column has a type hint. Hides the type
-   *  chip row when the BE didn't ship types for any column. */
+  /** True when the BE supplied any column type information. */
   get hasAnyColumnType(): boolean {
-    const types = this.queryResult?.columnTypes;
-    return !!types && Object.keys(types).length > 0;
+    return this.grid.hasAnyColumnType();
   }
 
-  // ── Bottom-sheet state (mirrors add-dataset) ──────────────────────
-  resultSheetHeightPx = 420;
-  isResultSheetCollapsed = false;
-  private sheetDragState: {
-    startY: number;
-    startHeight: number;
-    onMove: (ev: MouseEvent) => void;
-    onUp: () => void;
-  } | null = null;
+  // ── Bottom-sheet + result-grid state ──────────────────────────────
+  //
+  // Held by ResultSheetLayoutService and ResultGridToolsService; these proxies
+  // keep the template bindings working unchanged.
 
-  /** Per-column pixel width applied to the result grid's <colgroup>. */
-  columnWidths: Record<string, number> = {};
+  get resultSheetHeightPx(): number {
+    return this.sheet.heightPx;
+  }
+  set resultSheetHeightPx(px: number) {
+    this.sheet.heightPx = px;
+  }
+
+  get isResultSheetCollapsed(): boolean {
+    return this.sheet.isCollapsed;
+  }
+  set isResultSheetCollapsed(collapsed: boolean) {
+    this.sheet.isCollapsed = collapsed;
+  }
+
+  /**
+   * Per-column pixel width applied to the result grid's <colgroup>.
+   *
+   * Writable, unlike add-dataset's: this screen also overlays widths the user
+   * dragged and persisted per dataset (see restoreColumnState / onResultColResize).
+   */
+  get columnWidths(): Record<string, number> {
+    return this.grid.columnWidths;
+  }
+  set columnWidths(widths: Record<string, number>) {
+    this.grid.columnWidths = widths;
+  }
 
   /** Expanded JSON-cell tracking for the result grid. */
-  expandedJsonCells = new Set<string>();
+  get expandedJsonCells(): Set<string> {
+    return this.grid.expandedJsonCells;
+  }
+  set expandedJsonCells(cells: Set<string>) {
+    this.grid.expandedJsonCells = cells;
+  }
 
   /** Cell-level right-click context menu state. */
-  showCellContextMenu = false;
-  cellContextMenuTop = 0;
-  cellContextMenuLeft = 0;
-  private cellContextTarget: { rowIndex: number; col: string } | null = null;
-
-  /** ResizeObserver watching .editor-results-area so column widths
-   *  re-flow when the pane width changes. */
-  private paneResizeObserver: ResizeObserver | null = null;
-  private paneResizeTimer: any = null;
-  private lastObservedPaneWidth = 0;
+  get showCellContextMenu(): boolean {
+    return this.grid.showCellContextMenu;
+  }
+  get cellContextMenuTop(): number {
+    return this.grid.cellContextMenuTop;
+  }
+  get cellContextMenuLeft(): number {
+    return this.grid.cellContextMenuLeft;
+  }
 
   /** PrimeNG <p-table> ref so we can reset `.first` between
    *  successive queries (prevents stale paginator state). */
@@ -416,12 +453,47 @@ export class EditDatasetComponent
     private translate: TranslateService,
     private elementRef: ElementRef<HTMLElement>,
     private fieldsStore: DatasetFieldsStore,
+    private readonly sheet: ResultSheetLayoutService,
+    private readonly grid: ResultGridToolsService,
   ) {}
+
+  // ── ResultSheetHost / ResultGridHost ────────────────────────────
+  //
+  // The two result-pane services reach back through these rather than taking an
+  // ElementRef or a ChangeDetectorRef of their own, which keeps them free of any
+  // dependency on this screen in particular.
+
+  /** The pane the sheet lives in; height is clamped against it, not the viewport. */
+  sheetPaneElement(): HTMLElement | null {
+    return this.elementRef.nativeElement.querySelector(
+      '.editor-results-area',
+    ) as HTMLElement | null;
+  }
+
+  requestRender(): void {
+    this.cdr.markForCheck();
+  }
+
+  /** Pane width changed materially — re-measure the result grid's columns. */
+  onPaneWidthChanged(): void {
+    this.grid.recalculateColumnWidths();
+  }
+
+  currentResult(): QueryResult | null {
+    return this.queryResult;
+  }
+
+  /** Close the datasource tree menu so two menus are never open at once. */
+  closeOtherMenus(): void {
+    this.showContextMenu = false;
+  }
 
   ngOnInit(): void {
     // Restore the user's preferred result-sheet height + collapsed
     // state so a returning user gets back where they left off.
-    this.loadPersistedSheetState();
+    this.sheet.attach(this);
+    this.grid.attach(this);
+    this.sheet.loadPersisted();
 
     // Setup debounce for result filter changes
     this.resultFilterSubject
@@ -524,20 +596,14 @@ export class EditDatasetComponent
 
   ngAfterViewInit(): void {
     this.loadMonacoEditor();
-    this.installResultPaneResizeObserver();
+    this.sheet.installResizeObserver();
   }
 
   ngOnDestroy(): void {
     this.resultFilterSubject.complete();
-
-    if (this.paneResizeObserver) {
-      this.paneResizeObserver.disconnect();
-      this.paneResizeObserver = null;
-    }
-    if (this.paneResizeTimer) {
-      clearTimeout(this.paneResizeTimer);
-      this.paneResizeTimer = null;
-    }
+    // The pane observer, its debounce timer and any in-flight sheet drag are
+    // disposed by ResultSheetLayoutService's own ngOnDestroy, which Angular runs
+    // for a component-provided service.
 
     if (this.editor) {
       // Through the handle: it disposes the editor plus every listener and
@@ -1346,7 +1412,7 @@ export class EditDatasetComponent
 
           // Refresh the profiling strip against the new rows (only when
           // it's currently visible — otherwise it recomputes on open).
-          if (this.showColumnProfile) this.recomputeColumnProfiles();
+          if (this.showColumnProfile) this.grid.recomputeColumnProfiles();
 
           if (this.queryResult.columns.length > 0) {
             this.surfaceResultSheet();
@@ -1402,80 +1468,21 @@ export class EditDatasetComponent
   private static readonly SHEET_MIN_HEIGHT = 240;
   private static readonly SHEET_MAX_HEIGHT_PADDING = 120;
 
-  private clampSheetHeight(px: number): number {
-    const host = this.elementRef.nativeElement.querySelector(
-      '.editor-results-area',
-    ) as HTMLElement | null;
-    const containerHeight =
-      host?.getBoundingClientRect().height ?? window.innerHeight;
-    const max = Math.max(
-      EditDatasetComponent.SHEET_MIN_HEIGHT,
-      containerHeight - EditDatasetComponent.SHEET_MAX_HEIGHT_PADDING,
-    );
-    return Math.min(max, Math.max(EditDatasetComponent.SHEET_MIN_HEIGHT, px));
-  }
 
-  private loadPersistedSheetState(): void {
-    try {
-      const raw = localStorage.getItem(
-        EditDatasetComponent.SHEET_HEIGHT_STORAGE_KEY,
-      );
-      if (raw) {
-        const parsed = parseInt(raw, 10);
-        if (Number.isFinite(parsed)) {
-          this.resultSheetHeightPx = this.clampSheetHeight(parsed);
-        }
-      } else {
-        this.resultSheetHeightPx = this.clampSheetHeight(
-          Math.round(window.innerHeight * 0.45),
-        );
-      }
-      const collapsedRaw = localStorage.getItem(
-        EditDatasetComponent.SHEET_COLLAPSED_STORAGE_KEY,
-      );
-      this.isResultSheetCollapsed = collapsedRaw === 'true';
-    } catch (_) {
-      /* localStorage may be unavailable */
-    }
-  }
-
-  private persistSheetHeight(px: number): void {
-    try {
-      localStorage.setItem(
-        EditDatasetComponent.SHEET_HEIGHT_STORAGE_KEY,
-        String(Math.round(px)),
-      );
-    } catch (_) {}
-  }
-
-  private persistSheetCollapsed(collapsed: boolean): void {
-    try {
-      localStorage.setItem(
-        EditDatasetComponent.SHEET_COLLAPSED_STORAGE_KEY,
-        collapsed ? 'true' : 'false',
-      );
-    } catch (_) {}
-  }
-
+  /** Toggle the sheet between expanded and collapsed. */
   toggleResultSheet(): void {
-    this.isResultSheetCollapsed = !this.isResultSheetCollapsed;
-    this.persistSheetCollapsed(this.isResultSheetCollapsed);
+    this.sheet.toggle();
   }
 
   dismissResultSheet(): void {
     this.showResultsPopup = false;
     this.queryResult = null;
-    if (this.expandedJsonCells.size > 0) {
-      this.expandedJsonCells = new Set();
-    }
+    this.grid.resetExpandedCells();
   }
 
   private surfaceResultSheet(): void {
     this.showResultsPopup = true;
-    if (this.isResultSheetCollapsed) {
-      this.isResultSheetCollapsed = false;
-      this.persistSheetCollapsed(false);
-    }
+    this.sheet.expand();
     if (this.resultsTable) {
       this.resultsTable.first = 0;
     }
@@ -1483,118 +1490,43 @@ export class EditDatasetComponent
   }
 
   onSheetDragStart(event: MouseEvent): void {
-    event.preventDefault();
-    if (this.isResultSheetCollapsed) return;
-    const startY = event.clientY;
-    const startHeight = this.resultSheetHeightPx;
-    const onMove = (ev: MouseEvent) => {
-      const delta = startY - ev.clientY;
-      this.resultSheetHeightPx = this.clampSheetHeight(startHeight + delta);
-      this.cdr.markForCheck();
-    };
-    const onUp = () => {
-      document.removeEventListener('mousemove', onMove);
-      document.removeEventListener('mouseup', onUp);
-      this.persistSheetHeight(this.resultSheetHeightPx);
-      this.sheetDragState = null;
-      document.body.classList.remove('ds-sheet-dragging');
-    };
-    this.sheetDragState = { startY, startHeight, onMove, onUp };
-    document.body.classList.add('ds-sheet-dragging');
-    document.addEventListener('mousemove', onMove);
-    document.addEventListener('mouseup', onUp);
+    this.sheet.onDragStart(event);
   }
 
   onSheetHandleKeydown(event: KeyboardEvent): void {
-    if (this.isResultSheetCollapsed) return;
-    const step = event.shiftKey ? 80 : 20;
-    let next = this.resultSheetHeightPx;
-    if (event.key === 'ArrowUp') next = this.resultSheetHeightPx + step;
-    else if (event.key === 'ArrowDown') next = this.resultSheetHeightPx - step;
-    else return;
-    event.preventDefault();
-    this.resultSheetHeightPx = this.clampSheetHeight(next);
-    this.persistSheetHeight(this.resultSheetHeightPx);
+    this.sheet.onHandleKeydown(event);
   }
 
+  /** Height for the host's `--sheet-height` CSS variable. */
   get effectiveSheetHeightPx(): number {
-    if (!this.showResultsPopup || !this.queryResult) return 0;
-    return this.isResultSheetCollapsed ? 44 : this.resultSheetHeightPx;
+    return this.sheet.effectiveHeightPx(
+      this.showResultsPopup,
+      !!this.queryResult,
+    );
   }
 
-  // ── JSON cell expand/collapse ─────────────────────────────────
   jsonCellKey(rowIndex: number, col: string): string {
-    return `${rowIndex}-${col}`;
+    return this.grid.jsonCellKey(rowIndex, col);
   }
 
   toggleJsonCell(rowIndex: number, col: string): void {
-    const key = this.jsonCellKey(rowIndex, col);
-    if (this.expandedJsonCells.has(key)) this.expandedJsonCells.delete(key);
-    else this.expandedJsonCells.add(key);
-    this.expandedJsonCells = new Set(this.expandedJsonCells);
+    this.grid.toggleJsonCell(rowIndex, col);
   }
 
-  // ── Cell context menu (Copy cell / column) ────────────────────
   onCellContextMenu(event: MouseEvent, rowIndex: number, col: string): void {
-    if (!this.queryResult) return;
-    event.preventDefault();
-    event.stopPropagation();
-    this.showContextMenu = false;
-    this.cellContextTarget = { rowIndex, col };
-    this.cellContextMenuLeft = event.clientX;
-    this.cellContextMenuTop = event.clientY;
-    this.showCellContextMenu = true;
+    this.grid.onCellContextMenu(event, rowIndex, col);
   }
 
+  /** Copy the right-clicked cell as displayed. */
   async copyCellValue(): Promise<void> {
-    if (!this.cellContextTarget || !this.queryResult) return;
-    const { rowIndex, col } = this.cellContextTarget;
-    const raw = this.queryResult.rows?.[rowIndex]?.[col];
-    const cell = formatCellValue(raw, this.queryResult.columnTypes?.[col]);
-    const text =
-      cell.kind === 'null'
-        ? this.translate.instant('DATASET.CELL_NULL')
-        : cell.display;
-    await this.writeToClipboard(text);
-    this.closeContextMenu();
+    await this.grid.copyCellValue();
   }
 
+  /** Copy every row's value for the right-clicked column. */
   async copyColumnValues(): Promise<void> {
-    if (!this.cellContextTarget || !this.queryResult) return;
-    const { col } = this.cellContextTarget;
-    const lines = (this.queryResult.rows || []).map(row => {
-      const cell = formatCellValue(
-        row?.[col],
-        this.queryResult?.columnTypes?.[col],
-      );
-      return cell.kind === 'null' ? '' : cell.display;
-    });
-    await this.writeToClipboard(lines.join('\n'));
-    this.closeContextMenu();
+    await this.grid.copyColumnValues();
   }
 
-  private async writeToClipboard(text: string): Promise<void> {
-    try {
-      if (navigator.clipboard?.writeText) {
-        await navigator.clipboard.writeText(text);
-      } else {
-        const ta = document.createElement('textarea');
-        ta.value = text;
-        ta.setAttribute('readonly', '');
-        ta.style.position = 'absolute';
-        ta.style.left = '-9999px';
-        document.body.appendChild(ta);
-        ta.select();
-        document.execCommand('copy');
-        document.body.removeChild(ta);
-      }
-      this.globalService.showInfo(this.translate.instant('DATASET.COPIED'));
-    } catch (_) {
-      this.globalService.showWarn(
-        this.translate.instant('DATASET.COPY_FAILED'),
-      );
-    }
-  }
 
   // ── Client-side result export + profiling (Slice 4) ───────────────
 
@@ -1637,31 +1569,16 @@ export class EditDatasetComponent
   /** Copy the current SQL editor content to the clipboard. */
   async copySql(): Promise<void> {
     const sql = this.editor?.getValue() || this.currentQuery || '';
-    await this.writeToClipboard(sql);
+    await this.grid.writeToClipboard(sql);
   }
 
-  /** Toggle the column-profiling strip; (re)compute on show. */
   toggleColumnProfile(): void {
-    this.showColumnProfile = !this.showColumnProfile;
-    if (this.showColumnProfile) this.recomputeColumnProfiles();
-    this.cdr.markForCheck();
+    this.grid.toggleColumnProfile();
   }
 
-  /** Recompute per-column profiles over the loaded preview rows. */
-  private recomputeColumnProfiles(): void {
-    if (!this.queryResult?.columns?.length) {
-      this.columnProfiles = [];
-      return;
-    }
-    this.columnProfiles = profileColumns(
-      this.queryResult.columns,
-      this.queryResult.rows,
-    );
-  }
 
-  /** Template helper — traffic-light class for a null-% bar. */
   nullSeverity(pct: number): 'good' | 'warn' | 'bad' {
-    return nullPctSeverity(pct);
+    return this.grid.nullSeverity(pct);
   }
 
   // ── Result-grid column-state persistence (Slice 4) ────────────────
@@ -1728,38 +1645,6 @@ export class EditDatasetComponent
     }
   }
 
-  // ── Pane-resize column re-flow ────────────────────────────────
-  private installResultPaneResizeObserver(): void {
-    if (typeof ResizeObserver === 'undefined') return;
-    const pane = this.elementRef.nativeElement.querySelector(
-      '.editor-results-area',
-    ) as HTMLElement | null;
-    if (!pane) return;
-    this.lastObservedPaneWidth = pane.getBoundingClientRect().width;
-    this.paneResizeObserver = new ResizeObserver(entries => {
-      const entry = entries[0];
-      if (!entry) return;
-      const width = entry.contentRect.width;
-      if (Math.abs(width - this.lastObservedPaneWidth) < 50) return;
-      this.lastObservedPaneWidth = width;
-      if (this.paneResizeTimer) clearTimeout(this.paneResizeTimer);
-      this.paneResizeTimer = setTimeout(() => {
-        this.recalculateColumnWidths();
-        this.paneResizeTimer = null;
-      }, 80);
-    });
-    this.paneResizeObserver.observe(pane);
-  }
-
-  private recalculateColumnWidths(): void {
-    if (!this.queryResult || !this.queryResult.columns?.length) return;
-    this.columnWidths = measureColumnWidths(
-      this.queryResult.columns,
-      this.queryResult.rows,
-      this.queryResult.columnTypes,
-    );
-    this.cdr.markForCheck();
-  }
 
   onDatasetDialogClose(formData: DatasetFormData | null): void {
     this.showDatasetDialog = false;
@@ -2000,7 +1885,7 @@ export class EditDatasetComponent
           this.queryResult.columnTypes,
         );
         this.restoreColumnState();
-        if (this.showColumnProfile) this.recomputeColumnProfiles();
+        if (this.showColumnProfile) this.grid.recomputeColumnProfiles();
         if (columns.length > 0) {
           this.surfaceResultSheet();
         }
@@ -2387,10 +2272,9 @@ export class EditDatasetComponent
   closeContextMenu(): void {
     this.showContextMenu = false;
     this.contextMenuDatasource = null;
-    // Cell-level context menu shares the global outside-click
-    // listener, so close it from here too.
-    this.showCellContextMenu = false;
-    this.cellContextTarget = null;
+    // The cell-level menu shares the global outside-click listener, so it
+    // closes from here too.
+    this.grid.closeCellContextMenu();
   }
 
   refreshDatasourceFromContext(): void {
