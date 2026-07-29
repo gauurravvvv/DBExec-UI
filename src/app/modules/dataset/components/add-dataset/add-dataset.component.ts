@@ -74,7 +74,13 @@ import {
   profileColumns,
   rowsToCsv,
   rowsToJson,
-} from './dataset-result-tools.helper';
+} from '../../helpers/dataset-result-tools.helper';
+import {
+  buildResultExportPayload,
+  downloadBlob,
+  exportBaseName as buildExportBaseName,
+  readSqlFile,
+} from '../../helpers/dataset-export.helper';
 
 // Declare Monaco and window for TypeScript
 declare const monaco: any;
@@ -96,6 +102,15 @@ import {
 export class AddDatasetComponent
   implements OnInit, OnDestroy, AfterViewInit, OnChanges, HasUnsavedChanges
 {
+  /**
+   * Size cap for an imported .sql / .txt script.
+   *
+   * edit-dataset uses 22 here. That divergence is preserved deliberately — see
+   * the drift reconciliation plan — so the value stays per-screen rather than
+   * moving into the shared helper.
+   */
+  private static readonly SQL_UPLOAD_MAX_MB = 2;
+
   // ViewChild for file input
   @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
   @ViewChild('sqlEditorContainer')
@@ -1357,17 +1372,12 @@ export class AddDatasetComponent
   exportCurrentScript(): void {
     if (!this.editor || !this.selectedDatasourceObj) return;
 
-    const query = this.editor.getValue();
     const datasourceName = this.selectedDatasourceObj.name || 'datasource';
-    const fileName = `${datasourceName}_script.sql`;
-
-    const blob = new Blob([query], { type: 'text/plain' });
-    const url = window.URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = fileName;
-    link.click();
-    window.URL.revokeObjectURL(url);
+    downloadTextFile(
+      this.editor.getValue(),
+      `${datasourceName}_script.sql`,
+      'text/plain',
+    );
   }
 
   triggerFileInput(): void {
@@ -1376,70 +1386,56 @@ export class AddDatasetComponent
     }
   }
 
-  onFileSelected(event: any): void {
+  /**
+   * Import a .sql / .txt file into the editor.
+   *
+   * Validation and reading live in `dataset-export.helper`; this keeps the toast
+   * copy and the editor write, which are the parts that need the component. The
+   * file input is cleared on every path so re-picking the same file still fires a
+   * change event.
+   */
+  async onFileSelected(event: any): Promise<void> {
     const file = event.target.files[0];
     if (!file) return;
 
-    // Validate file extension
-    const fileName = file.name.toLowerCase();
-    if (!fileName.endsWith('.sql') && !fileName.endsWith('.txt')) {
-      this.messageService.add({
-        severity: 'error',
-        summary: this.translate.instant('DATASET.INVALID_FILE_FORMAT'),
-        detail: this.translate.instant('DATASET.INVALID_FILE_FORMAT_DESC'),
-        key: 'topRight',
-        life: 3000,
-        styleClass: 'custom-toast',
-      });
-      // Reset the file input
-      event.target.value = '';
-      return;
-    }
+    const result = await readSqlFile(file, AddDatasetComponent.SQL_UPLOAD_MAX_MB);
+    event.target.value = '';
 
-    // Validate file size (e.g., max 2MB)
-    const maxSizeInMB = 2;
-    const maxSizeInBytes = maxSizeInMB * 1024 * 1024;
-    if (file.size > maxSizeInBytes) {
-      this.messageService.add({
-        severity: 'error',
-        summary: this.translate.instant('DATASET.FILE_TOO_LARGE'),
-        detail: this.translate.instant('DATASET.FILE_SIZE_LIMIT', {
-          size: maxSizeInMB,
-        }),
-        key: 'topRight',
-        life: 3000,
-        styleClass: 'custom-toast',
-      });
-      event.target.value = '';
-      return;
-    }
-
-    // Read file content
-    const reader = new FileReader();
-    reader.onload = (e: any) => {
-      const content = e.target.result;
+    if (result.ok) {
       if (this.editor) {
-        // Set the content to the editor
-        this.editor.setValue(content);
-        this.currentQuery = content;
+        this.editor.setValue(result.sql);
+        this.currentQuery = result.sql;
       }
-      // Reset the file input so the same file can be selected again if needed
-      event.target.value = '';
-    };
+      return;
+    }
 
-    reader.onerror = () => {
-      this.messageService.add({
-        severity: 'error',
-        summary: this.translate.instant('DATASET.IMPORT_FAILED'),
-        detail: this.translate.instant('DATASET.IMPORT_FAILED_DESC'),
-        key: 'topRight',
-        life: 3000,
-        styleClass: 'custom-toast',
-      });
-      event.target.value = '';
-    };
+    const toast =
+      result.reason === 'extension'
+        ? {
+            summary: 'DATASET.INVALID_FILE_FORMAT',
+            detail: 'DATASET.INVALID_FILE_FORMAT_DESC',
+            params: undefined,
+          }
+        : result.reason === 'size'
+          ? {
+              summary: 'DATASET.FILE_TOO_LARGE',
+              detail: 'DATASET.FILE_SIZE_LIMIT',
+              params: { size: AddDatasetComponent.SQL_UPLOAD_MAX_MB },
+            }
+          : {
+              summary: 'DATASET.IMPORT_FAILED',
+              detail: 'DATASET.IMPORT_FAILED_DESC',
+              params: undefined,
+            };
 
-    reader.readAsText(file);
+    this.messageService.add({
+      severity: 'error',
+      summary: this.translate.instant(toast.summary),
+      detail: this.translate.instant(toast.detail, toast.params),
+      key: 'topRight',
+      life: 3000,
+      styleClass: 'custom-toast',
+    });
   }
 
   saveAsDataset(): void {
@@ -1505,33 +1501,16 @@ export class AddDatasetComponent
 
     this.isExportingResults = true;
 
-    // Build filter from current filter values
-    const filter: { [key: string]: string } = {};
-    for (const col of Object.keys(this.resultFilterValues)) {
-      if (this.resultFilterValues[col]) {
-        filter[col] = this.resultFilterValues[col];
-      }
-    }
-
-    const payload: any = {
-      datasourceId: this.selectedDatasourceObj.id,
-      query: this.lastExecutedQuery,
-    };
-
-    if (Object.keys(filter).length > 0) {
-      payload.filter = JSON.stringify(filter);
-    }
+    const payload = buildResultExportPayload(
+      this.selectedDatasourceObj.id,
+      this.lastExecutedQuery,
+      this.resultFilterValues,
+    );
 
     this.queryService.exportQueryResults(payload).subscribe({
       next: (blob: Blob) => {
         const datasourceName = this.selectedDatasourceObj.name || 'datasource';
-        const fileName = `${datasourceName}_query_results.csv`;
-        const url = window.URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = fileName;
-        link.click();
-        window.URL.revokeObjectURL(url);
+        downloadBlob(blob, `${datasourceName}_query_results.csv`);
         this.isExportingResults = false;
         this.cdr.markForCheck();
       },
@@ -2699,10 +2678,7 @@ export class AddDatasetComponent
 
   /** Base file name for exports — derived from the datasource. */
   private exportBaseName(): string {
-    return (this.selectedDatasourceObj?.name || 'dataset').replace(
-      /[^\w.-]+/g,
-      '_',
-    );
+    return buildExportBaseName([this.selectedDatasourceObj?.name]);
   }
 
   /**

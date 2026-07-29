@@ -1,14 +1,16 @@
 /**
- * Pure, dependency-free helpers shared by add-dataset and edit-dataset
- * for the Slice 3 (diff-before-save) and Slice 4 (result export +
- * column profiling) work.
+ * Pure, dependency-free serialisation and analysis of the result grid's
+ * in-memory preview rows: CSV/JSON export, column profiling, and the
+ * SQL/column diffs the save-review pane shows.
  *
- * Lives under add-dataset/ (an allowed path) and is imported by
- * edit-dataset via a relative path so both editors share ONE
- * implementation without a new module declaration.
+ * Shared by add-dataset and edit-dataset. It previously sat inside
+ * `components/add-dataset/`, which meant edit-dataset reached sideways into
+ * another component's folder to use it; it now lives in `helpers/` where both
+ * screens are peers of it.
  *
- * Everything here operates on the in-memory preview rows the grid
- * already holds — no BE round-trips, no new npm deps.
+ * Everything here operates on rows the grid already holds — no BE round-trips,
+ * no new npm deps. The surrounding decisions (file naming, export payloads,
+ * upload validation) live in `dataset-export.helper.ts`.
  */
 
 /** A row is a plain record keyed by column name (BE `data[]` shape). */
