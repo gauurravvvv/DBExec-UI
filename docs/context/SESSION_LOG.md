@@ -1,5 +1,16 @@
 # DBExec-UI — Session Log (newest first)
 
+### 2026-07-29 — Dataset decomposition, part 2
+- Focus: reduce the three files still over ~1,900 lines after part 1, still with zero behaviour change.
+- Changed: extracted `DatasetSqlWorkbenchBase` (852) holding the 81 byte-identical members + 37 shared fields that part 1's service extraction had made identical (up from 56); split `monaco-intellisense.service.ts` by Monaco provider into `services/intellisense/` behind an `IntelliSenseContext` seam.
+- Result: add-dataset 2,790 → 1,112 · edit-dataset 2,542 → 1,234 · monaco-intellisense 2,330 → 414 (both parts combined).
+- Found + fixed: a stranded `@HostListener` in edit-dataset that would have made Escape re-fetch the dataset and discard unsaved SQL; a stranded `@ViewChild`; and two decorators lost on the way into the base.
+- Verified: all three build gates after every commit; member-set and decorator audits show nothing lost; all 18 moved IntelliSense bodies byte-identical to their originals; add-dataset live-verified end to end.
+- Also: `editor-parity`'s `dataset-add` failure was a migration-import stub datasource returning 500 from `/schemas` (proven with a direct API call), not a regression — the spec now picks a datasource that can connect.
+- Modules updated: dataset.
+- Open for next session: `formula-field-dialog` (1,025); `intellisense/completion-provider` (693) wants the dataset-workbench e2e first since splitting it is a control-flow change.
+
+
 ### 2026-07-29 — Dataset module decomposition, part 1
 - Focus: reduce the dataset module's oversized TypeScript files with **zero behaviour change** — modularity only, committed task by task.
 - Changed: deleted 739 lines of unreferenced mock data and extracted the module's shared models; extracted the IntelliSense string analysis, an export helper, and three component-provided services (schema tree, result-sheet layout, result-grid tools). add-dataset 2,790 → 1,962; edit-dataset 2,542 → 1,942; monaco-intellisense 2,330 → 1,912.
