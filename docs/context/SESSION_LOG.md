@@ -1,5 +1,14 @@
 # DBExec-UI — Session Log (newest first)
 
+### 2026-07-29 — Dataset module decomposition, part 1
+- Focus: reduce the dataset module's oversized TypeScript files with **zero behaviour change** — modularity only, committed task by task.
+- Changed: deleted 739 lines of unreferenced mock data and extracted the module's shared models; extracted the IntelliSense string analysis, an export helper, and three component-provided services (schema tree, result-sheet layout, result-grid tools). add-dataset 2,790 → 1,962; edit-dataset 2,542 → 1,942; monaco-intellisense 2,330 → 1,912.
+- Decisions: add/edit drift is parameterised per screen, never merged by picking a winner (34 of 90 shared bodies differ). `initMonaco` left duplicated on purpose. sql-dialects data tables left alone. Templates untouched via proxy accessors.
+- Found: edit-dataset registers **neither** the SQL validator nor the formatter (0 refs vs 4 on add) and binds Ctrl+Enter through the non-functioning `editor.addCommand` — a real defect, recorded not fixed.
+- Modules updated: dataset.
+- Open for next session: the functional e2e for dataset create/edit, then the shared base component; formula-field-dialog (1,025) and the IntelliSense provider split still pending.
+
+
 ### 2026-07-24 — Enriched all module docs with real current state
 - Focus: Make docs/context a TRUE single source of truth — every module file now carries genuine feature context + current progress, not a generic scaffold.
 - Changed: Rewrote all 27 docs/context/modules/*.md (Context = real feature surface + how-it-works + real gotchas; Goals = real focus/backlog/known-issues; Progress = dated "Current state captured" entry citing actual shipped commits + memory, kept the "Initialized" entry beneath). Synced INDEX statuses to each module's declared status.

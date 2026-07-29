@@ -11,7 +11,10 @@
   - **Gone:** `calculated-fields-dialog`, `calculated-fields.service.ts`, `constants/functions-reference.ts` (962 lines) — the second engine and its UI were removed when the two merged.
   - `components/dataset-params-panel` + `helpers/param-tokens.helper.ts` — `{{name}}` param tokenizer (ignores string-literals/comments; mirrored BE `datasetParams.ts`), static + query-based dropdown options.
   - `components/edit-dataset-fields-dialog` — rich column metadata editor (description/role/defaultAggregation/formatHint/isVisible/typeOverride).
-  - `services/dataset.service.ts` (HTTP+signals), plus SQL helper services (formatter/linter/validator/scope-tracker), `services/monaco-intellisense.service.ts` (2,272 lines — now shared with the Query Executor) and `config/sql-dialects/` (postgres/mysql/mariadb/mssql/oracle/snowflake).
+  - `services/dataset.service.ts` (HTTP+signals), plus SQL helper services (formatter/linter/validator/scope-tracker), `services/monaco-intellisense.service.ts` (1,912 lines — shared with the Query Executor; its pure string analysis lives in `services/sql-text-analysis.ts`) and `config/sql-dialects/` (postgres/mysql/mariadb/mssql/oracle/snowflake).
+  - **Result-pane + tree services (component-provided, one instance per screen):** `services/dataset-schema-tree.service.ts` (schema load, lazy tables/columns, expand state, filter), `services/result-sheet-layout.service.ts` (sheet height/collapse/drag/persistence + pane ResizeObserver), `services/result-grid-tools.service.ts` (expanded JSON cells, column widths, profiling strip, cell menu, clipboard). add/edit reach them through `SchemaTreeHost` / `ResultSheetHost` / `ResultGridHost` and keep proxy accessors so **no template changed**.
+  - `models/dataset-schema.model.ts` — the module's shared interfaces (`TableSchema`, `DatasourceSchema`, `QueryResult`, …). Previously buried in a `dummy-data.helper` alongside 739 lines of unreferenced mock data, now deleted.
+  - `helpers/dataset-export.helper.ts` + `helpers/dataset-result-tools.helper.ts` — export payloads, file naming, upload validation; and pure CSV/JSON/profiling/diff.
   - **Editors are created ONLY via `shared/editor/CodeEditorService`** — never `monaco.editor.create` directly. One theme, one options set, one chrome stylesheet, shared with the Query Executor. See ARCHITECTURE.md.
 - Depends on: **datasource** (schema introspection + runQuery). `DATASET` api/routes constants. Mirrored Zod `validators/datasets.ts` + `calculatedFields.ts` (byte-identical FE↔BE).
 - Depended on by: **analyses** (dataset picker + fields), **dashboard**, **rls-rules** (rules bind to a dataset), **alerts**, **migration** (export/import + dependency inclusion).
@@ -23,11 +26,14 @@
   - `formula-field-dialog` naming is confusing: formula stored in `customField.columnToUse`, display name in `columnToView`.
   - Save `/datasets/:id/fields` needs `datasetId` in the BODY too (not just URL) or 400.
   - Enrichment no longer re-parses per row: the AST is built once by `compileFormula` and only `evaluate` runs per row. Bounds still apply (length 4000, depth 32, nodes 2000, calls 200, args 100).
+  - **add-dataset and edit-dataset are near-copies with real drift.** After the decomposition the divergence is explicit — per-screen options on the shared services (`EnsureTablesOptions.guardReentry`, `dbTypeCandidates()`, `cachedSchemaDbType()`, `omitPublicSchemaPrefix()`, `scopedSchema`, `onScopedTreeChanged()`) and per-screen constants (`SQL_UPLOAD_MAX_MB` is 2 on add, 22 on edit). Nothing was unified by fiat; picking winners is tracked in `docs/superpowers/plans/2026-07-29-dataset-drift-reconciliation.md`.
+  - **edit-dataset has no SQL validation and no formatter.** `initMonaco` was deliberately NOT merged: edit-dataset never calls `sqlValidatorService` or `sqlFormatterService` (0 references vs 4 on add), so a syntax error draws no marker and there is no format action when editing an existing dataset. Its Ctrl+Enter also uses `editor.addCommand`, which does not bind in this app — that is why `CodeEditorService.addShortcut` exists. Real defect, fix recorded in the drift plan.
+  - **No functional e2e covers dataset create or edit.** The 61 existing cases cover the formula dialog, the executor and editor styling parity. `e2e/dataset-workbench.e2e.ts` is specified in the decomposition plan and still unwritten; it is the prerequisite for the remaining base-class step.
   - `view-dataset` still renders its OWN inline field list instead of `app-field-sidebar` — two implementations of the same thing. Known, not yet unified.
 
 ## 2. Goals
 - Objective: Author a trustworthy, typed, parameterised dataset with derived fields that downstream BI can consume safely.
-- Current focus: — none active. The formula-engine merge, the editor unification and the explorer/dialog review round are all landed and verified.
+- Current focus: **decomposition, partly done.** add/edit are down from 2,790/2,542 to 1,962/1,942 by extracting three component-provided services and two helpers. Remaining: the shared base component (needs the e2e first), the IntelliSense provider split, and `formula-field-dialog` (1,025).
 - Next up, in the order they should be taken:
   1. **Datasource connection blocker** — `formula-fields` e2e fails 8/16 with "Failed to connect to the datasource" from the validate endpoint. Verified environmental (reproduces with all FE changes stashed; a single validate returns 200; Postgres 11/100 connections). Looks like pool exhaustion under ~10 rapid validates, which a real user would hit too.
   2. **Component decomposition** — mapped in `docs/superpowers/plans/2026-07-28-dataset-component-decomposition.md`. 84 of 96 methods are shared between add- and edit-dataset: 35 byte-identical (~714 lines), **49 drifted** (the same feature behaving differently when creating vs editing). Blocked on there being no functional e2e for dataset create/edit — write that first.
@@ -36,6 +42,24 @@
 - Out of scope: chart authoring (analyses), raw ad-hoc SQL runs (query-runner).
 
 ## 3. Progress (newest first)
+### 2026-07-29 — Dataset module decomposition (part 1 of 2)
+- Focus: bring the module's oversized TypeScript under control **without changing behaviour** — modularity only.
+- Changed:
+  - `helpers/dummy-data.helper.ts` (848) deleted. 100 lines were the module's most-imported interfaces (`TableSchema` 37 refs, `DatasourceSchema` 32, `TableColumn` 21) → `models/dataset-schema.model.ts`; the other 739 were a `DummyDataHelper` class with **zero references anywhere**. Six importers repointed.
+  - `services/sql-text-analysis.ts` (466) — 9 pure functions out of `monaco-intellisense.service.ts` (2,330 → 1,912). Cherry-picked from an abandoned branch after verifying `tsc` + `ngc` clean in an isolated worktree.
+  - `helpers/dataset-export.helper.ts` (148) — export payloads, file naming, upload validate/read. `dataset-result-tools.helper.ts` moved out of `components/add-dataset/` (edit-dataset had been importing sideways into it) to `helpers/`.
+  - `services/result-sheet-layout.service.ts` (327) + `services/result-grid-tools.service.ts` (258) — the sheet and grid interaction state. Both were carried **identically** by the two screens, so consolidated with no per-screen options.
+  - `services/dataset-schema-tree.service.ts` (911) — the biggest slice, ~650 duplicated lines. 16 of 23 members were already identical; the 7 drifted ones became explicit per-screen options rather than a merge.
+  - Both components also lost `schemaDataObservables` / `schemaStatusObservables` — declared, never read once the tree moved out.
+- Result: `add-dataset` **2,790 → 1,962**, `edit-dataset` **2,542 → 1,942**, `monaco-intellisense` **2,330 → 1,912**. Module 25,991 → 25,525 lines across 51 → 56 files, with ~1,300 lines of former duplication now single-sourced.
+- Decisions:
+  - **Drift reconciliation is out of scope.** 34 of 90 shared method bodies differ; choosing a winner changes one screen's behaviour. Every shared extraction parameterises the difference and each screen passes what it does today.
+  - **`initMonaco` deliberately left duplicated** — its drift is ~8 differences, not one, and three are defects in edit-dataset (see gotchas).
+  - `config/sql-dialects/*` (7,564) and `constants/postgres-sql.constants.ts` (932) untouched: they are data tables, and long is the right shape for data.
+  - Templates untouched — components keep proxy accessors for every bound member, avoiding 2,420 lines of HTML churn.
+- Verified: `tsc --noEmit`, `ngc -p tsconfig.app.json --noEmit` and `ng build --configuration production` green after **every** commit. A member-set audit against the pre-refactor tree confirms 29 members moved out of each component and **none lost**. Functional e2e not yet run — deferred at the user's direction.
+- Open for next session: write `e2e/dataset-workbench.e2e.ts`, then the shared base component (now a much better proposition — the extraction made the two screens far more alike), the IntelliSense provider split, and `formula-field-dialog`. Fix the edit-dataset validator/formatter/Ctrl+Enter gap as a separate behaviour change.
+
 ### 2026-07-29 — Explorer/dialog review round: parity, legibility and two measured layout faults
 Follow-up on the editor unification, driven by reviewing the running screens rather than the code.
 
