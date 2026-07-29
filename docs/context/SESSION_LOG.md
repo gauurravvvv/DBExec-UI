@@ -15,6 +15,19 @@
 - Modules updated: all (initialized).
 - Open for next session: Module files carry accurate Context/Goals scaffolds; enrich individual files with deeper specifics as work touches them. Follow the session-end protocol on every future change.
 
+## 2026-07-29 — Explorer/dialog review round
+Reviewing the running screens (rather than the code) found: the two schema trees
+still differed structurally, explorer rows rendering at 11.375px, the identifier
+font inherited differently per screen, search that ignored columns, a field sidebar
+showing one icon for all 26 fields, an object-detail tab strip compressed to 22px
+against 28px of content, a dialog whose height tracked its data, and a Comment
+column wrapping one character per line (body scrollHeight 3374px -> 1030px). Also
+fixed: Monaco's suggestion details pane persisting its expanded state, and
+Unsaved-Changes buttons rendering as browser defaults. Column types moved to a
+tooltip after the opacity approach cost names their width. formula-fields is
+blocked by an environmental datasource connection issue, verified by reproducing it
+with all changes stashed.
+
 ## 2026-07-28 — Editor unification: one Monaco editor across the three modules
 Query Executor migrated off CodeMirror 6; every editor now mounts through
 shared/editor/CodeEditorService, the single place monaco.editor.create is called.

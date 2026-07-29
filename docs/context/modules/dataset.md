@@ -29,6 +29,33 @@
 - Out of scope: chart authoring (analyses), raw ad-hoc SQL runs (query-runner).
 
 ## 3. Progress (newest first)
+### 2026-07-29 — Explorer/dialog review round: parity, legibility and two measured layout faults
+Follow-up on the editor unification, driven by reviewing the running screens rather than the code.
+
+**Object explorer — the two trees are now the same thing.**
+- Tables are never wrapped in a category node. The executor inserted `TABLES / VIEWS / FUNCTIONS / SEQUENCES` on every schema while the dataset tree is schema → table → column, so tables sat a level deeper. An earlier "adaptive" rule only collapsed the level when a schema held ONE kind of object — useless in practice, because a real Postgres `public` holds tables *and* functions *and* sequences. Tables now render directly under the schema; the other kinds keep their headers below, as a capability the dataset explorer has no data for.
+- Panel title, search box, "N tables" count and amber folder icons brought over from the dataset sidebar. Primary-key colour unified (the executor used `--warning-color`, the dataset `--pk-color`); data-type label unified (was `(integer)` vs `integer`).
+- Rows were rendering at **11.375px**: the type-scale comments assume a 16px root and this app sets 14px, so `--fs-control` resolves smaller than its "13px" label. Rows now use `--fs-body`.
+- The identifier font is **pinned** rather than inherited — the executor's tree was picking up a monospace stack from an ancestor while the dataset used the UI font, so the same column name looked different on the two screens.
+- Search matches **columns**, not just schemas and tables, which is what the box implied but did not do. Honest limit: the executor loads columns lazily, so a column search reaches loaded columns — the placeholder (`SEARCH_EXPLORER`, 10 locales) says "tables and columns" rather than promising more.
+
+**Data types moved to a tooltip.** First attempt hid the inline label with `opacity: 0` to avoid reflow — but that keeps the label's BOX, so names lost that width permanently and `organisationName` truncated to `organisat...`. The type is now out of layout and carried by a `pTooltip` on the row, in both explorers and the field sidebar. Verified: six sampled column rows report `scrollWidth` within `clientWidth`, i.e. no truncation. `editor-explorer-reveals-type` is kept as a documented no-op so a stale include cannot break the build.
+
+**Field sidebar icons now carry information.** It rendered `pi-table` for EVERY non-computed field, so 26 columns showed the same glyph 26 times. The app already had a complete data-type vocabulary in a private method on `ViewDatasetComponent`; extracted verbatim to `shared/helpers/data-type-icon.ts` and used by both. Distinct icons went 1 → 7. Type moved onto the same line; row height halved to 26.6px.
+
+**Object-detail dialog — three faults, each measured not guessed.**
+- Tab strip measured **22px tall against a 28px scrollHeight**: as a flex child with no shrink guard it was compressed by the flexing body and its labels clipped in half. Pinned with `flex-shrink: 0`, plus `overflow-y: hidden` — `overflow-x: auto` alone makes an element a scroll container on BOTH axes, which is what allowed the vertical clip.
+- Height tracked the data (`max-height`), so the tab strip sat at a different y for every object inspected. Now a fixed height.
+- The Comment column wrapped **one character per line**: under auto table layout `uuid_generate_v4()` bid for width and squeezed Comment to ~100px, making one row taller than the dialog. Body scrollHeight was **3374px**; with fixed layout + `overflow-wrap: break-word` it is **1030px** for the same table.
+
+**Unsaved-Changes dialog buttons** were rendering as browser defaults — `.acf-btn` is declared under the main dialog's own nesting and never reached that separate `p-dialog`. Now the shared button mixin, with Discard reading as destructive.
+
+**Monaco's suggestion details pane no longer sticks.** Monaco remembers the expanded state and restores it on every later suggestion for the rest of the session, with no option to disable it — traced across four DOM states. Normalised to collapsed on each open via the public `toggleSuggestionDetails`; expanding still works while the list is open.
+
+- Regression guards added: the showcase asserts >3 distinct sidebar icons, and that the dialog's tab strip is at least as tall as its content.
+- Verified: `tsc`, `ngc` and a production build clean; **editor-parity 1/1** (explorer rows measured identical), **query-executor 7/7**, **editor-showcase 3/3**.
+- **Known blocker, NOT from this work:** `formula-fields` fails 8/16 with "Failed to connect to the datasource" from the validate endpoint. Confirmed environmental — the failures reproduce with these changes **stashed**, the same validate returns 200 when called once by hand, the API is untouched, and Postgres shows 11 of 100 connections used. Looks like connection-pool exhaustion for a datasource under the ~10 validates the suite fires in quick succession, which a user validating several formulas in a row would also hit. Worth a backend look.
+- Files: `assets/sass/_editor-chrome.scss`, `shared/helpers/data-type-icon.ts`, `shared/editor/code-editor.service.ts`, `query-executor.component.{ts,html,scss}`, `object-detail.component.{html,scss}`, `add-dataset`/`edit-dataset` `{html,scss}`, `field-sidebar.component.{ts,html,scss}`, `view-dataset.component.ts`, `e2e/{editor-showcase,editor-parity}`
 ### 2026-07-28 — Database explorer synced with the Query Executor
 - Sharing the chrome mixins was **not** sufficient: the two schema trees differed **structurally**, which is why they still did not look alike after the styling pass.
 - **The category level is now adaptive.** The executor inserted a `TABLES / VIEWS / FUNCTIONS / SEQUENCES` node on every schema; the dataset tree is schema → table → column. `showObjectGroups()` renders that level only when a schema holds more than one KIND of object, so the common case — and the only case the dataset explorer can represent — is now identical in both. Table rows move a level shallower when ungrouped so the indent matches. The grouping stays where it earns its keep: it is a capability the dataset explorer has no data for, not a styling inconsistency.

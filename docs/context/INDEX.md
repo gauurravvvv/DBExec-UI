@@ -1,6 +1,6 @@
 # DBExec-UI — Context Index
 > Master map of all frontend feature modules. Point any new session at this file first.
-> Last updated: 2026-07-24
+> Last updated: 2026-07-29
 
 ## Snapshot
 - What: Angular web client for DBExec — multi-tenant DB management, query execution & BI. Talks to DBExec-API over REST + WebSocket.
@@ -20,7 +20,7 @@
 | auth | `src/app/modules/auth` | [auth](./modules/auth.md) | 🟢 | 2026-07-24 |
 | dashboard | `src/app/modules/dashboard` | [dashboard](./modules/dashboard.md) | 🟢 | 2026-07-24 |
 | data-transfer | `src/app/modules/data-transfer` | [data-transfer](./modules/data-transfer.md) | ⚪ | 2026-07-24 |
-| dataset | `src/app/modules/dataset` | [dataset](./modules/dataset.md) | 🟢 | 2026-07-28 |
+| dataset | `src/app/modules/dataset` | [dataset](./modules/dataset.md) | 🟢 | 2026-07-29 |
 | datasource | `src/app/modules/datasource` | [datasource](./modules/datasource.md) | 🟢 | 2026-07-24 |
 | db-access | `src/app/modules/db-access` | [db-access](./modules/db-access.md) | 🟢 | 2026-07-24 |
 | embed | `src/app/modules/embed` | [embed](./modules/embed.md) | 🟢 | 2026-07-24 |
@@ -33,7 +33,7 @@
 | profile | `src/app/modules/profile` | [profile](./modules/profile.md) | 🟢 | 2026-07-24 |
 | prompt | `src/app/modules/prompt` | [prompt](./modules/prompt.md) | 🟢 | 2026-07-24 |
 | query-builder | `src/app/modules/query-builder` | [query-builder](./modules/query-builder.md) | 🟢 | 2026-07-24 |
-| query-runner | `src/app/modules/query-runner` | [query-runner](./modules/query-runner.md) | 🟢 | 2026-07-28 |
+| query-runner | `src/app/modules/query-runner` | [query-runner](./modules/query-runner.md) | 🟢 | 2026-07-29 |
 | rls-rules | `src/app/modules/rls-rules` | [rls-rules](./modules/rls-rules.md) | 🟡 | 2026-07-24 |
 | role | `src/app/modules/role` | [role](./modules/role.md) | 🟢 | 2026-07-24 |
 | section | `src/app/modules/section` | [section](./modules/section.md) | 🟢 | 2026-07-24 |

@@ -23,6 +23,14 @@
 - Out of scope: visual query building (query-builder), semantic datasets (dataset).
 
 ## 3. Progress (newest first)
+### 2026-07-29 — Explorer parity, search, and the object-detail dialog
+- The object browser now matches the Dataset Creator's schema tree: tables render directly under the schema (no `TABLES` wrapper), same panel title, search box, "N tables" count, amber folders, primary-key colour and data-type label. See `modules/dataset.md` for the full entry — the work spans both modules.
+- Added a schema/table/**column** search. Columns load lazily here, so it reaches loaded columns; the placeholder says "tables and columns" rather than promising more.
+- Column data types moved from an inline label to a `pTooltip`, because hiding the label with `opacity: 0` still reserved its width and truncated names to `organisat...`.
+- **Object-detail dialog** — tab strip measured 22px against a 28px scrollHeight (compressed by the flexing body, labels clipped); height tracked the row count so the tabs moved per object; the Comment column wrapped one character per line and body scrollHeight was 3374px. Now `flex-shrink: 0` + `overflow-y: hidden`, a fixed height, and fixed table layout — scrollHeight down to 1030px. Header adopts the shared dialog-header mixin.
+- Monaco's suggestion details pane no longer persists its expanded state across suggestions.
+- Verified: `query-executor` 7/7, `editor-parity` 1/1, `editor-showcase` 3/3, plus tsc/ngc/prod build.
+- Files: `executor/query-executor.component.{ts,html,scss}`, `executor/object-detail.component.{html,scss}`
 ### 2026-07-28 — Query Executor moved from CodeMirror 6 to Monaco
 - The editor now mounts through the shared `CodeEditorService`, so this screen uses the same editor, theme, options and IntelliSense as the Dataset Creator and Field Creator. See `docs/context/modules/dataset.md` for the full entry — the work spans both modules.
 - Feature parity was checked item by item against the CodeMirror extension list. Line numbers, active-line highlight, folding, bracket matching/closing, indent-on-input, selection-match highlight, history, multi-cursor, find/replace and the SQL grammar are all Monaco options or built-ins. Three things had no equivalent and were rebuilt in `shared/editor/`: the placeholder, the flash marking which statement ran (now whole-line), and offset-based document access — `splitStatements` works in character offsets because it mirrors the backend splitter, so offsets are the natural currency and Monaco's line/column model is the awkward one.

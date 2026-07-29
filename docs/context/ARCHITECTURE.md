@@ -79,3 +79,32 @@ dark values — the theme reads computed values, so it follows automatically.
 Parity is enforced by `e2e/editor-parity.e2e.ts`, which compares computed styles
 across the four components that mount an editor and fails naming any property
 that differs.
+
+### Explorer and list conventions (2026-07-29)
+
+Three surfaces list database objects: the executor's object browser, the Dataset
+Creator/Editor schema sidebar, and the live field sidebar. They share one set of
+mixins in `_editor-chrome.scss` (`editor-explorer-*`, `editor-tree-row`,
+`editor-side-row`, `editor-dialog-head`, `editor-dialog-close`, `editor-button`).
+
+Rules worth knowing before changing any of them:
+
+- **Tables are never wrapped in a category node.** They are the objects every
+  explorer shows, so they sit directly under the schema at the same depth
+  everywhere. Views, functions, sequences and triggers keep group headers — that is
+  a data capability the dataset explorer lacks, not a styling difference.
+- **A column's data type lives in a tooltip, not inline.** Hiding an inline label
+  with `opacity: 0` still reserves its box and truncates the name — that is how
+  `organisationName` became `organisat...`. Keep it out of layout.
+- **Icons come from `shared/helpers/data-type-icon.ts`.** One vocabulary for the
+  whole app. Do not hard-code a single glyph for a list of typed things.
+- **Type scale:** the token comments assume a 16px root; this app sets 14px, so
+  `--fs-control` renders at 11.375px. Use `--fs-body` for anything read down a
+  list.
+- **Dialogs:** fixed height, `flex-shrink: 0` on the header and any tab strip, and
+  `table-layout: fixed` on data tables. A `max-height` dialog moves its tab strip
+  as the data changes, and an auto-layout table lets one long token squeeze a prose
+  column until it wraps per character.
+- **Monaco's suggestion details pane** is normalised to collapsed on each open;
+  Monaco otherwise remembers the expanded state for the session with no option to
+  disable it.
