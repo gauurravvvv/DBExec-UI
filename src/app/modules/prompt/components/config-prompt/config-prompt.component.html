@@ -89,30 +89,6 @@
               </app-custom-input>
             </div>
           </div>
-          <div class="form-row">
-            <div class="form-field">
-              <app-custom-input
-                [ngModel]="selectedTabName"
-                [ngModelOptions]="{ standalone: true }"
-                [label]="'COMMON.TAB' | translate"
-                [placeholder]="'COMMON.TAB' | translate"
-                icon="pi-box"
-                [inputDisabled]="true"
-              >
-              </app-custom-input>
-            </div>
-            <div class="form-field">
-              <app-custom-input
-                [ngModel]="selectedSectionName"
-                [ngModelOptions]="{ standalone: true }"
-                [label]="'COMMON.SECTION' | translate"
-                [placeholder]="'COMMON.SECTION' | translate"
-                icon="pi-box"
-                [inputDisabled]="true"
-              >
-              </app-custom-input>
-            </div>
-          </div>
           <div class="section-header">
             <h3>
               <i class="pi pi-database mr-2"></i>
@@ -314,8 +290,7 @@
           <div class="form-row">
             <div class="form-field full-width">
               <label for="promptWhere">
-                {{ 'PROMPT_MODULE.PROMPT_WHERE_CONDITION' | translate
-                }}<span class="required">*</span>
+                {{ 'PROMPT_MODULE.PROMPT_WHERE_CONDITION' | translate }}
                 <i
                   class="pi pi-info-circle info-icon"
                   [pTooltip]="'PROMPT_MODULE.WHERE_CONDITION_HINT' | translate"

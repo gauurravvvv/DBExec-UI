@@ -174,7 +174,10 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
       tables: [[], Validators.required],
       columns: [[], Validators.required],
       promptJoin: [''],
-      promptWhere: ['', Validators.required],
+      // WHERE is optional: Query Builder v2 generates the filter from the
+      // operator catalog at compose time, so a static per-prompt WHERE template
+      // is no longer mandatory (mirrors the BE configurePrompt validation).
+      promptWhere: [''],
       promptValues: [[]], // Initially no validation
       type: [''],
       promptValueSQL: [''],

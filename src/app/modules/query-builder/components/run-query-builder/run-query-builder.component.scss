@@ -1,21 +1,75 @@
 :host {
   display: block;
+  height: 100%;
 }
 
-.qb-run {
-  padding: var(--space-6);
-  max-width: 1600px;
-  margin: 0 auto;
-}
-
-.qb-run__header {
+// Standard page card, matching add-user / add-prompt so the composer sits
+// inside the same parent card as every other module screen.
+.add-admin-wrapper {
+  background-color: var(--card-background);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  height: 100%;
   display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: var(--space-4);
-  margin-bottom: var(--space-6);
+  flex-direction: column;
 
-  h1 {
+  .add-admin-container {
+    padding: var(--space-8);
+    max-width: 100%;
+    margin: var(--space-0);
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow-y: auto;
+  }
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-6);
+  flex-shrink: 0;
+
+  .left-section {
+    display: flex;
+    align-items: center;
+    gap: var(--space-6);
+
+    .back-button {
+      padding: var(--space-0) !important;
+      width: 36px;
+      height: 36px;
+      border-radius: 50% !important;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: transparent !important;
+      color: var(--text-color) !important;
+      min-width: 0;
+      border: none !important;
+      transition: all var(--motion-base) ease;
+
+      &:hover {
+        background: var(--hover-background) !important;
+      }
+
+      i {
+        font-size: var(--fs-h2);
+      }
+    }
+  }
+
+  .action-buttons {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+  }
+}
+
+.qb-run__title {
+  h2 {
     margin: 0;
     font-size: var(--fs-h1);
     font-weight: var(--fw-semibold, 600);

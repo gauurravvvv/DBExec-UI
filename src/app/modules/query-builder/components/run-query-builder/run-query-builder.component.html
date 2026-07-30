@@ -1,11 +1,23 @@
-<div class="qb-run">
+<div class="add-admin-wrapper">
+  <div class="add-admin-container qb-run">
   <!-- Header -->
-  <header class="qb-run__header" *ngIf="schema() as s">
-    <div class="qb-run__title">
-      <h1>{{ s.queryBuilder.name }}</h1>
-      <p *ngIf="s.queryBuilder.description">{{ s.queryBuilder.description }}</p>
+  <div class="page-header">
+    <div class="left-section">
+      <button
+        pButton
+        class="p-button-text p-button-plain back-button"
+        routerLink="/app/query-builders"
+      >
+        <i class="pi pi-arrow-left back-icon"></i>
+      </button>
+      <div class="qb-run__title">
+        <h2>{{ schema()?.queryBuilder?.name || ('QUERY_BUILDER.COMPOSE' | translate) }}</h2>
+        <p *ngIf="schema()?.queryBuilder?.description">
+          {{ schema()!.queryBuilder.description }}
+        </p>
+      </div>
     </div>
-    <div class="qb-run__header-actions">
+    <div class="action-buttons qb-run__header-actions" *ngIf="schema() as s">
       <app-chip *ngIf="s.queryBuilder.sharedWithMe" variant="tag">
         <i class="pi pi-share-alt"></i> {{ 'QUERY_BUILDER.SHARED' | translate }}
       </app-chip>
@@ -24,7 +36,7 @@
         [title]="'QUERY_BUILDER.REDO' | translate"
         (clicked)="redo()" />
     </div>
-  </header>
+  </div>
 
   <!-- Loading -->
   <div class="qb-run__loading" *ngIf="loading()">
@@ -133,4 +145,5 @@
       </div>
     </section>
   </ng-container>
+  </div>
 </div>

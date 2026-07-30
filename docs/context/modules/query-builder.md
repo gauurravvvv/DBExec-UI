@@ -1,6 +1,6 @@
 # query-builder
 > Update the Progress log on every change.
-> Code path: `src/app/modules/query-builder` · Status: 🟢 · Last updated: 2026-07-30
+> Code path: `src/app/modules/query-builder` · Status: 🟢 · Last updated: 2026-07-31
 
 ## 1. Context
 - Responsibility: DBExec **Studio** feature — build a parameterised query WITHOUT hand-writing SQL. v2 model: an admin designs a flat, group-based form of **prompts** over a datasource; a business user composes an AND/OR **condition tree** over those prompts and runs it. The client never builds SQL — it sends a validated JSON tree of metadata IDs; the server compiles it. Can produce a dataset (`/datasets/from-builder`).
@@ -23,6 +23,15 @@
 - Out of scope: hand-written SQL (dataset/query-runner), chart authoring (analyses).
 
 ## 3. Progress (newest first)
+### 2026-07-31 — Screen parity (parent card + 50% forms) + placement labels + live proof
+- **`qb-design` shell** rewrapped in the standard page card (`.add-admin-wrapper > .add-admin-container > .page-header` with back button to `/app/query-builders` + builder-name title), tab nav kept inside the card. Was a bare `.qb-design` shell with no card — the user's "no parent card on config screen" complaint. `.qb-design__panel` now scrolls inside the card.
+- **`run-query-builder` (compose)** rewrapped in the same page card + `.page-header` (back button, title, undo/redo actions). The 2-column composer grid stays inside.
+- **`qb-settings`** grid → single-column 50%/one-control-per-row (was `repeat(auto-fill,minmax(240px,1fr))`).
+- **`add-query-builder`** normalized to `.form-grid{width:50%}` / `.form-field{width:100%}` (was 50% on the field with a 100% grid) so it matches add/edit-prompt + add-user.
+- **`config-prompt`** collapsed its two-column `.form-container` into a single 50% column (one control per row); removed the stale Tab/Section display row; dropped the now-optional `promptWhere` required validator + `*` marker (mirrors the BE change).
+- Form Designer now shows prompt **names** not UUIDs — fixed via the BE `getPlacements` enrichment (FE `hydrate` reads `r.name || r.promptName`).
+- Gates green (tsc → ngc → prod build). Verified with a headed Playwright walkthrough (`e2e/qb-walkthrough.e2e.ts`, idempotent seed over `clinical.encounter_analytics`); 16 screenshots in `/DBExec/screenshots/QB` covering prompt library, per-prompt config, form designer (named prompts, grouped), joins/columns/settings, value-source drawer, compose pre-filled multi-condition tree with live SQL + summary + open value dropdown, count (≈746), and the RUN results grid with real rows.
+
 ### 2026-07-30 — Value-source layer (spec 6.6): config, typeahead, bulk paste
 - Done: prompt value sourcing end to end. Admin `qb-value-source` (in the form-designer drawer) picks free / fixed list (manual + bulk import) / lookup SQL (Monaco) / distinct column, previews before saving, and warns when the server forces server-paged typeahead. Runtime `qb-value-control` now server-searches lookup prompts (dropdown/multiselect serverMode + `/values/search` fetcher), passes parent selections for cascading lookups (`store.valuesForPrompt` → `dependsOnValues`), and offers a "Paste values" dialog (`/values/resolve`, matched vs not-found). Services `qb-admin.getValueSource/saveValueSource/previewValues` + `qb-runtime.searchValues/resolveValues`; mirrored `promptValueSource` validator; QUERY_BUILDER.VS.* + PASTE_* i18n × 10.
 - Backend (same day): `promptValueSource.ts`/`promptValueRuntime.ts` controllers + 5 routes (value-source GET/PUT, values/preview·search·resolve), shared `promptValueSource.helper` (safe SQL run + distinct-column build + cardinality probe), schema controller emits kind from cardinality, compiler rule 8 (curated allowed-set enforcement, 49 tests).

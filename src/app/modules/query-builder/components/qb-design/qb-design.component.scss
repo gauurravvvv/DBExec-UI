@@ -1,25 +1,77 @@
 :host {
   display: block;
+  height: 100%;
 }
 
-.qb-design {
-  padding: var(--space-6);
-  max-width: 1600px;
-  margin: 0 auto;
-}
+// Standard page card + header, matching add-user / add-prompt so the design
+// screen looks like every other module screen (parent card, not a bare shell).
+.add-admin-wrapper {
+  background-color: var(--card-background);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 
-.qb-design__head {
-  margin-bottom: var(--space-5);
+  .add-admin-container {
+    padding: var(--space-8);
+    max-width: 100%;
+    margin: var(--space-0);
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
 
-  h1 {
-    margin: 0;
-    font-size: var(--fs-h1);
-    font-weight: var(--fw-semibold, 600);
-  }
-  p {
-    margin: var(--space-2) 0 0;
-    color: var(--text-muted);
-    font-size: var(--fs-body);
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: var(--space-4);
+      flex-shrink: 0;
+
+      .left-section {
+        display: flex;
+        align-items: center;
+        gap: var(--space-6);
+
+        .back-button {
+          padding: var(--space-0) !important;
+          width: 36px;
+          height: 36px;
+          border-radius: 50% !important;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background: transparent !important;
+          color: var(--text-color) !important;
+          min-width: 0;
+          border: none !important;
+          transition: all var(--motion-base) ease;
+
+          &:hover {
+            background: var(--hover-background) !important;
+          }
+
+          i {
+            font-size: var(--fs-h2);
+          }
+        }
+
+        h2 {
+          color: var(--text-color);
+          margin: var(--space-0);
+          font-size: var(--fs-h1);
+          font-weight: var(--fw-semibold);
+        }
+      }
+    }
+
+    .page-subtitle {
+      margin: var(--space-0) 0 var(--space-6);
+      color: var(--text-muted);
+      font-size: var(--fs-body);
+      flex-shrink: 0;
+    }
   }
 }
 
@@ -29,6 +81,7 @@
   border-bottom: 1px solid var(--border-color);
   margin-bottom: var(--space-6);
   overflow-x: auto;
+  flex-shrink: 0;
 }
 
 .qb-design__tab {
@@ -55,5 +108,24 @@
 }
 
 .qb-design__panel {
+  flex: 1;
+  overflow-y: auto;
   min-height: 40vh;
+  padding-right: 12px;
+
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+  &::-webkit-scrollbar-track {
+    background: var(--card-background);
+    border-radius: var(--radius-xs);
+  }
+  &::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: var(--radius-xs);
+
+    &:hover {
+      background: var(--secondary-color);
+    }
+  }
 }
