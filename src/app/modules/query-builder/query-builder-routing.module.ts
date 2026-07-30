@@ -6,6 +6,7 @@ import { ConfigureQueryBuilderComponent } from './components/configure-query-bui
 import { EditQueryBuilderComponent } from './components/edit-query-builder/edit-query-builder.component';
 import { ExecuteQueryBuilderComponent } from './components/execute-query-builder/execute-query-builder.component';
 import { ListQueryBuilderComponent } from './components/list-query-builder/list-query-builder.component';
+import { RunQueryBuilderComponent } from './components/run-query-builder/run-query-builder.component';
 import { ViewQueryBuilderComponent } from './components/view-query-builder/view-query-builder.component';
 
 const routes: Routes = [
@@ -17,6 +18,12 @@ const routes: Routes = [
     path: 'new',
     component: AddQueryBuilderComponent,
     canDeactivate: [unsavedChangesGuard],
+  },
+  {
+    // Query Builder v2 — the business-user composer (tree filters + run).
+    // Placed before ':id' so it is not swallowed by the view route.
+    path: ':id/compose',
+    component: RunQueryBuilderComponent,
   },
   { path: ':id', component: ViewQueryBuilderComponent },
   {

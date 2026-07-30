@@ -1,0 +1,66 @@
+:host {
+  display: block;
+}
+
+.qb-condition {
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md, 8px);
+  background: var(--surface-card, #fff);
+  transition:
+    border-color 0.15s ease,
+    opacity 0.15s ease;
+
+  &--skipped {
+    opacity: 0.65;
+  }
+
+  &--error {
+    border-color: var(--warning-color, #d9534f);
+  }
+}
+
+.qb-condition__main {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.qb-condition__prompt {
+  flex: 0 0 220px;
+  min-width: 180px;
+}
+
+.qb-condition__operator {
+  flex: 0 0 180px;
+  min-width: 150px;
+}
+
+.qb-condition__value {
+  flex: 1 1 260px;
+  min-width: 220px;
+}
+
+.qb-condition__not {
+  flex: 0 0 auto;
+}
+.qb-condition__not--active :where(button, .app-button) {
+  color: var(--primary-color);
+  font-weight: var(--fw-semibold, 600);
+}
+
+.qb-condition__remove {
+  flex: 0 0 auto;
+  margin-left: auto;
+}
+
+.qb-condition__chip {
+  margin-top: var(--space-2);
+}
+
+.qb-condition__errmsg {
+  margin: var(--space-2) 0 0;
+  font-size: var(--fs-label);
+  color: var(--warning-color, #d9534f);
+}

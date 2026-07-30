@@ -1,0 +1,12 @@
+:host { display: block; }
+.qb-summary {
+  display: flex;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  background: var(--surface-ground, #f8f9fb);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md, 8px);
+  &--empty { color: var(--text-muted); font-style: italic; }
+}
+.qb-summary__icon { color: var(--primary-color); margin-top: 2px; }
+.qb-summary__text { margin: 0; font-size: var(--fs-body); line-height: 1.5; }

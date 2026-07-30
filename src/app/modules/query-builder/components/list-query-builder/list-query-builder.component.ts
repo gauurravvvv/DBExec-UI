@@ -402,6 +402,7 @@ export class ListQueryBuilderComponent implements OnInit {
   }
 
   onExecute(id: string) {
-    this.router.navigate([QUERY_BUILDER.run(this.selectedDatasource, id)]);
+    // Query Builder v2 — open the business-user composer (tree filters + run).
+    this.router.navigate([QUERY_BUILDER.compose(id)]);
   }
 }

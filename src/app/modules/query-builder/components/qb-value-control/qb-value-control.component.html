@@ -1,0 +1,140 @@
+<!--
+  The control is chosen by prompt type x operator arity. arity 'none' renders
+  nothing; 'two' renders a from/to pair; otherwise a single control.
+  Every control is a shared app-custom-* component.
+-->
+<ng-container [ngSwitch]="arity">
+  <!-- No value (is empty / is not empty) -->
+  <span *ngSwitchCase="'none'" class="qb-value__none">
+    {{ 'QUERY_BUILDER.NO_VALUE_NEEDED' | translate }}
+  </span>
+
+  <!-- Two values (between / not between) -->
+  <div *ngSwitchCase="'two'" class="qb-value__pair">
+    <ng-container *ngIf="singleControl === 'number'; else twoDates">
+      <app-custom-number
+        [ngModel]="first"
+        [placeholder]="'QUERY_BUILDER.FROM' | translate"
+        [min]="appearance.min ?? null"
+        [max]="appearance.max ?? null"
+        [step]="appearance.step ?? 1"
+        (onChangeEvent)="emitFirst($event)" />
+      <span class="qb-value__sep">{{ 'QUERY_BUILDER.AND' | translate }}</span>
+      <app-custom-number
+        [ngModel]="second"
+        [placeholder]="'QUERY_BUILDER.TO' | translate"
+        [min]="appearance.min ?? null"
+        [max]="appearance.max ?? null"
+        [step]="appearance.step ?? 1"
+        (onChangeEvent)="emitSecond($event)" />
+    </ng-container>
+    <ng-template #twoDates>
+      <app-custom-calendar
+        [ngModel]="first"
+        [placeholder]="'QUERY_BUILDER.FROM' | translate"
+        [dateFormat]="appearance.dateFormat || 'dd/mm/yy'"
+        (onChangeEvent)="emitFirst($event)" />
+      <span class="qb-value__sep">{{ 'QUERY_BUILDER.AND' | translate }}</span>
+      <app-custom-calendar
+        [ngModel]="second"
+        [placeholder]="'QUERY_BUILDER.TO' | translate"
+        [dateFormat]="appearance.dateFormat || 'dd/mm/yy'"
+        (onChangeEvent)="emitSecond($event)" />
+    </ng-template>
+  </div>
+
+  <!-- Many values (is any of / is none of) -->
+  <div *ngSwitchCase="'many'" class="qb-value__many">
+    <app-custom-multiselect
+      *ngIf="hasOptions; else chipsMany"
+      [options]="options"
+      [ngModel]="values"
+      optionLabel="label"
+      optionValue="value"
+      [display]="appearance.display || 'chip'"
+      [placeholder]="appearance.placeholder || ('QUERY_BUILDER.SELECT_VALUES' | translate)"
+      (ngModelChange)="emitMany($event)" />
+    <ng-template #chipsMany>
+      <app-email-chips-input
+        mode="tag"
+        [ngModel]="values"
+        [placeholder]="'QUERY_BUILDER.TYPE_OR_PASTE' | translate"
+        (ngModelChange)="emitMany($event)" />
+    </ng-template>
+  </div>
+
+  <!-- Single value (default) -->
+  <div *ngSwitchDefault class="qb-value__single">
+    <ng-container [ngSwitch]="singleControl">
+      <app-custom-dropdown
+        *ngSwitchCase="'dropdown'"
+        [options]="options"
+        [ngModel]="first"
+        optionLabel="label"
+        optionValue="value"
+        [showClear]="true"
+        [placeholder]="appearance.placeholder || ('QUERY_BUILDER.SELECT_VALUE' | translate)"
+        (onChangeEvent)="emitSingle($event)" />
+
+      <app-custom-dropdown
+        *ngSwitchCase="'multiselect'"
+        [options]="options"
+        [ngModel]="first"
+        optionLabel="label"
+        optionValue="value"
+        [showClear]="true"
+        [placeholder]="'QUERY_BUILDER.SELECT_VALUE' | translate"
+        (onChangeEvent)="emitSingle($event)" />
+
+      <app-custom-radio
+        *ngSwitchCase="'radio'"
+        [options]="options"
+        [ngModel]="first"
+        (ngModelChange)="emitSingle($event)" />
+
+      <app-custom-dropdown
+        *ngSwitchCase="'checkbox'"
+        [options]="options"
+        [ngModel]="first"
+        optionLabel="label"
+        optionValue="value"
+        (onChangeEvent)="emitSingle($event)" />
+
+      <app-custom-number
+        *ngSwitchCase="'number'"
+        [ngModel]="first"
+        [min]="appearance.min ?? null"
+        [max]="appearance.max ?? null"
+        [step]="appearance.step ?? 1"
+        [placeholder]="appearance.placeholder || ''"
+        (onChangeEvent)="emitSingle($event)" />
+
+      <app-custom-number
+        *ngSwitchCase="'rangeslider'"
+        [ngModel]="first"
+        [placeholder]="appearance.placeholder || ''"
+        (onChangeEvent)="emitSingle($event)" />
+
+      <app-custom-calendar
+        *ngSwitchCase="'date'"
+        [ngModel]="first"
+        [dateFormat]="appearance.dateFormat || 'dd/mm/yy'"
+        [placeholder]="appearance.placeholder || ''"
+        (onChangeEvent)="emitSingle($event)" />
+
+      <app-custom-calendar
+        *ngSwitchCase="'calendar'"
+        [ngModel]="first"
+        [showTime]="appearance.showTime ?? true"
+        [dateFormat]="appearance.dateFormat || 'dd/mm/yy'"
+        [placeholder]="appearance.placeholder || ''"
+        (onChangeEvent)="emitSingle($event)" />
+
+      <app-custom-input
+        *ngSwitchDefault
+        [ngModel]="first"
+        [placeholder]="appearance.placeholder || ''"
+        (onChangeEvent)="emitSingle($event)" />
+    </ng-container>
+  </div>
+</ng-container>

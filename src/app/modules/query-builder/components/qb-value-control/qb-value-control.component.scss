@@ -1,0 +1,33 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+.qb-value__none {
+  font-size: var(--fs-label);
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.qb-value__pair {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+
+  app-custom-number,
+  app-custom-calendar {
+    flex: 1 1 0;
+    min-width: 0;
+  }
+}
+
+.qb-value__sep {
+  font-size: var(--fs-label);
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.qb-value__single,
+.qb-value__many {
+  width: 100%;
+}

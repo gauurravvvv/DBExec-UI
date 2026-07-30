@@ -296,6 +296,16 @@ export const QUERY_BUILDER = {
   STRUCTURE_SUFFIX: '/structure',
   // POST /query-builders/:queryBuilderId/execute
   EXECUTE_SUFFIX: '/execute',
+  // Query Builder v2 — runtime + admin surface
+  SCHEMA_SUFFIX: '/schema', // GET /query-builders/:id/schema
+  PREVIEW: '/query-builders/preview', // POST tree -> { sql, paramCount, joinsUsed, warnings }
+  VALIDATE: '/query-builders/validate', // POST tree -> { errors }
+  RUN: '/query-builders/execute', // POST tree -> { columns, rows, ... }
+  COUNT: '/query-builders/count', // POST tree -> { total }
+  SETTINGS_SUFFIX: '/settings',
+  DEFAULT_TREE_SUFFIX: '/default-tree',
+  OUTPUT_COLUMNS_SUFFIX: '/output-columns',
+  JOINS_SUFFIX: '/joins',
 };
 
 export const QUERY = {

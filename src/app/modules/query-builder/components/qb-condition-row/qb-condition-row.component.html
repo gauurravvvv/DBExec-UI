@@ -1,0 +1,74 @@
+<div
+  class="qb-condition"
+  *ngIf="node() as n"
+  [class.qb-condition--skipped]="isSkipped()"
+  [class.qb-condition--error]="errors().length"
+>
+  <div class="qb-condition__main">
+    <!-- Prompt picker -->
+    <app-custom-dropdown
+      class="qb-condition__prompt"
+      [options]="promptOptions()"
+      [ngModel]="n.promptId"
+      optionLabel="label"
+      optionValue="value"
+      [filter]="true"
+      filterBy="label"
+      [placeholder]="'QUERY_BUILDER.SELECT_FIELD' | translate"
+      (onChangeEvent)="onPromptChange($event)" />
+
+    <!-- Negate -->
+    <app-button
+      variant="ghost"
+      size="sm"
+      [class.qb-condition__not--active]="n.negate"
+      class="qb-condition__not"
+      (clicked)="onNegateToggle()"
+    >
+      {{ 'QUERY_BUILDER.NOT' | translate }}
+    </app-button>
+
+    <!-- Operator -->
+    <app-custom-dropdown
+      class="qb-condition__operator"
+      [options]="operatorOptions()"
+      [ngModel]="n.operatorCode"
+      optionLabel="label"
+      optionValue="value"
+      [placeholder]="'QUERY_BUILDER.OPERATOR' | translate"
+      (onChangeEvent)="onOperatorChange($event)" />
+
+    <!-- Value -->
+    <qb-value-control
+      *ngIf="prompt() as p"
+      class="qb-condition__value"
+      [prompt]="p"
+      [arity]="arity()"
+      [values]="n.values"
+      [invalid]="errors().length > 0"
+      (valuesChange)="onValuesChange($event)" />
+
+    <!-- Remove -->
+    <app-button
+      variant="ghost"
+      size="sm"
+      icon="pi pi-times"
+      class="qb-condition__remove"
+      [title]="'QUERY_BUILDER.REMOVE_CONDITION' | translate"
+      (clicked)="remove()" />
+  </div>
+
+  <!-- "Not applied" chip when empty and optional -->
+  <app-chip
+    *ngIf="isSkipped()"
+    variant="tag"
+    class="qb-condition__chip"
+  >
+    {{ 'QUERY_BUILDER.NOT_APPLIED' | translate }}
+  </app-chip>
+
+  <!-- Validation errors -->
+  <p class="qb-condition__errmsg" *ngFor="let e of errors()">
+    {{ e.message }}
+  </p>
+</div>

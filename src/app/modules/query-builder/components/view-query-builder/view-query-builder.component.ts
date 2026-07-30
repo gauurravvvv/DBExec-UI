@@ -483,6 +483,11 @@ export class ViewQueryBuilderComponent implements OnInit, OnDestroy {
       .catch(() => {});
   }
 
+  onCompose(): void {
+    // Query Builder v2 — open the business-user composer (tree filters + run).
+    this.router.navigate([QUERY_BUILDER.compose(this.queryBuilderId)]);
+  }
+
   onEdit(): void {
     this.router.navigate([QUERY_BUILDER.edit(this.queryBuilderId)]);
   }

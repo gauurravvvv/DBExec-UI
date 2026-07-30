@@ -1,0 +1,50 @@
+:host {
+  display: block;
+}
+
+.qb-group {
+  border: 1px solid var(--border-color);
+  border-left: 3px solid var(--primary-color);
+  border-radius: var(--radius-md, 8px);
+  background: var(--surface-ground, #f8f9fb);
+  padding: var(--space-3);
+
+  &--or {
+    border-left-color: var(--secondary-color, #f5a623);
+  }
+  &--negated {
+    border-style: dashed;
+  }
+}
+
+.qb-group__head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
+}
+
+.qb-group__spacer {
+  flex: 1 1 auto;
+}
+
+.qb-group__not--active :where(button, .app-button) {
+  color: var(--primary-color);
+  font-weight: var(--fw-semibold, 600);
+}
+
+.qb-group__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.qb-group__empty {
+  margin: 0;
+  padding: var(--space-4);
+  text-align: center;
+  font-size: var(--fs-label);
+  color: var(--text-muted);
+  border: 1px dashed var(--border-color);
+  border-radius: var(--radius-sm, 6px);
+}

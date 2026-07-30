@@ -142,6 +142,9 @@ export const QUERY_BUILDER = {
     `/app/query-builders/${dbId}/${id}/configure`,
   run: (dbId: string | number, queryBuilderId: string | number) =>
     `/app/query-builders/${dbId}/${queryBuilderId}/run`,
+  // Query Builder v2 — the business-user composer. Only needs the QB id;
+  // the datasource is resolved from the hydrated schema server-side.
+  compose: (id: string | number) => `/app/query-builders/${id}/compose`,
 };
 
 // Dashboards are view-only.

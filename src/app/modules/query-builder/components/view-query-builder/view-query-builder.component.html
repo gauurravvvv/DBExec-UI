@@ -53,8 +53,17 @@
           </div>
         </div>
         <button
-          *hasPermission="'queryBuilderScreen'; level: 'write'"
+          *hasPermission="'queryBuilderScreen'; level: 'read'"
           class="btn-primary"
+          type="button"
+          (click)="onCompose()"
+        >
+          <i class="pi pi-play"></i>
+          {{ 'QUERY_BUILDER.RUN' | translate }}
+        </button>
+        <button
+          *hasPermission="'queryBuilderScreen'; level: 'write'"
+          class="btn-configure"
           type="button"
           (click)="onEdit()"
         >
