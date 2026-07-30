@@ -1,6 +1,6 @@
 # prompt
 > Update the Progress log on every change.
-> Code path: `src/app/modules/prompt` · Status: 🟢 · Last updated: 2026-07-24
+> Code path: `src/app/modules/prompt` · Status: 🟢 · Last updated: 2026-07-30
 
 ## 1. Context
 - Responsibility: DBExec **Studio** primitive — a reusable parameterised input control (a "prompt"). Each prompt has a control **type** (one of ~9: text, number, dropdown, multiselect, checkbox, radio, calendar, daterange, rangeslider), is bound to a datasource + tab + section, and supplies values either statically or from a SQL query. Prompts are the form fields that `query-builder` (and older Studio flows) arrange and run.
@@ -23,6 +23,15 @@
 - Out of scope: chart/BI parameters (analyses), dataset `{{name}}` params (dataset).
 
 ## 3. Progress (newest first)
+### 2026-07-30 — Query Builder v2: de-couple from Tab/Section
+- Done: prompts are now datasource-scoped, not section-scoped. `add-prompt`
+  rewritten as a flat single-prompt reactive form (datasource / name /
+  description / type / optional groupName); `edit-prompt` drops the required
+  `section` control (keeps name/description/datasource/groupName/status).
+  `prompt.service` posts the flat body (no tab/section). The Section module was
+  deleted; the config-prompt per-type dialogs are unchanged.
+- Files touched: components/add-prompt, components/edit-prompt, services/prompt.service.
+
 ### 2026-07-24 — Current state captured
 - Done: Full prompt CRUD + per-type configuration across all 9 control types (text/number/dropdown/multiselect/checkbox/radio/calendar/daterange/rangeslider), static + SQL-query-driven values (sql-query-dialog with Execute preview + refresh-values), appearance config, NgRx-backed config-prompt state. RBAC: hide Actions column when no row actions (53c57624) + gate every CUD button (bfe557d6). Skeleton-loading + cancellation (66fe8f41); relative timestamps (a1654900); form body max-height dropped (ef88920c).
 - In progress / Known issues: older Studio module not on the shared custom-table/reference-data path for its config dialogs; query-backed values bypass RLS (RLS-P2-1); overlaps with analyses-parameters. No active work.

@@ -1,5 +1,15 @@
 # DBExec-UI — Session Log (newest first)
 
+### 2026-07-30 — Query Builder v2 (runtime composer, admin design, tab/section removal)
+- Focus: build the full Query Builder v2 UI from the spec and remove the Tab/Section layers so the module is "just Prompt + Query Builder".
+- Built: the business-user composer at `:id/compose` — a normalized signal store (Map+rootId, undo/redo) driving a recursive AND/OR tree (qb-filter-tree/group-node/condition-row/value-control), with a plain-English summary, a read-only Monaco SQL preview (server-generated only), and count/run against the compile pipeline (`qb-runtime.service`). Value control resolves by prompt type × operator arity; empty conditions are skipped; errors key by nodeId.
+- Built: the admin design shell at `:id/design` — a tabbed `qb-design` hosting `qb-form-designer` + `qb-prompt-palette` (CDK drag-drop placements into groups), `qb-appearance-form` (data-driven per-type editor round-tripped through the mirrored `promptAppearance` Zod schema), `qb-join-designer`, `qb-output-columns`, `qb-settings` (`qb-admin.service`). Reused `asset-share-dialog` for the `querybuilder` type.
+- Removed: the tab and section feature modules, the legacy configure/execute QB screens, and their app routes / permission entries / api constants. Rewrote view-query-builder lean (Run/Design/Share/Edit/Delete) and de-coupled add/edit-prompt from SectionService (flat forms). Repointed dataset type-2 edit nav to the composer.
+- Gotchas learned: `app-custom-input`/`-multiselect`/`-radio`/`-binary-checkbox` are pure CVAs (bind `ngModelChange`, not `onChangeEvent`); button/chip/email-chips are standalone (import in the module); CDK `DragDropModule` needs aliasing vs PrimeNG's; the worktree isolation branches from a fresh origin ref (a subagent there lacked the just-made P6/P7 commits — did the removal in the main tree instead).
+- Verified: tsc → ngc → prod build green after each phase (P6, P7, P8). QUERY_BUILDER + QUERY_BUILDER.APPEARANCE + prompt keys across all 10 locales.
+- Modules updated: query-builder, prompt (+ dataset nav, shared asset-share-dialog type). Backend: query-builders (v2 admin endpoints + share unblock).
+- Open for next session: live end-to-end verification against a seeded org; the `/app/query-builders` routing redirect wants a live browser check; bulk-paste resolve + value-source admin config not yet wired.
+
 ### 2026-07-29 — Dataset decomposition, part 2
 - Focus: reduce the three files still over ~1,900 lines after part 1, still with zero behaviour change.
 - Changed: extracted `DatasetSqlWorkbenchBase` (852) holding the 81 byte-identical members + 37 shared fields that part 1's service extraction had made identical (up from 56); split `monaco-intellisense.service.ts` by Monaco provider into `services/intellisense/` behind an `IntelliSenseContext` seam.
