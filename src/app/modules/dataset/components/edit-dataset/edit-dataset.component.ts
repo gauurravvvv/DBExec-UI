@@ -1142,10 +1142,10 @@ export class EditDatasetComponent
         if (this.globalService.handleSuccessService(response, false)) {
           const dataset = response.data;
 
-          // Type 2 (Prompt-based): redirect to execute-query-builder in edit mode
+          // Type 2 (Prompt-based): open the v2 composer in edit mode
           if (dataset.type === 2 && dataset.queryBuilderId) {
             this.router.navigate(
-              [QUERY_BUILDER.run(dataset.datasourceId, dataset.queryBuilderId)],
+              [QUERY_BUILDER.compose(dataset.queryBuilderId)],
               {
                 queryParams: {
                   editDatasetId: dataset.id,

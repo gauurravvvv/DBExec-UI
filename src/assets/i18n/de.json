@@ -2757,7 +2757,10 @@
     "UPLOAD_VALUES_FILE": "Wertedatei hochladen",
     "USE": "Verwenden",
     "WHERE_CONDITION_HINT": "Eine optionale WHERE-Klausel zum Filtern der Werte.",
-    "WHERE_CONDITION_REQUIRED": "Eine WHERE-Bedingung ist erforderlich"
+    "WHERE_CONDITION_REQUIRED": "Eine WHERE-Bedingung ist erforderlich",
+    "TYPE": "Typ",
+    "GROUP": "Gruppe",
+    "GROUP_PLACEHOLDER": "Optionaler Gruppenname"
   },
   "QUERY_BUILDER_MODULE": {
     "TITLE": "Query Builders",

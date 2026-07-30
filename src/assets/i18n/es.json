@@ -2757,7 +2757,10 @@
     "UPLOAD_VALUES_FILE": "Subir archivo de valores",
     "USE": "Usar",
     "WHERE_CONDITION_HINT": "Una cláusula WHERE opcional para filtrar los valores.",
-    "WHERE_CONDITION_REQUIRED": "Se requiere una condición WHERE"
+    "WHERE_CONDITION_REQUIRED": "Se requiere una condición WHERE",
+    "TYPE": "Tipo",
+    "GROUP": "Grupo",
+    "GROUP_PLACEHOLDER": "Nombre de grupo opcional"
   },
   "QUERY_BUILDER_MODULE": {
     "TITLE": "Query Builders",

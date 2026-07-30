@@ -24,9 +24,7 @@ import { ChipComponent } from 'src/app/shared/components/chip/chip.component';
 import { EmailChipsInputComponent } from 'src/app/shared/components/email-chips-input/email-chips-input.component';
 import { AppPrimeNGModule } from 'src/app/shared/modules/app-primeng.module';
 import { AddQueryBuilderComponent } from './components/add-query-builder/add-query-builder.component';
-import { ConfigureQueryBuilderComponent } from './components/configure-query-builder/configure-query-builder.component';
 import { EditQueryBuilderComponent } from './components/edit-query-builder/edit-query-builder.component';
-import { ExecuteQueryBuilderComponent } from './components/execute-query-builder/execute-query-builder.component';
 import { ListQueryBuilderComponent } from './components/list-query-builder/list-query-builder.component';
 import { QbAppearanceFormComponent } from './components/qb-appearance-form/qb-appearance-form.component';
 import { QbConditionRowComponent } from './components/qb-condition-row/qb-condition-row.component';
@@ -51,8 +49,6 @@ import { QueryBuilderRoutingModule } from './query-builder-routing.module';
     EditQueryBuilderComponent,
     ListQueryBuilderComponent,
     ViewQueryBuilderComponent,
-    ConfigureQueryBuilderComponent,
-    ExecuteQueryBuilderComponent,
     // Query Builder v2 — runtime composer (business-user screen)
     RunQueryBuilderComponent,
     QbFilterTreeComponent,
@@ -101,6 +97,5 @@ import { QueryBuilderRoutingModule } from './query-builder-routing.module';
     ChipComponent,
     EmailChipsInputComponent,
   ],
-  exports: [ConfigureQueryBuilderComponent],
 })
 export class QueryBuilderModule {}

@@ -2757,7 +2757,10 @@
     "UPLOAD_VALUES_FILE": "値ファイルをアップロード",
     "USE": "使用",
     "WHERE_CONDITION_HINT": "値をフィルタリングするための任意の WHERE 句。",
-    "WHERE_CONDITION_REQUIRED": "WHERE 条件が必要です"
+    "WHERE_CONDITION_REQUIRED": "WHERE 条件が必要です",
+    "TYPE": "種類",
+    "GROUP": "グループ",
+    "GROUP_PLACEHOLDER": "グループ名（任意）"
   },
   "QUERY_BUILDER_MODULE": {
     "TITLE": "Query Builders",

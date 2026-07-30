@@ -2760,7 +2760,10 @@
     "UPLOAD_VALUES_FILE": "Upload values file",
     "USE": "Use",
     "WHERE_CONDITION_HINT": "An optional WHERE clause to filter values.",
-    "WHERE_CONDITION_REQUIRED": "A WHERE condition is required"
+    "WHERE_CONDITION_REQUIRED": "A WHERE condition is required",
+    "TYPE": "Type",
+    "GROUP": "Group",
+    "GROUP_PLACEHOLDER": "Optional group name"
   },
   "QUERY_BUILDER_MODULE": {
     "TITLE": "Query Builders",

@@ -7,20 +7,25 @@ import {
   OnInit,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
-import { DEFAULT_PAGE, MAX_LIMIT } from 'src/app/core/constants';
+import { DEFAULT_PAGE } from 'src/app/core/constants';
 import { REGEX } from 'src/app/core/constants/regex.constant';
 import { PROMPT } from 'src/app/core/constants/routes.constant';
 import { HasUnsavedChanges } from 'src/app/core/models/has-unsaved-changes.model';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { DatasourceService } from 'src/app/modules/datasource/services/datasource.service';
-import { PromptService } from 'src/app/modules/prompt/services/prompt.service';
-import { SectionService } from 'src/app/modules/section/services/section.service';
-import { TabService } from 'src/app/modules/tab/services/tab.service';
 import { PROMPT_TYPES } from '../../constants/prompt.constant';
+import { PromptService } from '../../services/prompt.service';
 
+/**
+ * add-prompt — create a single prompt for a datasource.
+ *
+ * Query Builder v2: a prompt is datasource-scoped (no tab/section). This is a
+ * plain reactive form — datasource, name, description, type and an optional
+ * group — that posts one prompt via promptService.add.
+ */
 @Component({
   selector: 'app-add-prompt',
   templateUrl: './add-prompt.component.html',
@@ -31,89 +36,44 @@ export class AddPromptComponent implements OnInit, HasUnsavedChanges {
   private destroyRef = inject(DestroyRef);
   private cdr = inject(ChangeDetectorRef);
 
-  sectionForm!: FormGroup;
-  showPassword = false;
-  selectedTab: any = null;
-  selectedDatasource: any = null;
-  datasources: any[] = [];
+  promptForm!: FormGroup;
+  promptTypes = PROMPT_TYPES;
+
   preloadedDatasources: any[] | null = null;
   preloadedDatasourcesTotal: number | null = null;
-  tabs: any[] = [];
-  preloadedTabs: any[] | null = null;
-  preloadedTabsTotal: number | null = null;
-  hasDuplicates: boolean = false;
-  duplicateRows: { [key: string]: Array<[number, number]> } = {};
-  isNewlyAdded: boolean = false;
-  isNewlyAddedSection: boolean = false;
-  lastAddedSectionIndex: number = -1;
-  lastAddedGroupIndex: number = -1;
-  sections: any[] = [];
-  selectedSection: any = null;
-  lastAddedPromptIndex: number = -1;
-  promptTypes = PROMPT_TYPES;
-  expandedGroups: Set<number> = new Set();
+
   saving = this.promptService.saving;
 
   constructor(
     private fb: FormBuilder,
     private router: Router,
-    private tabService: TabService,
     private globalService: GlobalService,
     private datasourceService: DatasourceService,
-    private sectionService: SectionService,
     private promptService: PromptService,
     private translate: TranslateService,
   ) {
     this.initForm();
   }
 
+  ngOnInit(): void {
+    this.loadDatasources();
+
+    this.promptForm.valueChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => this.cdr.markForCheck());
+  }
+
   get isFormDirty(): boolean {
-    return this.sectionForm.dirty;
+    return this.promptForm.dirty;
   }
 
   hasUnsavedChanges(): boolean {
     return this.isFormDirty;
   }
 
-  ngOnInit() {
-    this.loadDatasources();
-
-    this.sectionForm.valueChanges
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(() => {
-        this.checkForDuplicates();
-      });
-  }
-
-  initForm() {
-    this.sectionForm = this.fb.group({
-      datasource: [{ value: '', disabled: false }, Validators.required],
-      tab: [{ value: '', disabled: true }, Validators.required],
-      sectionGroups: this.fb.array([]),
-    });
-
-    if (this.selectedTab) {
-      this.addSectionGroup();
-    }
-  }
-
-  get sectionGroups(): FormArray {
-    return this.sectionForm.get('sectionGroups') as FormArray;
-  }
-
-  createSectionGroup(): FormGroup {
-    return this.fb.group({
-      sectionId: ['', Validators.required],
-      prompts: this.fb.array([this.createPrompt()]),
-    });
-  }
-
-  getPrompts(groupIndex: number): FormArray {
-    return this.sectionGroups.at(groupIndex).get('prompts') as FormArray;
-  }
-
-  createPrompt(): FormGroup {
-    return this.fb.group({
+  private initForm(): void {
+    this.promptForm = this.fb.group({
+      datasource: ['', Validators.required],
       name: [
         '',
         [
@@ -125,264 +85,25 @@ export class AddPromptComponent implements OnInit, HasUnsavedChanges {
       ],
       description: [''],
       type: ['', Validators.required],
+      groupName: [''],
     });
   }
 
-  getNameError(control: any): string {
-    if (control?.errors?.['required'])
-      return this.translate.instant('PROMPT_MODULE.NAME_REQUIRED');
-    if (control?.errors?.['minlength'])
-      return this.translate.instant('PROMPT_MODULE.NAME_MIN', {
-        min: control.errors['minlength'].requiredLength,
-      });
-    if (control?.errors?.['maxlength'])
-      return this.translate.instant('PROMPT_MODULE.NAME_MAX', {
-        max: control.errors['maxlength'].requiredLength,
-      });
-    if (control?.errors?.['pattern'])
-      return this.translate.instant('PROMPT_MODULE.NAME_PATTERN');
-    return '';
-  }
-
-  addSectionGroup() {
-    this.sectionGroups.push(this.createSectionGroup());
-    const newIndex = this.sectionGroups.length - 1;
-    this.lastAddedGroupIndex = newIndex;
-    this.expandedGroups.add(newIndex);
-
-    this.scrollToBottom();
-    setTimeout(() => {
-      this.isNewlyAdded = true; // For group highlighting
-      setTimeout(() => {
-        this.isNewlyAdded = false;
-        this.lastAddedGroupIndex = -1;
-      }, 500);
-    }, 300);
-  }
-
-  removeSectionGroup(index: number) {
-    this.sectionGroups.removeAt(index);
-    this.expandedGroups.delete(index);
-    const newExpanded = new Set<number>();
-    this.expandedGroups.forEach(i => {
-      newExpanded.add(i > index ? i - 1 : i);
-    });
-    this.expandedGroups = newExpanded;
-    this.checkForDuplicates();
-  }
-
-  addPromptToSection(groupIndex: number) {
-    const prompts = this.getPrompts(groupIndex);
-    prompts.push(this.createPrompt());
-    this.expandedGroups.add(groupIndex);
-    this.lastAddedPromptIndex = prompts.length - 1;
-    this.lastAddedGroupIndex = groupIndex;
-    this.scrollToBottom();
-
-    setTimeout(() => {
-      this.isNewlyAddedSection = true; // For prompt highlighting
-      setTimeout(() => {
-        this.isNewlyAddedSection = false;
-        this.lastAddedPromptIndex = -1;
-        this.lastAddedGroupIndex = -1;
-      }, 500);
-    }, 300);
-  }
-
-  removePromptFromSection(groupIndex: number, promptIndex: number) {
-    const prompts = this.getPrompts(groupIndex);
-    prompts.removeAt(promptIndex);
-    this.checkForDuplicates();
-  }
-
-  clearAllSectionGroups() {
-    while (this.sectionGroups.length !== 0) {
-      this.sectionGroups.removeAt(0);
-    }
-    this.expandedGroups.clear();
-  }
-
-  toggleGroup(index: number) {
-    if (this.expandedGroups.has(index)) {
-      this.expandedGroups.delete(index);
-    } else {
-      this.expandedGroups.add(index);
-    }
-  }
-
-  isGroupExpanded(index: number): boolean {
-    return this.expandedGroups.has(index);
-  }
-
-  expandAll() {
-    for (let i = 0; i < this.sectionGroups.length; i++) {
-      this.expandedGroups.add(i);
-    }
-  }
-
-  collapseAll() {
-    this.expandedGroups.clear();
-  }
-
-  get areAllExpanded(): boolean {
-    return (
-      this.sectionGroups.length > 0 &&
-      this.expandedGroups.size === this.sectionGroups.length
-    );
-  }
-
-  get hasEmptyPrompts(): boolean {
-    return this.sectionGroups.controls.some(
-      group => (group.get('prompts') as FormArray).length === 0,
-    );
-  }
-
-  scrollToBottom(): void {
-    setTimeout(() => {
-      const formElement = document.querySelector('.admin-form');
-      if (formElement) {
-        formElement.scrollTo({
-          top: formElement.scrollHeight,
-          behavior: 'smooth',
-        });
-      }
-    }, 100);
-  }
-
-  checkForDuplicates() {
-    this.hasDuplicates = false;
-    this.duplicateRows = {};
-
-    this.sectionGroups.controls.forEach((group, groupIndex) => {
-      const nameMap = new Map<string, Array<number>>();
-      const prompts = this.getPrompts(groupIndex);
-
-      prompts.controls.forEach((prompt, promptIndex) => {
-        const name = prompt.get('name')?.value?.trim().toLowerCase();
-        if (name) {
-          if (!nameMap.has(name)) {
-            nameMap.set(name, [promptIndex]);
-          } else {
-            nameMap.get(name)?.push(promptIndex);
-          }
-        }
-      });
-
-      nameMap.forEach((promptIndices, name) => {
-        if (promptIndices.length > 1) {
-          this.hasDuplicates = true;
-          this.duplicateRows[`${groupIndex}-${name}`] = promptIndices.map(
-            index => [groupIndex, index] as [number, number],
-          );
-        }
-      });
-    });
-  }
-
-  isDuplicateRow(groupIndex: number, promptIndex: number): boolean {
-    return Object.values(this.duplicateRows).some(positions =>
-      positions.some(([g, s]) => g === groupIndex && s === promptIndex),
-    );
-  }
-
-  onSubmit() {
-    this.checkForDuplicates();
-    if (this.hasDuplicates) {
-      return;
-    }
-
-    if (this.sectionForm.valid) {
-      const formValue = this.sectionForm.value;
-
-      const transformedData = {
-        datasource: formValue.datasource,
-        tab: formValue.tab,
-        prompts: this.transformPrompts(),
-      };
-
-      this.promptService
-        .add(transformedData)
-        .then(response => {
-          if (this.globalService.handleSuccessService(response)) {
-            this.sectionForm.markAsPristine();
-            this.router.navigate([PROMPT.LIST]);
-          }
-          this.cdr.markForCheck();
-        })
-        .catch(() => {
-          this.cdr.markForCheck();
-        });
-    }
-  }
-
-  private transformPrompts(): any[] {
-    const prompts: any[] = [];
-    this.sectionGroups.controls.forEach(group => {
-      const sectionId = group.get('sectionId')?.value;
-      const sectionPrompts = (group.get('prompts') as FormArray).controls;
-
-      sectionPrompts.forEach(prompt => {
-        prompts.push({
-          name: prompt.get('name')?.value,
-          description: prompt.get('description')?.value,
-          type: prompt.get('type')?.value,
-          sectionId: sectionId,
-        });
-      });
-    });
-    return prompts;
-  }
-
-  onCancel() {
-    // Fix #4: Properly reset form, FormArray, and component states
-    this.sectionForm.reset();
-    this.clearAllSectionGroups();
-
-    // Reset component state
-    this.selectedDatasource = null;
-    this.selectedTab = null;
-    this.datasources = [];
-    this.preloadedDatasources = null;
-    this.preloadedDatasourcesTotal = null;
-    this.tabs = [];
-    this.preloadedTabs = null;
-    this.preloadedTabsTotal = null;
-    this.sections = [];
-    this.hasDuplicates = false;
-    this.duplicateRows = {};
-
-    // Re-disable dependent controls
-    this.sectionForm.get('tab')?.disable();
-
-    this.sectionForm.get('datasource')?.enable();
-    this.loadDatasources();
-  }
-
-  private loadDatasources() {
-    const params = {
-      page: DEFAULT_PAGE,
-      limit: 10,
-    };
-
+  private loadDatasources(): void {
     this.datasourceService
-      .listDatasource(params)
+      .listDatasource({ page: DEFAULT_PAGE, limit: 10 })
       .then(response => {
         if (this.globalService.handleSuccessService(response, false)) {
           const items = response?.data?.datasources ?? [];
           this.preloadedDatasources = items;
-          this.preloadedDatasourcesTotal =
-            response?.data?.count ?? items.length;
-          this.datasources = items;
+          this.preloadedDatasourcesTotal = response?.data?.count ?? items.length;
         }
-      })
-      .catch(() => {
         this.cdr.markForCheck();
-      });
+      })
+      .catch(() => this.cdr.markForCheck());
   }
 
-  /**
-   * Fetcher for the server-mode datasource dropdown.
-   */
+  /** Fetcher for the server-mode datasource dropdown. */
   loadDatasourcesPage = async ({
     search,
     page,
@@ -408,146 +129,41 @@ export class AddPromptComponent implements OnInit, HasUnsavedChanges {
     }
   };
 
-  onDatasourceChange(event: any) {
-    if (event.value) {
-      this.selectedDatasource = {
-        id: event.value,
-      };
-
-      const tabControl = this.sectionForm.get('tab');
-      tabControl?.enable();
-      tabControl?.setValue('');
-
-      // Tabs are scoped to datasource — drop stale preload so the dropdown
-      // re-fetches against the new datasource on next open.
-      this.preloadedTabs = null;
-      this.preloadedTabsTotal = null;
-
-      this.clearAllSectionGroups();
-      this.loadTabs();
-    }
+  getNameError(): string {
+    const control = this.promptForm.get('name');
+    if (control?.errors?.['required'])
+      return this.translate.instant('PROMPT_MODULE.NAME_REQUIRED');
+    if (control?.errors?.['minlength'])
+      return this.translate.instant('PROMPT_MODULE.NAME_MIN', {
+        min: control.errors['minlength'].requiredLength,
+      });
+    if (control?.errors?.['maxlength'])
+      return this.translate.instant('PROMPT_MODULE.NAME_MAX', {
+        max: control.errors['maxlength'].requiredLength,
+      });
+    if (control?.errors?.['pattern'])
+      return this.translate.instant('PROMPT_MODULE.NAME_PATTERN');
+    return '';
   }
 
-  onTabChange(event: any) {
-    if (event.value) {
-      this.selectedTab = {
-        id: event.value,
-      };
-      this.clearAllSectionGroups();
-      this.loadSections();
-    }
-  }
-
-  /**
-   * Fetcher for the server-mode tab dropdown. Gated on org + datasource so it
-   * stays silent until both are chosen.
-   */
-  loadTabsPage = async ({
-    search,
-    page,
-    limit,
-  }: {
-    search: string;
-    page: number;
-    limit: number;
-  }): Promise<{ items: any[]; total: number }> => {
-    if (!this.selectedDatasource?.id) {
-      return { items: [], total: 0 };
-    }
-    const params: any = {
-      datasourceId: this.selectedDatasource.id,
-      page,
-      limit,
-    };
-    if (search) params.filter = JSON.stringify({ name: search });
-    try {
-      const res: any = await this.tabService.listTab(params);
-      if (this.globalService.handleSuccessService(res, false)) {
-        return { items: res?.data?.tabs ?? [], total: res?.data?.count ?? 0 };
-      }
-      return { items: [], total: 0 };
-    } catch {
-      return { items: [], total: 0 };
-    }
-  };
-
-  loadTabs() {
-    if (!this.selectedDatasource) {
+  onSubmit(): void {
+    if (this.promptForm.invalid) {
+      this.promptForm.markAllAsTouched();
       return;
     }
-
-    const param = {
-      datasourceId: this.selectedDatasource.id,
-      page: DEFAULT_PAGE,
-      limit: 10,
-    };
-    this.tabService
-      .listTab(param)
+    this.promptService
+      .add(this.promptForm.value)
       .then(response => {
-        if (this.globalService.handleSuccessService(response, false)) {
-          const items = response?.data?.tabs ?? [];
-          this.tabs = items;
-          this.preloadedTabs = items;
-          this.preloadedTabsTotal = response?.data?.count ?? items.length;
+        if (this.globalService.handleSuccessService(response)) {
+          this.promptForm.markAsPristine();
+          this.router.navigate([PROMPT.LIST]);
         }
         this.cdr.markForCheck();
       })
-      .catch(() => {
-        this.cdr.markForCheck();
-      });
+      .catch(() => this.cdr.markForCheck());
   }
 
-  loadSections() {
-    if (!this.selectedDatasource || !this.selectedTab) {
-      return;
-    }
-
-    const params = {
-      datasourceId: this.selectedDatasource.id,
-      tabId: this.selectedTab.id,
-      page: DEFAULT_PAGE,
-      limit: MAX_LIMIT,
-    };
-    this.sectionService
-      .listSection(params)
-      .then(response => {
-        if (this.globalService.handleSuccessService(response, false)) {
-          this.sections = [...response.data.sections];
-          if (this.sectionGroups.length === 0) {
-            this.addSectionGroup();
-          }
-        }
-        this.cdr.markForCheck();
-      })
-      .catch(() => {
-        this.cdr.markForCheck();
-      });
-  }
-
-  onSectionChange(event: any, groupIndex: number) {
-    if (event.value) {
-      // Only reset prompts within this specific section group, not all groups
-      const prompts = this.getPrompts(groupIndex);
-      while (prompts.length > 0) {
-        prompts.removeAt(0);
-      }
-      prompts.push(this.createPrompt());
-    }
-  }
-
-  getAvailableSections(currentIndex: number): any[] {
-    const selectedSections = this.sectionGroups.controls
-      .map((group, index) =>
-        index !== currentIndex ? group.get('sectionId')?.value : null,
-      )
-      .filter(section => section !== null);
-
-    return this.sections.filter(
-      section => !selectedSections.includes(section.id),
-    );
-  }
-
-  trackByIndex(index: number): number {
-    return index;
+  onCancel(): void {
+    this.router.navigate([PROMPT.LIST]);
   }
 }

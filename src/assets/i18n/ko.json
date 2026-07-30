@@ -2757,7 +2757,10 @@
     "UPLOAD_VALUES_FILE": "값 파일 업로드",
     "USE": "사용",
     "WHERE_CONDITION_HINT": "값을 필터링하는 선택적 WHERE 절입니다.",
-    "WHERE_CONDITION_REQUIRED": "WHERE 조건이 필요합니다"
+    "WHERE_CONDITION_REQUIRED": "WHERE 조건이 필요합니다",
+    "TYPE": "유형",
+    "GROUP": "그룹",
+    "GROUP_PLACEHOLDER": "그룹 이름(선택)"
   },
   "QUERY_BUILDER_MODULE": {
     "TITLE": "Query Builders",

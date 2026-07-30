@@ -2,9 +2,7 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { unsavedChangesGuard } from 'src/app/core/guards/unsaved-changes.guard';
 import { AddQueryBuilderComponent } from './components/add-query-builder/add-query-builder.component';
-import { ConfigureQueryBuilderComponent } from './components/configure-query-builder/configure-query-builder.component';
 import { EditQueryBuilderComponent } from './components/edit-query-builder/edit-query-builder.component';
-import { ExecuteQueryBuilderComponent } from './components/execute-query-builder/execute-query-builder.component';
 import { ListQueryBuilderComponent } from './components/list-query-builder/list-query-builder.component';
 import { QbDesignComponent } from './components/qb-design/qb-design.component';
 import { RunQueryBuilderComponent } from './components/run-query-builder/run-query-builder.component';
@@ -36,17 +34,6 @@ const routes: Routes = [
     path: ':id/edit',
     component: EditQueryBuilderComponent,
     canDeactivate: [unsavedChangesGuard],
-  },
-  // Action sub-routes nested under the resource — RESTful action shape.
-  // Carrying :dbId in the URL is intentional: the QB is scoped to a
-  // specific database, and the page needs both.
-  {
-    path: ':dbId/:id/configure',
-    component: ConfigureQueryBuilderComponent,
-  },
-  {
-    path: ':dbId/:queryBuilderId/run',
-    component: ExecuteQueryBuilderComponent,
   },
 ];
 

@@ -2757,7 +2757,10 @@
     "UPLOAD_VALUES_FILE": "Téléverser un fichier de valeurs",
     "USE": "Utiliser",
     "WHERE_CONDITION_HINT": "Une clause WHERE facultative pour filtrer les valeurs.",
-    "WHERE_CONDITION_REQUIRED": "Une condition WHERE est requise"
+    "WHERE_CONDITION_REQUIRED": "Une condition WHERE est requise",
+    "TYPE": "Type",
+    "GROUP": "Groupe",
+    "GROUP_PLACEHOLDER": "Nom de groupe facultatif"
   },
   "QUERY_BUILDER_MODULE": {
     "TITLE": "Query Builders",

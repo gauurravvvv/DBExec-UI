@@ -2757,7 +2757,10 @@
     "UPLOAD_VALUES_FILE": "Waardenbestand uploaden",
     "USE": "Gebruiken",
     "WHERE_CONDITION_HINT": "Een optionele WHERE-clausule om waarden te filteren.",
-    "WHERE_CONDITION_REQUIRED": "Een WHERE-voorwaarde is vereist"
+    "WHERE_CONDITION_REQUIRED": "Een WHERE-voorwaarde is vereist",
+    "TYPE": "Type",
+    "GROUP": "Groep",
+    "GROUP_PLACEHOLDER": "Optionele groepsnaam"
   },
   "QUERY_BUILDER_MODULE": {
     "TITLE": "Query Builders",

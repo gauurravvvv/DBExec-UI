@@ -237,31 +237,6 @@ export const CALCULATED_FIELD = {
   DELETE: '/calculated-fields/', // DELETE /calculated-fields/:id
 };
 
-export const TAB = {
-  LIST: '/tabs',
-  ADD: '/tabs',
-  TREE: '/tabs/tree',
-  GET: '/tabs/', // GET /tabs/:tabId
-  UPDATE: '/tabs/', // PUT /tabs/:tabId
-  DELETE: '/tabs/', // DELETE /tabs/:tabId
-  BULK_DELETE: '/tabs/bulk-delete',
-  // GET /tabs/:tabId/sections?queryBuilderId=
-  SECTIONS_PREFIX: '/tabs/',
-  SECTIONS_SUFFIX: '/sections',
-};
-
-export const SECTION = {
-  LIST: '/sections',
-  ADD: '/sections',
-  GET: '/sections/',
-  UPDATE: '/sections/',
-  DELETE: '/sections/',
-  BULK_DELETE: '/sections/bulk-delete',
-  // GET /sections/:sectionId/prompts?queryBuilderId=&tabId=
-  PROMPTS_PREFIX: '/sections/',
-  PROMPTS_SUFFIX: '/prompts',
-};
-
 export const PROMPT = {
   LIST: '/prompts',
   ADD: '/prompts',

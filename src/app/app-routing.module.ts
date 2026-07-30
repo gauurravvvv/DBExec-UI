@@ -205,23 +205,6 @@ const routes: Routes = [
         },
       },
       {
-        path: 'tabs',
-        loadChildren: () =>
-          import('./modules/tab/tab.module').then(m => m.TabModule),
-        canActivate: [roleGuard],
-        data: { permission: PERMISSIONS.QB_TAB, title: 'PAGE_TITLES.TABS' },
-      },
-      {
-        path: 'sections',
-        loadChildren: () =>
-          import('./modules/section/section.module').then(m => m.SectionModule),
-        canActivate: [roleGuard],
-        data: {
-          permission: PERMISSIONS.QB_SECTION,
-          title: 'PAGE_TITLES.SECTIONS',
-        },
-      },
-      {
         path: 'prompts',
         loadChildren: () =>
           import('./modules/prompt/prompt.module').then(m => m.PromptModule),

@@ -2757,7 +2757,10 @@
     "UPLOAD_VALUES_FILE": "Carica file di valori",
     "USE": "Usa",
     "WHERE_CONDITION_HINT": "Una clausola WHERE facoltativa per filtrare i valori.",
-    "WHERE_CONDITION_REQUIRED": "È richiesta una condizione WHERE"
+    "WHERE_CONDITION_REQUIRED": "È richiesta una condizione WHERE",
+    "TYPE": "Tipo",
+    "GROUP": "Gruppo",
+    "GROUP_PLACEHOLDER": "Nome gruppo facoltativo"
   },
   "QUERY_BUILDER_MODULE": {
     "TITLE": "Query Builders",

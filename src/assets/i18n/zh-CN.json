@@ -2757,7 +2757,10 @@
     "UPLOAD_VALUES_FILE": "上传值文件",
     "USE": "使用",
     "WHERE_CONDITION_HINT": "可选的 WHERE 子句，用于筛选值。",
-    "WHERE_CONDITION_REQUIRED": "必须填写 WHERE 条件"
+    "WHERE_CONDITION_REQUIRED": "必须填写 WHERE 条件",
+    "TYPE": "类型",
+    "GROUP": "分组",
+    "GROUP_PLACEHOLDER": "可选的分组名称"
   },
   "QUERY_BUILDER_MODULE": {
     "TITLE": "Query Builders",
