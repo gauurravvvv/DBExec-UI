@@ -5556,6 +5556,34 @@
       "ORIENTATION": "Orientation",
       "SHOW_VALUE_LABELS": "Show value labels",
       "UNIT": "Unit"
+    },
+    "PASTE_VALUES": "粘贴值",
+    "PASTE_HINT": "粘贴以换行、逗号或制表符分隔的值",
+    "PASTE_PLACEHOLDER": "ACC-1001\nACC-1002\nACC-1003",
+    "PASTE_CHECK": "检查值",
+    "PASTE_MATCHED": "匹配",
+    "PASTE_UNMATCHED": "未找到",
+    "PASTE_ADD": "添加匹配项",
+    "VS": {
+      "TITLE": "值来源",
+      "FREE": "自由输入",
+      "STATIC": "固定列表",
+      "LOOKUP": "查找查询",
+      "DISTINCT": "去重列",
+      "FREE_HINT": "Users type any value; no option list.",
+      "BULK_IMPORT": "Bulk import",
+      "BULK_PLACEHOLDER": "One value per line, or value,display",
+      "IMPORT": "Import",
+      "VALUE": "Value",
+      "DISPLAY": "Display",
+      "ADD_VALUE": "Add value",
+      "LOOKUP_SQL": "Lookup SQL",
+      "LOOKUP_HINT": "A SELECT returning a value column (and an optional display column).",
+      "COLUMN": "Value column",
+      "DISPLAY_COLUMN": "Display column (optional)",
+      "PREVIEW": "Preview",
+      "PREVIEW_RESULT": "Preview",
+      "THRESHOLD_WARNING": "Large value set — the runtime will use server-paged search."
     }
   }
 }

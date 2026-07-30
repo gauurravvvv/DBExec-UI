@@ -39,6 +39,7 @@ import { QbSettingsComponent } from './components/qb-settings/qb-settings.compon
 import { QbSqlPreviewComponent } from './components/qb-sql-preview/qb-sql-preview.component';
 import { QbSummaryComponent } from './components/qb-summary/qb-summary.component';
 import { QbValueControlComponent } from './components/qb-value-control/qb-value-control.component';
+import { QbValueSourceComponent } from './components/qb-value-source/qb-value-source.component';
 import { RunQueryBuilderComponent } from './components/run-query-builder/run-query-builder.component';
 import { ViewQueryBuilderComponent } from './components/view-query-builder/view-query-builder.component';
 import { QueryBuilderRoutingModule } from './query-builder-routing.module';
@@ -65,6 +66,7 @@ import { QueryBuilderRoutingModule } from './query-builder-routing.module';
     QbJoinDesignerComponent,
     QbOutputColumnsComponent,
     QbSettingsComponent,
+    QbValueSourceComponent,
   ],
   imports: [
     CommonModule,

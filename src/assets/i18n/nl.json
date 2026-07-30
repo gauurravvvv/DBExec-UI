@@ -5556,6 +5556,34 @@
       "ORIENTATION": "Orientation",
       "SHOW_VALUE_LABELS": "Show value labels",
       "UNIT": "Unit"
+    },
+    "PASTE_VALUES": "Waarden plakken",
+    "PASTE_HINT": "Plak waarden gescheiden door nieuwe regels, komma's of tabs",
+    "PASTE_PLACEHOLDER": "ACC-1001\nACC-1002\nACC-1003",
+    "PASTE_CHECK": "Waarden controleren",
+    "PASTE_MATCHED": "gevonden",
+    "PASTE_UNMATCHED": "niet gevonden",
+    "PASTE_ADD": "Gevonden toevoegen",
+    "VS": {
+      "TITLE": "Waardebron",
+      "FREE": "Vrije invoer",
+      "STATIC": "Vaste lijst",
+      "LOOKUP": "Zoekopdracht",
+      "DISTINCT": "Unieke kolom",
+      "FREE_HINT": "Users type any value; no option list.",
+      "BULK_IMPORT": "Bulk import",
+      "BULK_PLACEHOLDER": "One value per line, or value,display",
+      "IMPORT": "Import",
+      "VALUE": "Value",
+      "DISPLAY": "Display",
+      "ADD_VALUE": "Add value",
+      "LOOKUP_SQL": "Lookup SQL",
+      "LOOKUP_HINT": "A SELECT returning a value column (and an optional display column).",
+      "COLUMN": "Value column",
+      "DISPLAY_COLUMN": "Display column (optional)",
+      "PREVIEW": "Preview",
+      "PREVIEW_RESULT": "Preview",
+      "THRESHOLD_WARNING": "Large value set — the runtime will use server-paged search."
     }
   }
 }

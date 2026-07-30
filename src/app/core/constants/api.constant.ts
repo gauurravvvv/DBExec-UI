@@ -253,6 +253,11 @@ export const PROMPT = {
   REFRESH_VALUES_SUFFIX: '/refresh-values',
   // PUT/GET /prompts/:promptId/appearance
   APPEARANCE_SUFFIX: '/appearance',
+  // Query Builder v2 — value-source config + runtime value lookup (spec 6.6)
+  VALUE_SOURCE_SUFFIX: '/value-source', // GET/PUT /prompts/:id/value-source
+  VALUES_PREVIEW_SUFFIX: '/values/preview', // POST -> sample rows before saving
+  VALUES_SEARCH_SUFFIX: '/values/search', // POST -> paged typeahead + cascade
+  VALUES_RESOLVE_SUFFIX: '/values/resolve', // POST -> bulk-paste { matched, unmatched }
 };
 
 export const QUERY_BUILDER = {

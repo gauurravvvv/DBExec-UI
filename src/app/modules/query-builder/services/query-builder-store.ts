@@ -103,6 +103,22 @@ export class QueryBuilderStore {
     return computed(() => this.serverErrors().filter(e => e.nodeId === id));
   }
 
+  /**
+   * Current values entered for a given prompt anywhere in the tree — used to
+   * feed cascading (dependsOn) child lookups. Reactive: reads the nodes signal.
+   */
+  valuesForPrompt(promptId: string): string[] {
+    const out: string[] = [];
+    for (const node of this.nodes().values()) {
+      if (node.kind === 'condition' && node.promptId === promptId) {
+        for (const v of node.values) {
+          if (v != null && v !== '') out.push(String(v));
+        }
+      }
+    }
+    return out;
+  }
+
   /** Operator metadata for a prompt + code, from the hydrated schema. */
   operatorMeta(promptId: string, code: string): { arity: Arity } {
     const p = this.schema()

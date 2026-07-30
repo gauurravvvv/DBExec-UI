@@ -8,7 +8,7 @@
  */
 import { Injectable } from '@angular/core';
 import { lastValueFrom } from 'rxjs';
-import { QUERY_BUILDER } from 'src/app/core/constants/api.constant';
+import { PROMPT, QUERY_BUILDER } from 'src/app/core/constants/api.constant';
 import { HttpClientService } from 'src/app/core/services/http-client.service';
 
 export interface QbSchemaResponse {
@@ -51,8 +51,31 @@ export interface QbSchemaPrompt {
   operators: { code: string; label: string; arity: string }[];
   valueSource:
     | { kind: 'static'; values: { value: string; display: string }[] }
-    | { kind: 'lookup'; searchable: boolean; pageSize: number }
+    | {
+        kind: 'lookup';
+        searchable: boolean;
+        pageSize: number;
+        dependsOn?: string[];
+      }
     | { kind: 'free' };
+}
+
+export interface QbValueOption {
+  value: string;
+  display: string;
+}
+
+export interface QbValueSearchResponse {
+  options: QbValueOption[];
+  total: number;
+  page: number;
+  hasMore: boolean;
+}
+
+export interface QbValueResolveResponse {
+  matched: QbValueOption[];
+  unmatched: string[];
+  total: number;
 }
 
 export interface QbPreviewResponse {
@@ -102,5 +125,33 @@ export class QbRuntimeService {
 
   count(definition: any): Promise<any> {
     return lastValueFrom(this.http.apiPost(QUERY_BUILDER.COUNT, definition));
+  }
+
+  /** Server-paged typeahead for a lookup prompt (spec 6.6.2). */
+  searchValues(
+    promptId: string,
+    body: {
+      search?: string;
+      page?: number;
+      pageSize?: number;
+      dependsOn?: Record<string, string[]>;
+    },
+  ): Promise<any> {
+    return lastValueFrom(
+      this.http.apiPost(
+        PROMPT.GET + promptId + PROMPT.VALUES_SEARCH_SUFFIX,
+        body,
+        { skipLoader: true },
+      ),
+    );
+  }
+
+  /** Bulk-paste resolution: raw blob -> { matched, unmatched } (spec 6.6.4). */
+  resolveValues(promptId: string, raw: string): Promise<any> {
+    return lastValueFrom(
+      this.http.apiPost(PROMPT.GET + promptId + PROMPT.VALUES_RESOLVE_SUFFIX, {
+        raw,
+      }),
+    );
   }
 }

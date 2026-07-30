@@ -46,6 +46,7 @@
       [arity]="arity()"
       [values]="n.values"
       [invalid]="errors().length > 0"
+      [dependsOnValues]="dependsOnValues()"
       (valuesChange)="onValuesChange($event)" />
 
     <!-- Remove -->

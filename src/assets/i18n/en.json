@@ -5553,6 +5553,34 @@
       "ORIENTATION": "Orientation",
       "SHOW_VALUE_LABELS": "Show value labels",
       "UNIT": "Unit"
+    },
+    "PASTE_VALUES": "Paste values",
+    "PASTE_HINT": "Paste values separated by new lines, commas or tabs",
+    "PASTE_PLACEHOLDER": "ACC-1001\nACC-1002\nACC-1003",
+    "PASTE_CHECK": "Check values",
+    "PASTE_MATCHED": "matched",
+    "PASTE_UNMATCHED": "not found",
+    "PASTE_ADD": "Add matched",
+    "VS": {
+      "TITLE": "Value source",
+      "FREE": "Free entry",
+      "STATIC": "Fixed list",
+      "LOOKUP": "Lookup query",
+      "DISTINCT": "Distinct column",
+      "FREE_HINT": "Users type any value; no option list.",
+      "BULK_IMPORT": "Bulk import",
+      "BULK_PLACEHOLDER": "One value per line, or value,display",
+      "IMPORT": "Import",
+      "VALUE": "Value",
+      "DISPLAY": "Display",
+      "ADD_VALUE": "Add value",
+      "LOOKUP_SQL": "Lookup SQL",
+      "LOOKUP_HINT": "A SELECT returning a value column (and an optional display column).",
+      "COLUMN": "Value column",
+      "DISPLAY_COLUMN": "Display column (optional)",
+      "PREVIEW": "Preview",
+      "PREVIEW_RESULT": "Preview",
+      "THRESHOLD_WARNING": "Large value set — the runtime will use server-paged search."
     }
   }
 }

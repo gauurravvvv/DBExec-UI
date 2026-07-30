@@ -163,4 +163,28 @@ export class QbAdminService {
       this.http.apiGet(PROMPT.LIST, { params, skipLoader: true }),
     );
   }
+
+  // ── Prompt value source (spec 6.6.1) ──────────────────────────────────
+
+  getValueSource(promptId: string): Promise<any> {
+    return this.get(PROMPT.GET + promptId + PROMPT.VALUE_SOURCE_SUFFIX);
+  }
+
+  saveValueSource(promptId: string, valueSource: any): Promise<any> {
+    return this.put(PROMPT.GET + promptId + PROMPT.VALUE_SOURCE_SUFFIX, {
+      valueSource,
+    });
+  }
+
+  /** Run a value source and return sample rows before saving. */
+  previewValues(
+    promptId: string,
+    valueSource: any,
+    limit = 50,
+  ): Promise<any> {
+    return this.post(PROMPT.GET + promptId + PROMPT.VALUES_PREVIEW_SUFFIX, {
+      valueSource,
+      limit,
+    });
+  }
 }

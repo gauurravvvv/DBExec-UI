@@ -45,8 +45,9 @@
 
   <!-- Many values (is any of / is none of) -->
   <div *ngSwitchCase="'many'" class="qb-value__many">
+    <!-- static curated set -->
     <app-custom-multiselect
-      *ngIf="hasOptions; else chipsMany"
+      *ngIf="hasOptions"
       [options]="options"
       [ngModel]="values"
       optionLabel="label"
@@ -54,13 +55,38 @@
       [display]="appearance.display || 'chip'"
       [placeholder]="appearance.placeholder || ('QUERY_BUILDER.SELECT_VALUES' | translate)"
       (ngModelChange)="emitMany($event)" />
-    <ng-template #chipsMany>
-      <app-email-chips-input
-        mode="tag"
-        [ngModel]="values"
-        [placeholder]="'QUERY_BUILDER.TYPE_OR_PASTE' | translate"
-        (ngModelChange)="emitMany($event)" />
-    </ng-template>
+
+    <!-- server-paged lookup -->
+    <app-custom-multiselect
+      *ngIf="isLookup"
+      [serverMode]="true"
+      [fetcher]="fetcher"
+      [ngModel]="values"
+      optionLabel="label"
+      optionValue="value"
+      [display]="appearance.display || 'chip'"
+      [placeholder]="appearance.placeholder || ('QUERY_BUILDER.SELECT_VALUES' | translate)"
+      (ngModelChange)="emitMany($event)" />
+
+    <!-- free entry -->
+    <app-email-chips-input
+      *ngIf="!hasOptions && !isLookup"
+      mode="tag"
+      [ngModel]="values"
+      [placeholder]="'QUERY_BUILDER.TYPE_OR_PASTE' | translate"
+      (ngModelChange)="emitMany($event)" />
+
+    <!-- bulk paste (spec 6.6.4) -->
+    <app-button
+      *ngIf="canBulkPaste"
+      variant="ghost"
+      size="sm"
+      icon="pi pi-clone"
+      class="qb-value__paste-btn"
+      (clicked)="openPaste()"
+    >
+      {{ 'QUERY_BUILDER.PASTE_VALUES' | translate }}
+    </app-button>
   </div>
 
   <!-- Single value (default) -->
@@ -69,6 +95,8 @@
       <app-custom-dropdown
         *ngSwitchCase="'dropdown'"
         [options]="options"
+        [serverMode]="isLookup"
+        [fetcher]="isLookup ? fetcher : null"
         [ngModel]="first"
         optionLabel="label"
         optionValue="value"
@@ -138,3 +166,72 @@
     </ng-container>
   </div>
 </ng-container>
+
+<!-- Bulk-paste dialog (spec 6.6.4) -->
+<div class="qb-paste" *ngIf="pasteOpen()">
+  <div class="qb-paste__backdrop" (click)="closePaste()"></div>
+  <div class="qb-paste__panel">
+    <header class="qb-paste__head">
+      <h3>{{ 'QUERY_BUILDER.PASTE_VALUES' | translate }}</h3>
+      <app-button
+        variant="ghost"
+        size="sm"
+        icon="pi pi-times"
+        (clicked)="closePaste()" />
+    </header>
+
+    <div class="qb-paste__body">
+      <app-custom-input
+        inputMode="textarea"
+        [label]="'QUERY_BUILDER.PASTE_HINT' | translate"
+        [placeholder]="'QUERY_BUILDER.PASTE_PLACEHOLDER' | translate"
+        [ngModel]="pasteText()"
+        (ngModelChange)="pasteText.set($event)" />
+
+      <app-button
+        variant="secondary"
+        size="sm"
+        icon="pi pi-check-circle"
+        [loading]="pasteResolving()"
+        (clicked)="resolvePaste()"
+      >
+        {{ 'QUERY_BUILDER.PASTE_CHECK' | translate }}
+      </app-button>
+
+      <div class="qb-paste__result" *ngIf="pasteMatched().length || pasteUnmatched().length">
+        <p class="qb-paste__summary">
+          <span class="qb-paste__matched">
+            {{ pasteMatched().length | number }}
+            {{ 'QUERY_BUILDER.PASTE_MATCHED' | translate }}
+          </span>
+          <span class="qb-paste__unmatched-count" *ngIf="pasteUnmatched().length">
+            · {{ pasteUnmatched().length | number }}
+            {{ 'QUERY_BUILDER.PASTE_UNMATCHED' | translate }}
+          </span>
+        </p>
+
+        <div class="qb-paste__unmatched" *ngIf="pasteUnmatched().length">
+          <app-chip
+            *ngFor="let u of pasteUnmatched()"
+            variant="status"
+          >
+            {{ u }}
+          </app-chip>
+        </div>
+      </div>
+    </div>
+
+    <footer class="qb-paste__foot">
+      <app-button variant="secondary" (clicked)="closePaste()">
+        {{ 'COMMON.CANCEL' | translate }}
+      </app-button>
+      <app-button
+        variant="primary"
+        [disabled]="!pasteMatched().length"
+        (clicked)="applyPaste()"
+      >
+        {{ 'QUERY_BUILDER.PASTE_ADD' | translate }} ({{ pasteMatched().length | number }})
+      </app-button>
+    </footer>
+  </div>
+</div>

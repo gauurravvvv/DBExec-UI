@@ -63,6 +63,23 @@ export class QbConditionRowComponent {
     return (op?.arity as any) ?? 'one';
   });
 
+  /**
+   * Parent selections for a cascading lookup: for each promptId this prompt's
+   * value source depends on, the values currently entered elsewhere in the tree.
+   */
+  readonly dependsOnValues = computed<Record<string, string[]>>(() => {
+    const vs = this.prompt()?.valueSource as any;
+    const parents: string[] =
+      vs && vs.kind === 'lookup' && Array.isArray(vs.dependsOn)
+        ? vs.dependsOn
+        : [];
+    const out: Record<string, string[]> = {};
+    for (const parentId of parents) {
+      out[parentId] = this.store.valuesForPrompt(parentId);
+    }
+    return out;
+  });
+
   /** Empty and not mandatory -> the condition is skipped. */
   readonly isSkipped = computed(() => {
     const n = this.node();

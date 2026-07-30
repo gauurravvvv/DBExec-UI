@@ -5556,6 +5556,34 @@
       "ORIENTATION": "Orientation",
       "SHOW_VALUE_LABELS": "Show value labels",
       "UNIT": "Unit"
+    },
+    "PASTE_VALUES": "Colar valores",
+    "PASTE_HINT": "Cole valores separados por quebras de linha, vírgulas ou tabulações",
+    "PASTE_PLACEHOLDER": "ACC-1001\nACC-1002\nACC-1003",
+    "PASTE_CHECK": "Verificar valores",
+    "PASTE_MATCHED": "correspondentes",
+    "PASTE_UNMATCHED": "não encontrados",
+    "PASTE_ADD": "Adicionar correspondentes",
+    "VS": {
+      "TITLE": "Origem dos valores",
+      "FREE": "Entrada livre",
+      "STATIC": "Lista fixa",
+      "LOOKUP": "Consulta de busca",
+      "DISTINCT": "Coluna distinta",
+      "FREE_HINT": "Users type any value; no option list.",
+      "BULK_IMPORT": "Bulk import",
+      "BULK_PLACEHOLDER": "One value per line, or value,display",
+      "IMPORT": "Import",
+      "VALUE": "Value",
+      "DISPLAY": "Display",
+      "ADD_VALUE": "Add value",
+      "LOOKUP_SQL": "Lookup SQL",
+      "LOOKUP_HINT": "A SELECT returning a value column (and an optional display column).",
+      "COLUMN": "Value column",
+      "DISPLAY_COLUMN": "Display column (optional)",
+      "PREVIEW": "Preview",
+      "PREVIEW_RESULT": "Preview",
+      "THRESHOLD_WARNING": "Large value set — the runtime will use server-paged search."
     }
   }
 }

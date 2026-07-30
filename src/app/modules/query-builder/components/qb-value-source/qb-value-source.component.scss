@@ -1,0 +1,120 @@
+:host {
+  display: block;
+}
+
+.qb-vs {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.qb-vs__kinds {
+  display: flex;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.qb-vs__kind {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md, 8px);
+  background: var(--surface-card, #fff);
+  color: var(--text-color);
+  font-size: var(--fs-control);
+  cursor: pointer;
+
+  &:hover {
+    border-color: var(--primary-color);
+  }
+  &--active {
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+    background: var(--primary-color-transparent, rgba(0, 0, 0, 0.03));
+  }
+}
+
+.qb-vs__warn {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  border-radius: var(--radius-md, 8px);
+  background: var(--warning-color-transparent, rgba(245, 158, 11, 0.12));
+  color: var(--warning-color, #b45309);
+  font-size: var(--fs-label);
+}
+
+.qb-vs__hint {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: var(--fs-label);
+}
+
+.qb-vs__label {
+  display: block;
+  margin: 0 0 var(--space-2);
+  font-size: var(--fs-control);
+  font-weight: var(--fw-semibold, 600);
+}
+
+.qb-vs__paste {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  align-items: flex-start;
+  margin-bottom: var(--space-4);
+}
+
+.qb-vs__rows {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
+}
+
+.qb-vs__row {
+  display: grid;
+  grid-template-columns: 1fr 1fr auto;
+  gap: var(--space-2);
+  align-items: center;
+}
+
+.qb-vs__editor {
+  height: 220px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md, 8px);
+  overflow: hidden;
+}
+
+.qb-vs__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: var(--space-3);
+}
+
+.qb-vs__actions {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.qb-vs__preview {
+  border-top: 1px solid var(--border-color);
+  padding-top: var(--space-3);
+}
+
+.qb-vs__preview-count {
+  color: var(--text-muted);
+  font-weight: var(--fw-regular, 400);
+}
+
+.qb-vs__preview-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+  max-height: 200px;
+  overflow-y: auto;
+}

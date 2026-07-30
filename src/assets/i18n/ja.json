@@ -5556,6 +5556,34 @@
       "ORIENTATION": "Orientation",
       "SHOW_VALUE_LABELS": "Show value labels",
       "UNIT": "Unit"
+    },
+    "PASTE_VALUES": "値を貼り付け",
+    "PASTE_HINT": "改行・カンマ・タブ区切りで値を貼り付けます",
+    "PASTE_PLACEHOLDER": "ACC-1001\nACC-1002\nACC-1003",
+    "PASTE_CHECK": "値を確認",
+    "PASTE_MATCHED": "一致",
+    "PASTE_UNMATCHED": "見つかりません",
+    "PASTE_ADD": "一致を追加",
+    "VS": {
+      "TITLE": "値のソース",
+      "FREE": "自由入力",
+      "STATIC": "固定リスト",
+      "LOOKUP": "ルックアップクエリ",
+      "DISTINCT": "個別の列",
+      "FREE_HINT": "Users type any value; no option list.",
+      "BULK_IMPORT": "Bulk import",
+      "BULK_PLACEHOLDER": "One value per line, or value,display",
+      "IMPORT": "Import",
+      "VALUE": "Value",
+      "DISPLAY": "Display",
+      "ADD_VALUE": "Add value",
+      "LOOKUP_SQL": "Lookup SQL",
+      "LOOKUP_HINT": "A SELECT returning a value column (and an optional display column).",
+      "COLUMN": "Value column",
+      "DISPLAY_COLUMN": "Display column (optional)",
+      "PREVIEW": "Preview",
+      "PREVIEW_RESULT": "Preview",
+      "THRESHOLD_WARNING": "Large value set — the runtime will use server-paged search."
     }
   }
 }

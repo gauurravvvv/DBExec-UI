@@ -139,6 +139,13 @@
           [promptType]="p.type"
           [appearance]="p.appearanceOverride ?? null"
           (appearanceChange)="onAppearanceChange($event)" />
+
+        <div class="qb-designer__drawer-section">
+          <h4 class="qb-designer__drawer-section-title">
+            {{ 'QUERY_BUILDER.VS.TITLE' | translate }}
+          </h4>
+          <qb-value-source [promptId]="p.promptId" />
+        </div>
       </div>
       <footer class="qb-designer__drawer-foot">
         <app-button variant="secondary" (clicked)="closeAppearance()">
