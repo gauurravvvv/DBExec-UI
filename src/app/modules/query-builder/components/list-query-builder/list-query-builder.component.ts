@@ -396,9 +396,9 @@ export class ListQueryBuilderComponent implements OnInit {
   }
 
   onConfig(id: string) {
-    this.router.navigate([
-      QUERY_BUILDER.configure(this.selectedDatasource, id),
-    ]);
+    // Query Builder v2 — open the admin design shell (form / joins / columns /
+    // settings). Replaces the removed configure screen.
+    this.router.navigate([QUERY_BUILDER.design(id)]);
   }
 
   onExecute(id: string) {

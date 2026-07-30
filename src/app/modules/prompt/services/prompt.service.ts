@@ -102,19 +102,23 @@ export class PromptService {
   async add(promptForm: any): Promise<any> {
     this._saving.set(true);
     try {
-      // v2: a prompt is datasource-scoped (no tab/section). Accept either a
-      // single flat form or a legacy { prompts } batch and normalise to the
-      // flat single-prompt body the API now expects.
+      // v2: a prompt is datasource-scoped (no tab/section). The API accepts a
+      // batch — POST { datasource, prompts: [...] } — so wrap the single flat
+      // form into a one-element prompts array.
       const { datasource, name, description, type, groupName } = promptForm;
       return await lastValueFrom(
         this.http.apiPost(
           PROMPT.ADD,
           {
             datasource,
-            name,
-            description,
-            type,
-            groupName: groupName || null,
+            prompts: [
+              {
+                name,
+                description: description || '',
+                type,
+                groupName: groupName || null,
+              },
+            ],
           },
           { skipLoader: true },
         ),
