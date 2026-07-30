@@ -1,4 +1,69 @@
 import { Injectable } from '@angular/core';
+import {
+  transformTo3DFormat,
+  transformToBoxPlotFormat,
+  transformToBubbleFormat,
+  transformToGeoLines3D,
+  transformToGeoLngLatValue,
+  transformToHeatMapFormat,
+  transformToHierarchy,
+  transformToHistogram,
+  transformToLineSegments,
+  transformToMultiSeriesByValueColumns,
+  transformToOhlc,
+  transformToParallel,
+  transformToPolygons3DFormat,
+  transformToRadar,
+  transformToSankeyFormat,
+  transformToSingleSeries,
+  transformToThemeRiver,
+  transformToVectorField,
+} from '../helpers/chart-shape-transforms';
+
+import {
+  MULTI_SERIES_CHART_TYPES,
+  BUBBLE_CHART_TYPE,
+  BOX_CHART_TYPE,
+  SANKEY_CHART_TYPE,
+  GRAPH_CHART_TYPE,
+  FLOW_LINES_CHART_TYPE,
+  LINES3D_CHART_TYPE,
+  POLYGONS3D_CHART_TYPE,
+  THREE_D_CHART_TYPES,
+  MULTI_BAR_CHART_TYPES,
+  CANDLESTICK_CHART_TYPE,
+  COMBO_CHART_TYPE,
+  HISTOGRAM_CHART_TYPE,
+  HIERARCHY_CHART_TYPES,
+  RADAR_CHART_TYPE,
+  PARALLEL_CHART_TYPE,
+  THEME_RIVER_CHART_TYPE,
+  GLOBE_CHART_TYPE,
+  LINESGL_CHART_TYPE,
+  FLOWGL_CHART_TYPE,
+} from '../constants/chart-type-categories';
+import {
+  aggregateSamples,
+  formatBinBoundary,
+  formatCategoryLabel,
+  formatCategoryValue,
+  formatDate,
+  formatLabelValue,
+  formatMeasureValue,
+  hasRequiredFields,
+  isColumnNumeric,
+  isHeatMapChart,
+  isISODateString,
+  isSingleSeriesShape,
+  needsMultiSeriesFormat,
+  percentile,
+  quantile,
+  requiresThirdDimension,
+  sortChronologicallyIfTemporal,
+  toNumber,
+  wrapAsMultiSeries,
+} from '../helpers/chart-transform-utils';
+
 import { formatValue } from '../helpers/format-grammar';
 import { chronoSortKey, looksTemporal } from '../helpers/temporal';
 import {
@@ -15,62 +80,6 @@ import {
 } from './analysis-analytics.service';
 
 /** Default category label for a retained null dimension value (null-as-member). */
-const DEFAULT_NULL_MEMBER_LABEL = '(null)';
-
-/**
- * Chart type categories for determining data format
- */
-const MULTI_SERIES_CHART_TYPES = [
-  'line',
-  'line-stacked',
-  'line-step',
-  'area',
-  'area-stacked',
-  'area-normalized',
-  'polar',
-];
-const HEAT_MAP_CHART_TYPE = 'heat-map';
-const BUBBLE_CHART_TYPE = 'bubble';
-const BOX_CHART_TYPE = 'box-chart';
-const SANKEY_CHART_TYPE = 'sankey';
-const GRAPH_CHART_TYPE = 'graph';
-const FLOW_LINES_CHART_TYPE = 'flow-lines';
-const LINES3D_CHART_TYPE = 'lines3d';
-const POLYGONS3D_CHART_TYPE = 'polygons3d';
-const THREE_D_CHART_TYPES = ['bar3d', 'line3d', 'scatter3d'];
-
-// New per-family chart-id sets — match the ECharts-canonical shapes we
-// produce in phase 2. Each set maps a chart family to its dedicated
-// transformer; transformData() dispatches by these first, then falls back
-// to the legacy single-series path for charts that genuinely fit it.
-const MULTI_BAR_CHART_TYPES = [
-  'bar-vertical-2d',
-  'bar-horizontal-2d',
-  'bar-vertical-stacked',
-  'bar-horizontal-stacked',
-  'bar-vertical-normalized',
-  'bar-horizontal-normalized',
-];
-const CANDLESTICK_CHART_TYPE = 'candlestick';
-// Combo (bars + line dual-axis) shares the multi-series-by-value-columns shape:
-// x = category, yAxis = first measure, valueColumns = the rest. Which series
-// renders as a line / rides the secondary axis is decided in the option builder
-// from config.dualAxis. Histogram bins a single numeric column client-side.
-const COMBO_CHART_TYPE = 'combo';
-const HISTOGRAM_CHART_TYPE = 'histogram';
-const HIERARCHY_CHART_TYPES = ['tree-map', 'sunburst', 'tree'];
-const RADAR_CHART_TYPE = 'radar';
-const PARALLEL_CHART_TYPE = 'parallel';
-const THEME_RIVER_CHART_TYPE = 'theme-river';
-const GLOBE_CHART_TYPE = 'globe';
-const WORLD_MAP_CHART_TYPE = 'world-map';
-const LINESGL_CHART_TYPE = 'linesgl';
-const FLOWGL_CHART_TYPE = 'flowgl';
-
-/**
- * Maximum label length for chart categories (prevents overflow)
- */
-const MAX_LABEL_LENGTH = 25;
 
 /**
  * Service to transform raw data into chart-compatible formats
@@ -122,8 +131,8 @@ export class ChartDataTransformerService {
       }
 
       // Heat-map requires special 3-dimensional handling
-      if (this.isHeatMapChart(chartType)) {
-        return this.transformToHeatMapFormat(rawData, mapping);
+      if (isHeatMapChart(chartType)) {
+        return transformToHeatMapFormat(rawData, mapping);
       }
 
       // Bubble + scatter share the numeric X/Y transform. Scatter and
@@ -139,22 +148,22 @@ export class ChartDataTransformerService {
         chartType === 'scatter' ||
         chartType === 'effect-scatter'
       ) {
-        return this.transformToBubbleFormat(rawData, mapping);
+        return transformToBubbleFormat(rawData, mapping);
       }
 
       // Box plot requires statistical data format
       if (chartType === BOX_CHART_TYPE) {
-        return this.transformToBoxPlotFormat(rawData, mapping);
+        return transformToBoxPlotFormat(rawData, mapping);
       }
 
       // Sankey chart requires source, target, value format
       if (chartType === SANKEY_CHART_TYPE) {
-        return this.transformToSankeyFormat(rawData, mapping);
+        return transformToSankeyFormat(rawData, mapping);
       }
 
       // Graph chart uses same 3-field format as sankey
       if (chartType === GRAPH_CHART_TYPE) {
-        return this.transformToSankeyFormat(rawData, mapping);
+        return transformToSankeyFormat(rawData, mapping);
       }
 
       // Graph GL (WebGL-accelerated network) is the same node+link shape as
@@ -162,34 +171,34 @@ export class ChartDataTransformerService {
       // transform case, so it fell through to the single-series transform and
       // produced no graphGL series. Route it to the sankey/graph transform.
       if (chartType === 'graphgl') {
-        return this.transformToSankeyFormat(rawData, mapping);
+        return transformToSankeyFormat(rawData, mapping);
       }
 
       // Flow-lines uses sankey source→target→value format
       if (chartType === FLOW_LINES_CHART_TYPE) {
-        return this.transformToSankeyFormat(rawData, mapping);
+        return transformToSankeyFormat(rawData, mapping);
       }
 
       // Lines 3D: [[lng, lat], ...] coordinate pairs for globe polyline.
       // When lngColumn/latColumn are explicitly set we use those (geo
       // canonical); otherwise fall back to xAxis/yAxis as legacy did.
       if (chartType === LINES3D_CHART_TYPE) {
-        return this.transformToGeoLines3D(rawData, mapping);
+        return transformToGeoLines3D(rawData, mapping);
       }
 
       // Polygons 3D: grouped polygon vertices by name
       if (chartType === POLYGONS3D_CHART_TYPE) {
-        return this.transformToPolygons3DFormat(rawData, mapping);
+        return transformToPolygons3DFormat(rawData, mapping);
       }
 
       // 3D charts need [[x, y, z], ...] coordinate format
       if (THREE_D_CHART_TYPES.includes(chartType)) {
-        return this.transformTo3DFormat(rawData, mapping, chartType);
+        return transformTo3DFormat(rawData, mapping, chartType);
       }
 
       // Histogram — auto-bin a single numeric column into frequency buckets.
       if (chartType === HISTOGRAM_CHART_TYPE) {
-        return this.transformToHistogram(rawData, mapping);
+        return transformToHistogram(rawData, mapping);
       }
 
       // ── New per-family transformers (Phase 2) ────────────────────────
@@ -200,7 +209,7 @@ export class ChartDataTransformerService {
         MULTI_BAR_CHART_TYPES.includes(chartType) ||
         chartType === COMBO_CHART_TYPE
       ) {
-        return this.transformToMultiSeriesByValueColumns(rawData, mapping);
+        return transformToMultiSeriesByValueColumns(rawData, mapping);
       }
 
       // Multi-line / multi-area when valueColumns are populated.
@@ -210,47 +219,47 @@ export class ChartDataTransformerService {
         mapping.valueColumns &&
         mapping.valueColumns.length > 0
       ) {
-        return this.transformToMultiSeriesByValueColumns(rawData, mapping);
+        return transformToMultiSeriesByValueColumns(rawData, mapping);
       }
 
       // Candlestick — OHLC ordering matches ECharts canonical [open, close, low, high]
       if (chartType === CANDLESTICK_CHART_TYPE) {
-        return this.transformToOhlc(rawData, mapping);
+        return transformToOhlc(rawData, mapping);
       }
 
       // Hierarchical — tree/treemap/sunburst with parent column
       if (HIERARCHY_CHART_TYPES.includes(chartType)) {
-        return this.transformToHierarchy(rawData, mapping);
+        return transformToHierarchy(rawData, mapping);
       }
 
       // Radar — one value per indicator axis
       if (chartType === RADAR_CHART_TYPE) {
-        return this.transformToRadar(rawData, mapping);
+        return transformToRadar(rawData, mapping);
       }
 
       // Parallel — N-dim row per data point
       if (chartType === PARALLEL_CHART_TYPE) {
-        return this.transformToParallel(rawData, mapping);
+        return transformToParallel(rawData, mapping);
       }
 
       // Theme river — [time, value, category] triples
       if (chartType === THEME_RIVER_CHART_TYPE) {
-        return this.transformToThemeRiver(rawData, mapping);
+        return transformToThemeRiver(rawData, mapping);
       }
 
       // Globe — [lng, lat, value] triples on geo coord system
       if (chartType === GLOBE_CHART_TYPE) {
-        return this.transformToGeoLngLatValue(rawData, mapping);
+        return transformToGeoLngLatValue(rawData, mapping);
       }
 
       // Lines GL — pair-of-points segments
       if (chartType === LINESGL_CHART_TYPE) {
-        return this.transformToLineSegments(rawData, mapping);
+        return transformToLineSegments(rawData, mapping);
       }
 
       // Flow GL — vector field [[x, y, vx, vy]...]
       if (chartType === FLOWGL_CHART_TYPE) {
-        return this.transformToVectorField(rawData, mapping);
+        return transformToVectorField(rawData, mapping);
       }
 
       // Number-card — a single KPI value. It maps only yAxis (no category
@@ -261,7 +270,7 @@ export class ChartDataTransformerService {
       if (chartType === 'number-card') {
         const yCol = mapping.yAxisColumn;
         if (!yCol) return [];
-        const yNumeric = this.isColumnNumeric(rawData, yCol);
+        const yNumeric = isColumnNumeric(rawData, yCol);
         const aggFn = mapping.aggregate ?? null;
         // Pure count mode: explicit COUNT, or a non-numeric measure with no
         // explicit aggregate (legacy). Otherwise reduce the numeric samples by
@@ -271,12 +280,12 @@ export class ChartDataTransformerService {
           const buckets = new Map<string, number[]>();
           const counts = new Map<string, number>();
           rawData.forEach(row => {
-            const name = this.formatLabelValue(row[mapping.xAxisColumn!]);
+            const name = formatLabelValue(row[mapping.xAxisColumn!]);
             if (countMode) {
               counts.set(name, (counts.get(name) || 0) + 1);
             } else {
               const b = buckets.get(name) ?? [];
-              b.push(this.toNumber(row[yCol]));
+              b.push(toNumber(row[yCol]));
               buckets.set(name, b);
             }
           });
@@ -287,7 +296,7 @@ export class ChartDataTransformerService {
               }))
             : Array.from(buckets.entries()).map(([name, samples]) => ({
                 name,
-                value: this.aggregateSamples(
+                value: aggregateSamples(
                   samples,
                   aggFn,
                   mapping.percentile,
@@ -296,8 +305,8 @@ export class ChartDataTransformerService {
         }
         const total = countMode
           ? rawData.length
-          : this.aggregateSamples(
-              rawData.map(row => this.toNumber(row[yCol])),
+          : aggregateSamples(
+              rawData.map(row => toNumber(row[yCol])),
               aggFn,
               mapping.percentile,
             );
@@ -305,11 +314,11 @@ export class ChartDataTransformerService {
       }
 
       // Standard 2-field transformation
-      const singleSeries = this.transformToSingleSeries(rawData, mapping);
+      const singleSeries = transformToSingleSeries(rawData, mapping);
 
       // Multi-series charts need wrapped format
-      if (this.needsMultiSeriesFormat(chartType)) {
-        return this.wrapAsMultiSeries(singleSeries);
+      if (needsMultiSeriesFormat(chartType)) {
+        return wrapAsMultiSeries(singleSeries);
       }
 
       return singleSeries;
@@ -350,7 +359,7 @@ export class ChartDataTransformerService {
     const win = mapping.movingAverageWindow ?? 3;
 
     // Single-series shape — array of {name,value}.
-    if (this.isSingleSeriesShape(data)) {
+    if (isSingleSeriesShape(data)) {
       const pts = data as unknown as Point[];
       const calced = calc
         ? this.analytics.applyQuickCalcToPoints(pts, calc, win)
@@ -404,687 +413,6 @@ export class ChartDataTransformerService {
   /** Label used for the appended prior-period companion series. */
   private readonly PRIOR_SERIES_NAME = 'Prior period';
 
-  /** True when `data` is the flat single-series `{name,value}[]` shape. */
-  private isSingleSeriesShape(data: ChartData): boolean {
-    const first = (data as any[])[0];
-    return !!first && typeof first === 'object' && !('series' in first);
-  }
-
-  /**
-   * Reduce a bucket of numeric samples to a single value per the chosen
-   * aggregate function. Client-side twin of the BE aggregation wrap so the
-   * editor + dashboard (which never receive server-grouped rows) compute the
-   * SAME measure the author picked instead of blindly summing. Unknown / absent
-   * functions fall back to SUM (the legacy default). GENERALISED — no column or
-   * domain assumptions.
-   */
-  private aggregateSamples(
-    values: number[],
-    fn: string | null | undefined,
-    percentile?: number,
-  ): number {
-    if (!values.length) return 0;
-    switch (fn) {
-      case 'avg': {
-        return values.reduce((a, b) => a + b, 0) / values.length;
-      }
-      case 'min':
-        // reduce (not Math.min(...values)) so a very large bucket can't blow
-        // the argument-count stack limit.
-        return values.reduce((a, b) => (b < a ? b : a), values[0]);
-      case 'max':
-        return values.reduce((a, b) => (b > a ? b : a), values[0]);
-      case 'count':
-        return values.length;
-      case 'count_distinct':
-        return new Set(values).size;
-      case 'median':
-        return this.quantile(values, 0.5);
-      case 'percentile': {
-        const p =
-          typeof percentile === 'number' && percentile >= 0 && percentile <= 100
-            ? percentile / 100
-            : 0.9;
-        return this.quantile(values, p);
-      }
-      case 'stddev':
-      case 'variance': {
-        const mean = values.reduce((a, b) => a + b, 0) / values.length;
-        const variance =
-          values.reduce((a, b) => a + (b - mean) * (b - mean), 0) /
-          values.length;
-        return fn === 'variance' ? variance : Math.sqrt(variance);
-      }
-      case 'sum':
-      default:
-        return values.reduce((a, b) => a + b, 0);
-    }
-  }
-
-  /** Linear-interpolated quantile (q in [0,1]) over a numeric sample. */
-  private quantile(values: number[], q: number): number {
-    const sorted = [...values].sort((a, b) => a - b);
-    if (sorted.length === 1) return sorted[0];
-    const pos = (sorted.length - 1) * q;
-    const base = Math.floor(pos);
-    const rest = pos - base;
-    return sorted[base + 1] !== undefined
-      ? sorted[base] + rest * (sorted[base + 1] - sorted[base])
-      : sorted[base];
-  }
-
-  /**
-   * Transform raw data to single-series format: [{name, value}]
-   * Used for bar, pie, gauge, treemap, card charts
-   *
-   * Smart aggregation:
-   * - Detects if Y-axis column is numeric by sampling
-   * - If numeric: sums values by X-axis category
-   * - If non-numeric: counts occurrences by X-axis category
-   */
-  private transformToSingleSeries(
-    rawData: any[],
-    mapping: ChartDataMapping,
-  ): SingleSeriesData[] {
-    if (!mapping.xAxisColumn || !mapping.yAxisColumn) {
-      return [];
-    }
-
-    // Detect if Y-axis column contains numeric values by sampling
-    const isYAxisNumeric = this.isColumnNumeric(rawData, mapping.yAxisColumn);
-    // The explicit aggregate wins; 'count' works on any column (numeric or
-    // not). For a non-numeric measure with no explicit aggregate we still count
-    // occurrences (legacy). Otherwise gather the numeric samples per category
-    // and reduce them with the chosen function so AVG/MIN/MAX/etc. are correct
-    // — not silently summed.
-    const agg = mapping.aggregate ?? null;
-    const countMode = agg === 'count' || (!isYAxisNumeric && !agg);
-    // Samples per category (only used when not in pure count mode).
-    const samplesByLabel = new Map<string, number[]>();
-    const countByLabel = new Map<string, number>();
-    // Remember one RAW x value per label so a temporal dimension can be
-    // ordered chronologically by the underlying date, not the label text.
-    const rawByLabel = new Map<string, unknown>();
-
-    rawData.forEach(row => {
-      // Process X-axis value (category/name) — Wave 2 label formatting +
-      // null-as-member applied here.
-      const rawName = row[mapping.xAxisColumn!];
-      const name = this.formatCategoryLabel(rawName, mapping);
-      if (!rawByLabel.has(name)) rawByLabel.set(name, rawName);
-
-      if (countMode) {
-        countByLabel.set(name, (countByLabel.get(name) || 0) + 1);
-        return;
-      }
-      const bucket = samplesByLabel.get(name) ?? [];
-      bucket.push(this.toNumber(row[mapping.yAxisColumn!]));
-      samplesByLabel.set(name, bucket);
-    });
-
-    // Keep zero buckets (code-review CR-2). A legitimate zero total — a
-    // month with no sales, a category that summed to 0 — is real data: the
-    // point must render as 0, not vanish (which would leave a misleading gap
-    // in a time series and connect neighbouring points across the hole). The
-    // multi-series path never filtered zeros, so keeping them here also makes
-    // single- and multi-series charts of the same data agree.
-    const points = countMode
-      ? Array.from(countByLabel.entries()).map(([name, value]) => ({
-          name,
-          value,
-        }))
-      : Array.from(samplesByLabel.entries()).map(([name, samples]) => ({
-          name,
-          value: this.aggregateSamples(samples, agg, mapping.percentile),
-        }));
-
-    // Temporal dimension → chronological order; otherwise keep the legacy
-    // value-descending order so non-time charts are unchanged.
-    if (looksTemporal(points.map(p => rawByLabel.get(p.name)))) {
-      return this.sortChronologicallyIfTemporal(points, rawByLabel);
-    }
-    return points.sort((a, b) => b.value - a.value);
-  }
-
-  /**
-   * Check if a column contains primarily numeric values
-   * Samples up to 20 non-null values to determine type
-   */
-  private isColumnNumeric(data: any[], columnName: string): boolean {
-    let numericCount = 0;
-    let sampleCount = 0;
-    const sampleSize = Math.min(20, data.length);
-
-    for (let i = 0; i < data.length && sampleCount < sampleSize; i++) {
-      const value = data[i][columnName];
-      if (value !== null && value !== undefined && value !== '') {
-        sampleCount++;
-        // Accept both real numbers AND numeric strings. SQL drivers return
-        // Postgres NUMERIC/DECIMAL columns as strings over JSON, so a strict
-        // `typeof === 'number'` test wrongly classified numeric columns
-        // (e.g. marketing/revenue) as categorical — which made scatter group
-        // every row into its own single-point series.
-        const num = typeof value === 'number' ? value : Number(value);
-        if (!isNaN(num) && isFinite(num)) {
-          numericCount++;
-        }
-      }
-    }
-
-    // Consider numeric if more than 80% of samples are valid numbers
-    return sampleCount > 0 && numericCount / sampleCount >= 0.8;
-  }
-
-  /**
-   * Convert any value to a number safely
-   * Returns 0 for non-numeric or invalid values
-   */
-  private toNumber(value: any): number {
-    if (value === null || value === undefined || value === '') {
-      return 0;
-    }
-    if (typeof value === 'number') {
-      return isFinite(value) ? value : 0;
-    }
-    if (typeof value === 'boolean') {
-      return value ? 1 : 0;
-    }
-    const parsed = parseFloat(String(value));
-    return isFinite(parsed) ? parsed : 0;
-  }
-
-  /**
-   * Format any value into a display-friendly label string
-   * Handles: strings, numbers, dates, booleans, null/undefined
-   */
-  private formatLabelValue(value: any): string {
-    // Handle null/undefined/empty
-    if (value === null || value === undefined || value === '') {
-      return '(empty)';
-    }
-
-    // Handle booleans
-    if (typeof value === 'boolean') {
-      return value ? 'Yes' : 'No';
-    }
-
-    // Handle numbers
-    if (typeof value === 'number') {
-      return String(value);
-    }
-
-    // Handle Date objects
-    if (value instanceof Date) {
-      return this.formatDate(value);
-    }
-
-    // Handle ISO date strings (detect and format)
-    const stringValue = String(value).trim();
-    if (this.isISODateString(stringValue)) {
-      return this.formatDate(new Date(stringValue));
-    }
-
-    // Truncate long strings
-    if (stringValue.length > MAX_LABEL_LENGTH) {
-      return stringValue.substring(0, MAX_LABEL_LENGTH - 3) + '...';
-    }
-
-    return stringValue || '(empty)';
-  }
-
-  /**
-   * Type-semantics (Wave 2) category-label formatter. Layers null-as-member
-   * and the author's label ValueFormat on top of the legacy formatLabelValue:
-   *
-   *   - null / undefined / '' →
-   *       • `nullLabel` (default '(null)') when `nullAsMember` is on;
-   *       • the legacy '(empty)' otherwise (unchanged behaviour).
-   *   - a configured `labelFormat` routes the value through the format grammar
-   *     (so a date dimension can render 'MMM yyyy', a code can carry a prefix,
-   *     etc.). When no labelFormat is set we fall back to formatLabelValue so
-   *     existing charts look identical.
-   *
-   * Returns the display label; callers still aggregate by this string.
-   */
-  /**
-   * PUBLIC formatting authority (code-review CR-1). Formats a raw category
-   * value to its display label exactly as the chart does, so callers outside
-   * the transformer (e.g. the editor resolving a clicked tick label back to
-   * its raw value for cross-filter/drill) share ONE formatting definition and
-   * never drift. Thin delegate to the private formatCategoryLabel.
-   */
-  formatCategoryValue(value: any, mapping: ChartDataMapping): string {
-    return this.formatCategoryLabel(value, mapping);
-  }
-
-  private formatCategoryLabel(value: any, mapping: ChartDataMapping): string {
-    if (value === null || value === undefined || value === '') {
-      return mapping.nullAsMember
-        ? mapping.nullLabel || DEFAULT_NULL_MEMBER_LABEL
-        : '(empty)';
-    }
-    if (mapping.labelFormat) {
-      const formatted = formatValue(value, mapping.labelFormat);
-      // Guard: if the grammar produced an empty string for a non-null value,
-      // fall back so the category never silently disappears.
-      if (formatted !== '') return formatted;
-    }
-    return this.formatLabelValue(value);
-  }
-
-  /**
-   * Order a category series chronologically when its underlying dimension is
-   * temporal, otherwise leave the order untouched. `rawCategoryFor` maps a
-   * shaped point back to the RAW (pre-format) x value so the sort keys off the
-   * real date, not the formatted label — fixing the "Apr, Aug, Dec…"
-   * alphabetical bug. No-op (returns input) when the dimension isn't temporal.
-   */
-  private sortChronologicallyIfTemporal<T extends { name: string }>(
-    points: T[],
-    rawByLabel: Map<string, unknown>,
-  ): T[] {
-    const rawValues = points.map(p => rawByLabel.get(p.name));
-    if (!looksTemporal(rawValues)) return points;
-    return [...points].sort(
-      (a, b) =>
-        chronoSortKey(rawByLabel.get(a.name)) -
-        chronoSortKey(rawByLabel.get(b.name)),
-    );
-  }
-
-  /**
-   * Check if a string looks like an ISO date
-   */
-  private isISODateString(value: string): boolean {
-    // Match ISO 8601 date formats
-    const isoPattern = /^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}:\d{2})?/;
-    if (!isoPattern.test(value)) {
-      return false;
-    }
-    const date = new Date(value);
-    return !isNaN(date.getTime());
-  }
-
-  /**
-   * Format a date for display in charts
-   */
-  private formatDate(date: Date): string {
-    if (isNaN(date.getTime())) {
-      return '(invalid date)';
-    }
-    // Format as "MMM DD, YYYY" (e.g., "Dec 16, 2025")
-    const months = [
-      'Jan',
-      'Feb',
-      'Mar',
-      'Apr',
-      'May',
-      'Jun',
-      'Jul',
-      'Aug',
-      'Sep',
-      'Oct',
-      'Nov',
-      'Dec',
-    ];
-    return `${
-      months[date.getMonth()]
-    } ${date.getDate()}, ${date.getFullYear()}`;
-  }
-
-  /**
-   * Wrap single-series data into multi-series format
-   * Used for line, area, polar charts
-   */
-  private wrapAsMultiSeries(
-    singleSeries: SingleSeriesData[],
-  ): MultiSeriesData[] {
-    return [
-      {
-        name: 'Data Series',
-        series: singleSeries,
-      },
-    ];
-  }
-
-  /**
-   * Transform raw data to heat-map format (3D: row, column, value)
-   * Groups data by xAxisColumn (rows) with yAxisColumn (columns) and zAxisColumn (values)
-   */
-  private transformToHeatMapFormat(
-    rawData: any[],
-    mapping: ChartDataMapping,
-  ): MultiSeriesData[] {
-    if (!mapping.xAxisColumn || !mapping.yAxisColumn || !mapping.zAxisColumn) {
-      return [];
-    }
-
-    // Detect if Z-axis is numeric
-    const isZAxisNumeric = this.isColumnNumeric(rawData, mapping.zAxisColumn);
-    const rowMap = new Map<string, Map<string, number>>();
-
-    rawData.forEach(row => {
-      const rowName = this.formatLabelValue(row[mapping.xAxisColumn!]);
-      const colName = this.formatLabelValue(row[mapping.yAxisColumn!]);
-
-      let value: number;
-      if (isZAxisNumeric) {
-        value = this.toNumber(row[mapping.zAxisColumn!]);
-      } else {
-        // Count occurrences for non-numeric Z-axis
-        value = 1;
-      }
-
-      if (!rowMap.has(rowName)) {
-        rowMap.set(rowName, new Map());
-      }
-      const colMap = rowMap.get(rowName)!;
-      const existing = colMap.get(colName) || 0;
-      colMap.set(colName, existing + value);
-    });
-
-    return Array.from(rowMap.entries()).map(([rowName, colMap]) => ({
-      name: rowName,
-      series: Array.from(colMap.entries()).map(([colName, value]) => ({
-        name: colName,
-        value,
-      })),
-    }));
-  }
-
-  /**
-   * Check if chart type requires multi-series data format
-   */
-  needsMultiSeriesFormat(chartType: string | null): boolean {
-    if (!chartType) return false;
-    return MULTI_SERIES_CHART_TYPES.includes(chartType);
-  }
-
-  /**
-   * Check if chart type is a heat-map
-   */
-  isHeatMapChart(chartType: string | null): boolean {
-    return chartType === HEAT_MAP_CHART_TYPE;
-  }
-
-  /**
-   * Transform data to bubble chart format
-   * Bubble charts need: [{ name: 'Series', series: [{ name, x, y, r }] }]
-   * Uses x-axis for x, y-axis for y, z-axis for bubble size (r)
-   */
-  private transformToBubbleFormat(
-    rawData: any[],
-    mapping: ChartDataMapping,
-  ): MultiSeriesData[] {
-    if (!mapping.xAxisColumn || !mapping.yAxisColumn) {
-      return [];
-    }
-
-    // ECharts bubble (scatter with size) expects numeric x AND y. When the
-    // x column is non-numeric we substitute the row index as x (treating
-    // bubble as a strip-plot grouped by category label). Previously this
-    // function used `row[xAxisColumn]` twice — once as the category label,
-    // once as the numeric x — which collapsed x to 0 for any category x.
-    const isXNumeric = this.isColumnNumeric(rawData, mapping.xAxisColumn);
-    const categoryMap = new Map<string, any[]>();
-
-    rawData.forEach((row, rowIdx) => {
-      // When X is numeric (the true XY scatter/bubble case) every row is a
-      // distinct point — grouping by the X value would create one
-      // single-point series per row (hundreds of series, each a different
-      // colour). Put them all in ONE series instead. Only group into
-      // separate (coloured) series when X is categorical.
-      const category = isXNumeric
-        ? 'points'
-        : this.formatLabelValue(row[mapping.xAxisColumn!]);
-      const x = isXNumeric ? this.toNumber(row[mapping.xAxisColumn!]) : rowIdx;
-      const y = this.toNumber(row[mapping.yAxisColumn!]);
-      const r = mapping.zAxisColumn
-        ? this.toNumber(row[mapping.zAxisColumn])
-        : 10; // Default size if no z-axis
-
-      if (!categoryMap.has(category)) {
-        categoryMap.set(category, []);
-      }
-
-      categoryMap.get(category)!.push({
-        name: category,
-        x: x,
-        y: y,
-        r: Math.max(r, 1), // Ensure minimum size
-      });
-    });
-
-    // Convert to multi-series format
-    return Array.from(categoryMap.entries()).map(([category, points]) => ({
-      name: category,
-      series: points,
-    }));
-  }
-
-  /**
-   * Transform data to box plot format
-   * Box plots need: [{ name, value: [min, q1, median, q3, max] }]
-   * Groups by x-axis and calculates statistics for y-axis values
-   */
-  private transformToBoxPlotFormat(
-    rawData: any[],
-    mapping: ChartDataMapping,
-  ): any[] {
-    // Prefer the new `sampleColumn` role (raw samples — the canonical
-    // ECharts input for boxplot). Fall back to yAxisColumn for visuals
-    // created before the role spec existed.
-    const sampleCol = mapping.sampleColumn ?? mapping.yAxisColumn;
-    if (!mapping.xAxisColumn || !sampleCol) {
-      return [];
-    }
-
-    const groupMap = new Map<string, number[]>();
-
-    // Group numeric values by category
-    rawData.forEach(row => {
-      const category = this.formatLabelValue(row[mapping.xAxisColumn!]);
-      const value = this.toNumber(row[sampleCol!]);
-
-      if (!groupMap.has(category)) {
-        groupMap.set(category, []);
-      }
-      groupMap.get(category)!.push(value);
-    });
-
-    // Calculate box plot statistics for each group
-    return Array.from(groupMap.entries()).map(([category, values]) => {
-      const sorted = values.sort((a, b) => a - b);
-      const min = sorted[0];
-      const max = sorted[sorted.length - 1];
-      const q1 = this.percentile(sorted, 25);
-      const median = this.percentile(sorted, 50);
-      const q3 = this.percentile(sorted, 75);
-
-      return {
-        name: category,
-        value: [min, q1, median, q3, max],
-      };
-    });
-  }
-
-  /**
-   * Calculate percentile of a sorted array
-   */
-  private percentile(sorted: number[], p: number): number {
-    const index = (p / 100) * (sorted.length - 1);
-    const lower = Math.floor(index);
-    const upper = Math.ceil(index);
-    const weight = index - lower;
-
-    if (lower === upper) {
-      return sorted[lower];
-    }
-
-    return sorted[lower] * (1 - weight) + sorted[upper] * weight;
-  }
-
-  /**
-   * Transform data to sankey format (source → target with value)
-   * Sankey needs: { nodes: [{name}], links: [{source, target, value}] }
-   * Uses x-axis for source, y-axis for target, z-axis for value
-   */
-  private transformToSankeyFormat(
-    rawData: any[],
-    mapping: ChartDataMapping,
-  ): any {
-    if (!mapping.xAxisColumn || !mapping.yAxisColumn) {
-      return { nodes: [], links: [] };
-    }
-
-    const nodeSet = new Set<string>();
-    const linkMap = new Map<string, number>();
-
-    const hasValue = !!mapping.zAxisColumn;
-    const isZNumeric = hasValue
-      ? this.isColumnNumeric(rawData, mapping.zAxisColumn!)
-      : false;
-
-    rawData.forEach(row => {
-      const source = this.formatLabelValue(row[mapping.xAxisColumn!]);
-      const target = this.formatLabelValue(row[mapping.yAxisColumn!]);
-      if (source === target) return; // Skip self-loops
-
-      nodeSet.add(source);
-      nodeSet.add(target);
-
-      const linkKey = `${source}→${target}`;
-      const value =
-        hasValue && isZNumeric ? this.toNumber(row[mapping.zAxisColumn!]) : 1;
-
-      const existing = linkMap.get(linkKey) || 0;
-      linkMap.set(linkKey, existing + value);
-    });
-
-    const nodes = Array.from(nodeSet).map(name => ({ name }));
-    const links = Array.from(linkMap.entries()).map(([key, value]) => {
-      const [source, target] = key.split('→');
-      return { source, target, value };
-    });
-
-    return { nodes, links };
-  }
-
-  /**
-   * Transform data to polygons3D format: [{name, coords: [[lng, lat], ...]}]
-   * Groups rows by xAxisColumn (name) and collects [lng, lat] pairs from y/z columns
-   */
-  private transformToPolygons3DFormat(
-    rawData: any[],
-    mapping: ChartDataMapping,
-  ): any[] {
-    if (!mapping.xAxisColumn || !mapping.yAxisColumn || !mapping.zAxisColumn) {
-      return [];
-    }
-
-    const polyMap = new Map<string, number[][]>();
-
-    rawData.forEach(row => {
-      const name = this.formatLabelValue(row[mapping.xAxisColumn!]);
-      const lng = this.toNumber(row[mapping.yAxisColumn!]);
-      const lat = this.toNumber(row[mapping.zAxisColumn!]);
-
-      if (!isFinite(lng) || !isFinite(lat)) return;
-
-      if (!polyMap.has(name)) {
-        polyMap.set(name, []);
-      }
-      polyMap.get(name)!.push([lng, lat]);
-    });
-
-    return Array.from(polyMap.entries()).map(([name, coords]) => ({
-      name,
-      coords,
-    }));
-  }
-
-  /**
-   * Transform data to 3D coordinate format: [[x, y, z], ...]
-   * Used for bar3d, line3d, scatter3d chart types.
-   *
-   * bar3D uses category axes on x and y, so the values must be the raw category
-   * strings rather than `toNumber()` (which collapses every string to NaN→0 and
-   * piled all 1000 rows on cell [0,0,…]). For line3d / scatter3d the axes are
-   * numeric, so we still coerce to number. When the x/y columns are categorical
-   * we also AGGREGATE by (x,y) — summing z — so a 4-region × 4-product dataset
-   * produces 16 bars instead of 1000 overlapping ones.
-   */
-  private transformTo3DFormat(
-    rawData: any[],
-    mapping: ChartDataMapping,
-    chartType?: string,
-  ): any[] {
-    if (!mapping.xAxisColumn || !mapping.yAxisColumn) {
-      return [];
-    }
-
-    // Detect categorical x/y from the first non-null value.
-    const xSample = rawData.find(r => r[mapping.xAxisColumn!] != null)?.[
-      mapping.xAxisColumn!
-    ];
-    const ySample = rawData.find(r => r[mapping.yAxisColumn!] != null)?.[
-      mapping.yAxisColumn!
-    ];
-    const xIsCategory = typeof xSample === 'string' && isNaN(Number(xSample));
-    const yIsCategory = typeof ySample === 'string' && isNaN(Number(ySample));
-
-    // Only bar3D uses category axes; line3D / scatter3D have value axes and
-    // expect numeric data. Don't promote string data into a category-axis
-    // aggregation for those — that would only stack everything at (0,0).
-    if (chartType === 'bar3d' && (xIsCategory || yIsCategory)) {
-      // Aggregate by (x,y) group, summing z.
-      const groups = new Map<string, [any, any, number]>();
-      for (const row of rawData) {
-        const xRaw = row[mapping.xAxisColumn!];
-        const yRaw = row[mapping.yAxisColumn!];
-        const x = xIsCategory ? String(xRaw ?? '') : this.toNumber(xRaw);
-        const y = yIsCategory ? String(yRaw ?? '') : this.toNumber(yRaw);
-        const z = mapping.zAxisColumn
-          ? this.toNumber(row[mapping.zAxisColumn])
-          : 0;
-        if (!isFinite(z)) continue;
-        const key = JSON.stringify([x, y]);
-        const prev = groups.get(key);
-        if (prev) {
-          prev[2] += z;
-        } else {
-          groups.set(key, [x, y, z]);
-        }
-      }
-      return Array.from(groups.values());
-    }
-
-    return rawData
-      .map(row => {
-        const x = this.toNumber(row[mapping.xAxisColumn!]);
-        const y = this.toNumber(row[mapping.yAxisColumn!]);
-        const z = mapping.zAxisColumn
-          ? this.toNumber(row[mapping.zAxisColumn])
-          : 0;
-        return [x, y, z];
-      })
-      .filter(([x, y, z]) => isFinite(x) && isFinite(y) && isFinite(z));
-  }
-
-  /**
-   * Check if chart type requires a third dimension (z-axis)
-   * Heat map, bubble, sankey, graph, and 3D charts benefit from a third dimension
-   */
-  requiresThirdDimension(chartType: string | null): boolean {
-    return (
-      this.isHeatMapChart(chartType) ||
-      chartType === BUBBLE_CHART_TYPE ||
-      chartType === SANKEY_CHART_TYPE ||
-      chartType === GRAPH_CHART_TYPE ||
-      chartType === POLYGONS3D_CHART_TYPE ||
-      (!!chartType && THREE_D_CHART_TYPES.includes(chartType))
-    );
-  }
 
   /**
    * Get the field labels for a chart type
@@ -1095,7 +423,7 @@ export class ChartDataTransformerService {
     field2: string;
     field3?: string;
   } {
-    if (this.isHeatMapChart(chartType)) {
+    if (isHeatMapChart(chartType)) {
       return { field1: 'Row', field2: 'Column', field3: 'Value' };
     }
 
@@ -1163,487 +491,6 @@ export class ChartDataTransformerService {
     return { field1: 'X-Axis', field2: 'Y-Axis' };
   }
 
-  /**
-   * Validate if a visual has all required fields for chart data
-   */
-  hasRequiredFields(visual: any): boolean {
-    if (!visual?.chartType) return false;
-
-    if (this.requiresThirdDimension(visual.chartType)) {
-      return !!(visual.xAxisColumn && visual.yAxisColumn && visual.zAxisColumn);
-    }
-
-    // number-card needs only a value (yAxis) — it shows a single metric, no
-    // category axis. Requiring xAxis too left it permanently on "No data
-    // available" when the user mapped only the value field (which is all its
-    // role spec asks for: required ['yAxis'], optional ['xAxis']).
-    if (visual.chartType === 'number-card') {
-      return !!visual.yAxisColumn;
-    }
-
-    // Histogram bins a single numeric column — only the X (measure) role is
-    // required; Y is the computed frequency.
-    if (visual.chartType === 'histogram') {
-      return !!visual.xAxisColumn;
-    }
-
-    return !!(visual.xAxisColumn && visual.yAxisColumn);
-  }
-
-  // ── New per-family transformers (Phase 2) ───────────────────────────────
-
-  /**
-   * Multi-series bars / lines / areas. `xAxisColumn` defines the category;
-   * `yAxisColumn` is the first value series; `valueColumns` carries any
-   * additional series. Output shape matches `MultiSeriesData[]`:
-   *
-   *   [{ name: <seriesName>, series: [{ name: <category>, value: <n> }, ...] }]
-   *
-   * One outer entry per series — that's what every consumer of multi-series
-   * shape (line/area/2D-bar builders) already expects.
-   */
-  private transformToMultiSeriesByValueColumns(
-    rawData: any[],
-    mapping: ChartDataMapping,
-  ): MultiSeriesData[] {
-    if (!mapping.xAxisColumn || !mapping.yAxisColumn) {
-      return [];
-    }
-    const valueCols = [mapping.yAxisColumn!, ...(mapping.valueColumns ?? [])];
-
-    // One shared raw-label map so every series orders on the same underlying
-    // x value (a temporal dimension sorts chronologically across all series).
-    const rawByLabel = new Map<string, unknown>();
-
-    // Aggregate one value per (series, category), honouring the chosen
-    // aggregate (SUM/AVG/MIN/MAX/COUNT/…) instead of blindly summing so combo /
-    // stacked / multi-line measures are correct client-side.
-    const aggFn = mapping.aggregate ?? null;
-    return valueCols.map(col => {
-      const isNumeric = this.isColumnNumeric(rawData, col);
-      const countMode = aggFn === 'count' || (!isNumeric && !aggFn);
-      const buckets = new Map<string, number[]>();
-      const counts = new Map<string, number>();
-      rawData.forEach(row => {
-        const rawName = row[mapping.xAxisColumn!];
-        const name = this.formatCategoryLabel(rawName, mapping);
-        if (!rawByLabel.has(name)) rawByLabel.set(name, rawName);
-        if (countMode) {
-          counts.set(name, (counts.get(name) ?? 0) + 1);
-        } else {
-          const b = buckets.get(name) ?? [];
-          b.push(this.toNumber(row[col]));
-          buckets.set(name, b);
-        }
-      });
-      const series = countMode
-        ? Array.from(counts.entries()).map(([name, value]) => ({ name, value }))
-        : Array.from(buckets.entries()).map(([name, samples]) => ({
-            name,
-            value: this.aggregateSamples(samples, aggFn, mapping.percentile),
-          }));
-      return {
-        name: col,
-        // Chronological order for a temporal x; insertion order otherwise
-        // (unchanged for non-time charts).
-        series: this.sortChronologicallyIfTemporal(series, rawByLabel),
-      };
-    });
-  }
-
-  /**
-   * Histogram — auto-bin the numeric `xAxisColumn` into frequency buckets and
-   * return `{name, value}[]` where name is the bin range label and value is the
-   * count of rows in that bin. Bin count comes from `mapping.histogramBins`;
-   * 0/undefined falls back to Sturges' rule (⌈log2(n)⌉ + 1), capped to [1, 50].
-   *
-   * Non-numeric / null cells are skipped. When the column has no numeric spread
-   * (all identical, or < 2 usable values) a single bucket is returned so the
-   * chart still renders rather than blanking.
-   */
-  private transformToHistogram(
-    rawData: any[],
-    mapping: ChartDataMapping,
-  ): SingleSeriesData[] {
-    const col = mapping.xAxisColumn;
-    if (!col) return [];
-
-    const values: number[] = [];
-    rawData.forEach(row => {
-      const raw = row[col];
-      if (raw === null || raw === undefined || raw === '') return;
-      const n = typeof raw === 'number' ? raw : Number(raw);
-      if (Number.isFinite(n)) values.push(n);
-    });
-    if (values.length === 0) return [];
-
-    const min = Math.min(...values);
-    const max = Math.max(...values);
-    if (min === max) {
-      // No spread — one bucket holding every row.
-      return [{ name: this.formatBinBoundary(min), value: values.length }];
-    }
-
-    // Bin count: explicit config wins; otherwise Sturges' rule.
-    const requested = Math.floor(mapping.histogramBins || 0);
-    const sturges = Math.ceil(Math.log2(values.length)) + 1;
-    const binCount = Math.max(
-      1,
-      Math.min(50, requested > 0 ? requested : sturges),
-    );
-
-    const width = (max - min) / binCount;
-    const counts = new Array(binCount).fill(0);
-    values.forEach(v => {
-      // Last bin is inclusive of max so the maximum value isn't dropped.
-      let idx = Math.floor((v - min) / width);
-      if (idx >= binCount) idx = binCount - 1;
-      if (idx < 0) idx = 0;
-      counts[idx] += 1;
-    });
-
-    return counts.map((count, i) => {
-      const lo = min + i * width;
-      const hi = i === binCount - 1 ? max : lo + width;
-      return {
-        name: `${this.formatBinBoundary(lo)}–${this.formatBinBoundary(hi)}`,
-        value: count,
-      };
-    });
-  }
-
-  /** Compact numeric label for a histogram bin edge. */
-  private formatBinBoundary(n: number): string {
-    if (!Number.isFinite(n)) return '';
-    // Keep small decimals readable; round wide ranges to whole numbers.
-    const abs = Math.abs(n);
-    if (abs >= 1000) return String(Math.round(n));
-    if (Number.isInteger(n)) return String(n);
-    return n.toFixed(2);
-  }
-
-  /**
-   * Candlestick — `[[open, close, low, high], ...]` per category.
-   * Empty rows or missing role columns surface as `null` data items so
-   * ECharts skips them rather than rendering a zero-height candle.
-   */
-  private transformToOhlc(rawData: any[], mapping: ChartDataMapping): any {
-    const { xAxisColumn, openColumn, highColumn, lowColumn, closeColumn } =
-      mapping;
-    if (
-      !xAxisColumn ||
-      !openColumn ||
-      !highColumn ||
-      !lowColumn ||
-      !closeColumn
-    ) {
-      return { categories: [], values: [] };
-    }
-    const categories: string[] = [];
-    const values: (number[] | null)[] = [];
-    rawData.forEach(row => {
-      categories.push(this.formatLabelValue(row[xAxisColumn]));
-      const o = this.toNumber(row[openColumn]);
-      const c = this.toNumber(row[closeColumn]);
-      const l = this.toNumber(row[lowColumn]);
-      const h = this.toNumber(row[highColumn]);
-      if (!isFinite(o) || !isFinite(c) || !isFinite(l) || !isFinite(h)) {
-        values.push(null);
-      } else {
-        values.push([o, c, l, h]);
-      }
-    });
-    return { categories, values };
-  }
-
-  /**
-   * Hierarchical — tree/treemap/sunburst. Reads `xAxisColumn` (name),
-   * `yAxisColumn` (value), `parentColumn` (parent-name). Rows with a null
-   * or empty parent become roots. Returns a forest (array of trees); the
-   * tree builder wraps a single synthetic root around it if needed.
-   *
-   * If no `parentColumn` is set, returns flat `{name, value}[]` as siblings
-   * of an implicit root — matches old behaviour.
-   */
-  private transformToHierarchy(rawData: any[], mapping: ChartDataMapping): any {
-    const { xAxisColumn, yAxisColumn, parentColumn } = mapping;
-    if (!xAxisColumn) {
-      return [];
-    }
-    if (!parentColumn) {
-      // Flat fallback (no hierarchy). AGGREGATE by name — previously this
-      // mapped every raw row 1:1, so a treemap/sunburst over e.g. 1000 rows of
-      // 4 products produced 1000 tiny slivers instead of 4 summed tiles. Sum
-      // the value per distinct name so each category is one node. When
-      // yAxisColumn is absent (e.g. tree chart with just xAxis), use a row
-      // count so the tree builder still has nodes to render.
-      const agg = new Map<string, number>();
-      rawData.forEach(row => {
-        const name = this.formatLabelValue(row[xAxisColumn]);
-        if (!name || name === '(empty)') return;
-        const v = yAxisColumn ? this.toNumber(row[yAxisColumn]) : 1;
-        agg.set(name, (agg.get(name) || 0) + v);
-      });
-      return Array.from(agg.entries()).map(([name, value]) => ({
-        name,
-        value,
-      }));
-    }
-    // Build a name → node map, then attach children to their parents.
-    const nodes = new Map<
-      string,
-      { name: string; value: number; children: any[] }
-    >();
-    rawData.forEach(row => {
-      const name = this.formatLabelValue(row[xAxisColumn]);
-      // When yAxis isn't mapped (tree chart with just xAxis + parent), each
-      // row contributes a count of 1.
-      const value = yAxisColumn ? this.toNumber(row[yAxisColumn]) : 1;
-      if (!name || name === '(empty)') return;
-      if (nodes.has(name)) {
-        // Aggregate duplicate-named rows
-        nodes.get(name)!.value += value;
-      } else {
-        nodes.set(name, { name, value, children: [] });
-      }
-    });
-    const roots: any[] = [];
-    rawData.forEach(row => {
-      const name = this.formatLabelValue(row[xAxisColumn]);
-      const node = nodes.get(name);
-      if (!node) return;
-      const rawParent = row[parentColumn];
-      const parentName =
-        rawParent === null || rawParent === undefined || rawParent === ''
-          ? null
-          : this.formatLabelValue(rawParent);
-      if (parentName === null || parentName === name) {
-        if (!roots.includes(node)) roots.push(node);
-      } else {
-        const parent = nodes.get(parentName);
-        if (parent && !parent.children.includes(node)) {
-          parent.children.push(node);
-        } else if (!parent && !roots.includes(node)) {
-          // Orphan — parent doesn't exist; treat as root so it still renders.
-          roots.push(node);
-        }
-      }
-    });
-    return roots;
-  }
-
-  /**
-   * Radar — `{indicators: [{name, max}], series: [{name, value:[v1..vK]}]}`.
-   *
-   * `xAxisColumn` defines the grouping (one polygon per distinct category) and
-   * `indicatorColumns` defines the K radar axes. Each indicator value is the
-   * SUM of that column for the rows in the group (matches the bar/line family
-   * aggregation default — see `transformToBar` etc.). The indicator's max is
-   * also derived from the grouped values, so the axis scale tracks the
-   * aggregated polygons, not the raw rows.
-   *
-   * Previously this returned one polygon per raw row, which produced ~N
-   * overlapping shapes (5040 for the demo dataset) and looked like noise.
-   */
-  private transformToRadar(rawData: any[], mapping: ChartDataMapping): any {
-    const { xAxisColumn, indicatorColumns } = mapping;
-    if (!xAxisColumn || !indicatorColumns?.length) {
-      return { indicators: [], series: [] };
-    }
-
-    // Group rows by xAxisColumn → indicator values are summed within group.
-    const groups = new Map<string, number[]>();
-    for (const row of rawData) {
-      const key = this.formatLabelValue(row[xAxisColumn]);
-      let bucket = groups.get(key);
-      if (!bucket) {
-        bucket = indicatorColumns.map(() => 0);
-        groups.set(key, bucket);
-      }
-      indicatorColumns.forEach((col, i) => {
-        const v = this.toNumber(row[col]);
-        if (isFinite(v)) bucket![i] += v;
-      });
-    }
-
-    const series = Array.from(groups, ([name, value]) => ({ name, value }));
-
-    const indicators = indicatorColumns.map((col, i) => {
-      const max = Math.max(0, ...series.map(s => s.value[i]).filter(isFinite));
-      return { name: col, max: max || 1 };
-    });
-
-    return { indicators, series };
-  }
-
-  /**
-   * Parallel — `[[d0, d1, ...dN], ...]` plus `parallelAxis[]` config. Reads
-   * `dimensionColumns` (ordered). xAxis is optional and, when set, used as
-   * the line-name (legend entry).
-   */
-  private transformToParallel(rawData: any[], mapping: ChartDataMapping): any {
-    const { xAxisColumn, dimensionColumns } = mapping;
-    if (!dimensionColumns?.length) {
-      return { axes: [], data: [] };
-    }
-    const axes = dimensionColumns.map((col, idx) => ({
-      dim: idx,
-      name: col,
-      type: this.isColumnNumeric(rawData, col) ? 'value' : 'category',
-    }));
-    const data = rawData.map(row => {
-      const values = dimensionColumns.map(col => {
-        return this.isColumnNumeric(rawData, col)
-          ? this.toNumber(row[col])
-          : this.formatLabelValue(row[col]);
-      });
-      const name = xAxisColumn
-        ? this.formatLabelValue(row[xAxisColumn])
-        : undefined;
-      return name ? { name, value: values } : values;
-    });
-    return { axes, data };
-  }
-
-  /**
-   * Theme river — `[[time, value, category], ...]`. If `timeColumn` is set
-   * we use its values; otherwise we synthesise a time axis from the row
-   * index so legacy visuals still render (the old behaviour).
-   */
-  private transformToThemeRiver(
-    rawData: any[],
-    mapping: ChartDataMapping,
-  ): any[] {
-    const { xAxisColumn, yAxisColumn, timeColumn } = mapping;
-    if (!xAxisColumn || !yAxisColumn) return [];
-    return rawData.map((row, idx) => {
-      const time = timeColumn ? row[timeColumn] : idx;
-      const value = this.toNumber(row[yAxisColumn]);
-      const category = this.formatLabelValue(row[xAxisColumn]);
-      return [time, value, category];
-    });
-  }
-
-  /**
-   * Globe / geo overlay — `[{value: [lng, lat, value]}, ...]`.
-   * `lngColumn` / `latColumn` are required; `yAxisColumn` (if set)
-   * carries the third numeric value, otherwise 1.
-   */
-  private transformToGeoLngLatValue(
-    rawData: any[],
-    mapping: ChartDataMapping,
-  ): any[] {
-    const { lngColumn, latColumn, yAxisColumn } = mapping;
-    if (!lngColumn || !latColumn) return [];
-    return rawData
-      .map(row => {
-        const lng = this.toNumber(row[lngColumn]);
-        const lat = this.toNumber(row[latColumn]);
-        const value = yAxisColumn ? this.toNumber(row[yAxisColumn]) : 1;
-        return isFinite(lng) && isFinite(lat)
-          ? { value: [lng, lat, value] }
-          : null;
-      })
-      .filter((v): v is { value: number[] } => v !== null);
-  }
-
-  /**
-   * Lines 3D on globe — pair-of-points segments. Prefer lng/lat roles
-   * when set; fall back to x/y for backwards compat (legacy behaviour
-   * was to read xAxis as lng and yAxis as lat).
-   */
-  private transformToGeoLines3D(
-    rawData: any[],
-    mapping: ChartDataMapping,
-  ): any[] {
-    const lngCol = mapping.lngColumn ?? mapping.xAxisColumn;
-    const latCol = mapping.latColumn ?? mapping.yAxisColumn;
-    if (!lngCol || !latCol) return [];
-    return rawData
-      .map(row => {
-        const lng = this.toNumber(row[lngCol]);
-        const lat = this.toNumber(row[latCol]);
-        return isFinite(lng) && isFinite(lat) ? [lng, lat, 0] : null;
-      })
-      .filter((v): v is number[] => v !== null);
-  }
-
-  /**
-   * Lines GL — multi-segment polyline. Each row contributes a vertex; the
-   * builder splits into `[start, end]` pairs.
-   */
-  private transformToLineSegments(
-    rawData: any[],
-    mapping: ChartDataMapping,
-  ): any[] {
-    const lngCol = mapping.lngColumn ?? mapping.xAxisColumn;
-    const latCol = mapping.latColumn ?? mapping.yAxisColumn;
-    if (!lngCol || !latCol) return [];
-    const points: number[][] = [];
-    rawData.forEach(row => {
-      const x = this.toNumber(row[lngCol]);
-      const y = this.toNumber(row[latCol]);
-      if (isFinite(x) && isFinite(y)) points.push([x, y]);
-    });
-    // Build consecutive [start, end] pairs as separate line segments.
-    const segments: any[] = [];
-    for (let i = 0; i < points.length - 1; i++) {
-      segments.push({ coords: [points[i], points[i + 1]] });
-    }
-    return segments;
-  }
-
-  /**
-   * Flow GL — vector field `[[x, y, vx, vy], ...]`. Needs four columns
-   * mapped: x = lngColumn, y = latColumn, vx = xAxisColumn, vy = yAxisColumn
-   * (legacy roles repurposed for the velocity components).
-   */
-  private transformToVectorField(
-    rawData: any[],
-    mapping: ChartDataMapping,
-  ): any[] {
-    const { lngColumn, latColumn, xAxisColumn, yAxisColumn } = mapping;
-    if (!lngColumn || !latColumn || !xAxisColumn || !yAxisColumn) return [];
-    return rawData
-      .map(row => {
-        const x = this.toNumber(row[lngColumn]);
-        const y = this.toNumber(row[latColumn]);
-        const vx = this.toNumber(row[xAxisColumn]);
-        const vy = this.toNumber(row[yAxisColumn]);
-        return isFinite(x) && isFinite(y) && isFinite(vx) && isFinite(vy)
-          ? [x, y, vx, vy]
-          : null;
-      })
-      .filter((v): v is number[] => v !== null);
-  }
-
-  /**
-   * Build a ChartDataMapping from a Visual — central helper consumed by all
-   * the call sites so they don't each have to know which role columns to
-   * forward. New roles added to Visual only need to be added here.
-   */
-  /**
-   * WAVE2-FORMAT-HOOK — public measure-value formatter for the ECharts option
-   * builder (owned by Waves 3/4). The transformer intentionally keeps `value`
-   * as a RAW number so downstream calcs (stacking, %-of-total, reference
-   * lines) stay numeric; the display string is produced only at the render
-   * edge — axis tick labels, data labels, tooltip value fields.
-   *
-   * The builder should call this at each of those sites, passing the visual's
-   * value ValueFormat (mapping.valueFormat / config.format.value):
-   *
-   *   formatter: (v) => transformer.formatMeasureValue(v, mapping.valueFormat)
-   *
-   * Kept here (not in the builder) so all value formatting funnels through the
-   * one pure grammar and the builder file stays owned by its wave. A no-format
-   * (undefined) input returns a plain grouped-number string.
-   */
-  formatMeasureValue(
-    value: number | string | null | undefined,
-    fmt?: import('../models/visual-config.model').ValueFormat,
-  ): string {
-    return formatValue(value, fmt);
-  }
 
   buildMapping(visual: any): ChartDataMapping {
     const mapping: ChartDataMapping = {
@@ -1718,4 +565,13 @@ export class ChartDataTransformerService {
 
     return mapping;
   }
+  /**
+   * Public delegate kept for external callers (edit-analyses uses it to match a
+   * clicked category against a mapping). The implementation is the free function
+   * in chart-transform-utils; this preserves the service's public surface.
+   */
+  formatCategoryValue(value: any, mapping: ChartDataMapping): string {
+    return formatCategoryValue(value, mapping);
+  }
+
 }
