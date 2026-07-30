@@ -1,6 +1,6 @@
 # prompt
 > Update the Progress log on every change.
-> Code path: `src/app/modules/prompt` · Status: 🟢 · Last updated: 2026-07-30
+> Code path: `src/app/modules/prompt` · Status: 🟢 · Last updated: 2026-07-31
 
 ## 1. Context
 - Responsibility: DBExec **Studio** primitive — a reusable parameterised input control (a "prompt"). Each prompt has a control **type** (one of ~9: text, number, dropdown, multiselect, checkbox, radio, calendar, daterange, rangeslider), is bound to a datasource + tab + section, and supplies values either statically or from a SQL query. Prompts are the form fields that `query-builder` (and older Studio flows) arrange and run.
@@ -23,6 +23,14 @@
 - Out of scope: chart/BI parameters (analyses), dataset `{{name}}` params (dataset).
 
 ## 3. Progress (newest first)
+### 2026-07-31 — Prompt module now owns ALL prompt config (appearance/operators/values/joins)
+Architectural rule (user): every prompt config lives here; the Query Builder only picks + arranges prompts and reads their config.
+- **New components:** `prompt-appearance-form` (relocated from qb-appearance-form — data-driven General/per-type/date/Operator accordion, mirrored `promptAppearance` Zod) + `prompt-value-source` (relocated from qb-value-source — free/static/lookup_query/distinct_column) + `prompt-join-picker` (NEW — no-SQL FK join: pick related table→column, derives joinKey+onClause from `DatasourceService.listForeignKeys`, emits an edge descriptor). Helper `prompt-appearance-fields.ts` moved here.
+- **config-prompt** now shows inline sections: Related table (FK join picker), Appearance & Operators (`prompt-appearance-form`, operators from `ReferenceDataService.getOptions('filter_operator')`), Values (`prompt-value-source`). The 9 legacy `*-config-dialog` components + the "Customise" dialog flow are DELETED. On save it persists v2 fields (filterExpr/selectExpr/requiredJoins/joinEdges) alongside the config.
+- **PromptService** gained `getValueSource`/`saveValueSource`/`previewValues`; **fixed** the `appearence:`→`appearance:` body-key bug (BE reads `req.body.appearance`) so appearance actually persists.
+- **list-prompt** migrated from raw p-table+bulk-select → `app-custom-table` + `UsServerListAdapter` (infinite scroll, row actions, datasource filter kept), matching every other module.
+- Gates: tsc/ngc/prod-build green.
+
 ### 2026-07-30 — Query Builder v2: de-couple from Tab/Section
 - Done: prompts are now datasource-scoped, not section-scoped. `add-prompt`
   rewritten as a flat single-prompt reactive form (datasource / name /

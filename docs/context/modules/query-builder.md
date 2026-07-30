@@ -23,6 +23,13 @@
 - Out of scope: hand-written SQL (dataset/query-runner), chart authoring (analyses).
 
 ## 3. Progress (newest first)
+### 2026-07-31 (later) — QB configures NOTHING about a prompt; it only composes
+- Removed the per-prompt appearance/value-source drawer from `qb-form-designer`; each placement row = name + type chip + display-name + mandatory/locked + remove (form position only). Moved `qb-appearance-form`/`qb-value-source`/`qb-appearance-fields` OUT to the prompt module.
+- `qb-admin.service` lost the 5 prompt-endpoint methods (appearance×2, value-source×3); kept `listPrompts` (palette read).
+- `qb-join-designer` is now READ-ONLY: shows the joins auto-materialised from placed prompts' `required_joins`/`join_edges` (server upserts `QueryBuilderJoin` in `putPlacements`). No hand authoring.
+- `list-query-builder` migrated to `app-custom-table` + `UsServerListAdapter` (infinite scroll, row actions, datasource filter) — matches every module.
+- The no-SQL join picker + all prompt config now live in the Prompt module (see prompt.md). Compose runtime verified end-to-end (multi-condition tree → correct aliased SQL → real filtered rows) via headless Playwright; screenshots in /DBExec/screenshots/QB.
+
 ### 2026-07-31 — Screen parity (parent card + 50% forms) + placement labels + live proof
 - **`qb-design` shell** rewrapped in the standard page card (`.add-admin-wrapper > .add-admin-container > .page-header` with back button to `/app/query-builders` + builder-name title), tab nav kept inside the card. Was a bare `.qb-design` shell with no card — the user's "no parent card on config screen" complaint. `.qb-design__panel` now scrolls inside the card.
 - **`run-query-builder` (compose)** rewrapped in the same page card + `.page-header` (back button, title, undo/redo actions). The 2-column composer grid stays inside.

@@ -152,6 +152,26 @@ test('QB v2 complete walkthrough', async ({ page }) => {
         data: { valueSource: { kind: 'static', options: p.values.map(v => ({ value: v })) } },
       });
     }
+    // Appearance + operators (prompt-level config, owned by the Prompt module).
+    const opsByType: Record<string, string[]> = {
+      multiselect: ['in', 'not_in'],
+      dropdown: ['eq', 'neq'],
+      radio: ['eq', 'neq'],
+      number: ['eq', 'gt', 'gte', 'lt', 'lte', 'between'],
+      checkbox: ['eq'],
+    };
+    await page.request.put(`${API}/prompts/${id}/appearance`, {
+      headers: H,
+      data: {
+        id,
+        appearance: {
+          type: p.type,
+          label: p.name,
+          placeholder: `Select ${p.name}`,
+          allowedOperators: opsByType[p.type] ?? [],
+        },
+      },
+    });
   }
 
   // ── SEED: query builder over clinical.encounter_analytics ────────────
@@ -219,10 +239,23 @@ test('QB v2 complete walkthrough', async ({ page }) => {
   await page.waitForTimeout(1500);
   await shot(page, 'prompt-library-list');
 
-  // 2) A single prompt's config screen (Department)
+  // 2) The prompt config screen — now the single home for ALL prompt config:
+  // schema/table/column, related-table FK join, Appearance & Operators, Values.
   await page.goto(`/app/prompts/${promptIds['Department']}/configure`, { waitUntil: 'domcontentloaded' });
-  await page.waitForTimeout(1800);
-  await shot(page, 'prompt-configure-department');
+  await page.waitForTimeout(2500);
+  await shot(page, 'prompt-config-top');
+  // The scroll container is the inner .admin-form (overflow-y:auto), not body.
+  const scrollForm = async (frac: number) =>
+    page.evaluate((f) => {
+      const el = document.querySelector('.admin-form') as HTMLElement | null;
+      if (el) el.scrollTop = el.scrollHeight * f;
+    }, frac);
+  await scrollForm(0.5);
+  await page.waitForTimeout(1000);
+  await shot(page, 'prompt-config-appearance-operators');
+  await scrollForm(1);
+  await page.waitForTimeout(1000);
+  await shot(page, 'prompt-config-values');
 
   // 3) Add-prompt form (blank, shows the create UX)
   await page.goto('/app/prompts/new', { waitUntil: 'domcontentloaded' });
@@ -256,18 +289,12 @@ test('QB v2 complete walkthrough', async ({ page }) => {
   await page.waitForTimeout(1000);
   await shot(page, 'design-settings');
 
-  // 9) DESIGN — appearance + value-source drawer (open the first placement)
+  // 9) DESIGN — back to the picker-only Form Designer (no per-prompt config).
+  // The form designer now only picks + arranges prompts; all prompt config
+  // (appearance/operators/values) lives in the Prompt module (step 2).
   await page.locator('button:has-text("Form")').first().click();
-  await page.waitForTimeout(800);
-  const gear = page.locator('button:has(i.pi-sliders-h)').first();
-  if (await gear.count()) {
-    await gear.click();
-    await page.waitForTimeout(1200);
-    await shot(page, 'design-appearance-valuesource-drawer');
-    // close
-    await page.keyboard.press('Escape').catch(() => {});
-    await page.locator('.qb-designer__drawer-backdrop').click({ timeout: 2000 }).catch(() => {});
-  }
+  await page.waitForTimeout(1000);
+  await shot(page, 'design-form-picker-only');
 
   // 10) COMPOSE — opens PRE-FILLED from the seeded default tree
   // (Department in Cardiology/Oncology AND Sex = F).
