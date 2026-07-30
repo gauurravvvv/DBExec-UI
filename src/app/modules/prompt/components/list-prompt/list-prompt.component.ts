@@ -6,20 +6,35 @@ import {
   inject,
   OnDestroy,
   OnInit,
-  ViewChild,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
-import { Table } from 'primeng/table';
-import { Subject } from 'rxjs';
-import { debounceTime } from 'rxjs/operators';
 import { DEFAULT_PAGE } from 'src/app/core/constants';
 import { PROMPT } from 'src/app/core/constants/routes.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { DatasourceService } from 'src/app/modules/datasource/services/datasource.service';
+import {
+  UsServerListAdapter,
+  UsListLoadParams,
+} from 'src/app/shared/components/us-data-grid/us-server-list-adapter';
+import type {
+  CustomTableColumn,
+  CustomTableConfig,
+} from 'src/app/shared/components/custom-table/custom-table.types';
 import { PromptService } from '../../services/prompt.service';
 
+/**
+ * Prompt listing — renders through the shared `<app-custom-table>` (the app's
+ * unified list table) driven by a `UsServerListAdapter` on the BE prompt list
+ * call. Infinite scroll (no page controls), a global search plus on-demand
+ * per-column filters, and per-row actions. No bulk selection.
+ *
+ * A prompt list is datasource-scoped, so the screen keeps its datasource
+ * dropdown (server-mode) projected into the table's toolbar-left slot. The
+ * adapter closes over the selected datasourceId; selecting a datasource
+ * rebuilds the adapter so the next load carries the new scope.
+ */
 @Component({
   selector: 'app-list-prompt',
   templateUrl: './list-prompt.component.html',
@@ -27,72 +42,49 @@ import { PromptService } from '../../services/prompt.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ListPromptComponent implements OnInit, OnDestroy {
-  ngOnDestroy() {
-    // Abort in-flight reads if the user navigates away.
-    this.promptService.cancelReads();
-  }
-
-  @ViewChild('dt') dt!: Table;
-
   private destroyRef = inject(DestroyRef);
   private cdr = inject(ChangeDetectorRef);
 
-  // Signal refs from service
-  prompts = this.promptService.prompts;
-  total = this.promptService.total;
-  loading = this.promptService.loading;
-  saving = this.promptService.saving;
+  /* ── page state ──────────────────────────────────────── */
 
-  // Pagination limit for prompts
-  limit = 10;
-  lastTableLazyLoadEvent: any;
-
-  selectedPrompts: any[] = [];
-  searchTerm: string = '';
   showDeleteConfirm = false;
   promptToDelete: string | null = null;
-  bulkDelete = false;
   deleteJustification = '';
-  Math = Math;
+  today = new Date();
+
+  // Datasource filter — server-mode dropdown outside the grid (toolbar-left).
   datasources: any[] = [];
   preloadedDatasources: any[] | null = null;
   preloadedDatasourcesTotal: number | null = null;
   selectedDatasource: any = null;
+
+  // Deep-link name filter, applied to the adapter's initial filter.
+  private deepLinkName: string | null = null;
+
   loggedInUserId: any = this.globalService.getTokenDetails('userId');
 
-  today = new Date();
+  saving = this.promptService.saving;
 
-  statusOptions: any[] = [];
+  /* ── custom-table wiring (unified simple table; server-driven) ──────── */
 
-  // Filter values for column filtering
-  filterValues: any = {
-    name: '',
-    description: '',
-    groupName: '',
-    type: '',
-    status: null,
-    createdDateRange: null,
+  cols: CustomTableColumn[] = [];
+
+  tableConfig: CustomTableConfig = {
+    pageSize: 50,
+    globalSearch: true,
+    globalSearchKey: 'name', // prompt list matches a `name` filter for search
+    globalSearchPlaceholder: undefined, // set in ngOnInit (translate ready)
+    showColumnFilters: true,
+    enableExport: true,
+    gridKey: 'prompts-list',
+    height: 'flex',
+    rowIdField: 'id',
   };
 
-  // Debouncing for filter changes
-  private filter$ = new Subject<void>();
-
-  get selectedCount(): number {
-    return this.selectedPrompts?.length || 0;
-  }
-
-  isRowSelectable = (event: any) => true;
-
-  get isFilterActive(): boolean {
-    return (
-      !!this.filterValues.name ||
-      !!this.filterValues.description ||
-      !!this.filterValues.groupName ||
-      !!this.filterValues.type ||
-      this.filterValues.status !== null ||
-      !!this.filterValues.createdDateRange
-    );
-  }
+  /** Server-side adapter — bound only once a datasource is selected, and
+   *  rebuilt whenever the datasource changes so the closure picks up the
+   *  new scope. Null until the first datasource resolves. */
+  adapter: UsServerListAdapter<any> | null = null;
 
   constructor(
     private datasourceService: DatasourceService,
@@ -104,17 +96,11 @@ export class ListPromptComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
-    this.statusOptions = [
-      { label: this.translate.instant('COMMON.ACTIVE'), value: 1 },
-      { label: this.translate.instant('COMMON.INACTIVE'), value: 0 },
-    ];
-
-    // Setup debounced filter
-    this.filter$
-      .pipe(debounceTime(400), takeUntilDestroyed(this.destroyRef))
-      .subscribe(() => {
-        this.loadPrompts();
-      });
+    this.cols = this.buildColumns();
+    this.tableConfig = {
+      ...this.tableConfig,
+      globalSearchPlaceholder: this.translate.instant('COMMON.SEARCH_NAME'),
+    };
 
     this.route.queryParams
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -127,12 +113,77 @@ export class ListPromptComponent implements OnInit, OnDestroy {
       });
   }
 
+  ngOnDestroy() {
+    // Abort in-flight reads if the user navigates away.
+    this.promptService.cancelReads();
+    this.adapter?.destroy();
+  }
+
+  /* ── column definitions ──────────────────────────────── */
+
+  private buildColumns(): CustomTableColumn[] {
+    const t = (k: string) => this.translate.instant(k);
+    return [
+      {
+        colId: 'name',
+        field: 'name',
+        header: t('COMMON.NAME'),
+        width: '224px',
+        frozen: true,
+        filter: 'text',
+      },
+      {
+        colId: 'description',
+        field: 'description',
+        header: t('COMMON.DESCRIPTION'),
+        width: '320px',
+        filter: 'text',
+      },
+      {
+        colId: 'groupName',
+        field: 'groupName',
+        header: t('PROMPT_MODULE.GROUP'),
+        width: '176px',
+        filter: 'text',
+      },
+      {
+        colId: 'type',
+        field: 'type',
+        header: t('COMMON.TYPE'),
+        width: '144px',
+        filter: 'text',
+      },
+      {
+        colId: 'status',
+        field: 'status',
+        header: t('COMMON.STATUS'),
+        width: '144px',
+        sortable: false,
+      },
+      {
+        colId: 'createdOn',
+        field: 'createdOn',
+        header: t('COMMON.CREATED_ON'),
+        width: '192px',
+        sortable: false,
+      },
+      {
+        colId: 'actions',
+        header: t('COMMON.ACTIONS'),
+        width: '160px',
+        sortable: false,
+      },
+    ];
+  }
+
+  /* ── deep-linking ────────────────────────────────────── */
+
   handleDeepLinking(params: any) {
     const datasourceId = params['datasourceId'] ? params['datasourceId'] : null;
     const name = params['name'];
 
     if (name) {
-      this.filterValues.name = name;
+      this.deepLinkName = name;
     }
 
     if (datasourceId) {
@@ -141,6 +192,8 @@ export class ListPromptComponent implements OnInit, OnDestroy {
       this.loadDatasources();
     }
   }
+
+  /* ── datasource filter dropdown ──────────────────────── */
 
   /**
    * Fetcher for the server-mode datasource dropdown.
@@ -170,37 +223,6 @@ export class ListPromptComponent implements OnInit, OnDestroy {
     }
   };
 
-  onDBChange(datasourceId: any) {
-    this.selectedDatasource = datasourceId;
-    this.loadPrompts();
-  }
-
-  onFilterChange() {
-    this.selectedPrompts = [];
-    // Trigger debounced API call
-    this.filter$.next();
-  }
-
-  clearFilters() {
-    this.filterValues = {
-      name: '',
-      description: '',
-      groupName: '',
-      type: '',
-      status: null,
-      createdDateRange: null,
-    };
-    this.selectedPrompts = [];
-    this.loadPrompts();
-  }
-
-  onCreatedDateRangeChange(range: Date[] | null) {
-    this.filterValues.createdDateRange = range;
-    if (!range || (range[0] && range[1])) {
-      this.onFilterChange();
-    }
-  }
-
   loadDatasources(preSelectedDbId?: string): Promise<void> {
     return new Promise(resolve => {
       const params = {
@@ -226,99 +248,83 @@ export class ListPromptComponent implements OnInit, OnDestroy {
               } else {
                 this.selectedDatasource = this.datasources[0].id;
               }
-              this.loadPrompts();
+              this.bindAdapter();
             } else {
               this.selectedDatasource = null;
+              this.adapter = null;
             }
           } else {
             this.datasources = [];
             this.selectedDatasource = null;
+            this.adapter = null;
           }
+          this.cdr.markForCheck();
           resolve();
         })
         .catch(() => {
           this.datasources = [];
           this.selectedDatasource = null;
+          this.adapter = null;
+          this.cdr.markForCheck();
           resolve();
         });
     });
   }
 
-  loadPrompts(event?: any) {
-    if (!this.selectedDatasource) return;
-
-    // Clear selection when page/sort changes
-    if (event) {
-      const prev = this.lastTableLazyLoadEvent;
-      if (
-        prev &&
-        (prev.first !== event.first ||
-          prev.rows !== event.rows ||
-          prev.sortField !== event.sortField ||
-          prev.sortOrder !== event.sortOrder)
-      ) {
-        this.selectedPrompts = [];
-      }
-      this.lastTableLazyLoadEvent = event;
-    }
-
-    const page = event ? Math.floor(event.first / event.rows) + 1 : 1;
-    const limit = event ? event.rows : this.limit;
-
-    const params: any = {
-      datasourceId: this.selectedDatasource,
-      page: page,
-      limit: limit,
-    };
-
-    // Build filter object
-    const filter: any = {};
-    if (this.filterValues.name) {
-      filter.name = this.filterValues.name;
-    }
-    if (this.filterValues.description) {
-      filter.description = this.filterValues.description;
-    }
-    if (this.filterValues.tabName) {
-      filter.tabName = this.filterValues.tabName;
-    }
-    if (this.filterValues.sectionName) {
-      filter.sectionName = this.filterValues.sectionName;
-    }
-
-    if (this.filterValues.type) {
-      filter.type = this.filterValues.type;
-    }
-    if (
-      this.filterValues.status !== null &&
-      this.filterValues.status !== undefined
-    ) {
-      filter.status = this.filterValues.status;
-    }
-    if (this.filterValues.createdDateRange?.[0]) {
-      filter.createdDateFrom =
-        this.filterValues.createdDateRange[0].toISOString();
-    }
-    if (this.filterValues.createdDateRange?.[1]) {
-      const dateTo = new Date(this.filterValues.createdDateRange[1]);
-      dateTo.setHours(23, 59, 59, 999);
-      filter.createdDateTo = dateTo.toISOString();
-    }
-
-    // Add JSON stringified filter if any filter is set
-    if (Object.keys(filter).length > 0) {
-      params.filter = JSON.stringify(filter);
-    }
-
-    this.promptService
-      .load(params)
-      .then(() => {
-        this.cdr.markForCheck();
-      })
-      .catch(() => {
-        this.cdr.markForCheck();
-      });
+  onDBChange(datasourceId: any) {
+    this.selectedDatasource = datasourceId;
+    // The adapter closes over selectedDatasource — rebuild so the next
+    // load picks up the new scope.
+    this.bindAdapter();
   }
+
+  /* ── adapter wiring ─────────────────────────────────── */
+
+  private bindAdapter() {
+    // Tear down any prior adapter so its in-flight call doesn't race the
+    // new one's first load.
+    this.adapter?.destroy();
+    if (!this.selectedDatasource) {
+      this.adapter = null;
+      this.cdr.markForCheck();
+      return;
+    }
+    const datasourceId = this.selectedDatasource;
+    // Seed the deep-link name into the adapter's initial filter (once).
+    const name = this.deepLinkName;
+    this.deepLinkName = null;
+    this.adapter = new UsServerListAdapter<any>({
+      load: (params: UsListLoadParams) => {
+        // The datasourceId travels as a top-level query param, NOT inside the
+        // JSON filter payload — the BE list contract expects it there.
+        const req: any = {
+          datasourceId,
+          page: params.page,
+          limit: params.limit,
+        };
+        if (params.sort) req.sort = params.sort;
+        if (params.filter) req.filter = params.filter;
+        return this.promptService.listPrompt(req);
+      },
+      // BE returns `{ data: { prompts: [], count } }`.
+      unwrap: (res: any) => ({
+        rows: res?.data?.prompts ?? [],
+        total: res?.data?.count ?? 0,
+      }),
+      initial: {
+        page: 1,
+        limit: 50,
+        ...(name ? { filterModel: { name } } : {}),
+      },
+    });
+    this.cdr.markForCheck();
+  }
+
+  refreshList() {
+    this.adapter?.reload();
+  }
+
+  /* ── nav + per-row delete ────────────────────────────── */
 
   onAddNewPrompt() {
     this.router.navigate([PROMPT.ADD]);
@@ -334,21 +340,12 @@ export class ListPromptComponent implements OnInit, OnDestroy {
 
   confirmDelete(id: string) {
     this.promptToDelete = id;
-    this.bulkDelete = false;
-    this.showDeleteConfirm = true;
-  }
-
-  confirmBulkDelete() {
-    if (this.selectedCount === 0) return;
-    this.promptToDelete = null;
-    this.bulkDelete = true;
     this.showDeleteConfirm = true;
   }
 
   cancelDelete() {
     this.showDeleteConfirm = false;
     this.promptToDelete = null;
-    this.bulkDelete = false;
     this.deleteJustification = '';
   }
 
@@ -356,40 +353,17 @@ export class ListPromptComponent implements OnInit, OnDestroy {
     const reason = this.deleteJustification.trim();
     if (!reason) return;
 
-    if (this.bulkDelete) {
-      const ids = this.selectedPrompts.map(p => p.id);
-      if (ids.length === 0) {
-        this.cancelDelete();
-        return;
-      }
-      this.promptService
-        .bulkDelete(ids, reason)
-        .then((res: any) => {
-          if (this.globalService.handleSuccessService(res)) {
-            this.selectedPrompts = [];
-            this.refreshList();
-          }
-        })
-        .catch(() => {})
-        .finally(() => {
-          this.closeDeletePopup();
-          this.cdr.markForCheck();
-        });
-      return;
-    }
-
     if (this.promptToDelete) {
       this.promptService
         .delete(this.promptToDelete, reason)
         .then(response => {
           if (this.globalService.handleSuccessService(response)) {
-            this.selectedPrompts = this.selectedPrompts.filter(
-              p => p.id !== this.promptToDelete,
-            );
             this.refreshList();
           }
         })
-        .catch(() => {})
+        .catch(() => {
+          /* global interceptor shows error toast */
+        })
         .finally(() => {
           this.closeDeletePopup();
           this.cdr.markForCheck();
@@ -400,15 +374,6 @@ export class ListPromptComponent implements OnInit, OnDestroy {
   private closeDeletePopup() {
     this.showDeleteConfirm = false;
     this.promptToDelete = null;
-    this.bulkDelete = false;
     this.deleteJustification = '';
-  }
-
-  refreshList() {
-    if (this.lastTableLazyLoadEvent) {
-      this.loadPrompts(this.lastTableLazyLoadEvent);
-    } else {
-      this.loadPrompts();
-    }
   }
 }

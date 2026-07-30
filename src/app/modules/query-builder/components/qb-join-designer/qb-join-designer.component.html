@@ -5,27 +5,8 @@
         {{ 'QUERY_BUILDER.JOINS' | translate }}
       </h2>
       <p class="qb-joins__sub">
-        {{ 'QUERY_BUILDER.JOINS_HINT' | translate }}
+        {{ 'QUERY_BUILDER.JOINS_AUTO_HINT' | translate }}
       </p>
-    </div>
-    <div class="qb-joins__actions">
-      <app-button
-        variant="secondary"
-        size="sm"
-        icon="pi pi-plus"
-        (clicked)="addJoin()"
-      >
-        {{ 'QUERY_BUILDER.ADD_JOIN' | translate }}
-      </app-button>
-      <app-button
-        variant="primary"
-        size="sm"
-        icon="pi pi-save"
-        [loading]="saving()"
-        (clicked)="save()"
-      >
-        {{ 'COMMON.SAVE' | translate }}
-      </app-button>
     </div>
   </header>
 
@@ -35,68 +16,32 @@
   </div>
 
   <p class="qb-joins__empty" *ngIf="!loading() && !hasJoins()">
-    {{ 'QUERY_BUILDER.NO_JOINS' | translate }}
+    {{ 'QUERY_BUILDER.NO_JOINS_AUTO' | translate }}
   </p>
 
+  <!-- Read-only: joins are materialised automatically from the placed prompts'
+       required tables (configured in the Prompt module). No hand authoring. -->
   <div class="qb-joins__list" *ngIf="!loading() && hasJoins()">
     <div
-      class="qb-joins__card"
-      *ngFor="let join of joins(); trackBy: trackByIndex; let i = index"
+      class="qb-joins__card qb-joins__card--readonly"
+      *ngFor="let join of joins(); trackBy: trackByIndex"
     >
-      <div class="qb-joins__row">
-        <app-custom-dropdown
-          class="qb-joins__type"
-          [label]="'QUERY_BUILDER.JOIN_TYPE' | translate"
-          [options]="joinTypes"
-          optionLabel="label"
-          optionValue="value"
-          [ngModel]="join.joinType"
-          (onChangeEvent)="patch(i, 'joinType', $event)" />
-
-        <app-custom-input
-          [label]="'QUERY_BUILDER.LEFT_ALIAS' | translate"
-          [ngModel]="join.leftAlias"
-          (ngModelChange)="patch(i, 'leftAlias', $event)" />
-        <app-custom-input
-          [label]="'QUERY_BUILDER.LEFT_COLUMN' | translate"
-          [ngModel]="join.leftColumn"
-          (ngModelChange)="patch(i, 'leftColumn', $event)" />
-
-        <app-button
-          variant="ghost"
-          size="sm"
-          icon="pi pi-times"
-          class="qb-joins__remove"
-          [title]="'QUERY_BUILDER.REMOVE_JOIN' | translate"
-          (clicked)="removeJoin(i)" />
+      <div class="qb-joins__auto">
+        <app-chip variant="tag" size="sm">
+          <i class="pi pi-bolt"></i> {{ 'QUERY_BUILDER.AUTO' | translate }}
+        </app-chip>
+        <span class="qb-joins__type-label">{{ join.joinType }} JOIN</span>
       </div>
-
-      <div class="qb-joins__row">
-        <app-custom-input
-          [label]="'QUERY_BUILDER.RIGHT_SCHEMA' | translate"
-          [ngModel]="join.rightSchema"
-          (ngModelChange)="patch(i, 'rightSchema', $event)" />
-        <app-custom-input
-          [label]="'QUERY_BUILDER.RIGHT_TABLE' | translate"
-          [ngModel]="join.rightTable"
-          (ngModelChange)="patch(i, 'rightTable', $event)" />
-        <app-custom-input
-          [label]="'QUERY_BUILDER.RIGHT_ALIAS' | translate"
-          [ngModel]="join.rightAlias"
-          (ngModelChange)="patch(i, 'rightAlias', $event)" />
-        <app-custom-input
-          [label]="'QUERY_BUILDER.RIGHT_COLUMN' | translate"
-          [ngModel]="join.rightColumn"
-          (ngModelChange)="patch(i, 'rightColumn', $event)" />
-
-        <app-custom-dropdown
-          class="qb-joins__card-cardinality"
-          [label]="'QUERY_BUILDER.CARDINALITY' | translate"
-          [options]="cardinalities"
-          optionLabel="label"
-          optionValue="value"
-          [ngModel]="join.cardinality"
-          (onChangeEvent)="patch(i, 'cardinality', $event)" />
+      <div class="qb-joins__clause">
+        <code>
+          {{ join.rightSchema ? join.rightSchema + '.' : '' }}{{ join.rightTable }}
+          {{ join.rightAlias }}
+          <span class="qb-joins__on">ON</span>
+          {{ join.onClause }}
+        </code>
+      </div>
+      <div class="qb-joins__meta" *ngIf="join.cardinality">
+        {{ 'QUERY_BUILDER.CARDINALITY' | translate }}: {{ join.cardinality }}
       </div>
     </div>
   </div>

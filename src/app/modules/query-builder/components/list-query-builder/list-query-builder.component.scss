@@ -40,9 +40,6 @@
 
   .header-content {
     h2 {
-      // Title carries the header on its own (no subtitle). Clamp
-      // sits between 1.25rem and 1.375rem — lands ~22px at typical
-      // desktop widths.
       font-size: clamp(1.25rem, 1.05rem + 0.4vw, 1.375rem);
       font-weight: var(--fw-semibold);
       color: var(--text-color);
@@ -59,9 +56,37 @@
     gap: var(--space-4);
     flex-shrink: 0;
   }
+
+  .modern-button {
+    border-radius: var(--radius-sm) !important;
+    font-weight: var(--fw-semibold);
+    padding: 0.65rem 1.25rem;
+
+    &.p-button-primary {
+      background: linear-gradient(
+        135deg,
+        var(--primary-color),
+        var(--primary-hover)
+      );
+      color: var(--primary-text);
+      border: none;
+      box-shadow: 0 4px 10px var(--primary-color-transparent);
+      transition: all var(--motion-base) ease;
+
+      &:hover {
+        opacity: 1;
+        transform: translateY(-1px);
+        box-shadow: var(--shadow-md);
+      }
+
+      &:focus {
+        box-shadow: 0 0 0 2px var(--primary-color-transparent);
+      }
+    }
+  }
 }
 
-// 2. Content Card & Toolbar
+// 2. Content Card
 .content-card {
   // Flat surface — no outline, no shadow, no border. Table sits directly
   // on the page background.
@@ -76,96 +101,6 @@
   min-height: 0;
   overflow: hidden;
 
-  .card-toolbar {
-    padding: 0 0 var(--space-5);
-    border-bottom: none;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: var(--space-6);
-    background: transparent;
-
-    .toolbar-left,
-    .toolbar-right {
-      display: flex;
-      align-items: center;
-      gap: var(--space-6);
-    }
-
-    // Search Input
-    .search-input-wrapper {
-      i {
-        left: 1rem;
-        color: var(--secondary-color);
-      }
-
-      .modern-search {
-        border-radius: var(--radius-sm);
-        border: 1px solid var(--border-color);
-        padding: 0.65rem 1rem 0.65rem 2.5rem;
-        width: 280px;
-        font-size: var(--fs-body);
-        background: var(--hover-background);
-        transition: all var(--motion-base);
-        color: var(--text-color);
-
-        &:focus {
-          background: var(--card-background);
-          border-color: var(--primary-color);
-          box-shadow: 0 0 0 2px var(--primary-color-transparent);
-        }
-
-        &::placeholder {
-          color: var(--secondary-color);
-        }
-      }
-    }
-
-    // Modern Button
-    .modern-button {
-      border-radius: var(--radius-sm) !important;
-      font-weight: var(--fw-semibold);
-      padding: 0.65rem 1.25rem;
-
-      &.p-button-primary {
-        background: linear-gradient(
-          135deg,
-          var(--primary-color),
-          var(--primary-hover)
-        );
-        color: var(--primary-text);
-        border: none;
-        box-shadow: 0 4px 10px var(--primary-color-transparent);
-        transition: all var(--motion-base) ease;
-
-        &:hover {
-          opacity: 1;
-          transform: translateY(-1px);
-          box-shadow: var(--shadow-md);
-        }
-
-        &:focus {
-          box-shadow: 0 0 0 2px var(--primary-color-transparent);
-        }
-      }
-
-      &.p-button-outlined {
-        background: transparent;
-        border: 1px solid var(--border-color);
-
-        &.p-button-danger {
-          border-color: var(--error-color);
-          color: var(--error-color);
-
-          &:hover {
-            background: var(--error-bg);
-          }
-        }
-      }
-    }
-  }
-
   // 3. Table Wrapper
   .table-wrapper {
     flex: 1;
@@ -175,240 +110,43 @@
     flex-direction: column;
     min-width: 0;
     width: 100%;
-    overflow: hidden;
-
-    ::ng-deep .modern-table {
-      .p-datatable-wrapper {
-        background: var(--card-background);
-      }
-
-      // Header
-      .p-datatable-header {
-        display: none;
-      } // We used custom toolbar
-
-      .p-datatable-thead > tr > th {
-        background: var(--hover-background);
-        color: var(--text-color);
-        opacity: 1;
-        font-size: var(--fs-label);
-        font-weight: var(--fw-semibold);
-        text-transform: uppercase;
-        letter-spacing: 0.04em;
-        padding: 0.75rem 1rem;
-        border-bottom: 1px solid var(--border-color);
-
-        .th-content {
-          display: flex;
-          align-items: center;
-          gap: var(--space-4);
-
-          &.centered-header {
-            justify-content: center;
-          }
-        }
-
-        &:first-child {
-          padding-left: 2rem;
-        }
-        &:last-child {
-          padding-right: 2rem;
-        }
-
-        &:focus {
-          box-shadow: none;
-        }
-
-        &.p-highlight {
-          color: var(--primary-color);
-          opacity: 1;
-          .p-sortable-column-icon {
-            color: var(--primary-color);
-          }
-        }
-      }
-
-      // Filter row - white background
-      .p-datatable-thead > tr:last-child > th {
-        background: var(--card-background);
-        padding: 0.5rem 0.75rem;
-
-        &:first-child {
-          padding-left: 1rem;
-        }
-        &:last-child {
-          padding-right: 1rem;
-        }
-      }
-
-      // Body Rows
-      .p-datatable-tbody > tr {
-        background: var(--card-background);
-        transition: all var(--motion-fast) ease;
-        border-bottom: 1px solid var(--border-color);
-
-        td {
-          padding: 0.75rem 1rem;
-          vertical-align: middle;
-          color: var(--text-color);
-          font-size: var(--fs-body);
-
-          &:first-child {
-            padding-left: 2rem;
-          }
-          &:last-child {
-            padding-right: 2rem;
-          }
-        }
-
-        // Row Hover Effect
-        &:hover {
-          background-color: var(--hover-background) !important;
-
-          // Show actions on hover (optional, here we keep them visible but highlighted)
-          .row-actions {
-            opacity: 1;
-          }
-        }
-      }
-
-      // Link Style
-      .dataset-name-link {
-        color: var(--text-color);
-        font-weight: var(--fw-semibold);
-        font-size: var(--fs-h3);
-        text-decoration: none;
-        transition: color var(--motion-base);
-        position: relative;
-        display: flex;
-        align-items: center;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        max-width: 100%;
-
-        &:hover {
-          color: var(--primary-color);
-        }
-      }
-
-      // Description
-      .description-text {
-        color: var(--secondary-color);
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        display: block;
-        max-width: 100%;
-      }
-
-      .date-text {
-        color: var(--text-muted);
-        font-variant-numeric: tabular-nums;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        display: block;
-        max-width: 100%;
-      }
-
-      .pill {
-        background-color: var(--hover-background);
-        color: var(--secondary-color);
-        padding: 2px 8px;
-        border-radius: var(--radius-pill);
-        font-size: var(--fs-control);
-        display: inline-block;
-        max-width: 100%;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-      }
-
-      // Status Indicator
-
-      // Row Actions
-      .row-actions {
-        display: flex;
-        align-items: center;
-        justify-content: flex-end;
-        gap: var(--space-4);
-        transition: opacity var(--motion-base);
-
-        .icon-btn {
-          width: 32px;
-          height: 32px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          border: 1px solid transparent;
-          background: transparent;
-          border-radius: var(--radius-sm);
-          color: var(--secondary-color);
-          cursor: pointer;
-          transition: all var(--motion-base);
-
-          &:hover {
-            background: var(--hover-background);
-            color: var(--primary-color);
-          }
-
-          &.edit-btn:hover {
-            background: var(--primary-color-transparent);
-            color: var(--primary-hover);
-          }
-
-          &.delete-btn:hover {
-            background: var(--error-bg);
-            color: var(--error-color);
-          }
-        }
-      }
-
-      // Paginator
-      .p-paginator {
-        background: var(--card-background);
-        border-top: 1px solid var(--border-color);
-        justify-content: flex-end;
-        padding: 1rem 1.5rem;
-
-        .p-paginator-page,
-        .p-paginator-next,
-        .p-paginator-prev,
-        .p-paginator-first,
-        .p-paginator-last {
-          border-radius: var(--radius-sm);
-          color: var(--secondary-color);
-          min-width: 2rem;
-          height: 2rem;
-          margin: 0 0.125rem;
-          font-weight: var(--fw-medium);
-
-          &:hover {
-            background: var(--hover-background);
-            color: var(--text-color);
-          }
-
-          &.p-highlight {
-            background: var(--primary-color);
-            color: var(--primary-text);
-          }
-        }
-      }
-    }
   }
 }
 
-// 4. Empty State
-td.text-center {
-  text-align: center;
+/* ── custom-table toolbar-left slot: the datasource filter dropdown ──── */
+.qb-toolbar-start {
+  display: flex;
+  align-items: center;
+  gap: var(--space-5);
+  min-width: 0;
+
+  // Give the server-mode datasource dropdown a sensible fixed width so it
+  // sits neatly at the start of the toolbar row (opposite search + icons).
+  ::ng-deep app-custom-dropdown {
+    display: block;
+    width: 15rem;
+    max-width: 40vw;
+  }
 }
 
-td.empty-message-cell {
+/* ── projected empty body (centred; not a row) ─────────────────────────── */
+.ct-empty-body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-4);
+  padding: var(--space-9) var(--space-6);
+  color: var(--text-muted);
   text-align: center;
-  padding: var(--space-9) !important;
-  color: var(--secondary-color);
-  font-size: var(--fs-h3);
+
+  i {
+    font-size: 1.6rem;
+    opacity: 0.6;
+  }
+  span {
+    font-size: var(--fs-body);
+  }
 }
 
 // 5. Popups & Modals
@@ -600,7 +338,7 @@ td.empty-message-cell {
           box-shadow: 0 4px 6px -1px var(--error-bg);
 
           &:hover:not(:disabled) {
-            background: var(--error-color); // Darker red
+            background: var(--error-color);
             transform: translateY(-1px);
             box-shadow: 0 6px 8px -1px var(--error-bg);
           }

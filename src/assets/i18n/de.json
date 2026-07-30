@@ -2762,7 +2762,15 @@
     "GROUP": "Gruppe",
     "GROUP_PLACEHOLDER": "Optionaler Gruppenname",
     "APPEARANCE_OPERATORS": "Darstellung & Operatoren",
-    "VALUES_SECTION": "Werte"
+    "VALUES_SECTION": "Werte",
+    "JOIN_PICKER_HINT": "Benötigen Sie eine Spalte aus einer verwandten Tabelle? Wählen Sie unten die verwandte Tabelle — die Verknüpfung wird automatisch aus Ihren Datenbankbeziehungen erstellt, ohne SQL.",
+    "RELATED_TABLE": "Verwandte Tabelle",
+    "SELECT_RELATED_TABLE": "Verwandte Tabelle auswählen",
+    "RELATED_COLUMN": "Spalte der verwandten Tabelle",
+    "SELECT_RELATED_COLUMN": "Spalte auswählen",
+    "CLEAR_JOIN": "Verknüpfung entfernen",
+    "NO_RELATED_TABLES": "Keine verwandten Tabellen für diese Tabelle gefunden. Verwenden Sie eine Spalte der Basistabelle oder die Option Erweitertes SQL.",
+    "RELATED_TABLE_JOIN": "Verwandte Tabelle (optional)"
   },
   "QUERY_BUILDER_MODULE": {
     "TITLE": "Query Builders",
@@ -5588,6 +5596,9 @@
       "THRESHOLD_WARNING": "Large value set — the runtime will use server-paged search."
     },
     "DISPLAY_NAME": "Anzeigename",
-    "CONFIG_IN_PROMPT_HINT": "Prompt-SQL, Werte, Darstellung und Operatoren werden im Prompt-Modul konfiguriert. Hier wählen Sie nur aus, welche Prompts erscheinen und wie das Formular angeordnet ist."
+    "CONFIG_IN_PROMPT_HINT": "Prompt-SQL, Werte, Darstellung und Operatoren werden im Prompt-Modul konfiguriert. Hier wählen Sie nur aus, welche Prompts erscheinen und wie das Formular angeordnet ist.",
+    "JOINS_AUTO_HINT": "Verknüpfungen werden automatisch aus den Tabellen erstellt, die Ihre platzierten Prompts benötigen — konfiguriert im Prompt-Modul. Hier gibt es nichts zu erstellen.",
+    "NO_JOINS_AUTO": "Keine Verknüpfungen erforderlich — jeder platzierte Prompt filtert auf seiner eigenen Basistabelle.",
+    "AUTO": "Auto"
   }
 }

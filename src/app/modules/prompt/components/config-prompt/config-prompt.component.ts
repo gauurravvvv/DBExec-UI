@@ -55,6 +55,18 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
   schemas: any[] = [];
   tables: { [key: string]: any[] } = {};
   staticSchemaData: any[] = [];
+
+  // No-SQL join: when the admin reaches a column on a related table via the
+  // FK picker, we carry the edge descriptor + reached column into the config
+  // save (filter_expr/select_expr/required_joins/join_edges). Null = the prompt
+  // filters on a base-table column (no join needed).
+  reachedColumn: {
+    edge: any;
+    columnExpr: string;
+    targetSchema: string;
+    targetTable: string;
+    column: string;
+  } | null = null;
   separator: string = ','; // Use comma as separator
   editingChipIndex: number = -1;
   editingChipValue: string | null = null;
@@ -569,7 +581,7 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
       // Auto-append value placeholder to WHERE condition if needed
       const formattedWhere = this.formatWhereCondition(formValues.promptWhere);
 
-      const submitData = {
+      const submitData: any = {
         ...formValues,
         tables: transformedTables,
         columns: transformedColumns,
@@ -577,6 +589,25 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
         promptWhere: formattedWhere,
         promptSql: this.generateSqlPreview(),
       };
+
+      // No-SQL join: if the admin reached a column on a related table, carry
+      // the v2 fields so the compiler filters on the reached column and the
+      // Query Builder materialises the join. Otherwise the filter targets the
+      // base-table column and no join is needed.
+      if (this.reachedColumn) {
+        const baseAlias = this.promptBaseTable ?? '';
+        submitData.filterExpr = this.reachedColumn.columnExpr;
+        submitData.selectExpr = this.reachedColumn.columnExpr;
+        submitData.requiredJoins = [this.reachedColumn.edge.joinKey];
+        submitData.joinEdges = [this.reachedColumn.edge];
+        void baseAlias;
+      } else {
+        // Explicitly clear any prior join so a re-config removes it.
+        submitData.filterExpr = null;
+        submitData.selectExpr = null;
+        submitData.requiredJoins = null;
+        submitData.joinEdges = null;
+      }
 
       this.promptService
         .configPrompt(submitData)
@@ -632,6 +663,36 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
   /** Track appearance validation errors (i18n keys) from the appearance form. */
   onAppearanceValidity(errors: string[]): void {
     this.appearanceErrors = errors;
+  }
+
+  /** The base table (name only) the FK join picker reaches out from. */
+  get promptBaseTable(): string | null {
+    const tables = this.promptForm.get('tables')?.value as any[];
+    if (!tables?.length) return null;
+    const first = tables[0];
+    return first?.tableName ?? first?.name ?? null;
+  }
+
+  get promptBaseSchema(): string | null {
+    return this.promptForm.get('schema')?.value?.name ?? null;
+  }
+
+  /** The admin reached a column on a related table via the FK picker. */
+  onJoinReached(reached: {
+    edge: any;
+    columnExpr: string;
+    targetSchema: string;
+    targetTable: string;
+    column: string;
+  }): void {
+    this.reachedColumn = reached;
+    this.promptForm.markAsDirty();
+  }
+
+  /** The admin cleared the join — back to a base-table column. */
+  onJoinCleared(): void {
+    this.reachedColumn = null;
+    this.promptForm.markAsDirty();
   }
 
   /**

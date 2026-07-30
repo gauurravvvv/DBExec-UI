@@ -2765,7 +2765,15 @@
     "GROUP": "Group",
     "GROUP_PLACEHOLDER": "Optional group name",
     "APPEARANCE_OPERATORS": "Appearance & Operators",
-    "VALUES_SECTION": "Values"
+    "VALUES_SECTION": "Values",
+    "JOIN_PICKER_HINT": "Need a column from a related table? Pick the related table below — the join is built automatically from your database relationships, no SQL required.",
+    "RELATED_TABLE": "Related table",
+    "SELECT_RELATED_TABLE": "Select a related table",
+    "RELATED_COLUMN": "Column on the related table",
+    "SELECT_RELATED_COLUMN": "Select a column",
+    "CLEAR_JOIN": "Clear join",
+    "NO_RELATED_TABLES": "No related tables found for this table. Use a column from the base table, or the Advanced SQL option.",
+    "RELATED_TABLE_JOIN": "Related table (optional)"
   },
   "QUERY_BUILDER_MODULE": {
     "TITLE": "Query Builders",
@@ -5585,6 +5593,9 @@
       "THRESHOLD_WARNING": "Large value set — the runtime will use server-paged search."
     },
     "DISPLAY_NAME": "Display name",
-    "CONFIG_IN_PROMPT_HINT": "Prompt SQL, values, appearance and operators are configured in the Prompt module. Here you only choose which prompts appear and how the form is arranged."
+    "CONFIG_IN_PROMPT_HINT": "Prompt SQL, values, appearance and operators are configured in the Prompt module. Here you only choose which prompts appear and how the form is arranged.",
+    "JOINS_AUTO_HINT": "Joins are built automatically from the tables your placed prompts need — configured in the Prompt module. Nothing to author here.",
+    "NO_JOINS_AUTO": "No joins needed — every placed prompt filters on its own base table.",
+    "AUTO": "Auto"
   }
 }

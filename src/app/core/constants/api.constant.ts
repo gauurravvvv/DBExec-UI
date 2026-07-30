@@ -96,6 +96,8 @@ export const DATASOURCE = {
   SCHEMAS_SEGMENT: '/schemas/',
   TABLES_SEGMENT: '/tables/',
   COLUMNS_SEGMENT: '/columns',
+  // GET /datasources/:datasourceId/foreign-keys (no-SQL join picker)
+  FOREIGN_KEYS_SUFFIX: '/foreign-keys',
   // POST /datasources/:datasourceId/query
   RUN_QUERY_PREFIX: '/datasources/',
   RUN_QUERY_SUFFIX: '/query',

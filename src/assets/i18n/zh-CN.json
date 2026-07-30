@@ -2762,7 +2762,15 @@
     "GROUP": "分组",
     "GROUP_PLACEHOLDER": "可选的分组名称",
     "APPEARANCE_OPERATORS": "外观和运算符",
-    "VALUES_SECTION": "值"
+    "VALUES_SECTION": "值",
+    "JOIN_PICKER_HINT": "需要来自关联表的列吗？在下面选择关联表——连接会根据数据库关系自动构建，无需 SQL。",
+    "RELATED_TABLE": "关联表",
+    "SELECT_RELATED_TABLE": "选择关联表",
+    "RELATED_COLUMN": "关联表中的列",
+    "SELECT_RELATED_COLUMN": "选择列",
+    "CLEAR_JOIN": "清除连接",
+    "NO_RELATED_TABLES": "未找到该表的关联表。请使用基础表中的列，或使用高级 SQL 选项。",
+    "RELATED_TABLE_JOIN": "关联表（可选）"
   },
   "QUERY_BUILDER_MODULE": {
     "TITLE": "Query Builders",
@@ -5588,6 +5596,9 @@
       "THRESHOLD_WARNING": "Large value set — the runtime will use server-paged search."
     },
     "DISPLAY_NAME": "显示名称",
-    "CONFIG_IN_PROMPT_HINT": "提示的 SQL、值、外观和运算符在提示模块中配置。此处仅选择显示哪些提示以及表单的排列方式。"
+    "CONFIG_IN_PROMPT_HINT": "提示的 SQL、值、外观和运算符在提示模块中配置。此处仅选择显示哪些提示以及表单的排列方式。",
+    "JOINS_AUTO_HINT": "连接会根据已放置提示所需的表自动构建——在提示模块中配置。此处无需创建。",
+    "NO_JOINS_AUTO": "无需连接——每个已放置的提示都在其自身的基础表上进行筛选。",
+    "AUTO": "自动"
   }
 }

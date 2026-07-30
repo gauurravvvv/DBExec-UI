@@ -21,7 +21,10 @@ import { TabViewModule } from 'primeng/tabview';
 import { SharedModule } from 'src/app/shared';
 import { ButtonComponent } from 'src/app/shared/components/button/button.component';
 import { ChipComponent } from 'src/app/shared/components/chip/chip.component';
+import { CustomTableComponent } from 'src/app/shared/components/custom-table/custom-table.component';
+import { CustomTableEmptyDirective } from 'src/app/shared/components/custom-table/custom-table-empty.directive';
 import { EmailChipsInputComponent } from 'src/app/shared/components/email-chips-input/email-chips-input.component';
+import { UsGridCellDirective } from 'src/app/shared/components/us-data-grid/us-grid-cell.directive';
 import { AppPrimeNGModule } from 'src/app/shared/modules/app-primeng.module';
 import { AddQueryBuilderComponent } from './components/add-query-builder/add-query-builder.component';
 import { EditQueryBuilderComponent } from './components/edit-query-builder/edit-query-builder.component';
@@ -94,6 +97,10 @@ import { QueryBuilderRoutingModule } from './query-builder-routing.module';
     ButtonComponent,
     ChipComponent,
     EmailChipsInputComponent,
+    // Unified list table + its cell/empty directives (all standalone).
+    CustomTableComponent,
+    CustomTableEmptyDirective,
+    UsGridCellDirective,
   ],
 })
 export class QueryBuilderModule {}

@@ -579,6 +579,29 @@
             </div>
           </div>
 
+          <!-- No-SQL join: reach a column on a related table via FK edges -->
+          <ng-container *ngIf="promptBaseTable">
+            <div class="section-header">
+              <h3>
+                <i class="pi pi-sitemap mr-2"></i>
+                {{ 'PROMPT_MODULE.RELATED_TABLE_JOIN' | translate }}
+              </h3>
+            </div>
+            <div class="form-row">
+              <div class="form-field full-width">
+                <prompt-join-picker
+                  [datasourceId]="sectionData?.datasourceId"
+                  [baseSchema]="promptBaseSchema"
+                  [baseTable]="promptBaseTable"
+                  [baseAlias]="promptBaseTable"
+                  (reached)="onJoinReached($event)"
+                  (cleared)="onJoinCleared()"
+                >
+                </prompt-join-picker>
+              </div>
+            </div>
+          </ng-container>
+
           <!-- Appearance & Operators (inline, always-visible per-type editor) -->
           <ng-container *ngIf="selectedPromptType">
             <div class="section-header">

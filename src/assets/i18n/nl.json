@@ -2762,7 +2762,15 @@
     "GROUP": "Groep",
     "GROUP_PLACEHOLDER": "Optionele groepsnaam",
     "APPEARANCE_OPERATORS": "Weergave en operatoren",
-    "VALUES_SECTION": "Waarden"
+    "VALUES_SECTION": "Waarden",
+    "JOIN_PICKER_HINT": "Een kolom uit een gerelateerde tabel nodig? Kies hieronder de gerelateerde tabel — de join wordt automatisch opgebouwd uit je databaserelaties, zonder SQL.",
+    "RELATED_TABLE": "Gerelateerde tabel",
+    "SELECT_RELATED_TABLE": "Selecteer een gerelateerde tabel",
+    "RELATED_COLUMN": "Kolom in de gerelateerde tabel",
+    "SELECT_RELATED_COLUMN": "Selecteer een kolom",
+    "CLEAR_JOIN": "Join wissen",
+    "NO_RELATED_TABLES": "Geen gerelateerde tabellen gevonden voor deze tabel. Gebruik een kolom uit de basistabel of de optie Geavanceerde SQL.",
+    "RELATED_TABLE_JOIN": "Gerelateerde tabel (optioneel)"
   },
   "QUERY_BUILDER_MODULE": {
     "TITLE": "Query Builders",
@@ -5588,6 +5596,9 @@
       "THRESHOLD_WARNING": "Large value set — the runtime will use server-paged search."
     },
     "DISPLAY_NAME": "Weergavenaam",
-    "CONFIG_IN_PROMPT_HINT": "Prompt-SQL, waarden, weergave en operatoren worden in de Prompt-module geconfigureerd. Hier kies je alleen welke prompts verschijnen en hoe het formulier is ingedeeld."
+    "CONFIG_IN_PROMPT_HINT": "Prompt-SQL, waarden, weergave en operatoren worden in de Prompt-module geconfigureerd. Hier kies je alleen welke prompts verschijnen en hoe het formulier is ingedeeld.",
+    "JOINS_AUTO_HINT": "Joins worden automatisch opgebouwd uit de tabellen die je geplaatste prompts nodig hebben — geconfigureerd in de Prompt-module. Hier valt niets te maken.",
+    "NO_JOINS_AUTO": "Geen joins nodig — elke geplaatste prompt filtert op zijn eigen basistabel.",
+    "AUTO": "Auto"
   }
 }

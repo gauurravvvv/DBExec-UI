@@ -2762,7 +2762,15 @@
     "GROUP": "Gruppo",
     "GROUP_PLACEHOLDER": "Nome gruppo facoltativo",
     "APPEARANCE_OPERATORS": "Aspetto e operatori",
-    "VALUES_SECTION": "Valori"
+    "VALUES_SECTION": "Valori",
+    "JOIN_PICKER_HINT": "Serve una colonna da una tabella correlata? Scegli la tabella correlata qui sotto: il join viene creato automaticamente dalle relazioni del database, senza SQL.",
+    "RELATED_TABLE": "Tabella correlata",
+    "SELECT_RELATED_TABLE": "Seleziona una tabella correlata",
+    "RELATED_COLUMN": "Colonna della tabella correlata",
+    "SELECT_RELATED_COLUMN": "Seleziona una colonna",
+    "CLEAR_JOIN": "Rimuovi join",
+    "NO_RELATED_TABLES": "Nessuna tabella correlata trovata per questa tabella. Usa una colonna della tabella base o l'opzione SQL avanzato.",
+    "RELATED_TABLE_JOIN": "Tabella correlata (facoltativo)"
   },
   "QUERY_BUILDER_MODULE": {
     "TITLE": "Query Builders",
@@ -5588,6 +5596,9 @@
       "THRESHOLD_WARNING": "Large value set — the runtime will use server-paged search."
     },
     "DISPLAY_NAME": "Nome visualizzato",
-    "CONFIG_IN_PROMPT_HINT": "SQL, valori, aspetto e operatori del prompt sono configurati nel modulo Prompt. Qui scegli solo quali prompt appaiono e come è disposto il modulo."
+    "CONFIG_IN_PROMPT_HINT": "SQL, valori, aspetto e operatori del prompt sono configurati nel modulo Prompt. Qui scegli solo quali prompt appaiono e come è disposto il modulo.",
+    "JOINS_AUTO_HINT": "I join vengono creati automaticamente dalle tabelle necessarie ai prompt inseriti — configurato nel modulo Prompt. Nulla da creare qui.",
+    "NO_JOINS_AUTO": "Nessun join necessario — ogni prompt filtra sulla propria tabella base.",
+    "AUTO": "Auto"
   }
 }

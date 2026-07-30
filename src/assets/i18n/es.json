@@ -2762,7 +2762,15 @@
     "GROUP": "Grupo",
     "GROUP_PLACEHOLDER": "Nombre de grupo opcional",
     "APPEARANCE_OPERATORS": "Apariencia y operadores",
-    "VALUES_SECTION": "Valores"
+    "VALUES_SECTION": "Valores",
+    "JOIN_PICKER_HINT": "¿Necesitas una columna de una tabla relacionada? Elige la tabla relacionada abajo: la combinación se crea automáticamente a partir de las relaciones de tu base de datos, sin SQL.",
+    "RELATED_TABLE": "Tabla relacionada",
+    "SELECT_RELATED_TABLE": "Selecciona una tabla relacionada",
+    "RELATED_COLUMN": "Columna de la tabla relacionada",
+    "SELECT_RELATED_COLUMN": "Selecciona una columna",
+    "CLEAR_JOIN": "Quitar combinación",
+    "NO_RELATED_TABLES": "No se encontraron tablas relacionadas para esta tabla. Usa una columna de la tabla base o la opción SQL avanzado.",
+    "RELATED_TABLE_JOIN": "Tabla relacionada (opcional)"
   },
   "QUERY_BUILDER_MODULE": {
     "TITLE": "Query Builders",
@@ -5588,6 +5596,9 @@
       "THRESHOLD_WARNING": "Large value set — the runtime will use server-paged search."
     },
     "DISPLAY_NAME": "Nombre para mostrar",
-    "CONFIG_IN_PROMPT_HINT": "El SQL, los valores, la apariencia y los operadores del prompt se configuran en el módulo de Prompts. Aquí solo eliges qué prompts aparecen y cómo se organiza el formulario."
+    "CONFIG_IN_PROMPT_HINT": "El SQL, los valores, la apariencia y los operadores del prompt se configuran en el módulo de Prompts. Aquí solo eliges qué prompts aparecen y cómo se organiza el formulario.",
+    "JOINS_AUTO_HINT": "Las combinaciones se crean automáticamente a partir de las tablas que necesitan tus prompts — configurado en el módulo de Prompts. No hay nada que crear aquí.",
+    "NO_JOINS_AUTO": "No se necesitan combinaciones: cada prompt filtra en su propia tabla base.",
+    "AUTO": "Auto"
   }
 }

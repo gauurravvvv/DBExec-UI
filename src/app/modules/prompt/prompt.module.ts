@@ -15,12 +15,16 @@ import { TooltipModule } from 'primeng/tooltip';
 import { SharedModule } from 'src/app/shared';
 import { ButtonComponent } from 'src/app/shared/components/button/button.component';
 import { ChipComponent } from 'src/app/shared/components/chip/chip.component';
+import { CustomTableComponent } from 'src/app/shared/components/custom-table/custom-table.component';
+import { CustomTableEmptyDirective } from 'src/app/shared/components/custom-table/custom-table-empty.directive';
+import { UsGridCellDirective } from 'src/app/shared/components/us-data-grid/us-grid-cell.directive';
 import { AppPrimeNGModule } from 'src/app/shared/modules/app-primeng.module';
 import { AddPromptComponent } from './components/add-prompt/add-prompt.component';
 import { ConfigPromptComponent } from './components/config-prompt/config-prompt.component';
 import { EditPromptComponent } from './components/edit-prompt/edit-prompt.component';
 import { ListPromptComponent } from './components/list-prompt/list-prompt.component';
 import { PromptAppearanceFormComponent } from './components/prompt-appearance-form/prompt-appearance-form.component';
+import { PromptJoinPickerComponent } from './components/prompt-join-picker/prompt-join-picker.component';
 import { PromptValueSourceComponent } from './components/prompt-value-source/prompt-value-source.component';
 import { SqlQueryDialogComponent } from './components/sql-query-dialog/sql-query-dialog.component';
 import { ViewPromptComponent } from './components/view-prompt/view-prompt.component';
@@ -40,6 +44,7 @@ import { configPromptReducer, CONFIG_PROMPT_FEATURE_KEY } from './store';
     // for all prompt configuration.
     PromptAppearanceFormComponent,
     PromptValueSourceComponent,
+    PromptJoinPickerComponent,
   ],
   imports: [
     CommonModule,
@@ -61,6 +66,10 @@ import { configPromptReducer, CONFIG_PROMPT_FEATURE_KEY } from './store';
     // Standalone shared components (SharedModule does not re-export them).
     ButtonComponent,
     ChipComponent,
+    // Unified list table + its cell/empty directives (all standalone).
+    CustomTableComponent,
+    CustomTableEmptyDirective,
+    UsGridCellDirective,
     StoreModule.forFeature(CONFIG_PROMPT_FEATURE_KEY, configPromptReducer),
   ],
 })

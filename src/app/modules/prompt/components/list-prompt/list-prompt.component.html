@@ -7,30 +7,6 @@
       </div>
 
       <div class="header-actions">
-        <!-- Bulk Delete Button -->
-        <ng-container *hasPermission="'queryBuilderPrompt'; level: 'delete'">
-          <button
-            *ngIf="selectedCount > 0"
-            pButton
-            [label]="
-              'COMMON.DELETE_COUNT' | translate: { count: selectedCount }
-            "
-            icon="pi pi-trash"
-            (click)="confirmBulkDelete()"
-            class="p-button-raised p-button-danger modern-button"
-          ></button>
-        </ng-container>
-
-        <!-- Clear Filters Button -->
-        <button
-          pButton
-          [label]="'COMMON.CLEAR' | translate"
-          icon="pi pi-filter-slash"
-          (click)="clearFilters()"
-          [disabled]="!isFilterActive"
-          class="p-button-outlined p-button-danger modern-button"
-        ></button>
-
         <!-- Add Button -->
         <button
           *hasPermission="'queryBuilderPrompt'; level: 'write'"
@@ -45,11 +21,21 @@
 
     <!-- Content Card -->
     <div class="content-card">
-      <!-- Toolbar -->
-      <div class="card-toolbar">
-        <div class="toolbar-left">
-          <!-- Datasource Dropdown — server-driven -->
-          <div class="dropdown-field">
+      <!-- Unified simple table. Infinite scroll, global search + on-demand
+           per-column filters, per-row actions. The datasource filter is
+           projected into the toolbar's LEFT slot so it sits inline with the
+           search + action icons. Per-cell DOM via <ng-template usGridCell>. -->
+      <div class="table-wrapper">
+        <app-custom-table
+          *ngIf="adapter"
+          [columns]="cols"
+          [serverAdapter]="adapter"
+          [config]="tableConfig"
+          [hasProjectedEmpty]="true"
+          (refresh)="refreshList()"
+        >
+          <!-- Toolbar-left slot: server-driven datasource filter dropdown. -->
+          <div tableToolbarStart class="prompt-toolbar-start">
             <app-custom-dropdown
               [(ngModel)]="selectedDatasource"
               [serverMode]="true"
@@ -62,260 +48,115 @@
               [filter]="true"
               [floatingLabel]="true"
               [label]="'COMMON.DATASOURCE' | translate"
+              [autoDisplayFirst]="false"
               filterBy="name"
               (onChangeEvent)="onDBChange($event)"
               icon="pi-database"
-            >
-            </app-custom-dropdown>
+            ></app-custom-dropdown>
           </div>
-        </div>
-      </div>
 
-      <!-- Table Wrapper -->
-      <div class="table-wrapper">
-        <p-table
-          #dt
-          [value]="prompts()"
-          [rows]="10"
-          [paginator]="true"
-          [lazy]="true"
-          (onLazyLoad)="loadPrompts($event)"
-          [totalRecords]="total()"
-          [rowHover]="true"
-          dataKey="id"
-          [(selection)]="selectedPrompts"
-          [rowSelectable]="isRowSelectable"
-          currentPageReportTemplate="{first} - {last} of {totalRecords}"
-          [showCurrentPageReport]="true"
-          [rowsPerPageOptions]="[10, 25, 50, 100]"
-          styleClass="p-datatable-sm modern-table"
-          [scrollable]="true"
-          scrollHeight="calc(100vh - 450px)"
-          [tableStyle]="{ 'min-width': '98rem' }"
-        >
-          <ng-template pTemplate="header">
-            <tr>
-              <th style="width: 2.75rem; min-width: 2.75rem" pFrozenColumn>
-                <p-tableHeaderCheckbox></p-tableHeaderCheckbox>
-              </th>
-              <th style="width: 14rem; min-width: 14rem" pFrozenColumn>
-                <div class="th-content">{{ 'COMMON.NAME' | translate }}</div>
-              </th>
-              <th style="min-width: 20rem">
-                <div class="th-content">
-                  {{ 'COMMON.DESCRIPTION' | translate }}
-                </div>
-              </th>
-              <th style="width: 12rem; min-width: 12rem">
-                <div class="th-content">{{ 'PROMPT_MODULE.GROUP' | translate }}</div>
-              </th>
-              <th style="width: 9rem; min-width: 9rem">
-                <div class="th-content">{{ 'COMMON.TYPE' | translate }}</div>
-              </th>
-              <th style="width: 9rem; min-width: 9rem">
-                <div class="th-content">{{ 'COMMON.STATUS' | translate }}</div>
-              </th>
-              <th style="width: 12rem; min-width: 12rem">
-                <div class="th-content">
-                  {{ 'COMMON.CREATED_ON' | translate }}
-                </div>
-              </th>
-              <ng-container
-                *hasPermission="'queryBuilderPrompt'; level: 'write'"
-              >
-                <th style="width: 7rem; min-width: 7rem">
-                  <div class="th-content actions-th">
-                    {{ 'COMMON.ACTIONS' | translate }}
-                  </div>
-                </th>
-              </ng-container>
-            </tr>
-            <!-- Filter Row -->
-            <tr>
-              <th pFrozenColumn></th>
-              <th pFrozenColumn>
-                <app-custom-input
-                  [(ngModel)]="filterValues.name"
-                  (ngModelChange)="onFilterChange()"
-                  [placeholder]="'COMMON.SEARCH_NAME' | translate"
-                  icon="pi-search"
-                ></app-custom-input>
-              </th>
-              <th>
-                <app-custom-input
-                  [(ngModel)]="filterValues.description"
-                  (ngModelChange)="onFilterChange()"
-                  [placeholder]="'COMMON.SEARCH_DESCRIPTION' | translate"
-                  icon="pi-search"
-                ></app-custom-input>
-              </th>
-              <th>
-                <app-custom-input
-                  [(ngModel)]="filterValues.groupName"
-                  (ngModelChange)="onFilterChange()"
-                  [placeholder]="'PROMPT_MODULE.GROUP' | translate"
-                  icon="pi-search"
-                ></app-custom-input>
-              </th>
-              <th>
-                <app-custom-input
-                  [(ngModel)]="filterValues.type"
-                  (ngModelChange)="onFilterChange()"
-                  [placeholder]="'COMMON.SEARCH_TYPE' | translate"
-                  icon="pi-search"
-                ></app-custom-input>
-              </th>
-              <th>
-                <app-custom-dropdown
-                  [(ngModel)]="filterValues.status"
-                  [options]="statusOptions"
-                  optionLabel="label"
-                  optionValue="value"
-                  [placeholder]="'COMMON.ALL' | translate"
-                  [showClear]="true"
-                  [filter]="false"
-                  [autoDisplayFirst]="false"
-                  appendTo="body"
-                  (onChangeEvent)="onFilterChange()"
-                  icon="pi-circle-fill"
-                ></app-custom-dropdown>
-              </th>
-              <th>
-                <app-custom-daterange
-                  [(ngModel)]="filterValues.createdDateRange"
-                  [placeholder]="'COMMON.SELECT_RANGE' | translate"
-                  [showButtonBar]="true"
-                  [maxDate]="today"
-                  (onChangeEvent)="onCreatedDateRangeChange($event)"
-                ></app-custom-daterange>
-              </th>
-              <ng-container
-                *hasPermission="'queryBuilderPrompt'; level: 'write'"
-              >
-                <th>
-                  <!-- No filter for Actions -->
-                </th>
-              </ng-container>
-            </tr>
-          </ng-template>
+          <!-- Empty body — always projected so only one empty state shows. -->
+          <div tableEmpty class="ct-empty-body">
+            <i class="pi pi-inbox"></i>
+            <span>{{ 'COMMON.NO_RECORDS' | translate }}</span>
+          </div>
 
-          <ng-template pTemplate="body" let-prompt>
-            <tr class="modern-row">
-              <td pFrozenColumn>
-                <p-tableCheckbox [value]="prompt"></p-tableCheckbox>
-              </td>
-              <td pFrozenColumn>
-                <a
-                  class="dataset-name-link"
-                  [routerLink]="['/app/prompts', prompt.id]"
-                >
-                  {{ prompt.name }}
-                </a>
-              </td>
-              <td>
-                <span class="description-text" [title]="prompt.description">
-                  {{ prompt.description }}
-                </span>
-              </td>
-              <td>
-                <span class="description-text">
-                  {{ prompt.groupName || '—' }}
-                </span>
-              </td>
-              <td>
-                <span class="pill">
-                  {{ prompt.type }}
-                </span>
-              </td>
-              <td>
-                <span
-                  class="status-pill"
-                  [ngClass]="{
-                    active: prompt.status === 1,
-                    inactive: prompt.status !== 1,
-                  }"
-                >
-                  <span class="dot"></span>
-                  {{
-                    prompt.status === 1
-                      ? ('COMMON.ACTIVE' | translate)
-                      : ('COMMON.INACTIVE' | translate)
-                  }}
-                </span>
-              </td>
-              <td>
-                <span
-                  class="date-text"
-                  [pTooltip]="
-                    (prompt.createdOn | date: 'dd MMM yyyy, HH:mm:ss') || ''
-                  "
-                  tooltipPosition="top"
-                  >{{ prompt.createdOn | relativeTime }}</span
-                >
-              </td>
-              <ng-container
-                *hasPermission="'queryBuilderPrompt'; level: 'write'"
-              >
-                <td>
-                  <div class="row-actions">
-                    <button
-                      *hasPermission="'queryBuilderPrompt'; level: 'write'"
-                      class="icon-btn"
-                      (click)="onEdit(prompt.id)"
-                      [pTooltip]="'COMMON.EDIT' | translate"
-                      tooltipPosition="bottom"
-                    >
-                      <i class="pi pi-pencil"></i>
-                    </button>
-                    <button
-                      *hasPermission="'queryBuilderPrompt'; level: 'write'"
-                      class="icon-btn"
-                      (click)="onConfig(prompt.id)"
-                      [pTooltip]="'COMMON.CONFIG' | translate"
-                      tooltipPosition="bottom"
-                    >
-                      <i class="pi pi-cog"></i>
-                    </button>
-                    <button
-                      *hasPermission="'queryBuilderPrompt'; level: 'delete'"
-                      class="icon-btn delete-btn"
-                      (click)="confirmDelete(prompt.id)"
-                      [pTooltip]="'COMMON.DELETE' | translate"
-                      tooltipPosition="bottom"
-                    >
-                      <i class="pi pi-trash"></i>
-                    </button>
-                  </div>
-                </td>
-              </ng-container>
-            </tr>
-          </ng-template>
-
-          <ng-template pTemplate="emptymessage">
-            <tr class="empty-row">
-              <td colspan="9" class="empty-message-cell">
-                <div class="empty-state-inline">
-                  <i class="pi pi-search empty-state-icon"></i>
-                  <span class="empty-state-text">
-                    {{ 'COMMON.NO_RECORD_FOUND' | translate }}&nbsp;&mdash;
-                    {{ 'COMMON.TRY_ADJUST_FILTERS' | translate }}
-                  </span>
-                </div>
-              </td>
-            </tr>
-          </ng-template>
-
-          <ng-template pTemplate="paginatorright">
-            <button
-              type="button"
-              class="paginator-refresh-btn"
-              (click)="refreshList()"
-              [attr.aria-label]="'COMMON.REFRESH' | translate"
+          <ng-template usGridCell="name" let-prompt>
+            <a
+              class="dataset-name-link"
+              [routerLink]="['/app/prompts', prompt.id]"
             >
-              <i class="pi pi-refresh"></i>
-            </button>
+              {{ prompt.name }}
+            </a>
           </ng-template>
-        </p-table>
+
+          <ng-template usGridCell="description" let-prompt>
+            <span class="description-text" [title]="prompt.description">
+              {{ prompt.description }}
+            </span>
+          </ng-template>
+
+          <ng-template usGridCell="groupName" let-prompt>
+            <span class="description-text">
+              {{ prompt.groupName || '—' }}
+            </span>
+          </ng-template>
+
+          <ng-template usGridCell="type" let-prompt>
+            <span class="pill">
+              {{ prompt.type }}
+            </span>
+          </ng-template>
+
+          <ng-template usGridCell="status" let-prompt>
+            <span
+              class="status-pill"
+              [ngClass]="{
+                active: prompt.status === 1,
+                inactive: prompt.status !== 1,
+              }"
+            >
+              <span class="dot"></span>
+              {{
+                prompt.status === 1
+                  ? ('COMMON.ACTIVE' | translate)
+                  : ('COMMON.INACTIVE' | translate)
+              }}
+            </span>
+          </ng-template>
+
+          <ng-template usGridCell="createdOn" let-prompt>
+            <span
+              class="date-text"
+              [pTooltip]="
+                (prompt.createdOn | date: 'dd MMM yyyy, HH:mm:ss') || ''
+              "
+              tooltipPosition="top"
+              >{{ prompt.createdOn | relativeTime }}</span
+            >
+          </ng-template>
+
+          <ng-template usGridCell="actions" let-prompt>
+            <div class="row-actions">
+              <button
+                *hasPermission="'queryBuilderPrompt'; level: 'write'"
+                class="icon-btn edit-btn"
+                (click)="onEdit(prompt.id)"
+                [attr.aria-label]="'COMMON.EDIT' | translate"
+                [pTooltip]="'COMMON.EDIT' | translate"
+                tooltipPosition="bottom"
+              >
+                <i class="pi pi-pencil"></i>
+              </button>
+              <button
+                *hasPermission="'queryBuilderPrompt'; level: 'write'"
+                class="icon-btn config-btn"
+                (click)="onConfig(prompt.id)"
+                [attr.aria-label]="'COMMON.CONFIG' | translate"
+                [pTooltip]="'COMMON.CONFIG' | translate"
+                tooltipPosition="bottom"
+              >
+                <i class="pi pi-cog"></i>
+              </button>
+              <button
+                *hasPermission="'queryBuilderPrompt'; level: 'delete'"
+                class="icon-btn delete-btn"
+                (click)="confirmDelete(prompt.id)"
+                [attr.aria-label]="'COMMON.DELETE' | translate"
+                [pTooltip]="'COMMON.DELETE' | translate"
+                tooltipPosition="bottom"
+              >
+                <i class="pi pi-trash"></i>
+              </button>
+            </div>
+          </ng-template>
+        </app-custom-table>
+
+        <!-- No datasource selected / none available. -->
+        <div class="ct-empty-body" *ngIf="!adapter">
+          <i class="pi pi-database"></i>
+          <span>{{ 'COMMON.NO_RECORDS' | translate }}</span>
+        </div>
       </div>
     </div>
   </div>
@@ -333,15 +174,8 @@
 
     <!-- Delete Info Section -->
     <div class="standard-delete-section">
-      <p class="delete-intro" *ngIf="!bulkDelete">
+      <p class="delete-intro">
         {{ 'PROMPT_MODULE.DELETE_SINGLE' | translate }}
-      </p>
-      <p class="delete-intro" *ngIf="bulkDelete">
-        <span
-          [innerHTML]="
-            'PROMPT_MODULE.DELETE_BULK' | translate: { count: selectedCount }
-          "
-        ></span>
       </p>
 
       <ul class="delete-info-list">

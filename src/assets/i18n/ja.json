@@ -2762,7 +2762,15 @@
     "GROUP": "グループ",
     "GROUP_PLACEHOLDER": "グループ名（任意）",
     "APPEARANCE_OPERATORS": "外観と演算子",
-    "VALUES_SECTION": "値"
+    "VALUES_SECTION": "値",
+    "JOIN_PICKER_HINT": "関連テーブルの列が必要ですか？下で関連テーブルを選択すると、データベースのリレーションから結合が自動的に作成されます。SQLは不要です。",
+    "RELATED_TABLE": "関連テーブル",
+    "SELECT_RELATED_TABLE": "関連テーブルを選択",
+    "RELATED_COLUMN": "関連テーブルの列",
+    "SELECT_RELATED_COLUMN": "列を選択",
+    "CLEAR_JOIN": "結合をクリア",
+    "NO_RELATED_TABLES": "このテーブルの関連テーブルが見つかりません。ベーステーブルの列、または高度なSQLオプションを使用してください。",
+    "RELATED_TABLE_JOIN": "関連テーブル（任意）"
   },
   "QUERY_BUILDER_MODULE": {
     "TITLE": "Query Builders",
@@ -5588,6 +5596,9 @@
       "THRESHOLD_WARNING": "Large value set — the runtime will use server-paged search."
     },
     "DISPLAY_NAME": "表示名",
-    "CONFIG_IN_PROMPT_HINT": "プロンプトのSQL、値、外観、演算子はプロンプトモジュールで設定します。ここでは、どのプロンプトを表示し、フォームをどう配置するかのみを選択します。"
+    "CONFIG_IN_PROMPT_HINT": "プロンプトのSQL、値、外観、演算子はプロンプトモジュールで設定します。ここでは、どのプロンプトを表示し、フォームをどう配置するかのみを選択します。",
+    "JOINS_AUTO_HINT": "結合は、配置したプロンプトが必要とするテーブルから自動的に作成されます（プロンプトモジュールで設定）。ここで作成するものはありません。",
+    "NO_JOINS_AUTO": "結合は不要です。配置された各プロンプトは自身のベーステーブルでフィルタリングします。",
+    "AUTO": "自動"
   }
 }

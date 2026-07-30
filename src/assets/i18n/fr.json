@@ -2762,7 +2762,15 @@
     "GROUP": "Groupe",
     "GROUP_PLACEHOLDER": "Nom de groupe facultatif",
     "APPEARANCE_OPERATORS": "Apparence et opérateurs",
-    "VALUES_SECTION": "Valeurs"
+    "VALUES_SECTION": "Valeurs",
+    "JOIN_PICKER_HINT": "Besoin d'une colonne d'une table liée ? Choisissez la table liée ci-dessous — la jointure est construite automatiquement à partir des relations de votre base de données, sans SQL.",
+    "RELATED_TABLE": "Table liée",
+    "SELECT_RELATED_TABLE": "Sélectionner une table liée",
+    "RELATED_COLUMN": "Colonne de la table liée",
+    "SELECT_RELATED_COLUMN": "Sélectionner une colonne",
+    "CLEAR_JOIN": "Effacer la jointure",
+    "NO_RELATED_TABLES": "Aucune table liée trouvée pour cette table. Utilisez une colonne de la table de base ou l'option SQL avancé.",
+    "RELATED_TABLE_JOIN": "Table liée (facultatif)"
   },
   "QUERY_BUILDER_MODULE": {
     "TITLE": "Query Builders",
@@ -5588,6 +5596,9 @@
       "THRESHOLD_WARNING": "Large value set — the runtime will use server-paged search."
     },
     "DISPLAY_NAME": "Nom d'affichage",
-    "CONFIG_IN_PROMPT_HINT": "Le SQL, les valeurs, l'apparence et les opérateurs du prompt sont configurés dans le module Prompts. Ici, vous choisissez seulement quels prompts apparaissent et comment le formulaire est organisé."
+    "CONFIG_IN_PROMPT_HINT": "Le SQL, les valeurs, l'apparence et les opérateurs du prompt sont configurés dans le module Prompts. Ici, vous choisissez seulement quels prompts apparaissent et comment le formulaire est organisé.",
+    "JOINS_AUTO_HINT": "Les jointures sont créées automatiquement à partir des tables dont vos prompts ont besoin — configuré dans le module Prompts. Rien à créer ici.",
+    "NO_JOINS_AUTO": "Aucune jointure nécessaire — chaque prompt filtre sur sa propre table de base.",
+    "AUTO": "Auto"
   }
 }

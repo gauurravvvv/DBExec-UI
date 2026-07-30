@@ -1,85 +1,88 @@
 import {
   ChangeDetectionStrategy,
+  ChangeDetectorRef,
   Component,
   DestroyRef,
   inject,
+  OnDestroy,
   OnInit,
-  ViewChild,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Table } from 'primeng/table';
-import { Subject } from 'rxjs';
-import { debounceTime } from 'rxjs/operators';
+import { TranslateService } from '@ngx-translate/core';
 import { DEFAULT_PAGE } from 'src/app/core/constants';
 import { QUERY_BUILDER } from 'src/app/core/constants/routes.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { DatasourceService } from 'src/app/modules/datasource/services/datasource.service';
+import {
+  UsServerListAdapter,
+  UsListLoadParams,
+} from 'src/app/shared/components/us-data-grid/us-server-list-adapter';
+import type {
+  CustomTableColumn,
+  CustomTableConfig,
+} from 'src/app/shared/components/custom-table/custom-table.types';
 import { QueryBuilderService } from '../../services/query-builder.service';
 
+/**
+ * Query Builder listing — renders through the shared `<app-custom-table>` (the
+ * app's unified list table) driven by a `UsServerListAdapter` on the BE
+ * query-builder list call. Infinite scroll (no page controls), a global search
+ * plus on-demand per-column filters, and per-row actions. No bulk selection.
+ *
+ * A query-builder list is datasource-scoped, so the screen keeps its datasource
+ * dropdown (server-mode) projected into the table's toolbar-left slot. The
+ * adapter closes over the selected datasourceId; selecting a datasource
+ * rebuilds the adapter so the next load carries the new scope.
+ */
 @Component({
   selector: 'app-list-query-builder',
   templateUrl: './list-query-builder.component.html',
   styleUrls: ['./list-query-builder.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ListQueryBuilderComponent implements OnInit {
-  @ViewChild('dt') dt!: Table;
+export class ListQueryBuilderComponent implements OnInit, OnDestroy {
+  private destroyRef = inject(DestroyRef);
+  private cdr = inject(ChangeDetectorRef);
 
-  // Pagination limit for query builders
-  limit = 10;
-  totalRecords = 0;
-  lastTableLazyLoadEvent: any;
+  /* ── page state ──────────────────────────────────────── */
 
-  filteredQueryBuilders: any[] = [];
-
-  selectedQueryBuilders: any[] = [];
-  searchTerm: string = '';
   showDeleteConfirm = false;
   queryBuilderToDelete: string | null = null;
-  bulkDelete = false;
   deleteJustification = '';
-  Math = Math;
+  today = new Date();
+
+  // Datasource filter — server-mode dropdown outside the grid (toolbar-left).
   datasources: any[] = [];
   preloadedDatasources: any[] | null = null;
   preloadedDatasourcesTotal: number | null = null;
-  queryBuilders: any[] = [];
   selectedDatasource: any = null;
+
+  // Deep-link name filter, applied to the adapter's initial filter.
+  private deepLinkName: string | null = null;
+
   loggedInUserId: any = this.globalService.getTokenDetails('userId');
 
-  today = new Date();
+  /* ── custom-table wiring (unified simple table; server-driven) ──────── */
 
-  statusOptions = [
-    { label: 'Active', value: 1 },
-    { label: 'Inactive', value: 0 },
-  ];
+  cols: CustomTableColumn[] = [];
 
-  // Filter values for column filtering
-  filterValues: any = {
-    name: '',
-    description: '',
-    status: null,
-    createdDateRange: null,
+  tableConfig: CustomTableConfig = {
+    pageSize: 50,
+    globalSearch: true,
+    globalSearchKey: 'name', // query-builder list matches a `name` filter
+    globalSearchPlaceholder: undefined, // set in ngOnInit (translate ready)
+    showColumnFilters: true,
+    enableExport: true,
+    gridKey: 'query-builders-list',
+    height: 'flex',
+    rowIdField: 'id',
   };
 
-  // Debouncing for filter changes
-  private filter$ = new Subject<void>();
-  private destroyRef = inject(DestroyRef);
-
-  get selectedCount(): number {
-    return this.selectedQueryBuilders?.length || 0;
-  }
-
-  isRowSelectable = (event: any) => true;
-
-  get isFilterActive(): boolean {
-    return (
-      !!this.filterValues.name ||
-      !!this.filterValues.description ||
-      this.filterValues.status !== null ||
-      !!this.filterValues.createdDateRange
-    );
-  }
+  /** Server-side adapter — bound only once a datasource is selected, and
+   *  rebuilt whenever the datasource changes so the closure picks up the
+   *  new scope. Null until the first datasource resolves. */
+  adapter: UsServerListAdapter<any> | null = null;
 
   constructor(
     private datasourceService: DatasourceService,
@@ -87,15 +90,15 @@ export class ListQueryBuilderComponent implements OnInit {
     private router: Router,
     private globalService: GlobalService,
     private route: ActivatedRoute,
+    private translate: TranslateService,
   ) {}
 
   ngOnInit() {
-    // Setup debounced filter
-    this.filter$
-      .pipe(debounceTime(400), takeUntilDestroyed(this.destroyRef))
-      .subscribe(() => {
-        this.loadQueryBuilders();
-      });
+    this.cols = this.buildColumns();
+    this.tableConfig = {
+      ...this.tableConfig,
+      globalSearchPlaceholder: this.translate.instant('COMMON.SEARCH_NAME'),
+    };
 
     this.route.queryParams
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -108,12 +111,62 @@ export class ListQueryBuilderComponent implements OnInit {
       });
   }
 
+  ngOnDestroy() {
+    this.queryBuilderService.cancelReads();
+    this.adapter?.destroy();
+  }
+
+  /* ── column definitions ──────────────────────────────── */
+
+  private buildColumns(): CustomTableColumn[] {
+    const t = (k: string) => this.translate.instant(k);
+    return [
+      {
+        colId: 'name',
+        field: 'name',
+        header: t('COMMON.NAME'),
+        width: '224px',
+        frozen: true,
+        filter: 'text',
+      },
+      {
+        colId: 'description',
+        field: 'description',
+        header: t('COMMON.DESCRIPTION'),
+        width: '320px',
+        filter: 'text',
+      },
+      {
+        colId: 'status',
+        field: 'status',
+        header: t('COMMON.STATUS'),
+        width: '144px',
+        sortable: false,
+      },
+      {
+        colId: 'createdOn',
+        field: 'createdOn',
+        header: t('COMMON.CREATED_ON'),
+        width: '192px',
+        sortable: false,
+      },
+      {
+        colId: 'actions',
+        header: t('COMMON.ACTIONS'),
+        width: '184px',
+        sortable: false,
+      },
+    ];
+  }
+
+  /* ── deep-linking ────────────────────────────────────── */
+
   handleDeepLinking(params: any) {
     const datasourceId = params['datasourceId'] ? params['datasourceId'] : null;
     const name = params['name'];
 
     if (name) {
-      this.filterValues.name = name;
+      this.deepLinkName = name;
     }
 
     if (datasourceId) {
@@ -122,6 +175,8 @@ export class ListQueryBuilderComponent implements OnInit {
       this.loadDatasources();
     }
   }
+
+  /* ── datasource filter dropdown ──────────────────────── */
 
   /**
    * Fetcher for the server-mode datasource dropdown.
@@ -151,11 +206,6 @@ export class ListQueryBuilderComponent implements OnInit {
     }
   };
 
-  onDBChange(datasourceId: any) {
-    this.selectedDatasource = datasourceId;
-    this.loadQueryBuilders();
-  }
-
   loadDatasources(preSelectedDbId?: string): Promise<void> {
     return new Promise(resolve => {
       const params = {
@@ -181,218 +231,84 @@ export class ListQueryBuilderComponent implements OnInit {
               } else {
                 this.selectedDatasource = this.datasources[0].id;
               }
-              this.loadQueryBuilders();
+              this.bindAdapter();
             } else {
               this.selectedDatasource = null;
-              this.queryBuilders = [];
-              this.filteredQueryBuilders = [];
-              this.totalRecords = 0;
+              this.adapter = null;
             }
           } else {
             this.datasources = [];
             this.selectedDatasource = null;
-            this.queryBuilders = [];
-            this.filteredQueryBuilders = [];
-            this.totalRecords = 0;
+            this.adapter = null;
           }
+          this.cdr.markForCheck();
           resolve();
         })
         .catch(() => {
           this.datasources = [];
           this.selectedDatasource = null;
-          this.queryBuilders = [];
-          this.filteredQueryBuilders = [];
-          this.totalRecords = 0;
+          this.adapter = null;
+          this.cdr.markForCheck();
           resolve();
         });
     });
   }
 
-  loadQueryBuilders(event?: any) {
-    if (!this.selectedDatasource) return;
-
-    // Clear selection when page/sort changes
-    if (event) {
-      const prev = this.lastTableLazyLoadEvent;
-      if (
-        prev &&
-        (prev.first !== event.first ||
-          prev.rows !== event.rows ||
-          prev.sortField !== event.sortField ||
-          prev.sortOrder !== event.sortOrder)
-      ) {
-        this.selectedQueryBuilders = [];
-      }
-      this.lastTableLazyLoadEvent = event;
-    }
-
-    const page = event ? Math.floor(event.first / event.rows) + 1 : 1;
-    const limit = event ? event.rows : this.limit;
-
-    const params: any = {
-      datasourceId: this.selectedDatasource,
-      page: page,
-      limit: limit,
-    };
-
-    // Build filter object
-    const filter: any = {};
-    if (this.filterValues.name) {
-      filter.name = this.filterValues.name;
-    }
-    if (this.filterValues.description) {
-      filter.description = this.filterValues.description;
-    }
-    if (
-      this.filterValues.status !== null &&
-      this.filterValues.status !== undefined
-    ) {
-      filter.status = this.filterValues.status;
-    }
-    if (this.filterValues.createdDateRange?.[0]) {
-      filter.createdDateFrom =
-        this.filterValues.createdDateRange[0].toISOString();
-    }
-    if (this.filterValues.createdDateRange?.[1]) {
-      const dateTo = new Date(this.filterValues.createdDateRange[1]);
-      dateTo.setHours(23, 59, 59, 999);
-      filter.createdDateTo = dateTo.toISOString();
-    }
-
-    // Add JSON stringified filter if any filter is set
-    if (Object.keys(filter).length > 0) {
-      params.filter = JSON.stringify(filter);
-    }
-
-    this.queryBuilderService
-      .listQueryBuilder(params)
-      .then((response: any) => {
-        if (this.globalService.handleSuccessService(response, false)) {
-          this.queryBuilders = response.data?.queryBuilders || [];
-          this.filteredQueryBuilders = [...this.queryBuilders];
-          this.totalRecords = response.data?.count || this.queryBuilders.length;
-        } else {
-          this.queryBuilders = [];
-          this.filteredQueryBuilders = [];
-          this.totalRecords = 0;
-        }
-      })
-      .catch(() => {
-        this.queryBuilders = [];
-        this.filteredQueryBuilders = [];
-        this.totalRecords = 0;
-      });
+  onDBChange(datasourceId: any) {
+    this.selectedDatasource = datasourceId;
+    this.bindAdapter();
   }
 
-  onFilterChange() {
-    this.selectedQueryBuilders = [];
-    // Trigger debounced API call
-    this.filter$.next();
-  }
+  /* ── adapter wiring ─────────────────────────────────── */
 
-  clearFilters() {
-    this.filterValues = {
-      name: '',
-      description: '',
-      status: null,
-      createdDateRange: null,
-    };
-    this.selectedQueryBuilders = [];
-    this.loadQueryBuilders();
-  }
-
-  onCreatedDateRangeChange(range: Date[] | null) {
-    this.filterValues.createdDateRange = range;
-    if (!range || (range[0] && range[1])) {
-      this.onFilterChange();
+  private bindAdapter() {
+    this.adapter?.destroy();
+    if (!this.selectedDatasource) {
+      this.adapter = null;
+      this.cdr.markForCheck();
+      return;
     }
+    const datasourceId = this.selectedDatasource;
+    const name = this.deepLinkName;
+    this.deepLinkName = null;
+    this.adapter = new UsServerListAdapter<any>({
+      load: (params: UsListLoadParams) => {
+        // datasourceId is a top-level query param, NOT inside the JSON filter.
+        const req: any = {
+          datasourceId,
+          page: params.page,
+          limit: params.limit,
+        };
+        if (params.sort) req.sort = params.sort;
+        if (params.filter) req.filter = params.filter;
+        return this.queryBuilderService.listQueryBuilder(req);
+      },
+      // BE returns `{ data: { queryBuilders: [], count } }`.
+      unwrap: (res: any) => ({
+        rows: res?.data?.queryBuilders ?? [],
+        total: res?.data?.count ?? 0,
+      }),
+      initial: {
+        page: 1,
+        limit: 50,
+        ...(name ? { filterModel: { name } } : {}),
+      },
+    });
+    this.cdr.markForCheck();
   }
+
+  refreshList() {
+    this.adapter?.reload();
+  }
+
+  /* ── nav + per-row delete ────────────────────────────── */
 
   onAddNewQueryBuilder() {
     this.router.navigate([QUERY_BUILDER.ADD]);
   }
 
-  // Not used but kept for reference if direct edit without object is needed
   onEdit(id: string) {
     this.router.navigate([QUERY_BUILDER.edit(id)]);
-  }
-
-  confirmDelete(id: string) {
-    this.queryBuilderToDelete = id;
-    this.bulkDelete = false;
-    this.showDeleteConfirm = true;
-  }
-
-  confirmBulkDelete() {
-    if (this.selectedCount === 0) return;
-    this.queryBuilderToDelete = null;
-    this.bulkDelete = true;
-    this.showDeleteConfirm = true;
-  }
-
-  cancelDelete() {
-    this.showDeleteConfirm = false;
-    this.queryBuilderToDelete = null;
-    this.bulkDelete = false;
-    this.deleteJustification = '';
-  }
-
-  proceedDelete() {
-    const reason = this.deleteJustification.trim();
-    if (!reason) return;
-
-    if (this.bulkDelete) {
-      const ids = this.selectedQueryBuilders.map(q => q.id);
-      if (ids.length === 0) {
-        this.cancelDelete();
-        return;
-      }
-      this.queryBuilderService
-        .bulkDeleteQueryBuilder(ids, reason)
-        .then((res: any) => {
-          if (this.globalService.handleSuccessService(res)) {
-            this.selectedQueryBuilders = [];
-            this.refreshList();
-          }
-        })
-        .catch(() => {})
-        .finally(() => this.closeDeletePopup());
-      return;
-    }
-
-    if (this.queryBuilderToDelete) {
-      this.queryBuilderService
-        .deleteQueryBuilder(this.queryBuilderToDelete, reason)
-        .then(response => {
-          if (this.globalService.handleSuccessService(response)) {
-            this.selectedQueryBuilders = this.selectedQueryBuilders.filter(
-              q => q.id !== this.queryBuilderToDelete,
-            );
-            this.refreshList();
-          }
-        })
-        .catch(() => {})
-        .finally(() => this.closeDeletePopup());
-    }
-  }
-
-  private closeDeletePopup() {
-    this.showDeleteConfirm = false;
-    this.queryBuilderToDelete = null;
-    this.bulkDelete = false;
-    this.deleteJustification = '';
-  }
-
-  refreshList() {
-    if (this.lastTableLazyLoadEvent) {
-      this.loadQueryBuilders(this.lastTableLazyLoadEvent);
-    } else {
-      this.loadQueryBuilders();
-    }
-  }
-
-  onEditQueryBuilder(queryBuilder: any) {
-    this.router.navigate([QUERY_BUILDER.edit(queryBuilder.id)]);
   }
 
   onConfig(id: string) {
@@ -404,5 +320,44 @@ export class ListQueryBuilderComponent implements OnInit {
   onExecute(id: string) {
     // Query Builder v2 — open the business-user composer (tree filters + run).
     this.router.navigate([QUERY_BUILDER.compose(id)]);
+  }
+
+  confirmDelete(id: string) {
+    this.queryBuilderToDelete = id;
+    this.showDeleteConfirm = true;
+  }
+
+  cancelDelete() {
+    this.showDeleteConfirm = false;
+    this.queryBuilderToDelete = null;
+    this.deleteJustification = '';
+  }
+
+  proceedDelete() {
+    const reason = this.deleteJustification.trim();
+    if (!reason) return;
+
+    if (this.queryBuilderToDelete) {
+      this.queryBuilderService
+        .deleteQueryBuilder(this.queryBuilderToDelete, reason)
+        .then(response => {
+          if (this.globalService.handleSuccessService(response)) {
+            this.refreshList();
+          }
+        })
+        .catch(() => {
+          /* global interceptor shows error toast */
+        })
+        .finally(() => {
+          this.closeDeletePopup();
+          this.cdr.markForCheck();
+        });
+    }
+  }
+
+  private closeDeletePopup() {
+    this.showDeleteConfirm = false;
+    this.queryBuilderToDelete = null;
+    this.deleteJustification = '';
   }
 }

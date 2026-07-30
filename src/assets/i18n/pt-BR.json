@@ -2762,7 +2762,15 @@
     "GROUP": "Grupo",
     "GROUP_PLACEHOLDER": "Nome de grupo opcional",
     "APPEARANCE_OPERATORS": "Aparência e operadores",
-    "VALUES_SECTION": "Valores"
+    "VALUES_SECTION": "Valores",
+    "JOIN_PICKER_HINT": "Precisa de uma coluna de uma tabela relacionada? Escolha a tabela relacionada abaixo — a junção é criada automaticamente a partir das relações do banco de dados, sem SQL.",
+    "RELATED_TABLE": "Tabela relacionada",
+    "SELECT_RELATED_TABLE": "Selecione uma tabela relacionada",
+    "RELATED_COLUMN": "Coluna na tabela relacionada",
+    "SELECT_RELATED_COLUMN": "Selecione uma coluna",
+    "CLEAR_JOIN": "Limpar junção",
+    "NO_RELATED_TABLES": "Nenhuma tabela relacionada encontrada para esta tabela. Use uma coluna da tabela base ou a opção SQL Avançado.",
+    "RELATED_TABLE_JOIN": "Tabela relacionada (opcional)"
   },
   "QUERY_BUILDER_MODULE": {
     "TITLE": "Query Builders",
@@ -5588,6 +5596,9 @@
       "THRESHOLD_WARNING": "Large value set — the runtime will use server-paged search."
     },
     "DISPLAY_NAME": "Nome de exibição",
-    "CONFIG_IN_PROMPT_HINT": "O SQL, os valores, a aparência e os operadores do prompt são configurados no módulo de Prompts. Aqui você só escolhe quais prompts aparecem e como o formulário é organizado."
+    "CONFIG_IN_PROMPT_HINT": "O SQL, os valores, a aparência e os operadores do prompt são configurados no módulo de Prompts. Aqui você só escolhe quais prompts aparecem e como o formulário é organizado.",
+    "JOINS_AUTO_HINT": "As junções são criadas automaticamente a partir das tabelas que seus prompts precisam — configurado no módulo de Prompts. Nada para criar aqui.",
+    "NO_JOINS_AUTO": "Nenhuma junção necessária — cada prompt filtra em sua própria tabela base.",
+    "AUTO": "Auto"
   }
 }

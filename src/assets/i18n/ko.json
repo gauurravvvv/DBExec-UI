@@ -2762,7 +2762,15 @@
     "GROUP": "그룹",
     "GROUP_PLACEHOLDER": "그룹 이름(선택)",
     "APPEARANCE_OPERATORS": "모양 및 연산자",
-    "VALUES_SECTION": "값"
+    "VALUES_SECTION": "값",
+    "JOIN_PICKER_HINT": "관련 테이블의 열이 필요하신가요? 아래에서 관련 테이블을 선택하면 데이터베이스 관계에서 조인이 자동으로 만들어집니다. SQL이 필요 없습니다.",
+    "RELATED_TABLE": "관련 테이블",
+    "SELECT_RELATED_TABLE": "관련 테이블 선택",
+    "RELATED_COLUMN": "관련 테이블의 열",
+    "SELECT_RELATED_COLUMN": "열 선택",
+    "CLEAR_JOIN": "조인 지우기",
+    "NO_RELATED_TABLES": "이 테이블에 대한 관련 테이블이 없습니다. 기본 테이블의 열 또는 고급 SQL 옵션을 사용하세요.",
+    "RELATED_TABLE_JOIN": "관련 테이블(선택 사항)"
   },
   "QUERY_BUILDER_MODULE": {
     "TITLE": "Query Builders",
@@ -5588,6 +5596,9 @@
       "THRESHOLD_WARNING": "Large value set — the runtime will use server-paged search."
     },
     "DISPLAY_NAME": "표시 이름",
-    "CONFIG_IN_PROMPT_HINT": "프롬프트 SQL, 값, 모양 및 연산자는 프롬프트 모듈에서 구성됩니다. 여기서는 어떤 프롬프트를 표시하고 폼을 어떻게 배치할지만 선택합니다."
+    "CONFIG_IN_PROMPT_HINT": "프롬프트 SQL, 값, 모양 및 연산자는 프롬프트 모듈에서 구성됩니다. 여기서는 어떤 프롬프트를 표시하고 폼을 어떻게 배치할지만 선택합니다.",
+    "JOINS_AUTO_HINT": "조인은 배치한 프롬프트에 필요한 테이블에서 자동으로 생성됩니다(프롬프트 모듈에서 구성). 여기서 작성할 것은 없습니다.",
+    "NO_JOINS_AUTO": "조인이 필요 없습니다. 배치된 각 프롬프트는 자체 기본 테이블에서 필터링합니다.",
+    "AUTO": "자동"
   }
 }
