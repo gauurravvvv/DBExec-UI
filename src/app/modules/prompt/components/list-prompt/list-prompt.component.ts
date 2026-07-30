@@ -68,8 +68,7 @@ export class ListPromptComponent implements OnInit, OnDestroy {
   filterValues: any = {
     name: '',
     description: '',
-    tabName: '',
-    sectionName: '',
+    groupName: '',
     type: '',
     status: null,
     createdDateRange: null,
@@ -88,8 +87,7 @@ export class ListPromptComponent implements OnInit, OnDestroy {
     return (
       !!this.filterValues.name ||
       !!this.filterValues.description ||
-      !!this.filterValues.tabName ||
-      !!this.filterValues.sectionName ||
+      !!this.filterValues.groupName ||
       !!this.filterValues.type ||
       this.filterValues.status !== null ||
       !!this.filterValues.createdDateRange
@@ -187,8 +185,7 @@ export class ListPromptComponent implements OnInit, OnDestroy {
     this.filterValues = {
       name: '',
       description: '',
-      tabName: '',
-      sectionName: '',
+      groupName: '',
       type: '',
       status: null,
       createdDateRange: null,

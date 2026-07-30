@@ -107,10 +107,7 @@
                 </div>
               </th>
               <th style="width: 12rem; min-width: 12rem">
-                <div class="th-content">{{ 'COMMON.TAB' | translate }}</div>
-              </th>
-              <th style="width: 12rem; min-width: 12rem">
-                <div class="th-content">{{ 'COMMON.SECTION' | translate }}</div>
+                <div class="th-content">{{ 'PROMPT_MODULE.GROUP' | translate }}</div>
               </th>
               <th style="width: 9rem; min-width: 9rem">
                 <div class="th-content">{{ 'COMMON.TYPE' | translate }}</div>
@@ -154,17 +151,9 @@
               </th>
               <th>
                 <app-custom-input
-                  [(ngModel)]="filterValues.tabName"
+                  [(ngModel)]="filterValues.groupName"
                   (ngModelChange)="onFilterChange()"
-                  [placeholder]="'COMMON.SEARCH_TAB' | translate"
-                  icon="pi-search"
-                ></app-custom-input>
-              </th>
-              <th>
-                <app-custom-input
-                  [(ngModel)]="filterValues.sectionName"
-                  (ngModelChange)="onFilterChange()"
-                  [placeholder]="'COMMON.SEARCH_SECTION' | translate"
+                  [placeholder]="'PROMPT_MODULE.GROUP' | translate"
                   icon="pi-search"
                 ></app-custom-input>
               </th>
@@ -230,12 +219,7 @@
               </td>
               <td>
                 <span class="description-text">
-                  {{ prompt.tab?.name || 'N/A' }}
-                </span>
-              </td>
-              <td>
-                <span class="description-text">
-                  {{ prompt.section?.name || 'N/A' }}
+                  {{ prompt.groupName || '—' }}
                 </span>
               </td>
               <td>
