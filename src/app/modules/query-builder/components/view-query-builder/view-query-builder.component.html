@@ -74,10 +74,19 @@
           *hasPermission="'queryBuilderScreen'; level: 'write'"
           class="btn-configure"
           type="button"
-          (click)="onConfigure()"
+          (click)="onDesign()"
         >
           <i class="pi pi-cog"></i>
-          {{ 'QUERY_BUILDER_MODULE.CONFIGURE' | translate }}
+          {{ 'QUERY_BUILDER.DESIGN' | translate }}
+        </button>
+        <button
+          *hasPermission="'queryBuilderScreen'; level: 'write'"
+          class="btn-configure"
+          type="button"
+          (click)="onShare()"
+        >
+          <i class="pi pi-share-alt"></i>
+          {{ 'QUERY_BUILDER.SHARE' | translate }}
         </button>
         <button
           *hasPermission="'queryBuilderScreen'; level: 'delete'"
@@ -806,3 +815,12 @@
     </div>
   </div>
 </div>
+
+<!-- Share (asset-share-dialog reuse, 'querybuilder' asset type) -->
+<app-asset-share-dialog
+  [visible]="showShareDialog"
+  assetType="querybuilder"
+  [assetId]="queryBuilderId"
+  [assetName]="queryBuilderName"
+  (closed)="onShareClosed()">
+</app-asset-share-dialog>

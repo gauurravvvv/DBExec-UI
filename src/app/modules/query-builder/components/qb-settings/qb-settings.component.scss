@@ -1,0 +1,45 @@
+:host {
+  display: block;
+}
+
+.qb-settings__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4);
+  margin-bottom: var(--space-5);
+}
+
+.qb-settings__title {
+  margin: 0;
+  font-size: var(--fs-h2);
+  font-weight: var(--fw-semibold, 600);
+}
+
+.qb-settings__sub {
+  margin: var(--space-1) 0 0;
+  font-size: var(--fs-label);
+  color: var(--text-muted);
+}
+
+.qb-settings__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: var(--space-4);
+  max-width: 900px;
+}
+
+.qb-settings__toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md, 8px);
+  font-size: var(--fs-control);
+}
+
+.qb-settings__wide {
+  grid-column: 1 / -1;
+}

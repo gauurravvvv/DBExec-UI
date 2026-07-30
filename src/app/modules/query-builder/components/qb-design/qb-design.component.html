@@ -1,0 +1,45 @@
+<div class="qb-design">
+  <header class="qb-design__head">
+    <div class="qb-design__title">
+      <h1>{{ name() || ('QUERY_BUILDER.FORM_DESIGNER' | translate) }}</h1>
+      <p>{{ 'QUERY_BUILDER.DESIGN_SUBTITLE' | translate }}</p>
+    </div>
+  </header>
+
+  <nav class="qb-design__tabs">
+    <button
+      *ngFor="let tab of tabs"
+      type="button"
+      class="qb-design__tab"
+      [class.qb-design__tab--active]="activeTab() === tab.key"
+      (click)="setTab(tab.key)"
+    >
+      <i [class]="tab.icon"></i>
+      {{ tab.label | translate }}
+    </button>
+  </nav>
+
+  <div class="qb-design__loading" *ngIf="loading()">
+    <p-skeleton height="4rem" styleClass="mb-2"></p-skeleton>
+    <p-skeleton height="16rem"></p-skeleton>
+  </div>
+
+  <section class="qb-design__panel" *ngIf="!loading()">
+    <qb-form-designer
+      *ngIf="activeTab() === 'form'"
+      [queryBuilderId]="queryBuilderId()"
+      [datasourceId]="datasourceId()" />
+
+    <qb-join-designer
+      *ngIf="activeTab() === 'joins'"
+      [queryBuilderId]="queryBuilderId()" />
+
+    <qb-output-columns
+      *ngIf="activeTab() === 'columns'"
+      [queryBuilderId]="queryBuilderId()" />
+
+    <qb-settings
+      *ngIf="activeTab() === 'settings'"
+      [queryBuilderId]="queryBuilderId()" />
+  </section>
+</div>

@@ -1,0 +1,85 @@
+<div class="qb-appearance">
+  <app-custom-accordion
+    *ngFor="let section of sections(); trackBy: trackSection; let first = first"
+    [header]="section.title | translate"
+    [expanded]="first"
+  >
+    <div class="qb-appearance__grid">
+        <div
+          class="qb-appearance__field"
+          *ngFor="let field of section.fields; trackBy: trackField"
+        >
+          <!-- text -->
+          <app-custom-input
+            *ngIf="field.kind === 'text'"
+            [label]="field.label | translate"
+            [ngModel]="value(field.key)"
+            (ngModelChange)="setValue(field.key, $event)" />
+
+          <!-- textarea -->
+          <app-custom-input
+            *ngIf="field.kind === 'textarea'"
+            inputMode="textarea"
+            [label]="field.label | translate"
+            [ngModel]="value(field.key)"
+            (ngModelChange)="setValue(field.key, $event)" />
+
+          <!-- number -->
+          <app-custom-number
+            *ngIf="field.kind === 'number'"
+            [label]="field.label | translate"
+            [min]="field.min ?? null"
+            [max]="field.max ?? null"
+            [step]="field.step ?? 1"
+            [ngModel]="value(field.key)"
+            (onChangeEvent)="setValue(field.key, $event)" />
+
+          <!-- toggle -->
+          <div class="qb-appearance__toggle" *ngIf="field.kind === 'toggle'">
+            <span class="qb-appearance__toggle-label">
+              {{ field.label | translate }}
+            </span>
+            <app-custom-toggle
+              [showStatusLabel]="false"
+              [ngModel]="!!value(field.key)"
+              (onChange)="setValue(field.key, $event.checked)" />
+          </div>
+
+          <!-- select -->
+          <app-custom-dropdown
+            *ngIf="field.kind === 'select'"
+            [label]="field.label | translate"
+            [options]="field.options ?? []"
+            optionLabel="label"
+            optionValue="value"
+            [ngModel]="value(field.key)"
+            (onChangeEvent)="setValue(field.key, $event)" />
+
+          <!-- allowed-operators multiselect -->
+          <app-custom-multiselect
+            *ngIf="field.kind === 'multiselect-codes'"
+            [label]="field.label | translate"
+            [options]="operatorOptions"
+            optionLabel="label"
+            optionValue="value"
+            [ngModel]="allowedOperators"
+            (ngModelChange)="setValue(field.key, $event)" />
+
+          <!-- chips (free codes/values) -->
+          <div class="qb-appearance__chips" *ngIf="field.kind === 'chips'">
+            <span class="qb-appearance__toggle-label">
+              {{ field.label | translate }}
+            </span>
+            <app-email-chips-input
+              mode="tag"
+              [ngModel]="value(field.key) || []"
+              (ngModelChange)="setValue(field.key, $event)" />
+          </div>
+
+          <small class="qb-appearance__hint" *ngIf="field.hint">
+            {{ field.hint | translate }}
+          </small>
+        </div>
+    </div>
+  </app-custom-accordion>
+</div>

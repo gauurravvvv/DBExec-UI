@@ -1,0 +1,71 @@
+<div class="qb-columns">
+  <header class="qb-columns__head">
+    <div>
+      <h2 class="qb-columns__title">
+        {{ 'QUERY_BUILDER.OUTPUT_COLUMNS' | translate }}
+      </h2>
+      <p class="qb-columns__sub">
+        {{ 'QUERY_BUILDER.OUTPUT_COLUMNS_HINT' | translate }}
+      </p>
+    </div>
+    <div class="qb-columns__actions">
+      <app-button
+        variant="secondary"
+        size="sm"
+        icon="pi pi-plus"
+        (clicked)="addColumn()"
+      >
+        {{ 'QUERY_BUILDER.ADD_COLUMN' | translate }}
+      </app-button>
+      <app-button
+        variant="primary"
+        size="sm"
+        icon="pi pi-save"
+        [loading]="saving()"
+        (clicked)="save()"
+      >
+        {{ 'COMMON.SAVE' | translate }}
+      </app-button>
+    </div>
+  </header>
+
+  <div class="qb-columns__loading" *ngIf="loading()">
+    <p-skeleton height="3rem" styleClass="mb-2"></p-skeleton>
+    <p-skeleton height="3rem"></p-skeleton>
+  </div>
+
+  <p class="qb-columns__empty" *ngIf="!loading() && !hasColumns()">
+    {{ 'QUERY_BUILDER.NO_COLUMNS' | translate }}
+  </p>
+
+  <div
+    class="qb-columns__list"
+    *ngIf="!loading() && hasColumns()"
+    cdkDropList
+    (cdkDropListDropped)="drop($event)"
+  >
+    <div
+      class="qb-columns__row"
+      *ngFor="let col of columns(); trackBy: trackByIndex; let i = index"
+      cdkDrag
+    >
+      <i class="pi pi-bars qb-columns__handle" cdkDragHandle></i>
+      <app-custom-input
+        class="qb-columns__expr"
+        [ngModel]="col.expr"
+        [placeholder]="'QUERY_BUILDER.COLUMN_EXPR' | translate"
+        (ngModelChange)="setExpr(i, $event)" />
+      <app-custom-input
+        class="qb-columns__alias"
+        [ngModel]="col.alias"
+        [placeholder]="'QUERY_BUILDER.COLUMN_ALIAS' | translate"
+        (ngModelChange)="setAlias(i, $event)" />
+      <app-button
+        variant="ghost"
+        size="sm"
+        icon="pi pi-times"
+        [title]="'QUERY_BUILDER.REMOVE_COLUMN' | translate"
+        (clicked)="removeColumn(i)" />
+    </div>
+  </div>
+</div>

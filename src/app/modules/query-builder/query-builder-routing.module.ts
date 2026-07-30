@@ -6,6 +6,7 @@ import { ConfigureQueryBuilderComponent } from './components/configure-query-bui
 import { EditQueryBuilderComponent } from './components/edit-query-builder/edit-query-builder.component';
 import { ExecuteQueryBuilderComponent } from './components/execute-query-builder/execute-query-builder.component';
 import { ListQueryBuilderComponent } from './components/list-query-builder/list-query-builder.component';
+import { QbDesignComponent } from './components/qb-design/qb-design.component';
 import { RunQueryBuilderComponent } from './components/run-query-builder/run-query-builder.component';
 import { ViewQueryBuilderComponent } from './components/view-query-builder/view-query-builder.component';
 
@@ -24,6 +25,11 @@ const routes: Routes = [
     // Placed before ':id' so it is not swallowed by the view route.
     path: ':id/compose',
     component: RunQueryBuilderComponent,
+  },
+  {
+    // Query Builder v2 — admin design shell (form / joins / columns / settings).
+    path: ':id/design',
+    component: QbDesignComponent,
   },
   { path: ':id', component: ViewQueryBuilderComponent },
   {

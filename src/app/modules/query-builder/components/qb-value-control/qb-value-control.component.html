@@ -134,7 +134,7 @@
         *ngSwitchDefault
         [ngModel]="first"
         [placeholder]="appearance.placeholder || ''"
-        (onChangeEvent)="emitSingle($event)" />
+        (ngModelChange)="emitSingle($event)" />
     </ng-container>
   </div>
 </ng-container>

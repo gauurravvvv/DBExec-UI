@@ -1,0 +1,153 @@
+<div class="qb-designer">
+  <header class="qb-designer__head">
+    <div>
+      <h2 class="qb-designer__title">
+        {{ 'QUERY_BUILDER.FORM_DESIGNER' | translate }}
+      </h2>
+      <p class="qb-designer__sub">
+        {{ 'QUERY_BUILDER.FORM_DESIGNER_HINT' | translate }}
+      </p>
+    </div>
+    <div class="qb-designer__actions">
+      <app-button
+        variant="secondary"
+        size="sm"
+        icon="pi pi-plus"
+        (clicked)="addGroup()"
+      >
+        {{ 'QUERY_BUILDER.ADD_GROUP' | translate }}
+      </app-button>
+      <app-button
+        variant="primary"
+        size="sm"
+        icon="pi pi-save"
+        [loading]="saving()"
+        (clicked)="save()"
+      >
+        {{ 'COMMON.SAVE' | translate }}
+      </app-button>
+    </div>
+  </header>
+
+  <div class="qb-designer__body" *ngIf="!loading()">
+    <!-- Palette (drag source) -->
+    <aside class="qb-designer__palette">
+      <qb-prompt-palette
+        [datasourceId]="datasourceId"
+        [placedIds]="placedIds()"
+        [connectedTo]="dropIds()" />
+    </aside>
+
+    <!-- Groups (drop targets) -->
+    <section class="qb-designer__canvas">
+      <div
+        class="qb-designer__group"
+        *ngFor="let group of groups(); trackBy: trackByGroup"
+      >
+        <header class="qb-designer__group-head">
+          <app-custom-input
+            *ngIf="group.label !== ''; else ungroupedLabel"
+            class="qb-designer__group-name"
+            [ngModel]="group.label"
+            [placeholder]="'QUERY_BUILDER.GROUP_NAME' | translate"
+            (ngModelChange)="renameGroup(group.dropId, $event)" />
+          <ng-template #ungroupedLabel>
+            <span class="qb-designer__group-ungrouped">
+              {{ 'QUERY_BUILDER.UNGROUPED' | translate }}
+            </span>
+          </ng-template>
+          <app-button
+            *ngIf="group.label !== ''"
+            variant="ghost"
+            size="sm"
+            icon="pi pi-trash"
+            [title]="'QUERY_BUILDER.REMOVE_GROUP' | translate"
+            (clicked)="removeGroup(group.dropId)" />
+        </header>
+
+        <div
+          class="qb-designer__dropzone"
+          [id]="group.dropId"
+          cdkDropList
+          [cdkDropListData]="group.placements"
+          [cdkDropListConnectedTo]="dropIds()"
+          (cdkDropListDropped)="drop($event, group)"
+        >
+          <div
+            class="qb-designer__placement"
+            *ngFor="let p of group.placements; trackBy: trackByPlacement"
+            cdkDrag
+            [cdkDragData]="p"
+          >
+            <i class="pi pi-bars qb-designer__grip" cdkDragHandle></i>
+            <span class="qb-designer__placement-name">{{ p.name }}</span>
+            <app-chip variant="tag" size="sm">{{ p.type }}</app-chip>
+
+            <label class="qb-designer__flag">
+              <app-custom-binary-checkbox
+                [ngModel]="p.isMandatory"
+                (ngModelChange)="toggleFlag(group.dropId, p.promptId, 'isMandatory', $event)" />
+              {{ 'QUERY_BUILDER.MANDATORY' | translate }}
+            </label>
+            <label class="qb-designer__flag">
+              <app-custom-binary-checkbox
+                [ngModel]="p.isLocked"
+                (ngModelChange)="toggleFlag(group.dropId, p.promptId, 'isLocked', $event)" />
+              {{ 'QUERY_BUILDER.LOCKED' | translate }}
+            </label>
+
+            <app-button
+              variant="ghost"
+              size="sm"
+              icon="pi pi-sliders-h"
+              [title]="'QUERY_BUILDER.APPEARANCE_OVERRIDE' | translate"
+              (clicked)="openAppearance(p)" />
+            <app-button
+              variant="ghost"
+              size="sm"
+              icon="pi pi-times"
+              [title]="'QUERY_BUILDER.REMOVE_PLACEMENT' | translate"
+              (clicked)="removePlacement(group.dropId, p.promptId)" />
+          </div>
+
+          <p class="qb-designer__dropzone-empty" *ngIf="!group.placements.length">
+            {{ 'QUERY_BUILDER.DROP_PROMPTS_HERE' | translate }}
+          </p>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <div class="qb-designer__loading" *ngIf="loading()">
+    <p-skeleton height="20rem"></p-skeleton>
+  </div>
+
+  <!-- Appearance override drawer -->
+  <div class="qb-designer__drawer" *ngIf="editing() as p">
+    <div class="qb-designer__drawer-backdrop" (click)="closeAppearance()"></div>
+    <div class="qb-designer__drawer-panel">
+      <header class="qb-designer__drawer-head">
+        <h3>{{ 'QUERY_BUILDER.APPEARANCE_OVERRIDE' | translate }} — {{ p.name }}</h3>
+        <app-button
+          variant="ghost"
+          size="sm"
+          icon="pi pi-times"
+          (clicked)="closeAppearance()" />
+      </header>
+      <div class="qb-designer__drawer-body">
+        <qb-appearance-form
+          [promptType]="p.type"
+          [appearance]="p.appearanceOverride ?? null"
+          (appearanceChange)="onAppearanceChange($event)" />
+      </div>
+      <footer class="qb-designer__drawer-foot">
+        <app-button variant="secondary" (clicked)="closeAppearance()">
+          {{ 'COMMON.CANCEL' | translate }}
+        </app-button>
+        <app-button variant="primary" (clicked)="applyAppearance()">
+          {{ 'COMMON.APPLY' | translate }}
+        </app-button>
+      </footer>
+    </div>
+  </div>
+</div>

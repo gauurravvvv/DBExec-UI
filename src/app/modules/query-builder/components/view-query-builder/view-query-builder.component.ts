@@ -55,6 +55,9 @@ export class ViewQueryBuilderComponent implements OnInit, OnDestroy {
   showDeleteConfirm = false;
   deleteJustification = '';
 
+  // Sharing (asset-share-dialog reuse, 'querybuilder' asset type)
+  showShareDialog = false;
+
   // Structure tree navigation
   structureTreeNodes: TreeNode[] = [];
   showStructureTree = false;
@@ -486,6 +489,19 @@ export class ViewQueryBuilderComponent implements OnInit, OnDestroy {
   onCompose(): void {
     // Query Builder v2 — open the business-user composer (tree filters + run).
     this.router.navigate([QUERY_BUILDER.compose(this.queryBuilderId)]);
+  }
+
+  onDesign(): void {
+    // Query Builder v2 — open the admin design shell.
+    this.router.navigate([QUERY_BUILDER.design(this.queryBuilderId)]);
+  }
+
+  onShare(): void {
+    this.showShareDialog = true;
+  }
+
+  onShareClosed(): void {
+    this.showShareDialog = false;
   }
 
   onEdit(): void {

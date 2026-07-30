@@ -145,6 +145,8 @@ export const QUERY_BUILDER = {
   // Query Builder v2 — the business-user composer. Only needs the QB id;
   // the datasource is resolved from the hydrated schema server-side.
   compose: (id: string | number) => `/app/query-builders/${id}/compose`,
+  // Query Builder v2 — the admin design shell (form / joins / columns / settings).
+  design: (id: string | number) => `/app/query-builders/${id}/design`,
 };
 
 // Dashboards are view-only.
