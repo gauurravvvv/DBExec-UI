@@ -23,6 +23,12 @@
 - Out of scope: hand-written SQL (dataset/query-runner), chart authoring (analyses).
 
 ## 3. Progress (newest first)
+### 2026-07-30 — Value-source layer (spec 6.6): config, typeahead, bulk paste
+- Done: prompt value sourcing end to end. Admin `qb-value-source` (in the form-designer drawer) picks free / fixed list (manual + bulk import) / lookup SQL (Monaco) / distinct column, previews before saving, and warns when the server forces server-paged typeahead. Runtime `qb-value-control` now server-searches lookup prompts (dropdown/multiselect serverMode + `/values/search` fetcher), passes parent selections for cascading lookups (`store.valuesForPrompt` → `dependsOnValues`), and offers a "Paste values" dialog (`/values/resolve`, matched vs not-found). Services `qb-admin.getValueSource/saveValueSource/previewValues` + `qb-runtime.searchValues/resolveValues`; mirrored `promptValueSource` validator; QUERY_BUILDER.VS.* + PASTE_* i18n × 10.
+- Backend (same day): `promptValueSource.ts`/`promptValueRuntime.ts` controllers + 5 routes (value-source GET/PUT, values/preview·search·resolve), shared `promptValueSource.helper` (safe SQL run + distinct-column build + cardinality probe), schema controller emits kind from cardinality, compiler rule 8 (curated allowed-set enforcement, 49 tests).
+- Gotchas: `app-custom-dropdown/-multiselect` take `serverMode` + `fetcher` (arrow, returns `{items,total}`); the SQL editor mounts via CodeEditorService only after its `*ngIf` host renders (setTimeout tick on kind change).
+- Files touched: components/{qb-value-source,qb-value-control,qb-condition-row,qb-form-designer}, services/{qb-admin,qb-runtime,query-builder-store}, validators/promptValueSource, api constants, i18n × 10.
+
 ### 2026-07-30 — Query Builder v2 (runtime composer + admin design + tab/section removal)
 - Done: shipped v2 end to end. Runtime composer (`run-query-builder` + tree components + normalized store + summary + Monaco SQL preview) at `:id/compose`; admin design shell (`qb-design` + form-designer/palette/appearance-form/join-designer/output-columns/settings) at `:id/design`; `qb-admin.service` + `qb-runtime.service`; mirrored `queryBuilderTree`/`promptAppearance` validators; `querybuilder` asset-share reuse; QUERY_BUILDER + QUERY_BUILDER.APPEARANCE i18n across 10 locales. All three FE gates green (tsc → ngc → prod build).
 - Tab/Section: modules removed; `add-prompt`/`edit-prompt` de-coupled from SectionService; `configure-query-builder` + `execute-query-builder` (legacy) deleted; app routes + permission entries cleaned.
