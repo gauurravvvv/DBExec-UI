@@ -22,6 +22,7 @@ export const ASSET_SHARE_ASSET_TYPES = [
   'dataset',
   'analysis',
   'dashboard',
+  'querybuilder',
 ] as const;
 export type AssetShareAssetType = (typeof ASSET_SHARE_ASSET_TYPES)[number];
 
