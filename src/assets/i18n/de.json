@@ -2760,7 +2760,9 @@
     "WHERE_CONDITION_REQUIRED": "Eine WHERE-Bedingung ist erforderlich",
     "TYPE": "Typ",
     "GROUP": "Gruppe",
-    "GROUP_PLACEHOLDER": "Optionaler Gruppenname"
+    "GROUP_PLACEHOLDER": "Optionaler Gruppenname",
+    "APPEARANCE_OPERATORS": "Darstellung & Operatoren",
+    "VALUES_SECTION": "Werte"
   },
   "QUERY_BUILDER_MODULE": {
     "TITLE": "Query Builders",
@@ -5584,6 +5586,8 @@
       "PREVIEW": "Preview",
       "PREVIEW_RESULT": "Preview",
       "THRESHOLD_WARNING": "Large value set — the runtime will use server-paged search."
-    }
+    },
+    "DISPLAY_NAME": "Anzeigename",
+    "CONFIG_IN_PROMPT_HINT": "Prompt-SQL, Werte, Darstellung und Operatoren werden im Prompt-Modul konfiguriert. Hier wählen Sie nur aus, welche Prompts erscheinen und wie das Formular angeordnet ist."
   }
 }

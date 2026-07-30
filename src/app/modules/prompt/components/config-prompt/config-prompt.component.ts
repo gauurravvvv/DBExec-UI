@@ -21,6 +21,7 @@ import { Store } from '@ngrx/store';
 import { first } from 'rxjs/operators';
 import { PROMPT } from 'src/app/core/constants/routes.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
+import { ReferenceDataService } from 'src/app/core/services/reference-data.service';
 import { DatasourceService } from 'src/app/modules/datasource/services/datasource.service';
 import { PROMPT_TYPES } from '../../constants/prompt.constant';
 import { PromptService } from '../../services/prompt.service';
@@ -94,41 +95,17 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
   // Refresh state
   isRefreshingValues = false;
 
-  // Dropdown Configuration Dialog
-  showDropdownConfigDialog = false;
-  dropdownConfig: any = {};
-
-  // Multiselect Configuration Dialog
-  showMultiselectConfigDialog = false;
-  multiselectConfig: any = {};
-
-  // Checkbox Configuration Dialog
-  showCheckboxConfigDialog = false;
-  checkboxConfig: any = {};
-
-  // Radio Configuration Dialog
-  showRadioConfigDialog = false;
-  radioConfig: any = {};
-
-  // Text Configuration Dialog
-  showTextConfigDialog = false;
-  textConfig: any = {};
-
-  // Number Configuration Dialog
-  showNumberConfigDialog = false;
-  numberConfig: any = {};
-
-  // Date Range Configuration Dialog
-  showDateRangeConfigDialog = false;
-  dateRangeConfig: any = {};
-
-  // Calendar Configuration Dialog
-  showCalendarConfigDialog = false;
-  calendarConfig: any = {};
-
-  // Range Slider Configuration Dialog
-  showRangeSliderConfigDialog = false;
-  rangeSliderConfig: any = {};
+  // ── Appearance & Operators (inline prompt-appearance-form) ──────────────
+  // The stored appearance object, seeded from GET /prompts/:id/appearance and
+  // fed to <prompt-appearance-form>. The validated object it emits is held in
+  // `pendingAppearance` and persisted alongside the config on Save.
+  loadedAppearance: Record<string, any> | null = null;
+  pendingAppearance: Record<string, any> | null = null;
+  appearanceErrors: string[] = [];
+  // Allowed-operators picker options. The query-builder condition system reads
+  // the same DB-driven `filter_operator` family (its meta contract is owned by
+  // QB), so we reuse it here for the prompt's allowed-operators list.
+  operatorOptions: { label: string; value: string }[] = [];
 
   constructor(
     private fb: FormBuilder,
@@ -137,6 +114,7 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
     private globalService: GlobalService,
     private promptService: PromptService,
     private datasourceService: DatasourceService,
+    private referenceData: ReferenceDataService,
     private store: Store,
   ) {
     this.initForm();
@@ -145,6 +123,17 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.promptId = this.route.snapshot.params['id'];
+
+    // DB-driven operator catalog for the appearance form's allowed-operators
+    // picker. Same `filter_operator` family the query-builder condition rows
+    // use. Degrades to [] if the fetch fails (the form handles an empty list).
+    this.referenceData
+      .getOptions('filter_operator')
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(options => {
+        this.operatorOptions = options;
+        this.cdr.markForCheck();
+      });
 
     if (this.promptId) {
       this.loadPromptData();
@@ -298,13 +287,14 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
         if (data) {
           this.sectionData = data;
 
-          // Set basic prompt data
+          // Set basic prompt data. v2 prompts are datasource-scoped: the
+          // tab/section relations were removed, so guard those reads.
           this.promptForm.patchValue({
             id: this.sectionData.id,
             name: this.sectionData.name,
             datasource: this.sectionData.datasourceId,
-            tab: this.sectionData.section.tab.id,
-            section: this.sectionData.section.id,
+            tab: this.sectionData.section?.tab?.id ?? '',
+            section: this.sectionData.section?.id ?? '',
             type: PROMPT_TYPES.find(
               type => type.value === this.sectionData.type,
             )?.label,
@@ -312,9 +302,12 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
 
           // Set display names
           this.selectedDatasourceName = this.sectionData.datasource?.name || '';
-          this.selectedTabName = this.sectionData.section.tab.name || '';
-          this.selectedSectionName = this.sectionData.section.name || '';
+          this.selectedTabName = this.sectionData.section?.tab?.name || '';
+          this.selectedSectionName = this.sectionData.section?.name || '';
           this.selectedPromptType = this.sectionData.type || '';
+
+          // Load the stored appearance for the inline appearance form.
+          this.loadAppearance();
 
           // Set prompt type validations
           this.showAddPromptValues =
@@ -587,8 +580,22 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
 
       this.promptService
         .configPrompt(submitData)
-        .then(response => {
+        .then(async response => {
           if (this.globalService.handleSuccessService(response)) {
+            // Also persist the appearance edited in the inline appearance
+            // form, if the admin changed it. Kept separate from the config
+            // save so a config-only edit never overwrites appearance.
+            if (this.pendingAppearance) {
+              try {
+                await this.promptService.updateAppearance({
+                  id: this.promptId,
+                  appearance: this.pendingAppearance,
+                });
+              } catch {
+                // Appearance persistence is best-effort; the config already
+                // saved. The service surfaces its own error toast.
+              }
+            }
             this.router.navigate([PROMPT.LIST]);
           }
           this.cdr.markForCheck();
@@ -597,6 +604,34 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
           this.cdr.markForCheck();
         });
     }
+  }
+
+  /**
+   * Load the stored appearance for the inline appearance form. Non-fatal:
+   * an unconfigured prompt returns {} and the form seeds its defaults.
+   */
+  private loadAppearance(): void {
+    if (!this.promptId) return;
+    this.promptService
+      .getAppearance(this.promptId)
+      .then((res: any) => {
+        this.loadedAppearance = res?.data?.appearance ?? {};
+        this.cdr.markForCheck();
+      })
+      .catch(() => {
+        this.loadedAppearance = {};
+        this.cdr.markForCheck();
+      });
+  }
+
+  /** Store the validated appearance emitted by <prompt-appearance-form>. */
+  onAppearanceChange(appearance: Record<string, any>): void {
+    this.pendingAppearance = appearance;
+  }
+
+  /** Track appearance validation errors (i18n keys) from the appearance form. */
+  onAppearanceValidity(errors: string[]): void {
+    this.appearanceErrors = errors;
   }
 
   /**
@@ -617,8 +652,8 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
         id: this.sectionData.id,
         name: this.sectionData.name,
         datasource: this.sectionData.datasourceId,
-        tab: this.sectionData.section.tab.id,
-        section: this.sectionData.section.id,
+        tab: this.sectionData.section?.tab?.id ?? '',
+        section: this.sectionData.section?.id ?? '',
         schema: null,
         tables: [],
         columns: [],
@@ -628,8 +663,8 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
       });
 
       this.selectedDatasourceName = this.sectionData.datasource?.name || '';
-      this.selectedTabName = this.sectionData.section.tab.name || '';
-      this.selectedSectionName = this.sectionData.section.name || '';
+      this.selectedTabName = this.sectionData.section?.tab?.name || '';
+      this.selectedSectionName = this.sectionData.section?.name || '';
 
       this.tables = {};
 
@@ -1270,310 +1305,6 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
    */
   closeSqlDialog(): void {
     this.showSqlDialog = false;
-  }
-
-  /**
-   * Open dropdown configuration dialog
-   */
-  openDropdownConfigDialog(): void {
-    this.showDropdownConfigDialog = true;
-  }
-
-  /**
-   * Handle dropdown config saved
-   */
-  onDropdownConfigSaved(config: any): void {
-    this.dropdownConfig = config;
-    this.showDropdownConfigDialog = false;
-    this.promptForm.markAsDirty();
-    this.saveAppearance(config);
-  }
-
-  /**
-   * Open multiselect configuration dialog
-   */
-  openMultiselectConfigDialog(): void {
-    this.showMultiselectConfigDialog = true;
-  }
-
-  /**
-   * Handle multiselect config saved
-   */
-  onMultiselectConfigSaved(config: any): void {
-    this.multiselectConfig = config;
-    this.showMultiselectConfigDialog = false;
-    this.promptForm.markAsDirty();
-    this.saveAppearance(config);
-  }
-
-  /**
-   * Open checkbox configuration dialog
-   */
-  openCheckboxConfigDialog(): void {
-    this.showCheckboxConfigDialog = true;
-  }
-
-  /**
-   * Handle checkbox config saved
-   */
-  onCheckboxConfigSaved(config: any): void {
-    this.checkboxConfig = config;
-    this.showCheckboxConfigDialog = false;
-    this.promptForm.markAsDirty();
-    this.saveAppearance(config);
-  }
-
-  /**
-   * Open radio configuration dialog
-   */
-  openRadioConfigDialog(): void {
-    this.showRadioConfigDialog = true;
-  }
-
-  /**
-   * Handle radio config saved
-   */
-  onRadioConfigSaved(config: any): void {
-    this.radioConfig = config;
-    this.showRadioConfigDialog = false;
-    this.promptForm.markAsDirty();
-    this.saveAppearance(config);
-  }
-
-  /**
-   * Open text configuration dialog
-   */
-  openTextConfigDialog(): void {
-    this.showTextConfigDialog = true;
-  }
-
-  /**
-   * Handle text config saved
-   */
-  onTextConfigSaved(config: any): void {
-    this.textConfig = config;
-    this.showTextConfigDialog = false;
-    this.promptForm.markAsDirty();
-    this.saveAppearance(config);
-  }
-
-  /**
-   * Open number configuration dialog
-   */
-  openNumberConfigDialog(): void {
-    this.showNumberConfigDialog = true;
-  }
-
-  /**
-   * Handle number config saved
-   */
-  onNumberConfigSaved(config: any): void {
-    this.numberConfig = config;
-    this.showNumberConfigDialog = false;
-    this.promptForm.markAsDirty();
-    this.saveAppearance(config);
-  }
-
-  /**
-   * Open date range configuration dialog
-   */
-  openDateRangeConfigDialog(): void {
-    this.showDateRangeConfigDialog = true;
-  }
-
-  /**
-   * Handle date range config saved
-   */
-  onDateRangeConfigSaved(config: any): void {
-    this.dateRangeConfig = config;
-    this.showDateRangeConfigDialog = false;
-    this.promptForm.markAsDirty();
-    this.saveAppearance(config);
-  }
-
-  /**
-   * Open calendar configuration dialog
-   */
-  openCalendarConfigDialog(): void {
-    this.showCalendarConfigDialog = true;
-  }
-
-  /**
-   * Handle calendar config saved
-   */
-  onCalendarConfigSaved(config: any): void {
-    this.calendarConfig = config;
-    this.showCalendarConfigDialog = false;
-    this.promptForm.markAsDirty();
-    this.saveAppearance(config);
-  }
-
-  /**
-   * Open range slider configuration dialog
-   */
-  openRangeSliderConfigDialog(): void {
-    this.showRangeSliderConfigDialog = true;
-  }
-
-  /**
-   * Handle range slider config saved
-   */
-  onRangeSliderConfigSaved(config: any): void {
-    this.rangeSliderConfig = config;
-    this.showRangeSliderConfigDialog = false;
-    this.promptForm.markAsDirty();
-    this.saveAppearance(config);
-  }
-
-  /**
-   * Check if current prompt type is configurable (has a config dialog)
-   */
-  isConfigurable(): boolean {
-    const configurableTypes = [
-      'dropdown',
-      'multiselect',
-      'checkbox',
-      'radio',
-      'text',
-      'number',
-      'daterange',
-      'calendar',
-      'rangeslider',
-    ];
-    return configurableTypes.includes(this.selectedPromptType);
-  }
-
-  /**
-   * Open config dialog based on prompt type — fetches saved appearance first
-   */
-  openConfigDialog(): void {
-    this.promptService
-      .getAppearance(this.promptId)
-      .then((response: any) => {
-        if (this.globalService.handleSuccessService(response, false)) {
-          const appearance = response.data?.appearance;
-          if (appearance && Object.keys(appearance).length > 0) {
-            this.patchConfigFromAppearance(appearance);
-          } else {
-            this.clearCurrentConfig();
-          }
-        }
-        this.openSpecificConfigDialog();
-      })
-      .catch(() => {
-        this.openSpecificConfigDialog();
-      });
-  }
-
-  private patchConfigFromAppearance(appearance: any): void {
-    switch (this.selectedPromptType) {
-      case 'dropdown':
-        this.dropdownConfig = appearance;
-        break;
-      case 'multiselect':
-        this.multiselectConfig = appearance;
-        break;
-      case 'checkbox':
-        this.checkboxConfig = appearance;
-        break;
-      case 'radio':
-        this.radioConfig = appearance;
-        break;
-      case 'text':
-        this.textConfig = appearance;
-        break;
-      case 'number':
-        this.numberConfig = appearance;
-        break;
-      case 'daterange':
-        this.dateRangeConfig = appearance;
-        break;
-      case 'calendar':
-        this.calendarConfig = appearance;
-        break;
-      case 'rangeslider':
-        this.rangeSliderConfig = appearance;
-        break;
-    }
-  }
-
-  private clearCurrentConfig(): void {
-    switch (this.selectedPromptType) {
-      case 'dropdown':
-        this.dropdownConfig = {};
-        break;
-      case 'multiselect':
-        this.multiselectConfig = {};
-        break;
-      case 'checkbox':
-        this.checkboxConfig = {};
-        break;
-      case 'radio':
-        this.radioConfig = {};
-        break;
-      case 'text':
-        this.textConfig = {};
-        break;
-      case 'number':
-        this.numberConfig = {};
-        break;
-      case 'daterange':
-        this.dateRangeConfig = {};
-        break;
-      case 'calendar':
-        this.calendarConfig = {};
-        break;
-      case 'rangeslider':
-        this.rangeSliderConfig = {};
-        break;
-    }
-  }
-
-  private openSpecificConfigDialog(): void {
-    switch (this.selectedPromptType) {
-      case 'dropdown':
-        this.showDropdownConfigDialog = true;
-        break;
-      case 'multiselect':
-        this.showMultiselectConfigDialog = true;
-        break;
-      case 'checkbox':
-        this.showCheckboxConfigDialog = true;
-        break;
-      case 'radio':
-        this.showRadioConfigDialog = true;
-        break;
-      case 'text':
-        this.showTextConfigDialog = true;
-        break;
-      case 'number':
-        this.showNumberConfigDialog = true;
-        break;
-      case 'daterange':
-        this.showDateRangeConfigDialog = true;
-        break;
-      case 'calendar':
-        this.showCalendarConfigDialog = true;
-        break;
-      case 'rangeslider':
-        this.showRangeSliderConfigDialog = true;
-        break;
-    }
-  }
-
-  private saveAppearance(config: any): void {
-    this.promptService
-      .updateAppearance({
-        id: this.promptId,
-        appearance: config,
-      })
-      .then((response: any) => {
-        this.globalService.handleSuccessService(response, true);
-        this.cdr.markForCheck();
-      })
-      .catch(() => {
-        this.cdr.markForCheck();
-      });
   }
 
   /**

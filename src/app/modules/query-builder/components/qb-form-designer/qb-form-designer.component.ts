@@ -5,8 +5,10 @@
  * A builder's form is a flat list of prompt placements bucketed by groupLabel —
  * no tabs, no sections. The admin drags prompts from the palette into groups,
  * reorders within and across groups, renames or adds groups, and sets per-
- * placement flags (mandatory / locked) and an appearance override. Saved via
- * QbAdminService.savePlacements as an ordered replace.
+ * placement FORM POSITION only (mandatory / locked / display-name). Prompt
+ * CONFIG — SQL, values, appearance, operators — is owned by the Prompt module
+ * and is NOT editable here. Saved via QbAdminService.savePlacements as an
+ * ordered replace.
  *
  * Placement order is implied by array order at save (groupSequence from group
  * index, promptSequence from within-group index), so the store never has to
@@ -60,10 +62,6 @@ export class QbFormDesignerComponent implements OnInit {
   readonly loading = signal(true);
   readonly saving = signal(false);
 
-  /** The placement whose appearance drawer is open (null = closed). */
-  readonly editing = signal<DesignPlacement | null>(null);
-  private editingAppearance: any = null;
-
   /** All drop-list ids so the palette + every group connect to each other. */
   readonly dropIds = computed(() => [
     'qb-palette',
@@ -103,7 +101,6 @@ export class QbFormDesignerComponent implements OnInit {
         isMandatory: !!r.isMandatory,
         isLocked: !!r.isLocked,
         displayNameOverride: r.displayNameOverride ?? null,
-        appearanceOverride: r.appearanceOverride ?? null,
       });
     }
     // Always keep an ungrouped bucket so there's a default drop target.
@@ -146,7 +143,6 @@ export class QbFormDesignerComponent implements OnInit {
         isMandatory: false,
         isLocked: false,
         displayNameOverride: null,
-        appearanceOverride: null,
       };
       const list = [...target.placements];
       list.splice(event.currentIndex, 0, placement);
@@ -271,35 +267,23 @@ export class QbFormDesignerComponent implements OnInit {
     );
   }
 
-  // ── Appearance override drawer ──────────────────────────────────────
-
-  openAppearance(p: DesignPlacement): void {
-    this.editingAppearance = p.appearanceOverride;
-    this.editing.set(p);
-  }
-
-  onAppearanceChange(appearance: any): void {
-    this.editingAppearance = appearance;
-  }
-
-  applyAppearance(): void {
-    const p = this.editing();
-    if (!p) return;
+  /** In-form display name for this placement (falls back to the prompt name). */
+  setDisplayName(dropId: string, promptId: string, value: string): void {
+    const trimmed = (value ?? '').trim();
     this.groups.update(groups =>
-      groups.map(g => ({
-        ...g,
-        placements: g.placements.map(x =>
-          x.promptId === p.promptId
-            ? { ...x, appearanceOverride: this.editingAppearance }
-            : x,
-        ),
-      })),
+      groups.map(g =>
+        g.dropId === dropId
+          ? {
+              ...g,
+              placements: g.placements.map(p =>
+                p.promptId === promptId
+                  ? { ...p, displayNameOverride: trimmed || null }
+                  : p,
+              ),
+            }
+          : g,
+      ),
     );
-    this.editing.set(null);
-  }
-
-  closeAppearance(): void {
-    this.editing.set(null);
   }
 
   // ── Save ────────────────────────────────────────────────────────────
@@ -318,7 +302,6 @@ export class QbFormDesignerComponent implements OnInit {
             isMandatory: p.isMandatory,
             isLocked: p.isLocked,
             displayNameOverride: p.displayNameOverride ?? null,
-            appearanceOverride: p.appearanceOverride ?? null,
           });
         });
       });

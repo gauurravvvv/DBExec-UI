@@ -2760,7 +2760,9 @@
     "WHERE_CONDITION_REQUIRED": "必须填写 WHERE 条件",
     "TYPE": "类型",
     "GROUP": "分组",
-    "GROUP_PLACEHOLDER": "可选的分组名称"
+    "GROUP_PLACEHOLDER": "可选的分组名称",
+    "APPEARANCE_OPERATORS": "外观和运算符",
+    "VALUES_SECTION": "值"
   },
   "QUERY_BUILDER_MODULE": {
     "TITLE": "Query Builders",
@@ -5584,6 +5586,8 @@
       "PREVIEW": "Preview",
       "PREVIEW_RESULT": "Preview",
       "THRESHOLD_WARNING": "Large value set — the runtime will use server-paged search."
-    }
+    },
+    "DISPLAY_NAME": "显示名称",
+    "CONFIG_IN_PROMPT_HINT": "提示的 SQL、值、外观和运算符在提示模块中配置。此处仅选择显示哪些提示以及表单的排列方式。"
   }
 }

@@ -11,7 +11,6 @@ import { Injectable, inject } from '@angular/core';
 import { lastValueFrom } from 'rxjs';
 import { PROMPT, QUERY_BUILDER } from 'src/app/core/constants/api.constant';
 import { HttpClientService } from 'src/app/core/services/http-client.service';
-import { PromptAppearance } from 'src/app/shared/validators/promptAppearance';
 
 // ── Wire types (kept loose where the server shape is still settling) ──────
 
@@ -34,7 +33,6 @@ export interface QbPlacement {
   isMandatory: boolean;
   isLocked: boolean;
   displayNameOverride?: string | null;
-  appearanceOverride?: Record<string, any> | null;
 }
 
 export interface QbJoin {
@@ -136,21 +134,9 @@ export class QbAdminService {
     return this.post(QUERY_BUILDER.GET + id + '/publish', {});
   }
 
-  // ── Prompt appearance (admin) ─────────────────────────────────────────
-
-  savePromptAppearance(
-    promptId: string,
-    appearance: PromptAppearance,
-  ): Promise<any> {
-    return this.put(PROMPT.GET + promptId + PROMPT.APPEARANCE_SUFFIX, {
-      appearance,
-    });
-  }
-  getPromptAppearance(promptId: string): Promise<any> {
-    return this.get(PROMPT.GET + promptId + PROMPT.APPEARANCE_SUFFIX);
-  }
-
-  // ── Prompt library (for the designer palette) ─────────────────────────
+  // ── Prompt library (for the designer palette — read-only) ─────────────
+  // NOTE: prompt CONFIG (appearance, operators, value-source) is owned by the
+  // Prompt module, not here. QB only READS the prompt list to place prompts.
 
   listPrompts(datasourceId: string, search = ''): Promise<any> {
     const params: Record<string, any> = {
@@ -162,29 +148,5 @@ export class QbAdminService {
     return lastValueFrom(
       this.http.apiGet(PROMPT.LIST, { params, skipLoader: true }),
     );
-  }
-
-  // ── Prompt value source (spec 6.6.1) ──────────────────────────────────
-
-  getValueSource(promptId: string): Promise<any> {
-    return this.get(PROMPT.GET + promptId + PROMPT.VALUE_SOURCE_SUFFIX);
-  }
-
-  saveValueSource(promptId: string, valueSource: any): Promise<any> {
-    return this.put(PROMPT.GET + promptId + PROMPT.VALUE_SOURCE_SUFFIX, {
-      valueSource,
-    });
-  }
-
-  /** Run a value source and return sample rows before saving. */
-  previewValues(
-    promptId: string,
-    valueSource: any,
-    limit = 50,
-  ): Promise<any> {
-    return this.post(PROMPT.GET + promptId + PROMPT.VALUES_PREVIEW_SUFFIX, {
-      valueSource,
-      limit,
-    });
   }
 }

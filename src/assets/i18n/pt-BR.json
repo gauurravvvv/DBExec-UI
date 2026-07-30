@@ -2760,7 +2760,9 @@
     "WHERE_CONDITION_REQUIRED": "Uma condição WHERE é obrigatória",
     "TYPE": "Tipo",
     "GROUP": "Grupo",
-    "GROUP_PLACEHOLDER": "Nome de grupo opcional"
+    "GROUP_PLACEHOLDER": "Nome de grupo opcional",
+    "APPEARANCE_OPERATORS": "Aparência e operadores",
+    "VALUES_SECTION": "Valores"
   },
   "QUERY_BUILDER_MODULE": {
     "TITLE": "Query Builders",
@@ -5584,6 +5586,8 @@
       "PREVIEW": "Preview",
       "PREVIEW_RESULT": "Preview",
       "THRESHOLD_WARNING": "Large value set — the runtime will use server-paged search."
-    }
+    },
+    "DISPLAY_NAME": "Nome de exibição",
+    "CONFIG_IN_PROMPT_HINT": "O SQL, os valores, a aparência e os operadores do prompt são configurados no módulo de Prompts. Aqui você só escolhe quais prompts aparecem e como o formulário é organizado."
   }
 }

@@ -1,6 +1,7 @@
 /**
- * qb-value-source — admin editor for where a prompt's options come from
- * (spec 6.6.1). Five ways collapse to four persisted kinds:
+ * prompt-value-source — admin editor for where a prompt's options come from.
+ * Lives in the Prompt module (value-source is prompt-level config, configured
+ * once and identical in every Query Builder). Five ways, four persisted kinds:
  *
  *   free            no list (text search, arbitrary values)
  *   static          curated list — typed by hand or bulk-pasted / CSV
@@ -30,7 +31,7 @@ import {
   EditorHandle,
 } from 'src/app/shared/editor/code-editor.service';
 import { GlobalService } from 'src/app/core/services/global.service';
-import { QbAdminService } from '../../services/qb-admin.service';
+import { PromptService } from '../../services/prompt.service';
 
 type Kind = 'free' | 'static' | 'lookup_query' | 'distinct_column';
 
@@ -40,15 +41,17 @@ interface StaticRow {
 }
 
 @Component({
-  selector: 'qb-value-source',
+  selector: 'prompt-value-source',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  templateUrl: './qb-value-source.component.html',
-  styleUrls: ['./qb-value-source.component.scss'],
+  templateUrl: './prompt-value-source.component.html',
+  styleUrls: ['./prompt-value-source.component.scss'],
 })
-export class QbValueSourceComponent implements OnInit, AfterViewInit, OnDestroy {
+export class PromptValueSourceComponent
+  implements OnInit, AfterViewInit, OnDestroy
+{
   @Input({ required: true }) promptId!: string;
 
-  private readonly admin = inject(QbAdminService);
+  private readonly admin = inject(PromptService);
   private readonly global = inject(GlobalService);
   private readonly codeEditor = inject(CodeEditorService);
 

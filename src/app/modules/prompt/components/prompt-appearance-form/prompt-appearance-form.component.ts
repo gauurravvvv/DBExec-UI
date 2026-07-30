@@ -1,8 +1,11 @@
 /**
- * qb-appearance-form — the admin's per-prompt appearance editor (spec §6.3).
+ * prompt-appearance-form — the admin's per-prompt appearance + operators editor.
+ *
+ * Lives in the Prompt module: appearance/operators are prompt-level config,
+ * configured once and identical in every Query Builder that uses the prompt.
  *
  * The appearance config is a discriminated union on Prompt.type. This form is
- * data-driven from qb-appearance-fields: an accordion of sections, each a grid
+ * data-driven from prompt-appearance-fields: an accordion of sections, each a grid
  * of shared app-custom-* controls. On save it round-trips the edited object
  * through the mirrored promptAppearanceSchema so what the admin sees is exactly
  * what the runtime renderer and the server validator accept.
@@ -30,15 +33,15 @@ import {
   AppearanceSection,
   FieldOption,
   sectionsForType,
-} from '../../helpers/qb-appearance-fields';
+} from '../../helpers/prompt-appearance-fields';
 
 @Component({
-  selector: 'qb-appearance-form',
+  selector: 'prompt-appearance-form',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  templateUrl: './qb-appearance-form.component.html',
-  styleUrls: ['./qb-appearance-form.component.scss'],
+  templateUrl: './prompt-appearance-form.component.html',
+  styleUrls: ['./prompt-appearance-form.component.scss'],
 })
-export class QbAppearanceFormComponent implements OnChanges {
+export class PromptAppearanceFormComponent implements OnChanges {
   /** The prompt's control type — the appearance discriminant. */
   @Input({ required: true }) promptType!: string;
   /** The stored appearance ({} for never-configured prompts). */

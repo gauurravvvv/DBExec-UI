@@ -13,17 +13,6 @@
       </div>
       <div class="action-buttons">
         <button
-          class="btn-secondary"
-          type="button"
-          *ngIf="isConfigurable()"
-          (click)="openConfigDialog()"
-          [pTooltip]="'PROMPT_MODULE.CUSTOMISE_DISPLAY_OPTIONS' | translate"
-          tooltipPosition="bottom"
-        >
-          <i class="pi pi-cog"></i>
-          {{ 'PROMPT_MODULE.CUSTOMISE' | translate }}
-        </button>
-        <button
           class="btn-cancel"
           type="button"
           [disabled]="!isFormDirty || isCancelClicked"
@@ -589,6 +578,44 @@
               </small>
             </div>
           </div>
+
+          <!-- Appearance & Operators (inline, always-visible per-type editor) -->
+          <ng-container *ngIf="selectedPromptType">
+            <div class="section-header">
+              <h3>
+                <i class="pi pi-sliders-h mr-2"></i>
+                {{ 'PROMPT_MODULE.APPEARANCE_OPERATORS' | translate }}
+              </h3>
+            </div>
+            <div class="form-row">
+              <div class="form-field full-width">
+                <prompt-appearance-form
+                  [promptType]="selectedPromptType"
+                  [appearance]="loadedAppearance"
+                  [operatorOptions]="operatorOptions"
+                  (appearanceChange)="onAppearanceChange($event)"
+                  (validityChange)="onAppearanceValidity($event)"
+                >
+                </prompt-appearance-form>
+              </div>
+            </div>
+          </ng-container>
+
+          <!-- Values (self-contained value-source editor with its own Save) -->
+          <ng-container *ngIf="promptId">
+            <div class="section-header">
+              <h3>
+                <i class="pi pi-list mr-2"></i>
+                {{ 'PROMPT_MODULE.VALUES_SECTION' | translate }}
+              </h3>
+            </div>
+            <div class="form-row">
+              <div class="form-field full-width">
+                <prompt-value-source [promptId]="promptId">
+                </prompt-value-source>
+              </div>
+            </div>
+          </ng-container>
         </div>
       </div>
     </form>
@@ -605,106 +632,3 @@
   (execute)="executeSqlQuery($event)"
 >
 </app-sql-query-dialog>
-
-<!-- Dropdown Configuration Dialog -->
-<app-dropdown-config-dialog
-  *ngIf="showDropdownConfigDialog"
-  [(visible)]="showDropdownConfigDialog"
-  [promptValues]="promptForm.get('promptValues')?.value || []"
-  [currentConfig]="dropdownConfig"
-  [saving]="saving()"
-  (close)="showDropdownConfigDialog = false"
-  (save)="onDropdownConfigSaved($event)"
->
-</app-dropdown-config-dialog>
-
-<!-- Multiselect Configuration Dialog -->
-<app-multiselect-config-dialog
-  *ngIf="showMultiselectConfigDialog"
-  [(visible)]="showMultiselectConfigDialog"
-  [promptValues]="promptForm.get('promptValues')?.value || []"
-  [currentConfig]="multiselectConfig"
-  [saving]="saving()"
-  (close)="showMultiselectConfigDialog = false"
-  (save)="onMultiselectConfigSaved($event)"
->
-</app-multiselect-config-dialog>
-
-<!-- Checkbox Configuration Dialog -->
-<app-checkbox-config-dialog
-  *ngIf="showCheckboxConfigDialog"
-  [(visible)]="showCheckboxConfigDialog"
-  [promptValues]="promptForm.get('promptValues')?.value || []"
-  [currentConfig]="checkboxConfig"
-  [saving]="saving()"
-  (close)="showCheckboxConfigDialog = false"
-  (save)="onCheckboxConfigSaved($event)"
->
-</app-checkbox-config-dialog>
-
-<!-- Radio Configuration Dialog -->
-<app-radio-config-dialog
-  *ngIf="showRadioConfigDialog"
-  [(visible)]="showRadioConfigDialog"
-  [promptValues]="promptForm.get('promptValues')?.value || []"
-  [currentConfig]="radioConfig"
-  [saving]="saving()"
-  (close)="showRadioConfigDialog = false"
-  (save)="onRadioConfigSaved($event)"
->
-</app-radio-config-dialog>
-
-<!-- Text Configuration Dialog -->
-<app-text-config-dialog
-  *ngIf="showTextConfigDialog"
-  [(visible)]="showTextConfigDialog"
-  [currentConfig]="textConfig"
-  [saving]="saving()"
-  (close)="showTextConfigDialog = false"
-  (save)="onTextConfigSaved($event)"
->
-</app-text-config-dialog>
-
-<!-- Number Configuration Dialog -->
-<app-number-config-dialog
-  *ngIf="showNumberConfigDialog"
-  [(visible)]="showNumberConfigDialog"
-  [currentConfig]="numberConfig"
-  [saving]="saving()"
-  (close)="showNumberConfigDialog = false"
-  (save)="onNumberConfigSaved($event)"
->
-</app-number-config-dialog>
-
-<!-- Date Range Configuration Dialog -->
-<app-daterange-config-dialog
-  *ngIf="showDateRangeConfigDialog"
-  [(visible)]="showDateRangeConfigDialog"
-  [currentConfig]="dateRangeConfig"
-  [saving]="saving()"
-  (close)="showDateRangeConfigDialog = false"
-  (save)="onDateRangeConfigSaved($event)"
->
-</app-daterange-config-dialog>
-
-<!-- Calendar Configuration Dialog -->
-<app-calendar-config-dialog
-  *ngIf="showCalendarConfigDialog"
-  [(visible)]="showCalendarConfigDialog"
-  [currentConfig]="calendarConfig"
-  [saving]="saving()"
-  (close)="showCalendarConfigDialog = false"
-  (save)="onCalendarConfigSaved($event)"
->
-</app-calendar-config-dialog>
-
-<!-- Range Slider Configuration Dialog -->
-<app-rangeslider-config-dialog
-  *ngIf="showRangeSliderConfigDialog"
-  [(visible)]="showRangeSliderConfigDialog"
-  [currentConfig]="rangeSliderConfig"
-  [saving]="saving()"
-  (close)="showRangeSliderConfigDialog = false"
-  (save)="onRangeSliderConfigSaved($event)"
->
-</app-rangeslider-config-dialog>

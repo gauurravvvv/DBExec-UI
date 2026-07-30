@@ -2763,7 +2763,9 @@
     "WHERE_CONDITION_REQUIRED": "A WHERE condition is required",
     "TYPE": "Type",
     "GROUP": "Group",
-    "GROUP_PLACEHOLDER": "Optional group name"
+    "GROUP_PLACEHOLDER": "Optional group name",
+    "APPEARANCE_OPERATORS": "Appearance & Operators",
+    "VALUES_SECTION": "Values"
   },
   "QUERY_BUILDER_MODULE": {
     "TITLE": "Query Builders",
@@ -5581,6 +5583,8 @@
       "PREVIEW": "Preview",
       "PREVIEW_RESULT": "Preview",
       "THRESHOLD_WARNING": "Large value set — the runtime will use server-paged search."
-    }
+    },
+    "DISPLAY_NAME": "Display name",
+    "CONFIG_IN_PROMPT_HINT": "Prompt SQL, values, appearance and operators are configured in the Prompt module. Here you only choose which prompts appear and how the form is arranged."
   }
 }

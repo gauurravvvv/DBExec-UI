@@ -2760,7 +2760,9 @@
     "WHERE_CONDITION_REQUIRED": "WHERE 조건이 필요합니다",
     "TYPE": "유형",
     "GROUP": "그룹",
-    "GROUP_PLACEHOLDER": "그룹 이름(선택)"
+    "GROUP_PLACEHOLDER": "그룹 이름(선택)",
+    "APPEARANCE_OPERATORS": "모양 및 연산자",
+    "VALUES_SECTION": "값"
   },
   "QUERY_BUILDER_MODULE": {
     "TITLE": "Query Builders",
@@ -5584,6 +5586,8 @@
       "PREVIEW": "Preview",
       "PREVIEW_RESULT": "Preview",
       "THRESHOLD_WARNING": "Large value set — the runtime will use server-paged search."
-    }
+    },
+    "DISPLAY_NAME": "표시 이름",
+    "CONFIG_IN_PROMPT_HINT": "프롬프트 SQL, 값, 모양 및 연산자는 프롬프트 모듈에서 구성됩니다. 여기서는 어떤 프롬프트를 표시하고 폼을 어떻게 배치할지만 선택합니다."
   }
 }

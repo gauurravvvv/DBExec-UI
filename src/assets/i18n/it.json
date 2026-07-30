@@ -2760,7 +2760,9 @@
     "WHERE_CONDITION_REQUIRED": "È richiesta una condizione WHERE",
     "TYPE": "Tipo",
     "GROUP": "Gruppo",
-    "GROUP_PLACEHOLDER": "Nome gruppo facoltativo"
+    "GROUP_PLACEHOLDER": "Nome gruppo facoltativo",
+    "APPEARANCE_OPERATORS": "Aspetto e operatori",
+    "VALUES_SECTION": "Valori"
   },
   "QUERY_BUILDER_MODULE": {
     "TITLE": "Query Builders",
@@ -5584,6 +5586,8 @@
       "PREVIEW": "Preview",
       "PREVIEW_RESULT": "Preview",
       "THRESHOLD_WARNING": "Large value set — the runtime will use server-paged search."
-    }
+    },
+    "DISPLAY_NAME": "Nome visualizzato",
+    "CONFIG_IN_PROMPT_HINT": "SQL, valori, aspetto e operatori del prompt sono configurati nel modulo Prompt. Qui scegli solo quali prompt appaiono e come è disposto il modulo."
   }
 }

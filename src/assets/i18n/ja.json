@@ -2760,7 +2760,9 @@
     "WHERE_CONDITION_REQUIRED": "WHERE 条件が必要です",
     "TYPE": "種類",
     "GROUP": "グループ",
-    "GROUP_PLACEHOLDER": "グループ名（任意）"
+    "GROUP_PLACEHOLDER": "グループ名（任意）",
+    "APPEARANCE_OPERATORS": "外観と演算子",
+    "VALUES_SECTION": "値"
   },
   "QUERY_BUILDER_MODULE": {
     "TITLE": "Query Builders",
@@ -5584,6 +5586,8 @@
       "PREVIEW": "Preview",
       "PREVIEW_RESULT": "Preview",
       "THRESHOLD_WARNING": "Large value set — the runtime will use server-paged search."
-    }
+    },
+    "DISPLAY_NAME": "表示名",
+    "CONFIG_IN_PROMPT_HINT": "プロンプトのSQL、値、外観、演算子はプロンプトモジュールで設定します。ここでは、どのプロンプトを表示し、フォームをどう配置するかのみを選択します。"
   }
 }

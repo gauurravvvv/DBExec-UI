@@ -2760,7 +2760,9 @@
     "WHERE_CONDITION_REQUIRED": "Een WHERE-voorwaarde is vereist",
     "TYPE": "Type",
     "GROUP": "Groep",
-    "GROUP_PLACEHOLDER": "Optionele groepsnaam"
+    "GROUP_PLACEHOLDER": "Optionele groepsnaam",
+    "APPEARANCE_OPERATORS": "Weergave en operatoren",
+    "VALUES_SECTION": "Waarden"
   },
   "QUERY_BUILDER_MODULE": {
     "TITLE": "Query Builders",
@@ -5584,6 +5586,8 @@
       "PREVIEW": "Preview",
       "PREVIEW_RESULT": "Preview",
       "THRESHOLD_WARNING": "Large value set — the runtime will use server-paged search."
-    }
+    },
+    "DISPLAY_NAME": "Weergavenaam",
+    "CONFIG_IN_PROMPT_HINT": "Prompt-SQL, waarden, weergave en operatoren worden in de Prompt-module geconfigureerd. Hier kies je alleen welke prompts verschijnen en hoe het formulier is ingedeeld."
   }
 }

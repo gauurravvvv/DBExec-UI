@@ -2,28 +2,27 @@ import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { StoreModule } from '@ngrx/store';
+import { AccordionModule } from 'primeng/accordion';
 import { ButtonModule } from 'primeng/button';
 import { CheckboxModule } from 'primeng/checkbox';
+import { InputNumberModule } from 'primeng/inputnumber';
+import { InputSwitchModule } from 'primeng/inputswitch';
 import { InputTextModule } from 'primeng/inputtext';
 import { PasswordModule } from 'primeng/password';
 import { RippleModule } from 'primeng/ripple';
+import { SkeletonModule } from 'primeng/skeleton';
 import { TooltipModule } from 'primeng/tooltip';
 import { SharedModule } from 'src/app/shared';
+import { ButtonComponent } from 'src/app/shared/components/button/button.component';
+import { ChipComponent } from 'src/app/shared/components/chip/chip.component';
 import { AppPrimeNGModule } from 'src/app/shared/modules/app-primeng.module';
 import { AddPromptComponent } from './components/add-prompt/add-prompt.component';
-import { CalendarConfigDialogComponent } from './components/calendar-config-dialog/calendar-config-dialog.component';
-import { CheckboxConfigDialogComponent } from './components/checkbox-config-dialog/checkbox-config-dialog.component';
 import { ConfigPromptComponent } from './components/config-prompt/config-prompt.component';
-import { DateRangeConfigDialogComponent } from './components/daterange-config-dialog/daterange-config-dialog.component';
-import { DropdownConfigDialogComponent } from './components/dropdown-config-dialog/dropdown-config-dialog.component';
 import { EditPromptComponent } from './components/edit-prompt/edit-prompt.component';
 import { ListPromptComponent } from './components/list-prompt/list-prompt.component';
-import { MultiselectConfigDialogComponent } from './components/multiselect-config-dialog/multiselect-config-dialog.component';
-import { NumberConfigDialogComponent } from './components/number-config-dialog/number-config-dialog.component';
-import { RadioConfigDialogComponent } from './components/radio-config-dialog/radio-config-dialog.component';
-import { RangeSliderConfigDialogComponent } from './components/rangeslider-config-dialog/rangeslider-config-dialog.component';
+import { PromptAppearanceFormComponent } from './components/prompt-appearance-form/prompt-appearance-form.component';
+import { PromptValueSourceComponent } from './components/prompt-value-source/prompt-value-source.component';
 import { SqlQueryDialogComponent } from './components/sql-query-dialog/sql-query-dialog.component';
-import { TextConfigDialogComponent } from './components/text-config-dialog/text-config-dialog.component';
 import { ViewPromptComponent } from './components/view-prompt/view-prompt.component';
 import { PromptRoutingModule } from './prompt-routing.module';
 import { configPromptReducer, CONFIG_PROMPT_FEATURE_KEY } from './store';
@@ -36,15 +35,11 @@ import { configPromptReducer, CONFIG_PROMPT_FEATURE_KEY } from './store';
     ViewPromptComponent,
     ConfigPromptComponent,
     SqlQueryDialogComponent,
-    DropdownConfigDialogComponent,
-    MultiselectConfigDialogComponent,
-    CheckboxConfigDialogComponent,
-    RadioConfigDialogComponent,
-    TextConfigDialogComponent,
-    NumberConfigDialogComponent,
-    DateRangeConfigDialogComponent,
-    CalendarConfigDialogComponent,
-    RangeSliderConfigDialogComponent,
+    // Prompt-level config editors (appearance + operators, value source) —
+    // relocated from the query-builder module; this is now the single home
+    // for all prompt configuration.
+    PromptAppearanceFormComponent,
+    PromptValueSourceComponent,
   ],
   imports: [
     CommonModule,
@@ -59,6 +54,13 @@ import { configPromptReducer, CONFIG_PROMPT_FEATURE_KEY } from './store';
     SharedModule,
     PromptRoutingModule,
     TooltipModule,
+    AccordionModule,
+    InputNumberModule,
+    InputSwitchModule,
+    SkeletonModule,
+    // Standalone shared components (SharedModule does not re-export them).
+    ButtonComponent,
+    ChipComponent,
     StoreModule.forFeature(CONFIG_PROMPT_FEATURE_KEY, configPromptReducer),
   ],
 })

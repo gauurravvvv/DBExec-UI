@@ -83,6 +83,14 @@
             <span class="qb-designer__placement-name">{{ p.name }}</span>
             <app-chip variant="tag" size="sm">{{ p.type }}</app-chip>
 
+            <input
+              class="qb-designer__displayname"
+              type="text"
+              [ngModel]="p.displayNameOverride"
+              (ngModelChange)="setDisplayName(group.dropId, p.promptId, $event)"
+              [placeholder]="'QUERY_BUILDER.DISPLAY_NAME' | translate"
+              [attr.aria-label]="'QUERY_BUILDER.DISPLAY_NAME' | translate" />
+
             <label class="qb-designer__flag">
               <app-custom-binary-checkbox
                 [ngModel]="p.isMandatory"
@@ -96,12 +104,6 @@
               {{ 'QUERY_BUILDER.LOCKED' | translate }}
             </label>
 
-            <app-button
-              variant="ghost"
-              size="sm"
-              icon="pi pi-sliders-h"
-              [title]="'QUERY_BUILDER.APPEARANCE_OVERRIDE' | translate"
-              (clicked)="openAppearance(p)" />
             <app-button
               variant="ghost"
               size="sm"
@@ -122,39 +124,8 @@
     <p-skeleton height="20rem"></p-skeleton>
   </div>
 
-  <!-- Appearance override drawer -->
-  <div class="qb-designer__drawer" *ngIf="editing() as p">
-    <div class="qb-designer__drawer-backdrop" (click)="closeAppearance()"></div>
-    <div class="qb-designer__drawer-panel">
-      <header class="qb-designer__drawer-head">
-        <h3>{{ 'QUERY_BUILDER.APPEARANCE_OVERRIDE' | translate }} — {{ p.name }}</h3>
-        <app-button
-          variant="ghost"
-          size="sm"
-          icon="pi pi-times"
-          (clicked)="closeAppearance()" />
-      </header>
-      <div class="qb-designer__drawer-body">
-        <qb-appearance-form
-          [promptType]="p.type"
-          [appearance]="p.appearanceOverride ?? null"
-          (appearanceChange)="onAppearanceChange($event)" />
-
-        <div class="qb-designer__drawer-section">
-          <h4 class="qb-designer__drawer-section-title">
-            {{ 'QUERY_BUILDER.VS.TITLE' | translate }}
-          </h4>
-          <qb-value-source [promptId]="p.promptId" />
-        </div>
-      </div>
-      <footer class="qb-designer__drawer-foot">
-        <app-button variant="secondary" (clicked)="closeAppearance()">
-          {{ 'COMMON.CANCEL' | translate }}
-        </app-button>
-        <app-button variant="primary" (clicked)="applyAppearance()">
-          {{ 'COMMON.APPLY' | translate }}
-        </app-button>
-      </footer>
-    </div>
-  </div>
+  <p class="qb-designer__hint" *ngIf="!loading()">
+    <i class="pi pi-info-circle"></i>
+    {{ 'QUERY_BUILDER.CONFIG_IN_PROMPT_HINT' | translate }}
+  </p>
 </div>

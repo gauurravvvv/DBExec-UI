@@ -127,7 +127,7 @@ test('QB v2 complete walkthrough', async ({ page }) => {
       id = cb?.data?.[0]?.id ?? cb?.data?.id;
       expect(id, `prompt ${p.name}: ${JSON.stringify(cb).slice(0, 200)}`).toBeTruthy();
     }
-    promptIds[p.name] = id;
+    promptIds[p.name] = id as string;
 
     // Config: bind to the real column (ea.<col>) + value source.
     await page.request.post(`${API}/prompts/${id}/config`, {
