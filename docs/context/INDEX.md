@@ -37,5 +37,5 @@
 | query-runner | `src/app/modules/query-runner` | [query-runner](./modules/query-runner.md) | 🟢 | 2026-07-29 |
 | rls-rules | `src/app/modules/rls-rules` | [rls-rules](./modules/rls-rules.md) | 🟡 | 2026-07-24 |
 | role | `src/app/modules/role` | [role](./modules/role.md) | 🟢 | 2026-07-24 |
-| system-admin | `src/app/modules/system-admin` | [system-admin](./modules/system-admin.md) | 🟢 | 2026-07-24 |
-| users | `src/app/modules/users` | [users](./modules/users.md) | 🟢 | 2026-07-24 |
+| system-admin | `src/app/modules/system-admin` | [system-admin](./modules/system-admin.md) | 🟢 | 2026-08-03 |
+| users | `src/app/modules/users` | [users](./modules/users.md) | 🟢 | 2026-08-03 |
