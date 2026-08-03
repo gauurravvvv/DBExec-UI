@@ -70,18 +70,9 @@
             <div class="detail-row">
               <span class="label"
                 ><i class="pi pi-user"></i>
-                {{ 'PROFILE.FIRST_NAME' | translate }}</span
+                {{ 'COMMON.FULL_NAME' | translate }}</span
               >
-              <span class="value">{{ profile()?.firstName }}</span>
-            </div>
-            <div class="detail-row">
-              <span class="label"
-                ><i class="pi pi-user"></i>
-                {{ 'PROFILE.LAST_NAME' | translate }}</span
-              >
-              <span class="value">{{
-                profile()?.lastName || ('COMMON.NOT_PROVIDED' | translate)
-              }}</span>
+              <span class="value">{{ profile()?.fullName }}</span>
             </div>
           </div>
 

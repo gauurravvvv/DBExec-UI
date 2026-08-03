@@ -3,6 +3,9 @@ export const REGEX = {
   // Unicode-aware: supports accented chars (José), apostrophes (O'Brien), hyphens (Mary-Jane)
   firstName: /^[\p{L}][\p{L}'\- ]*$/u,
   lastName: /^[\p{L}][\p{L}'\- ]*$/u,
+  // Full name — single field replacing first/last. Same Unicode-aware
+  // pattern; spaces allow a complete name like "María José García".
+  fullName: /^[\p{L}][\p{L}'\- ]*$/u,
   // Legacy password regex — prefer passwordStrengthValidator() for per-rule errors
   password:
     '^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$',

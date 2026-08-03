@@ -95,6 +95,7 @@
     "UNLOCK": "ロック解除",
     "UNLOCK_ACCOUNT": "アカウントのロック解除",
     "FIRST_NAME": "名",
+    "FULL_NAME": "氏名",
     "LAST_NAME": "姓",
     "USERNAME": "ユーザー名",
     "EMAIL": "メールアドレス",
@@ -113,6 +114,7 @@
     "DEFAULT_USER": "デフォルトユーザー",
     "ORG_ID": "組織ID",
     "ENTER_FIRST_NAME": "名を入力",
+    "ENTER_FULL_NAME": "氏名を入力",
     "ENTER_LAST_NAME": "姓を入力",
     "ENTER_USERNAME": "ユーザー名を入力",
     "ENTER_EMAIL": "メールアドレスを入力",
@@ -120,6 +122,7 @@
     "ENTER_DESCRIPTION": "説明を入力",
     "SEARCH_USERNAME": "ユーザー名で検索",
     "SEARCH_FIRST_NAME": "名で検索",
+    "SEARCH_FULL_NAME": "氏名で検索",
     "SEARCH_LAST_NAME": "姓で検索",
     "SEARCH_EMAIL": "メールで検索",
     "SEARCH_NAME": "名前で検索",
@@ -224,6 +227,10 @@
     "FIRST_NAME_MIN": "名は{{min}}文字以上で入力してください",
     "FIRST_NAME_MAX": "名は{{max}}文字以内で入力してください",
     "FIRST_NAME_PATTERN": "名は文字で始まり、文字、ハイフン、アポストロフィ、スペースのみ使用できます",
+    "FULL_NAME_REQUIRED": "氏名は必須です",
+    "FULL_NAME_MIN": "氏名は{{min}}文字以上で入力してください",
+    "FULL_NAME_MAX": "氏名は{{max}}文字以内で入力してください",
+    "FULL_NAME_PATTERN": "氏名は文字で始まり、文字、ハイフン、アポストロフィ、スペースのみ使用できます",
     "LAST_NAME_REQUIRED": "姓は必須です",
     "LAST_NAME_MIN": "姓は{{min}}文字以上で入力してください",
     "LAST_NAME_MAX": "姓は{{max}}文字以内で入力してください",
@@ -531,6 +538,8 @@
     "ADMIN_FIRST_NAME_PLACEHOLDER": "名を入力",
     "ADMIN_LAST_NAME": "姓",
     "ADMIN_LAST_NAME_PLACEHOLDER": "姓を入力",
+    "ADMIN_FULL_NAME": "氏名",
+    "ADMIN_FULL_NAME_PLACEHOLDER": "氏名を入力",
     "ADMIN_USERNAME": "ユーザー名",
     "ADMIN_USERNAME_PLACEHOLDER": "ユーザー名を入力"
   },
@@ -4040,6 +4049,11 @@
         "tooShort": "管理者のユーザー名は3文字以上で入力してください",
         "tooLong": "管理者のユーザー名は64文字以内で入力してください",
         "invalid": "ユーザー名は英字または数字で始まり、英字または数字で終わり、英字、数字、ドット、アンダースコア、ハイフンのみを含めることができます"
+      },
+      "adminFullName": {
+        "required": "管理者の氏名は必須です",
+        "tooLong": "管理者の氏名は64文字以内で入力してください",
+        "invalid": "氏名は文字で始まり、文字、スペース、ドット、アポストロフィ、ハイフンのみを含めることができます"
       }
     },
     "common": {
@@ -4078,6 +4092,12 @@
       "groupIds": {
         "required": "少なくとも1つのグループを選択する必要があります",
         "idInvalid": "1つ以上のグループIDが無効です"
+      },
+      "fullName": {
+        "required": "氏名は必須です",
+        "tooShort": "氏名は2文字以上である必要があります",
+        "tooLong": "氏名は60文字を超えてはいけません",
+        "invalid": "氏名は文字で始まり、文字、ハイフン、アポストロフィ、スペースのみを含めることができます"
       }
     },
     "roles": {
@@ -5600,5 +5620,8 @@
     "JOINS_AUTO_HINT": "結合は、配置したプロンプトが必要とするテーブルから自動的に作成されます（プロンプトモジュールで設定）。ここで作成するものはありません。",
     "NO_JOINS_AUTO": "結合は不要です。配置された各プロンプトは自身のベーステーブルでフィルタリングします。",
     "AUTO": "自動"
+  },
+  "ORGANISATION": {
+    "ADMIN_FULL_NAME": "氏名"
   }
 }

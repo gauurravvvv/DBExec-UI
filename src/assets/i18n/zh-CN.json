@@ -95,6 +95,7 @@
     "UNLOCK": "解锁",
     "UNLOCK_ACCOUNT": "解锁账户",
     "FIRST_NAME": "名",
+    "FULL_NAME": "全名",
     "LAST_NAME": "姓",
     "USERNAME": "用户名",
     "EMAIL": "电子邮箱",
@@ -113,6 +114,7 @@
     "DEFAULT_USER": "默认用户",
     "ORG_ID": "组织 ID",
     "ENTER_FIRST_NAME": "请输入名字",
+    "ENTER_FULL_NAME": "请输入全名",
     "ENTER_LAST_NAME": "请输入姓氏",
     "ENTER_USERNAME": "请输入用户名",
     "ENTER_EMAIL": "请输入电子邮箱地址",
@@ -120,6 +122,7 @@
     "ENTER_DESCRIPTION": "请输入描述",
     "SEARCH_USERNAME": "搜索用户名",
     "SEARCH_FIRST_NAME": "搜索名字",
+    "SEARCH_FULL_NAME": "搜索全名",
     "SEARCH_LAST_NAME": "搜索姓氏",
     "SEARCH_EMAIL": "搜索邮箱",
     "SEARCH_NAME": "搜索名称",
@@ -224,6 +227,10 @@
     "FIRST_NAME_MIN": "名字至少需要 {{min}} 个字符",
     "FIRST_NAME_MAX": "名字不得超过 {{max}} 个字符",
     "FIRST_NAME_PATTERN": "名字必须以字母开头，且只能包含字母、连字符、撇号和空格",
+    "FULL_NAME_REQUIRED": "全名为必填项",
+    "FULL_NAME_MIN": "全名至少需要 {{min}} 个字符",
+    "FULL_NAME_MAX": "全名不得超过 {{max}} 个字符",
+    "FULL_NAME_PATTERN": "全名必须以字母开头，且只能包含字母、连字符、撇号和空格",
     "LAST_NAME_REQUIRED": "姓氏为必填项",
     "LAST_NAME_MIN": "姓氏至少需要 {{min}} 个字符",
     "LAST_NAME_MAX": "姓氏不得超过 {{max}} 个字符",
@@ -531,6 +538,8 @@
     "ADMIN_FIRST_NAME_PLACEHOLDER": "请输入名",
     "ADMIN_LAST_NAME": "姓",
     "ADMIN_LAST_NAME_PLACEHOLDER": "请输入姓",
+    "ADMIN_FULL_NAME": "全名",
+    "ADMIN_FULL_NAME_PLACEHOLDER": "请输入全名",
     "ADMIN_USERNAME": "用户名",
     "ADMIN_USERNAME_PLACEHOLDER": "请输入用户名"
   },
@@ -4040,6 +4049,11 @@
         "tooShort": "管理员用户名至少需要 3 个字符",
         "tooLong": "管理员用户名不得超过 64 个字符",
         "invalid": "用户名必须以字母或数字开头和结尾，且只能包含字母、数字、点、下划线或连字符"
+      },
+      "adminFullName": {
+        "required": "管理员全名为必填项",
+        "tooLong": "管理员全名不得超过 64 个字符",
+        "invalid": "全名必须以字母开头，且只能包含字母、空格、点、撇号或连字符"
       }
     },
     "common": {
@@ -4078,6 +4092,12 @@
       "groupIds": {
         "required": "必须至少选择一个组",
         "idInvalid": "一个或多个组标识符无效"
+      },
+      "fullName": {
+        "required": "全名为必填项",
+        "tooShort": "全名至少需要 2 个字符",
+        "tooLong": "全名不能超过 60 个字符",
+        "invalid": "全名必须以字母开头，且只能包含字母、连字符、撇号或空格"
       }
     },
     "roles": {
@@ -5600,5 +5620,8 @@
     "JOINS_AUTO_HINT": "连接会根据已放置提示所需的表自动构建——在提示模块中配置。此处无需创建。",
     "NO_JOINS_AUTO": "无需连接——每个已放置的提示都在其自身的基础表上进行筛选。",
     "AUTO": "自动"
+  },
+  "ORGANISATION": {
+    "ADMIN_FULL_NAME": "全名"
   }
 }

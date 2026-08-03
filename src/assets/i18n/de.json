@@ -95,6 +95,7 @@
     "UNLOCK": "Entsperren",
     "UNLOCK_ACCOUNT": "Konto entsperren",
     "FIRST_NAME": "Vorname",
+    "FULL_NAME": "Vollständiger Name",
     "LAST_NAME": "Nachname",
     "USERNAME": "Benutzername",
     "EMAIL": "E-Mail",
@@ -113,6 +114,7 @@
     "DEFAULT_USER": "Standardbenutzer",
     "ORG_ID": "Org-ID",
     "ENTER_FIRST_NAME": "Vorname eingeben",
+    "ENTER_FULL_NAME": "Vollständigen Namen eingeben",
     "ENTER_LAST_NAME": "Nachname eingeben",
     "ENTER_USERNAME": "Benutzername eingeben",
     "ENTER_EMAIL": "E-Mail-Adresse eingeben",
@@ -120,6 +122,7 @@
     "ENTER_DESCRIPTION": "Beschreibung eingeben",
     "SEARCH_USERNAME": "Benutzername suchen",
     "SEARCH_FIRST_NAME": "Vorname suchen",
+    "SEARCH_FULL_NAME": "Vollständigen Namen suchen",
     "SEARCH_LAST_NAME": "Nachname suchen",
     "SEARCH_EMAIL": "E-Mail suchen",
     "SEARCH_NAME": "Name suchen",
@@ -224,6 +227,10 @@
     "FIRST_NAME_MIN": "Vorname muss mindestens {{min}} Zeichen lang sein",
     "FIRST_NAME_MAX": "Vorname darf {{max}} Zeichen nicht überschreiten",
     "FIRST_NAME_PATTERN": "Vorname muss mit einem Buchstaben beginnen und darf nur Buchstaben, Bindestriche, Apostrophe und Leerzeichen enthalten",
+    "FULL_NAME_REQUIRED": "Vollständiger Name ist erforderlich",
+    "FULL_NAME_MIN": "Vollständiger Name muss mindestens {{min}} Zeichen lang sein",
+    "FULL_NAME_MAX": "Vollständiger Name darf {{max}} Zeichen nicht überschreiten",
+    "FULL_NAME_PATTERN": "Vollständiger Name muss mit einem Buchstaben beginnen und darf nur Buchstaben, Bindestriche, Apostrophe und Leerzeichen enthalten",
     "LAST_NAME_REQUIRED": "Nachname ist erforderlich",
     "LAST_NAME_MIN": "Nachname muss mindestens {{min}} Zeichen lang sein",
     "LAST_NAME_MAX": "Nachname darf {{max}} Zeichen nicht überschreiten",
@@ -531,6 +538,8 @@
     "ADMIN_FIRST_NAME_PLACEHOLDER": "Vorname eingeben",
     "ADMIN_LAST_NAME": "Nachname",
     "ADMIN_LAST_NAME_PLACEHOLDER": "Nachname eingeben",
+    "ADMIN_FULL_NAME": "Vollständiger Name",
+    "ADMIN_FULL_NAME_PLACEHOLDER": "Vollständigen Namen eingeben",
     "ADMIN_USERNAME": "Benutzername",
     "ADMIN_USERNAME_PLACEHOLDER": "Benutzername eingeben"
   },
@@ -4040,6 +4049,11 @@
         "tooShort": "Benutzername des Administrators muss mindestens 3 Zeichen lang sein",
         "tooLong": "Benutzername des Administrators darf 64 Zeichen nicht überschreiten",
         "invalid": "Benutzername muss mit einem Buchstaben oder einer Ziffer beginnen und enden und darf nur Buchstaben, Ziffern, Punkte, Unterstriche oder Bindestriche enthalten"
+      },
+      "adminFullName": {
+        "required": "Vollständiger Name des Administrators ist erforderlich",
+        "tooLong": "Vollständiger Name des Administrators darf 64 Zeichen nicht überschreiten",
+        "invalid": "Vollständiger Name muss mit einem Buchstaben beginnen und darf nur Buchstaben, Leerzeichen, Punkte, Apostrophe oder Bindestriche enthalten"
       }
     },
     "common": {
@@ -4078,6 +4092,12 @@
       "groupIds": {
         "required": "Mindestens eine Gruppe muss ausgewählt sein",
         "idInvalid": "Eine oder mehrere Gruppenkennungen sind ungültig"
+      },
+      "fullName": {
+        "required": "Vollständiger Name ist erforderlich",
+        "tooShort": "Vollständiger Name muss mindestens 2 Zeichen lang sein",
+        "tooLong": "Vollständiger Name darf 60 Zeichen nicht überschreiten",
+        "invalid": "Vollständiger Name muss mit einem Buchstaben beginnen und darf nur Buchstaben, Bindestriche, Apostrophe oder Leerzeichen enthalten"
       }
     },
     "roles": {
@@ -5600,5 +5620,8 @@
     "JOINS_AUTO_HINT": "Verknüpfungen werden automatisch aus den Tabellen erstellt, die Ihre platzierten Prompts benötigen — konfiguriert im Prompt-Modul. Hier gibt es nichts zu erstellen.",
     "NO_JOINS_AUTO": "Keine Verknüpfungen erforderlich — jeder platzierte Prompt filtert auf seiner eigenen Basistabelle.",
     "AUTO": "Auto"
+  },
+  "ORGANISATION": {
+    "ADMIN_FULL_NAME": "Vollständiger Name"
   }
 }

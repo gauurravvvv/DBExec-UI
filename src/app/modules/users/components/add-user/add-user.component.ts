@@ -15,9 +15,8 @@ import { SUPPORTED_LOCALES } from 'src/app/core/services/locale.service';
 import { GroupService } from 'src/app/modules/groups/services/group.service';
 import {
   emailSchema,
-  firstNameSchema,
+  fullNameSchema,
   groupIdsSchema,
-  lastNameSchema,
   localeSchema,
   usernameSchema,
 } from 'src/app/shared/validators/users';
@@ -70,8 +69,7 @@ export class AddUserComponent implements OnInit, HasUnsavedChanges {
     // repo). Required / regex / length / locale-enum rules are
     // identical on both sides.
     this.userForm = this.fb.group({
-      firstName: ['', [zodValidator(firstNameSchema)]],
-      lastName: ['', [zodValidator(lastNameSchema)]],
+      fullName: ['', [zodValidator(fullNameSchema)]],
       username: ['', [zodValidator(usernameSchema)]],
       email: ['', [zodValidator(emailSchema)]],
       groupIds: [[], [zodValidator(groupIdsSchema)]],
@@ -167,11 +165,8 @@ export class AddUserComponent implements OnInit, HasUnsavedChanges {
 
   // Backwards-compat aliases for existing templates. New code should
   // call fieldError(name) directly.
-  getFirstNameError(): string {
-    return this.fieldError('firstName');
-  }
-  getLastNameError(): string {
-    return this.fieldError('lastName');
+  getFullNameError(): string {
+    return this.fieldError('fullName');
   }
   getUsernameError(): string {
     return this.fieldError('username');

@@ -95,6 +95,7 @@
     "UNLOCK": "Ontgrendelen",
     "UNLOCK_ACCOUNT": "Account ontgrendelen",
     "FIRST_NAME": "Voornaam",
+    "FULL_NAME": "Volledige naam",
     "LAST_NAME": "Achternaam",
     "USERNAME": "Gebruikersnaam",
     "EMAIL": "E-mail",
@@ -113,6 +114,7 @@
     "DEFAULT_USER": "Standaardgebruiker",
     "ORG_ID": "Organisatie-ID",
     "ENTER_FIRST_NAME": "Voer voornaam in",
+    "ENTER_FULL_NAME": "Voer volledige naam in",
     "ENTER_LAST_NAME": "Voer achternaam in",
     "ENTER_USERNAME": "Voer gebruikersnaam in",
     "ENTER_EMAIL": "Voer e-mailadres in",
@@ -120,6 +122,7 @@
     "ENTER_DESCRIPTION": "Voer beschrijving in",
     "SEARCH_USERNAME": "Zoek gebruikersnaam",
     "SEARCH_FIRST_NAME": "Zoek voornaam",
+    "SEARCH_FULL_NAME": "Zoek volledige naam",
     "SEARCH_LAST_NAME": "Zoek achternaam",
     "SEARCH_EMAIL": "Zoek e-mail",
     "SEARCH_NAME": "Zoek naam",
@@ -224,6 +227,10 @@
     "FIRST_NAME_MIN": "Voornaam moet minstens {{min}} tekens bevatten",
     "FIRST_NAME_MAX": "Voornaam mag niet meer dan {{max}} tekens bevatten",
     "FIRST_NAME_PATTERN": "Voornaam moet beginnen met een letter en mag alleen letters, koppeltekens, apostrofs en spaties bevatten",
+    "FULL_NAME_REQUIRED": "Volledige naam is verplicht",
+    "FULL_NAME_MIN": "Volledige naam moet minstens {{min}} tekens bevatten",
+    "FULL_NAME_MAX": "Volledige naam mag niet meer dan {{max}} tekens bevatten",
+    "FULL_NAME_PATTERN": "Volledige naam moet beginnen met een letter en mag alleen letters, koppeltekens, apostrofs en spaties bevatten",
     "LAST_NAME_REQUIRED": "Achternaam is verplicht",
     "LAST_NAME_MIN": "Achternaam moet minstens {{min}} tekens bevatten",
     "LAST_NAME_MAX": "Achternaam mag niet meer dan {{max}} tekens bevatten",
@@ -531,6 +538,8 @@
     "ADMIN_FIRST_NAME_PLACEHOLDER": "Voer voornaam in",
     "ADMIN_LAST_NAME": "Achternaam",
     "ADMIN_LAST_NAME_PLACEHOLDER": "Voer achternaam in",
+    "ADMIN_FULL_NAME": "Volledige naam",
+    "ADMIN_FULL_NAME_PLACEHOLDER": "Voer volledige naam in",
     "ADMIN_USERNAME": "Gebruikersnaam",
     "ADMIN_USERNAME_PLACEHOLDER": "Voer gebruikersnaam in"
   },
@@ -4040,6 +4049,11 @@
         "tooShort": "Gebruikersnaam van beheerder moet minstens 3 tekens bevatten",
         "tooLong": "Gebruikersnaam van beheerder mag niet langer zijn dan 64 tekens",
         "invalid": "Gebruikersnaam moet beginnen en eindigen met een letter of cijfer en mag alleen letters, cijfers, punten, underscores of streepjes bevatten"
+      },
+      "adminFullName": {
+        "required": "Volledige naam van beheerder is vereist",
+        "tooLong": "Volledige naam van beheerder mag niet langer zijn dan 64 tekens",
+        "invalid": "Volledige naam moet beginnen met een letter en mag alleen letters, spaties, punten, apostrofs of streepjes bevatten"
       }
     },
     "common": {
@@ -4078,6 +4092,12 @@
       "groupIds": {
         "required": "Er moet ten minste één groep worden geselecteerd",
         "idInvalid": "Een of meer groepsidentificatoren zijn ongeldig"
+      },
+      "fullName": {
+        "required": "Volledige naam is vereist",
+        "tooShort": "Volledige naam moet minimaal 2 tekens bevatten",
+        "tooLong": "Volledige naam mag niet meer dan 60 tekens bevatten",
+        "invalid": "Volledige naam moet beginnen met een letter en mag alleen letters, streepjes, apostrofs of spaties bevatten"
       }
     },
     "roles": {
@@ -5600,5 +5620,8 @@
     "JOINS_AUTO_HINT": "Joins worden automatisch opgebouwd uit de tabellen die je geplaatste prompts nodig hebben — geconfigureerd in de Prompt-module. Hier valt niets te maken.",
     "NO_JOINS_AUTO": "Geen joins nodig — elke geplaatste prompt filtert op zijn eigen basistabel.",
     "AUTO": "Auto"
+  },
+  "ORGANISATION": {
+    "ADMIN_FULL_NAME": "Volledige naam"
   }
 }

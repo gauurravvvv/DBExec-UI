@@ -237,7 +237,7 @@ export function loadRecipientUsersPage(
         const users = (res?.data?.users ?? []).map((u: any) => ({
           ...u,
           displayLabel:
-            [u.firstName, u.lastName].filter(Boolean).join(' ') ||
+            u.fullName ||
             u.username ||
             u.email,
         }));

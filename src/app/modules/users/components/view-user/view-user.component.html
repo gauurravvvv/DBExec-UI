@@ -72,10 +72,7 @@
               {{ userInitials }}
             </div>
             <h3 class="admin-name">
-              {{
-                (userData?.firstName || '') +
-                  (userData?.lastName ? ' ' + userData?.lastName : '')
-              }}
+              {{ userData?.fullName }}
             </h3>
             <p class="admin-username">&#64;{{ userData?.username }}</p>
           </div>
@@ -86,16 +83,9 @@
             <div class="detail-item">
               <span class="label">
                 <i class="pi pi-user"></i>
-                {{ 'COMMON.FIRST_NAME' | translate }}
+                {{ 'COMMON.FULL_NAME' | translate }}
               </span>
-              <span class="value">{{ userData?.firstName }}</span>
-            </div>
-            <div class="detail-item">
-              <span class="label">
-                <i class="pi pi-user"></i>
-                {{ 'COMMON.LAST_NAME' | translate }}
-              </span>
-              <span class="value">{{ userData?.lastName }}</span>
+              <span class="value">{{ userData?.fullName }}</span>
             </div>
           </div>
         </div>

@@ -312,7 +312,7 @@ export class AddRlsRuleComponent implements OnInit, HasUnsavedChanges {
           if (this.globalService.handleSuccessService(res, false)) {
             done(
               (res?.data?.users ?? []).map((u: any) => ({
-                label: `${u.firstName} ${u.lastName ?? ''}`.trim(),
+                label: u.fullName,
                 value: u.id,
               })),
             );

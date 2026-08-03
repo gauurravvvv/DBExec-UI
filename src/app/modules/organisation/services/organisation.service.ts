@@ -116,8 +116,7 @@ export class OrganisationService {
         dbUsername,
         dbPassword,
         adminEmail,
-        adminFirstName,
-        adminLastName,
+        adminFullName,
         adminUsername,
         adminLocale,
       } = orgForm.value;
@@ -137,8 +136,7 @@ export class OrganisationService {
         dbUsername,
         dbPassword,
         adminEmail,
-        adminFirstName,
-        adminLastName,
+        adminFullName,
         adminUsername,
         adminLocale,
       };
@@ -256,8 +254,7 @@ export class OrganisationService {
       dbUsername,
       dbPassword,
       adminEmail,
-      adminFirstName,
-      adminLastName,
+      adminFullName,
       adminUsername,
       adminLocale,
     } = orgForm.value;
@@ -277,8 +274,7 @@ export class OrganisationService {
       dbUsername,
       dbPassword,
       adminEmail,
-      adminFirstName,
-      adminLastName,
+      adminFullName,
       adminUsername,
       adminLocale,
     };

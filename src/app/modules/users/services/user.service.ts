@@ -154,14 +154,12 @@ export class UserService {
   async add(form: FormGroup): Promise<any> {
     this._saving.set(true);
     try {
-      const { firstName, lastName, username, email, groupIds, locale } =
-        form.value;
+      const { fullName, username, email, groupIds, locale } = form.value;
       return await lastValueFrom(
         this.http.apiPost(
           USER.ADD,
           {
-            firstName,
-            lastName,
+            fullName,
             username,
             email,
             groupIds,
@@ -178,15 +176,14 @@ export class UserService {
   async update(form: FormGroup, justification?: string): Promise<any> {
     this._saving.set(true);
     try {
-      const { id, firstName, lastName, username, email, status, groupIds } =
+      const { id, fullName, username, email, status, groupIds } =
         form.getRawValue();
       return await lastValueFrom(
         this.http.apiPut(
           USER.UPDATE + id,
           {
             id,
-            firstName,
-            lastName,
+            fullName,
             username,
             email,
             status: status ? 1 : 0,

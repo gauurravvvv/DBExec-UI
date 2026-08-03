@@ -95,6 +95,7 @@
     "UNLOCK": "Déverrouiller",
     "UNLOCK_ACCOUNT": "Déverrouiller le compte",
     "FIRST_NAME": "Prénom",
+    "FULL_NAME": "Nom complet",
     "LAST_NAME": "Nom",
     "USERNAME": "Nom d'utilisateur",
     "EMAIL": "E-mail",
@@ -113,6 +114,7 @@
     "DEFAULT_USER": "Utilisateur par défaut",
     "ORG_ID": "ID de l'organisation",
     "ENTER_FIRST_NAME": "Saisir le prénom",
+    "ENTER_FULL_NAME": "Saisir le nom complet",
     "ENTER_LAST_NAME": "Saisir le nom",
     "ENTER_USERNAME": "Saisir le nom d'utilisateur",
     "ENTER_EMAIL": "Saisir l'adresse e-mail",
@@ -120,6 +122,7 @@
     "ENTER_DESCRIPTION": "Saisir la description",
     "SEARCH_USERNAME": "Rechercher par nom d'utilisateur",
     "SEARCH_FIRST_NAME": "Rechercher par prénom",
+    "SEARCH_FULL_NAME": "Rechercher par nom complet",
     "SEARCH_LAST_NAME": "Rechercher par nom",
     "SEARCH_EMAIL": "Rechercher par e-mail",
     "SEARCH_NAME": "Rechercher par nom",
@@ -224,6 +227,10 @@
     "FIRST_NAME_MIN": "Le prénom doit comporter au moins {{min}} caractères",
     "FIRST_NAME_MAX": "Le prénom ne doit pas dépasser {{max}} caractères",
     "FIRST_NAME_PATTERN": "Le prénom doit commencer par une lettre et ne peut contenir que des lettres, des tirets, des apostrophes et des espaces",
+    "FULL_NAME_REQUIRED": "Le nom complet est requis",
+    "FULL_NAME_MIN": "Le nom complet doit comporter au moins {{min}} caractères",
+    "FULL_NAME_MAX": "Le nom complet ne doit pas dépasser {{max}} caractères",
+    "FULL_NAME_PATTERN": "Le nom complet doit commencer par une lettre et ne peut contenir que des lettres, des tirets, des apostrophes et des espaces",
     "LAST_NAME_REQUIRED": "Le nom est requis",
     "LAST_NAME_MIN": "Le nom doit comporter au moins {{min}} caractères",
     "LAST_NAME_MAX": "Le nom ne doit pas dépasser {{max}} caractères",
@@ -531,6 +538,8 @@
     "ADMIN_FIRST_NAME_PLACEHOLDER": "Saisir le prénom",
     "ADMIN_LAST_NAME": "Nom",
     "ADMIN_LAST_NAME_PLACEHOLDER": "Saisir le nom",
+    "ADMIN_FULL_NAME": "Nom complet",
+    "ADMIN_FULL_NAME_PLACEHOLDER": "Saisir le nom complet",
     "ADMIN_USERNAME": "Nom d'utilisateur",
     "ADMIN_USERNAME_PLACEHOLDER": "Saisir le nom d'utilisateur"
   },
@@ -4040,6 +4049,11 @@
         "tooShort": "Le nom d'utilisateur de l'administrateur doit comporter au moins 3 caractères",
         "tooLong": "Le nom d'utilisateur de l'administrateur ne doit pas dépasser 64 caractères",
         "invalid": "Le nom d'utilisateur doit commencer et se terminer par une lettre ou un chiffre et ne peut contenir que des lettres, chiffres, points, tirets bas ou tirets"
+      },
+      "adminFullName": {
+        "required": "Le nom complet de l'administrateur est obligatoire",
+        "tooLong": "Le nom complet de l'administrateur ne doit pas dépasser 64 caractères",
+        "invalid": "Le nom complet doit commencer par une lettre et ne peut contenir que des lettres, espaces, points, apostrophes ou tirets"
       }
     },
     "common": {
@@ -4078,6 +4092,12 @@
       "groupIds": {
         "required": "Au moins un groupe doit être sélectionné",
         "idInvalid": "Un ou plusieurs identifiants de groupe sont invalides"
+      },
+      "fullName": {
+        "required": "Le nom complet est obligatoire",
+        "tooShort": "Le nom complet doit comporter au moins 2 caractères",
+        "tooLong": "Le nom complet ne doit pas dépasser 60 caractères",
+        "invalid": "Le nom complet doit commencer par une lettre et ne peut contenir que des lettres, tirets, apostrophes ou espaces"
       }
     },
     "roles": {
@@ -5600,5 +5620,8 @@
     "JOINS_AUTO_HINT": "Les jointures sont créées automatiquement à partir des tables dont vos prompts ont besoin — configuré dans le module Prompts. Rien à créer ici.",
     "NO_JOINS_AUTO": "Aucune jointure nécessaire — chaque prompt filtre sur sa propre table de base.",
     "AUTO": "Auto"
+  },
+  "ORGANISATION": {
+    "ADMIN_FULL_NAME": "Nom complet"
   }
 }

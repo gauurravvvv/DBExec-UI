@@ -219,25 +219,14 @@ export const adminEmailSchema = z.preprocess(
 export const PERSON_NAME_PATTERN = /^[A-Za-z][A-Za-z .'-]*$/;
 export const USERNAME_PATTERN = /^[A-Za-z0-9](?:[A-Za-z0-9._-]*[A-Za-z0-9])?$/;
 
-export const adminFirstNameSchema = z.preprocess(
+export const adminFullNameSchema = z.preprocess(
   trimOrUndefined,
   z
-    .string({ message: 'validation.organisation.adminFirstName.required' })
-    .min(1, { message: 'validation.organisation.adminFirstName.required' })
-    .max(64, { message: 'validation.organisation.adminFirstName.tooLong' })
+    .string({ message: 'validation.organisation.adminFullName.required' })
+    .min(1, { message: 'validation.organisation.adminFullName.required' })
+    .max(64, { message: 'validation.organisation.adminFullName.tooLong' })
     .regex(PERSON_NAME_PATTERN, {
-      message: 'validation.organisation.adminFirstName.invalid',
-    }),
-);
-
-export const adminLastNameSchema = z.preprocess(
-  trimOrUndefined,
-  z
-    .string({ message: 'validation.organisation.adminLastName.required' })
-    .min(1, { message: 'validation.organisation.adminLastName.required' })
-    .max(64, { message: 'validation.organisation.adminLastName.tooLong' })
-    .regex(PERSON_NAME_PATTERN, {
-      message: 'validation.organisation.adminLastName.invalid',
+      message: 'validation.organisation.adminFullName.invalid',
     }),
 );
 
@@ -288,8 +277,7 @@ export const addOrganisationSchema = z.object({
   dbUsername: dbUsernameSchema,
   dbPassword: dbPasswordSchema,
   adminEmail: adminEmailSchema,
-  adminFirstName: adminFirstNameSchema,
-  adminLastName: adminLastNameSchema,
+  adminFullName: adminFullNameSchema,
   adminUsername: adminUsernameSchema,
   adminLocale: adminLocaleSchema,
 });

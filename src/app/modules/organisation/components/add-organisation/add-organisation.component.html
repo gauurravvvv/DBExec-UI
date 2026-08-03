@@ -132,34 +132,18 @@
             </div>
 
             <app-custom-input
-              formControlName="adminFirstName"
-              [label]="'ORG.ADMIN_FIRST_NAME' | translate"
-              [placeholder]="'ORG.ADMIN_FIRST_NAME_PLACEHOLDER' | translate"
+              formControlName="adminFullName"
+              [label]="'ORG.ADMIN_FULL_NAME' | translate"
+              [placeholder]="'ORG.ADMIN_FULL_NAME_PLACEHOLDER' | translate"
               icon="pi-user"
               [required]="true"
               [showError]="
                 !!(
-                  orgForm.get('adminFirstName')?.invalid &&
-                  orgForm.get('adminFirstName')?.touched
+                  orgForm.get('adminFullName')?.invalid &&
+                  orgForm.get('adminFullName')?.touched
                 )
               "
-              [errorMessage]="getDbFieldError('adminFirstName')"
-            >
-            </app-custom-input>
-
-            <app-custom-input
-              formControlName="adminLastName"
-              [label]="'ORG.ADMIN_LAST_NAME' | translate"
-              [placeholder]="'ORG.ADMIN_LAST_NAME_PLACEHOLDER' | translate"
-              icon="pi-user"
-              [required]="true"
-              [showError]="
-                !!(
-                  orgForm.get('adminLastName')?.invalid &&
-                  orgForm.get('adminLastName')?.touched
-                )
-              "
-              [errorMessage]="getDbFieldError('adminLastName')"
+              [errorMessage]="getDbFieldError('adminFullName')"
             >
             </app-custom-input>
 

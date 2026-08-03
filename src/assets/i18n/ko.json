@@ -95,6 +95,7 @@
     "UNLOCK": "잠금 해제",
     "UNLOCK_ACCOUNT": "계정 잠금 해제",
     "FIRST_NAME": "이름",
+    "FULL_NAME": "이름",
     "LAST_NAME": "성",
     "USERNAME": "사용자명",
     "EMAIL": "이메일",
@@ -113,6 +114,7 @@
     "DEFAULT_USER": "기본 사용자",
     "ORG_ID": "조직 ID",
     "ENTER_FIRST_NAME": "이름을 입력하세요",
+    "ENTER_FULL_NAME": "이름을 입력하세요",
     "ENTER_LAST_NAME": "성을 입력하세요",
     "ENTER_USERNAME": "사용자명을 입력하세요",
     "ENTER_EMAIL": "이메일 주소를 입력하세요",
@@ -120,6 +122,7 @@
     "ENTER_DESCRIPTION": "설명을 입력하세요",
     "SEARCH_USERNAME": "사용자명 검색",
     "SEARCH_FIRST_NAME": "이름 검색",
+    "SEARCH_FULL_NAME": "이름 검색",
     "SEARCH_LAST_NAME": "성 검색",
     "SEARCH_EMAIL": "이메일 검색",
     "SEARCH_NAME": "이름 검색",
@@ -224,6 +227,10 @@
     "FIRST_NAME_MIN": "이름은 최소 {{min}}자 이상이어야 합니다",
     "FIRST_NAME_MAX": "이름은 {{max}}자를 초과할 수 없습니다",
     "FIRST_NAME_PATTERN": "이름은 문자로 시작해야 하며 문자, 하이픈, 아포스트로피, 공백만 포함할 수 있습니다",
+    "FULL_NAME_REQUIRED": "이름은 필수 항목입니다",
+    "FULL_NAME_MIN": "이름은 최소 {{min}}자 이상이어야 합니다",
+    "FULL_NAME_MAX": "이름은 {{max}}자를 초과할 수 없습니다",
+    "FULL_NAME_PATTERN": "이름은 문자로 시작해야 하며 문자, 하이픈, 아포스트로피, 공백만 포함할 수 있습니다",
     "LAST_NAME_REQUIRED": "성은 필수 항목입니다",
     "LAST_NAME_MIN": "성은 최소 {{min}}자 이상이어야 합니다",
     "LAST_NAME_MAX": "성은 {{max}}자를 초과할 수 없습니다",
@@ -531,6 +538,8 @@
     "ADMIN_FIRST_NAME_PLACEHOLDER": "이름을 입력하세요",
     "ADMIN_LAST_NAME": "성",
     "ADMIN_LAST_NAME_PLACEHOLDER": "성을 입력하세요",
+    "ADMIN_FULL_NAME": "이름",
+    "ADMIN_FULL_NAME_PLACEHOLDER": "이름을 입력하세요",
     "ADMIN_USERNAME": "사용자명",
     "ADMIN_USERNAME_PLACEHOLDER": "사용자명을 입력하세요"
   },
@@ -4040,6 +4049,11 @@
         "tooShort": "관리자 사용자 이름은 3자 이상이어야 합니다",
         "tooLong": "관리자 사용자 이름은 64자를 초과할 수 없습니다",
         "invalid": "사용자 이름은 문자 또는 숫자로 시작하고 끝나야 하며 문자, 숫자, 점, 밑줄 또는 하이픈만 포함할 수 있습니다"
+      },
+      "adminFullName": {
+        "required": "관리자 이름은 필수입니다",
+        "tooLong": "관리자 이름은 64자를 초과할 수 없습니다",
+        "invalid": "이름은 문자로 시작해야 하며 문자, 공백, 점, 아포스트로피 또는 하이픈만 포함할 수 있습니다"
       }
     },
     "common": {
@@ -4078,6 +4092,12 @@
       "groupIds": {
         "required": "최소한 하나의 그룹을 선택해야 합니다",
         "idInvalid": "하나 이상의 그룹 식별자가 유효하지 않습니다"
+      },
+      "fullName": {
+        "required": "이름은 필수입니다",
+        "tooShort": "이름은 2자 이상이어야 합니다",
+        "tooLong": "이름은 60자를 초과할 수 없습니다",
+        "invalid": "이름은 문자로 시작해야 하며 문자, 하이픈, 아포스트로피 또는 공백만 포함할 수 있습니다"
       }
     },
     "roles": {
@@ -5600,5 +5620,8 @@
     "JOINS_AUTO_HINT": "조인은 배치한 프롬프트에 필요한 테이블에서 자동으로 생성됩니다(프롬프트 모듈에서 구성). 여기서 작성할 것은 없습니다.",
     "NO_JOINS_AUTO": "조인이 필요 없습니다. 배치된 각 프롬프트는 자체 기본 테이블에서 필터링합니다.",
     "AUTO": "자동"
+  },
+  "ORGANISATION": {
+    "ADMIN_FULL_NAME": "이름"
   }
 }

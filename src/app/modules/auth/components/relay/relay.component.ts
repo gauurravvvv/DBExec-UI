@@ -106,9 +106,16 @@ export class RelayComponent implements OnInit, OnDestroy {
 
   readonly state = signal<'loading' | 'slow' | 'ready' | 'error'>('loading');
 
-  readonly firstName = signal<string>('');
-  readonly lastName = signal<string>('');
+  readonly fullName = signal<string>('');
   readonly isFirstLogin = signal<boolean>(false);
+
+  /** First token of the full name — the greeting addresses the user by
+   *  their first name ("Welcome, Jane"). Falls back to the whole value
+   *  for a single-word (mononym) name. */
+  readonly firstName = computed(() => {
+    const parts = this.fullName().trim().split(/\s+/).filter(Boolean);
+    return parts[0] ?? '';
+  });
 
   /** Raw server-provided message (or HTTP error message). Surfaced
    *  in the muted Details line under the friendly copy. */
@@ -152,11 +159,16 @@ export class RelayComponent implements OnInit, OnDestroy {
   readonly greetingSuffix = computed(() => this.greetingParts()[1]);
 
   readonly initials = computed(() => {
-    const fn = this.firstName().trim();
-    const ln = this.lastName().trim();
-    const a = fn ? fn[0] : '';
-    const b = ln ? ln[0] : '';
-    return (a + b).toUpperCase() || (fn ? fn[0].toUpperCase() : '?');
+    // First + last token for a multi-word name, else the first two
+    // chars of a single-word (mononym) name.
+    const parts = this.fullName().trim().split(/\s+/).filter(Boolean);
+    if (parts.length >= 2) {
+      return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+    }
+    if (parts.length === 1) {
+      return parts[0].slice(0, 2).toUpperCase() || '?';
+    }
+    return '?';
   });
 
   @ViewChild('retryBtn') retryBtnRef?: ElementRef<HTMLButtonElement>;
@@ -218,18 +230,16 @@ export class RelayComponent implements OnInit, OnDestroy {
       (_e: LangChangeEvent) => this.langTick.update(n => n + 1),
     );
 
-    const firstName = StorageService.get(StorageType.RELAY_FIRST_NAME) || '';
-    const lastName = StorageService.get(StorageType.RELAY_LAST_NAME) || '';
+    const fullName = StorageService.get(StorageType.RELAY_FULL_NAME) || '';
     const isFirstLogin =
       StorageService.get(StorageType.RELAY_IS_FIRST_LOGIN) === 'true';
 
-    if (!firstName) {
+    if (!fullName) {
       this.router.navigateByUrl('/login', { replaceUrl: true });
       return;
     }
 
-    this.firstName.set(firstName);
-    this.lastName.set(lastName);
+    this.fullName.set(fullName);
     this.isFirstLogin.set(isFirstLogin);
 
     this.kickBootstrap();

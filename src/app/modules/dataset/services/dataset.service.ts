@@ -223,7 +223,7 @@ export class DatasetService {
   }
 
   async updateSystemAdmin(systemAdminForm: FormGroup) {
-    const { id, firstName, lastName, username, email, mobile, status } =
+    const { id, fullName, username, email, mobile, status } =
       systemAdminForm.value;
     this._saving.set(true);
     try {
@@ -232,8 +232,7 @@ export class DatasetService {
           SYSTEM_ADMIN.UPDATE + id,
           {
             id,
-            firstName,
-            lastName,
+            fullName,
             username,
             email,
             mobile,

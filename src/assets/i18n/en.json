@@ -95,6 +95,7 @@
     "UNLOCK": "Unlock",
     "UNLOCK_ACCOUNT": "Unlock account",
     "FIRST_NAME": "First Name",
+    "FULL_NAME": "Full Name",
     "LAST_NAME": "Last Name",
     "USERNAME": "Username",
     "EMAIL": "Email",
@@ -113,6 +114,7 @@
     "DEFAULT_USER": "Default User",
     "ORG_ID": "Org ID",
     "ENTER_FIRST_NAME": "Enter first name",
+    "ENTER_FULL_NAME": "Enter full name",
     "ENTER_LAST_NAME": "Enter last name",
     "ENTER_USERNAME": "Enter username",
     "ENTER_EMAIL": "Enter email address",
@@ -120,6 +122,7 @@
     "ENTER_DESCRIPTION": "Enter description",
     "SEARCH_USERNAME": "Search Username",
     "SEARCH_FIRST_NAME": "Search First Name",
+    "SEARCH_FULL_NAME": "Search Full Name",
     "SEARCH_LAST_NAME": "Search Last Name",
     "SEARCH_EMAIL": "Search Email",
     "SEARCH_NAME": "Search Name",
@@ -224,6 +227,10 @@
     "FIRST_NAME_MIN": "First name must be at least {{min}} characters",
     "FIRST_NAME_MAX": "First name must not exceed {{max}} characters",
     "FIRST_NAME_PATTERN": "First name must start with a letter and can only contain letters, hyphens, apostrophes and spaces",
+    "FULL_NAME_REQUIRED": "Full name is required",
+    "FULL_NAME_MIN": "Full name must be at least {{min}} characters",
+    "FULL_NAME_MAX": "Full name must not exceed {{max}} characters",
+    "FULL_NAME_PATTERN": "Full name must start with a letter and can only contain letters, hyphens, apostrophes and spaces",
     "LAST_NAME_REQUIRED": "Last name is required",
     "LAST_NAME_MIN": "Last name must be at least {{min}} characters",
     "LAST_NAME_MAX": "Last name must not exceed {{max}} characters",
@@ -531,6 +538,8 @@
     "ADMIN_FIRST_NAME_PLACEHOLDER": "Enter first name",
     "ADMIN_LAST_NAME": "Last Name",
     "ADMIN_LAST_NAME_PLACEHOLDER": "Enter last name",
+    "ADMIN_FULL_NAME": "Full Name",
+    "ADMIN_FULL_NAME_PLACEHOLDER": "Enter full name",
     "ADMIN_USERNAME": "Username",
     "ADMIN_USERNAME_PLACEHOLDER": "Enter username"
   },
@@ -4037,6 +4046,11 @@
         "tooShort": "Administrator username must be at least 3 characters",
         "tooLong": "Administrator username must not exceed 64 characters",
         "invalid": "Username must start and end with a letter or digit and contain only letters, digits, dots, underscores, or hyphens"
+      },
+      "adminFullName": {
+        "required": "Administrator full name is required",
+        "tooLong": "Administrator full name must not exceed 64 characters",
+        "invalid": "Full name must start with a letter and contain only letters, spaces, dots, apostrophes, or hyphens"
       }
     },
     "common": {
@@ -4075,6 +4089,12 @@
       "groupIds": {
         "required": "At least one group must be selected",
         "idInvalid": "One or more group identifiers are invalid"
+      },
+      "fullName": {
+        "required": "Full name is required",
+        "tooShort": "Full name must be at least 2 characters",
+        "tooLong": "Full name must not exceed 60 characters",
+        "invalid": "Full name must start with a letter and contain only letters, hyphens, apostrophes, or spaces"
       }
     },
     "roles": {
@@ -5597,5 +5617,8 @@
     "JOINS_AUTO_HINT": "Joins are built automatically from the tables your placed prompts need — configured in the Prompt module. Nothing to author here.",
     "NO_JOINS_AUTO": "No joins needed — every placed prompt filters on its own base table.",
     "AUTO": "Auto"
+  },
+  "ORGANISATION": {
+    "ADMIN_FULL_NAME": "Full Name"
   }
 }

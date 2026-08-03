@@ -95,6 +95,7 @@
     "UNLOCK": "Desbloquear",
     "UNLOCK_ACCOUNT": "Desbloquear cuenta",
     "FIRST_NAME": "Nombre",
+    "FULL_NAME": "Nombre completo",
     "LAST_NAME": "Apellido",
     "USERNAME": "Nombre de usuario",
     "EMAIL": "Correo electrónico",
@@ -113,6 +114,7 @@
     "DEFAULT_USER": "Usuario predeterminado",
     "ORG_ID": "ID de organización",
     "ENTER_FIRST_NAME": "Ingrese el nombre",
+    "ENTER_FULL_NAME": "Ingrese el nombre completo",
     "ENTER_LAST_NAME": "Ingrese el apellido",
     "ENTER_USERNAME": "Ingrese el nombre de usuario",
     "ENTER_EMAIL": "Ingrese la dirección de correo electrónico",
@@ -120,6 +122,7 @@
     "ENTER_DESCRIPTION": "Ingrese la descripción",
     "SEARCH_USERNAME": "Buscar nombre de usuario",
     "SEARCH_FIRST_NAME": "Buscar nombre",
+    "SEARCH_FULL_NAME": "Buscar nombre completo",
     "SEARCH_LAST_NAME": "Buscar apellido",
     "SEARCH_EMAIL": "Buscar correo electrónico",
     "SEARCH_NAME": "Buscar nombre",
@@ -224,6 +227,10 @@
     "FIRST_NAME_MIN": "El nombre debe tener al menos {{min}} caracteres",
     "FIRST_NAME_MAX": "El nombre no debe exceder {{max}} caracteres",
     "FIRST_NAME_PATTERN": "El nombre debe comenzar con una letra y solo puede contener letras, guiones, apóstrofos y espacios",
+    "FULL_NAME_REQUIRED": "El nombre completo es obligatorio",
+    "FULL_NAME_MIN": "El nombre completo debe tener al menos {{min}} caracteres",
+    "FULL_NAME_MAX": "El nombre completo no debe exceder {{max}} caracteres",
+    "FULL_NAME_PATTERN": "El nombre completo debe comenzar con una letra y solo puede contener letras, guiones, apóstrofos y espacios",
     "LAST_NAME_REQUIRED": "El apellido es obligatorio",
     "LAST_NAME_MIN": "El apellido debe tener al menos {{min}} caracteres",
     "LAST_NAME_MAX": "El apellido no debe exceder {{max}} caracteres",
@@ -531,6 +538,8 @@
     "ADMIN_FIRST_NAME_PLACEHOLDER": "Ingrese el nombre",
     "ADMIN_LAST_NAME": "Apellido",
     "ADMIN_LAST_NAME_PLACEHOLDER": "Ingrese el apellido",
+    "ADMIN_FULL_NAME": "Nombre completo",
+    "ADMIN_FULL_NAME_PLACEHOLDER": "Ingrese el nombre completo",
     "ADMIN_USERNAME": "Nombre de usuario",
     "ADMIN_USERNAME_PLACEHOLDER": "Ingrese el nombre de usuario"
   },
@@ -4040,6 +4049,11 @@
         "tooShort": "El nombre de usuario del administrador debe tener al menos 3 caracteres",
         "tooLong": "El nombre de usuario del administrador no debe superar los 64 caracteres",
         "invalid": "El nombre de usuario debe comenzar y terminar con una letra o un dígito y solo puede contener letras, dígitos, puntos, guiones bajos o guiones"
+      },
+      "adminFullName": {
+        "required": "El nombre completo del administrador es obligatorio",
+        "tooLong": "El nombre completo del administrador no debe superar los 64 caracteres",
+        "invalid": "El nombre completo debe comenzar con una letra y solo puede contener letras, espacios, puntos, apóstrofes o guiones"
       }
     },
     "common": {
@@ -4078,6 +4092,12 @@
       "groupIds": {
         "required": "Debe seleccionarse al menos un grupo",
         "idInvalid": "Uno o más identificadores de grupo no son válidos"
+      },
+      "fullName": {
+        "required": "El nombre completo es obligatorio",
+        "tooShort": "El nombre completo debe tener al menos 2 caracteres",
+        "tooLong": "El nombre completo no debe superar los 60 caracteres",
+        "invalid": "El nombre completo debe comenzar con una letra y solo puede contener letras, guiones, apóstrofes o espacios"
       }
     },
     "roles": {
@@ -5600,5 +5620,8 @@
     "JOINS_AUTO_HINT": "Las combinaciones se crean automáticamente a partir de las tablas que necesitan tus prompts — configurado en el módulo de Prompts. No hay nada que crear aquí.",
     "NO_JOINS_AUTO": "No se necesitan combinaciones: cada prompt filtra en su propia tabla base.",
     "AUTO": "Auto"
+  },
+  "ORGANISATION": {
+    "ADMIN_FULL_NAME": "Nombre completo"
   }
 }
