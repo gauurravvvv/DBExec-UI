@@ -14,7 +14,7 @@ import { ThemeService } from 'src/app/core/services/theme.service';
  *
  *   phase 1 — `login(form)` → POST /auth/login
  *     Verifies credentials, returns access + refresh tokens and the
- *     minimal payload the relay screen needs (first/last name,
+ *     minimal payload the relay screen needs (full name,
  *     locale, isFirstLogin). Persists the relay-only fields in
  *     storage so the relay component can read them synchronously
  *     on mount, and applies the user's locale immediately so the
@@ -119,8 +119,7 @@ export class LoginService implements OnDestroy {
     // cleared when phase 2 completes. Kept out of the main user
     // blob to make their short lifecycle obvious.
     const u = data.user || {};
-    StorageService.set(StorageType.RELAY_FIRST_NAME, u.firstName || '');
-    StorageService.set(StorageType.RELAY_LAST_NAME, u.lastName || '');
+    StorageService.set(StorageType.RELAY_FULL_NAME, u.fullName || '');
     StorageService.set(
       StorageType.RELAY_IS_FIRST_LOGIN,
       u.isFirstLogin ? 'true' : 'false',
@@ -302,8 +301,7 @@ export class LoginService implements OnDestroy {
 
     // Drop the short-lived relay fields now that the bootstrap is
     // complete.
-    StorageService.remove(StorageType.RELAY_FIRST_NAME);
-    StorageService.remove(StorageType.RELAY_LAST_NAME);
+    StorageService.remove(StorageType.RELAY_FULL_NAME);
     StorageService.remove(StorageType.RELAY_IS_FIRST_LOGIN);
     return true;
   }

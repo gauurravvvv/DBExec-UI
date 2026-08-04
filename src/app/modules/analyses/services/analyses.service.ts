@@ -412,15 +412,14 @@ export class AnalysesService {
   }
 
   updateSystemAdmin(systemAdminForm: FormGroup) {
-    const { id, firstName, lastName, username, email, mobile, status } =
+    const { id, fullName, username, email, mobile, status } =
       systemAdminForm.value;
     return lastValueFrom(
       this.http.apiPut(
         SYSTEM_ADMIN.UPDATE + id,
         {
           id,
-          firstName,
-          lastName,
+          fullName,
           username,
           email,
           mobile,

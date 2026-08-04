@@ -49,19 +49,6 @@ const trimOrUndefined = (v: unknown): unknown => {
   return v;
 };
 
-const nullableTrim = (v: unknown): unknown => {
-  // lastName + similar optional human fields: '' → undefined so the
-  // schema's optional() takes over and accepts the absence. null is
-  // also normalised to undefined so JSON `null` doesn't trip the
-  // type guard.
-  if (v === null) return undefined;
-  if (typeof v === 'string') {
-    const trimmed = v.trim();
-    return trimmed.length === 0 ? undefined : trimmed;
-  }
-  return v;
-};
-
 // ── Field schemas ──────────────────────────────────────────────────
 
 export const emailSchema = z.preprocess(
@@ -88,26 +75,18 @@ export const usernameSchema = z.preprocess(
     .regex(USERNAME_PATTERN, { message: 'validation.users.username.invalid' }),
 );
 
-export const firstNameSchema = z.preprocess(
+/**
+ * Full name — a single required field (no separate first/last).
+ * Unicode-aware, allows spaces so a complete name like "María José García"
+ * passes. Max widened to 60 to accommodate full names.
+ */
+export const fullNameSchema = z.preprocess(
   trimOrUndefined,
   z
-    .string({ message: 'validation.users.firstName.required' })
-    .min(2, { message: 'validation.users.firstName.tooShort' })
-    .max(30, { message: 'validation.users.firstName.tooLong' })
-    .regex(NAME_PATTERN, { message: 'validation.users.firstName.invalid' }),
-);
-
-/**
- * lastName is OPTIONAL by product policy (some cultures use mononyms).
- * When supplied it has to match the same rules as firstName.
- */
-export const lastNameSchema = z.preprocess(
-  nullableTrim,
-  z
-    .string()
-    .max(30, { message: 'validation.users.lastName.tooLong' })
-    .regex(NAME_PATTERN, { message: 'validation.users.lastName.invalid' })
-    .optional(),
+    .string({ message: 'validation.users.fullName.required' })
+    .min(2, { message: 'validation.users.fullName.tooShort' })
+    .max(60, { message: 'validation.users.fullName.tooLong' })
+    .regex(NAME_PATTERN, { message: 'validation.users.fullName.invalid' }),
 );
 
 /** Supported locale codes — mirror src/shared/utility/i18n.ts. */
@@ -144,8 +123,7 @@ export const groupIdsSchema = z
 export const addUserSchema = z.object({
   email: emailSchema,
   username: usernameSchema,
-  firstName: firstNameSchema,
-  lastName: lastNameSchema,
+  fullName: fullNameSchema,
   locale: localeSchema,
   groupIds: groupIdsSchema,
 });
@@ -162,8 +140,7 @@ export type AddUserInput = z.infer<typeof addUserSchema>;
 export const updateUserSchema = z.object({
   email: emailSchema,
   username: usernameSchema,
-  firstName: firstNameSchema,
-  lastName: lastNameSchema,
+  fullName: fullNameSchema,
   locale: localeSchema.optional(),
   groupIds: groupIdsSchema.optional(),
 });

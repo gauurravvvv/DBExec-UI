@@ -1,0 +1,58 @@
+<div class="qb-palette">
+  <header class="qb-palette__head">
+    <h3 class="qb-palette__title">
+      {{ 'QUERY_BUILDER.PROMPT_LIBRARY' | translate }}
+    </h3>
+    <app-custom-input
+      class="qb-palette__search"
+      icon="pi pi-search"
+      [ngModel]="search()"
+      [placeholder]="'COMMON.SEARCH' | translate"
+      (ngModelChange)="onSearch($event)" />
+  </header>
+
+  <div class="qb-palette__loading" *ngIf="loading()">
+    <p-skeleton height="2rem" styleClass="mb-2"></p-skeleton>
+    <p-skeleton height="2rem" styleClass="mb-2"></p-skeleton>
+    <p-skeleton height="2rem"></p-skeleton>
+  </div>
+
+  <p class="qb-palette__empty" *ngIf="!loading() && !filtered().length">
+    {{ 'QUERY_BUILDER.NO_PROMPTS' | translate }}
+  </p>
+
+  <div class="qb-palette__scroll" *ngIf="!loading()">
+    <section
+      class="qb-palette__group"
+      *ngFor="let group of groups(); trackBy: trackByGroup"
+    >
+      <h4 class="qb-palette__group-label">
+        {{ group.label || ('QUERY_BUILDER.UNGROUPED' | translate) }}
+      </h4>
+      <div
+        class="qb-palette__items"
+        cdkDropList
+        [cdkDropListData]="group.prompts"
+        [cdkDropListConnectedTo]="connectedTo"
+        [cdkDropListSortingDisabled]="true"
+      >
+        <div
+          class="qb-palette__item"
+          *ngFor="let prompt of group.prompts; trackBy: trackByPrompt"
+          cdkDrag
+          [cdkDragData]="prompt"
+          [class.qb-palette__item--placed]="isPlaced(prompt.promptId)"
+        >
+          <i class="pi pi-bars qb-palette__grip"></i>
+          <span class="qb-palette__item-name">{{ prompt.name }}</span>
+          <app-chip variant="tag" size="sm">{{ prompt.type }}</app-chip>
+          <i
+            class="pi pi-check qb-palette__placed-tick"
+            *ngIf="isPlaced(prompt.promptId)"
+            [title]="'QUERY_BUILDER.ALREADY_PLACED' | translate"
+          ></i>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>

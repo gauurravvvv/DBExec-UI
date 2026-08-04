@@ -139,17 +139,10 @@ export class ListUserComponent implements OnInit, OnDestroy {
         filter: 'text',
       },
       {
-        colId: 'firstName',
-        field: 'firstName',
-        header: t('COMMON.FIRST_NAME'),
-        width: '160px',
-        filter: 'text',
-      },
-      {
-        colId: 'lastName',
-        field: 'lastName',
-        header: t('COMMON.LAST_NAME'),
-        width: '160px',
+        colId: 'fullName',
+        field: 'fullName',
+        header: t('COMMON.FULL_NAME'),
+        width: '224px',
         filter: 'text',
       },
       {
@@ -274,7 +267,7 @@ export class ListUserComponent implements OnInit, OnDestroy {
         total: res?.data?.count ?? 0,
       }),
       // custom-table sends PLAIN filter values (global `search` + per-column
-      // username/firstName/lastName/email), so the adapter's identity mapping
+      // username/fullName/email), so the adapter's identity mapping
       // passes them straight through — no AG-Grid cell unwrapping needed.
       initial: { page: 1, limit: 50 },
     });

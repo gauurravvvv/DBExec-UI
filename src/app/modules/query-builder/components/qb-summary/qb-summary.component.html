@@ -1,0 +1,7 @@
+<div class="qb-summary" *ngIf="text() as t">
+  <i class="pi pi-align-left qb-summary__icon"></i>
+  <p class="qb-summary__text">{{ t }}</p>
+</div>
+<div class="qb-summary qb-summary--empty" *ngIf="!text()">
+  <p class="qb-summary__text">{{ 'QUERY_BUILDER.SUMMARY_EMPTY' | translate }}</p>
+</div>

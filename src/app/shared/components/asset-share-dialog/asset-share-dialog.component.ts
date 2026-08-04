@@ -18,11 +18,16 @@ import {
 } from 'src/app/shared/services/asset-shares.service';
 
 /** The asset family this dialog is sharing. */
-export type ShareableAssetType = 'dataset' | 'analysis' | 'dashboard';
+export type ShareableAssetType =
+  | 'dataset'
+  | 'analysis'
+  | 'dashboard'
+  | 'querybuilder';
 
 /**
- * AssetShareDialog — a Google-Docs-style share modal for datasets, analyses
- * and dashboards. Reused across all three modules (declared in SharedModule).
+ * AssetShareDialog — a Google-Docs-style share modal for datasets, analyses,
+ * dashboards and query builders. Reused across all modules (declared in
+ * SharedModule).
  *
  * Sharing is VIEW-ONLY: a grant confers read + run access and nothing more.
  * Edit/delete authority stays with the asset's creator or an org admin and is

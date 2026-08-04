@@ -15,9 +15,8 @@ import { GlobalService } from 'src/app/core/services/global.service';
 import { GroupService } from 'src/app/modules/groups/services/group.service';
 import {
   emailSchema,
-  firstNameSchema,
+  fullNameSchema,
   groupIdsSchema,
-  lastNameSchema,
   usernameSchema,
 } from 'src/app/shared/validators/users';
 import { zodValidator } from 'src/app/shared/validators/zod-validator';
@@ -138,8 +137,7 @@ export class EditUserComponent implements OnInit, OnDestroy, HasUnsavedChanges {
     // Field validators sourced from the SHARED Zod schema.
     this.userForm = this.fb.group({
       id: [''],
-      firstName: ['', [zodValidator(firstNameSchema)]],
-      lastName: ['', [zodValidator(lastNameSchema)]],
+      fullName: ['', [zodValidator(fullNameSchema)]],
       username: ['', [zodValidator(usernameSchema)]],
       email: ['', [zodValidator(emailSchema)]],
       status: [],
@@ -169,8 +167,7 @@ export class EditUserComponent implements OnInit, OnDestroy, HasUnsavedChanges {
     }
     this.userForm.patchValue({
       id: this.userData.id,
-      firstName: this.userData.firstName,
-      lastName: this.userData.lastName,
+      fullName: this.userData.fullName,
       username: this.userData.username,
       email: this.userData.email,
       status: this.userData.status,
@@ -224,8 +221,7 @@ export class EditUserComponent implements OnInit, OnDestroy, HasUnsavedChanges {
     if (!this.userData) return;
     this.userForm.patchValue({
       id: this.userData.id,
-      firstName: this.userData.firstName,
-      lastName: this.userData.lastName,
+      fullName: this.userData.fullName,
       username: this.userData.username,
       email: this.userData.email,
       status: this.userData.status,
@@ -245,10 +241,7 @@ export class EditUserComponent implements OnInit, OnDestroy, HasUnsavedChanges {
     return key ? this.translate.instant(key) : '';
   }
 
-  getFirstNameError(): string {
-    return this.fieldError('firstName');
-  }
-  getLastNameError(): string {
-    return this.fieldError('lastName');
+  getFullNameError(): string {
+    return this.fieldError('fullName');
   }
 }

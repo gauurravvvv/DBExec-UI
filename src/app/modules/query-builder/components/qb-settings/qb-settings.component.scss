@@ -1,0 +1,57 @@
+:host {
+  display: block;
+}
+
+.qb-settings__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4);
+  margin-bottom: var(--space-5);
+}
+
+.qb-settings__title {
+  margin: 0;
+  font-size: var(--fs-h2);
+  font-weight: var(--fw-semibold, 600);
+}
+
+.qb-settings__sub {
+  margin: var(--space-1) 0 0;
+  font-size: var(--fs-label);
+  color: var(--text-muted);
+}
+
+// One control per row at 50% width, matching add-user / add-prompt forms.
+.qb-settings__grid {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-7);
+  width: 50%;
+
+  @media (max-width: 992px) {
+    width: 75%;
+  }
+  @media (max-width: 768px) {
+    width: 100%;
+  }
+
+  > * {
+    width: 100%;
+  }
+}
+
+.qb-settings__toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md, 8px);
+  font-size: var(--fs-control);
+}
+
+.qb-settings__wide {
+  width: 100%;
+}

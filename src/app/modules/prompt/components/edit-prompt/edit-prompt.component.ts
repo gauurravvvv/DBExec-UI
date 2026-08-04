@@ -11,12 +11,10 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { MessageService } from 'primeng/api';
-import { DEFAULT_PAGE } from 'src/app/core/constants';
 import { REGEX } from 'src/app/core/constants/regex.constant';
 import { PROMPT } from 'src/app/core/constants/routes.constant';
 import { HasUnsavedChanges } from 'src/app/core/models/has-unsaved-changes.model';
 import { GlobalService } from 'src/app/core/services/global.service';
-import { SectionService } from 'src/app/modules/section/services/section.service';
 import { PromptService } from '../../services/prompt.service';
 
 @Component({
@@ -32,11 +30,7 @@ export class EditPromptComponent implements OnInit, HasUnsavedChanges {
   promptForm!: FormGroup;
   promptId: string = '';
   selectedDatasourceName: string = '';
-  selectedTabName: string = '';
-  sectionData: any = null;
-  sections: any[] = [];
-  preloadedSections: any[] | null = null;
-  preloadedSectionsTotal: number | null = null;
+  promptData: any = null;
   isCancelClicked = false;
   showSaveConfirm = false;
   saveJustification = '';
@@ -48,7 +42,6 @@ export class EditPromptComponent implements OnInit, HasUnsavedChanges {
     private route: ActivatedRoute,
     private globalService: GlobalService,
     private messageService: MessageService,
-    private sectionService: SectionService,
     private promptService: PromptService,
     private translate: TranslateService,
   ) {
@@ -93,8 +86,7 @@ export class EditPromptComponent implements OnInit, HasUnsavedChanges {
       ],
       description: [''],
       datasource: [''],
-      tab: [''],
-      section: ['', Validators.required],
+      groupName: [''],
       status: [false],
     });
   }
@@ -106,93 +98,19 @@ export class EditPromptComponent implements OnInit, HasUnsavedChanges {
       .then(() => {
         const data = this.promptService.current();
         if (data) {
-          this.sectionData = data;
+          this.promptData = data;
 
           this.promptForm.patchValue({
-            id: this.sectionData.id,
-            name: this.sectionData.name,
-            description: this.sectionData.description,
-            datasource: this.sectionData.datasourceId,
-            tab: this.sectionData.section.tab.id,
-            section: this.sectionData.section.id,
-            status: this.sectionData.status,
+            id: data.id,
+            name: data.name,
+            description: data.description,
+            datasource: data.datasourceId,
+            groupName: data.groupName ?? '',
+            status: data.status,
           });
 
-          this.selectedDatasourceName = this.sectionData.datasource?.name || '';
-          this.selectedTabName = this.sectionData.section.tab.name || '';
-          this.loadSectionData();
-
+          this.selectedDatasourceName = data.datasource?.name || '';
           this.promptForm.markAsPristine();
-        }
-        this.cdr.markForCheck();
-      })
-      .catch(() => {
-        this.cdr.markForCheck();
-      });
-  }
-
-  /**
-   * Fetcher for the server-mode section dropdown. Gated on the prompt's
-   * tabId (loaded via loadPromptData).
-   */
-  loadSectionsPage = async ({
-    search,
-    page,
-    limit,
-  }: {
-    search: string;
-    page: number;
-    limit: number;
-  }): Promise<{ items: any[]; total: number }> => {
-    const tabId = this.sectionData?.section?.tab?.id;
-    if (!tabId) return { items: [], total: 0 };
-    const params: any = {
-      tabId,
-      page,
-      limit,
-    };
-    if (search) params.filter = JSON.stringify({ name: search });
-    try {
-      const res: any = await this.sectionService.listSection(params);
-      if (this.globalService.handleSuccessService(res, false)) {
-        return {
-          items: res?.data?.sections ?? [],
-          total: res?.data?.count ?? 0,
-        };
-      }
-      return { items: [], total: 0 };
-    } catch {
-      return { items: [], total: 0 };
-    }
-  };
-
-  /**
-   * Resolves the prompt's currently-stored sectionId for label rendering when
-   * the value isn't in the first page of fetched sections.
-   */
-  resolveSelectedSection = async (id: string): Promise<any> => {
-    try {
-      const res: any = await this.sectionService.viewSection(id);
-      return res?.data ?? null;
-    } catch {
-      return null;
-    }
-  };
-
-  loadSectionData() {
-    const param = {
-      tabId: this.sectionData.section.tab.id,
-      page: DEFAULT_PAGE,
-      limit: 10,
-    };
-    this.sectionService
-      .listSection(param)
-      .then(response => {
-        if (this.globalService.handleSuccessService(response, false)) {
-          const items = response?.data?.sections ?? [];
-          this.sections = items;
-          this.preloadedSections = items;
-          this.preloadedSectionsTotal = response?.data?.count ?? items.length;
         }
         this.cdr.markForCheck();
       })
@@ -252,15 +170,14 @@ export class EditPromptComponent implements OnInit, HasUnsavedChanges {
 
   onCancel(): void {
     if (this.isFormDirty) {
-      if (!this.sectionData) return;
-      // Restore basic form values
+      if (!this.promptData) return;
       this.promptForm.patchValue({
-        id: this.sectionData.id,
-        name: this.sectionData.name,
-        description: this.sectionData.description,
-        section: this.sectionData.section.id,
-        datasource: this.sectionData.datasourceId,
-        status: this.sectionData.status,
+        id: this.promptData.id,
+        name: this.promptData.name,
+        description: this.promptData.description,
+        datasource: this.promptData.datasourceId,
+        groupName: this.promptData.groupName ?? '',
+        status: this.promptData.status,
       });
 
       this.isCancelClicked = true;

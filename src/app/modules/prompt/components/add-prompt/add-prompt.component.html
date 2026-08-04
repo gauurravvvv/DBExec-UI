@@ -12,19 +12,12 @@
         </button>
         <h2>{{ 'PROMPT_MODULE.ADD_TITLE' | translate }}</h2>
       </div>
-      <div class="warning-section" *ngIf="hasDuplicates">
-        <div class="duplicate-warning">
-          <i class="pi pi-exclamation-triangle"></i>
-          <span>{{ 'PROMPT_MODULE.DUPLICATE_WARNING' | translate }}</span>
-        </div>
-      </div>
       <div class="action-buttons">
         <button
           pButton
           type="button"
           [label]="'COMMON.CANCEL' | translate"
           class="p-button-outlined btn-cancel"
-          [disabled]="!isFormDirty"
           (click)="onCancel()"
         ></button>
         <button
@@ -34,9 +27,7 @@
           type="submit"
           [label]="'COMMON.SAVE' | translate"
           (click)="onSubmit()"
-          [disabled]="
-            sectionForm.invalid || hasDuplicates || hasEmptyPrompts || saving()
-          "
+          [disabled]="promptForm.invalid || saving()"
         >
           <i class="pi pi-save mr-2"></i>
         </button>
@@ -44,294 +35,84 @@
     </div>
 
     <!-- Form Section -->
-    <form autocomplete="off" [formGroup]="sectionForm" class="admin-form">
+    <form autocomplete="off" [formGroup]="promptForm" class="admin-form">
       <div class="form-grid">
-        <!-- Datasource dropdown — server-driven -->
-        <div class="form-field">
-          <app-custom-dropdown
-            formControlName="datasource"
-            [label]="'COMMON.DATASOURCE' | translate"
-            [placeholder]="'COMMON.SELECT_DATASOURCE' | translate"
-            [serverMode]="true"
-            [fetcher]="loadDatasourcesPage"
-            [pageSize]="10"
-            [preloadedItems]="preloadedDatasources"
-            [preloadedTotal]="preloadedDatasourcesTotal"
-            optionLabel="name"
-            optionValue="id"
-            [filter]="true"
-            filterBy="name"
-            [required]="true"
-            [showError]="
-              !!(
-                sectionForm.get('datasource')?.invalid &&
-                sectionForm.get('datasource')?.touched
-              )
-            "
-            [errorMessage]="'VALIDATION.FIELD_REQUIRED' | translate"
-            (ngModelChange)="
-              onDatasourceChange({
-                value: sectionForm.get('datasource')?.value,
-              })
-            "
-            icon="pi-database"
-          >
-          </app-custom-dropdown>
-        </div>
-
-        <!-- Tab dropdown — server-driven -->
-        <div class="form-field">
-          <app-custom-dropdown
-            formControlName="tab"
-            [label]="'COMMON.TAB' | translate"
-            [placeholder]="'COMMON.SELECT_TAB' | translate"
-            [serverMode]="true"
-            [fetcher]="loadTabsPage"
-            [pageSize]="10"
-            [preloadedItems]="preloadedTabs"
-            [preloadedTotal]="preloadedTabsTotal"
-            optionLabel="name"
-            optionValue="id"
-            [filter]="true"
-            filterBy="name"
-            [required]="true"
-            [showError]="
-              !!(
-                sectionForm.get('tab')?.invalid &&
-                sectionForm.get('tab')?.touched
-              )
-            "
-            [errorMessage]="'COMMON.TAB_REQUIRED' | translate"
-            (ngModelChange)="
-              onTabChange({ value: sectionForm.get('tab')?.value })
-            "
-            icon="pi-folder"
-          >
-          </app-custom-dropdown>
-        </div>
-
-        <!-- Section Groups Container - Only show when tab is selected -->
-        <div
-          class="form-field fields-container"
-          *ngIf="selectedTab && sectionForm.get('tab')?.value"
-        >
-          <div class="fields-header">
-            <label
-              >{{ 'PROMPT_MODULE.SECTION_GROUPS' | translate
-              }}<span class="required">*</span></label
+        <!-- Datasource -->
+          <div class="form-field">
+            <app-custom-dropdown
+              formControlName="datasource"
+              [label]="'COMMON.DATASOURCE' | translate"
+              [placeholder]="'COMMON.SELECT_DATASOURCE' | translate"
+              [serverMode]="true"
+              [fetcher]="loadDatasourcesPage"
+              [pageSize]="10"
+              [preloadedItems]="preloadedDatasources"
+              [preloadedTotal]="preloadedDatasourcesTotal"
+              optionLabel="name"
+              optionValue="id"
+              [filter]="true"
+              filterBy="name"
+              [required]="true"
+              icon="pi-database"
             >
-            <div class="button-group">
-              <button
-                pButton
-                type="button"
-                [icon]="
-                  areAllExpanded
-                    ? 'pi pi-angle-double-up'
-                    : 'pi pi-angle-double-down'
-                "
-                class="p-button-rounded p-button-text expand-collapse-btn"
-                (click)="areAllExpanded ? collapseAll() : expandAll()"
-                [pTooltip]="
-                  areAllExpanded
-                    ? ('COMMON.COLLAPSE_ALL' | translate)
-                    : ('COMMON.EXPAND_ALL' | translate)
-                "
-                tooltipPosition="bottom"
-                *ngIf="sectionGroups.length > 0"
-              ></button>
-              <button
-                pButton
-                type="button"
-                icon="pi pi-times"
-                class="p-button-rounded p-button-text p-button-danger clear-btn mr-1"
-                (click)="clearAllSectionGroups()"
-              ></button>
-              <button
-                pButton
-                type="button"
-                icon="pi pi-plus"
-                class="p-button-rounded p-button-text add-btn"
-                (click)="addSectionGroup()"
-              ></button>
-            </div>
+            </app-custom-dropdown>
           </div>
 
-          <div class="fields-list">
-            <div
-              *ngFor="
-                let sectionGroup of sectionGroups.controls;
-                let groupIndex = index;
-                trackBy: trackByIndex
+          <!-- Name -->
+          <div class="form-field">
+            <app-custom-input
+              formControlName="name"
+              [label]="'COMMON.NAME' | translate"
+              [placeholder]="'COMMON.ENTER_NAME' | translate"
+              icon="pi-id-card"
+              [required]="true"
+              [showError]="
+                !!(
+                  promptForm.get('name')?.invalid &&
+                  promptForm.get('name')?.touched
+                )
               "
-              [formGroup]="$any(sectionGroup)"
-              class="schema-group"
-              [class.highlight-animation]="
-                groupIndex === lastAddedGroupIndex && isNewlyAdded
-              "
+              [errorMessage]="getNameError()"
             >
-              <!-- Section Header -->
-              <div class="schema-header">
-                <button
-                  pButton
-                  type="button"
-                  [icon]="
-                    isGroupExpanded(groupIndex)
-                      ? 'pi pi-chevron-down'
-                      : 'pi pi-chevron-right'
-                  "
-                  class="p-button-rounded p-button-text expand-btn"
-                  (click)="toggleGroup(groupIndex)"
-                ></button>
-                <div style="width: 300px">
-                  <app-custom-dropdown
-                    formControlName="sectionId"
-                    [label]="'COMMON.SECTION' | translate"
-                    [placeholder]="'COMMON.SELECT_SECTION' | translate"
-                    [options]="getAvailableSections(groupIndex)"
-                    optionLabel="name"
-                    optionValue="id"
-                    [filter]="true"
-                    filterBy="name"
-                    [required]="true"
-                    [showError]="
-                      !!(
-                        sectionGroup.get('sectionId')?.invalid &&
-                        sectionGroup.get('sectionId')?.touched
-                      )
-                    "
-                    [errorMessage]="'COMMON.SECTION_REQUIRED' | translate"
-                    (ngModelChange)="
-                      onSectionChange(
-                        { value: sectionGroup.get('sectionId')?.value },
-                        groupIndex
-                      )
-                    "
-                    icon="pi-bookmark"
-                  >
-                  </app-custom-dropdown>
-                </div>
-                <span
-                  class="section-count"
-                  *ngIf="!isGroupExpanded(groupIndex)"
-                >
-                  {{
-                    'PROMPT_MODULE.PROMPT_COUNT'
-                      | translate: { count: getPrompts(groupIndex).length }
-                  }}
-                </span>
-                <button
-                  pButton
-                  type="button"
-                  icon="pi pi-plus"
-                  class="p-button-rounded p-button-text add-btn"
-                  (click)="addPromptToSection(groupIndex)"
-                  [disabled]="!sectionGroup.get('sectionId')?.value"
-                ></button>
-                <button
-                  pButton
-                  type="button"
-                  icon="pi pi-trash"
-                  class="p-button-rounded p-button-text clear-btn"
-                  (click)="removeSectionGroup(groupIndex)"
-                  [disabled]="sectionGroups.length === 1"
-                ></button>
-              </div>
-
-              <!-- Prompts for this section -->
-              <div
-                class="mappings-list"
-                formArrayName="prompts"
-                *ngIf="isGroupExpanded(groupIndex)"
-              >
-                <div
-                  *ngFor="
-                    let prompt of getPrompts(groupIndex).controls;
-                    let promptIndex = index;
-                    trackBy: trackByIndex
-                  "
-                  [formGroupName]="promptIndex"
-                  class="mapping-row"
-                  [ngClass]="{
-                    duplicate: isDuplicateRow(groupIndex, promptIndex),
-                    'highlight-animation':
-                      promptIndex === lastAddedPromptIndex &&
-                      groupIndex === lastAddedGroupIndex &&
-                      isNewlyAddedSection,
-                  }"
-                >
-                  <span class="index-number">{{ promptIndex + 1 }}</span>
-
-                  <div class="mapping-inputs">
-                    <!-- Name field -->
-                    <div class="form-field">
-                      <app-custom-input
-                        formControlName="name"
-                        [label]="'COMMON.NAME' | translate"
-                        [placeholder]="
-                          'PROMPT_MODULE.ENTER_PROMPT_NAME' | translate
-                        "
-                        icon="pi-id-card"
-                        [required]="true"
-                        [showError]="
-                          !!(
-                            prompt.get('name')?.invalid &&
-                            prompt.get('name')?.touched
-                          )
-                        "
-                        [errorMessage]="getNameError(prompt.get('name'))"
-                      >
-                      </app-custom-input>
-                    </div>
-
-                    <!-- Description field -->
-                    <div class="form-field">
-                      <app-custom-input
-                        formControlName="description"
-                        [label]="'COMMON.DESCRIPTION' | translate"
-                        [placeholder]="'COMMON.ENTER_DESCRIPTION' | translate"
-                        icon="pi-align-left"
-                      >
-                      </app-custom-input>
-                    </div>
-
-                    <!-- Type field -->
-                    <div class="form-field">
-                      <app-custom-dropdown
-                        formControlName="type"
-                        [label]="'COMMON.TYPE' | translate"
-                        [placeholder]="'PROMPT_MODULE.SELECT_TYPE' | translate"
-                        [options]="promptTypes"
-                        optionLabel="label"
-                        optionValue="value"
-                        [filter]="true"
-                        filterBy="label"
-                        [required]="true"
-                        [showError]="
-                          !!(
-                            prompt.get('type')?.invalid &&
-                            prompt.get('type')?.touched
-                          )
-                        "
-                        [errorMessage]="'COMMON.TYPE_REQUIRED' | translate"
-                        icon="pi-th-large"
-                      >
-                      </app-custom-dropdown>
-                    </div>
-                  </div>
-
-                  <button
-                    pButton
-                    type="button"
-                    icon="pi pi-trash"
-                    class="p-button-rounded p-button-text p-button-danger"
-                    (click)="removePromptFromSection(groupIndex, promptIndex)"
-                    [disabled]="getPrompts(groupIndex).length === 1"
-                  ></button>
-                </div>
-              </div>
-            </div>
+            </app-custom-input>
           </div>
-        </div>
+
+          <!-- Description -->
+          <div class="form-field">
+            <app-custom-input
+              formControlName="description"
+              [label]="'COMMON.DESCRIPTION' | translate"
+              [placeholder]="'COMMON.ENTER_DESCRIPTION' | translate"
+              icon="pi-align-left"
+            >
+            </app-custom-input>
+          </div>
+
+          <!-- Type -->
+          <div class="form-field">
+            <app-custom-dropdown
+              formControlName="type"
+              [label]="'PROMPT_MODULE.TYPE' | translate"
+              [placeholder]="'PROMPT_MODULE.SELECT_TYPE' | translate"
+              [options]="promptTypes"
+              optionLabel="label"
+              optionValue="value"
+              [required]="true"
+              icon="pi-sliders-h"
+            >
+            </app-custom-dropdown>
+          </div>
+
+          <!-- Group (optional) -->
+          <div class="form-field">
+            <app-custom-input
+              formControlName="groupName"
+              [label]="'PROMPT_MODULE.GROUP' | translate"
+              [placeholder]="'PROMPT_MODULE.GROUP_PLACEHOLDER' | translate"
+              icon="pi-folder"
+            >
+            </app-custom-input>
+          </div>
       </div>
     </form>
   </div>

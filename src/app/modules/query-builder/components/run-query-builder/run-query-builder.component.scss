@@ -1,0 +1,176 @@
+:host {
+  display: block;
+  height: 100%;
+}
+
+// Standard page card, matching add-user / add-prompt so the composer sits
+// inside the same parent card as every other module screen.
+.add-admin-wrapper {
+  background-color: var(--card-background);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+
+  .add-admin-container {
+    padding: var(--space-8);
+    max-width: 100%;
+    margin: var(--space-0);
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow-y: auto;
+  }
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-6);
+  flex-shrink: 0;
+
+  .left-section {
+    display: flex;
+    align-items: center;
+    gap: var(--space-6);
+
+    .back-button {
+      padding: var(--space-0) !important;
+      width: 36px;
+      height: 36px;
+      border-radius: 50% !important;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: transparent !important;
+      color: var(--text-color) !important;
+      min-width: 0;
+      border: none !important;
+      transition: all var(--motion-base) ease;
+
+      &:hover {
+        background: var(--hover-background) !important;
+      }
+
+      i {
+        font-size: var(--fs-h2);
+      }
+    }
+  }
+
+  .action-buttons {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+  }
+}
+
+.qb-run__title {
+  h2 {
+    margin: 0;
+    font-size: var(--fs-h1);
+    font-weight: var(--fw-semibold, 600);
+    color: var(--text-color);
+  }
+  p {
+    margin: var(--space-2) 0 0;
+    color: var(--text-muted);
+    font-size: var(--fs-body);
+  }
+}
+
+.qb-run__header-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.qb-run__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 420px;
+  gap: var(--space-6);
+  align-items: start;
+
+  @media (max-width: 1100px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.qb-run__section-title {
+  margin: 0 0 var(--space-4);
+  font-size: var(--fs-h2);
+  font-weight: var(--fw-semibold, 600);
+}
+
+.qb-run__aside {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  position: sticky;
+  top: var(--space-4);
+}
+
+.qb-run__panel {
+  background: var(--surface-card, #fff);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md, 8px);
+  padding: var(--space-4);
+}
+
+.qb-run__panel-title {
+  margin: 0 0 var(--space-3);
+  font-size: var(--fs-control);
+  font-weight: var(--fw-semibold, 600);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--text-muted);
+}
+
+.qb-run__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+}
+
+.qb-run__count {
+  font-size: var(--fs-body);
+  font-weight: var(--fw-semibold, 600);
+  color: var(--primary-color);
+  font-variant-numeric: tabular-nums;
+}
+
+.qb-run__results {
+  margin-top: var(--space-8);
+}
+
+.qb-run__results-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.qb-run__results-meta {
+  margin-left: var(--space-3);
+  font-size: var(--fs-label);
+  font-weight: var(--fw-regular, 400);
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.qb-run__truncated {
+  margin-bottom: var(--space-3);
+}
+
+.qb-run__table-wrap {
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md, 8px);
+  overflow: hidden;
+}
+
+.qb-run__loading {
+  padding: var(--space-6) 0;
+}

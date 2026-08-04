@@ -2,10 +2,10 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { unsavedChangesGuard } from 'src/app/core/guards/unsaved-changes.guard';
 import { AddQueryBuilderComponent } from './components/add-query-builder/add-query-builder.component';
-import { ConfigureQueryBuilderComponent } from './components/configure-query-builder/configure-query-builder.component';
 import { EditQueryBuilderComponent } from './components/edit-query-builder/edit-query-builder.component';
-import { ExecuteQueryBuilderComponent } from './components/execute-query-builder/execute-query-builder.component';
 import { ListQueryBuilderComponent } from './components/list-query-builder/list-query-builder.component';
+import { QbDesignComponent } from './components/qb-design/qb-design.component';
+import { RunQueryBuilderComponent } from './components/run-query-builder/run-query-builder.component';
 import { ViewQueryBuilderComponent } from './components/view-query-builder/view-query-builder.component';
 
 const routes: Routes = [
@@ -18,22 +18,22 @@ const routes: Routes = [
     component: AddQueryBuilderComponent,
     canDeactivate: [unsavedChangesGuard],
   },
+  {
+    // Query Builder v2 — the business-user composer (tree filters + run).
+    // Placed before ':id' so it is not swallowed by the view route.
+    path: ':id/compose',
+    component: RunQueryBuilderComponent,
+  },
+  {
+    // Query Builder v2 — admin design shell (form / joins / columns / settings).
+    path: ':id/design',
+    component: QbDesignComponent,
+  },
   { path: ':id', component: ViewQueryBuilderComponent },
   {
     path: ':id/edit',
     component: EditQueryBuilderComponent,
     canDeactivate: [unsavedChangesGuard],
-  },
-  // Action sub-routes nested under the resource — RESTful action shape.
-  // Carrying :dbId in the URL is intentional: the QB is scoped to a
-  // specific database, and the page needs both.
-  {
-    path: ':dbId/:id/configure',
-    component: ConfigureQueryBuilderComponent,
-  },
-  {
-    path: ':dbId/:queryBuilderId/run',
-    component: ExecuteQueryBuilderComponent,
   },
 ];
 

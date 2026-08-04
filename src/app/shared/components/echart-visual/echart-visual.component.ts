@@ -15,7 +15,7 @@ import * as echarts from 'echarts';
 import { requiresGl } from '../../../modules/analyses/constants/charts.constants';
 import { GeoRegistryService } from '../../../modules/analyses/services/geo-registry.service';
 import { buildChartOption } from '../../helpers/echarts-option-builder';
-import { loadEchartsGl } from '../../modules/shared-charts.module';
+import { loadEchartsGl } from '../../modules/echarts-gl.loader';
 
 /**
  * Chart types that render on a registered GeoJSON map. The `world.json`

@@ -102,14 +102,23 @@ export class PromptService {
   async add(promptForm: any): Promise<any> {
     this._saving.set(true);
     try {
-      const { datasource, tab, prompts } = promptForm;
+      // v2: a prompt is datasource-scoped (no tab/section). The API accepts a
+      // batch — POST { datasource, prompts: [...] } — so wrap the single flat
+      // form into a one-element prompts array.
+      const { datasource, name, description, type, groupName } = promptForm;
       return await lastValueFrom(
         this.http.apiPost(
           PROMPT.ADD,
           {
             datasource,
-            tab,
-            prompts,
+            prompts: [
+              {
+                name,
+                description: description || '',
+                type,
+                groupName: groupName || null,
+              },
+            ],
           },
           { skipLoader: true },
         ),
@@ -122,7 +131,7 @@ export class PromptService {
   async update(form: FormGroup, justification?: string): Promise<any> {
     this._saving.set(true);
     try {
-      const { id, datasource, tab, section, name, description, status } =
+      const { id, datasource, name, description, groupName, status } =
         form.value;
       // PUT /prompts/:promptId
       return await lastValueFrom(
@@ -131,10 +140,9 @@ export class PromptService {
           {
             id,
             datasource,
-            tab,
-            section,
             name,
             description,
+            groupName: groupName || null,
             status: status ? 1 : 0,
             justification,
           },
@@ -221,13 +229,13 @@ export class PromptService {
   async updateAppearance(params: any): Promise<any> {
     this._saving.set(true);
     try {
-      // PUT /prompts/:promptId/appearance
+      // PUT /prompts/:promptId/appearance — BE reads req.body.appearance.
       return await lastValueFrom(
         this.http.apiPut(
           PROMPT.GET + params.id + PROMPT.APPEARANCE_SUFFIX,
           {
             id: params.id,
-            appearence: params.appearance,
+            appearance: params.appearance,
           },
           { skipLoader: true },
         ),
@@ -242,6 +250,37 @@ export class PromptService {
       this.http.apiGet(PROMPT.GET + id + PROMPT.APPEARANCE_SUFFIX, {
         skipLoader: true,
       }),
+    );
+  }
+
+  // ── Value source (spec 6.6.1) — prompt-level config ────────────────────
+
+  getValueSource(promptId: string): Promise<any> {
+    return lastValueFrom(
+      this.http.apiGet(PROMPT.GET + promptId + PROMPT.VALUE_SOURCE_SUFFIX, {
+        skipLoader: true,
+      }),
+    );
+  }
+
+  saveValueSource(promptId: string, valueSource: any): Promise<any> {
+    return lastValueFrom(
+      this.http.apiPut(
+        PROMPT.GET + promptId + PROMPT.VALUE_SOURCE_SUFFIX,
+        { valueSource },
+        { skipLoader: true },
+      ),
+    );
+  }
+
+  /** Run a value source and return sample rows before saving. */
+  previewValues(promptId: string, valueSource: any, limit = 50): Promise<any> {
+    return lastValueFrom(
+      this.http.apiPost(
+        PROMPT.GET + promptId + PROMPT.VALUES_PREVIEW_SUFFIX,
+        { valueSource, limit },
+        { skipLoader: true },
+      ),
     );
   }
 

@@ -1,0 +1,48 @@
+<div class="qb-joins">
+  <header class="qb-joins__head">
+    <div>
+      <h2 class="qb-joins__title">
+        {{ 'QUERY_BUILDER.JOINS' | translate }}
+      </h2>
+      <p class="qb-joins__sub">
+        {{ 'QUERY_BUILDER.JOINS_AUTO_HINT' | translate }}
+      </p>
+    </div>
+  </header>
+
+  <div class="qb-joins__loading" *ngIf="loading()">
+    <p-skeleton height="4rem" styleClass="mb-2"></p-skeleton>
+    <p-skeleton height="4rem"></p-skeleton>
+  </div>
+
+  <p class="qb-joins__empty" *ngIf="!loading() && !hasJoins()">
+    {{ 'QUERY_BUILDER.NO_JOINS_AUTO' | translate }}
+  </p>
+
+  <!-- Read-only: joins are materialised automatically from the placed prompts'
+       required tables (configured in the Prompt module). No hand authoring. -->
+  <div class="qb-joins__list" *ngIf="!loading() && hasJoins()">
+    <div
+      class="qb-joins__card qb-joins__card--readonly"
+      *ngFor="let join of joins(); trackBy: trackByIndex"
+    >
+      <div class="qb-joins__auto">
+        <app-chip variant="tag" size="sm">
+          <i class="pi pi-bolt"></i> {{ 'QUERY_BUILDER.AUTO' | translate }}
+        </app-chip>
+        <span class="qb-joins__type-label">{{ join.joinType }} JOIN</span>
+      </div>
+      <div class="qb-joins__clause">
+        <code>
+          {{ join.rightSchema ? join.rightSchema + '.' : '' }}{{ join.rightTable }}
+          {{ join.rightAlias }}
+          <span class="qb-joins__on">ON</span>
+          {{ join.onClause }}
+        </code>
+      </div>
+      <div class="qb-joins__meta" *ngIf="join.cardinality">
+        {{ 'QUERY_BUILDER.CARDINALITY' | translate }}: {{ join.cardinality }}
+      </div>
+    </div>
+  </div>
+</div>

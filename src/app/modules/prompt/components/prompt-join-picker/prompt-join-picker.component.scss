@@ -1,0 +1,41 @@
+.prompt-join-picker {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+
+  .form-field {
+    width: 100%;
+  }
+}
+
+.prompt-join-picker__hint,
+.prompt-join-picker__empty {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0;
+  font-size: var(--fs-label);
+  color: var(--text-muted);
+
+  i {
+    color: var(--primary-color);
+  }
+}
+
+.prompt-join-picker__clear {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm, 4px);
+  background: var(--card-background);
+  color: var(--text-color);
+  font-size: var(--fs-control);
+  cursor: pointer;
+
+  &:hover {
+    background: var(--hover-background);
+  }
+}

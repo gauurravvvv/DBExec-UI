@@ -124,11 +124,11 @@ export class SystemAdminService {
   async add(form: FormGroup): Promise<any> {
     this._saving.set(true);
     try {
-      const { firstName, lastName, username, email } = form.value;
+      const { fullName, username, email } = form.value;
       return await lastValueFrom(
         this.http.apiPost(
           SYSTEM_ADMIN.ADD,
-          { firstName, lastName, username, email },
+          { fullName, username, email },
           { skipLoader: true },
         ),
       );
@@ -140,15 +140,13 @@ export class SystemAdminService {
   async update(form: FormGroup, justification?: string): Promise<any> {
     this._saving.set(true);
     try {
-      const { id, firstName, lastName, username, email, status } =
-        form.getRawValue();
+      const { id, fullName, username, email, status } = form.getRawValue();
       return await lastValueFrom(
         this.http.apiPut(
           SYSTEM_ADMIN.UPDATE + id,
           {
             id,
-            firstName,
-            lastName,
+            fullName,
             username,
             email,
             status: status ? 1 : 0,

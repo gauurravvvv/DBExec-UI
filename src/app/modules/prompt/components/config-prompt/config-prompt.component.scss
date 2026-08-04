@@ -133,18 +133,17 @@
       overflow-y: auto;
       padding-right: 10px;
 
+      // Single-column form at 50% width, one control per row — matching
+      // add-user / add-prompt so the config screen reads the same as every
+      // other module form.
       .form-container {
         display: flex;
-        gap: var(--space-10);
+        flex-direction: column;
 
-        .left-column {
-          flex: 1;
-          max-width: 100% !important;
-        }
-
+        .left-column,
         .right-column {
           flex: 1;
-          max-width: 50%;
+          max-width: 100%;
         }
 
         .form-grid {
@@ -152,9 +151,10 @@
           flex-direction: column;
           gap: var(--space-7);
           align-content: flex-start;
+          width: 50%;
 
           @media (max-width: 992px) {
-            width: 100%;
+            width: 75%;
           }
 
           @media (max-width: 768px) {
@@ -162,8 +162,10 @@
           }
 
           .form-row {
+            // Stack multi-field rows to one control per line.
             display: flex;
-            gap: var(--space-8);
+            flex-direction: column;
+            gap: var(--space-7);
 
             &.full-width {
               width: 100%;
@@ -171,7 +173,7 @@
             }
 
             .form-field {
-              flex: 1;
+              width: 100%;
               min-width: 0;
             }
           }

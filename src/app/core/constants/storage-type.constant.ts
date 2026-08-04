@@ -20,9 +20,10 @@ export enum StorageType {
   PERMISSION_TREE = 'permission-tree',
   // Phase-1 relay payload — populated by login() and consumed by the
   // /auth/relay component to render the greeting before phase 2
-  // returns. Cleared once the relay navigates to home.
-  RELAY_FIRST_NAME = 'relay-first-name',
-  RELAY_LAST_NAME = 'relay-last-name',
+  // returns. Cleared once the relay navigates to home. The user model
+  // now carries a single `fullName`, so a single relay key replaces
+  // the former first/last pair.
+  RELAY_FULL_NAME = 'relay-full-name',
   RELAY_IS_FIRST_LOGIN = 'relay-is-first-login',
   // Whether the org's AI assistant (Dex) is fully configured, from the login
   // response. Lets the launcher gate at session build without a separate

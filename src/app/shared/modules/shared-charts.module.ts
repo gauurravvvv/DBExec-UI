@@ -4,23 +4,9 @@ import { NgxEchartsModule } from 'ngx-echarts';
 import { ConfigurableCardChartComponent } from '../components/configurable-card-chart/configurable-card-chart.component';
 import { EchartVisualComponent } from '../components/echart-visual/echart-visual.component';
 
-/**
- * Lazy-load echarts-gl on first need. Each call returns a shared
- * promise so concurrent requests reuse the same import. Imported by
- * EchartVisualComponent before rendering a chart whose type requires
- * GL (any chart for which requiresGl(type) is true).
- *
- * Memoised because import() caches on the module level anyway; the
- * extra ref-counter is just so we can synchronously check "is it
- * already loaded?" without re-entering the promise.
- */
-let glLoadPromise: Promise<unknown> | null = null;
-export function loadEchartsGl(): Promise<unknown> {
-  if (!glLoadPromise) {
-    glLoadPromise = import('echarts-gl');
-  }
-  return glLoadPromise;
-}
+// loadEchartsGl moved to ./echarts-gl.loader to break the module<->component
+// circular import. Re-exported here for existing importers.
+export { loadEchartsGl } from './echarts-gl.loader';
 
 @NgModule({
   declarations: [EchartVisualComponent, ConfigurableCardChartComponent],

@@ -42,10 +42,8 @@
       class="admin-form"
       #formContainer
     >
-      <div class="form-container">
-        <!-- Left Column -->
-        <div class="form-grid left-column">
-          <!-- Name Field -->
+      <div class="form-grid">
+        <!-- Name Field -->
           <div class="form-field">
             <app-custom-input
               formControlName="name"
@@ -85,43 +83,15 @@
           >
           </app-custom-input>
 
-          <app-custom-input
-            [ngModel]="selectedTabName"
-            [ngModelOptions]="{ standalone: true }"
-            [label]="'COMMON.TAB' | translate"
-            [placeholder]="'COMMON.TAB' | translate"
-            icon="pi-box"
-            [inputDisabled]="true"
-          >
-          </app-custom-input>
-
-          <!-- Section dropdown — server-driven -->
+          <!-- Group (optional; buckets the prompt in the designer palette) -->
           <div class="form-field">
-            <app-custom-dropdown
-              formControlName="section"
-              [label]="'COMMON.SECTION' | translate"
-              [placeholder]="'COMMON.SELECT_SECTION' | translate"
-              [serverMode]="true"
-              [fetcher]="loadSectionsPage"
-              [pageSize]="10"
-              [preloadedItems]="preloadedSections"
-              [preloadedTotal]="preloadedSectionsTotal"
-              [resolveSelected]="resolveSelectedSection"
-              optionLabel="name"
-              optionValue="id"
-              [filter]="true"
-              filterBy="name"
-              [required]="true"
-              [showError]="
-                !!(
-                  promptForm.get('section')?.invalid &&
-                  promptForm.get('section')?.touched
-                )
-              "
-              [errorMessage]="'COMMON.SECTION_REQUIRED' | translate"
-              icon="pi-bookmark"
+            <app-custom-input
+              formControlName="groupName"
+              [label]="'PROMPT_MODULE.GROUP' | translate"
+              [placeholder]="'PROMPT_MODULE.GROUP_PLACEHOLDER' | translate"
+              icon="pi-folder"
             >
-            </app-custom-dropdown>
+            </app-custom-input>
           </div>
 
           <!-- Status -->
@@ -135,7 +105,6 @@
           >
           </app-custom-toggle>
         </div>
-      </div>
     </form>
   </div>
 </div>

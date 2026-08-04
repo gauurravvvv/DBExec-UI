@@ -281,14 +281,9 @@ export class ViewDatasetComponent implements OnInit, OnDestroy {
 
   onEdit() {
     if (this.datasetData.type === 2 && this.datasetData.queryBuilderId) {
-      // Type 2 (Prompt-based): navigate to execute-query-builder in edit mode
+      // Type 2 (Prompt-based): open the v2 composer in edit mode
       this.router.navigate(
-        [
-          QUERY_BUILDER.run(
-            this.datasetData.datasourceId,
-            this.datasetData.queryBuilderId,
-          ),
-        ],
+        [QUERY_BUILDER.compose(this.datasetData.queryBuilderId)],
         {
           queryParams: {
             editDatasetId: this.datasetData.id,

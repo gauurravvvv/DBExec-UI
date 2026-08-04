@@ -15,10 +15,7 @@ interface ValidRow {
   row: number;
   email: string;
   username: string;
-  firstName: string;
-  // Optional — many cultures use a single mononym. Empty cell in
-  // the CSV is normalised to null at the BE.
-  lastName?: string | null;
+  fullName: string;
   groupIds: string[];
   groupNames: string[];
   locale: string;
@@ -231,9 +228,9 @@ export class BulkAddUserComponent implements OnInit {
    */
   downloadTemplate(): void {
     const csv =
-      'email,username,firstName,lastName,groupNames,locale\n' +
-      'jane.doe@example.com,jane.doe,Jane,Doe,Marketing|Analytics,en\n' +
-      'john.smith@example.com,j.smith,John,Smith,Engineering,\n';
+      'email,username,fullName,groupNames,locale\n' +
+      'jane.doe@example.com,jane.doe,Jane Doe,Marketing|Analytics,en\n' +
+      'john.smith@example.com,j.smith,John Smith,Engineering,\n';
     this.downloadCsvBlob(csv, 'bulk-users-template.csv');
   }
 

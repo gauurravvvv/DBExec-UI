@@ -96,6 +96,8 @@ export const DATASOURCE = {
   SCHEMAS_SEGMENT: '/schemas/',
   TABLES_SEGMENT: '/tables/',
   COLUMNS_SEGMENT: '/columns',
+  // GET /datasources/:datasourceId/foreign-keys (no-SQL join picker)
+  FOREIGN_KEYS_SUFFIX: '/foreign-keys',
   // POST /datasources/:datasourceId/query
   RUN_QUERY_PREFIX: '/datasources/',
   RUN_QUERY_SUFFIX: '/query',
@@ -237,31 +239,6 @@ export const CALCULATED_FIELD = {
   DELETE: '/calculated-fields/', // DELETE /calculated-fields/:id
 };
 
-export const TAB = {
-  LIST: '/tabs',
-  ADD: '/tabs',
-  TREE: '/tabs/tree',
-  GET: '/tabs/', // GET /tabs/:tabId
-  UPDATE: '/tabs/', // PUT /tabs/:tabId
-  DELETE: '/tabs/', // DELETE /tabs/:tabId
-  BULK_DELETE: '/tabs/bulk-delete',
-  // GET /tabs/:tabId/sections?queryBuilderId=
-  SECTIONS_PREFIX: '/tabs/',
-  SECTIONS_SUFFIX: '/sections',
-};
-
-export const SECTION = {
-  LIST: '/sections',
-  ADD: '/sections',
-  GET: '/sections/',
-  UPDATE: '/sections/',
-  DELETE: '/sections/',
-  BULK_DELETE: '/sections/bulk-delete',
-  // GET /sections/:sectionId/prompts?queryBuilderId=&tabId=
-  PROMPTS_PREFIX: '/sections/',
-  PROMPTS_SUFFIX: '/prompts',
-};
-
 export const PROMPT = {
   LIST: '/prompts',
   ADD: '/prompts',
@@ -278,6 +255,11 @@ export const PROMPT = {
   REFRESH_VALUES_SUFFIX: '/refresh-values',
   // PUT/GET /prompts/:promptId/appearance
   APPEARANCE_SUFFIX: '/appearance',
+  // Query Builder v2 — value-source config + runtime value lookup (spec 6.6)
+  VALUE_SOURCE_SUFFIX: '/value-source', // GET/PUT /prompts/:id/value-source
+  VALUES_PREVIEW_SUFFIX: '/values/preview', // POST -> sample rows before saving
+  VALUES_SEARCH_SUFFIX: '/values/search', // POST -> paged typeahead + cascade
+  VALUES_RESOLVE_SUFFIX: '/values/resolve', // POST -> bulk-paste { matched, unmatched }
 };
 
 export const QUERY_BUILDER = {
@@ -296,6 +278,16 @@ export const QUERY_BUILDER = {
   STRUCTURE_SUFFIX: '/structure',
   // POST /query-builders/:queryBuilderId/execute
   EXECUTE_SUFFIX: '/execute',
+  // Query Builder v2 — runtime + admin surface
+  SCHEMA_SUFFIX: '/schema', // GET /query-builders/:id/schema
+  PREVIEW: '/query-builders/preview', // POST tree -> { sql, paramCount, joinsUsed, warnings }
+  VALIDATE: '/query-builders/validate', // POST tree -> { errors }
+  RUN: '/query-builders/execute', // POST tree -> { columns, rows, ... }
+  COUNT: '/query-builders/count', // POST tree -> { total }
+  SETTINGS_SUFFIX: '/settings',
+  DEFAULT_TREE_SUFFIX: '/default-tree',
+  OUTPUT_COLUMNS_SUFFIX: '/output-columns',
+  JOINS_SUFFIX: '/joins',
 };
 
 export const QUERY = {

@@ -1,0 +1,9 @@
+<div class="qb-sql">
+  <div class="qb-sql__host" #host></div>
+  <div class="qb-sql__warnings" *ngIf="warnings?.length">
+    <app-chip *ngFor="let w of warnings" variant="status">
+      <i class="pi pi-exclamation-triangle"></i>
+      {{ 'QUERY_BUILDER.WARNING_' + w | translate }}
+    </app-chip>
+  </div>
+</div>

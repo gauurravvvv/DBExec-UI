@@ -1,0 +1,76 @@
+<div class="qb-settings">
+  <header class="qb-settings__head">
+    <div>
+      <h2 class="qb-settings__title">
+        {{ 'QUERY_BUILDER.SETTINGS' | translate }}
+      </h2>
+      <p class="qb-settings__sub">
+        {{ 'QUERY_BUILDER.SETTINGS_HINT' | translate }}
+      </p>
+    </div>
+    <app-button
+      variant="primary"
+      size="sm"
+      icon="pi pi-save"
+      [loading]="saving()"
+      (clicked)="save()"
+    >
+      {{ 'COMMON.SAVE' | translate }}
+    </app-button>
+  </header>
+
+  <div class="qb-settings__loading" *ngIf="loading()">
+    <p-skeleton height="12rem"></p-skeleton>
+  </div>
+
+  <div class="qb-settings__grid" *ngIf="!loading()">
+    <app-custom-number
+      [label]="'QUERY_BUILDER.DEFAULT_LIMIT' | translate"
+      [min]="1"
+      [ngModel]="model().defaultLimit"
+      (onChangeEvent)="patch('defaultLimit', $event)" />
+
+    <app-custom-number
+      [label]="'QUERY_BUILDER.MAX_LIMIT' | translate"
+      [min]="1"
+      [ngModel]="model().maxLimit"
+      (onChangeEvent)="patch('maxLimit', $event)" />
+
+    <div class="qb-settings__toggle">
+      <span>{{ 'QUERY_BUILDER.FORCE_DISTINCT' | translate }}</span>
+      <app-custom-toggle
+        [showStatusLabel]="false"
+        [ngModel]="model().forceDistinct"
+        (onChange)="patch('forceDistinct', $event.checked)" />
+    </div>
+
+    <div class="qb-settings__toggle">
+      <span>{{ 'QUERY_BUILDER.USES_OPERATOR_ENGINE' | translate }}</span>
+      <app-custom-toggle
+        [showStatusLabel]="false"
+        [ngModel]="model().usesOperatorEngine"
+        (onChange)="patch('usesOperatorEngine', $event.checked)" />
+    </div>
+
+    <app-custom-input
+      [label]="'QUERY_BUILDER.BASE_SCHEMA' | translate"
+      [ngModel]="model().baseSchema"
+      (ngModelChange)="patch('baseSchema', $event)" />
+    <app-custom-input
+      [label]="'QUERY_BUILDER.BASE_TABLE' | translate"
+      [ngModel]="model().baseTable"
+      (ngModelChange)="patch('baseTable', $event)" />
+    <app-custom-input
+      [label]="'QUERY_BUILDER.BASE_ALIAS' | translate"
+      [ngModel]="model().baseAlias"
+      (ngModelChange)="patch('baseAlias', $event)" />
+
+    <app-custom-input
+      class="qb-settings__wide"
+      inputMode="textarea"
+      [label]="'QUERY_BUILDER.MANDATORY_FILTER' | translate"
+      [ngModel]="model().mandatoryFilter"
+      [placeholder]="'QUERY_BUILDER.MANDATORY_FILTER_HINT' | translate"
+      (ngModelChange)="patch('mandatoryFilter', $event)" />
+  </div>
+</div>

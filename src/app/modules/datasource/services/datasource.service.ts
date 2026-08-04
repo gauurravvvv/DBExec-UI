@@ -319,6 +319,28 @@ export class DatasourceService {
     );
   }
 
+  /**
+   * Foreign-key edges for a datasource — feeds the no-SQL join picker.
+   * Optionally scope to a single originating table with { schema, table }.
+   */
+  listForeignKeys(
+    datasourceId: string,
+    scope?: { schema?: string; table?: string },
+    skipLoader = true,
+  ): Promise<any> {
+    const params: Record<string, any> = {};
+    if (scope?.schema) params['schema'] = scope.schema;
+    if (scope?.table) params['table'] = scope.table;
+    return lastValueFrom(
+      this.http.apiGet(
+        DATASOURCE.LIST_SCHEMAS_PREFIX +
+          datasourceId +
+          DATASOURCE.FOREIGN_KEYS_SUFFIX,
+        { params, ...(skipLoader ? { skipLoader: true } : {}) },
+      ),
+    );
+  }
+
   async runQuery(params: any): Promise<any> {
     this._queryLoading.set(true);
     try {

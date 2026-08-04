@@ -119,7 +119,7 @@ export class ManageRlsAssignmentsComponent implements OnInit {
         if (this.globalService.handleSuccessService(res, false)) {
           const users = (res?.data?.users ?? []).map((u: any) => ({
             ...u,
-            displayLabel: `${u.firstName} ${u.lastName}`,
+            displayLabel: u.fullName,
           }));
           return { items: users, total: res?.data?.count ?? users.length };
         }
@@ -147,7 +147,7 @@ export class ManageRlsAssignmentsComponent implements OnInit {
           if (this.globalService.handleSuccessService(response, false)) {
             const users = (response?.data?.users ?? []).map((u: any) => ({
               ...u,
-              displayLabel: `${u.firstName} ${u.lastName}`,
+              displayLabel: u.fullName,
             }));
             // Keep the legacy {label, value} array populated for any consumers
             // outside this dropdown.

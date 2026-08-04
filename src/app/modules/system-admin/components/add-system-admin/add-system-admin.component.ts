@@ -41,21 +41,14 @@ export class AddSystemAdminComponent implements OnInit, HasUnsavedChanges {
 
   private initForm(): void {
     this.adminForm = this.fb.group({
-      firstName: [
+      fullName: [
         '',
         [
           Validators.required,
           Validators.minLength(2),
-          Validators.maxLength(30),
-          Validators.pattern(REGEX.firstName),
+          Validators.maxLength(60),
+          Validators.pattern(REGEX.fullName),
         ],
-      ],
-      // lastName is OPTIONAL — many cultures use a single mononym.
-      // Drop required + minLength; keep pattern + maxLength so an
-      // explicitly typed value still has to be well-formed.
-      lastName: [
-        '',
-        [Validators.maxLength(30), Validators.pattern(REGEX.lastName)],
       ],
       username: [
         '',
@@ -103,37 +96,20 @@ export class AddSystemAdminComponent implements OnInit, HasUnsavedChanges {
     });
   }
 
-  getFirstNameError(): string {
-    const control = this.adminForm.get('firstName');
+  getFullNameError(): string {
+    const control = this.adminForm.get('fullName');
     if (control?.errors?.['required'])
-      return this.translate.instant('VALIDATION.FIRST_NAME_REQUIRED');
+      return this.translate.instant('VALIDATION.FULL_NAME_REQUIRED');
     if (control?.errors?.['minlength'])
-      return this.translate.instant('VALIDATION.FIRST_NAME_MIN', {
+      return this.translate.instant('VALIDATION.FULL_NAME_MIN', {
         min: control.errors['minlength'].requiredLength,
       });
     if (control?.errors?.['maxlength'])
-      return this.translate.instant('VALIDATION.FIRST_NAME_MAX', {
+      return this.translate.instant('VALIDATION.FULL_NAME_MAX', {
         max: control.errors['maxlength'].requiredLength,
       });
     if (control?.errors?.['pattern'])
-      return this.translate.instant('VALIDATION.FIRST_NAME_PATTERN');
-    return '';
-  }
-
-  getLastNameError(): string {
-    const control = this.adminForm.get('lastName');
-    if (control?.errors?.['required'])
-      return this.translate.instant('VALIDATION.LAST_NAME_REQUIRED');
-    if (control?.errors?.['minlength'])
-      return this.translate.instant('VALIDATION.LAST_NAME_MIN', {
-        min: control.errors['minlength'].requiredLength,
-      });
-    if (control?.errors?.['maxlength'])
-      return this.translate.instant('VALIDATION.LAST_NAME_MAX', {
-        max: control.errors['maxlength'].requiredLength,
-      });
-    if (control?.errors?.['pattern'])
-      return this.translate.instant('VALIDATION.LAST_NAME_PATTERN');
+      return this.translate.instant('VALIDATION.FULL_NAME_PATTERN');
     return '';
   }
 

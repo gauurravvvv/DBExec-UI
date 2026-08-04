@@ -1,0 +1,57 @@
+<div class="prompt-join-picker">
+  <p class="prompt-join-picker__hint">
+    <i class="pi pi-info-circle"></i>
+    {{ 'PROMPT_MODULE.JOIN_PICKER_HINT' | translate }}
+  </p>
+
+  <ng-container *ngIf="reachableTables().length; else noFks">
+    <div class="form-field">
+      <app-custom-dropdown
+        [label]="'PROMPT_MODULE.RELATED_TABLE' | translate"
+        [placeholder]="'PROMPT_MODULE.SELECT_RELATED_TABLE' | translate"
+        [options]="reachableTables()"
+        optionLabel="label"
+        optionValue="value"
+        [filter]="true"
+        filterBy="label"
+        [ngModel]="selectedEdgeKey()"
+        (onChangeEvent)="onEdgeChange($event)"
+        icon="pi-sitemap"
+      >
+      </app-custom-dropdown>
+    </div>
+
+    <div class="form-field" *ngIf="selectedEdgeKey()">
+      <app-custom-dropdown
+        [label]="'PROMPT_MODULE.RELATED_COLUMN' | translate"
+        [placeholder]="'PROMPT_MODULE.SELECT_RELATED_COLUMN' | translate"
+        [options]="columns()"
+        optionLabel="label"
+        optionValue="value"
+        [filter]="true"
+        filterBy="label"
+        [ngModel]="selectedColumn()"
+        (onChangeEvent)="onColumnChange($event)"
+        icon="pi-id-card"
+      >
+      </app-custom-dropdown>
+    </div>
+
+    <button
+      *ngIf="selectedEdgeKey()"
+      type="button"
+      class="prompt-join-picker__clear"
+      (click)="clear()"
+    >
+      <i class="pi pi-times"></i>
+      {{ 'PROMPT_MODULE.CLEAR_JOIN' | translate }}
+    </button>
+  </ng-container>
+
+  <ng-template #noFks>
+    <p class="prompt-join-picker__empty">
+      <i class="pi pi-info-circle"></i>
+      {{ 'PROMPT_MODULE.NO_RELATED_TABLES' | translate }}
+    </p>
+  </ng-template>
+</div>

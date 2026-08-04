@@ -44,37 +44,20 @@
     <!-- Form Section -->
     <form autocomplete="off" [formGroup]="adminForm" class="admin-form">
       <div class="form-grid">
-        <!-- First Name -->
+        <!-- Full Name -->
         <app-custom-input
-          formControlName="firstName"
-          [label]="'COMMON.FIRST_NAME' | translate"
-          [placeholder]="'COMMON.ENTER_FIRST_NAME' | translate"
+          formControlName="fullName"
+          [label]="'COMMON.FULL_NAME' | translate"
+          [placeholder]="'COMMON.ENTER_FULL_NAME' | translate"
           icon="pi-user"
           [required]="true"
           [showError]="
             !!(
-              adminForm.get('firstName')?.invalid &&
-              adminForm.get('firstName')?.touched
+              adminForm.get('fullName')?.invalid &&
+              adminForm.get('fullName')?.touched
             )
           "
-          [errorMessage]="getFirstNameError()"
-        >
-        </app-custom-input>
-
-        <!-- Last Name -->
-        <app-custom-input
-          formControlName="lastName"
-          [label]="'COMMON.LAST_NAME' | translate"
-          [placeholder]="'COMMON.ENTER_LAST_NAME' | translate"
-          icon="pi-user"
-          [required]="false"
-          [showError]="
-            !!(
-              adminForm.get('lastName')?.invalid &&
-              adminForm.get('lastName')?.touched
-            )
-          "
-          [errorMessage]="getLastNameError()"
+          [errorMessage]="getFullNameError()"
         >
         </app-custom-input>
 

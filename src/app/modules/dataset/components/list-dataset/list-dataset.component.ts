@@ -514,9 +514,8 @@ export class ListDatasetComponent implements OnInit, OnDestroy {
 
   onQueryBuilderSelect(queryBuilder: any) {
     this.showQueryBuilderPopup = false;
-    this.router.navigate([
-      QUERY_BUILDER.run(this.selectedDatasource, queryBuilder.id),
-    ]);
+    // Query Builder v2 — open the business-user composer.
+    this.router.navigate([QUERY_BUILDER.compose(queryBuilder.id)]);
   }
 
   onEdit(id: string) {

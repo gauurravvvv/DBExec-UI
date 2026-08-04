@@ -16,8 +16,7 @@ import { GlobalService } from 'src/app/core/services/global.service';
 import { SUPPORTED_LOCALES } from 'src/app/core/services/locale.service';
 import {
   adminEmailSchema,
-  adminFirstNameSchema,
-  adminLastNameSchema,
+  adminFullNameSchema,
   adminLocaleSchema,
   adminUsernameSchema,
   dbHostSchema,
@@ -102,8 +101,7 @@ export class AddOrganisationComponent implements OnInit, HasUnsavedChanges {
       // Bootstrap-admin identity — gives the org's first administrator a
       // real name + username instead of a hardcoded placeholder. Validators
       // sourced from the same shared Zod schema the BE enforces.
-      adminFirstName: ['', [zodValidator(adminFirstNameSchema)]],
-      adminLastName: ['', [zodValidator(adminLastNameSchema)]],
+      adminFullName: ['', [zodValidator(adminFullNameSchema)]],
       adminUsername: ['', [zodValidator(adminUsernameSchema)]],
       adminLocale: ['en', [zodValidator(adminLocaleSchema)]],
       // Security + email policy now live on the per-org OrgPolicy
@@ -140,19 +138,16 @@ export class AddOrganisationComponent implements OnInit, HasUnsavedChanges {
     const nameValid = this.orgForm.get('name')?.valid || false;
     const descValid = this.orgForm.get('description')?.valid || false;
     const emailValid = this.orgForm.get('adminEmail')?.valid || false;
-    const firstNameValid = this.orgForm.get('adminFirstName')?.valid || false;
-    const lastNameValid = this.orgForm.get('adminLastName')?.valid || false;
+    const fullNameValid = this.orgForm.get('adminFullName')?.valid || false;
     const usernameValid = this.orgForm.get('adminUsername')?.valid || false;
     const localeValid = this.orgForm.get('adminLocale')?.valid || false;
     // Step 1 collects org basics AND the bootstrap admin's identity
-    // (first / last name, username, email, locale). All must be valid
-    // to advance.
+    // (full name, username, email, locale). All must be valid to advance.
     return (
       nameValid &&
       descValid &&
       emailValid &&
-      firstNameValid &&
-      lastNameValid &&
+      fullNameValid &&
       usernameValid &&
       localeValid
     );

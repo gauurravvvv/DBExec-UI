@@ -1,167 +1,121 @@
-@keyframes highlightBackground {
-  0% {
-    background-color: var(--primary-color-transparent);
-  }
-  50% {
-    background-color: var(--primary-color-transparent);
-  }
-  100% {
-    background-color: var(--surface-ground);
-  }
-}
-
-@keyframes highlightSchemaBackground {
-  0% {
-    background-color: var(--primary-color-transparent);
-  }
-  50% {
-    background-color: var(--primary-color-transparent);
-  }
-  100% {
-    background-color: var(--surface-card);
-  }
-}
-
-@keyframes pulse {
-  0% {
-    box-shadow: 0 0 0 0 var(--warning-bg);
-  }
-  70% {
-    box-shadow: 0 0 0 10px rgba(255, 87, 34, 0);
-  }
-  100% {
-    box-shadow: 0 0 0 0 rgba(255, 87, 34, 0);
-  }
-}
-
-@keyframes pulseGlow {
-  0% {
-    box-shadow: 0 0 0 0 var(--warning-bg);
-  }
-  70% {
-    box-shadow: 0 0 0 10px rgba(255, 193, 7, 0);
-  }
-  100% {
-    box-shadow: 0 0 0 0 rgba(255, 193, 7, 0);
-  }
-}
-
 .add-admin-wrapper {
+  background-color: var(--card-background);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
   height: 100%;
+  display: flex;
+  flex-direction: column;
 
   .add-admin-container {
-    background: var(--card-background);
-    border-radius: var(--radius-md);
-    height: 100%;
+    padding: var(--space-8);
+    max-width: 100%;
+    margin: var(--space-0);
+    flex: 1;
     display: flex;
     flex-direction: column;
-    padding: var(--space-8);
+    // Fill the available height like the other module forms (edit-user /
+    // edit-role) instead of capping to content via max-height: calc(...),
+    // which left the form container short of full height. The inner
+    // .admin-form (flex: 1; overflow-y: auto) handles scrolling.
+    height: 100%;
 
     .page-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 24px;
-      position: sticky;
-      top: 0;
-      background: var(--card-background);
-      z-index: var(--z-base);
+      margin-bottom: 2rem;
+      flex-shrink: 0;
 
       .left-section {
         display: flex;
         align-items: center;
-
-        button {
-          min-width: 0rem;
-        }
+        gap: var(--space-6);
 
         .back-button {
-          width: 36px !important;
-          height: 36px !important;
-          border-radius: 50% !important;
-          display: flex !important;
-          align-items: center !important;
-          justify-content: center !important;
           padding: var(--space-0) !important;
-          transition: all var(--motion-base) ease !important;
+          width: 36px;
+          height: 36px;
+          border-radius: 50% !important;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background: transparent !important;
+          color: var(--text-color) !important;
+          min-width: 0;
+          border: none !important;
+          transition: all var(--motion-base) ease;
 
           &:hover {
             background: var(--hover-background) !important;
-            transform: translateX(-2px);
+          }
+
+          i {
+            font-size: var(--fs-h2);
           }
         }
 
         h2 {
+          color: var(--text-color);
           margin: var(--space-0);
           font-size: var(--fs-h1);
           font-weight: var(--fw-semibold);
-          color: var(--text-color);
         }
       }
 
       .action-buttons {
         display: flex;
         gap: var(--space-5);
-      }
 
-      .btn-cancel {
-        background: var(--card-background) !important;
-        border: 1px solid var(--border-color) !important;
-        color: var(--text-color) !important;
-        box-shadow: var(--shadow-sm);
-        font-weight: var(--fw-semibold);
-        transition: all var(--motion-base) ease;
+        .btn-cancel {
+          background: var(--card-background) !important;
+          border: 1px solid var(--border-color) !important;
+          color: var(--text-color) !important;
+          padding: 0.65rem 1.25rem;
+          border-radius: var(--radius-sm) !important;
+          font-weight: var(--fw-semibold);
+          box-shadow: var(--shadow-sm);
 
-        &:hover:not(:disabled) {
-          background: var(--hover-background) !important;
-          border-color: var(--secondary-color) !important;
+          &:hover:not(:disabled) {
+            background: var(--hover-background) !important;
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+          }
+
+          &:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+          }
         }
 
-        &:disabled {
-          opacity: 0.6;
-          cursor: not-allowed;
-        }
-      }
+        .btn-save {
+          background: linear-gradient(
+            135deg,
+            var(--primary-color),
+            var(--primary-hover)
+          ) !important;
+          color: white !important;
+          border: none !important;
+          padding: 0.65rem 1.25rem;
+          border-radius: var(--radius-sm) !important;
+          font-weight: var(--fw-semibold);
+          box-shadow: 0 4px 10px var(--primary-color-transparent);
+          transition: all var(--motion-base) ease;
 
-      .btn-save {
-        background: linear-gradient(
-          135deg,
-          var(--primary-color),
-          var(--primary-hover)
-        ) !important;
-        color: white !important;
-        border: none !important;
-        box-shadow: 0 4px 10px var(--primary-color-transparent);
-        font-weight: var(--fw-semibold);
-        transition: all var(--motion-base) ease;
+          &:hover:not(:disabled) {
+            opacity: 1;
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+          }
 
-        &:hover:not(:disabled) {
-          transform: translateY(-1px);
-          box-shadow: var(--shadow-md);
-        }
-
-        &:focus {
-          box-shadow: 0 0 0 2px var(--primary-color-transparent);
-        }
-
-        &:disabled {
-          opacity: 0.6;
-          cursor: not-allowed;
-          transform: none;
-        }
-      }
-
-      .warning-section {
-        margin-right: 20px;
-
-        .duplicate-warning {
-          display: flex;
-          align-items: center;
-          gap: var(--space-4);
-          color: var(--warning-color);
+          &:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            background: var(--secondary-color) !important;
+            box-shadow: none;
+          }
 
           i {
-            font-size: var(--fs-h2);
+            font-size: var(--fs-body);
           }
         }
       }
@@ -170,17 +124,14 @@
     .admin-form {
       flex: 1;
       overflow-y: auto;
-      padding-right: 10px;
-      display: flex;
-      justify-content: left;
+      padding-right: 12px;
 
       &::-webkit-scrollbar {
         width: 8px;
-        height: 8px;
       }
 
       &::-webkit-scrollbar-track {
-        background: transparent;
+        background: var(--card-background);
         border-radius: var(--radius-xs);
       }
 
@@ -193,303 +144,105 @@
         }
       }
 
-      // For Firefox
-      scrollbar-width: thin;
-      scrollbar-color: var(--border-color) transparent;
-
       .form-grid {
         display: flex;
         flex-direction: column;
-        gap: var(--space-7);
+        gap: var(--space-8);
+        width: 50%;
+        margin-bottom: 0;
+        padding-bottom: 24px;
+
+        @media (max-width: 768px) {
+          width: 100%;
+        }
+      }
+
+      .form-field {
         width: 100%;
-        align-content: flex-start;
 
-        .form-field {
-          display: flex;
-          flex-direction: column;
-          gap: var(--space-4);
-          width: 50%;
-          margin-bottom: 1rem;
-          position: relative;
+        label {
+          display: block;
+          margin-bottom: 0.5rem;
+          color: var(--text-color);
+          font-weight: var(--fw-medium);
 
-          @media (max-width: 768px) {
-            width: 100%;
+          .required {
+            color: var(--error-color);
           }
+        }
 
-          label {
-            font-weight: var(--fw-medium);
+        .p-input-icon-left,
+        .p-input-icon-right {
+          width: 100%;
+
+          input {
+            width: 100%;
+            background: var(--card-background);
+            border: 1px solid var(--border-color);
             color: var(--text-color);
 
-            .required {
-              color: var(--error-color);
-              margin-left: 4px;
+            &::placeholder {
+              color: var(--text-color);
+              opacity: 0.5;
+            }
+
+            &:focus {
+              border-color: var(--primary-color);
+              box-shadow: 0 0 0 2px var(--primary-color-transparent);
+            }
+
+            &.ng-invalid.ng-dirty {
+              border-color: var(--error-color);
             }
           }
 
-          .p-input-icon-left {
-            position: relative;
-            width: 100%;
+          i {
+            color: var(--text-color);
+            opacity: 0.7;
 
-            i {
-              color: var(--text-color);
-              opacity: 0.4;
-            }
-
-            input {
-              width: 100%;
-              padding-left: 35px;
-              background: var(--card-background);
-              color: var(--text-color);
-              border-color: var(--border-color);
-
-              &::placeholder {
-                color: var(--text-color);
-                opacity: 0.4;
-              }
-            }
-
-            textarea {
-              width: 100%;
-              padding-left: 35px;
-              min-height: 80px;
-              resize: vertical;
-              background: var(--card-background);
-              color: var(--text-color);
-              border-color: var(--border-color);
-
-              &::placeholder {
-                color: var(--text-color);
-                opacity: 0.4;
-              }
-            }
-          }
-
-          .p-input-icon-right {
-            i:last-child {
+            &.pi-eye {
               cursor: pointer;
-              right: 10px;
-              color: var(--text-color);
-              opacity: 0.4;
-            }
-          }
-
-          .error-message {
-            color: var(--error-color) !important;
-            font-size: var(--fs-label);
-            position: absolute;
-            bottom: -20px;
-            left: 0;
-          }
-
-          .status-wrapper {
-            display: flex;
-            align-items: center;
-            gap: var(--space-5);
-            padding-top: 0.25rem;
-
-            .status-text {
-              color: var(--text-color);
-              font-size: var(--fs-body);
+              &:hover {
+                opacity: 1;
+              }
             }
           }
         }
 
-        .fields-container {
-          width: 100%;
-          margin: var(--space-0);
-          padding: var(--space-0);
+        .error-message {
+          color: var(--error-color);
+          // Match the size used by app-custom-input /
+          // app-custom-dropdown / app-custom-multiselect so the
+          // inline multiselect-required error matches every other
+          // field's validation message.
+          font-size: var(--fs-label);
+          margin-top: 0.25rem;
+          display: block;
+        }
+      }
 
-          .fields-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+      .form-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: var(--space-5);
+        margin-top: 24px;
 
-            .button-group {
-              display: flex;
-              align-items: center;
-
-              .expand-collapse-btn {
-                color: var(--secondary-color) !important;
-
-                &:hover {
-                  color: var(--primary-color) !important;
-                  background: var(--hover-background) !important;
-                }
-
-                i {
-                  color: inherit !important;
-                }
-              }
-
-              .clear-btn {
-                margin-right: -0.5rem;
-                color: var(--error-color) !important;
-
-                &:hover {
-                  background: rgba(var(--red-500), 0.04);
-                }
-              }
-
-              .add-btn {
-                z-index: var(--z-base);
-                color: var(--primary-color) !important;
-              }
-            }
-
-            label {
-              font-weight: var(--fw-medium);
-              color: var(--text-color);
-
-              .required {
-                color: var(--error-color);
-                margin-left: 4px;
-              }
-            }
-          }
-
-          .fields-list {
-            display: flex;
-            flex-direction: column;
-            gap: var(--space-6);
-
-            .credential-set {
-              display: flex;
-              align-items: flex-end;
-              gap: var(--space-7);
-              margin-bottom: 16px;
-              padding-bottom: 16px;
-              border-bottom: 1px solid var(--border-color);
-
-              &:last-child {
-                border-bottom: none;
-                padding-bottom: 0;
-              }
-
-              .credentials-grid {
-                flex: 1;
-                display: grid;
-                grid-template-columns: repeat(4, 1fr);
-                gap: var(--space-7);
-                align-items: end;
-
-                @media (max-width: 1200px) {
-                  grid-template-columns: repeat(2, 1fr);
-                }
-
-                @media (max-width: 768px) {
-                  grid-template-columns: 1fr;
-                }
-
-                .field-row {
-                  .field-input {
-                    display: flex;
-                    flex-direction: column;
-                    gap: var(--space-4);
-                    position: relative;
-
-                    &::after {
-                      content: '';
-                      position: absolute;
-                      bottom: -16px;
-                      left: 0;
-                      width: calc(100% - 20px);
-                      height: 1px;
-                      background-color: var(--border-color);
-                    }
-
-                    &:last-child::after {
-                      display: none;
-                    }
-
-                    label {
-                      font-weight: var(--fw-medium);
-                      color: var(--text-color);
-                    }
-
-                    .p-input-icon-left {
-                      width: 100%;
-
-                      input {
-                        width: 100%;
-                        background: var(--card-background);
-                        color: var(--text-color);
-                        border-color: var(--border-color);
-
-                        &::placeholder {
-                          color: var(--text-color);
-                          opacity: 0.4;
-                        }
-
-                        &:hover {
-                          border-color: var(--primary-color);
-                        }
-
-                        &:focus {
-                          border-color: var(--primary-color);
-                          box-shadow: 0 0 0 1px var(--primary-color-transparent);
-                        }
-                      }
-
-                      i {
-                        color: var(--text-color);
-                        opacity: 0.4;
-                      }
-                    }
-
-                    .error-message {
-                      color: var(--error-color) !important;
-                      font-size: var(--fs-label);
-                      position: absolute;
-                      bottom: -20px;
-                      left: 0;
-                    }
-                  }
-                }
-              }
-
-              .remove-btn {
-                width: 40px;
-                height: 40px;
-                padding: var(--space-0);
-                margin-bottom: 8px;
-                cursor: pointer;
-
-                &:hover {
-                  background: var(--error-color-transparent) !important;
-                  color: var(--error-color) !important;
-                }
-
-                &:disabled {
-                  cursor: not-allowed;
-                  opacity: 0.6;
-                }
-              }
-            }
-          }
+        .p-button {
+          display: flex;
+          align-items: center;
+          gap: var(--space-4);
         }
       }
     }
   }
 }
 
-@media (max-width: 576px) {
-  .add-admin-wrapper {
-    padding: var(--space-5);
+.p-input-icon-left.p-input-icon-right {
+  position: relative;
 
-    .add-admin-container {
-      padding: var(--space-6);
-
-      .page-header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: var(--space-6);
-
-        .action-buttons {
-          width: 100%;
-          justify-content: flex-end;
-        }
-      }
-    }
+  i.pi-lock {
+    left: 12px;
+    font-size: var(--fs-h2);
   }
 }
 
@@ -536,25 +289,12 @@
     }
   }
 
-  .p-inputtext:enabled:focus {
-    box-shadow: 0 0 0 1px var(--primary-color-transparent) !important;
-    border-color: var(--primary-color) !important;
-  }
-
-  .p-inputtext:enabled:hover {
-    border-color: var(--primary-color) !important;
-  }
-
   .p-dropdown {
-    background: var(--card-background);
-    border-color: var(--border-color);
+    background: var(--card-background) !important;
+    border: 1px solid var(--border-color) !important;
 
-    &.ng-invalid.ng-touched {
-      border-color: var(--error-color);
-    }
-
-    &:not(.ng-invalid) {
-      border-color: var(--border-color);
+    &:not(.p-disabled):hover {
+      border-color: var(--primary-color) !important;
     }
 
     &.p-focus {
@@ -563,28 +303,29 @@
     }
 
     .p-dropdown-label {
-      color: var(--text-color);
+      color: var(--text-color) !important;
 
       &.p-placeholder {
-        color: var(--text-color);
-        opacity: 0.4;
-      }
-
-      &.p-highlight {
-        background: transparent !important;
         color: var(--text-color) !important;
+        opacity: 0.7;
       }
     }
 
     .p-dropdown-trigger {
-      color: var(--text-color);
+      color: var(--text-color) !important;
       opacity: 0.7;
+
+      &:hover {
+        color: var(--primary-color) !important;
+        opacity: 1;
+      }
     }
   }
 
   .p-dropdown-panel {
     background: var(--card-background) !important;
     border: 1px solid var(--border-color) !important;
+    margin-top: 2px;
 
     .p-dropdown-header {
       background: var(--hover-background) !important;
@@ -598,7 +339,16 @@
 
         &::placeholder {
           color: var(--text-color) !important;
-          opacity: 0.4;
+          opacity: 0.7;
+        }
+
+        &:hover {
+          border-color: var(--primary-color) !important;
+        }
+
+        &:focus {
+          border-color: var(--primary-color) !important;
+          box-shadow: 0 0 0 1px var(--primary-color-transparent) !important;
         }
       }
 
@@ -633,560 +383,162 @@
         opacity: 0.4;
       }
     }
-
-    .p-dropdown-items-wrapper {
-      &::-webkit-scrollbar {
-        width: 8px;
-        height: 8px;
-      }
-
-      &::-webkit-scrollbar-track {
-        background: transparent;
-        border-radius: var(--radius-xs);
-      }
-
-      &::-webkit-scrollbar-thumb {
-        background: var(--border-color);
-        border-radius: var(--radius-xs);
-
-        &:hover {
-          background: var(--secondary-color);
-        }
-      }
-    }
   }
 
-  // Add multiselect styles to match dropdown
-  .p-multiselect {
-    background: var(--card-background);
-    border-color: var(--border-color);
-
-    &.ng-invalid.ng-touched {
-      border-color: var(--error-color);
-    }
-
-    &:not(.ng-invalid) {
-      border-color: var(--border-color);
-    }
-
-    &.p-focus {
-      border-color: var(--primary-color) !important;
+  .p-inputtext {
+    &:enabled:focus {
       box-shadow: 0 0 0 1px var(--primary-color-transparent) !important;
+      border-color: var(--primary-color) !important;
     }
 
-    .p-multiselect-label {
-      color: var(--text-color);
-      padding: var(--space-4);
-
-      &.p-placeholder {
-        color: var(--text-color);
-        opacity: 0.4;
-      }
-    }
-
-    .p-multiselect-trigger {
-      color: var(--text-color);
-      opacity: 0.7;
-    }
-
-    .p-multiselect-token {
-      background: var(--primary-color);
-      color: var(--text-color);
-      padding: 0.25rem 0.5rem;
-      margin: var(--space-1);
-      border-radius: var(--radius-xs);
-      display: inline-flex;
-      align-items: center;
-      gap: var(--space-4);
-
-      .p-multiselect-token-icon {
-        color: var(--text-color);
-        font-size: var(--fs-label);
-        cursor: pointer;
-        border-radius: 50%;
-        transition: all var(--motion-base);
-
-        &:hover {
-          background: rgba(255, 255, 255, 0.2);
-        }
-      }
+    &:enabled:hover {
+      border-color: var(--primary-color) !important;
     }
   }
 
-  .p-multiselect-panel {
-    background: var(--card-background) !important;
-    border: 1px solid var(--border-color) !important;
+  .p-float-label {
+    position: relative;
+    display: block;
 
-    .p-multiselect-header {
-      background: var(--hover-background) !important;
-      border-bottom: 1px solid var(--border-color) !important;
-      padding: var(--space-4) !important;
+    label {
+      position: absolute;
+      pointer-events: none;
+      top: 50%;
+      margin-top: -0.5rem;
+      transition: all var(--motion-base) ease;
+      color: var(--text-color-secondary);
+      left: 0.75rem;
+      z-index: var(--z-base);
+      padding: 0 4px;
+      margin-left: -4px;
+      background: linear-gradient(
+        to bottom,
+        transparent 0%,
+        transparent 45%,
+        var(--card-background) 45%,
+        var(--card-background) 55%,
+        transparent 55%,
+        transparent 100%
+      );
+    }
 
-      .p-multiselect-filter-container {
-        .p-inputtext {
-          background: var(--card-background) !important;
-          border: 1px solid var(--border-color) !important;
-          color: var(--text-color) !important;
+    // Updated floating label styles
+    input:focus ~ label,
+    input.p-filled ~ label,
+    textarea:focus ~ label,
+    textarea.p-filled ~ label,
+    .p-inputwrapper-focus ~ label,
+    .p-inputwrapper-filled ~ label,
+    .p-dropdown:focus ~ label,
+    .p-dropdown.p-focus ~ label,
+    .p-dropdown.p-filled ~ label {
+      top: -0.75rem;
+      font-size: var(--fs-label);
+      color: var(--primary-color);
+      background: var(--card-background);
+      padding: 0 4px;
+    }
 
-          &::placeholder {
-            color: var(--text-color) !important;
-            opacity: 0.4;
-          }
-        }
+    .p-dropdown {
+      width: 100%;
+      background: var(--card-background);
+      border-color: var(--border-color);
 
-        .p-multiselect-filter-icon {
+      .p-dropdown-label {
+        color: var(--text-color) !important;
+
+        &.p-placeholder {
           color: var(--text-color) !important;
           opacity: 0.7;
         }
       }
 
-      .p-checkbox {
-        .p-checkbox-box {
-          width: 18px;
-          height: 18px;
-          border-radius: var(--radius-xs);
-          background: var(--card-background);
-          border: 1px solid var(--border-color);
-          transition: all var(--motion-base);
+      // &.p-component {
+      //   .p-dropdown-label {
+      //     &.p-placeholder {
+      //       color: var(--text-color) !important;
+      //       opacity: 0.7 !important;
+      //     }
+      //   }
+      // }
 
-          &:not(.p-disabled):hover {
-            border-color: var(--primary-color);
-          }
+      &:hover {
+        border-color: var(--primary-color);
+      }
 
-          &.p-highlight {
-            .p-checkbox-icon {
-              color: var(--text-color);
-              font-size: var(--fs-label);
-            }
+      &.p-focus {
+        .p-dropdown-label {
+          &.p-placeholder {
+            color: var(--text-color) !important;
+            opacity: 0.7;
           }
         }
       }
 
-      .p-multiselect-close {
-        margin-left: 0.5rem;
-        width: 2rem;
-        height: 2rem;
-        color: var(--text-color);
-        opacity: 0.7;
-        border: 0 none;
-        background: var(--card-background);
-        border-radius: 50%;
-        transition:
-          background-color var(--motion-base),
-          color var(--motion-base),
-          box-shadow var(--motion-base);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        flex-shrink: 0;
-        overflow: hidden;
-        position: relative;
-        cursor: pointer;
-
-        &:hover {
-          background: var(--hover-background);
-          color: var(--text-color);
-          opacity: 1;
-        }
-
-        &:focus {
-          outline: none;
-          box-shadow: 0 0 0 1px var(--primary-color-transparent);
-        }
-
-        &:active {
-          background: var(--hover-background);
-        }
-      }
-    }
-
-    .p-multiselect-items {
-      padding: 0.5rem 0;
-      background: var(--card-background) !important;
-
-      .p-multiselect-item {
+      .p-dropdown-trigger {
         color: var(--text-color) !important;
-        padding: 0.75rem 1rem;
+        opacity: 0.7;
 
-        &:hover {
-          background: var(--hover-background) !important;
+        .pi-chevron-down {
           color: var(--text-color) !important;
+          opacity: 0.7;
+          transition: all var(--motion-base) ease;
         }
 
-        &.p-highlight {
-          background: var(--hover-background) !important;
-          color: var(--primary-color) !important;
-        }
-
-        .p-checkbox {
-          margin-right: 0.5rem;
-
-          .p-checkbox-box {
-            width: 18px;
-            height: 18px;
-            border-radius: var(--radius-xs);
-            background: var(--card-background);
-            border: 1px solid var(--border-color);
-            transition: all var(--motion-base);
-
-            &:not(.p-disabled):hover {
-              border-color: var(--primary-color);
-            }
-
-            &.p-highlight {
-              .p-checkbox-icon {
-                color: var(--text-color);
-                font-size: var(--fs-label);
-              }
-            }
+        &:hover {
+          .pi-chevron-down {
+            color: var(--primary-color) !important;
+            opacity: 1;
           }
         }
       }
 
-      .p-multiselect-empty-message {
-        color: var(--text-color) !important;
-        opacity: 0.7;
-        padding: 0.75rem 1rem;
-        font-size: var(--fs-body);
-      }
-    }
-
-    .p-multiselect-items-wrapper {
-      &::-webkit-scrollbar {
-        width: 8px;
-        height: 8px;
-      }
-
-      &::-webkit-scrollbar-track {
-        background: transparent;
-        border-radius: var(--radius-xs);
-      }
-
-      &::-webkit-scrollbar-thumb {
-        background: var(--border-color);
-        border-radius: var(--radius-xs);
-
-        &:hover {
-          background: var(--secondary-color);
+      &.p-focus {
+        .p-dropdown-trigger {
+          .pi-chevron-down {
+            color: var(--primary-color) !important;
+            opacity: 1;
+          }
         }
       }
-    }
-  }
-}
 
-.p-input-icon-left.p-input-icon-right {
-  position: relative;
-  width: 100%;
-
-  input {
-    width: 100%;
-    padding-left: 35px;
-    padding-right: 35px;
-  }
-
-  i:first-child {
-    left: 0.75rem;
-    color: var(--text-color);
-    opacity: 0.4;
-  }
-
-  i:last-child {
-    right: 0.75rem;
-    color: var(--text-color);
-    opacity: 0.4;
-    cursor: pointer;
-
-    &:hover {
-      opacity: 0.7;
-    }
-  }
-}
-
-.mapping-row {
-  display: flex;
-  align-items: center;
-  gap: var(--space-6);
-  padding: var(--space-6);
-  background: var(--surface-ground);
-  border-radius: var(--radius-md);
-  margin: var(--space-0);
-  transition: all var(--motion-base);
-
-  &.highlight-animation {
-    animation: highlightBackground 0.5s ease-out;
-  }
-
-  .index-number {
-    min-width: 24px;
-    height: 24px;
-    background: var(--primary-color);
-    color: var(--primary-text);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: var(--fs-body);
-    flex-shrink: 0;
-    margin: auto 0;
-  }
-
-  &.duplicate {
-    background: rgba(var(--warning-rgb), 0.04);
-
-    .index-number {
-      background-color: var(--warning-color) !important;
-      animation: pulseGlow 1.5s infinite;
-      color: var(--text-color);
-    }
-  }
-
-  .mapping-inputs {
-    flex: 1;
-    display: flex;
-    gap: var(--space-6);
-    position: relative;
-    flex-wrap: wrap;
-
-    .form-field {
-      flex: 1 1 200px;
-      min-width: 200px;
-      margin: var(--space-0);
-
-      .p-input-icon-left {
-        width: 100%;
-
-        input {
-          width: 100%;
-        }
-      }
-    }
-
-    @media (max-width: 1200px) {
-      .form-field {
-        flex: 1 1 calc(50% - 0.5rem);
-      }
-    }
-
-    @media (max-width: 768px) {
-      flex-direction: column;
-      gap: var(--space-6);
-
-      .form-field {
-        flex: 1 1 100%;
-        width: 100%;
-        min-width: unset;
-      }
-    }
-  }
-
-  button {
-    &.p-button-rounded.p-button-text.p-button-danger {
-      width: 2rem;
-      height: 2rem;
-      padding: var(--space-0);
-      align-self: center;
-
-      &:enabled {
-        color: var(--text-color) !important;
-        opacity: 0.7;
-
-        &:hover {
-          background: rgba(var(--error-rgb), 0.04) !important;
-          color: var(--error-color) !important;
+      &:hover {
+        .p-dropdown-trigger {
           opacity: 1;
+
+          .pi-chevron-down {
+            opacity: 1;
+          }
         }
       }
-
-      &:disabled {
-        opacity: 0.4;
-        cursor: not-allowed;
-        background: transparent !important;
-        margin-bottom: 1rem;
-
-        .pi {
-          color: var(--text-color-secondary) !important;
-        }
-      }
-
-      .pi {
-        font-size: var(--fs-h3);
-      }
     }
   }
 }
 
-:host ::ng-deep {
-  .mapping-inputs {
-    .p-dropdown,
-    .p-inputtext {
-      width: 100%;
-
-      &.ng-invalid.ng-touched {
-        border-color: var(--error-color);
-      }
-    }
-  }
-}
-
-.schema-group {
-  margin-bottom: 0;
-  background: var(--surface-card);
-  border-radius: var(--radius-md);
-  padding: var(--space-6);
-
-  &.highlight-animation {
-    animation: highlightBackground 0.5s ease-out;
-  }
-}
-
-// Update the button styles globally
-:host ::ng-deep {
-  .p-button {
-    &:disabled {
-      opacity: 0.6 !important;
-      cursor: not-allowed !important;
-
-      .pi {
-        opacity: 0.6;
-      }
-    }
-  }
-}
-
-.highlight-animation {
-  animation: highlightBackground 0.5s ease-out;
-}
-
-.schema-header {
+// Locale dropdown option — mirrors the brand-icon item pattern
+// used by the Database Type dropdown in Add Datasource. Flag glyph
+// on the left, native language name on the right. The custom-dropdown
+// renders the trigger inside .p-dropdown-label and panel rows inside
+// .p-dropdown-item; both contain our <ng-template> projection, so
+// the same .locale-option markup styles in both places.
+:host ::ng-deep .locale-option {
   display: flex;
   align-items: center;
-  gap: var(--space-6);
-  margin-bottom: 1rem;
-  padding-bottom: 1rem;
-  border-bottom: 1px solid var(--surface-border);
-  position: relative;
+  gap: 10px;
+  width: 100%;
+  padding: 2px 0;
 
-  .expand-btn {
+  .ci-flag {
+    width: 20px;
+    height: 14px;
     flex-shrink: 0;
-    color: var(--secondary-color) !important;
-    width: 2rem;
-    height: 2rem;
-    padding: var(--space-0);
-
-    &:hover {
-      color: var(--primary-color) !important;
-      background: var(--hover-background) !important;
-    }
-
-    i {
-      color: inherit !important;
-      font-size: var(--fs-h3);
-    }
   }
 
-  .section-count {
-    font-size: var(--fs-label);
-    color: var(--secondary-color);
-    background: var(--hover-background);
-    padding: 3px 8px;
-    border-radius: var(--radius-md);
+  .locale-option-label {
+    color: var(--text-color);
+    font-size: var(--fs-control);
+    line-height: 1.3;
     white-space: nowrap;
-  }
-
-  p-dropdown {
-    flex: 0 0 300px;
-
-    &.p-disabled {
-      opacity: 0.6;
-      pointer-events: none;
-    }
-  }
-
-  button {
-    flex-shrink: 0;
-
-    &:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-
-      .pi {
-        opacity: 0.6;
-      }
-    }
-
-    &.add-btn {
-      color: var(--primary-color) !important;
-
-      .pi {
-        color: var(--primary-color) !important;
-      }
-    }
-
-    &.clear-btn {
-      color: var(--error-color) !important;
-
-      .pi {
-        color: var(--error-color) !important;
-      }
-    }
-  }
-
-  .error-message {
-    position: absolute;
-    bottom: -20px;
-    left: 0;
-    color: var(--error-color);
-    font-size: var(--fs-label);
-  }
-}
-
-.mappings-list {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-6);
-
-  .mapping-row {
-    display: flex;
-    align-items: flex-start;
-    gap: var(--space-6);
-    padding: var(--space-6);
-    background: var(--surface-ground);
-    border-radius: var(--radius-md);
-    margin: var(--space-0); // Remove margin-bottom to match dataset spacing
-
-    .index-number {
-      min-width: 24px;
-      height: 24px;
-      background: var(--primary-color);
-      color: var(--primary-text);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: var(--fs-body);
-      flex-shrink: 0;
-      margin-bottom: 1.5rem;
-    }
-  }
-}
-
-.mapping-inputs {
-  .form-field {
-    position: relative;
-    margin-bottom: 1rem;
-
-    .error-message {
-      position: absolute;
-      bottom: -20px;
-      left: 0;
-      color: var(--error-color);
-      font-size: var(--fs-label);
-    }
-  }
-}
-
-:host ::ng-deep {
-  .ng-invalid.ng-dirty {
-    border-color: var(--error-color);
+    flex: 1;
   }
 }

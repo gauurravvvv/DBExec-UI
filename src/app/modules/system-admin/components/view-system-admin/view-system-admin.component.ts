@@ -15,8 +15,7 @@ import { SystemAdminService } from '../../services/system-admin.service';
 
 interface AdminData {
   id: string;
-  firstName: string;
-  lastName: string;
+  fullName: string;
   username: string;
   email: string;
   mobile: string;
@@ -104,9 +103,22 @@ export class ViewSystemAdminComponent implements OnInit, OnDestroy {
 
   private setAdminInitials(): void {
     if (this.adminData) {
-      const firstInitial = this.adminData.firstName.charAt(0).toUpperCase();
-      const lastInitial = this.adminData.lastName.charAt(0).toUpperCase();
-      this.adminInitials = `${firstInitial}${lastInitial}`;
+      // Derive initials from the single full-name field: first + last
+      // token for a multi-word name, else the first two chars of a
+      // single-word (mononym) name.
+      const parts = (this.adminData.fullName || '')
+        .trim()
+        .split(/\s+/)
+        .filter(Boolean);
+      if (parts.length >= 2) {
+        this.adminInitials = (
+          parts[0].charAt(0) + parts[parts.length - 1].charAt(0)
+        ).toUpperCase();
+      } else if (parts.length === 1) {
+        this.adminInitials = parts[0].slice(0, 2).toUpperCase();
+      } else {
+        this.adminInitials = '';
+      }
     }
   }
 

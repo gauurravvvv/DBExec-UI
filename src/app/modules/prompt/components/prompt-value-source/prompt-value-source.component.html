@@ -1,0 +1,160 @@
+<div class="qb-vs">
+  <div class="qb-vs__loading" *ngIf="loading()">
+    <p-skeleton height="8rem"></p-skeleton>
+  </div>
+
+  <ng-container *ngIf="!loading()">
+    <!-- Source-kind picker -->
+    <div class="qb-vs__kinds">
+      <button
+        *ngFor="let k of kinds"
+        type="button"
+        class="qb-vs__kind"
+        [class.qb-vs__kind--active]="kind() === k.key"
+        (click)="setKind(k.key)"
+      >
+        <i [class]="k.icon"></i>
+        {{ k.label | translate }}
+      </button>
+    </div>
+
+    <div class="qb-vs__warn" *ngIf="showThresholdWarning()">
+      <i class="pi pi-exclamation-triangle"></i>
+      {{ 'QUERY_BUILDER.VS.THRESHOLD_WARNING' | translate }}
+      ({{ cardinality() | number }})
+    </div>
+
+    <!-- free -->
+    <p class="qb-vs__hint" *ngIf="kind() === 'free'">
+      {{ 'QUERY_BUILDER.VS.FREE_HINT' | translate }}
+    </p>
+
+    <!-- static list -->
+    <div class="qb-vs__static" *ngIf="kind() === 'static'">
+      <div class="qb-vs__paste">
+        <app-custom-input
+          inputMode="textarea"
+          [label]="'QUERY_BUILDER.VS.BULK_IMPORT' | translate"
+          [placeholder]="'QUERY_BUILDER.VS.BULK_PLACEHOLDER' | translate"
+          [ngModel]="pasteText()"
+          (ngModelChange)="pasteText.set($event)" />
+        <app-button
+          variant="secondary"
+          size="sm"
+          icon="pi pi-download"
+          (clicked)="importPaste()"
+        >
+          {{ 'QUERY_BUILDER.VS.IMPORT' | translate }}
+        </app-button>
+      </div>
+
+      <div class="qb-vs__rows">
+        <div
+          class="qb-vs__row"
+          *ngFor="let row of staticRows(); trackBy: trackByIndex; let i = index"
+        >
+          <app-custom-input
+            [ngModel]="row.value"
+            [placeholder]="'QUERY_BUILDER.VS.VALUE' | translate"
+            (ngModelChange)="setStaticValue(i, $event)" />
+          <app-custom-input
+            [ngModel]="row.display"
+            [placeholder]="'QUERY_BUILDER.VS.DISPLAY' | translate"
+            (ngModelChange)="setStaticDisplay(i, $event)" />
+          <app-button
+            variant="ghost"
+            size="sm"
+            icon="pi pi-times"
+            (clicked)="removeStaticRow(i)" />
+        </div>
+      </div>
+      <app-button
+        variant="secondary"
+        size="sm"
+        icon="pi pi-plus"
+        (clicked)="addStaticRow()"
+      >
+        {{ 'QUERY_BUILDER.VS.ADD_VALUE' | translate }}
+      </app-button>
+    </div>
+
+    <!-- lookup SQL -->
+    <div class="qb-vs__lookup" *ngIf="kind() === 'lookup_query'">
+      <label class="qb-vs__label">
+        {{ 'QUERY_BUILDER.VS.LOOKUP_SQL' | translate }}
+      </label>
+      <p class="qb-vs__hint">{{ 'QUERY_BUILDER.VS.LOOKUP_HINT' | translate }}</p>
+      <div class="qb-vs__editor" #sqlHost></div>
+    </div>
+
+    <!-- distinct column -->
+    <div class="qb-vs__distinct" *ngIf="kind() === 'distinct_column'">
+      <div class="qb-vs__grid">
+        <app-custom-input
+          [label]="'QUERY_BUILDER.BASE_SCHEMA' | translate"
+          [ngModel]="dcSchema()"
+          (ngModelChange)="dcSchema.set($event)" />
+        <app-custom-input
+          [label]="'QUERY_BUILDER.BASE_TABLE' | translate"
+          [ngModel]="dcTable()"
+          (ngModelChange)="dcTable.set($event)" />
+        <app-custom-input
+          [label]="'QUERY_BUILDER.VS.COLUMN' | translate"
+          [ngModel]="dcColumn()"
+          (ngModelChange)="dcColumn.set($event)" />
+        <app-custom-input
+          [label]="'QUERY_BUILDER.VS.DISPLAY_COLUMN' | translate"
+          [ngModel]="dcDisplay()"
+          (ngModelChange)="dcDisplay.set($event)" />
+      </div>
+    </div>
+
+    <!-- actions -->
+    <div class="qb-vs__actions" *ngIf="kind() !== 'free'">
+      <app-button
+        variant="secondary"
+        icon="pi pi-eye"
+        [loading]="previewing()"
+        (clicked)="preview()"
+      >
+        {{ 'QUERY_BUILDER.VS.PREVIEW' | translate }}
+      </app-button>
+      <app-button
+        variant="primary"
+        icon="pi pi-save"
+        [loading]="saving()"
+        (clicked)="save()"
+      >
+        {{ 'COMMON.SAVE' | translate }}
+      </app-button>
+    </div>
+    <div class="qb-vs__actions" *ngIf="kind() === 'free'">
+      <app-button
+        variant="primary"
+        icon="pi pi-save"
+        [loading]="saving()"
+        (clicked)="save()"
+      >
+        {{ 'COMMON.SAVE' | translate }}
+      </app-button>
+    </div>
+
+    <!-- preview result -->
+    <div class="qb-vs__preview" *ngIf="previewRows().length">
+      <h4 class="qb-vs__label">
+        {{ 'QUERY_BUILDER.VS.PREVIEW_RESULT' | translate }}
+        <span class="qb-vs__preview-count" *ngIf="previewTotal() !== null">
+          ({{ previewTotal() | number }})
+        </span>
+      </h4>
+      <div class="qb-vs__preview-list">
+        <app-chip
+          *ngFor="let opt of previewRows(); trackBy: trackByIndex"
+          variant="tag"
+        >
+          {{ opt.display }}
+        </app-chip>
+      </div>
+    </div>
+  </ng-container>
+</div>

@@ -1,0 +1,237 @@
+<!--
+  The control is chosen by prompt type x operator arity. arity 'none' renders
+  nothing; 'two' renders a from/to pair; otherwise a single control.
+  Every control is a shared app-custom-* component.
+-->
+<ng-container [ngSwitch]="arity">
+  <!-- No value (is empty / is not empty) -->
+  <span *ngSwitchCase="'none'" class="qb-value__none">
+    {{ 'QUERY_BUILDER.NO_VALUE_NEEDED' | translate }}
+  </span>
+
+  <!-- Two values (between / not between) -->
+  <div *ngSwitchCase="'two'" class="qb-value__pair">
+    <ng-container *ngIf="singleControl === 'number'; else twoDates">
+      <app-custom-number
+        [ngModel]="first"
+        [placeholder]="'QUERY_BUILDER.FROM' | translate"
+        [min]="appearance.min ?? null"
+        [max]="appearance.max ?? null"
+        [step]="appearance.step ?? 1"
+        (onChangeEvent)="emitFirst($event)" />
+      <span class="qb-value__sep">{{ 'QUERY_BUILDER.AND' | translate }}</span>
+      <app-custom-number
+        [ngModel]="second"
+        [placeholder]="'QUERY_BUILDER.TO' | translate"
+        [min]="appearance.min ?? null"
+        [max]="appearance.max ?? null"
+        [step]="appearance.step ?? 1"
+        (onChangeEvent)="emitSecond($event)" />
+    </ng-container>
+    <ng-template #twoDates>
+      <app-custom-calendar
+        [ngModel]="first"
+        [placeholder]="'QUERY_BUILDER.FROM' | translate"
+        [dateFormat]="appearance.dateFormat || 'dd/mm/yy'"
+        (onChangeEvent)="emitFirst($event)" />
+      <span class="qb-value__sep">{{ 'QUERY_BUILDER.AND' | translate }}</span>
+      <app-custom-calendar
+        [ngModel]="second"
+        [placeholder]="'QUERY_BUILDER.TO' | translate"
+        [dateFormat]="appearance.dateFormat || 'dd/mm/yy'"
+        (onChangeEvent)="emitSecond($event)" />
+    </ng-template>
+  </div>
+
+  <!-- Many values (is any of / is none of) -->
+  <div *ngSwitchCase="'many'" class="qb-value__many">
+    <!-- static curated set -->
+    <app-custom-multiselect
+      *ngIf="hasOptions"
+      [options]="options"
+      [ngModel]="values"
+      optionLabel="label"
+      optionValue="value"
+      [display]="appearance.display || 'chip'"
+      [placeholder]="appearance.placeholder || ('QUERY_BUILDER.SELECT_VALUES' | translate)"
+      (ngModelChange)="emitMany($event)" />
+
+    <!-- server-paged lookup -->
+    <app-custom-multiselect
+      *ngIf="isLookup"
+      [serverMode]="true"
+      [fetcher]="fetcher"
+      [ngModel]="values"
+      optionLabel="label"
+      optionValue="value"
+      [display]="appearance.display || 'chip'"
+      [placeholder]="appearance.placeholder || ('QUERY_BUILDER.SELECT_VALUES' | translate)"
+      (ngModelChange)="emitMany($event)" />
+
+    <!-- free entry -->
+    <app-email-chips-input
+      *ngIf="!hasOptions && !isLookup"
+      mode="tag"
+      [ngModel]="values"
+      [placeholder]="'QUERY_BUILDER.TYPE_OR_PASTE' | translate"
+      (ngModelChange)="emitMany($event)" />
+
+    <!-- bulk paste (spec 6.6.4) -->
+    <app-button
+      *ngIf="canBulkPaste"
+      variant="ghost"
+      size="sm"
+      icon="pi pi-clone"
+      class="qb-value__paste-btn"
+      (clicked)="openPaste()"
+    >
+      {{ 'QUERY_BUILDER.PASTE_VALUES' | translate }}
+    </app-button>
+  </div>
+
+  <!-- Single value (default) -->
+  <div *ngSwitchDefault class="qb-value__single">
+    <ng-container [ngSwitch]="singleControl">
+      <app-custom-dropdown
+        *ngSwitchCase="'dropdown'"
+        [options]="options"
+        [serverMode]="isLookup"
+        [fetcher]="isLookup ? fetcher : null"
+        [ngModel]="first"
+        optionLabel="label"
+        optionValue="value"
+        [showClear]="true"
+        [placeholder]="appearance.placeholder || ('QUERY_BUILDER.SELECT_VALUE' | translate)"
+        (onChangeEvent)="emitSingle($event)" />
+
+      <app-custom-dropdown
+        *ngSwitchCase="'multiselect'"
+        [options]="options"
+        [ngModel]="first"
+        optionLabel="label"
+        optionValue="value"
+        [showClear]="true"
+        [placeholder]="'QUERY_BUILDER.SELECT_VALUE' | translate"
+        (onChangeEvent)="emitSingle($event)" />
+
+      <app-custom-radio
+        *ngSwitchCase="'radio'"
+        [options]="options"
+        [ngModel]="first"
+        (ngModelChange)="emitSingle($event)" />
+
+      <app-custom-dropdown
+        *ngSwitchCase="'checkbox'"
+        [options]="options"
+        [ngModel]="first"
+        optionLabel="label"
+        optionValue="value"
+        (onChangeEvent)="emitSingle($event)" />
+
+      <app-custom-number
+        *ngSwitchCase="'number'"
+        [ngModel]="first"
+        [min]="appearance.min ?? null"
+        [max]="appearance.max ?? null"
+        [step]="appearance.step ?? 1"
+        [placeholder]="appearance.placeholder || ''"
+        (onChangeEvent)="emitSingle($event)" />
+
+      <app-custom-number
+        *ngSwitchCase="'rangeslider'"
+        [ngModel]="first"
+        [placeholder]="appearance.placeholder || ''"
+        (onChangeEvent)="emitSingle($event)" />
+
+      <app-custom-calendar
+        *ngSwitchCase="'date'"
+        [ngModel]="first"
+        [dateFormat]="appearance.dateFormat || 'dd/mm/yy'"
+        [placeholder]="appearance.placeholder || ''"
+        (onChangeEvent)="emitSingle($event)" />
+
+      <app-custom-calendar
+        *ngSwitchCase="'calendar'"
+        [ngModel]="first"
+        [showTime]="appearance.showTime ?? true"
+        [dateFormat]="appearance.dateFormat || 'dd/mm/yy'"
+        [placeholder]="appearance.placeholder || ''"
+        (onChangeEvent)="emitSingle($event)" />
+
+      <app-custom-input
+        *ngSwitchDefault
+        [ngModel]="first"
+        [placeholder]="appearance.placeholder || ''"
+        (ngModelChange)="emitSingle($event)" />
+    </ng-container>
+  </div>
+</ng-container>
+
+<!-- Bulk-paste dialog (spec 6.6.4) -->
+<div class="qb-paste" *ngIf="pasteOpen()">
+  <div class="qb-paste__backdrop" (click)="closePaste()"></div>
+  <div class="qb-paste__panel">
+    <header class="qb-paste__head">
+      <h3>{{ 'QUERY_BUILDER.PASTE_VALUES' | translate }}</h3>
+      <app-button
+        variant="ghost"
+        size="sm"
+        icon="pi pi-times"
+        (clicked)="closePaste()" />
+    </header>
+
+    <div class="qb-paste__body">
+      <app-custom-input
+        inputMode="textarea"
+        [label]="'QUERY_BUILDER.PASTE_HINT' | translate"
+        [placeholder]="'QUERY_BUILDER.PASTE_PLACEHOLDER' | translate"
+        [ngModel]="pasteText()"
+        (ngModelChange)="pasteText.set($event)" />
+
+      <app-button
+        variant="secondary"
+        size="sm"
+        icon="pi pi-check-circle"
+        [loading]="pasteResolving()"
+        (clicked)="resolvePaste()"
+      >
+        {{ 'QUERY_BUILDER.PASTE_CHECK' | translate }}
+      </app-button>
+
+      <div class="qb-paste__result" *ngIf="pasteMatched().length || pasteUnmatched().length">
+        <p class="qb-paste__summary">
+          <span class="qb-paste__matched">
+            {{ pasteMatched().length | number }}
+            {{ 'QUERY_BUILDER.PASTE_MATCHED' | translate }}
+          </span>
+          <span class="qb-paste__unmatched-count" *ngIf="pasteUnmatched().length">
+            · {{ pasteUnmatched().length | number }}
+            {{ 'QUERY_BUILDER.PASTE_UNMATCHED' | translate }}
+          </span>
+        </p>
+
+        <div class="qb-paste__unmatched" *ngIf="pasteUnmatched().length">
+          <app-chip
+            *ngFor="let u of pasteUnmatched()"
+            variant="status"
+          >
+            {{ u }}
+          </app-chip>
+        </div>
+      </div>
+    </div>
+
+    <footer class="qb-paste__foot">
+      <app-button variant="secondary" (clicked)="closePaste()">
+        {{ 'COMMON.CANCEL' | translate }}
+      </app-button>
+      <app-button
+        variant="primary"
+        [disabled]="!pasteMatched().length"
+        (clicked)="applyPaste()"
+      >
+        {{ 'QUERY_BUILDER.PASTE_ADD' | translate }} ({{ pasteMatched().length | number }})
+      </app-button>
+    </footer>
+  </div>
+</div>

@@ -1,0 +1,61 @@
+<div
+  class="qb-group"
+  *ngIf="node() as g"
+  [class.qb-group--or]="g.op === 'OR'"
+  [class.qb-group--negated]="g.negate"
+  [style.--qb-depth]="depth"
+>
+  <header class="qb-group__head">
+    <app-custom-toggle
+      [trueValue]="true"
+      [falseValue]="false"
+      [trueLabel]="'QUERY_BUILDER.MATCH_ALL' | translate"
+      [falseLabel]="'QUERY_BUILDER.MATCH_ANY' | translate"
+      [showStatusLabel]="true"
+      [ngModel]="isAll()"
+      (onChange)="setOp($event.checked)" />
+
+    <span class="qb-group__spacer"></span>
+
+    <app-button variant="secondary" size="sm" icon="pi pi-plus" (clicked)="addCondition()">
+      {{ 'QUERY_BUILDER.ADD_CONDITION' | translate }}
+    </app-button>
+    <app-button variant="ghost" size="sm" icon="pi pi-folder-plus" (clicked)="addGroup()">
+      {{ 'QUERY_BUILDER.ADD_GROUP' | translate }}
+    </app-button>
+    <app-button
+      variant="ghost"
+      size="sm"
+      class="qb-group__not"
+      [class.qb-group__not--active]="g.negate"
+      (clicked)="toggleNegate()"
+    >
+      {{ 'QUERY_BUILDER.NOT' | translate }}
+    </app-button>
+    <app-button
+      *ngIf="canDelete()"
+      variant="ghost"
+      size="sm"
+      icon="pi pi-times"
+      [title]="'QUERY_BUILDER.REMOVE_GROUP' | translate"
+      (clicked)="remove()" />
+  </header>
+
+  <div class="qb-group__body">
+    <ng-container *ngFor="let child of children(); trackBy: trackById">
+      <qb-group-node
+        *ngIf="child.kind === 'group'"
+        [nodeId]="child.id"
+        [parentId]="g.id"
+        [depth]="depth + 1" />
+      <qb-condition-row
+        *ngIf="child.kind === 'condition'"
+        [nodeId]="child.id"
+        [parentId]="g.id" />
+    </ng-container>
+
+    <p class="qb-group__empty" *ngIf="!children().length">
+      {{ 'QUERY_BUILDER.EMPTY_GROUP' | translate }}
+    </p>
+  </div>
+</div>

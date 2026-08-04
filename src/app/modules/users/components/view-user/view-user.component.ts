@@ -64,9 +64,22 @@ export class ViewUserComponent implements OnInit, OnDestroy {
 
   setAdminInitials() {
     if (this.userData) {
-      const firstInitial = this.userData.firstName.charAt(0);
-      const lastInitial = this.userData.lastName.charAt(0);
-      this.userInitials = (firstInitial + lastInitial).toUpperCase();
+      // Derive initials from the single full-name field: first + last
+      // token for a multi-word name, else the first two chars of a
+      // single-word (mononym) name.
+      const parts = (this.userData.fullName || '')
+        .trim()
+        .split(/\s+/)
+        .filter(Boolean);
+      if (parts.length >= 2) {
+        this.userInitials = (
+          parts[0].charAt(0) + parts[parts.length - 1].charAt(0)
+        ).toUpperCase();
+      } else if (parts.length === 1) {
+        this.userInitials = parts[0].slice(0, 2).toUpperCase();
+      } else {
+        this.userInitials = '';
+      }
     }
   }
 

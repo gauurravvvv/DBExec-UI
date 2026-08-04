@@ -1,11 +1,7 @@
 import { Injectable, signal } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { EmptyError, Subject, lastValueFrom, takeUntil } from 'rxjs';
-import {
-  QUERY_BUILDER,
-  SECTION,
-  TAB,
-} from 'src/app/core/constants/api.constant';
+import { QUERY_BUILDER } from 'src/app/core/constants/api.constant';
 import { HttpClientService } from 'src/app/core/services/http-client.service';
 
 export interface ExecuteQueryBuilderRequest {
@@ -26,7 +22,6 @@ export class QueryBuilderService {
   private _total = signal(0);
   private _current = signal<any>(null);
   private _structure = signal<any>(null);
-  private _tabs = signal<any[]>([]);
   private _result = signal<any>(null);
   private _loading = signal(false);
   private _saving = signal(false);
@@ -41,7 +36,6 @@ export class QueryBuilderService {
   readonly total = this._total.asReadonly();
   readonly current = this._current.asReadonly();
   readonly structure = this._structure.asReadonly();
-  readonly tabs = this._tabs.asReadonly();
   readonly result = this._result.asReadonly();
   readonly loading = this._loading.asReadonly();
   readonly saving = this._saving.asReadonly();
@@ -92,21 +86,6 @@ export class QueryBuilderService {
           .pipe(takeUntil(this._cancelReads$)),
       );
       if (res?.status) this._structure.set(res.data);
-    } catch (err) {
-      if (!(err instanceof EmptyError)) throw err;
-    }
-  }
-
-  async loadTabs(queryBuilderId: string): Promise<void> {
-    try {
-      const res: any = await lastValueFrom(
-        this.http
-          .apiGet(
-            QUERY_BUILDER.GET + queryBuilderId + QUERY_BUILDER.TABS_SUFFIX,
-          )
-          .pipe(takeUntil(this._cancelReads$)),
-      );
-      if (res?.status) this._tabs.set(res.data ?? []);
     } catch (err) {
       if (!(err instanceof EmptyError)) throw err;
     }
@@ -208,34 +187,6 @@ export class QueryBuilderService {
     );
   }
 
-  async getTabSections(queryBuilderId: string, tabId: string): Promise<any> {
-    // GET /tabs/:tabId/sections?queryBuilderId=
-    return lastValueFrom(
-      this.http.apiGet(
-        TAB.SECTIONS_PREFIX +
-          tabId +
-          TAB.SECTIONS_SUFFIX +
-          `?queryBuilderId=${queryBuilderId}`,
-      ),
-    );
-  }
-
-  async getSectionPrompts(
-    queryBuilderId: string,
-    tabId: string,
-    sectionId: string,
-  ): Promise<any> {
-    // GET /sections/:sectionId/prompts?queryBuilderId=&tabId=
-    return lastValueFrom(
-      this.http.apiGet(
-        SECTION.PROMPTS_PREFIX +
-          sectionId +
-          SECTION.PROMPTS_SUFFIX +
-          `?queryBuilderId=${queryBuilderId}&tabId=${tabId}`,
-      ),
-    );
-  }
-
   async getQueryBuilderConfiguration(id: string): Promise<any> {
     // GET /query-builders/:queryBuilderId/config
     return lastValueFrom(
@@ -283,14 +234,6 @@ export class QueryBuilderService {
     queryBuilderId: string,
   ): Promise<any> {
     return this.saveConfig(configuration, datasourceId, queryBuilderId);
-  }
-
-  getQueryBuilderTabs(queryBuilderId: string): Promise<any> {
-    return lastValueFrom(
-      this.http.apiGet(
-        QUERY_BUILDER.GET + queryBuilderId + QUERY_BUILDER.TABS_SUFFIX,
-      ),
-    );
   }
 
   getQueryBuilderStructure(queryBuilderId: string): Promise<any> {

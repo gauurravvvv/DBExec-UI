@@ -31,7 +31,7 @@ export class ViewProfileComponent implements OnInit, OnDestroy {
   loading = this.profileService.loading;
 
   avatarBackground = computed(() =>
-    this.generateAvatarColor(this.profile()?.firstName ?? ''),
+    this.generateAvatarColor(this.profile()?.fullName ?? ''),
   );
   showChangePasswordDialog = signal(false);
 
@@ -56,15 +56,26 @@ export class ViewProfileComponent implements OnInit, OnDestroy {
   get initials(): string {
     const p = this.profile();
     if (!p) return '';
-    const first = p.firstName?.[0] || '';
-    const last = p.lastName?.[0] || '';
-    return (first + last).toUpperCase();
+    // Derive initials from the single full-name field: first + last
+    // token for a multi-word name, else the first two chars of a
+    // single-word (mononym) name.
+    const parts = (p.fullName || '')
+      .trim()
+      .split(/\s+/)
+      .filter(Boolean);
+    if (parts.length >= 2) {
+      return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+    }
+    if (parts.length === 1) {
+      return parts[0].slice(0, 2).toUpperCase();
+    }
+    return '';
   }
 
   get fullName(): string {
     const p = this.profile();
     if (!p) return '';
-    return `${p.firstName || ''} ${p.lastName || ''}`.trim();
+    return (p.fullName || '').trim();
   }
 
   /**

@@ -32,12 +32,10 @@
 | notifications | `src/app/modules/notifications` | [notifications](./modules/notifications.md) | 🟢 | 2026-07-24 |
 | organisation | `src/app/modules/organisation` | [organisation](./modules/organisation.md) | 🟢 | 2026-07-24 |
 | profile | `src/app/modules/profile` | [profile](./modules/profile.md) | 🟢 | 2026-07-24 |
-| prompt | `src/app/modules/prompt` | [prompt](./modules/prompt.md) | 🟢 | 2026-07-24 |
-| query-builder | `src/app/modules/query-builder` | [query-builder](./modules/query-builder.md) | 🟢 | 2026-07-24 |
+| prompt | `src/app/modules/prompt` | [prompt](./modules/prompt.md) | 🟢 | 2026-07-31 |
+| query-builder | `src/app/modules/query-builder` | [query-builder](./modules/query-builder.md) | 🟢 | 2026-07-31 |
 | query-runner | `src/app/modules/query-runner` | [query-runner](./modules/query-runner.md) | 🟢 | 2026-07-29 |
 | rls-rules | `src/app/modules/rls-rules` | [rls-rules](./modules/rls-rules.md) | 🟡 | 2026-07-24 |
 | role | `src/app/modules/role` | [role](./modules/role.md) | 🟢 | 2026-07-24 |
-| section | `src/app/modules/section` | [section](./modules/section.md) | 🟢 | 2026-07-24 |
-| system-admin | `src/app/modules/system-admin` | [system-admin](./modules/system-admin.md) | 🟢 | 2026-07-24 |
-| tab | `src/app/modules/tab` | [tab](./modules/tab.md) | 🟢 | 2026-07-24 |
-| users | `src/app/modules/users` | [users](./modules/users.md) | 🟢 | 2026-07-24 |
+| system-admin | `src/app/modules/system-admin` | [system-admin](./modules/system-admin.md) | 🟢 | 2026-08-03 |
+| users | `src/app/modules/users` | [users](./modules/users.md) | 🟢 | 2026-08-03 |
