@@ -1,0 +1,15 @@
+# Keep the build context small.
+node_modules
+dist
+.angular
+.git
+.vscode
+.claude
+docs
+ref
+e2e
+screenshots
+test-results
+*.md
+.DS_Store
+npm-debug.log*
