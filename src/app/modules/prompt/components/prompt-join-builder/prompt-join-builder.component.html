@@ -1,0 +1,179 @@
+<div class="join-builder">
+  <!-- Existing joins as structured rows -->
+  <div class="join-list" *ngIf="joins().length">
+    <div class="join-row" *ngFor="let j of joins(); let i = index">
+      <span class="hop-index">{{ i + 1 }}</span>
+      <span class="join-type-badge">{{ j.joinType }}</span>
+      <span class="join-target"
+        >{{ j.targetTable }} <span class="alias">({{ j.targetAlias }})</span></span
+      >
+      <span class="join-on">ON {{ j.onClause }}</span>
+      <button
+        type="button"
+        class="join-remove"
+        (click)="removeJoin(j.joinKey)"
+        [attr.aria-label]="'COMMON.DELETE' | translate"
+        [title]="'COMMON.DELETE' | translate"
+      >
+        <i class="pi pi-times"></i>
+      </button>
+    </div>
+  </div>
+
+  <p class="empty-hint" *ngIf="!joins().length && !addOpen()">
+    {{ 'PROMPT_MODULE.NO_JOINS_HINT' | translate }}
+  </p>
+
+  <!-- Add-join trigger -->
+  <app-button
+    *ngIf="!addOpen()"
+    variant="secondary"
+    icon="pi pi-plus"
+    (clicked)="openAdd()"
+    >{{ 'PROMPT_MODULE.ADD_JOIN' | translate }}</app-button
+  >
+
+  <!-- Add-join panel -->
+  <div class="add-join-panel" *ngIf="addOpen()">
+    <div class="mode-toggle">
+      <button
+        type="button"
+        [class.active]="mode() === 'fk'"
+        (click)="setMode('fk')"
+      >
+        <i class="pi pi-sitemap"></i> {{ 'PROMPT_MODULE.JOIN_FK' | translate }}
+      </button>
+      <button
+        type="button"
+        [class.active]="mode() === 'manual'"
+        (click)="setMode('manual')"
+      >
+        <i class="pi pi-pencil"></i> {{ 'PROMPT_MODULE.JOIN_MANUAL' | translate }}
+      </button>
+    </div>
+
+    <!-- FK-suggested mode -->
+    <ng-container *ngIf="mode() === 'fk'">
+      <span class="lazy-hint" *ngIf="loadingFks()">
+        <i class="pi pi-spin pi-spinner"></i>
+        {{ 'PROMPT_MODULE.LOADING_JOINS' | translate }}
+      </span>
+      <p class="empty-hint" *ngIf="!loadingFks() && !fkSuggestions().length">
+        {{ 'PROMPT_MODULE.NO_FK_HINT' | translate }}
+      </p>
+      <div class="add-row" *ngIf="fkSuggestions().length">
+        <app-custom-dropdown
+          [ngModel]="selectedFkKey()"
+          (ngModelChange)="selectedFkKey.set($event)"
+          [ngModelOptions]="{ standalone: true }"
+          [label]="'PROMPT_MODULE.FK_SUGGESTION' | translate"
+          [placeholder]="'PROMPT_MODULE.SELECT_FK' | translate"
+          [options]="fkSuggestions()"
+          optionLabel="label"
+          optionValue="value"
+          [filter]="true"
+        ></app-custom-dropdown>
+        <app-button
+          variant="primary"
+          icon="pi pi-check"
+          [disabled]="!selectedFkKey()"
+          (clicked)="addFkJoin()"
+          >{{ 'PROMPT_MODULE.ADD_JOIN' | translate }}</app-button
+        >
+      </div>
+    </ng-container>
+
+    <!-- Manual mode -->
+    <ng-container *ngIf="mode() === 'manual'">
+      <div class="manual-grid">
+        <app-custom-dropdown
+          [ngModel]="manSourceAlias()"
+          (ngModelChange)="onManSourceAlias($event)"
+          [ngModelOptions]="{ standalone: true }"
+          [label]="'PROMPT_MODULE.JOIN_FROM' | translate"
+          [placeholder]="'PROMPT_MODULE.SELECT_TABLE' | translate"
+          [options]="scopeOptions()"
+          optionLabel="label"
+          optionValue="value"
+        ></app-custom-dropdown>
+        <app-custom-dropdown
+          [ngModel]="manSourceColumn()"
+          (ngModelChange)="manSourceColumn.set($event)"
+          [ngModelOptions]="{ standalone: true }"
+          [label]="'PROMPT_MODULE.JOIN_ON_COLUMN' | translate"
+          [placeholder]="'PROMPT_MODULE.SELECT_COLUMN' | translate"
+          [options]="manSourceCols()"
+          optionLabel="label"
+          optionValue="value"
+          [filter]="true"
+        ></app-custom-dropdown>
+        <app-custom-dropdown
+          [ngModel]="manJoinType()"
+          (ngModelChange)="manJoinType.set($event)"
+          [ngModelOptions]="{ standalone: true }"
+          [label]="'PROMPT_MODULE.JOIN_TYPE' | translate"
+          [options]="[
+            { label: 'LEFT', value: 'LEFT' },
+            { label: 'INNER', value: 'INNER' },
+          ]"
+          optionLabel="label"
+          optionValue="value"
+        ></app-custom-dropdown>
+        <app-custom-dropdown
+          [ngModel]="manTargetSchema()"
+          (ngModelChange)="onManTargetSchema($event)"
+          [ngModelOptions]="{ standalone: true }"
+          [label]="'PROMPT_MODULE.JOIN_TO_SCHEMA' | translate"
+          [placeholder]="'PROMPT_MODULE.SELECT_SCHEMA' | translate"
+          [options]="manSchemas()"
+          optionLabel="label"
+          optionValue="value"
+          [filter]="true"
+        ></app-custom-dropdown>
+        <app-custom-dropdown
+          [ngModel]="manTargetTable()"
+          (ngModelChange)="onManTargetTable($event)"
+          [ngModelOptions]="{ standalone: true }"
+          [label]="'PROMPT_MODULE.JOIN_TO_TABLE' | translate"
+          [placeholder]="'PROMPT_MODULE.SELECT_TABLE' | translate"
+          [options]="manTargetTables()"
+          optionLabel="label"
+          optionValue="value"
+          [filter]="true"
+        ></app-custom-dropdown>
+        <app-custom-dropdown
+          [ngModel]="manTargetColumn()"
+          (ngModelChange)="manTargetColumn.set($event)"
+          [ngModelOptions]="{ standalone: true }"
+          [label]="'PROMPT_MODULE.JOIN_TO_COLUMN' | translate"
+          [placeholder]="'PROMPT_MODULE.SELECT_COLUMN' | translate"
+          [options]="manTargetCols()"
+          optionLabel="label"
+          optionValue="value"
+          [filter]="true"
+        ></app-custom-dropdown>
+      </div>
+      <div class="add-row">
+        <app-button
+          variant="primary"
+          icon="pi pi-check"
+          [disabled]="
+            !manSourceAlias() ||
+            !manSourceColumn() ||
+            !manTargetSchema() ||
+            !manTargetTable() ||
+            !manTargetColumn()
+          "
+          (clicked)="addManualJoin()"
+          >{{ 'PROMPT_MODULE.ADD_JOIN' | translate }}</app-button
+        >
+      </div>
+    </ng-container>
+
+    <div class="panel-actions">
+      <app-button variant="ghost" (clicked)="cancelAdd()"
+        >{{ 'COMMON.CANCEL' | translate }}</app-button
+      >
+    </div>
+  </div>
+</div>

@@ -25,6 +25,7 @@ import { EditPromptComponent } from './components/edit-prompt/edit-prompt.compon
 import { ListPromptComponent } from './components/list-prompt/list-prompt.component';
 import { PromptAppearanceFormComponent } from './components/prompt-appearance-form/prompt-appearance-form.component';
 import { PromptJoinPickerComponent } from './components/prompt-join-picker/prompt-join-picker.component';
+import { PromptJoinBuilderComponent } from './components/prompt-join-builder/prompt-join-builder.component';
 import { PromptValueSourceComponent } from './components/prompt-value-source/prompt-value-source.component';
 import { SqlQueryDialogComponent } from './components/sql-query-dialog/sql-query-dialog.component';
 import { ViewPromptComponent } from './components/view-prompt/view-prompt.component';
@@ -45,6 +46,7 @@ import { configPromptReducer, CONFIG_PROMPT_FEATURE_KEY } from './store';
     PromptAppearanceFormComponent,
     PromptValueSourceComponent,
     PromptJoinPickerComponent,
+    PromptJoinBuilderComponent,
   ],
   imports: [
     CommonModule,

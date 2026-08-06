@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 
 export interface RequestOptions {
   skipLoader?: boolean; // true = suppress global loader, use button spinner instead
+  forceLoader?: boolean; // true = force the global overlay ON for a write (rare)
   params?: any;
   headers?: HttpHeaders;
   responseType?: any;
@@ -112,13 +113,15 @@ export class HttpClientService {
   }
 
   private buildOptions(options?: RequestOptions): any {
-    const { skipLoader, ...httpOptions } = options || {};
-    if (!skipLoader)
+    const { skipLoader, forceLoader, ...httpOptions } = options || {};
+    if (!skipLoader && !forceLoader)
       return Object.keys(httpOptions).length ? httpOptions : undefined;
-    const headers = (httpOptions.headers || new HttpHeaders()).set(
-      'X-Skip-Loader',
-      'true',
-    );
+    let headers = httpOptions.headers || new HttpHeaders();
+    // Writes skip the global overlay by default (interceptor is method-aware);
+    // GET shows it. These headers only override that default: skipLoader on a
+    // read, forceLoader on a write.
+    if (skipLoader) headers = headers.set('X-Skip-Loader', 'true');
+    if (forceLoader) headers = headers.set('X-Force-Loader', 'true');
     return { ...httpOptions, headers };
   }
 }

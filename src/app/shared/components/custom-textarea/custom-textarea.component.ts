@@ -27,9 +27,14 @@ export class CustomTextareaComponent implements ControlValueAccessor {
   @Input() errorMessage = '';
   @Input() showError = false;
   @Input() rows = 4;
-  /** CSS resize behavior. Default 'vertical' preserves existing usage;
-   *  pass 'none' for a fixed-size box that scrolls internally. */
-  @Input() resize: 'vertical' | 'none' | 'both' | 'horizontal' = 'vertical';
+  /** Optional hard character cap (mirrors the native maxlength attribute). */
+  @Input() maxLength: number | null = null;
+  /** Optional id for the inner <textarea> (label `for` targeting / tests). */
+  @Input() inputId = '';
+  /** CSS resize behavior. Default 'none' — the textarea is a fixed-size box
+   *  that scrolls internally, so users can't drag its height/width and skew
+   *  the form/popup layout. Pass 'vertical' to opt a specific field back in. */
+  @Input() resize: 'vertical' | 'none' | 'both' | 'horizontal' = 'none';
 
   value = '';
   disabled = false;

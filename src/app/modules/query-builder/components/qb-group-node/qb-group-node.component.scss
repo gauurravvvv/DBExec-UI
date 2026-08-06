@@ -2,15 +2,22 @@
   display: block;
 }
 
+// Nesting affordance: alternate the panel tint by depth so each level of
+// grouping reads as visually distinct. `--qb-depth` is set on the host by
+// the template; even depths sit on the subtle ground, odd depths on the
+// card surface.
 .qb-group {
+  position: relative;
   border: 1px solid var(--border-color);
   border-left: 3px solid var(--primary-color);
-  border-radius: var(--radius-md, 8px);
-  background: var(--surface-ground, #f8f9fb);
-  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  background: var(--secondary-background);
+  padding: var(--space-4);
 
+  // AND groups (default) carry the primary accent; OR groups switch to the
+  // warning/amber accent so the boolean mode is legible at a glance.
   &--or {
-    border-left-color: var(--secondary-color, #f5a623);
+    border-left-color: var(--warning-color);
   }
   &--negated {
     border-style: dashed;
@@ -20,8 +27,9 @@
 .qb-group__head {
   display: flex;
   align-items: center;
-  gap: var(--space-2);
-  margin-bottom: var(--space-3);
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+  flex-wrap: wrap;
 }
 
 .qb-group__spacer {
@@ -30,21 +38,31 @@
 
 .qb-group__not--active :where(button, .app-button) {
   color: var(--primary-color);
-  font-weight: var(--fw-semibold, 600);
+  font-weight: var(--fw-semibold);
 }
 
+// Nested children get a left indent plus a vertical guide line so the tree
+// depth is obvious. The guide picks up the group's boolean accent colour.
 .qb-group__body {
   display: flex;
   flex-direction: column;
-  gap: var(--space-3);
+  gap: var(--space-4);
+  margin-left: var(--space-4);
+  padding-left: var(--space-5);
+  border-left: 2px solid var(--border-color);
+}
+
+.qb-group--or > .qb-group__body {
+  border-left-color: var(--warning-color-bg);
 }
 
 .qb-group__empty {
   margin: 0;
-  padding: var(--space-4);
+  padding: var(--space-5);
   text-align: center;
   font-size: var(--fs-label);
   color: var(--text-muted);
-  border: 1px dashed var(--border-color);
-  border-radius: var(--radius-sm, 6px);
+  background: var(--card-background);
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--radius-sm);
 }

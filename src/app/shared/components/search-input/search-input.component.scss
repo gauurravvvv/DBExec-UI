@@ -1,0 +1,72 @@
+.search-input {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  max-width: 320px;
+
+  .lead-icon {
+    position: absolute;
+    left: 0.65rem;
+    font-size: var(--fs-control);
+    color: var(--text-color);
+    opacity: 0.5;
+    pointer-events: none;
+  }
+
+  input {
+    width: 100%;
+    background: var(--card-background);
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    padding: 0.5rem 2rem 0.5rem 2.1rem; // room for both icons
+    font-size: var(--fs-body);
+    font-family: inherit;
+
+    &::placeholder {
+      color: var(--text-color);
+      opacity: 0.4;
+    }
+
+    &:enabled:focus {
+      outline: none;
+      box-shadow: 0 0 0 1px var(--primary-color-transparent);
+      border-color: var(--primary-color);
+    }
+
+    &:enabled:hover {
+      border-color: var(--primary-color);
+    }
+  }
+
+  .clear-btn {
+    position: absolute;
+    right: 0.4rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border: none;
+    background: transparent;
+    color: var(--text-color);
+    opacity: 0.5;
+    border-radius: 50%;
+    cursor: pointer;
+
+    i {
+      font-size: var(--fs-label);
+    }
+
+    &:hover {
+      opacity: 1;
+      background: var(--hover-background);
+    }
+  }
+
+  &.disabled {
+    opacity: 0.6;
+    pointer-events: none;
+  }
+}

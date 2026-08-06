@@ -10,29 +10,95 @@
           <i class="pi pi-arrow-left back-icon"></i>
         </button>
         <h2>{{ 'PROMPT_MODULE.CONFIG_TITLE' | translate }}</h2>
+        <!-- Prompt metadata behind an info popover (was 3 inline rows). -->
+        <div class="meta-wrap">
+          <button
+            type="button"
+            class="meta-btn"
+            [class.open]="showMeta"
+            (click)="toggleMeta($event)"
+            [attr.aria-expanded]="showMeta"
+            [attr.aria-label]="'PROMPT_MODULE.PROMPT_DETAILS' | translate"
+          >
+            <i class="pi pi-info-circle"></i>
+          </button>
+          <div class="meta-pop" *ngIf="showMeta" role="dialog">
+            <div class="meta-row">
+              <span class="mk">{{ 'COMMON.NAME' | translate }}</span>
+              <span class="mv">{{ promptForm.get('name')?.value || '—' }}</span>
+            </div>
+            <div class="meta-row">
+              <span class="mk">{{ 'COMMON.TYPE' | translate }}</span>
+              <span class="mv"
+                ><span class="meta-tag">{{
+                  promptForm.get('type')?.value || '—'
+                }}</span></span
+              >
+            </div>
+            <div class="meta-row">
+              <span class="mk">{{ 'COMMON.DATASOURCE' | translate }}</span>
+              <span class="mv">{{ selectedDatasourceName || '—' }}</span>
+            </div>
+          </div>
+        </div>
       </div>
       <div class="action-buttons">
-        <button
-          class="btn-cancel"
-          type="button"
-          [disabled]="!isFormDirty || isCancelClicked"
-          (click)="onCancel()"
+        <app-button variant="ghost" (clicked)="onCancel()"
+          >{{ 'COMMON.CANCEL' | translate }}</app-button
         >
-          <i class="pi pi-times"></i>
-          {{ 'COMMON.CANCEL' | translate }}
-        </button>
-        <button
+        <app-button
+          *ngIf="currentStep > 0"
+          variant="secondary"
+          icon="pi pi-arrow-left"
+          (clicked)="previousStep()"
+          >{{ 'ORG.PREVIOUS' | translate }}</app-button
+        >
+        <app-button
+          *ngIf="currentStep < lastStep"
+          variant="primary"
+          trailingIcon="pi pi-arrow-right"
+          [disabled]="!isStepValid(currentStep)"
+          (clicked)="nextStep()"
+          >{{ 'ORG.NEXT' | translate }}</app-button
+        >
+        <ng-container
           *hasPermission="'queryBuilderPrompt'; level: 'write'"
-          class="btn-primary"
-          type="button"
-          (click)="onSubmit()"
-          [disabled]="promptForm.invalid || !isFormDirty || saving()"
         >
-          <i class="pi pi-save"></i>
-          {{ 'COMMON.SAVE' | translate }}
-        </button>
+          <app-button
+            *ngIf="currentStep === lastStep"
+            variant="primary"
+            icon="pi pi-save"
+            [loading]="saving()"
+            [disabled]="!canSave || saving()"
+            (clicked)="onSubmit()"
+            >{{ 'COMMON.SAVE' | translate }}</app-button
+          >
+        </ng-container>
       </div>
     </div>
+    <!-- Full-width wizard stepper strip (its own row under the header) -->
+    <div class="stepbar">
+      <div class="steps-container" [ngClass]="'step-' + (currentStep + 1)">
+        <ng-container
+          *ngFor="let step of steps; let i = index; trackBy: trackByIndex"
+        >
+          <div
+            class="step"
+            [class.active]="currentStep === i"
+            [class.completed]="currentStep > i"
+            (click)="onStepClick(i)"
+          >
+            <div class="step-dot">
+              <i class="pi pi-check" *ngIf="currentStep > i"></i>
+              <span *ngIf="currentStep <= i">{{ i + 1 }}</span>
+            </div>
+            <span class="step-label">{{ step.titleKey | translate }}</span>
+          </div>
+          <div class="step-line" *ngIf="i < lastStep"></div>
+        </ng-container>
+      </div>
+    </div>
+
     <form
       autocomplete="off"
       [formGroup]="promptForm"
@@ -42,48 +108,8 @@
     >
       <div class="form-container">
         <div class="form-grid left-column">
-          <div class="form-row full-width">
-            <div class="form-field half-width">
-              <app-custom-input
-                [ngModel]="promptForm.get('name')?.value"
-                [ngModelOptions]="{ standalone: true }"
-                [label]="'COMMON.NAME' | translate"
-                icon="pi-tag"
-                [inputDisabled]="true"
-              >
-              </app-custom-input>
-            </div>
-
-            <div class="form-field half-width">
-              <app-custom-input
-                [ngModel]="promptForm.get('type')?.value"
-                [ngModelOptions]="{ standalone: true }"
-                [label]="'COMMON.TYPE' | translate"
-                icon="pi-tag"
-                [inputDisabled]="true"
-              >
-              </app-custom-input>
-            </div>
-          </div>
-          <div class="form-row full-width">
-            <div class="form-field">
-              <app-custom-input
-                [ngModel]="selectedDatasourceName"
-                [ngModelOptions]="{ standalone: true }"
-                [label]="'COMMON.DATASOURCE' | translate"
-                [placeholder]="'COMMON.DATASOURCE' | translate"
-                icon="pi-database"
-                [inputDisabled]="true"
-              >
-              </app-custom-input>
-            </div>
-          </div>
-          <div class="section-header">
-            <h3>
-              <i class="pi pi-database mr-2"></i>
-              {{ 'PROMPT_MODULE.QUERY_CONFIGURATIONS' | translate }}
-            </h3>
-          </div>
+          <!-- Step 1: Source (schema + tables) -->
+          <section class="wizard-step" *ngIf="currentStep === 0">
           <div class="form-row schema-table-row">
             <div class="form-field schema-field">
               <app-custom-dropdown
@@ -108,6 +134,10 @@
               </app-custom-dropdown>
             </div>
             <div class="form-field">
+              <span class="lazy-hint" *ngIf="isLoadingTables">
+                <i class="pi pi-spin pi-spinner"></i>
+                {{ 'PROMPT_MODULE.LOADING_TABLES' | translate }}
+              </span>
               <app-custom-multiselect
                 formControlName="tables"
                 [label]="'PROMPT_MODULE.TABLES' | translate"
@@ -131,11 +161,16 @@
               </app-custom-multiselect>
             </div>
           </div>
-          <div
-            class="form-row"
-            *ngIf="promptForm.get('tables')?.value?.length > 0"
-          >
+          </section>
+
+          <!-- Step 3: Column & Filter (columns + WHERE + SQL preview) -->
+          <section class="wizard-step" *ngIf="currentStep === 2">
+          <div class="form-row">
             <div class="form-field full-width">
+              <span class="lazy-hint" *ngIf="isLoadingColumns">
+                <i class="pi pi-spin pi-spinner"></i>
+                {{ 'PROMPT_MODULE.LOADING_COLUMNS' | translate }}
+              </span>
               <app-custom-multiselect
                 formControlName="columns"
                 [label]="'PROMPT_MODULE.COLUMNS' | translate"
@@ -159,316 +194,97 @@
               </app-custom-multiselect>
             </div>
           </div>
-          <div
-            class="form-row"
-            *ngIf="promptForm.get('tables')?.value?.length > 1"
-          >
+          <!-- Filter column + operator (structured — no free-text SQL). The
+               compiler builds the WHERE from these; prompt_where is legacy. -->
+          <div class="form-row">
             <div class="form-field full-width">
-              <label for="promptJoin">
-                {{ 'PROMPT_MODULE.PROMPT_JOIN_CONDITION' | translate
-                }}<span class="required">*</span>
-                <i
-                  class="pi pi-info-circle info-icon"
-                  [pTooltip]="'PROMPT_MODULE.JOIN_CONDITION_HINT' | translate"
-                  tooltipPosition="right"
-                ></i>
-              </label>
-              <div class="autocomplete-container">
-                <span class="p-input-icon-left full-width">
-                  <i class="pi pi-link"></i>
-                  <input
-                    id="promptJoin"
-                    type="text"
-                    pInputText
-                    formControlName="promptJoin"
-                    (input)="onJoinConditionInput($event)"
-                    (keydown)="onJoinKeydown($event)"
-                    (blur)="hideJoinSuggestionsDelayed()"
-                    (focus)="onJoinFocus($event)"
-                    [placeholder]="'PROMPT_MODULE.JOIN_PLACEHOLDER' | translate"
-                    autocomplete="off"
-                    [ngClass]="{
-                      'ng-invalid ng-dirty':
-                        promptForm.get('promptJoin')?.invalid &&
-                        promptForm.get('promptJoin')?.touched,
-                    }"
-                  />
-                </span>
-
-                <!-- Enhanced Autocomplete Dropdown for Join -->
-                <div
-                  class="column-suggestions"
-                  *ngIf="showJoinSuggestions && filteredJoinColumns.length > 0"
-                >
-                  <div class="suggestions-header">
-                    <span
-                      >{{ filteredJoinColumns.length }} column(s) found</span
-                    >
-                    <span class="keyboard-hint">{{
-                      'PROMPT_MODULE.KEYBOARD_HINT' | translate
-                    }}</span>
-                  </div>
-                  <div class="suggestions-list">
-                    <div
-                      class="suggestion-item"
-                      *ngFor="
-                        let column of filteredJoinColumns.slice(
-                          0,
-                          maxSuggestions
-                        );
-                        let i = index;
-                        trackBy: trackByName
-                      "
-                      [class.selected]="i === selectedJoinSuggestionIndex"
-                      (mousedown)="selectJoinSuggestion(column)"
-                      (mouseenter)="selectedJoinSuggestionIndex = i"
-                    >
-                      <i class="pi pi-hashtag column-icon"></i>
-                      <span class="column-name">{{ column.name }}</span>
-                      <span class="column-type">{{ column.type }}</span>
-                    </div>
-                  </div>
-                  <div
-                    class="suggestions-footer"
-                    *ngIf="filteredJoinColumns.length > maxSuggestions"
-                  >
-                    <span>{{
-                      'PROMPT_MODULE.SHOWING_RESULTS'
-                        | translate
-                          : {
-                              shown: maxSuggestions,
-                              total: filteredJoinColumns.length,
-                            }
-                    }}</span>
-                  </div>
-                </div>
-
-                <!-- No Results Message -->
-                <div
-                  class="column-suggestions no-results"
-                  *ngIf="
-                    showJoinSuggestions &&
-                    filteredJoinColumns.length === 0 &&
-                    currentJoinAlias
-                  "
-                >
-                  <div class="no-results-content">
-                    <i class="pi pi-search"></i>
-                    <span>{{
-                      'PROMPT_MODULE.NO_COLUMNS_FOUND'
-                        | translate: { alias: currentJoinAlias }
-                    }}</span>
-                  </div>
-                </div>
-              </div>
-              <small
-                class="error-message"
-                *ngIf="
-                  promptForm.get('promptJoin')?.invalid &&
-                  promptForm.get('promptJoin')?.touched
-                "
+              <app-custom-dropdown
+                [ngModel]="filterColumn"
+                (ngModelChange)="onFilterColumnChange($event)"
+                [ngModelOptions]="{ standalone: true }"
+                [label]="'PROMPT_MODULE.FILTER_COLUMN' | translate"
+                [placeholder]="'PROMPT_MODULE.SELECT_FILTER_COLUMN' | translate"
+                [options]="reachableColumns"
+                optionLabel="label"
+                optionValue="value"
+                [filter]="true"
+                filterBy="label"
+                icon="pi-filter"
               >
-                {{ 'PROMPT_MODULE.JOIN_CONDITION_REQUIRED' | translate }}
-              </small>
-              <small class="hint-text">
-                <i class="pi pi-lightbulb"></i>
-                {{ 'PROMPT_MODULE.JOIN_HINT_1_EQUALS_1' | translate }}
-              </small>
+              </app-custom-dropdown>
+              <span class="step-help">
+                <i class="pi pi-info-circle"></i>
+                {{ 'PROMPT_MODULE.FILTER_COLUMN_HINT' | translate }}
+              </span>
             </div>
           </div>
           <div class="form-row">
             <div class="form-field full-width">
-              <label for="promptWhere">
-                {{ 'PROMPT_MODULE.PROMPT_WHERE_CONDITION' | translate }}
-                <i
-                  class="pi pi-info-circle info-icon"
-                  [pTooltip]="'PROMPT_MODULE.WHERE_CONDITION_HINT' | translate"
-                  tooltipPosition="right"
-                ></i>
-              </label>
-              <div class="autocomplete-container">
-                <span class="p-input-icon-left full-width">
-                  <i class="pi pi-filter"></i>
-                  <input
-                    id="promptWhere"
-                    type="text"
-                    pInputText
-                    formControlName="promptWhere"
-                    (input)="onWhereConditionInput($event)"
-                    (keydown)="onWhereKeydown($event)"
-                    (blur)="hideSuggestionsDelayed()"
-                    (focus)="onWhereFocus($event)"
-                    [placeholder]="
-                      'PROMPT_MODULE.ENTER_WHERE_CONDITION' | translate
-                    "
-                    autocomplete="off"
-                    [ngClass]="{
-                      'ng-invalid ng-dirty':
-                        promptForm.get('promptWhere')?.invalid &&
-                        promptForm.get('promptWhere')?.touched,
-                    }"
-                  />
-                </span>
-
-                <!-- Enhanced Autocomplete Dropdown -->
-                <div
-                  class="column-suggestions"
-                  *ngIf="showSuggestions && filteredColumns.length > 0"
-                >
-                  <div class="suggestions-header">
-                    <span
-                      >{{ filteredColumns.length }}
-                      {{ 'PROMPT_MODULE.COLUMNS_FOUND' | translate }}</span
-                    >
-                    <span class="keyboard-hint">{{
-                      'PROMPT_MODULE.KEYBOARD_HINT' | translate
-                    }}</span>
-                  </div>
-                  <div class="suggestions-list">
-                    <div
-                      class="suggestion-item"
-                      *ngFor="
-                        let column of filteredColumns.slice(0, maxSuggestions);
-                        let i = index;
-                        trackBy: trackByName
-                      "
-                      [class.selected]="i === selectedSuggestionIndex"
-                      (mousedown)="selectSuggestion(column)"
-                      (mouseenter)="selectedSuggestionIndex = i"
-                    >
-                      <i class="pi pi-hashtag column-icon"></i>
-                      <span class="column-name">{{ column.name }}</span>
-                      <span class="column-type">{{ column.type }}</span>
-                    </div>
-                  </div>
-                  <div
-                    class="suggestions-footer"
-                    *ngIf="filteredColumns.length > maxSuggestions"
-                  >
-                    <span>{{
-                      'PROMPT_MODULE.SHOWING_RESULTS'
-                        | translate
-                          : {
-                              shown: maxSuggestions,
-                              total: filteredColumns.length,
-                            }
-                    }}</span>
-                  </div>
-                </div>
-
-                <!-- No Results Message -->
-                <div
-                  class="column-suggestions no-results"
-                  *ngIf="
-                    showSuggestions &&
-                    filteredColumns.length === 0 &&
-                    currentAlias
-                  "
-                >
-                  <div class="no-results-content">
-                    <i class="pi pi-search"></i>
-                    <span>{{
-                      'PROMPT_MODULE.NO_COLUMNS_FOUND'
-                        | translate: { alias: currentAlias }
-                    }}</span>
-                  </div>
-                </div>
-              </div>
-              <small
-                class="error-message"
-                *ngIf="
-                  promptForm.get('promptWhere')?.invalid &&
-                  promptForm.get('promptWhere')?.touched
-                "
+              <app-custom-dropdown
+                [ngModel]="operator"
+                (ngModelChange)="onOperatorChange($event)"
+                [ngModelOptions]="{ standalone: true }"
+                [label]="'PROMPT_MODULE.OPERATOR' | translate"
+                [placeholder]="'PROMPT_MODULE.SELECT_OPERATOR' | translate"
+                [options]="operatorOptions"
+                optionLabel="label"
+                optionValue="value"
+                icon="pi-sliders-h"
               >
-                {{ 'PROMPT_MODULE.WHERE_CONDITION_REQUIRED' | translate }}
-              </small>
-              <small
-                class="hint-text"
-                *ngIf="promptForm.get('tables')?.value?.length > 0"
-              >
-                <i class="pi pi-lightbulb"></i>
-                <span *ngIf="isRangeType()">
-                  <strong
-                    >{{ 'PROMPT_MODULE.RANGE_PROMPTS' | translate }}:</strong
-                  >
-                  {{ 'PROMPT_MODULE.USE' | translate }}
-                  <code>{{ '{' }}startValue{{ '}' }}</code> and
-                  <code>{{ '{' }}endValue{{ '}' }}</code>
-                  {{ 'PROMPT_MODULE.AS_PLACEHOLDERS' | translate }} <br />{{
-                    'PROMPT_MODULE.EXAMPLE' | translate
-                  }}:
-                  <code
-                    >alias.column BETWEEN '{{ '{' }}startValue{{ '}' }}' AND '{{
-                      '{'
-                    }}endValue{{ '}' }}'</code
-                  >
-                </span>
-                <span *ngIf="isMultiValueType()">
-                  <strong
-                    >{{
-                      'PROMPT_MODULE.MULTI_VALUE_PROMPTS' | translate
-                    }}:</strong
-                  >
-                  {{ 'PROMPT_MODULE.USE' | translate }}
-                  <code>{{ '{' }}value{{ '}' }}</code>
-                  {{ 'PROMPT_MODULE.AS_PLACEHOLDER' | translate }} <br />{{
-                    'PROMPT_MODULE.EXAMPLE' | translate
-                  }}:
-                  <code>alias.column IN ('{{ '{' }}value{{ '}' }}')</code>
-                </span>
-                <span *ngIf="!isRangeType() && !isMultiValueType()">
-                  <strong
-                    >{{
-                      'PROMPT_MODULE.SINGLE_VALUE_PROMPTS' | translate
-                    }}:</strong
-                  >
-                  {{ 'PROMPT_MODULE.USE' | translate }}
-                  <code>{{ '{' }}value{{ '}' }}</code>
-                  {{ 'PROMPT_MODULE.AS_PLACEHOLDER' | translate }} <br />{{
-                    'PROMPT_MODULE.EXAMPLE' | translate
-                  }}:
-                  <code>alias.column = '{{ '{' }}value{{ '}' }}'</code>
-                </span>
-              </small>
+              </app-custom-dropdown>
             </div>
           </div>
 
-          <!-- Live SQL Preview Section -->
+          <!-- Read-only generated-SQL preview (restyled to the module standard) -->
           <div
             class="form-row"
-            *ngIf="promptForm.get('tables')?.value?.length > 0"
+            *ngIf="promptForm.get('columns')?.value?.length > 0"
           >
             <div class="form-field full-width">
-              <div class="section-header sql-preview-header">
-                <h3>
-                  <i class="pi pi-code mr-2"></i>
-                  {{ 'PROMPT_MODULE.SQL_PREVIEW' | translate }}
-                </h3>
-                <button
-                  type="button"
-                  pButton
-                  class="p-button-text p-button-rounded p-button-sm"
-                  icon="pi pi-copy"
-                  [pTooltip]="'PROMPT_MODULE.COPY_SQL' | translate"
-                  tooltipPosition="left"
-                  (click)="copySqlToClipboard()"
-                ></button>
-              </div>
-              <div class="sql-preview-container">
-                <pre
-                  class="sql-preview-code"
-                ><code>{{ generateSqlPreview() }}</code></pre>
+              <div class="sql-preview">
+                <div class="sql-preview__bar">
+                  <span class="sql-preview__title">
+                    <i class="pi pi-code"></i>
+                    {{ 'PROMPT_MODULE.SQL_PREVIEW' | translate }}
+                  </span>
+                  <button
+                    type="button"
+                    class="sql-preview__copy"
+                    [title]="'PROMPT_MODULE.COPY_SQL' | translate"
+                    (click)="copySqlToClipboard()"
+                  >
+                    <i class="pi pi-copy"></i>
+                  </button>
+                </div>
+                <pre class="sql-preview__code"><code>{{ generateSqlPreview() }}</code></pre>
               </div>
             </div>
           </div>
+          </section>
 
-          <div class="section-header" *ngIf="showAddPromptValues">
-            <h3>
-              <i class="pi pi-list mr-2"></i>
-              {{ 'PROMPT_MODULE.CONFIGURATION' | translate }}
-            </h3>
-          </div>
+          <!-- Step 2: Joins (structured multi-hop builder) -->
+          <section class="wizard-step" *ngIf="currentStep === 1">
+            <div class="form-row" *ngIf="promptBaseTable">
+              <div class="form-field full-width">
+                <prompt-join-builder
+                  [datasourceId]="sectionData?.datasourceId"
+                  [baseSchema]="promptBaseSchema"
+                  [baseTable]="promptBaseTable"
+                  [baseAlias]="promptBaseTable"
+                  [initialEdges]="initialJoinEdges"
+                  (edgesChange)="onJoinEdgesChange($event)"
+                  (reachableChange)="onReachableColumnsChange($event)"
+                >
+                </prompt-join-builder>
+              </div>
+            </div>
+            <p class="wizard-empty" *ngIf="!promptBaseTable">
+              {{ 'PROMPT_MODULE.JOINS_PICK_TABLE_FIRST' | translate }}
+            </p>
+          </section>
+
+          <!-- Step 4: Values (value list + value-source editor) -->
+          <section class="wizard-step" *ngIf="currentStep === 3">
           <div class="form-row" *ngIf="showAddPromptValues">
             <div class="form-field">
               <div class="label-with-clear">
@@ -578,39 +394,21 @@
               </small>
             </div>
           </div>
+          <!-- value-source editor (its own Save) lives in the Values step -->
+          <div class="form-row" *ngIf="promptId">
+            <div class="form-field full-width">
+              <prompt-value-source [promptId]="promptId">
+              </prompt-value-source>
+            </div>
+          </div>
+          <p class="wizard-empty" *ngIf="!showAddPromptValues && !promptId">
+            {{ 'PROMPT_MODULE.VALUES_NOT_APPLICABLE' | translate }}
+          </p>
+          </section>
 
-          <!-- No-SQL join: reach a column on a related table via FK edges -->
-          <ng-container *ngIf="promptBaseTable">
-            <div class="section-header">
-              <h3>
-                <i class="pi pi-sitemap mr-2"></i>
-                {{ 'PROMPT_MODULE.RELATED_TABLE_JOIN' | translate }}
-              </h3>
-            </div>
-            <div class="form-row">
-              <div class="form-field full-width">
-                <prompt-join-picker
-                  [datasourceId]="sectionData?.datasourceId"
-                  [baseSchema]="promptBaseSchema"
-                  [baseTable]="promptBaseTable"
-                  [baseAlias]="promptBaseTable"
-                  (reached)="onJoinReached($event)"
-                  (cleared)="onJoinCleared()"
-                >
-                </prompt-join-picker>
-              </div>
-            </div>
-          </ng-container>
-
-          <!-- Appearance & Operators (inline, always-visible per-type editor) -->
-          <ng-container *ngIf="selectedPromptType">
-            <div class="section-header">
-              <h3>
-                <i class="pi pi-sliders-h mr-2"></i>
-                {{ 'PROMPT_MODULE.APPEARANCE_OPERATORS' | translate }}
-              </h3>
-            </div>
-            <div class="form-row">
+          <!-- Step 5: Review & Appearance -->
+          <section class="wizard-step" *ngIf="currentStep === 4">
+            <div class="form-row" *ngIf="selectedPromptType">
               <div class="form-field full-width">
                 <prompt-appearance-form
                   [promptType]="selectedPromptType"
@@ -622,23 +420,7 @@
                 </prompt-appearance-form>
               </div>
             </div>
-          </ng-container>
-
-          <!-- Values (self-contained value-source editor with its own Save) -->
-          <ng-container *ngIf="promptId">
-            <div class="section-header">
-              <h3>
-                <i class="pi pi-list mr-2"></i>
-                {{ 'PROMPT_MODULE.VALUES_SECTION' | translate }}
-              </h3>
-            </div>
-            <div class="form-row">
-              <div class="form-field full-width">
-                <prompt-value-source [promptId]="promptId">
-                </prompt-value-source>
-              </div>
-            </div>
-          </ng-container>
+          </section>
         </div>
       </div>
     </form>

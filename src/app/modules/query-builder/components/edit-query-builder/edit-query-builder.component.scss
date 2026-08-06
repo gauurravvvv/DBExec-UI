@@ -277,7 +277,7 @@
         color: var(--error-color) !important;
 
         &:hover:not(:disabled) {
-          background: rgba(var(--error-rgb), 0.04) !important;
+          background: var(--error-bg) !important;
         }
       }
     }

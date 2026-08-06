@@ -1,0 +1,45 @@
+<div class="form-field">
+  <label *ngIf="label">
+    {{ label }}
+    <span class="required" *ngIf="required">*</span>
+  </label>
+
+  <!-- Empty state: drag-drop zone + click to browse -->
+  <label
+    *ngIf="!file"
+    class="drop-zone"
+    [class.dragging]="dragging"
+    [class.disabled]="disabled"
+    (drop)="onDrop($event)"
+    (dragover)="onDragOver($event)"
+    (dragleave)="onDragLeave($event)"
+  >
+    <input
+      type="file"
+      [accept]="accept"
+      [disabled]="disabled"
+      (change)="onBrowse($event)"
+    />
+    <i class="pi pi-cloud-upload"></i>
+    <span class="dz-primary">{{ 'COMMON.FILE_DROP_HINT' | translate }}</span>
+    <span class="dz-hint" *ngIf="hint">{{ hint }}</span>
+  </label>
+
+  <!-- Selected state: file chip + clear -->
+  <div class="file-chip" *ngIf="file">
+    <i class="pi pi-file"></i>
+    <span class="file-name" [title]="file.name">{{ file.name }}</span>
+    <span class="file-size">{{ sizeLabel }}</span>
+    <button
+      type="button"
+      class="chip-clear"
+      [disabled]="disabled"
+      (click)="clear($event)"
+      aria-label="Remove file"
+    >
+      <i class="pi pi-times"></i>
+    </button>
+  </div>
+
+  <small class="error-message" *ngIf="error">{{ error }}</small>
+</div>

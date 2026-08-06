@@ -1,6 +1,6 @@
 # query-builder
 > Update the Progress log on every change.
-> Code path: `src/app/modules/query-builder` · Status: 🟢 · Last updated: 2026-07-31
+> Code path: `src/app/modules/query-builder` · Status: 🟢 · Last updated: 2026-08-06
 
 ## 1. Context
 - Responsibility: DBExec **Studio** feature — build a parameterised query WITHOUT hand-writing SQL. v2 model: an admin designs a flat, group-based form of **prompts** over a datasource; a business user composes an AND/OR **condition tree** over those prompts and runs it. The client never builds SQL — it sends a validated JSON tree of metadata IDs; the server compiles it. Can produce a dataset (`/datasets/from-builder`).
@@ -23,6 +23,9 @@
 - Out of scope: hand-written SQL (dataset/query-runner), chart authoring (analyses).
 
 ## 3. Progress (newest first)
+### 2026-08-06 — S4: UI/styling polish pass (SCSS-only, 15 files)
+- Visual polish across the module, no behavior/logic/binding changes (SCSS only; the qb `.html` changes in this diff are the earlier app-button/loading sweep, not this pass). Condition tree: `qb-group-node` gained per-depth indent + a vertical guide line and an AND(primary)/OR(amber) accent so boolean mode reads at a glance; `qb-condition-row` got a real red error state (was mis-tokened `--warning`) + aligned operator/value gaps. `qb-join-designer`/`qb-output-columns`: tidied row layout, monospace ON-clause block, primary left-accent, tokenized. `qb-sql-preview` + `run-query-builder`: code-bg SQL block, readable results grid (tabular nums, row hover) + centered empty state. Parent-card consistency on view-query-builder (was missing the card treatment). Removed ~440 lines of dead copy-paste CSS in add-query-builder targeting non-existent DOM/undefined tokens; replaced undefined `--surface-*` tokens with real theme tokens (`--card-background`/`--secondary-background`) so these surfaces now respond to org theming. Gates: tsc/ngc 0. Part of the config-prompt+QB UX program (spec `docs/superpowers/specs/2026-08-05-prompt-config-and-qb-ux-design.md`).
+
 ### 2026-07-31 (later) — QB configures NOTHING about a prompt; it only composes
 - Removed the per-prompt appearance/value-source drawer from `qb-form-designer`; each placement row = name + type chip + display-name + mandatory/locked + remove (form position only). Moved `qb-appearance-form`/`qb-value-source`/`qb-appearance-fields` OUT to the prompt module.
 - `qb-admin.service` lost the 5 prompt-endpoint methods (appearance×2, value-source×3); kept `listPrompts` (palette read).

@@ -40,11 +40,13 @@
 
       <!-- Error Fallback -->
       <div class="editor-fallback" *ngIf="monacoLoadFailed">
+        <!-- Raw monospace code box (keeps .fallback-textarea styling); shown
+             only when Monaco fails to load. resize locked in scss. -->
         <textarea
+          class="fallback-textarea"
           [(ngModel)]="sqlQuery"
           placeholder="SELECT DISTINCT column_name FROM schema.table_name WHERE condition"
           rows="12"
-          class="fallback-textarea"
         >
         </textarea>
       </div>

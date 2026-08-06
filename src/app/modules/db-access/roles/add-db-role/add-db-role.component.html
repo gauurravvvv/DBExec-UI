@@ -8,27 +8,18 @@
         <h2>{{ 'DB_ACCESS.CREATE_ROLE' | translate }}</h2>
       </div>
       <div class="action-buttons">
-        <button
-          pButton
-          type="button"
-          [label]="'COMMON.CANCEL' | translate"
-          class="p-button-outlined btn-cancel"
-          (click)="onCancel()"
-        ></button>
-        <button
-          *hasPermission="'dbRoles'; level: 'write'"
-          pButton
-          class="p-button-primary btn-save"
-          type="button"
-          [label]="'COMMON.CREATE' | translate"
-          (click)="onSubmit()"
-          [disabled]="!datasourceId || roleForm.invalid || saving()"
+        <app-button variant="secondary" (clicked)="onCancel()"
+          >{{ 'COMMON.CANCEL' | translate }}</app-button
         >
-          <i
-            class="pi mr-2"
-            [ngClass]="saving() ? 'pi-spin pi-spinner' : 'pi-save'"
-          ></i>
-        </button>
+        <app-button
+          *hasPermission="'dbRoles'; level: 'write'"
+          variant="primary"
+          icon="pi pi-save"
+          [loading]="saving()"
+          [disabled]="!datasourceId || roleForm.invalid || saving()"
+          (clicked)="onSubmit()"
+          >{{ 'COMMON.CREATE' | translate }}</app-button
+        >
       </div>
     </div>
 

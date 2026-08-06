@@ -24,7 +24,10 @@
     padding: 0.5rem 0.75rem;
     font-size: var(--fs-body);
     font-family: inherit;
-    resize: vertical;
+    // No drag-resize by default (the inline [style.resize] binding is the
+    // source of truth; this is the fallback). Keeps forms/popups from being
+    // skewed by a stretched textarea.
+    resize: none;
     line-height: 1.5;
     box-sizing: border-box;
 

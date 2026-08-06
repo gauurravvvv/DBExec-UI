@@ -459,6 +459,8 @@ export class EditRlsRuleComponent implements OnInit, HasUnsavedChanges {
   }
 
   proceedSave(): void {
+    // Drop a double-fire while the update is already in flight.
+    if (this.saving()) return;
     if (this.saveJustification.trim()) {
       const formVal = this.rlsForm.value;
       const type = formVal.securityType === 'column' ? 'column' : 'row';

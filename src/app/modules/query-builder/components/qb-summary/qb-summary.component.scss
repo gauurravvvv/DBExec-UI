@@ -2,11 +2,11 @@
 .qb-summary {
   display: flex;
   gap: var(--space-3);
-  padding: var(--space-3) var(--space-4);
-  background: var(--surface-ground, #f8f9fb);
+  padding: var(--space-4) var(--space-4);
+  background: var(--secondary-background);
   border: 1px solid var(--border-color);
-  border-radius: var(--radius-md, 8px);
+  border-radius: var(--radius-md);
   &--empty { color: var(--text-muted); font-style: italic; }
 }
 .qb-summary__icon { color: var(--primary-color); margin-top: 2px; }
-.qb-summary__text { margin: 0; font-size: var(--fs-body); line-height: 1.5; }
+.qb-summary__text { margin: 0; font-size: var(--fs-body); line-height: var(--lh-normal); }

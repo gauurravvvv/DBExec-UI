@@ -1,6 +1,17 @@
-// Page layout (self-contained after the legacy execute screen was removed).
+// Page layout — parent card matching qb-design / run-query-builder so the
+// view screen reads like every other module screen.
+:host {
+  display: block;
+  height: 100%;
+}
+
 .add-admin-wrapper {
-  padding: var(--space-6);
+  background-color: var(--card-background);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  height: 100%;
+  overflow-y: auto;
+  padding: var(--space-8);
 }
 
 .add-admin-container {
@@ -13,17 +24,36 @@
   align-items: center;
   justify-content: space-between;
   gap: var(--space-4);
-  margin-bottom: var(--space-5);
+  margin-bottom: var(--space-6);
 
   .left-section {
     display: flex;
     align-items: center;
-    gap: var(--space-2);
+    gap: var(--space-4);
+
+    .p-button-text {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: var(--space-0);
+      background: transparent;
+      color: var(--text-color);
+      border: none;
+      transition: background var(--motion-base) ease;
+
+      &:hover {
+        background: var(--hover-background);
+      }
+    }
 
     h2 {
       margin: 0;
       font-size: var(--fs-h1);
-      font-weight: var(--fw-semibold, 600);
+      font-weight: var(--fw-semibold);
+      color: var(--text-color);
     }
   }
 }
@@ -32,8 +62,25 @@
 .action-buttons {
   display: flex;
   align-items: center;
-  gap: var(--space-2);
+  gap: var(--space-3);
+  flex-wrap: wrap;
 
+  button {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-4) var(--space-6);
+    border: none;
+    border-radius: var(--radius-sm);
+    font-size: var(--fs-control);
+    font-weight: var(--fw-semibold);
+    cursor: pointer;
+    transition: all var(--motion-base) ease;
+
+    i {
+      font-size: var(--fs-control);
+    }
+  }
 
   .btn-primary {
     background: linear-gradient(
@@ -298,12 +345,12 @@
 .qb-view__card {
   margin-top: var(--space-4);
   border: 1px solid var(--border-color);
-  border-radius: var(--radius-md, 8px);
-  background: var(--surface-card, #fff);
-  padding: var(--space-4);
+  border-radius: var(--radius-md);
+  background: var(--secondary-background);
+  padding: var(--space-6);
   display: flex;
   flex-direction: column;
-  gap: var(--space-3);
+  gap: var(--space-2);
   max-width: 720px;
 }
 
@@ -312,12 +359,18 @@
   grid-template-columns: 160px 1fr;
   gap: var(--space-4);
   align-items: center;
+  padding: var(--space-3) 0;
+  border-bottom: 1px solid var(--border-color);
+
+  &:last-child {
+    border-bottom: none;
+  }
 }
 
 .qb-view__label {
   font-size: var(--fs-label);
   color: var(--text-muted);
-  font-weight: var(--fw-medium, 500);
+  font-weight: var(--fw-medium);
 }
 
 .qb-view__value {

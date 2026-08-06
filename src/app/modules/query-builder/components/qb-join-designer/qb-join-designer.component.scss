@@ -13,7 +13,7 @@
 .qb-joins__title {
   margin: 0;
   font-size: var(--fs-h2);
-  font-weight: var(--fw-semibold, 600);
+  font-weight: var(--fw-semibold);
 }
 
 .qb-joins__sub {
@@ -35,6 +35,12 @@
   text-align: center;
 }
 
+.qb-joins__loading {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
 .qb-joins__list {
   display: flex;
   flex-direction: column;
@@ -42,19 +48,63 @@
 }
 
 .qb-joins__card {
-  padding: var(--space-4);
-  background: var(--surface-card, #fff);
+  padding: var(--space-5);
+  background: var(--card-background);
   border: 1px solid var(--border-color);
-  border-radius: var(--radius-md, 8px);
+  border-left: 3px solid var(--primary-color);
+  border-radius: var(--radius-md);
   display: flex;
   flex-direction: column;
+  gap: var(--space-4);
+}
+
+// Auto-derived joins are read-only — the "Auto" badge sits alongside the
+// join type on one header row.
+.qb-joins__auto {
+  display: flex;
+  align-items: center;
   gap: var(--space-3);
+}
+
+.qb-joins__type-label {
+  font-size: var(--fs-label);
+  font-weight: var(--fw-semibold);
+  letter-spacing: var(--ls-wide);
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+// The ON clause rendered as a readable monospace block.
+.qb-joins__clause {
+  code {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: var(--fs-control);
+    line-height: var(--lh-snug);
+    color: var(--text-color);
+    background: var(--secondary-background);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    padding: var(--space-3) var(--space-4);
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+}
+
+.qb-joins__on {
+  font-weight: var(--fw-semibold);
+  color: var(--primary-color);
+}
+
+.qb-joins__meta {
+  font-size: var(--fs-label);
+  color: var(--text-muted);
 }
 
 .qb-joins__row {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-  gap: var(--space-3);
+  gap: var(--space-4);
   align-items: end;
 }
 

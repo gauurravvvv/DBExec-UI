@@ -24,6 +24,10 @@ import { CustomNumberComponent } from './components/custom-number/custom-number.
 import { CustomRadioComponent } from './components/custom-radio/custom-radio.component';
 import { CustomRangesliderComponent } from './components/custom-rangeslider/custom-rangeslider.component';
 import { CustomTextareaComponent } from './components/custom-textarea/custom-textarea.component';
+import { JustificationDialogComponent } from './components/justification-dialog/justification-dialog.component';
+import { CustomColorComponent } from './components/custom-color/custom-color.component';
+import { SearchInputComponent } from './components/search-input/search-input.component';
+import { CustomFileComponent } from './components/custom-file/custom-file.component';
 import { CustomToggleComponent } from './components/custom-toggle/custom-toggle.component';
 import { CommandModalComponent } from './components/command-modal/command-modal.component';
 import { GlobalSearchComponent } from './components/global-search/global-search.component';
@@ -60,6 +64,10 @@ import { ReplaceUnderscoresPipe } from './pipes/replace-underscores.pipe';
     CustomRangesliderComponent,
     CustomTextareaComponent,
     CustomToggleComponent,
+    JustificationDialogComponent,
+    CustomColorComponent,
+    SearchInputComponent,
+    CustomFileComponent,
     CommandModalComponent,
     GlobalSearchComponent,
     NotificationModalComponent,
@@ -108,6 +116,10 @@ import { ReplaceUnderscoresPipe } from './pipes/replace-underscores.pipe';
     CustomRangesliderComponent,
     CustomTextareaComponent,
     CustomToggleComponent,
+    JustificationDialogComponent,
+    CustomColorComponent,
+    SearchInputComponent,
+    CustomFileComponent,
     CommandModalComponent,
     GlobalSearchComponent,
     NotificationModalComponent,
@@ -131,6 +143,10 @@ import { ReplaceUnderscoresPipe } from './pipes/replace-underscores.pipe';
     BrandingWatermarkComponent,
     HasPermissionDirective,
     TranslateModule,
+    // Canonical action button — re-exported so every feature module that
+    // imports SharedModule can use <app-button> (button-level busy/loading
+    // is the app-wide save/submit convention). Avoids a per-module import.
+    ButtonComponent,
   ],
 })
 export class SharedModule {}

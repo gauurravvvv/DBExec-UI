@@ -3,27 +3,33 @@
 }
 
 .qb-condition {
-  padding: var(--space-3) var(--space-4);
+  padding: var(--space-4) var(--space-5);
   border: 1px solid var(--border-color);
-  border-radius: var(--radius-md, 8px);
-  background: var(--surface-card, #fff);
+  border-radius: var(--radius-md);
+  background: var(--card-background);
   transition:
-    border-color 0.15s ease,
-    opacity 0.15s ease;
+    border-color var(--motion-fast) ease,
+    box-shadow var(--motion-fast) ease,
+    opacity var(--motion-fast) ease;
+
+  &:hover {
+    border-color: var(--border-strong);
+  }
 
   &--skipped {
     opacity: 0.65;
   }
 
   &--error {
-    border-color: var(--warning-color, #d9534f);
+    border-color: var(--error-color);
+    box-shadow: 0 0 0 1px var(--error-bg);
   }
 }
 
 .qb-condition__main {
   display: flex;
   align-items: center;
-  gap: var(--space-3);
+  gap: var(--space-4);
   flex-wrap: wrap;
 }
 
@@ -47,7 +53,7 @@
 }
 .qb-condition__not--active :where(button, .app-button) {
   color: var(--primary-color);
-  font-weight: var(--fw-semibold, 600);
+  font-weight: var(--fw-semibold);
 }
 
 .qb-condition__remove {
@@ -56,11 +62,11 @@
 }
 
 .qb-condition__chip {
-  margin-top: var(--space-2);
+  margin-top: var(--space-3);
 }
 
 .qb-condition__errmsg {
-  margin: var(--space-2) 0 0;
+  margin: var(--space-3) 0 0;
   font-size: var(--fs-label);
-  color: var(--warning-color, #d9534f);
+  color: var(--error-color);
 }

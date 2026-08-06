@@ -42,42 +42,33 @@
           >{{ 'COMMON.JUSTIFICATION' | translate }}
           <span class="required">*</span></label
         >
-        <textarea
-          id="saveJustification"
+        <app-custom-textarea
+          inputId="saveJustification"
           [(ngModel)]="saveJustification"
           [ngModelOptions]="{ standalone: true }"
           [placeholder]="'ANALYSES.PROVIDE_UPDATE_REASON' | translate"
-          rows="3"
-          maxlength="500"
-        ></textarea>
+          [rows]="3"
+          [maxLength]="500"
+        ></app-custom-textarea>
         <small class="char-count">{{ saveJustification.length }}/500</small>
       </div>
 
       <div class="popup-actions">
-        <button
-          pButton
-          type="button"
-          [label]="'COMMON.CANCEL' | translate"
-          class="p-button-outlined btn-cancel"
-          (click)="onCancel()"
-        ></button>
-        <button
-          pButton
-          type="submit"
-          [label]="'ANALYSES.SAVE_ANALYSIS' | translate"
-          class="p-button-primary btn-save"
+        <app-button variant="secondary" (clicked)="onCancel()"
+          >{{ 'COMMON.CANCEL' | translate }}</app-button
+        >
+        <app-button
+          variant="primary"
+          icon="pi pi-save"
+          [loading]="saving"
           [disabled]="
             analysisForm.invalid ||
             (showJustification && !saveJustification.trim()) ||
             saving
           "
-          (click)="onSubmit()"
+          (clicked)="onSubmit()"
+          >{{ 'ANALYSES.SAVE_ANALYSIS' | translate }}</app-button
         >
-          <i
-            class="pi mr-2"
-            [ngClass]="saving ? 'pi-spin pi-spinner' : 'pi-save'"
-          ></i>
-        </button>
       </div>
     </form>
   </div>

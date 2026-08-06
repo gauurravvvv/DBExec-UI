@@ -6,10 +6,11 @@ import {
   OnInit,
   inject,
 } from '@angular/core';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { QUERY_RUNNER } from 'src/app/core/constants/routes.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
+import { DatasourceService } from 'src/app/modules/datasource/services/datasource.service';
 import { UsServerListAdapter } from 'src/app/shared/components/us-data-grid/us-server-list-adapter';
 import type {
   CustomTableColumn,
@@ -59,6 +60,12 @@ export class ListSavedQueriesComponent implements OnInit, OnDestroy {
   };
   adapter: UsServerListAdapter<any> | null = null;
 
+  /* ── datasource filter ──────────────────────────────────────────────── */
+  // Chosen datasource; folded into the JSON `filter` param as
+  // `filter.datasourceId` (the BE saved-queries list matches it there).
+  // Null = all. Persisted in the URL (?datasourceId=) so a refresh keeps it.
+  selectedDatasourceId: string | null = null;
+
   // New-Query popup
   showNewQuery = false;
 
@@ -70,9 +77,11 @@ export class ListSavedQueriesComponent implements OnInit, OnDestroy {
 
   constructor(
     private service: SavedQueriesService,
+    private datasourceService: DatasourceService,
     private globalService: GlobalService,
     private translate: TranslateService,
     private router: Router,
+    private route: ActivatedRoute,
   ) {}
 
   ngOnInit(): void {
@@ -83,7 +92,51 @@ export class ListSavedQueriesComponent implements OnInit, OnDestroy {
         'QUERY_RUNNER.SAVED_QUERIES_SEARCH_PLACEHOLDER',
       ),
     };
+    // Pre-select from the URL so a refresh keeps the datasource filter.
+    const fromUrl = this.route.snapshot.queryParamMap.get('datasourceId');
+    this.selectedDatasourceId = fromUrl && fromUrl.trim() ? fromUrl : null;
     this.buildAdapter();
+    this.adapter?.reload();
+  }
+
+  /** Server-mode fetcher for the datasource dropdown (mirrors NewQueryDialog). */
+  loadDatasourcesPage = async ({
+    search,
+    page,
+    limit,
+  }: {
+    search: string;
+    page: number;
+    limit: number;
+  }): Promise<{ items: any[]; total: number }> => {
+    const params: any = { page, limit };
+    if (search) params.filter = JSON.stringify({ name: search });
+    try {
+      const res: any = await this.datasourceService.listDatasource(params);
+      if (res?.status) {
+        return {
+          items: res?.data?.datasources ?? [],
+          total: res?.data?.count ?? 0,
+        };
+      }
+      return { items: [], total: 0 };
+    } catch {
+      return { items: [], total: 0 };
+    }
+  };
+
+  /**
+   * Datasource filter changed → fold it into the list call + reload, and
+   * mirror it into the URL (?datasourceId=) so a refresh keeps the filter.
+   * Clearing (null) drops the param and shows all saved queries.
+   */
+  onDatasourceFilterChange(dsId: string | null): void {
+    this.selectedDatasourceId = dsId || null;
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { datasourceId: this.selectedDatasourceId },
+      queryParamsHandling: 'merge',
+    });
     this.adapter?.reload();
   }
 
@@ -165,7 +218,10 @@ export class ListSavedQueriesComponent implements OnInit, OnDestroy {
             page: p.page,
             limit: p.limit,
             sort: p.sort,
-            filter: p.filter,
+            // Datasource filter lives INSIDE the JSON filter as
+            // `filter.datasourceId`. Merge it into whatever the table
+            // already built (global search + column filters) so both survive.
+            filter: this.withDatasourceFilter(p.filter),
           })
           .then(res => {
             const rows = res?.status ? (res.data?.queries ?? []) : [];
@@ -190,6 +246,26 @@ export class ListSavedQueriesComponent implements OnInit, OnDestroy {
         sortModel: [{ colId: 'createdOn', sort: 'desc' }],
       },
     });
+  }
+
+  /**
+   * Merge the selected datasource into the table's JSON `filter` string.
+   * `existing` is the adapter-built filter (search + column filters) as a
+   * JSON string, or undefined when the table has none. Returns a JSON string
+   * with `datasourceId` added, or the original when no datasource is picked.
+   */
+  private withDatasourceFilter(existing?: string): string | undefined {
+    if (!this.selectedDatasourceId) return existing;
+    let filter: Record<string, unknown> = {};
+    if (existing) {
+      try {
+        filter = JSON.parse(existing) ?? {};
+      } catch {
+        filter = {};
+      }
+    }
+    filter['datasourceId'] = this.selectedDatasourceId;
+    return JSON.stringify(filter);
   }
 
   refreshList(): void {

@@ -13,7 +13,7 @@
 .qb-designer__title {
   margin: 0;
   font-size: var(--fs-h2);
-  font-weight: var(--fw-semibold, 600);
+  font-weight: var(--fw-semibold);
 }
 
 .qb-designer__sub {
@@ -53,18 +53,18 @@
 
 .qb-designer__group {
   border: 1px solid var(--border-color);
-  border-radius: var(--radius-md, 8px);
-  background: var(--surface-card, #fff);
+  border-radius: var(--radius-md);
+  background: var(--card-background);
   overflow: hidden;
 }
 
 .qb-designer__group-head {
   display: flex;
   align-items: center;
-  gap: var(--space-2);
-  padding: var(--space-3);
+  gap: var(--space-3);
+  padding: var(--space-4);
   border-bottom: 1px solid var(--border-color);
-  background: var(--surface-ground, #fafafa);
+  background: var(--secondary-background);
 }
 
 .qb-designer__group-name {
@@ -75,7 +75,7 @@
 .qb-designer__group-ungrouped {
   flex: 1 1 auto;
   font-size: var(--fs-control);
-  font-weight: var(--fw-semibold, 600);
+  font-weight: var(--fw-semibold);
   color: var(--text-muted);
 }
 
@@ -89,25 +89,26 @@
 
 .qb-designer__dropzone-empty {
   margin: 0;
-  padding: var(--space-4);
+  padding: var(--space-5);
   text-align: center;
   color: var(--text-muted);
   font-size: var(--fs-label);
-  border: 1px dashed var(--border-color);
-  border-radius: var(--radius-sm, 6px);
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--radius-sm);
 }
 
 .qb-designer__placement {
   display: flex;
   align-items: center;
   gap: var(--space-3);
-  padding: var(--space-2) var(--space-3);
+  padding: var(--space-3) var(--space-4);
   border: 1px solid var(--border-color);
-  border-radius: var(--radius-sm, 6px);
-  background: var(--surface-ground, #fafafa);
+  border-radius: var(--radius-sm);
+  background: var(--secondary-background);
 
   &.cdk-drag-preview {
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.16);
+    border-radius: var(--radius-sm);
+    box-shadow: var(--shadow-md);
   }
   &.cdk-drag-placeholder {
     opacity: 0.3;
@@ -116,9 +117,12 @@
 
 .qb-designer__grip {
   cursor: grab;
-  color: var(--text-muted);
+  color: var(--text-subtle);
   font-size: var(--fs-control);
 
+  &:hover {
+    color: var(--text-muted);
+  }
   &:active {
     cursor: grabbing;
   }
@@ -153,7 +157,7 @@
   font-size: var(--fs-control);
   padding: var(--space-2) var(--space-3);
   border: 1px solid var(--border-color);
-  border-radius: var(--radius-sm, 4px);
+  border-radius: var(--radius-sm);
   background: var(--card-background);
   color: var(--text-color);
 

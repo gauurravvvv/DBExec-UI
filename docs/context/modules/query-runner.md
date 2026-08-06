@@ -1,6 +1,6 @@
 # query-runner
 > Update the Progress log on every change.
-> Code path: `src/app/modules/query-runner` · Status: 🟢 · Last updated: 2026-07-29
+> Code path: `src/app/modules/query-runner` · Status: 🟢 · Last updated: 2026-08-06
 
 ## 1. Context
 - Responsibility: The "SQL Workspace" — owner-private saved queries (home list + CRUD), private connection profiles CRUD, and a full-screen SQL executor (**Monaco** editor + shared SQL IntelliSense + server-side result grid + object explorer). This is the most complex FE module.
@@ -24,6 +24,13 @@
 - Out of scope: visual query building (query-builder), semantic datasets (dataset).
 
 ## 3. Progress (newest first)
+### 2026-08-06 — Datasource dropdown filter on the two list screens
+- Added an `app-custom-dropdown` (server-mode datasource picker, `optionLabel=name`/`optionValue=id`, `showClear`, `appendTo="body"`) above the table toolbar on both **Connections** and **Saved Queries** lists, in a new `.list-filter-bar` row inside `.content-card`. The fetcher mirrors New-Query popup's `loadDatasourcesPage` (`datasourceService.listDatasource`).
+- Data path differs per list, matching each BE list contract: **Connections** passes the chosen id as the TOP-LEVEL first arg of `listConnections(selectedDatasourceId ?? undefined, {…})` (a `datasourceId` query param). **Saved Queries** folds it INTO the JSON `filter` as `filter.datasourceId` via a `withDatasourceFilter()` helper that parse-merges whatever the table already built (global search + column filters) so all survive together.
+- Selection persists in the URL (`?datasourceId=`) via `router.navigate([], { queryParams, queryParamsHandling: 'merge' })`; `ngOnInit` reads it from `route.snapshot.queryParamMap` and pre-selects before the first `adapter.reload()`. Clearing → param becomes null and the list shows all. FE-only — no service or BE change.
+- New i18n key `COMMON.ALL_DATASOURCES` (dropdown placeholder) added to all 10 locales. Label reuses existing `COMMON.DATASOURCE`.
+- Verified: `tsc --noEmit` exit 0, `ngc -p tsconfig.app.json --noEmit` exit 0. (Prod build left to the caller.)
+- Files: `connections/list-connections/list-connections.component.{ts,html,scss}`, `saved-queries/list-saved-queries/list-saved-queries.component.{ts,html,scss}`, `src/assets/i18n/*.json`.
 ### 2026-07-29 — Explorer parity, search, and the object-detail dialog
 - The object browser now matches the Dataset Creator's schema tree: tables render directly under the schema (no `TABLES` wrapper), same panel title, search box, "N tables" count, amber folders, primary-key colour and data-type label. See `modules/dataset.md` for the full entry — the work spans both modules.
 - Added a schema/table/**column** search. Columns load lazily here, so it reaches loaded columns; the placeholder says "tables and columns" rather than promising more.

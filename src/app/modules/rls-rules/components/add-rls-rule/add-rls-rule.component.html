@@ -12,23 +12,18 @@
         <h2>{{ 'RLS.ADD_TITLE' | translate }}</h2>
       </div>
       <div class="action-buttons">
-        <button
-          pButton
-          type="button"
-          [label]="'COMMON.CANCEL' | translate"
-          class="p-button-outlined btn-cancel"
-          (click)="onCancel()"
-        ></button>
-        <button
-          *hasPermission="'rlsRules'; level: 'write'"
-          pButton
-          class="p-button-primary btn-save"
-          type="submit"
-          [label]="'COMMON.SAVE' | translate"
-          (click)="onSubmit()"
+        <app-button variant="secondary" (clicked)="onCancel()"
+          >{{ 'COMMON.CANCEL' | translate }}</app-button
         >
-          <i class="pi pi-save mr-2"></i>
-        </button>
+        <app-button
+          *hasPermission="'rlsRules'; level: 'write'"
+          variant="primary"
+          icon="pi pi-save"
+          [loading]="saving()"
+          [disabled]="rlsForm.invalid || saving()"
+          (clicked)="onSubmit()"
+          >{{ 'COMMON.SAVE' | translate }}</app-button
+        >
       </div>
     </div>
 

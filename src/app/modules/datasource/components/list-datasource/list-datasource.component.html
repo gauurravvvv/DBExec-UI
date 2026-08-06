@@ -185,12 +185,12 @@
           >{{ 'COMMON.JUSTIFICATION' | translate }}
           <span class="required">*</span></label
         >
-        <textarea
+        <app-custom-textarea
           [(ngModel)]="deleteJustification"
           [placeholder]="'COMMON.JUSTIFICATION_DELETE_PLACEHOLDER' | translate"
-          rows="3"
-          maxlength="500"
-        ></textarea>
+          [rows]="3"
+          [maxLength]="500"
+        ></app-custom-textarea>
         <span class="char-count">{{ deleteJustification.length }}/500</span>
       </div>
     </div>

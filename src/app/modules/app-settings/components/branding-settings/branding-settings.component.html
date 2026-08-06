@@ -141,11 +141,16 @@
           </div>
         </ng-container>
       </div>
-
-      <p class="theme-hint">
-        <i class="pi pi-info-circle"></i>
-        {{ 'BRANDING.RE_LOGIN_HINT' | translate }}
-      </p>
     </form>
+
+    <!-- Sign-in hint — a fixed footnote OUTSIDE the scroll form so it
+         doesn't trail the last field as a tinted box (matches Theme). -->
+    <p
+      class="theme-hint"
+      *ngIf="!loading() || brandingForm.value.watermarkText"
+    >
+      <i class="pi pi-info-circle"></i>
+      {{ 'BRANDING.RE_LOGIN_HINT' | translate }}
+    </p>
   </div>
 </div>

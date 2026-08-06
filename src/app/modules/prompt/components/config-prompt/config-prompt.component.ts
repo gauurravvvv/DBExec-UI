@@ -4,6 +4,7 @@ import {
   Component,
   DestroyRef,
   ElementRef,
+  HostListener,
   inject,
   OnDestroy,
   OnInit,
@@ -56,17 +57,45 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
   tables: { [key: string]: any[] } = {};
   staticSchemaData: any[] = [];
 
-  // No-SQL join: when the admin reaches a column on a related table via the
-  // FK picker, we carry the edge descriptor + reached column into the config
-  // save (filter_expr/select_expr/required_joins/join_edges). Null = the prompt
-  // filters on a base-table column (no join needed).
-  reachedColumn: {
-    edge: any;
-    columnExpr: string;
-    targetSchema: string;
-    targetTable: string;
+  // Structured multi-hop joins built by <prompt-join-builder>. Emitted as the
+  // compiler's join_edges shape and saved alongside the config. Empty = the
+  // prompt filters on a base-table column (no join needed).
+  joinEdges: any[] = [];
+  // Seed for the builder when editing an existing config (join_edges from the
+  // stored PromptConfig).
+  initialJoinEdges: any[] | null = null;
+  // The columns reachable across the base + all joined tables, for the
+  // WHERE/column pickers (alias-qualified).
+  reachableColumns: {
+    label: string;
+    value: string;
+    schema: string;
+    table: string;
+    alias: string;
     column: string;
-  } | null = null;
+  }[] = [];
+  // ── Guided wizard state (mirrors the Add Alert stepper idiom) ───────────
+  // Custom step index + per-step validity gates on Next, same pattern as
+  // add-alert / add-organisation. Steps are chunked views over ONE reactive
+  // form — no logic change, just navigation.
+  readonly steps: { key: string; titleKey: string; icon: string }[] = [
+    { key: 'source', titleKey: 'PROMPT_MODULE.STEP_SOURCE', icon: 'pi-database' },
+    { key: 'joins', titleKey: 'PROMPT_MODULE.STEP_JOINS', icon: 'pi-sitemap' },
+    { key: 'filter', titleKey: 'PROMPT_MODULE.STEP_FILTER', icon: 'pi-filter' },
+    { key: 'values', titleKey: 'PROMPT_MODULE.STEP_VALUES', icon: 'pi-list' },
+    { key: 'review', titleKey: 'PROMPT_MODULE.STEP_REVIEW', icon: 'pi-check-circle' },
+  ];
+  readonly lastStep = 4;
+  currentStep = 0;
+
+  /** Prompt-metadata (Name/Type/Datasource) info popover in the header. */
+  showMeta = false;
+
+  // Structured filter (replaces the free-text WHERE box). One prompt = one
+  // filter comparison on one column: the compiler builds `filterExpr <op> :val`.
+  filterColumn = ''; // alias-qualified, e.g. "reg.name" — from reachableColumns
+  operator = ''; // a filter_operator code from the reference-data catalog
+
   separator: string = ','; // Use comma as separator
   editingChipIndex: number = -1;
   editingChipValue: string | null = null;
@@ -164,6 +193,124 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
     return this.promptForm.dirty;
   }
 
+  // ── Wizard navigation (mirrors add-alert) ───────────────────────────────
+  /** True when this prompt type needs a value list (dropdown/select/etc.). */
+  private get typeNeedsValues(): boolean {
+    const t = (this.selectedPromptType || '').toLowerCase();
+    return ['dropdown', 'multiselect', 'checkbox', 'radio'].includes(t);
+  }
+
+  /** Does the current table selection require a join to be valid? */
+  private get multiTableNeedsJoin(): boolean {
+    const tables = this.promptForm.get('tables')?.value || [];
+    // A multi-table selection is only valid once the structured join builder
+    // has produced at least one edge. Single table needs no join.
+    if (tables.length <= 1) return false;
+    return !this.joinEdges?.length;
+  }
+
+  /**
+   * Per-step validity gate. Only the controls owned by `step` are checked so
+   * Next unlocks progressively — the underlying form + validators are unchanged.
+   */
+  isStepValid(step: number): boolean {
+    switch (step) {
+      case 0: // Source: schema + at least one table
+        return (
+          !!this.promptForm.get('schema')?.valid &&
+          (this.promptForm.get('tables')?.value?.length ?? 0) > 0
+        );
+      case 1: // Joins: optional; only invalid if a multi-table selection lacks a join
+        return !this.multiTableNeedsJoin;
+      case 2: // Column & filter: at least one column selected
+        return (this.promptForm.get('columns')?.value?.length ?? 0) > 0;
+      case 3: // Values: required only for value-list types
+        return (
+          !this.typeNeedsValues ||
+          (this.promptForm.get('promptValues')?.value?.length ?? 0) > 0
+        );
+      case 4: // Review: whole-form gate
+        return this.canSave;
+      default:
+        return false;
+    }
+  }
+
+  /** Save allowed only when the full config is valid AND the user changed something. */
+  get canSave(): boolean {
+    return this.promptForm.valid && this.isFormDirty && !this.multiTableNeedsJoin;
+  }
+
+  nextStep(): void {
+    if (this.currentStep < this.lastStep && this.isStepValid(this.currentStep)) {
+      this.currentStep++;
+      this.cdr.markForCheck();
+    }
+  }
+
+  previousStep(): void {
+    if (this.currentStep > 0) {
+      this.currentStep--;
+      this.cdr.markForCheck();
+    }
+  }
+
+  /** Jump backward freely; forward only if every step up to the target is valid. */
+  onStepClick(step: number): void {
+    if (step <= this.currentStep) {
+      this.currentStep = step;
+      this.cdr.markForCheck();
+      return;
+    }
+    for (let i = this.currentStep; i < step; i++) {
+      if (!this.isStepValid(i)) return;
+    }
+    this.currentStep = step;
+    this.cdr.markForCheck();
+  }
+
+  trackByIndex(index: number): number {
+    return index;
+  }
+
+  /** Admin picked the column this prompt filters on (from reachable columns). */
+  onFilterColumnChange(value: string): void {
+    this.filterColumn = value || '';
+    this.promptForm.markAsDirty();
+    this.cdr.markForCheck();
+  }
+
+  /** Admin picked the comparison operator (filter_operator catalog code). */
+  onOperatorChange(value: string): void {
+    this.operator = value || '';
+    this.promptForm.markAsDirty();
+    this.cdr.markForCheck();
+  }
+
+  /** Toggle the header metadata popover (Name/Type/Datasource). */
+  toggleMeta(event: MouseEvent): void {
+    event.stopPropagation();
+    this.showMeta = !this.showMeta;
+  }
+
+  /** Close the metadata popover on any outside click. */
+  @HostListener('document:click')
+  onDocClick(): void {
+    if (this.showMeta) {
+      this.showMeta = false;
+      this.cdr.markForCheck();
+    }
+  }
+
+  /** Close the metadata popover on Escape. */
+  @HostListener('document:keydown.escape')
+  onEsc(): void {
+    if (this.showMeta) {
+      this.showMeta = false;
+      this.cdr.markForCheck();
+    }
+  }
+
   initForm(): void {
     this.promptForm = this.fb.group({
       id: [''],
@@ -204,9 +351,9 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
           this.availableColumns = [];
           this.tableColumns = {};
 
-          // Load tables for the new schema
-          this.loadTablesForSchema(schema.name);
-          this.cachedAvailableTables = this.tables[schema.name] || [];
+          // Load tables for the new schema (async; sets cachedAvailableTables
+          // itself once the API returns — don't read it synchronously here).
+          void this.loadTablesForSchema(schema.name);
         }
       });
 
@@ -238,14 +385,11 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
         this.showSuggestions = false;
         this.filteredColumns = [];
 
-        // Update table columns mapping for selected tables
-        this.updateTableColumns(tables);
-
-        // Update available columns for the multiselect
-        this.updateAvailableColumns(tables);
-
-        // Handle selected columns when tables change
-        this.handleColumnsOnTableChange(tables);
+        // Lazily fetch the selected tables' columns from the API, then prune
+        // any previously-selected columns that belong to a now-deselected table.
+        void this.loadColumnsForSelectedTables(tables).then(() => {
+          this.handleColumnsOnTableChange(tables);
+        });
 
         // Update join validation
         const promptJoinControl = this.promptForm.get('promptJoin');
@@ -479,6 +623,16 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
       const values = response.values || [];
       this.configData = config;
 
+      // Seed the structured join builder from the stored join_edges (edit flow).
+      const savedEdges = (config as any).join_edges;
+      this.initialJoinEdges = Array.isArray(savedEdges) ? savedEdges : [];
+      this.joinEdges = this.initialJoinEdges;
+
+      // Seed the structured filter (column + operator) from the stored config.
+      this.filterColumn =
+        (config as any).filter_expr || (config as any).select_expr || '';
+      this.operator = (config as any).operator || '';
+
       // First set the schema
       const schemaControl = this.promptForm.get('schema');
       schemaControl?.patchValue({ name: config.prompt_schema });
@@ -498,18 +652,53 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
       });
 
       if (parsedTables.length > 0) {
-        // Fix #9: Use synchronous reactive approach instead of timeout
-        // Ensure schema data is loaded before proceeding
-        if (!this.staticSchemaData || this.staticSchemaData.length === 0) {
-          console.error(
-            'Schema data not loaded. Cannot populate table columns.',
-          );
-          return;
-        }
+        // Lazy backfill: fetch this schema's table list (so the tables
+        // multiselect has matching options) AND each saved table's columns
+        // from the API BEFORE patching, keyed by the SAVED alias. The old
+        // nested `staticSchemaData` is empty now (schema list is names-only).
+        await this.loadTablesForSchema(config.prompt_schema);
 
-        // Manually populate tableColumns and availableColumns before patching form
-        this.updateTableColumns(parsedTables);
-        this.updateAvailableColumns(parsedTables);
+        // The saved tables carry their own persisted aliases (e.g. dep_d22),
+        // which won't match the client-generated aliases in the freshly-fetched
+        // options. Merge the saved {tableName, alias} pairs in as options so the
+        // multiselect shows them selected (dedupe by tableName+alias).
+        const savedAsOptions = parsedTables.map(t => ({
+          name: `${t.tableName}(${t.alias})`,
+          value: { tableName: t.tableName, alias: t.alias },
+        }));
+        const seen = new Set(
+          this.cachedAvailableTables.map(
+            (o: any) => `${o.value.tableName}|${o.value.alias}`,
+          ),
+        );
+        savedAsOptions.forEach(o => {
+          const k = `${o.value.tableName}|${o.value.alias}`;
+          if (!seen.has(k)) {
+            this.cachedAvailableTables = [...this.cachedAvailableTables, o];
+            seen.add(k);
+          }
+        });
+
+        const nextTableColumns: { [alias: string]: any[] } = {};
+        const nextAvailable: any[] = [];
+        for (const t of parsedTables) {
+          const cols = await this.fetchColumnsFor(
+            config.prompt_schema,
+            t.tableName,
+          );
+          nextTableColumns[t.alias] = cols;
+          cols.forEach((column: any) => {
+            nextAvailable.push({
+              alias: t.alias,
+              columnName: column.name,
+              columnType: column.type,
+              fullName: `${t.alias}.${column.name}`,
+              displayName: `${t.alias}.${column.name}`,
+            });
+          });
+        }
+        this.tableColumns = nextTableColumns;
+        this.availableColumns = nextAvailable;
 
         // Now patch all form values synchronously
         this.promptForm.patchValue(
@@ -566,7 +755,11 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
   }
 
   onSubmit(): void {
-    if (this.promptForm.valid) {
+    // Honor the same gate the Save button uses (valid + dirty + join-complete)
+    // and drop a double-fire while a save is in flight.
+    if (this.saving()) return;
+    this.promptForm.markAllAsTouched();
+    if (this.canSave) {
       const formValues = this.promptForm.value;
 
       const transformedTables = formValues.tables
@@ -578,33 +771,32 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
         .map((col: any) => col.fullName)
         .join(',');
 
-      // Auto-append value placeholder to WHERE condition if needed
-      const formattedWhere = this.formatWhereCondition(formValues.promptWhere);
-
       const submitData: any = {
         ...formValues,
         tables: transformedTables,
         columns: transformedColumns,
         schema: formValues.schema.name,
-        promptWhere: formattedWhere,
+        // prompt_where is legacy (the v2 compiler ignores it) — send '' so the
+        // BE default is happy; the real filter is the structured operator +
+        // filter column below.
+        promptWhere: '',
         promptSql: this.generateSqlPreview(),
       };
 
-      // No-SQL join: if the admin reached a column on a related table, carry
-      // the v2 fields so the compiler filters on the reached column and the
-      // Query Builder materialises the join. Otherwise the filter targets the
-      // base-table column and no join is needed.
-      if (this.reachedColumn) {
-        const baseAlias = this.promptBaseTable ?? '';
-        submitData.filterExpr = this.reachedColumn.columnExpr;
-        submitData.selectExpr = this.reachedColumn.columnExpr;
-        submitData.requiredJoins = [this.reachedColumn.edge.joinKey];
-        submitData.joinEdges = [this.reachedColumn.edge];
-        void baseAlias;
+      // Structured filter: one column + one operator. The compiler builds
+      // `filter_expr <op> :value`. filterExpr = the chosen (possibly joined)
+      // column; the operator lives on the prompt's appearance/config.
+      submitData.filterExpr = this.filterColumn || null;
+      submitData.selectExpr = this.filterColumn || null;
+      submitData.operator = this.operator || null;
+
+      // Structured joins: carry the full chain so the Query Builder
+      // materialises every hop and the compiler can reach the joined columns.
+      if (this.joinEdges?.length) {
+        submitData.requiredJoins = this.joinEdges.map((e: any) => e.joinKey);
+        submitData.joinEdges = this.joinEdges;
       } else {
-        // Explicitly clear any prior join so a re-config removes it.
-        submitData.filterExpr = null;
-        submitData.selectExpr = null;
+        // Explicitly clear any prior joins so a re-config removes them.
         submitData.requiredJoins = null;
         submitData.joinEdges = null;
       }
@@ -677,22 +869,15 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
     return this.promptForm.get('schema')?.value?.name ?? null;
   }
 
-  /** The admin reached a column on a related table via the FK picker. */
-  onJoinReached(reached: {
-    edge: any;
-    columnExpr: string;
-    targetSchema: string;
-    targetTable: string;
-    column: string;
-  }): void {
-    this.reachedColumn = reached;
+  /** The structured join chain changed (from <prompt-join-builder>). */
+  onJoinEdgesChange(edges: any[]): void {
+    this.joinEdges = edges || [];
     this.promptForm.markAsDirty();
   }
 
-  /** The admin cleared the join — back to a base-table column. */
-  onJoinCleared(): void {
-    this.reachedColumn = null;
-    this.promptForm.markAsDirty();
+  /** The reachable columns (base + joined tables) changed. */
+  onReachableColumnsChange(cols: any[]): void {
+    this.reachableColumns = cols || [];
   }
 
   /**
@@ -736,45 +921,110 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
     }
   }
 
-  private loadTablesForSchema(schemaName: string) {
-    const schemaData = this.staticSchemaData.find(
-      schema => schema.schema_name === schemaName,
-    );
+  // Loading flags for the lazy table/column fetches (button-level busy).
+  isLoadingTables = false;
+  isLoadingColumns = false;
+  // Lazy caches keyed by schema (tables) and `${schema}.${table}` (columns) —
+  // avoids re-fetching a schema's tables or a table's columns twice.
+  private tablesCacheBySchema: { [schema: string]: any[] } = {};
+  private columnsCacheByTable: { [key: string]: any[] } = {};
 
-    // Clear previous table columns
-    this.tableColumns = {};
+  /** A stable, readable alias for a table name (departments → dep, else t1…). */
+  private aliasFor(tableName: string, index: number): string {
+    const base = (tableName || '')
+      .replace(/[^a-zA-Z0-9]/g, '')
+      .slice(0, 3)
+      .toLowerCase();
+    return base ? `${base}${index + 1}` : `t${index + 1}`;
+  }
 
-    if (schemaData) {
-      const tables = schemaData.tables.map((table: any) => {
-        // Store columns for each table alias
-        this.tableColumns[table.table_alias] = table.columns;
-
-        return {
-          name: `${table.table_name}(${table.table_alias})`,
-          value: {
-            tableName: table.table_name,
-            alias: table.table_alias,
-          },
-          columns: table.columns,
-        };
-      });
-
-      this.tables[schemaName] = tables;
-    } else {
-      this.tables[schemaName] = [];
+  /**
+   * Lazy step 2: fetch the tables for a schema from the API (the BE returns
+   * schema NAMES only now — tables + columns are separate endpoints). Builds
+   * the `cachedAvailableTables` options with client-generated aliases.
+   */
+  private async loadTablesForSchema(schemaName: string): Promise<void> {
+    if (!schemaName) return;
+    // Serve from cache if we already fetched this schema's tables.
+    if (this.tablesCacheBySchema[schemaName]) {
+      this.cachedAvailableTables = this.tablesCacheBySchema[schemaName];
+      this.tables[schemaName] = this.cachedAvailableTables;
+      return;
     }
-    this.cachedAvailableTables = this.tables[schemaName] || [];
+    const dsId = this.sectionData?.datasourceId;
+    if (!dsId) return;
+
+    this.isLoadingTables = true;
+    this.cachedAvailableTables = [];
+    this.cdr.markForCheck();
+    try {
+      const res: any = await this.datasourceService.listSchemaTables(
+        { datasourceId: dsId, schemaName },
+        true,
+      );
+      if (this.globalService.handleSuccessService(res, false)) {
+        const rows: any[] = res.data || [];
+        const options = rows.map((row: any, i: number) => {
+          const tableName = row.table_name ?? row.tableName ?? row.name;
+          const alias = this.aliasFor(tableName, i);
+          return {
+            name: `${tableName}(${alias})`,
+            value: { tableName, alias },
+          };
+        });
+        this.tablesCacheBySchema[schemaName] = options;
+        this.tables[schemaName] = options;
+        this.cachedAvailableTables = options;
+      }
+    } catch {
+      this.cachedAvailableTables = [];
+    } finally {
+      this.isLoadingTables = false;
+      this.cdr.markForCheck();
+    }
+  }
+
+  /**
+   * Lazy step 3: fetch a single table's columns from the API and cache them,
+   * keyed by `${schema}.${tableName}`. Returns the column rows.
+   */
+  private async fetchColumnsFor(
+    schemaName: string,
+    tableName: string,
+  ): Promise<any[]> {
+    const key = `${schemaName}.${tableName}`;
+    if (this.columnsCacheByTable[key]) return this.columnsCacheByTable[key];
+
+    const dsId = this.sectionData?.datasourceId;
+    if (!dsId) return [];
+    try {
+      const res: any = await this.datasourceService.listTableColumns(
+        { datasourceId: dsId, schemaName, tableName },
+        true,
+      );
+      if (this.globalService.handleSuccessService(res, false)) {
+        // The columns endpoint returns the array DIRECTLY in `data`
+        // (data: [{column_name, data_type, …}]), not data.columns — accept
+        // both shapes to be safe.
+        const rawCols: any[] = Array.isArray(res.data)
+          ? res.data
+          : res.data?.columns || [];
+        const cols: any[] = rawCols.map((c: any) => ({
+          name: c.column_name ?? c.columnName ?? c.name,
+          type: c.data_type ?? c.dataType ?? c.type ?? '',
+        }));
+        this.columnsCacheByTable[key] = cols;
+        return cols;
+      }
+    } catch {
+      // fall through to empty
+    }
+    return [];
   }
 
   getAvailableTables(schema: any): any[] {
     if (!schema) return [];
-    const schemaName = schema.name;
-
-    if (!this.tables[schemaName]) {
-      this.loadTablesForSchema(schemaName);
-    }
-
-    return this.tables[schemaName] || [];
+    return this.cachedAvailableTables || [];
   }
 
   clearPromptValues(): void {
@@ -1202,96 +1452,53 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
     }
   }
 
-  private updateTableColumns(selectedTables: any[]) {
-    // Clear previous table columns
-    this.tableColumns = {};
-
-    // Get current schema
-    const currentSchema = this.promptForm.get('schema')?.value?.name;
-    if (!currentSchema) {
-      console.warn('updateTableColumns: No schema selected');
-      return;
-    }
-
-    const schemaData = this.staticSchemaData.find(
-      schema => schema.schema_name === currentSchema,
-    );
-
-    if (!schemaData) {
-      console.warn(
-        `updateTableColumns: Schema '${currentSchema}' not found in staticSchemaData`,
-      );
-      return;
-    }
-
-    if (schemaData) {
-      selectedTables.forEach((selectedTable: any) => {
-        const table = schemaData.tables.find(
-          (t: any) => t.table_name === selectedTable.tableName,
-        );
-        if (table) {
-          // Fix #10: Store columns for the selected table's custom alias
-          // This ensures autocomplete works with user-defined aliases from saved configs
-          this.tableColumns[selectedTable.alias] = table.columns;
-        } else {
-          console.warn(
-            `updateTableColumns: Table '${selectedTable.tableName}' not found in schema '${currentSchema}'`,
-          );
-        }
-      });
-    }
-  }
-
   /**
-   * Update available columns based on selected tables
+   * Populate `tableColumns` (alias → columns, for the WHERE/JOIN autocomplete)
+   * AND `availableColumns` (the flat list for the columns multiselect) by
+   * lazily fetching each selected table's columns from the API. Columns are
+   * cached per `${schema}.${table}`, so re-selecting is instant. Async because
+   * the BE serves columns on demand — the old nested `staticSchemaData` is
+   * empty now (schema list is names-only).
    */
-  private updateAvailableColumns(selectedTables: any[]) {
-    this.availableColumns = [];
-
-    if (!selectedTables || selectedTables.length === 0) {
-      return;
-    }
-
-    // Get current schema
+  private async loadColumnsForSelectedTables(
+    selectedTables: any[],
+  ): Promise<void> {
     const currentSchema = this.promptForm.get('schema')?.value?.name;
-    if (!currentSchema) {
-      console.warn('updateAvailableColumns: No schema selected');
+    if (!currentSchema || !selectedTables?.length) {
+      this.tableColumns = {};
+      this.availableColumns = [];
+      this.cdr.markForCheck();
       return;
     }
 
-    const schemaData = this.staticSchemaData.find(
-      schema => schema.schema_name === currentSchema,
-    );
+    this.isLoadingColumns = true;
+    this.cdr.markForCheck();
 
-    if (!schemaData) {
-      console.warn(
-        `updateAvailableColumns: Schema '${currentSchema}' not found in staticSchemaData`,
-      );
-      return;
-    }
-
-    if (schemaData) {
-      selectedTables.forEach((selectedTable: any) => {
-        const table = schemaData.tables.find(
-          (t: any) => t.table_name === selectedTable.tableName,
+    const nextTableColumns: { [alias: string]: any[] } = {};
+    const nextAvailable: any[] = [];
+    try {
+      for (const selectedTable of selectedTables) {
+        const cols = await this.fetchColumnsFor(
+          currentSchema,
+          selectedTable.tableName,
         );
-        if (table && table.columns) {
-          // Add columns with custom alias prefix for proper column selection
-          table.columns.forEach((column: any) => {
-            this.availableColumns.push({
-              alias: selectedTable.alias,
-              columnName: column.name,
-              columnType: column.type,
-              fullName: `${selectedTable.alias}.${column.name}`,
-              displayName: `${selectedTable.alias}.${column.name}`,
-            });
+        // Keyed by the table's alias for the autocomplete helpers.
+        nextTableColumns[selectedTable.alias] = cols;
+        cols.forEach((column: any) => {
+          nextAvailable.push({
+            alias: selectedTable.alias,
+            columnName: column.name,
+            columnType: column.type,
+            fullName: `${selectedTable.alias}.${column.name}`,
+            displayName: `${selectedTable.alias}.${column.name}`,
           });
-        } else if (!table) {
-          console.warn(
-            `updateAvailableColumns: Table '${selectedTable.tableName}' not found in schema '${currentSchema}'`,
-          );
-        }
-      });
+        });
+      }
+      this.tableColumns = nextTableColumns;
+      this.availableColumns = nextAvailable;
+    } finally {
+      this.isLoadingColumns = false;
+      this.cdr.markForCheck();
     }
   }
 
@@ -1442,51 +1649,37 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
     const selectedTables = this.promptForm.get('tables')?.value || [];
     const selectedColumns = this.promptForm.get('columns')?.value || [];
     const schema = this.promptForm.get('schema')?.value?.name || 'schema';
-    const joinCondition = this.promptForm.get('promptJoin')?.value || '';
-    const whereCondition = this.promptForm.get('promptWhere')?.value || '';
 
     if (selectedTables.length === 0) {
-      return '-- Select tables to see preview';
+      return '-- Select a table to see the preview';
     }
 
-    // Build SELECT clause with selected columns or *
+    // SELECT: chosen output columns, or the filter column, or *.
     let sql = '';
     if (selectedColumns.length > 0) {
-      const columnList = selectedColumns
-        .map((col: any) => col.fullName)
-        .join(', ');
-      sql = `SELECT ${columnList}\n`;
+      sql = `SELECT ${selectedColumns.map((c: any) => c.fullName).join(', ')}\n`;
+    } else if (this.filterColumn) {
+      sql = `SELECT ${this.filterColumn}\n`;
     } else {
       sql = 'SELECT *\n';
     }
 
-    // FROM clause with first table
-    const firstTable = selectedTables[0];
-    sql += `FROM ${schema}.${firstTable.tableName} ${firstTable.alias}`;
+    // FROM base table + structured joins (from the join builder).
+    const base = selectedTables[0];
+    sql += `FROM ${schema}.${base.tableName} ${base.alias}`;
+    (this.joinEdges || []).forEach((j: any) => {
+      sql += `\n${j.joinType || 'LEFT'} JOIN ${j.targetSchema}.${j.targetTable} ${j.targetAlias} ON ${j.onClause}`;
+    });
 
-    // JOIN clauses for additional tables
-    if (selectedTables.length > 1) {
-      for (let i = 1; i < selectedTables.length; i++) {
-        const table = selectedTables[i];
-        sql += `\nJOIN ${schema}.${table.tableName} ${table.alias}`;
-      }
-
-      // Add ON clause if join condition exists
-      if (joinCondition) {
-        sql += `\n  ON ${joinCondition}`;
-      } else {
-        sql += '\n  ON <join_condition>';
-      }
-    }
-
-    // WHERE clause - format with value placeholder for preview
-    // Apply formatting in real-time as user types operator
-    if (whereCondition) {
-      const formattedWhere =
-        this.formatWhereConditionForPreview(whereCondition);
-      sql += `\nWHERE ${formattedWhere}`;
-    } else if (selectedTables.length > 0) {
-      sql += '\nWHERE <where_condition>';
+    // WHERE from the structured filter column + operator (placeholder value).
+    if (this.filterColumn) {
+      const opLabel =
+        this.operatorOptions.find(o => o.value === this.operator)?.label ||
+        this.operator ||
+        '=';
+      sql += `\nWHERE ${this.filterColumn} ${opLabel} :value`;
+    } else {
+      sql += '\nWHERE <pick a filter column>';
     }
 
     return sql;

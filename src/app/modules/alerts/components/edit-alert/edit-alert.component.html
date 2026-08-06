@@ -456,13 +456,13 @@
           {{ 'COMMON.JUSTIFICATION' | translate }}
           <span class="required">*</span>
         </label>
-        <textarea
-          id="saveJustification"
+        <app-custom-textarea
+          inputId="saveJustification"
           [(ngModel)]="saveJustification"
           [placeholder]="'COMMON.JUSTIFICATION_UPDATE_PLACEHOLDER' | translate"
-          rows="3"
-          maxlength="500"
-        ></textarea>
+          [rows]="3"
+          [maxLength]="500"
+        ></app-custom-textarea>
         <small class="char-count">{{ saveJustification.length }}/500</small>
       </div>
     </div>

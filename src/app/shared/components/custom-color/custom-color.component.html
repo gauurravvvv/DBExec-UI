@@ -1,0 +1,32 @@
+<div class="form-field">
+  <label *ngIf="label">
+    {{ label }}
+    <span class="required" *ngIf="required">*</span>
+  </label>
+
+  <div class="color-row" [class.disabled]="disabled">
+    <!-- Swatch doubles as the native colour-picker trigger -->
+    <label class="swatch" [style.background]="swatch">
+      <input
+        type="color"
+        [value]="swatch"
+        [disabled]="disabled"
+        (input)="onNativePick($event)"
+        aria-label="Pick colour"
+      />
+    </label>
+
+    <!-- Hex text field for typing / pasting an exact value -->
+    <input
+      type="text"
+      class="hex-input"
+      [value]="value"
+      [disabled]="disabled"
+      [placeholder]="placeholder"
+      autocomplete="off"
+      maxlength="7"
+      (input)="onHexInput($event)"
+      (blur)="onHexBlur()"
+    />
+  </div>
+</div>

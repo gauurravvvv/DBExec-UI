@@ -71,8 +71,22 @@ export class HttpRequestInterceptor implements HttpInterceptor {
     req: HttpRequest<any>,
     next: HttpHandler,
   ): Observable<HttpEvent<any>> {
-    // Check if we should skip the loader for this request
-    const skipLoader = req.headers.has('X-Skip-Loader');
+    // Global-overlay policy. Reads (GET) show the full-screen loader — a
+    // page/section load should block. Writes (POST/PUT/PATCH/DELETE) do NOT:
+    // they surface as a button-level spinner on the control that fired them
+    // (see app-button [loading] + the FormBusy convention), so the rest of
+    // the form stays interactive and a second submit is impossible because
+    // the button disables itself. Making this method-aware means a write can
+    // never accidentally re-introduce the global overlay by forgetting to
+    // pass skipLoader — the old opt-out footgun that left Announcement, etc.
+    // blocking the screen. Escape hatches:
+    //   - 'X-Skip-Loader'  : force-skip a read (search-as-POST, polling GETs)
+    //   - 'X-Force-Loader' : opt a write back INTO the global block (rare,
+    //                        e.g. a destructive long-op with no button anchor)
+    const isWrite = /^(POST|PUT|PATCH|DELETE)$/i.test(req.method);
+    const skipLoader =
+      req.headers.has('X-Skip-Loader') ||
+      (isWrite && !req.headers.has('X-Force-Loader'));
 
     if (!skipLoader) {
       this.loadingService.showLoader();
@@ -112,8 +126,12 @@ export class HttpRequestInterceptor implements HttpInterceptor {
     let headers = req.headers
       .set('x-auth-token', accessToken)
       .set('Accept-Language', locale);
+    // Strip the client-only loader-control headers so they never hit the wire.
     if (headers.has('X-Skip-Loader')) {
       headers = headers.delete('X-Skip-Loader');
+    }
+    if (headers.has('X-Force-Loader')) {
+      headers = headers.delete('X-Force-Loader');
     }
 
     req = req.clone({ url: URL, headers });

@@ -1,7 +1,7 @@
 import { Injectable, Injector, OnDestroy } from '@angular/core';
 import { UntypedFormGroup } from '@angular/forms';
 import { lastValueFrom, Observable } from 'rxjs';
-import { AUTH } from 'src/app/core/constants/api.constant';
+import { AUTH, THEME } from 'src/app/core/constants/api.constant';
 import { StorageType } from 'src/app/core/constants/storage-type.constant';
 import { BrandingService } from 'src/app/core/services/branding.service';
 import { HttpClientService } from 'src/app/core/services/http-client.service';
@@ -92,8 +92,41 @@ export class LoginService implements OnDestroy {
     );
     if (result.status) {
       this.stashLoginResponse(result.data, organisation);
+      // Pre-paint the org theme so the relay screen (navigated to next)
+      // and any subsequent auth page already render in the org's
+      // colours. Phase 2 (/auth/session) re-applies the authoritative
+      // theme; this is best-effort and never blocks the login flow.
+      void this.fetchAndApplyPublicTheme(organisation);
     }
     return result;
+  }
+
+  /**
+   * Fetch the org's colour theme from the UNAUTHENTICATED
+   * `/theme/public` endpoint and apply it immediately. Used so login /
+   * relay paint in the org's brand colours before a session exists.
+   *
+   * The org name is passed as a query param. The endpoint always 200s
+   * (defaults on any miss), and every failure here is swallowed — the
+   * pre-auth paint is a nicety, not a gate. `applyFromLogin` re-validates
+   * every colour before injecting, so a hostile response can't smuggle
+   * CSS.
+   */
+  async fetchAndApplyPublicTheme(organisation: string): Promise<void> {
+    const org = (organisation || '').trim();
+    if (!org) return;
+    try {
+      const url = `${THEME.PUBLIC}?org=${encodeURIComponent(org)}`;
+      const res: any = await lastValueFrom(
+        this.http.apiGet(url, { skipLoader: true }),
+      );
+      const colors = res?.data?.colors;
+      if (colors) {
+        this.themeService.applyFromLogin({ colors } as any);
+      }
+    } catch {
+      // Best-effort only — never block or error the login page.
+    }
   }
 
   /**

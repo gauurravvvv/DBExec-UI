@@ -14,28 +14,21 @@
         <h2>{{ 'ROLE.ADD_TITLE' | translate }}</h2>
       </div>
       <div class="action-buttons">
-        <button
-          pButton
-          type="button"
-          [label]="'COMMON.CANCEL' | translate"
-          class="p-button-outlined btn-cancel"
+        <app-button
+          variant="secondary"
           [disabled]="!isFormDirty"
-          (click)="onCancel()"
-        ></button>
-        <button
-          *hasPermission="'roleManagement'; level: 'write'"
-          pButton
-          class="p-button-primary btn-save"
-          type="submit"
-          [label]="'COMMON.SAVE' | translate"
-          (click)="onSubmit()"
-          [disabled]="!canSave"
+          (clicked)="onCancel()"
+          >{{ 'COMMON.CANCEL' | translate }}</app-button
         >
-          <i
-            class="pi mr-2"
-            [ngClass]="saving() ? 'pi-spin pi-spinner' : 'pi-save'"
-          ></i>
-        </button>
+        <app-button
+          *hasPermission="'roleManagement'; level: 'write'"
+          variant="primary"
+          icon="pi pi-save"
+          [loading]="saving()"
+          [disabled]="!canSave"
+          (clicked)="onSubmit()"
+          >{{ 'COMMON.SAVE' | translate }}</app-button
+        >
       </div>
     </div>
 

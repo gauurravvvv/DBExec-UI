@@ -13,14 +13,12 @@
         <h2>{{ 'ORG.ADD_TITLE' | translate }}</h2>
       </div>
       <div class="action-buttons">
-        <button
-          pButton
-          type="button"
-          [label]="'COMMON.CANCEL' | translate"
-          class="p-button-outlined btn-cancel"
+        <app-button
+          variant="secondary"
           [disabled]="!isFormDirty || orgForm.pristine"
-          (click)="onCancel()"
-        ></button>
+          (clicked)="onCancel()"
+          >{{ 'COMMON.CANCEL' | translate }}</app-button
+        >
         <button
           *ngIf="currentStep > 0"
           pButton
@@ -43,17 +41,15 @@
           [disabled]="!isStep1Valid()"
         ></button>
         <ng-container *hasPermission="'orgManagement'; level: 'write'">
-          <button
+          <app-button
             *ngIf="currentStep === 1"
-            pButton
-            class="p-button-primary btn-save"
-            type="submit"
-            [label]="'COMMON.SAVE' | translate"
-            [icon]="saving() ? 'pi pi-spin pi-spinner' : 'pi pi-save'"
-            iconPos="left"
-            (click)="onSubmit()"
+            variant="primary"
+            icon="pi pi-save"
+            [loading]="saving()"
             [disabled]="!isFormValid() || saving()"
-          ></button>
+            (clicked)="onSubmit()"
+            >{{ 'COMMON.SAVE' | translate }}</app-button
+          >
         </ng-container>
       </div>
     </div>

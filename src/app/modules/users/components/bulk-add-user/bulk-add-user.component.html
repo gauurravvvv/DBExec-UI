@@ -13,47 +13,40 @@
         <h2>{{ 'USER.BULK_ADD_TITLE' | translate }}</h2>
       </div>
       <div class="action-buttons">
-        <!-- Stage: idle — Cancel + Validate -->
-        <ng-container *ngIf="stage === 'idle'">
-          <button
-            pButton
-            type="button"
-            [label]="'COMMON.CANCEL' | translate"
-            class="p-button-outlined btn-cancel"
-            (click)="onCancel()"
-          ></button>
-          <button
-            *hasPermission="'userManagement'; level: 'write'"
-            pButton
-            class="p-button-primary btn-save"
-            type="button"
-            [label]="'USER.BULK_ADD_VALIDATE_BTN' | translate"
-            (click)="onValidateAndUpload()"
+        <!-- Stage: idle (and while validating, so the button stays mounted
+             to show its spinner) — Cancel + Validate -->
+        <ng-container *ngIf="stage === 'idle' || stage === 'validating'">
+          <app-button variant="secondary" (clicked)="onCancel()"
+            >{{ 'COMMON.CANCEL' | translate }}</app-button
           >
-            <i class="pi pi-check mr-2"></i>
-          </button>
+          <app-button
+            *hasPermission="'userManagement'; level: 'write'"
+            variant="primary"
+            icon="pi pi-check"
+            [loading]="stage === 'validating'"
+            [disabled]="stage === 'validating'"
+            (clicked)="onValidateAndUpload()"
+            >{{ 'USER.BULK_ADD_VALIDATE_BTN' | translate }}</app-button
+          >
         </ng-container>
 
-        <!-- Stage: confirming — Back + Proceed -->
-        <ng-container *ngIf="stage === 'confirming' && validateRes">
-          <button
-            pButton
-            type="button"
-            [label]="'USER.BULK_ADD_BACK' | translate"
-            class="p-button-outlined btn-cancel"
-            (click)="onResetForAnother()"
-          ></button>
-          <button
-            *hasPermission="'userManagement'; level: 'write'"
-            pButton
-            class="p-button-primary btn-save"
-            type="button"
-            [label]="'USER.BULK_ADD_PROCEED' | translate"
-            [disabled]="validateRes.summary.valid === 0"
-            (click)="onConfirmProceed()"
+        <!-- Stage: confirming (and while committing from the popup, so the
+             Proceed button stays mounted to show its spinner) — Back + Proceed -->
+        <ng-container
+          *ngIf="(stage === 'confirming' || stage === 'committing') && validateRes"
+        >
+          <app-button variant="secondary" (clicked)="onResetForAnother()"
+            >{{ 'USER.BULK_ADD_BACK' | translate }}</app-button
           >
-            <i class="pi pi-arrow-right mr-2"></i>
-          </button>
+          <app-button
+            *hasPermission="'userManagement'; level: 'write'"
+            variant="primary"
+            icon="pi pi-arrow-right"
+            [loading]="stage === 'committing'"
+            [disabled]="validateRes.summary.valid === 0 || stage === 'committing'"
+            (clicked)="onConfirmProceed()"
+            >{{ 'USER.BULK_ADD_PROCEED' | translate }}</app-button
+          >
         </ng-container>
 
         <!-- Stage: done — Add more + Back to users -->

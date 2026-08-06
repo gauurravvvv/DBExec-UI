@@ -37,6 +37,163 @@
 // every form that asks the admin to pick a hex value uses identical
 // visual weight. Component-level overrides are intentionally absent.
 
+// Small "default" badge above the section list — a fixed (non-scrolling)
+// header sibling, like the page-header in add-datasource.
+.theme-default-badge {
+  display: inline-flex;
+  flex-shrink: 0;
+  margin-bottom: var(--space-5);
+}
+
+// ── Collapsible token groups (full-palette editor) ───────────────
+// Scroll region. NOTE: the add-datasource `flex:1; overflow-y:auto`
+// recipe only scrolls when EVERY ancestor is height-bounded; inside the
+// settings hub that chain doesn't actually reach this component, so the
+// form just grew to fit its content (open 3-4 sections → no scroll).
+// A viewport-relative `max-height` is parent-independent: it caps the
+// form and scrolls its overflow no matter what the ancestors do. The
+// `flex:0 0 auto` on `.token-group` (below) is still required so the
+// sections keep their height instead of compressing to fit.
+.theme-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  max-height: calc(100vh - 230px);
+  overflow-y: auto;
+  // Right padding only, to clear the scrollbar. No bottom padding — the
+  // container already pads the bottom; adding it here stacked into a
+  // ~48px dead gap under the last section.
+  padding-right: var(--space-2);
+
+  @media (max-width: 768px) {
+    max-height: calc(100vh - 190px);
+  }
+
+  // Match add-datasource's scrollbar styling.
+  &::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  &::-webkit-scrollbar-track {
+    background: transparent;
+    border-radius: var(--radius-xs);
+  }
+  &::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: var(--radius-xs);
+    &:hover {
+      background: var(--secondary-color);
+    }
+  }
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-color) transparent;
+
+  .token-group {
+    // Keep natural height inside the flex-column scroll box — without
+    // this, flexbox shrinks the sections to fit `max-height` and the
+    // form never overflows, so it can't scroll. This flex-shrink:0 is
+    // what actually makes the scrollbar appear.
+    flex: 0 0 auto;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    width: 60%;
+
+    @media (max-width: 992px) {
+      width: 100%;
+    }
+
+    // Header row: toggle (fills the row) + a section-scoped reset.
+    &__header {
+      display: flex;
+      align-items: stretch;
+      background: var(--secondary-background);
+      transition: background var(--motion-base) ease;
+
+      &.open {
+        border-bottom: 1px solid var(--border-color);
+      }
+    }
+
+    &__toggle {
+      display: flex;
+      align-items: center;
+      gap: var(--space-4);
+      flex: 1;
+      padding: var(--space-5) var(--space-6);
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      font-size: var(--fs-body);
+      font-weight: var(--fw-semibold);
+      color: var(--text-color);
+
+      &:hover {
+        background: var(--hover-background);
+      }
+
+      i {
+        font-size: var(--fs-control);
+        color: var(--secondary-color);
+      }
+    }
+
+    // Section reset — quiet by default, tints to primary on hover.
+    &__reset {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-3);
+      padding: 0 var(--space-6);
+      background: transparent;
+      border: none;
+      border-left: 1px solid var(--border-color);
+      cursor: pointer;
+      color: var(--secondary-color);
+      font-size: var(--fs-label);
+      font-weight: var(--fw-semibold);
+      white-space: nowrap;
+      transition:
+        color var(--motion-base) ease,
+        background var(--motion-base) ease;
+
+      i {
+        font-size: var(--fs-control);
+      }
+      &:hover:not(:disabled) {
+        color: var(--primary-color);
+        background: var(--primary-color-transparent);
+      }
+      &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+    }
+
+    &__title {
+      flex: 1;
+      text-align: left;
+    }
+
+    &__count {
+      font-size: var(--fs-micro);
+      font-weight: var(--fw-semibold);
+      color: var(--secondary-color);
+      background: var(--card-background);
+      border: 1px solid var(--border-color);
+      border-radius: 999px;
+      padding: 1px 9px;
+    }
+
+    &__body {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-6);
+      padding: var(--space-6);
+      background: var(--card-background);
+    }
+  }
+}
+
 // Hint banner sits below the form-grid and must visually align with
 // the 50%-wide column above. `display: flex` (not inline-flex) +
 // explicit width keep it from stretching across the card on wide
@@ -46,8 +203,9 @@
   display: flex;
   align-items: center;
   gap: var(--space-3);
-  width: 50%;
-  margin: var(--space-4) var(--space-0) var(--space-0);
+  flex-shrink: 0; // fixed footnote under the scroll form, never grows
+  width: 60%;
+  margin: var(--space-5) var(--space-0) var(--space-0);
   padding: var(--space-4) var(--space-5);
   border-left: 3px solid var(--primary-color);
   background: var(--primary-color-transparent);
@@ -63,14 +221,13 @@
   }
 }
 
-// Re-use the existing add-admin-wrapper outer shell. The wrapper class
-// is set on the root in the HTML.
+// Shell. Not height-pinned: the scroll lives on `.theme-form` via its
+// own max-height (parent-independent), so the shell must NOT clip or it
+// would hide the form's scrollbar. Let it size to content.
 .add-admin-wrapper {
-  height: 100%;
   .add-admin-container {
     background: var(--card-background);
     border-radius: var(--radius-md);
-    height: 100%;
     display: flex;
     flex-direction: column;
     padding: var(--space-8);

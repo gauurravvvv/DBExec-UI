@@ -72,11 +72,18 @@ export class ThemeSettingsService {
     }
   }
 
-  async reset(): Promise<any> {
+  /**
+   * Reset the theme. With no argument, resets EVERY colour to platform
+   * defaults. With a `group` (a theme-tokens section) it resets only
+   * that section's colours, leaving the rest of the org's overrides in
+   * place. The BE returns the full resolved colour map either way.
+   */
+  async reset(group?: string): Promise<any> {
     this._resetting.set(true);
     try {
+      const body = group ? { group } : {};
       const res: any = await lastValueFrom(
-        this.http.apiPost(THEME.RESET, {}, { skipLoader: true }),
+        this.http.apiPost(THEME.RESET, body, { skipLoader: true }),
       );
       // Same contract as save: persist the row but don't repaint
       // the current session.

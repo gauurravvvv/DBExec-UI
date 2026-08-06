@@ -12,25 +12,21 @@
         <h2>{{ 'RLS.EDIT_TITLE' | translate }}</h2>
       </div>
       <div class="action-buttons">
-        <button
-          pButton
-          type="button"
-          [label]="'COMMON.CANCEL' | translate"
-          class="p-button-outlined btn-cancel"
+        <app-button
+          variant="secondary"
           [disabled]="!isFormDirty"
-          (click)="onCancel()"
-        ></button>
-        <button
-          *hasPermission="'rlsRules'; level: 'write'"
-          pButton
-          class="p-button-primary btn-save"
-          type="submit"
-          [label]="'COMMON.SAVE' | translate"
-          (click)="onSubmit()"
-          [disabled]="rlsForm.invalid || !isFormDirty"
+          (clicked)="onCancel()"
+          >{{ 'COMMON.CANCEL' | translate }}</app-button
         >
-          <i class="pi pi-save mr-2"></i>
-        </button>
+        <app-button
+          *hasPermission="'rlsRules'; level: 'write'"
+          variant="primary"
+          icon="pi pi-save"
+          [loading]="saving()"
+          [disabled]="rlsForm.invalid || !isFormDirty || saving()"
+          (clicked)="onSubmit()"
+          >{{ 'COMMON.SAVE' | translate }}</app-button
+        >
       </div>
     </div>
 
@@ -399,9 +395,13 @@
       <button
         class="btn-confirm"
         (click)="proceedSave()"
-        [disabled]="!saveJustification.trim()"
+        [disabled]="!saveJustification.trim() || saving()"
       >
-        <i class="pi pi-check"></i> {{ 'COMMON.UPDATE' | translate }}
+        <i
+          class="pi"
+          [ngClass]="saving() ? 'pi-spin pi-spinner' : 'pi-check'"
+        ></i>
+        {{ 'COMMON.UPDATE' | translate }}
       </button>
     </div>
   </div>

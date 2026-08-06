@@ -1,5 +1,6 @@
 import { DOCUMENT } from '@angular/common';
 import { Inject, Injectable, signal } from '@angular/core';
+import { THEME_TOKENS } from '../../shared/theme/theme-tokens';
 
 /**
  * Theme payload — what the BE sends alongside the auth token (login
@@ -19,23 +20,25 @@ export interface ThemePayload {
   primaryHover: string;
   primaryLight: string;
   primaryText: string;
+  // Full configurable colour map keyed by the theme-tokens registry
+  // (`{ tokenKey: '#rrggbb' }`). Present on session + settings + the
+  // pre-auth /theme/public response. When absent the service falls
+  // back to just the four brand fields (old contract).
+  colors?: Record<string, string>;
   createdOn?: string;
   updatedOn?: string;
   isDefault?: boolean;
 }
 
 /**
- * Resolved CSS variables block, derived from the persisted brand
- * fields. The keys map 1:1 to the CSS variable names in
- * `_theme-variables.scss`; we inject a single <style> tag whose body
- * is built from these key/value pairs.
+ * Resolved CSS variables block. Keys map 1:1 to the CSS custom
+ * property names in `_theme-variables.scss`; we inject a single
+ * <style> tag whose body is built from these key/value pairs.
  *
- * Twelve variables move with the primary brand colour:
- *  - --primary-color, --primary-color-rgb, --primary-color-transparent
- *  - --primary-light, --primary-hover, --primary-text
- *  - --info-color, --info-bg
- *  - --chip-bg, --chip-text
- *  - --table-row-hover, --menu-icon-color, --fk-color
+ * The set is now data-driven from the `theme-tokens.ts` registry: one
+ * CSS var per configured colour token, plus a handful of DERIVED
+ * companions (rgb / alpha tints) computed from the base colours so a
+ * single configured colour also updates its transparent variants.
  */
 type CssVars = Record<string, string>;
 
@@ -81,7 +84,11 @@ export class ThemeService {
    * localStorage copy to keep in sync.
    */
   applyFromLogin(theme: ThemePayload | null | undefined): void {
-    if (!theme || !this.isValidHex(theme.primary)) {
+    // The brand colour may arrive either as the legacy `primary` field
+    // or inside the `colors` map. Resolve it once; a payload with
+    // neither is rejected (system-admin / no-row path).
+    const primary = theme?.primary ?? theme?.colors?.['primary'];
+    if (!theme || !this.isValidHex(primary)) {
       // Reject the payload entirely if the brand colour is missing
       // or malformed. The BE Joi validator already enforces the hex
       // shape on save, but the FE re-checks here as defence-in-depth
@@ -106,43 +113,93 @@ export class ThemeService {
   // ── Internals ────────────────────────────────────────────────
 
   /**
-   * Resolve the 13 CSS variable values from the brand fields. The
-   * comment in the interface lists which variables move; everything
-   * else stays at the SCSS default.
+   * Resolve the injected CSS variables from the theme payload.
+   *
+   * Two layers:
+   *  1. Every registry token present in `t.colors` (or its legacy
+   *     brand field) emits its `cssVar` directly — this covers the
+   *     full configurable colour set. Absent/malformed values are
+   *     skipped so the SCSS default shows through.
+   *  2. Derived companions (rgb / alpha tints) are computed from the
+   *     resolved base colours so an admin sets ONE colour and its
+   *     alpha/rgb variants track it. These are never stored.
+   *
+   * Every emitted value passes `isValidHex` (or is a computed
+   * rgb()/rgba() string built from validated numbers) before it lands
+   * in the `<style>` tag, so a hostile payload can't smuggle extra CSS.
    */
   private resolveVars(t: ThemePayload): CssVars {
-    // Each sibling brand field is validated independently — a
-    // malformed hover/light/text doesn't poison the whole payload,
-    // it just falls back to the primary so the variable still
-    // resolves to a safe CSS value.
-    const primary = t.primary;
-    const primaryRgb = this.hexToRgb(primary);
-    const rgbStr = primaryRgb
-      ? `${primaryRgb.r}, ${primaryRgb.g}, ${primaryRgb.b}`
-      : '33, 150, 243';
-    const hover = this.isValidHex(t.primaryHover) ? t.primaryHover : primary;
-    const light = this.isValidHex(t.primaryLight) ? t.primaryLight : primary;
-    const text = this.resolvePrimaryText(t.primaryText, primaryRgb);
+    // Build the effective colour map: registry defaults are NOT applied
+    // here (absent → SCSS default shows through); we only emit what the
+    // payload actually provides. Legacy brand fields fold into the map.
+    const colors: Record<string, string> = { ...(t.colors ?? {}) };
+    if (this.isValidHex(t.primary)) colors['primary'] = t.primary;
+    if (this.isValidHex(t.primaryHover)) colors['primaryHover'] = t.primaryHover;
+    if (this.isValidHex(t.primaryLight)) colors['primaryLight'] = t.primaryLight;
+    // primaryText allows white/black keywords — resolve it specially below.
 
-    return {
-      '--primary-color': primary,
-      '--primary-color-rgb': rgbStr,
-      '--primary-color-transparent': `rgba(${rgbStr}, 0.15)`,
-      '--primary-light': light,
-      '--primary-hover': hover,
-      '--primary-text': text,
-      // Info palette typically mirrors brand on internal SaaS — only
-      // the persisted brand value changes here.
-      '--info-color': primary,
-      '--info-bg': `rgba(${rgbStr}, 0.08)`,
-      // Chip + table hover + menu icon all use primary tints.
-      '--chip-bg': `rgba(${rgbStr}, 0.10)`,
-      '--chip-text': hover,
-      '--table-row-hover': `rgba(${rgbStr}, 0.04)`,
-      '--menu-icon-color': primary,
-      // FK markers in the schema explorer use brand blue today.
-      '--fk-color': primary,
-    };
+    const vars: CssVars = {};
+
+    // Layer 1: one CSS var per registry token that has a valid value.
+    for (const token of THEME_TOKENS) {
+      if (token.key === 'primaryText') continue; // handled below
+      const value = colors[token.key];
+      if (this.isValidHex(value)) vars[token.cssVar] = value;
+    }
+
+    // primaryText: accepts white/black keyword or hex; falls back to the
+    // best-contrast colour against the resolved primary.
+    const primary = colors['primary'];
+    const primaryRgb = this.hexToRgb(primary);
+    vars['--primary-text'] = this.resolvePrimaryText(
+      t.primaryText ?? t.colors?.['primaryText'] ?? '',
+      primaryRgb,
+    );
+
+    // Layer 2: derived companions from the resolved primary.
+    if (primaryRgb) {
+      const rgbStr = `${primaryRgb.r}, ${primaryRgb.g}, ${primaryRgb.b}`;
+      vars['--primary-color-rgb'] = rgbStr;
+      vars['--primary-color-transparent'] = `rgba(${rgbStr}, 0.15)`;
+      vars['--chip-bg'] = `rgba(${rgbStr}, 0.10)`;
+      vars['--table-row-hover'] = `rgba(${rgbStr}, 0.04)`;
+      vars['--menu-icon-color'] = primary;
+    }
+
+    // Derived alpha backgrounds for the semantic base colours so their
+    // tinted surfaces track the configured colour.
+    this.deriveAlphaBg(vars, colors['infoColor'], '--info-bg', 0.08);
+    this.deriveAlphaBg(vars, colors['errorColor'], '--error-bg', 0.08);
+    this.deriveAlphaBg(vars, colors['successColor'], '--success-bg', 0.08);
+    this.deriveAlphaBg(vars, colors['warningColor'], '--warning-bg', 0.08);
+    this.deriveAlphaBg(vars, colors['warningColor'], '--warning-color-bg', 0.1);
+    this.deriveAlphaBg(
+      vars,
+      colors['statusActiveText'],
+      '--status-active-bg',
+      0.1,
+    );
+    this.deriveAlphaBg(
+      vars,
+      colors['statusInactiveText'],
+      '--status-inactive-bg',
+      0.08,
+    );
+
+    return vars;
+  }
+
+  /** Emit `cssVar: rgba(<hex as rgb>, alpha)` iff `hex` is valid. */
+  private deriveAlphaBg(
+    vars: CssVars,
+    hex: string | undefined,
+    cssVar: string,
+    alpha: number,
+  ): void {
+    if (!this.isValidHex(hex)) return;
+    const rgb = this.hexToRgb(hex);
+    if (!rgb) return;
+    vars[cssVar] = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${alpha})`;
   }
 
   /** Type guard: true iff the value matches `#rgb` or `#rrggbb`. */

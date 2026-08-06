@@ -6,10 +6,12 @@
   <textarea
     pInputTextarea
     autocomplete="off"
+    [attr.id]="inputId || null"
     [placeholder]="placeholder"
     [value]="value"
     [disabled]="disabled"
     [rows]="rows"
+    [attr.maxlength]="maxLength"
     [style.resize]="resize"
     [ngClass]="{ 'ng-invalid ng-dirty': showError }"
     (input)="onInputChange($event)"

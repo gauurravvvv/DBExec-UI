@@ -13,25 +13,21 @@
         <h2>{{ 'QUERY_BUILDER_MODULE.ADD_TITLE' | translate }}</h2>
       </div>
       <div class="action-buttons">
-        <button
-          pButton
-          type="button"
-          [label]="'COMMON.CANCEL' | translate"
-          class="p-button-outlined btn-cancel"
+        <app-button
+          variant="secondary"
           [disabled]="!isFormDirty"
-          (click)="onCancel()"
-        ></button>
-        <button
-          *hasPermission="'queryBuilderScreen'; level: 'write'"
-          pButton
-          class="p-button-primary btn-save"
-          type="submit"
-          [label]="'COMMON.SAVE' | translate"
-          (click)="onSubmit()"
-          [disabled]="queryBuilderForm.invalid || saving()"
+          (clicked)="onCancel()"
+          >{{ 'COMMON.CANCEL' | translate }}</app-button
         >
-          <i class="pi pi-save mr-2"></i>
-        </button>
+        <app-button
+          *hasPermission="'queryBuilderScreen'; level: 'write'"
+          variant="primary"
+          icon="pi pi-save"
+          [loading]="saving()"
+          [disabled]="queryBuilderForm.invalid || saving()"
+          (clicked)="onSubmit()"
+          >{{ 'COMMON.SAVE' | translate }}</app-button
+        >
       </div>
     </div>
 

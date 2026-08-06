@@ -72,7 +72,7 @@
   h2 {
     margin: 0;
     font-size: var(--fs-h1);
-    font-weight: var(--fw-semibold, 600);
+    font-weight: var(--fw-semibold);
     color: var(--text-color);
   }
   p {
@@ -102,7 +102,7 @@
 .qb-run__section-title {
   margin: 0 0 var(--space-4);
   font-size: var(--fs-h2);
-  font-weight: var(--fw-semibold, 600);
+  font-weight: var(--fw-semibold);
 }
 
 .qb-run__aside {
@@ -114,18 +114,18 @@
 }
 
 .qb-run__panel {
-  background: var(--surface-card, #fff);
+  background: var(--card-background);
   border: 1px solid var(--border-color);
-  border-radius: var(--radius-md, 8px);
-  padding: var(--space-4);
+  border-radius: var(--radius-md);
+  padding: var(--space-5);
 }
 
 .qb-run__panel-title {
-  margin: 0 0 var(--space-3);
-  font-size: var(--fs-control);
-  font-weight: var(--fw-semibold, 600);
+  margin: 0 0 var(--space-4);
+  font-size: var(--fs-micro);
+  font-weight: var(--fw-semibold);
   text-transform: uppercase;
-  letter-spacing: 0.03em;
+  letter-spacing: var(--ls-wide);
   color: var(--text-muted);
 }
 
@@ -138,7 +138,7 @@
 
 .qb-run__count {
   font-size: var(--fs-body);
-  font-weight: var(--fw-semibold, 600);
+  font-weight: var(--fw-semibold);
   color: var(--primary-color);
   font-variant-numeric: tabular-nums;
 }
@@ -167,8 +167,41 @@
 
 .qb-run__table-wrap {
   border: 1px solid var(--border-color);
-  border-radius: var(--radius-md, 8px);
+  border-radius: var(--radius-md);
   overflow: hidden;
+
+  // Readable, app-consistent results grid: tokenised header/cells,
+  // tabular numerics, and a centred empty state.
+  ::ng-deep {
+    .p-datatable {
+      .p-datatable-thead > tr > th {
+        background: var(--table-header-bg);
+        color: var(--table-header-text);
+        font-size: var(--fs-label);
+        font-weight: var(--fw-semibold);
+        border-bottom: 1px solid var(--border-color);
+        white-space: nowrap;
+      }
+
+      .p-datatable-tbody > tr > td {
+        font-size: var(--fs-table);
+        color: var(--text-color);
+        font-variant-numeric: tabular-nums;
+        border-bottom: 1px solid var(--border-color);
+      }
+
+      .p-datatable-tbody > tr:hover > td {
+        background: var(--table-row-hover);
+      }
+
+      .p-datatable-emptymessage > td {
+        text-align: center;
+        padding: var(--space-9) var(--space-6);
+        color: var(--text-muted);
+        font-size: var(--fs-body);
+      }
+    }
+  }
 }
 
 .qb-run__loading {

@@ -13,25 +13,21 @@
         <h2>{{ 'PROMPT_MODULE.EDIT_TITLE' | translate }}</h2>
       </div>
       <div class="action-buttons">
-        <button
-          pButton
-          type="button"
-          [label]="'COMMON.CANCEL' | translate"
-          class="p-button-outlined btn-cancel"
+        <app-button
+          variant="secondary"
           [disabled]="!isFormDirty || isCancelClicked"
-          (click)="onCancel()"
-        ></button>
-        <button
-          *hasPermission="'queryBuilderPrompt'; level: 'write'"
-          pButton
-          class="p-button-primary btn-save"
-          type="submit"
-          [label]="'COMMON.SAVE' | translate"
-          (click)="onSubmit()"
-          [disabled]="promptForm.invalid || !isFormDirty || saving()"
+          (clicked)="onCancel()"
+          >{{ 'COMMON.CANCEL' | translate }}</app-button
         >
-          <i class="pi pi-save mr-2"></i>
-        </button>
+        <app-button
+          *hasPermission="'queryBuilderPrompt'; level: 'write'"
+          variant="primary"
+          icon="pi pi-save"
+          [loading]="saving()"
+          [disabled]="promptForm.invalid || !isFormDirty || saving()"
+          (clicked)="onSubmit()"
+          >{{ 'COMMON.SAVE' | translate }}</app-button
+        >
       </div>
     </div>
 
@@ -128,13 +124,13 @@
           >{{ 'COMMON.JUSTIFICATION' | translate }}
           <span class="required">*</span></label
         >
-        <textarea
-          id="saveJustification"
+        <app-custom-textarea
+          inputId="saveJustification"
           [(ngModel)]="saveJustification"
           [placeholder]="'COMMON.JUSTIFICATION_UPDATE_PLACEHOLDER' | translate"
-          rows="3"
-          maxlength="500"
-        ></textarea>
+          [rows]="3"
+          [maxLength]="500"
+        ></app-custom-textarea>
         <small class="char-count">{{ saveJustification.length }}/500</small>
       </div>
     </div>
@@ -147,9 +143,12 @@
       <button
         class="btn-confirm"
         (click)="proceedSave()"
-        [disabled]="!saveJustification.trim()"
+        [disabled]="!saveJustification.trim() || saving()"
       >
-        <i class="pi pi-check"></i>
+        <i
+          class="pi"
+          [ngClass]="saving() ? 'pi-spin pi-spinner' : 'pi-check'"
+        ></i>
         {{ 'COMMON.UPDATE' | translate }}
       </button>
     </div>

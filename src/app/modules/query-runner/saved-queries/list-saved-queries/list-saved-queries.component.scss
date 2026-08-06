@@ -6,6 +6,20 @@
 @include db.db-access-page;
 @include db.db-access-dialog;
 
+/* ── datasource filter bar (above the table toolbar) ───────────────────── */
+.list-filter-bar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  margin-bottom: var(--space-5);
+  flex-wrap: wrap;
+
+  .ds-filter {
+    width: 240px;
+    max-width: 100%;
+  }
+}
+
 // The name cell opens the executor — make it read as a link.
 .dataset-name-link {
   cursor: pointer;

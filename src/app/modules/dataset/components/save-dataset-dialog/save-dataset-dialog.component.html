@@ -88,15 +88,15 @@
             >{{ 'COMMON.JUSTIFICATION' | translate }}
             <span class="required">*</span></label
           >
-          <textarea
-            id="justification"
+          <app-custom-textarea
+            inputId="justification"
             formControlName="justification"
             [placeholder]="
               'COMMON.JUSTIFICATION_UPDATE_PLACEHOLDER' | translate
             "
-            rows="3"
-            maxlength="500"
-          ></textarea>
+            [rows]="3"
+            [maxLength]="500"
+          ></app-custom-textarea>
           <small class="char-count">
             {{ datasetForm.get('justification')?.value?.length || 0 }}/500
           </small>

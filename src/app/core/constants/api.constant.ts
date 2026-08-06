@@ -402,6 +402,9 @@ export const THEME = {
   GET: '/theme',
   SAVE: '/theme',
   RESET: '/theme/reset',
+  // Unauthenticated colour-only lookup by org name — used by the login
+  // + relay pages to paint the org theme before a session exists.
+  PUBLIC: '/theme/public',
 };
 
 export const BRANDING = {

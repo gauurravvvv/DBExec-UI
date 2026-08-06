@@ -1274,79 +1274,98 @@
 // ===================================================================
 // SQL Preview Section
 // ===================================================================
-.sql-preview-header {
+/* ── Inline field hint (same font family/weight as control labels) ─────── */
+.step-help {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin: var(--space-0) !important;
-  padding: 12px 16px;
-  background-color: var(--hover-background);
-  border: 1px solid var(--border-color);
-  border-bottom: none;
-  border-radius: 6px 6px 0 0;
+  align-items: flex-start;
+  gap: var(--space-2);
+  margin-top: var(--space-3);
+  font-family: var(--font-ui);
+  font-size: var(--fs-label);
+  line-height: 1.45;
+  color: var(--secondary-color);
 
-  h3 {
-    margin: var(--space-0);
-    font-size: var(--fs-body);
-    font-weight: var(--fw-semibold);
+  i {
+    font-size: var(--fs-label);
+    margin-top: 1px;
+    flex-shrink: 0;
+  }
+}
+
+/* ── Generated-SQL preview (read-only, token-driven mono block) ────────── */
+.sql-preview {
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: var(--card-background);
+
+  &__bar {
     display: flex;
     align-items: center;
-
-    i {
-      color: var(--text-color);
-      opacity: 0.7;
-    }
+    justify-content: space-between;
+    gap: var(--space-4);
+    padding: var(--space-3) var(--space-5);
+    background: var(--hover-background);
+    border-bottom: 1px solid var(--border-color);
   }
 
-  .p-button {
-    width: 32px;
-    height: 32px;
+  &__title {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-family: var(--font-ui);
+    font-size: var(--fs-label);
+    font-weight: var(--fw-semibold);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--secondary-color);
 
-    &:hover {
-      background-color: var(--primary-color);
-      color: var(--primary-text);
-    }
-  }
-}
-
-.sql-preview-container {
-  background: var(--hover-background);
-  border: 1px solid var(--border-color);
-  border-radius: 0 0 6px 6px;
-  max-height: 300px;
-  overflow: auto;
-
-  &::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
+    i { font-size: var(--fs-control); color: var(--primary-color); }
   }
 
-  &::-webkit-scrollbar-track {
+  &__copy {
+    width: 26px;
+    height: 26px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: 1px solid transparent;
+    border-radius: var(--radius-sm);
     background: transparent;
-  }
+    color: var(--secondary-color);
+    cursor: pointer;
+    transition: all var(--motion-base) ease;
 
-  &::-webkit-scrollbar-thumb {
-    background: var(--border-color);
-    border-radius: var(--radius-xs);
-
+    i { font-size: var(--fs-control); }
     &:hover {
-      background: var(--secondary-color);
+      border-color: var(--primary-color);
+      color: var(--primary-color);
+      background: var(--primary-color-transparent);
     }
   }
-}
 
-.sql-preview-code {
-  margin: var(--space-0);
-  padding: var(--space-6);
-  font-family: var(--font-mono);
-  font-size: var(--fs-control);
-  line-height: 1.6;
-  color: var(--text-color);
-  white-space: pre-wrap;
-  word-wrap: break-word;
+  &__code {
+    margin: 0;
+    padding: var(--space-5);
+    max-height: 280px;
+    overflow: auto;
+    font-family: var(--font-mono);
+    font-size: var(--fs-control);
+    line-height: 1.6;
+    color: var(--text-color);
+    white-space: pre-wrap;
+    word-break: break-word;
 
-  code {
-    font-family: inherit;
+    code { font-family: inherit; }
+
+    &::-webkit-scrollbar { width: 8px; height: 8px; }
+    &::-webkit-scrollbar-track { background: transparent; }
+    &::-webkit-scrollbar-thumb {
+      background: var(--border-color);
+      border-radius: var(--radius-xs);
+      &:hover { background: var(--secondary-color); }
+    }
   }
 }
 
@@ -1559,5 +1578,186 @@
     align-items: center;
     gap: var(--space-4);
     margin-left: auto;
+  }
+}
+
+// Inline "Loading tables…/columns…" hint shown while a lazy schema fetch is
+// in flight (button-level busy — no global overlay).
+.lazy-hint {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--fs-label);
+  color: var(--secondary-color);
+  margin-bottom: var(--space-2);
+
+  i {
+    color: var(--primary-color);
+  }
+}
+
+// S3: each config concern is now a collapsible card (app-custom-accordion),
+// replacing the flat stacked sections — cuts the control noise, one concern
+// open at a time.
+.config-card {
+  display: block;
+  margin-bottom: var(--space-5);
+}
+
+/* ── S6: guided wizard stepper (mirrors add-alert / add-organisation) ──── */
+.steps-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: var(--space-4) 0 var(--space-6);
+  padding: 0 8%;
+  flex-shrink: 0;
+  flex-wrap: wrap;
+  gap: var(--space-3) 0;
+
+  .step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    flex: 0 0 auto;
+    cursor: pointer;
+    text-align: center;
+
+    &.active {
+      .step-dot { background: var(--primary-color); color: var(--primary-text, #fff); }
+      .step-label { color: var(--primary-color); font-weight: var(--fw-semibold); }
+    }
+    &.completed {
+      .step-dot { background: var(--success-color); color: var(--primary-text, #fff);
+        i { font-size: var(--fs-micro); } }
+      .step-label { color: var(--success-color); font-weight: var(--fw-medium); }
+    }
+
+    .step-dot {
+      width: 26px; height: 26px; border-radius: 50%;
+      background: var(--border-color);
+      display: flex; align-items: center; justify-content: center;
+      color: var(--text-color); font-weight: var(--fw-semibold);
+      margin-bottom: 6px; transition: all var(--motion-slow) ease;
+      font-size: var(--fs-label);
+    }
+    .step-label {
+      font-size: var(--fs-label); color: var(--text-color);
+      transition: all var(--motion-slow) ease; white-space: nowrap;
+    }
+  }
+
+  .step-line {
+    flex: 1; height: 2px; background: var(--border-color);
+    margin: 0 var(--space-4); margin-bottom: 26px; min-width: 16px;
+  }
+}
+
+/* one step's body; only the active step renders (via *ngIf) */
+/* A wizard step is a vertical stack of rows on the module's standard gap.
+   (One section shows at a time via *ngIf, so this owns the row rhythm.) */
+.wizard-step {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-7);
+}
+.wizard-empty {
+  margin: var(--space-4) 0; font-size: var(--fs-control);
+  color: var(--secondary-color); opacity: .85;
+}
+
+/* ── Header metadata popover (Name/Type/Datasource behind an ⓘ) ───────── */
+.left-section {
+  .meta-wrap {
+    position: relative;
+    display: inline-flex;
+  }
+  .meta-btn {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    border: 1px solid var(--border-color);
+    background: var(--card-background);
+    color: var(--secondary-color);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    margin-left: var(--space-3);
+    transition: all var(--motion-base) ease;
+
+    i { font-size: var(--fs-control); }
+    &:hover, &.open {
+      border-color: var(--primary-color);
+      color: var(--primary-color);
+      background: var(--primary-color-transparent);
+    }
+  }
+  .meta-pop {
+    position: absolute;
+    top: 36px;
+    left: 0;
+    z-index: var(--z-overlay, 1000);
+    min-width: 240px;
+    background: var(--card-background);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-xl);
+    padding: var(--space-5) var(--space-6);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+
+    &::before {
+      content: "";
+      position: absolute;
+      top: -6px;
+      left: 14px;
+      width: 11px;
+      height: 11px;
+      background: var(--card-background);
+      border-left: 1px solid var(--border-color);
+      border-top: 1px solid var(--border-color);
+      transform: rotate(45deg);
+    }
+    .meta-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: var(--space-6);
+      font-size: var(--fs-control);
+
+      .mk {
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        font-size: var(--fs-micro);
+        font-weight: var(--fw-semibold);
+        color: var(--secondary-color);
+      }
+      .mv { color: var(--text-color); font-weight: var(--fw-medium); }
+      .meta-tag {
+        font-size: var(--fs-label);
+        font-weight: var(--fw-semibold);
+        padding: 2px 8px;
+        border-radius: var(--radius-sm);
+        background: var(--primary-color-transparent);
+        color: var(--primary-color);
+      }
+    }
+  }
+}
+
+/* ── Full-width stepper strip (its own row under the header) ───────────── */
+.stepbar {
+  width: 100%;
+  padding: var(--space-3) var(--space-6) var(--space-5);
+  border-bottom: 1px solid var(--border-color);
+
+  .steps-container {
+    width: 100%;
+    margin: 0;              // override the default vertical margin
+    padding: 0 4%;
   }
 }

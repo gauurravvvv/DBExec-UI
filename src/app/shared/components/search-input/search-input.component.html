@@ -1,0 +1,21 @@
+<div class="search-input" [class.disabled]="disabled">
+  <i class="pi pi-search lead-icon"></i>
+  <input
+    type="text"
+    [value]="value"
+    [placeholder]="placeholder"
+    [disabled]="disabled"
+    autocomplete="off"
+    (input)="onInput($event)"
+  />
+  <button
+    *ngIf="value"
+    type="button"
+    class="clear-btn"
+    [disabled]="disabled"
+    (click)="clear()"
+    aria-label="Clear search"
+  >
+    <i class="pi pi-times"></i>
+  </button>
+</div>

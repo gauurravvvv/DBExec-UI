@@ -156,6 +156,9 @@ export class AiFeaturesComponent implements OnInit, SettingsTabForm {
   }
 
   async save(): Promise<void> {
+    // Double-fire guard: the hub Save button disables while busy, but this
+    // also drops a same-frame re-entry (Enter + click) before that paints.
+    if (this.saving()) return;
     // Block save on invalid config (e.g. AI enabled but a required field
     // missing / bad URL / accuracy out of 0–1) and surface the errors.
     if (this.form.invalid) {

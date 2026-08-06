@@ -15,27 +15,18 @@
         </h2>
       </div>
       <div class="action-buttons">
-        <button
-          pButton
-          type="button"
-          [label]="'COMMON.CANCEL' | translate"
-          class="p-button-outlined btn-cancel"
-          (click)="onCancel()"
-        ></button>
-        <button
-          *hasPermission="'connectionManager'; level: 'write'"
-          pButton
-          class="p-button-primary btn-save"
-          type="button"
-          [label]="(isEdit ? 'COMMON.SAVE' : 'COMMON.CREATE') | translate"
-          (click)="onSubmit()"
-          [disabled]="form.invalid || saving"
+        <app-button variant="secondary" (clicked)="onCancel()"
+          >{{ 'COMMON.CANCEL' | translate }}</app-button
         >
-          <i
-            class="pi mr-2"
-            [ngClass]="saving ? 'pi-spin pi-spinner' : 'pi-save'"
-          ></i>
-        </button>
+        <app-button
+          *hasPermission="'connectionManager'; level: 'write'"
+          variant="primary"
+          icon="pi pi-save"
+          [loading]="saving"
+          [disabled]="form.invalid || saving"
+          (clicked)="onSubmit()"
+          >{{ (isEdit ? 'COMMON.SAVE' : 'COMMON.CREATE') | translate }}</app-button
+        >
       </div>
     </div>
 

@@ -29,7 +29,7 @@
 - Screen quartet: `list-` (table + New) → `add-`/`edit-` (vertical form, one control per row, ~50% width) → `view-` (read-only + Edit/Open). OnPush + signals for new components.
 - Delete via shared `.confirmation-popup` overlay (NOT `p-dialog`). Add/edit forms implement `HasUnsavedChanges` + `unsaved-changes.guard`.
 - Validators mirror the BE file byte-for-byte; Zod messages are i18n keys. i18n: all 10 locales, no raw strings in templates.
-- Loading state: `loading` (reads) / `saving` (writes) / per-id record maps (row spinners); signal calls pass `{ skipLoader: true }`.
+- Loading state: `loading` (reads) / `saving` (writes) / per-id record maps (row spinners). **Writes NEVER show the global overlay** — the request interceptor is method-aware (GET blocks with `.spinner-container`; POST/PUT/PATCH/DELETE skip it by default). Busy is shown at the button: `<app-button [loading]="saving()" [disabled]="…||saving()">`, which also prevents double-submit (the button disables + its `onClick` guards). Escape hatches: `X-Skip-Loader` forces a read to skip; `forceLoader:true`/`X-Force-Loader` opts a write INTO the global block (rare). `skipLoader:true` on writes is now redundant. Multi-write-button screens use `shared/helpers/form-busy.ts` (`FormBusy`: `busy`/`activeAction`/`run()`); read-only buttons (Cancel/Back) are never disabled by busy. See `docs/superpowers/specs/2026-08-05-loading-busy-behavior-design.md`.
 - Never commit `environment*.ts` / `.env`.
 - Dates `YYYY-MM-DD` · Progress logs append-only, newest first · every change updates the module file + INDEX + SESSION_LOG.
 - **Code is truth.** If these docs disagree with the code, fix the docs and log the correction.

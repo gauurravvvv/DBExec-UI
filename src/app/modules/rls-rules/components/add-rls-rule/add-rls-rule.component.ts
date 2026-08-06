@@ -536,6 +536,9 @@ export class AddRlsRuleComponent implements OnInit, HasUnsavedChanges {
   }
 
   onSubmit() {
+    // Drop a double-fire while a save is already in flight (the button is
+    // disabled on saving(), this backstops a same-frame Enter+click).
+    if (this.saving()) return;
     this.rlsForm.markAllAsTouched();
     if (!this.rlsForm.valid) return;
 

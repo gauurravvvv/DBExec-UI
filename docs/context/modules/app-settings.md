@@ -1,6 +1,6 @@
 # app-settings
 > Update the Progress log on every change.
-> Code path: `src/app/modules/app-settings` · Status: 🟢 · Last updated: 2026-07-24
+> Code path: `src/app/modules/app-settings` · Status: 🟢 · Last updated: 2026-08-06
 
 ## 1. Context
 - **Responsibility:** The org's Settings surface, delivered as **two tabbed hubs** reached from the sidebar Settings group:
@@ -24,6 +24,11 @@
 - **Out of scope:** Platform-wide (cross-org) settings; per-user preferences (none — theme is org-level).
 
 ## 3. Progress (newest first)
+### 2026-08-06 — Theme tab: full colour-set editor
+- Done: Rebuilt `ThemeSettingsComponent` (App Settings hub, first tab, `/app/settings/app`) from the 4-brand-field form into a registry-driven editor over ALL 44 colour tokens (`src/app/shared/theme/theme-tokens.ts`, mirrored with BE). Collapsible `.token-group` sections (brand open by default), each token = `app-custom-input` (hex) + native colour swatch. Live preview via debounced `themeForm.valueChanges` → `ThemeService.applyFromLogin({colors})` on this tab; `ngOnDestroy` restores the authoritative theme. Save sends only non-blank keys as `{colors}` (BE merges). `ThemeService.resolveVars` rewritten to loop the registry + compute derived rgb/alpha companions. Pre-auth theming: `LoginService.fetchAndApplyPublicTheme(org)` hits the new unauthenticated `GET /theme/public?org=` from `login()` + `RelayComponent.ngOnInit` so login/relay paint in the org theme before session. New i18n `THEME_SETTINGS.GROUPS/TOKENS` ×10 locales. `THEME.PUBLIC` api const.
+- Verified: `tsc` 0, `ngc` 0, `ng build --configuration production` 0. BE side live-verified on the :3000 dev API. Live FE screenshot of the settings tab NOT captured (token-seed recipe bounced off the settings roleGuard; form-login automation flaky) — structurally validated by ngc/build; to view, log in normally on the :4200 dev FE → Settings → Theme.
+- Files: components/theme-settings/*, services/theme-settings.service.ts (unchanged — pass-through), core/services/theme.service.ts, core/services/login.service.ts, modules/auth/components/relay/relay.component.ts, core/constants/api.constant.ts, shared/theme/theme-tokens.ts (new), assets/i18n/*.json.
+
 ### 2026-07-24 — Current state captured
 - Done: Two tabbed Settings hubs + `SettingsTabForm` shared-Save contract (f93460a1). System Settings hub + SSO config UI + SAML login FE (fe254971, BE 4e7763b/5f68ab7/b66b104). AI Features tab + Dex polish (dd76b9d7, 6ece88d4). Theme/Branding/Email/Security/Announcements tabs. Leaf-permission gating fix for both hubs. Write-only secret masking (SSO cert / email pw / AI key). `backfill-settings` endpoint for existing orgs.
 - In progress / Known issues: SSO IdP round-trip unverified; backfill not verified on a live existing org; Dex needs a frontier model. UI commits local-only on `version_261`.

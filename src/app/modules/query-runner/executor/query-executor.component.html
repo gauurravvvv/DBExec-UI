@@ -868,10 +868,14 @@
 
       <div class="nq-save-field">
         <label>{{ 'QUERY_RUNNER.SAVED_QUERY_DESCRIPTION' | translate }}</label>
+        <!-- Raw textarea (not app-custom-textarea): the executor is a lean
+             standalone component that deliberately does NOT import SharedModule.
+             resize:none keeps it from being dragged out of the popup. -->
         <textarea
           rows="3"
           [(ngModel)]="savePromptDescription"
           maxlength="500"
+          style="resize: none"
           [placeholder]="
             'QUERY_RUNNER.SAVED_QUERY_DESCRIPTION_PLACEHOLDER' | translate
           "

@@ -1,14 +1,44 @@
 // Reuse the .add-admin-wrapper chrome that other settings pages use
 // so Branding visually matches Theme + Announcements.
 
+// Scroll region — matches the Theme tab: a viewport-relative max-height
+// makes the form scroll regardless of whether the hub's height chain
+// reaches this component (it doesn't reliably, inside p-tabView).
 .admin-form {
+  max-height: calc(100vh - 230px);
+  overflow-y: auto;
+  padding-right: var(--space-2);
+
+  @media (max-width: 768px) {
+    max-height: calc(100vh - 190px);
+  }
+
+  &::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  &::-webkit-scrollbar-track {
+    background: transparent;
+    border-radius: var(--radius-xs);
+  }
+  &::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: var(--radius-xs);
+    &:hover {
+      background: var(--secondary-color);
+    }
+  }
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-color) transparent;
+
   .form-grid {
     display: flex;
     flex-direction: column;
     gap: var(--space-8);
     width: 50%;
     margin-bottom: 0;
-    padding-bottom: 24px;
+    // No bottom padding — the card already pads the bottom; stacking
+    // them left a dead gap under the last field.
 
     @media (max-width: 768px) {
       width: 100%;
@@ -47,8 +77,9 @@
   display: flex;
   align-items: center;
   gap: var(--space-3);
+  flex-shrink: 0; // fixed footnote under the scroll form, never grows
   width: 50%;
-  margin: var(--space-4) var(--space-0) var(--space-0);
+  margin: var(--space-5) var(--space-0) var(--space-0);
   padding: var(--space-4) var(--space-5);
   border-left: 3px solid var(--primary-color);
   background: var(--primary-color-transparent);
@@ -65,12 +96,13 @@
   }
 }
 
+// Shell not height-pinned: the scroll lives on `.admin-form` via its
+// own max-height, so the shell must size to content (a height:100%
+// clip would hide the form's scrollbar).
 .add-admin-wrapper {
-  height: 100%;
   .add-admin-container {
     background: var(--card-background);
     border-radius: var(--radius-md);
-    height: 100%;
     display: flex;
     flex-direction: column;
     padding: var(--space-8);

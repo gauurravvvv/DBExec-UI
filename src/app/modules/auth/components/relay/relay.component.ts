@@ -242,6 +242,13 @@ export class RelayComponent implements OnInit, OnDestroy {
     this.fullName.set(fullName);
     this.isFirstLogin.set(isFirstLogin);
 
+    // Paint the org theme on the relay screen too — covers a page
+    // refresh on /relay (where login() didn't run this load) and any
+    // case where phase-1 hasn't applied it yet. Best-effort; phase-2
+    // re-applies the authoritative theme.
+    const org = StorageService.get(StorageType.ORGANISATION) || '';
+    if (org) void this.loginService.fetchAndApplyPublicTheme(org);
+
     this.kickBootstrap();
   }
 

@@ -6,10 +6,11 @@ import {
   OnInit,
   inject,
 } from '@angular/core';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { QUERY_RUNNER } from 'src/app/core/constants/routes.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
+import { DatasourceService } from 'src/app/modules/datasource/services/datasource.service';
 import { UsServerListAdapter } from 'src/app/shared/components/us-data-grid/us-server-list-adapter';
 import type {
   CustomTableColumn,
@@ -60,6 +61,12 @@ export class ListConnectionsComponent implements OnInit, OnDestroy {
   // query (LIMIT/OFFSET + WHERE + COUNT). See buildAdapter().
   adapter: UsServerListAdapter<any> | null = null;
 
+  /* ── datasource filter ──────────────────────────────────────────────── */
+  // Chosen datasource; folded into the connections list call as a TOP-LEVEL
+  // `datasourceId` query param (the BE list already accepts it). Null = all.
+  // Persisted in the URL (?datasourceId=) so a refresh keeps the filter.
+  selectedDatasourceId: string | null = null;
+
   testingId: string | null = null;
 
   // Delete confirm
@@ -69,9 +76,11 @@ export class ListConnectionsComponent implements OnInit, OnDestroy {
 
   constructor(
     private service: QueryRunnerService,
+    private datasourceService: DatasourceService,
     private globalService: GlobalService,
     private translate: TranslateService,
     private router: Router,
+    private route: ActivatedRoute,
   ) {}
 
   ngOnInit(): void {
@@ -83,7 +92,51 @@ export class ListConnectionsComponent implements OnInit, OnDestroy {
         'QUERY_RUNNER.CONNECTIONS_SEARCH_PLACEHOLDER',
       ),
     };
+    // Pre-select from the URL so a refresh keeps the datasource filter.
+    const fromUrl = this.route.snapshot.queryParamMap.get('datasourceId');
+    this.selectedDatasourceId = fromUrl && fromUrl.trim() ? fromUrl : null;
     this.buildAdapter();
+    this.adapter?.reload();
+  }
+
+  /** Server-mode fetcher for the datasource dropdown (mirrors NewQueryDialog). */
+  loadDatasourcesPage = async ({
+    search,
+    page,
+    limit,
+  }: {
+    search: string;
+    page: number;
+    limit: number;
+  }): Promise<{ items: any[]; total: number }> => {
+    const params: any = { page, limit };
+    if (search) params.filter = JSON.stringify({ name: search });
+    try {
+      const res: any = await this.datasourceService.listDatasource(params);
+      if (res?.status) {
+        return {
+          items: res?.data?.datasources ?? [],
+          total: res?.data?.count ?? 0,
+        };
+      }
+      return { items: [], total: 0 };
+    } catch {
+      return { items: [], total: 0 };
+    }
+  };
+
+  /**
+   * Datasource filter changed → fold it into the list call + reload, and
+   * mirror it into the URL (?datasourceId=) so a refresh keeps the filter.
+   * Clearing (null) drops the param and shows all connections.
+   */
+  onDatasourceFilterChange(dsId: string | null): void {
+    this.selectedDatasourceId = dsId || null;
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { datasourceId: this.selectedDatasourceId },
+      queryParamsHandling: 'merge',
+    });
     this.adapter?.reload();
   }
 
@@ -152,7 +205,7 @@ export class ListConnectionsComponent implements OnInit, OnDestroy {
     this.adapter = new UsServerListAdapter<any>({
       load: p =>
         this.service
-          .listConnections(undefined, {
+          .listConnections(this.selectedDatasourceId ?? undefined, {
             page: p.page,
             limit: p.limit,
             sort: p.sort,

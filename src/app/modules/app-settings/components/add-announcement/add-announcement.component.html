@@ -12,25 +12,23 @@
         <h2>{{ 'ANNOUNCEMENT.ADD_TITLE' | translate }}</h2>
       </div>
       <div class="action-buttons">
-        <button
-          pButton
-          type="button"
-          [label]="'COMMON.CANCEL' | translate"
-          class="p-button-outlined btn-cancel"
+        <!-- Cancel is read-only navigation: never disabled by the in-flight
+             save, so the user can always bail out. -->
+        <app-button
+          variant="secondary"
           [disabled]="!isFormDirty"
-          (click)="onCancel()"
-        ></button>
-        <button
-          *hasPermission="'announcementManagement'; level: 'write'"
-          pButton
-          class="p-button-primary btn-save"
-          type="submit"
-          [label]="'COMMON.SAVE' | translate"
-          (click)="onSubmit()"
-          [disabled]="!canSubmit()"
+          (clicked)="onCancel()"
+          >{{ 'COMMON.CANCEL' | translate }}</app-button
         >
-          <i class="pi pi-save mr-2"></i>
-        </button>
+        <app-button
+          *hasPermission="'announcementManagement'; level: 'write'"
+          variant="primary"
+          icon="pi pi-save"
+          [loading]="saving()"
+          [disabled]="!canSubmit()"
+          (clicked)="onSubmit()"
+          >{{ 'COMMON.SAVE' | translate }}</app-button
+        >
       </div>
     </div>
 

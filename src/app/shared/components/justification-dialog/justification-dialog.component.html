@@ -1,0 +1,77 @@
+<div class="confirmation-popup" (click)="onCancel()">
+  <div
+    class="popup-content"
+    role="dialog"
+    aria-modal="true"
+    (click)="$event.stopPropagation()"
+  >
+    <!-- Header -->
+    <div class="popup-header">
+      <div class="popup-icon" [class.danger]="mode === 'delete'">
+        <i [ngClass]="headerIcon"></i>
+      </div>
+      <h3>
+        {{
+          title ||
+            (mode === 'delete'
+              ? ('COMMON.CONFIRM_DELETE' | translate)
+              : ('COMMON.CONFIRM_UPDATE' | translate))
+        }}
+      </h3>
+    </div>
+
+    <!-- Body: message + any projected context (info-list, etc.) + reason -->
+    <div class="standard-delete-section">
+      <p class="delete-intro" *ngIf="message">{{ message }}</p>
+
+      <ng-content></ng-content>
+
+      <div class="justification-section">
+        <label
+          >{{ 'COMMON.JUSTIFICATION' | translate }}
+          <span class="required" *ngIf="requireJustification">*</span></label
+        >
+        <app-custom-textarea
+          [ngModel]="justification"
+          (ngModelChange)="onJustificationChange($event)"
+          [placeholder]="placeholder"
+          [rows]="3"
+          [maxLength]="maxLength"
+        ></app-custom-textarea>
+        <small class="char-count">{{ justification.length }}/{{ maxLength }}</small>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="popup-actions">
+      <button class="btn-cancel" type="button" [disabled]="busy" (click)="onCancel()">
+        <i class="pi pi-times"></i>
+        {{ 'COMMON.CANCEL' | translate }}
+      </button>
+      <button
+        class="btn-confirm"
+        [class.danger]="mode === 'delete'"
+        type="button"
+        [disabled]="confirmDisabled"
+        (click)="onConfirm()"
+      >
+        <i
+          class="pi"
+          [ngClass]="
+            busy
+              ? 'pi-spin pi-spinner'
+              : mode === 'delete'
+                ? 'pi-trash'
+                : 'pi-check'
+          "
+        ></i>
+        {{
+          confirmLabel ||
+            (mode === 'delete'
+              ? ('COMMON.DELETE' | translate)
+              : ('COMMON.UPDATE' | translate))
+        }}
+      </button>
+    </div>
+  </div>
+</div>
