@@ -158,6 +158,10 @@ export const DASHBOARD = {
 
 export const ANNOUNCEMENT = feature('/app/settings/announcements');
 
+// Theme presets — add/edit live as routed pages under the App Settings
+// hub, same shape as announcements (list stays a tab).
+export const THEME_PRESET = feature('/app/settings/themes');
+
 // Per-user notifications feed — the full-page view behind the bell
 // panel's "See all". Auth-gated only (not permission-gated), like the
 // profile screen.

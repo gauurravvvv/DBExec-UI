@@ -18,7 +18,8 @@ import { ListAnnouncementsComponent } from './components/list-announcements/list
 import { SecurityPolicyComponent } from './components/security-policy/security-policy.component';
 import { SsoSettingsComponent } from './components/sso-settings/sso-settings.component';
 import { SystemSettingsHubComponent } from './components/system-settings-hub/system-settings-hub.component';
-import { ThemeSettingsComponent } from './components/theme-settings/theme-settings.component';
+import { ListThemesComponent } from './components/list-themes/list-themes.component';
+import { AddThemeComponent } from './components/add-theme/add-theme.component';
 import { ViewAnnouncementComponent } from './components/view-announcement/view-announcement.component';
 
 @NgModule({
@@ -28,7 +29,8 @@ import { ViewAnnouncementComponent } from './components/view-announcement/view-a
     AddAnnouncementComponent,
     EditAnnouncementComponent,
     ViewAnnouncementComponent,
-    ThemeSettingsComponent,
+    ListThemesComponent,
+    AddThemeComponent,
     BrandingSettingsComponent,
     SecurityPolicyComponent,
     EmailConfigurationComponent,

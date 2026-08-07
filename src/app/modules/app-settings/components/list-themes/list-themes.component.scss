@@ -1,0 +1,241 @@
+.themes-tab {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+// Header: title + Add, matching the list-module header idiom.
+.tab-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-5);
+
+  &__text {
+    h3 {
+      margin: 0;
+      font-size: var(--fs-h2);
+      font-weight: var(--fw-semibold);
+      color: var(--text-color);
+    }
+    p {
+      margin: var(--space-2) 0 0;
+      font-size: var(--fs-label);
+      color: var(--text-muted);
+    }
+  }
+}
+
+// Try-out banner.
+.tryout-banner {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-5);
+  border-left: 3px solid var(--warning-color);
+  background: var(--warning-bg);
+  border-radius: 0 var(--radius-xs) var(--radius-xs) 0;
+  font-size: var(--fs-control);
+  color: var(--text-color);
+  i {
+    color: var(--warning-color);
+  }
+  .link-btn {
+    margin-left: auto;
+    background: none;
+    border: none;
+    color: var(--primary-color);
+    font-weight: var(--fw-semibold);
+    cursor: pointer;
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
+// Card wrapper + table — same visual weight as the app's list tables.
+.content-card {
+  background: var(--card-background);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+.ct-table-wrap {
+  overflow-x: auto;
+}
+.ct-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--fs-control);
+
+  thead th {
+    text-align: left;
+    padding: var(--space-4) var(--space-5);
+    background: var(--table-header-bg);
+    color: var(--table-header-text);
+    font-size: var(--fs-label);
+    font-weight: var(--fw-semibold);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    border-bottom: 1px solid var(--border-color);
+    white-space: nowrap;
+  }
+
+  tbody tr {
+    border-bottom: 1px solid var(--border-color);
+    transition: background var(--motion-base) ease;
+    &:last-child {
+      border-bottom: none;
+    }
+    &:hover {
+      background: var(--table-row-hover);
+    }
+    &.is-active {
+      background: var(--primary-color-transparent);
+    }
+    &.is-trying {
+      box-shadow: inset 3px 0 0 var(--warning-color);
+    }
+  }
+
+  td {
+    padding: var(--space-4) var(--space-5);
+    color: var(--text-color);
+    vertical-align: middle;
+  }
+
+  .col-name {
+    min-width: 200px;
+  }
+  .col-actions {
+    width: 210px;
+  }
+}
+
+.dataset-name-link {
+  color: var(--primary-color);
+  font-weight: var(--fw-semibold);
+  cursor: pointer;
+  &:hover {
+    text-decoration: underline;
+  }
+}
+.row-desc {
+  display: block;
+  margin-top: 2px;
+  font-size: var(--fs-label);
+  color: var(--text-muted);
+}
+
+// Swatch preview strip.
+.swatches {
+  display: inline-flex;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  border: 1px solid var(--border-color);
+  .sw {
+    width: 26px;
+    height: 20px;
+    &:first-child {
+      width: 40px;
+    }
+  }
+}
+
+// Type + status pills (match app conventions).
+.type-pill {
+  display: inline-flex;
+  padding: 2px 10px;
+  border-radius: 999px;
+  font-size: var(--fs-micro);
+  font-weight: var(--fw-semibold);
+  background: var(--chip-bg);
+  color: var(--chip-text);
+  &.built-in {
+    background: var(--hover-background);
+    color: var(--text-muted);
+  }
+}
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 10px;
+  border-radius: 999px;
+  font-size: var(--fs-micro);
+  font-weight: var(--fw-semibold);
+  .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+  }
+  &.active {
+    color: var(--status-active-text);
+    background: var(--status-active-bg);
+  }
+  &.inactive {
+    color: var(--text-muted);
+    background: var(--hover-background);
+  }
+}
+
+// Row actions — the app's icon-button cluster.
+.row-actions {
+  display: inline-flex;
+  gap: var(--space-2);
+
+  .icon-btn {
+    width: 30px;
+    height: 30px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    background: var(--card-background);
+    color: var(--secondary-color);
+    cursor: pointer;
+    transition: all var(--motion-base) ease;
+
+    i {
+      font-size: var(--fs-control);
+    }
+    &:hover:not(:disabled) {
+      border-color: var(--primary-color);
+      color: var(--primary-color);
+      background: var(--primary-color-transparent);
+    }
+    &:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+    &.apply-btn:hover:not(:disabled) {
+      border-color: var(--success-color);
+      color: var(--success-color);
+      background: var(--success-bg);
+    }
+    &.tryout-btn.on {
+      border-color: var(--warning-color);
+      color: var(--warning-color);
+      background: var(--warning-bg);
+    }
+    &.delete-btn:hover:not(:disabled) {
+      border-color: var(--error-color);
+      color: var(--error-color);
+      background: var(--error-bg);
+    }
+  }
+}
+
+.ct-empty-body {
+  text-align: center;
+  padding: var(--space-9) var(--space-5);
+  color: var(--text-muted);
+  i {
+    display: block;
+    font-size: 28px;
+    margin-bottom: var(--space-3);
+    opacity: 0.6;
+  }
+}

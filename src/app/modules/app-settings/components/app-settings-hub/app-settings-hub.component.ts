@@ -1,7 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { SettingsTabForm } from '../../settings-tab-form';
-import { ThemeSettingsComponent } from '../theme-settings/theme-settings.component';
 import { BrandingSettingsComponent } from '../branding-settings/branding-settings.component';
 
 /**
@@ -10,10 +9,10 @@ import { BrandingSettingsComponent } from '../branding-settings/branding-setting
  * three former standalone sidebar routes. Gated on the parent `appSettings`
  * permission; holding it shows every tab (no per-tab gating).
  *
- * Theme and Branding are savable forms; a single "Save" button in the hub
- * header (UltraSignal style) delegates to whichever is active. Announcements
- * is a list screen with its own add/edit/view flow — no Save — so the hub
- * Save button hides on that tab (activeForm() returns undefined).
+ * Theme is now a LIST screen (a preset library with its own add/edit/view
+ * routed pages) — like Announcements, no hub Save. Only Branding is a
+ * savable form; the hub header "Save" delegates to it and hides on the
+ * Theme + Announcements tabs (activeForm() returns undefined there).
  *
  * The active tab is mirrored to a `?tab=` query param so a deep link / a
  * refresh lands on the same tab. Announcement add/edit/view still live at
@@ -35,9 +34,9 @@ export class AppSettingsHubComponent implements OnInit {
   readonly tabs = ['theme', 'branding', 'announcements'] as const;
   activeTab = 0;
 
-  // Only the active tab is instantiated (*ngIf); the announcements tab has no
-  // savable form so neither ViewChild resolves there → activeForm() undefined.
-  @ViewChild(ThemeSettingsComponent) private theme?: ThemeSettingsComponent;
+  // Only Branding is a savable form; the Theme (list) + Announcements
+  // (list) tabs have no ViewChild here → activeForm() undefined → hub
+  // Save hides.
   @ViewChild(BrandingSettingsComponent)
   private branding?: BrandingSettingsComponent;
 
@@ -67,7 +66,7 @@ export class AppSettingsHubComponent implements OnInit {
    * is a list, not a form). The hub Save button binds to this being defined.
    */
   activeForm(): SettingsTabForm | undefined {
-    return this.theme ?? this.branding;
+    return this.branding;
   }
 
   /** Save the active tab through its own API. */

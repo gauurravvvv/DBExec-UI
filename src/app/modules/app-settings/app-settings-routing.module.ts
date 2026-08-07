@@ -8,6 +8,7 @@ import { AppSettingsHubComponent } from './components/app-settings-hub/app-setti
 import { EditAnnouncementComponent } from './components/edit-announcement/edit-announcement.component';
 import { SystemSettingsHubComponent } from './components/system-settings-hub/system-settings-hub.component';
 import { ViewAnnouncementComponent } from './components/view-announcement/view-announcement.component';
+import { AddThemeComponent } from './components/add-theme/add-theme.component';
 
 // Settings is now two tabbed hubs:
 //   /app/settings/app     → App Settings hub (Theme / Branding / Announcements)
@@ -53,6 +54,25 @@ const routes: Routes = [
     component: AddAnnouncementComponent,
     canDeactivate: [unsavedChangesGuard],
     data: { title: 'New Announcement' },
+  },
+  // Theme presets — add/edit/view as routed pages (list stays a hub tab),
+  // same shape as announcements. AddThemeComponent serves all three modes.
+  {
+    path: 'themes/new',
+    component: AddThemeComponent,
+    canDeactivate: [unsavedChangesGuard],
+    data: { title: 'New Theme' },
+  },
+  {
+    path: 'themes/:id/edit',
+    component: AddThemeComponent,
+    canDeactivate: [unsavedChangesGuard],
+    data: { title: 'Edit Theme' },
+  },
+  {
+    path: 'themes/:id',
+    component: AddThemeComponent,
+    data: { title: 'Theme Details' },
   },
   {
     path: 'announcements/:id',

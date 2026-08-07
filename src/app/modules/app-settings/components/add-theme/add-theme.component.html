@@ -1,0 +1,153 @@
+<div class="add-admin-wrapper">
+  <div class="add-admin-container">
+    <!-- Header: back + title + actions -->
+    <div class="page-header">
+      <div class="left-section">
+        <button
+          pButton
+          class="p-button-text p-button-plain back-button"
+          (click)="onCancel()"
+        >
+          <i class="pi pi-arrow-left back-icon"></i>
+        </button>
+        <h2>
+          {{
+            (isView
+              ? 'THEME_SETTINGS.VIEW_TITLE'
+              : isEdit
+                ? 'THEME_SETTINGS.EDIT_TITLE'
+                : 'THEME_SETTINGS.ADD_TITLE'
+            ) | translate
+          }}
+        </h2>
+        <span *ngIf="loadedPreset?.isSeeded" class="built-in-tag">
+          {{ 'THEME_SETTINGS.BUILT_IN' | translate }}
+        </span>
+      </div>
+
+      <div class="action-buttons">
+        <app-button variant="ghost" (clicked)="onCancel()">
+          {{ (isView ? 'COMMON.BACK' : 'COMMON.CANCEL') | translate }}
+        </app-button>
+        <!-- View mode: offer Edit (custom only). -->
+        <app-button
+          *ngIf="isView && !loadedPreset?.isSeeded"
+          variant="primary"
+          icon="pi pi-pencil"
+          (clicked)="onEditFromView()"
+          >{{ 'COMMON.EDIT' | translate }}</app-button
+        >
+        <!-- Add/Edit mode: Save. -->
+        <app-button
+          *ngIf="!isView && !readOnly"
+          variant="primary"
+          icon="pi pi-save"
+          [loading]="saving"
+          [disabled]="saving || themeForm.invalid || !themeForm.dirty"
+          (clicked)="onSave()"
+          >{{ 'COMMON.SAVE' | translate }}</app-button
+        >
+      </div>
+    </div>
+
+    <form
+      autocomplete="off"
+      [formGroup]="themeForm"
+      class="admin-form theme-editor"
+    >
+      <!-- Identity -->
+      <div class="form-grid">
+        <app-custom-input
+          formControlName="name"
+          [label]="'THEME_SETTINGS.PRESET_NAME' | translate"
+          [placeholder]="'THEME_SETTINGS.PRESET_NAME_PLACEHOLDER' | translate"
+          icon="pi-palette"
+          [required]="true"
+          [readonly]="readOnly"
+          [showError]="showFieldError('name')"
+          [errorMessage]="'THEME_SETTINGS.NAME_REQUIRED' | translate"
+        ></app-custom-input>
+
+        <app-custom-input
+          formControlName="description"
+          [label]="'COMMON.DESCRIPTION' | translate"
+          [placeholder]="'THEME_SETTINGS.DESC_PLACEHOLDER' | translate"
+          icon="pi-align-left"
+          [readonly]="readOnly"
+        ></app-custom-input>
+      </div>
+
+      <!-- Colour accordion -->
+      <div class="editor-subhead">
+        <span class="section-title">
+          <i class="pi pi-palette"></i>
+          {{ 'THEME_SETTINGS.CUSTOMISE' | translate }}
+        </span>
+      </div>
+
+      <div class="token-groups">
+        <div class="token-group" *ngFor="let g of groups; trackBy: trackByGroup">
+          <button
+            type="button"
+            class="token-group__toggle"
+            [class.open]="g.open"
+            (click)="toggleGroup(g)"
+            [attr.aria-expanded]="g.open"
+          >
+            <i
+              class="pi"
+              [ngClass]="g.open ? 'pi-chevron-down' : 'pi-chevron-right'"
+            ></i>
+            <span class="token-group__title">{{
+              'THEME_SETTINGS.GROUPS.' + (g.group | uppercase) | translate
+            }}</span>
+            <span class="token-group__count">{{ g.tokens.length }}</span>
+          </button>
+
+          <div class="token-group__body" *ngIf="g.open">
+            <div class="color-row" *ngFor="let t of g.tokens">
+              <app-custom-input
+                [formControlName]="t.key"
+                [label]="'THEME_SETTINGS.TOKENS.' + t.labelKey | translate"
+                [placeholder]="
+                  t.key === 'primary'
+                    ? ('THEME.PRIMARY_PLACEHOLDER' | translate)
+                    : ('THEME.HEX_PLACEHOLDER' | translate)
+                "
+                icon="pi-palette"
+                [required]="t.key === 'primary'"
+                [readonly]="readOnly"
+                [showError]="showFieldError(t.key)"
+                [errorMessage]="
+                  (t.key === 'primary'
+                    ? 'THEME.HEX_REQUIRED'
+                    : 'THEME.HEX_INVALID'
+                  ) | translate
+                "
+              ></app-custom-input>
+              <label
+                class="color-swatch"
+                [class.disabled]="readOnly"
+                [style.background-color]="swatchValue(t.key)"
+              >
+                <input
+                  type="color"
+                  [value]="swatchValue(t.key)"
+                  [disabled]="readOnly"
+                  (input)="onColorPicked(t.key, $any($event.target).value)"
+                  aria-hidden="true"
+                  tabindex="-1"
+                />
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <p class="theme-hint">
+        <i class="pi pi-info-circle"></i>
+        {{ 'THEME.RE_LOGIN_HINT' | translate }}
+      </p>
+    </form>
+  </div>
+</div>

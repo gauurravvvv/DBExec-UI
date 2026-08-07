@@ -29,7 +29,7 @@
         [scrollable]="true"
       >
         <p-tabPanel [header]="'SIDEBAR.themeManagement' | translate">
-          <app-theme-settings *ngIf="activeTab === 0"></app-theme-settings>
+          <app-list-themes *ngIf="activeTab === 0"></app-list-themes>
         </p-tabPanel>
 
         <p-tabPanel [header]="'SIDEBAR.brandingManagement' | translate">

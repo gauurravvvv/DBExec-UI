@@ -104,6 +104,14 @@ export class ThemeSettingsService {
     }
   }
 
+  /** One preset by id (for the edit/view page). */
+  async getPreset(id: string): Promise<ThemePreset | null> {
+    const res: any = await lastValueFrom(
+      this.http.apiGet(THEME.preset(id), { skipLoader: true }),
+    );
+    return res?.status ? (res.data as ThemePreset) : null;
+  }
+
   createPreset(body: {
     name: string;
     description?: string;

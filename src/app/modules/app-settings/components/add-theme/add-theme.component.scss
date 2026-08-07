@@ -1,0 +1,201 @@
+// Routed add/edit theme page — reuses the .add-admin-wrapper chrome
+// shared by the other add-/edit- screens.
+.add-admin-wrapper {
+  height: 100%;
+  overflow: hidden;
+
+  .add-admin-container {
+    background: var(--card-background);
+    border-radius: var(--radius-md);
+    padding: var(--space-8);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: var(--space-6);
+      flex-shrink: 0;
+
+      .left-section {
+        display: flex;
+        align-items: center;
+        gap: var(--space-4);
+
+        .back-button {
+          padding: 0 !important;
+          width: 36px;
+          height: 36px;
+          color: var(--text-color);
+        }
+        h2 {
+          margin: 0;
+          font-size: var(--fs-h1);
+          font-weight: var(--fw-semibold);
+          color: var(--text-color);
+        }
+        .built-in-tag {
+          padding: 2px 10px;
+          border-radius: 999px;
+          font-size: var(--fs-micro);
+          font-weight: var(--fw-semibold);
+          text-transform: uppercase;
+          letter-spacing: 0.04em;
+          background: var(--hover-background);
+          color: var(--text-muted);
+        }
+      }
+      .action-buttons {
+        display: flex;
+        gap: var(--space-4);
+        align-items: center;
+      }
+    }
+  }
+}
+
+// Scroll region — the form body (page header stays fixed above).
+.theme-editor {
+  flex: 1;
+  overflow-y: auto;
+  padding-right: var(--space-2);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+
+  &::-webkit-scrollbar {
+    width: 8px;
+  }
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: var(--radius-xs);
+    &:hover {
+      background: var(--secondary-color);
+    }
+  }
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-color) transparent;
+
+  // Name + description: one control per row, 50% width (module standard).
+  .form-grid {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+    width: 50%;
+    flex-shrink: 0;
+
+    @media (max-width: 992px) {
+      width: 100%;
+    }
+  }
+}
+
+.editor-subhead {
+  flex-shrink: 0;
+  .section-title {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-3);
+    font-size: var(--fs-h2);
+    font-weight: var(--fw-semibold);
+    color: var(--text-color);
+    i {
+      color: var(--primary-color);
+    }
+  }
+}
+
+.token-groups {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  flex-shrink: 0;
+}
+
+.token-group {
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  width: 60%;
+
+  @media (max-width: 992px) {
+    width: 100%;
+  }
+
+  &__toggle {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    width: 100%;
+    padding: var(--space-5) var(--space-6);
+    background: var(--secondary-background);
+    border: none;
+    cursor: pointer;
+    font-size: var(--fs-body);
+    font-weight: var(--fw-semibold);
+    color: var(--text-color);
+    transition: background var(--motion-base) ease;
+
+    &:hover {
+      background: var(--hover-background);
+    }
+    &.open {
+      border-bottom: 1px solid var(--border-color);
+    }
+    i {
+      font-size: var(--fs-control);
+      color: var(--secondary-color);
+    }
+  }
+  &__title {
+    flex: 1;
+    text-align: left;
+  }
+  &__count {
+    font-size: var(--fs-micro);
+    font-weight: var(--fw-semibold);
+    color: var(--secondary-color);
+    background: var(--card-background);
+    border: 1px solid var(--border-color);
+    border-radius: 999px;
+    padding: 1px 9px;
+  }
+  &__body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+    padding: var(--space-6);
+    background: var(--card-background);
+  }
+}
+
+.color-swatch.disabled {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.theme-hint {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 60%;
+  margin: 0;
+  padding: var(--space-4) var(--space-5);
+  border-left: 3px solid var(--primary-color);
+  background: var(--primary-color-transparent);
+  color: var(--text-muted);
+  font-size: var(--fs-control);
+  border-radius: 0 var(--radius-xs) var(--radius-xs) 0;
+  i {
+    color: var(--primary-color);
+  }
+  @media (max-width: 992px) {
+    width: 100%;
+  }
+}

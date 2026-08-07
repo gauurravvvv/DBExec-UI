@@ -5734,6 +5734,15 @@
     "PRESET_NAME": "Theme name",
     "PRESET_NAME_PLACEHOLDER": "e.g. Company Brand",
     "DELETE_TITLE": "Delete theme",
-    "DELETE_CONFIRM": "Delete the theme \"{{name}}\"?"
+    "DELETE_CONFIRM": "Delete the theme \"{{name}}\"?",
+    "ADD_THEME": "Add theme",
+    "THEME": "Theme",
+    "CUSTOM": "Custom",
+    "INACTIVE": "Inactive",
+    "ADD_TITLE": "Add theme",
+    "EDIT_TITLE": "Edit theme",
+    "VIEW_TITLE": "Theme details",
+    "NAME_REQUIRED": "A theme name is required",
+    "DESC_PLACEHOLDER": "Optional short description"
   }
 }

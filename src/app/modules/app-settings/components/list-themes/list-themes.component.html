@@ -1,0 +1,234 @@
+<div class="themes-tab">
+  <!-- Header: title + Add -->
+  <div class="tab-head">
+    <div class="tab-head__text">
+      <h3>{{ 'THEME_SETTINGS.LIBRARY' | translate }}</h3>
+      <p>{{ 'THEME_SETTINGS.LIBRARY_HINT' | translate }}</p>
+    </div>
+    <button
+      *hasPermission="'themeManagement'; level: 'write'"
+      pButton
+      [label]="'THEME_SETTINGS.ADD_THEME' | translate"
+      icon="pi pi-plus"
+      class="p-button-raised p-button-primary modern-button"
+      (click)="onAdd()"
+    ></button>
+  </div>
+
+  <!-- Try-out banner -->
+  <div class="tryout-banner" *ngIf="tryingOutId">
+    <i class="pi pi-eye"></i>
+    <span>{{ 'THEME_SETTINGS.TRYOUT_ACTIVE' | translate }}</span>
+    <button type="button" class="link-btn" (click)="stopTryOut()">
+      {{ 'THEME_SETTINGS.STOP_TRYOUT' | translate }}
+    </button>
+  </div>
+
+  <app-content-loader *ngIf="loading()"></app-content-loader>
+
+  <!-- Listing -->
+  <div class="content-card" *ngIf="!loading()">
+    <div class="ct-table-wrap">
+      <table class="ct-table">
+        <thead>
+          <tr>
+            <th class="col-name">{{ 'THEME_SETTINGS.THEME' | translate }}</th>
+            <th class="col-preview">{{ 'THEME_SETTINGS.PREVIEW' | translate }}</th>
+            <th class="col-type">{{ 'COMMON.TYPE' | translate }}</th>
+            <th class="col-status">{{ 'COMMON.STATUS' | translate }}</th>
+            <th class="col-actions">{{ 'COMMON.ACTIONS' | translate }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr
+            *ngFor="let p of presets(); trackBy: trackPreset"
+            [class.is-active]="p.isActive"
+            [class.is-trying]="tryingOutId === p.id"
+          >
+            <!-- name -->
+            <td class="col-name">
+              <a class="dataset-name-link" (click)="onView(p)">{{ p.name }}</a>
+              <span class="row-desc" *ngIf="p.description">{{
+                p.description
+              }}</span>
+            </td>
+
+            <!-- swatch preview -->
+            <td class="col-preview">
+              <span class="swatches">
+                <span
+                  class="sw"
+                  *ngFor="let c of swatchStrip(p)"
+                  [style.background-color]="c"
+                ></span>
+              </span>
+            </td>
+
+            <!-- type -->
+            <td class="col-type">
+              <span class="type-pill" [class.built-in]="p.isSeeded">
+                {{
+                  (p.isSeeded
+                    ? 'THEME_SETTINGS.BUILT_IN'
+                    : 'THEME_SETTINGS.CUSTOM'
+                  ) | translate
+                }}
+              </span>
+            </td>
+
+            <!-- status -->
+            <td class="col-status">
+              <span
+                class="status-pill"
+                [ngClass]="{ active: p.isActive, inactive: !p.isActive }"
+              >
+                <span class="dot"></span>
+                {{
+                  (p.isActive
+                    ? 'THEME_SETTINGS.ACTIVE'
+                    : 'THEME_SETTINGS.INACTIVE'
+                  ) | translate
+                }}
+              </span>
+            </td>
+
+            <!-- actions -->
+            <td class="col-actions">
+              <div class="row-actions">
+                <button
+                  class="icon-btn tryout-btn"
+                  *ngIf="tryingOutId !== p.id"
+                  (click)="tryOut(p)"
+                  [pTooltip]="'THEME_SETTINGS.TRY_OUT' | translate"
+                  tooltipPosition="bottom"
+                >
+                  <i class="pi pi-eye"></i>
+                </button>
+                <button
+                  class="icon-btn tryout-btn on"
+                  *ngIf="tryingOutId === p.id"
+                  (click)="stopTryOut()"
+                  [pTooltip]="'THEME_SETTINGS.STOP_TRYOUT' | translate"
+                  tooltipPosition="bottom"
+                >
+                  <i class="pi pi-eye-slash"></i>
+                </button>
+
+                <button
+                  *hasPermission="'themeManagement'; level: 'write'"
+                  class="icon-btn apply-btn"
+                  [disabled]="p.isActive || !!busyPresetId()"
+                  (click)="apply(p)"
+                  [pTooltip]="
+                    (p.isActive
+                      ? 'THEME_SETTINGS.ALREADY_ACTIVE'
+                      : 'THEME_SETTINGS.APPLY'
+                    ) | translate
+                  "
+                  tooltipPosition="bottom"
+                >
+                  <i
+                    class="pi"
+                    [ngClass]="
+                      busyPresetId() === p.id ? 'pi-spin pi-spinner' : 'pi-check'
+                    "
+                  ></i>
+                </button>
+
+                <button
+                  class="icon-btn view-btn"
+                  (click)="onView(p)"
+                  [pTooltip]="'COMMON.VIEW' | translate"
+                  tooltipPosition="bottom"
+                >
+                  <i class="pi pi-eye"></i>
+                </button>
+
+                <button
+                  *hasPermission="'themeManagement'; level: 'write'"
+                  class="icon-btn edit-btn"
+                  [disabled]="p.isSeeded"
+                  (click)="onEdit(p)"
+                  [pTooltip]="
+                    (p.isSeeded
+                      ? 'THEME_SETTINGS.BUILT_IN_READONLY'
+                      : 'COMMON.EDIT'
+                    ) | translate
+                  "
+                  tooltipPosition="bottom"
+                >
+                  <i class="pi pi-pencil"></i>
+                </button>
+
+                <button
+                  *hasPermission="'themeManagement'; level: 'delete'"
+                  class="icon-btn delete-btn"
+                  [disabled]="p.isSeeded || p.isActive || !!busyPresetId()"
+                  (click)="confirmDelete(p)"
+                  [pTooltip]="
+                    (p.isSeeded
+                      ? 'THEME_SETTINGS.BUILT_IN_READONLY'
+                      : p.isActive
+                        ? 'THEME_SETTINGS.CANT_DELETE_ACTIVE'
+                        : 'COMMON.DELETE'
+                    ) | translate
+                  "
+                  tooltipPosition="bottom"
+                >
+                  <i class="pi pi-trash"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+
+          <tr *ngIf="presets().length === 0">
+            <td colspan="5" class="ct-empty-body">
+              <i class="pi pi-inbox"></i>
+              <span>{{ 'COMMON.NO_RECORDS' | translate }}</span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Delete confirm popup -->
+<div class="confirmation-popup" *ngIf="presetToDelete">
+  <div class="popup-content">
+    <div class="popup-header">
+      <div class="popup-icon"><i class="pi pi-trash"></i></div>
+      <h3>{{ 'THEME_SETTINGS.DELETE_TITLE' | translate }}</h3>
+    </div>
+    <div class="standard-delete-section">
+      <p class="delete-intro">
+        {{
+          'THEME_SETTINGS.DELETE_CONFIRM'
+            | translate: { name: presetToDelete.name }
+        }}
+      </p>
+      <ul class="delete-info-list">
+        <li>
+          <i class="pi pi-info-circle"></i>
+          <span>{{ 'COMMON.DELETE_CANNOT_UNDO' | translate }}</span>
+        </li>
+      </ul>
+    </div>
+    <div class="popup-actions">
+      <button class="btn-cancel" (click)="cancelDelete()">
+        <i class="pi pi-times"></i>{{ 'COMMON.CANCEL' | translate }}
+      </button>
+      <button
+        class="btn-confirm"
+        (click)="proceedDelete()"
+        [disabled]="!!busyPresetId()"
+      >
+        <i
+          class="pi"
+          [ngClass]="busyPresetId() ? 'pi-spin pi-spinner' : 'pi-trash'"
+        ></i>
+        {{ 'COMMON.DELETE' | translate }}
+      </button>
+    </div>
+  </div>
+</div>
