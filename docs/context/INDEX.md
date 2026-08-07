@@ -16,7 +16,7 @@
 | ai-workspace | `src/app/modules/ai-workspace` | [ai-workspace](./modules/ai-workspace.md) | 🟡 | 2026-07-24 |
 | alerts | `src/app/modules/alerts` | [alerts](./modules/alerts.md) | 🟢 | 2026-07-24 |
 | analyses | `src/app/modules/analyses` | [analyses](./modules/analyses.md) | 🟢 | 2026-07-24 |
-| app-settings | `src/app/modules/app-settings` | [app-settings](./modules/app-settings.md) | 🟢 | 2026-07-24 |
+| app-settings | `src/app/modules/app-settings` | [app-settings](./modules/app-settings.md) | 🟢 | 2026-08-07 |
 | audit-logs | `src/app/modules/audit-logs` | [audit-logs](./modules/audit-logs.md) | 🟢 | 2026-07-24 |
 | auth | `src/app/modules/auth` | [auth](./modules/auth.md) | 🟢 | 2026-07-24 |
 | dashboard | `src/app/modules/dashboard` | [dashboard](./modules/dashboard.md) | 🟢 | 2026-07-24 |

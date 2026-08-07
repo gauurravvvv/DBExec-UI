@@ -234,7 +234,7 @@ export class AddThemeComponent implements OnInit, OnDestroy, HasUnsavedChanges {
         : await this.themeService.createPreset(body);
       if (this.globalService.handleSuccessService(res)) {
         this.themeForm.markAsPristine();
-        await this.themeService.loadPresets();
+        // The list reloads via its own adapter on navigation.
         this.router.navigateByUrl(THEME_PRESET.LIST);
       }
     } finally {

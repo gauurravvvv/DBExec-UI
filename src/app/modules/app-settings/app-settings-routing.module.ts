@@ -9,6 +9,7 @@ import { EditAnnouncementComponent } from './components/edit-announcement/edit-a
 import { SystemSettingsHubComponent } from './components/system-settings-hub/system-settings-hub.component';
 import { ViewAnnouncementComponent } from './components/view-announcement/view-announcement.component';
 import { AddThemeComponent } from './components/add-theme/add-theme.component';
+import { AddBrandingComponent } from './components/add-branding/add-branding.component';
 
 // Settings is now two tabbed hubs:
 //   /app/settings/app     → App Settings hub (Theme / Branding / Announcements)
@@ -73,6 +74,24 @@ const routes: Routes = [
     path: 'themes/:id',
     component: AddThemeComponent,
     data: { title: 'Theme Details' },
+  },
+  // Branding presets — add/edit/view routed pages (list stays a hub tab).
+  {
+    path: 'branding-presets/new',
+    component: AddBrandingComponent,
+    canDeactivate: [unsavedChangesGuard],
+    data: { title: 'New Branding' },
+  },
+  {
+    path: 'branding-presets/:id/edit',
+    component: AddBrandingComponent,
+    canDeactivate: [unsavedChangesGuard],
+    data: { title: 'Edit Branding' },
+  },
+  {
+    path: 'branding-presets/:id',
+    component: AddBrandingComponent,
+    data: { title: 'Branding Details' },
   },
   {
     path: 'announcements/:id',

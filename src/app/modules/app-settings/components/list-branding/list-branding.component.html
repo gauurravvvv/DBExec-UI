@@ -1,17 +1,7 @@
-<!-- Theme tab body — the hub owns the page title + the common "Add" button,
-     so this renders only the try-out banner + the presets table. -->
+<!-- Branding tab body — the hub owns the page title + the common "Add"
+     button, so this renders only the presets table. -->
 <div class="dataset-page-wrapper">
   <div class="dataset-content-container">
-    <!-- Try-out banner -->
-    <div class="tryout-banner" *ngIf="tryingOutId">
-      <i class="pi pi-eye"></i>
-      <span>{{ 'THEME_SETTINGS.TRYOUT_ACTIVE' | translate }}</span>
-      <button type="button" class="link-btn" (click)="stopTryOut()">
-        {{ 'THEME_SETTINGS.STOP_TRYOUT' | translate }}
-      </button>
-    </div>
-
-    <!-- Content Card -->
     <div class="content-card">
       <div class="table-wrapper" *ngIf="adapter">
         <app-custom-table
@@ -34,22 +24,26 @@
           </ng-template>
 
           <ng-template usGridCell="preview" let-p>
-            <span class="swatches">
-              <span
-                class="sw"
-                *ngFor="let c of swatchStrip(p)"
-                [style.background-color]="c"
-              ></span>
+            <span
+              class="watermark-pill"
+              *ngIf="p.showWatermark; else noPill"
+              [style.background-color]="p.watermarkBgColor || '#0d47a1'"
+              [style.color]="p.watermarkTextColor || '#ffffff'"
+            >
+              {{ p.watermarkText || ('BRANDING.WATERMARK' | translate) }}
             </span>
+            <ng-template #noPill><span class="muted">—</span></ng-template>
           </ng-template>
 
-          <ng-template usGridCell="type" let-p>
-            <span class="type-pill" [class.built-in]="p.isSeeded">
+          <ng-template usGridCell="watermark" let-p>
+            <span
+              class="status-pill"
+              [ngClass]="{ active: p.showWatermark, inactive: !p.showWatermark }"
+            >
+              <span class="dot"></span>
               {{
-                (p.isSeeded
-                  ? 'THEME_SETTINGS.BUILT_IN'
-                  : 'THEME_SETTINGS.CUSTOM'
-                ) | translate
+                (p.showWatermark ? 'COMMON.ENABLED' : 'COMMON.DISABLED')
+                  | translate
               }}
             </span>
           </ng-template>
@@ -61,10 +55,8 @@
             >
               <span class="dot"></span>
               {{
-                (p.isActive
-                  ? 'THEME_SETTINGS.ACTIVE'
-                  : 'THEME_SETTINGS.INACTIVE'
-                ) | translate
+                (p.isActive ? 'THEME_SETTINGS.ACTIVE' : 'THEME_SETTINGS.INACTIVE')
+                  | translate
               }}
             </span>
           </ng-template>
@@ -72,26 +64,7 @@
           <ng-template usGridCell="actions" let-p>
             <div class="row-actions">
               <button
-                class="icon-btn tryout-btn"
-                *ngIf="tryingOutId !== p.id"
-                (click)="tryOut(p)"
-                [pTooltip]="'THEME_SETTINGS.TRY_OUT' | translate"
-                tooltipPosition="bottom"
-              >
-                <i class="pi pi-palette"></i>
-              </button>
-              <button
-                class="icon-btn tryout-btn on"
-                *ngIf="tryingOutId === p.id"
-                (click)="stopTryOut()"
-                [pTooltip]="'THEME_SETTINGS.STOP_TRYOUT' | translate"
-                tooltipPosition="bottom"
-              >
-                <i class="pi pi-times-circle"></i>
-              </button>
-
-              <button
-                *hasPermission="'themeManagement'; level: 'write'"
+                *hasPermission="'brandingManagement'; level: 'write'"
                 class="icon-btn apply-btn"
                 [disabled]="p.isActive || !!busyPresetId()"
                 (click)="apply(p)"
@@ -112,32 +85,33 @@
               </button>
 
               <button
-                *hasPermission="'themeManagement'; level: 'write'"
+                class="icon-btn view-btn"
+                (click)="onView(p)"
+                [pTooltip]="'COMMON.VIEW' | translate"
+                tooltipPosition="bottom"
+              >
+                <i class="pi pi-eye"></i>
+              </button>
+
+              <button
+                *hasPermission="'brandingManagement'; level: 'write'"
                 class="icon-btn edit-btn"
-                [disabled]="p.isSeeded"
                 (click)="onEdit(p)"
-                [pTooltip]="
-                  (p.isSeeded
-                    ? 'THEME_SETTINGS.BUILT_IN_READONLY'
-                    : 'COMMON.EDIT'
-                  ) | translate
-                "
+                [pTooltip]="'COMMON.EDIT' | translate"
                 tooltipPosition="bottom"
               >
                 <i class="pi pi-pencil"></i>
               </button>
 
               <button
-                *hasPermission="'themeManagement'; level: 'delete'"
+                *hasPermission="'brandingManagement'; level: 'delete'"
                 class="icon-btn delete-btn"
-                [disabled]="p.isSeeded || p.isActive || !!busyPresetId()"
+                [disabled]="p.isActive || !!busyPresetId()"
                 (click)="confirmDelete(p)"
                 [pTooltip]="
-                  (p.isSeeded
-                    ? 'THEME_SETTINGS.BUILT_IN_READONLY'
-                    : p.isActive
-                      ? 'THEME_SETTINGS.CANT_DELETE_ACTIVE'
-                      : 'COMMON.DELETE'
+                  (p.isActive
+                    ? 'THEME_SETTINGS.CANT_DELETE_ACTIVE'
+                    : 'COMMON.DELETE'
                   ) | translate
                 "
                 tooltipPosition="bottom"
@@ -157,13 +131,12 @@
   <div class="popup-content">
     <div class="popup-header">
       <div class="popup-icon"><i class="pi pi-trash"></i></div>
-      <h3>{{ 'THEME_SETTINGS.DELETE_TITLE' | translate }}</h3>
+      <h3>{{ 'BRANDING.DELETE_TITLE' | translate }}</h3>
     </div>
     <div class="standard-delete-section">
       <p class="delete-intro">
         {{
-          'THEME_SETTINGS.DELETE_CONFIRM'
-            | translate: { name: presetToDelete.name }
+          'BRANDING.DELETE_CONFIRM' | translate: { name: presetToDelete.name }
         }}
       </p>
       <ul class="delete-info-list">

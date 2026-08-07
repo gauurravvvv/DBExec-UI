@@ -3887,7 +3887,23 @@
     "TEXT_COLOR": "텍스트 색상",
     "HEX_INVALID": "유효한 16진수여야 합니다 (#rgb 또는 #rrggbb)",
     "PREVIEW": "미리보기",
-    "RE_LOGIN_HINT": "변경 사항은 다른 사용자의 다음 로그인 시 적용됩니다."
+    "RE_LOGIN_HINT": "변경 사항은 다른 사용자의 다음 로그인 시 적용됩니다.",
+    "LIBRARY": "Branding library",
+    "ADD_PRESET": "Add branding",
+    "PRESET": "Branding",
+    "SEARCH_PLACEHOLDER": "Search branding presets…",
+    "WATERMARK": "Watermark",
+    "DELETE_TITLE": "Delete branding",
+    "DELETE_CONFIRM": "Delete the branding \"{{name}}\"?",
+    "PRESET_NAME": "Branding name",
+    "PRESET_NAME_PLACEHOLDER": "e.g. Corporate footer",
+    "DESC_PLACEHOLDER": "Optional short description",
+    "NAME_REQUIRED": "A branding name is required",
+    "ADD_TITLE": "Add branding",
+    "EDIT_TITLE": "Edit branding",
+    "VIEW_TITLE": "Branding details",
+    "TEXT_REQUIRED": "Watermark text is required when enabled",
+    "TEXT_LENGTH": "Watermark text must be {{min}}–{{max}} characters"
   },
   "MIGRATION": {
     "EXPORT": "내보내기",
@@ -5743,6 +5759,8 @@
     "EDIT_TITLE": "Edit theme",
     "VIEW_TITLE": "Theme details",
     "NAME_REQUIRED": "A theme name is required",
-    "DESC_PLACEHOLDER": "Optional short description"
+    "DESC_PLACEHOLDER": "Optional short description",
+    "SEARCH_PLACEHOLDER": "Search themes…",
+    "PREVIEW": "미리보기"
   }
 }

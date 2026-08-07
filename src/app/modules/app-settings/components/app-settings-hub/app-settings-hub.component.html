@@ -1,49 +1,43 @@
-<!-- App Settings hub — canonical page chrome: a page heading on top, then the
-     tab strip, then ONE full-height parent card holding the active tab. Each
-     child (Theme / Branding / Announcements) renders its own sub-heading +
-     form; the hub neutralises the child's own card so it sits flush inside
-     this one (no card-in-card). -->
+<!-- App Settings hub — canonical list-screen chrome (parity with list-role):
+     a page heading on the left and ONE common "Add" button top-right whose
+     label + destination follow the active tab, then the shared themed tab
+     strip, then the active tab's TABLE. The table sits flush on the page
+     background (no card-in-card) — each child list renders only its
+     <app-custom-table>. -->
 <div class="settings-page-wrapper">
   <div class="settings-content-container">
-    <div class="content-card">
-      <div class="page-header-section">
-        <div class="header-content">
-          <h2>{{ 'SIDEBAR.appSettings' | translate }}</h2>
-        </div>
-        <div class="header-actions" *ngIf="activeForm() as form">
-          <app-button
-            variant="primary"
-            icon="pi pi-save"
-            [loading]="!!form.busy"
-            [disabled]="!form.dirty || !!form.busy"
-            (clicked)="save()"
-          >
-            {{ 'COMMON.SAVE' | translate }}
-          </app-button>
-        </div>
+    <!-- Header: title left, common Add right (list-role parity). -->
+    <div class="page-header-section">
+      <div class="header-content">
+        <h2>{{ 'SIDEBAR.appSettings' | translate }}</h2>
       </div>
 
-      <p-tabView
-        [(activeIndex)]="activeTab"
-        (onChange)="onTabChange($event.index)"
-        [scrollable]="true"
-      >
-        <p-tabPanel [header]="'SIDEBAR.themeManagement' | translate">
-          <app-list-themes *ngIf="activeTab === 0"></app-list-themes>
-        </p-tabPanel>
+      <div class="header-actions">
+        <button
+          *hasPermission="currentAdd.permission; level: 'write'"
+          pButton
+          [label]="currentAdd.labelKey | translate"
+          icon="pi pi-plus"
+          (click)="onAdd()"
+          class="p-button-raised p-button-primary modern-button"
+        ></button>
+      </div>
+    </div>
 
-        <p-tabPanel [header]="'SIDEBAR.brandingManagement' | translate">
-          <app-branding-settings
-            *ngIf="activeTab === 1"
-          ></app-branding-settings>
-        </p-tabPanel>
+    <!-- Shared themed tab strip. -->
+    <app-tabs
+      [tabs]="tabs"
+      [active]="activeTab"
+      (activeChange)="onTabChange($event)"
+    ></app-tabs>
 
-        <p-tabPanel [header]="'SIDEBAR.announcementManagement' | translate">
-          <app-list-announcements
-            *ngIf="activeTab === 2"
-          ></app-list-announcements>
-        </p-tabPanel>
-      </p-tabView>
+    <!-- Active tab body — only the selected list is instantiated. -->
+    <div class="settings-tab-body" [ngSwitch]="activeTab">
+      <app-list-themes *ngSwitchCase="'theme'"></app-list-themes>
+      <app-list-branding *ngSwitchCase="'branding'"></app-list-branding>
+      <app-list-announcements
+        *ngSwitchCase="'announcements'"
+      ></app-list-announcements>
     </div>
   </div>
 </div>

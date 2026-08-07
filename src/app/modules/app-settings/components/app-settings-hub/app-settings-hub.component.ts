@@ -1,28 +1,32 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { SettingsTabForm } from '../../settings-tab-form';
-import { BrandingSettingsComponent } from '../branding-settings/branding-settings.component';
+import {
+  ANNOUNCEMENT,
+  BRANDING_PRESET,
+  THEME_PRESET,
+} from 'src/app/core/constants/routes.constant';
+import { PERMISSIONS } from 'src/app/core/constants/permissions.constant';
+import { AppTab } from 'src/app/shared/components/tabs/tabs.component';
+
+/** Per-tab Add-button metadata — one common header button whose label,
+ *  target route and permission switch with the active tab. */
+interface TabAdd {
+  labelKey: string;
+  route: string;
+  permission: string;
+}
 
 /**
- * App Settings hub — a single tabbed screen (p-tabView) that hosts the
- * org look-&-feel settings: Theme, Branding, Announcements. Replaces the
- * three former standalone sidebar routes. Gated on the parent `appSettings`
- * permission; holding it shows every tab (no per-tab gating).
+ * App Settings hub — a single tabbed screen hosting the org look-&-feel
+ * settings: Theme, Branding, Announcements.
  *
- * Theme is now a LIST screen (a preset library with its own add/edit/view
- * routed pages) — like Announcements, no hub Save. Only Branding is a
- * savable form; the hub header "Save" delegates to it and hides on the
- * Theme + Announcements tabs (activeForm() returns undefined there).
- *
- * The active tab is mirrored to a `?tab=` query param so a deep link / a
- * refresh lands on the same tab. Announcement add/edit/view still live at
- * their own child routes under this module and open as normal pages.
- *
- * Default change detection (not OnPush): the header Save button binds to
- * `activeForm()?.dirty/busy`, which flips on keystrokes inside the child
- * form. An OnPush hub wouldn't re-evaluate that on child input; default CD
- * re-reads the getter each tick so the button enables the moment the active
- * tab becomes dirty. Thin container, no perf-sensitive bindings.
+ * Uses the shared `<app-tabs>` strip (themed, token-driven) for the tab
+ * header; the active tab's LIST body is rendered below via `[ngSwitch]`.
+ * All three tabs are list screens with their own add/edit/view routed
+ * pages. The hub owns the page chrome (parity with list-role): a title
+ * left and ONE common "Add" button top-right whose label + destination
+ * follow the active tab. The active tab is mirrored to `?tab=` for deep
+ * links.
  */
 @Component({
   selector: 'app-app-settings-hub',
@@ -30,15 +34,50 @@ import { BrandingSettingsComponent } from '../branding-settings/branding-setting
   styleUrls: ['./app-settings-hub.component.scss'],
 })
 export class AppSettingsHubComponent implements OnInit {
-  /** Tab order — index maps to the query-param slug. */
-  readonly tabs = ['theme', 'branding', 'announcements'] as const;
-  activeTab = 0;
+  /** Tab strip model (also the source of order + the query-param slug). */
+  readonly tabs: AppTab[] = [
+    {
+      value: 'theme',
+      label: 'SIDEBAR.themeManagement',
+      permission: PERMISSIONS.THEME_MANAGEMENT,
+    },
+    {
+      value: 'branding',
+      label: 'SIDEBAR.brandingManagement',
+      permission: PERMISSIONS.BRANDING_MANAGEMENT,
+    },
+    {
+      value: 'announcements',
+      label: 'SIDEBAR.announcementManagement',
+      permission: PERMISSIONS.ANNOUNCEMENT_MANAGEMENT,
+    },
+  ];
 
-  // Only Branding is a savable form; the Theme (list) + Announcements
-  // (list) tabs have no ViewChild here → activeForm() undefined → hub
-  // Save hides.
-  @ViewChild(BrandingSettingsComponent)
-  private branding?: BrandingSettingsComponent;
+  /** Add-button config per tab value. */
+  private readonly addByTab: Record<string, TabAdd> = {
+    theme: {
+      labelKey: 'THEME_SETTINGS.ADD_THEME',
+      route: THEME_PRESET.NEW,
+      permission: PERMISSIONS.THEME_MANAGEMENT,
+    },
+    branding: {
+      labelKey: 'BRANDING.ADD_PRESET',
+      route: BRANDING_PRESET.NEW,
+      permission: PERMISSIONS.BRANDING_MANAGEMENT,
+    },
+    announcements: {
+      labelKey: 'COMMON.ADD',
+      route: ANNOUNCEMENT.ADD,
+      permission: PERMISSIONS.ANNOUNCEMENT_MANAGEMENT,
+    },
+  };
+
+  /** Active tab value (default: first tab). */
+  activeTab = 'theme';
+
+  get currentAdd(): TabAdd {
+    return this.addByTab[this.activeTab];
+  }
 
   constructor(
     private route: ActivatedRoute,
@@ -47,31 +86,21 @@ export class AppSettingsHubComponent implements OnInit {
 
   ngOnInit(): void {
     const slug = this.route.snapshot.queryParamMap.get('tab');
-    const idx = this.tabs.indexOf((slug ?? '') as (typeof this.tabs)[number]);
-    if (idx >= 0) this.activeTab = idx;
+    if (slug && this.tabs.some(t => t.value === slug)) this.activeTab = slug;
   }
 
-  onTabChange(index: number): void {
-    this.activeTab = index;
+  onTabChange(value: string): void {
+    this.activeTab = value;
     this.router.navigate([], {
       relativeTo: this.route,
-      queryParams: { tab: this.tabs[index] },
+      queryParams: { tab: value },
       queryParamsHandling: 'merge',
       replaceUrl: true,
     });
   }
 
-  /**
-   * The currently-rendered savable tab, or undefined on Announcements (which
-   * is a list, not a form). The hub Save button binds to this being defined.
-   */
-  activeForm(): SettingsTabForm | undefined {
-    return this.branding;
-  }
-
-  /** Save the active tab through its own API. */
-  save(): void {
-    const form = this.activeForm();
-    if (form && form.dirty && !form.busy) form.onSave();
+  /** Common Add — routes to the active tab's create page. */
+  onAdd(): void {
+    this.router.navigateByUrl(this.currentAdd.route);
   }
 }

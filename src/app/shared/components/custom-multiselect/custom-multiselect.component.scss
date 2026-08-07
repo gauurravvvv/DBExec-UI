@@ -41,7 +41,10 @@
     label {
       font-weight: var(--fw-medium);
       color: color-mix(in srgb, var(--text-color) 60%, transparent);
-      background: var(--card-background);
+      // Notch matches the field fill (--input-background), NOT
+      // --card-background — see custom-dropdown SCSS for the dark-theme
+      // mismatched-chip rationale.
+      background: var(--input-background);
       padding: 0 4px;
       // z-index 2 keeps the notch above the dropdown's border. Lower
       // values let the border render on top and clipped the label's
@@ -132,7 +135,9 @@
   }
 
   .p-multiselect {
-    background: var(--card-background);
+    // Field fill uses --input-background to match the floating-label notch
+    // (see custom-dropdown SCSS). Was --card-background.
+    background: var(--input-background);
     border: 1px solid var(--border-color);
     border-radius: var(--radius-sm);
     // Constant trigger width regardless of how many chips / how long
@@ -245,7 +250,8 @@
 
       .p-multiselect-filter-container {
         .p-inputtext {
-          background: var(--card-background) !important;
+          // Panel search box is an input → input surface token.
+          background: var(--input-background) !important;
           border: 1px solid var(--border-color) !important;
           color: var(--text-color) !important;
           font-size: var(--fs-body) !important;

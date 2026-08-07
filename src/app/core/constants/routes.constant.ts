@@ -162,6 +162,10 @@ export const ANNOUNCEMENT = feature('/app/settings/announcements');
 // hub, same shape as announcements (list stays a tab).
 export const THEME_PRESET = feature('/app/settings/themes');
 
+// Branding presets — same shape as themes (list stays a tab; add/edit
+// are routed pages).
+export const BRANDING_PRESET = feature('/app/settings/branding-presets');
+
 // Per-user notifications feed — the full-page view behind the bell
 // panel's "See all". Auth-gated only (not permission-gated), like the
 // profile screen.

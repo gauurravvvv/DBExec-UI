@@ -3887,7 +3887,23 @@
     "TEXT_COLOR": "Colore del testo",
     "HEX_INVALID": "Deve essere un esadecimale valido (#rgb o #rrggbb)",
     "PREVIEW": "Anteprima",
-    "RE_LOGIN_HINT": "Le modifiche verranno applicate agli altri utenti al loro prossimo accesso."
+    "RE_LOGIN_HINT": "Le modifiche verranno applicate agli altri utenti al loro prossimo accesso.",
+    "LIBRARY": "Branding library",
+    "ADD_PRESET": "Add branding",
+    "PRESET": "Branding",
+    "SEARCH_PLACEHOLDER": "Search branding presets…",
+    "WATERMARK": "Watermark",
+    "DELETE_TITLE": "Delete branding",
+    "DELETE_CONFIRM": "Delete the branding \"{{name}}\"?",
+    "PRESET_NAME": "Branding name",
+    "PRESET_NAME_PLACEHOLDER": "e.g. Corporate footer",
+    "DESC_PLACEHOLDER": "Optional short description",
+    "NAME_REQUIRED": "A branding name is required",
+    "ADD_TITLE": "Add branding",
+    "EDIT_TITLE": "Edit branding",
+    "VIEW_TITLE": "Branding details",
+    "TEXT_REQUIRED": "Watermark text is required when enabled",
+    "TEXT_LENGTH": "Watermark text must be {{min}}–{{max}} characters"
   },
   "MIGRATION": {
     "EXPORT": "Esporta",
@@ -5743,6 +5759,8 @@
     "EDIT_TITLE": "Edit theme",
     "VIEW_TITLE": "Theme details",
     "NAME_REQUIRED": "A theme name is required",
-    "DESC_PLACEHOLDER": "Optional short description"
+    "DESC_PLACEHOLDER": "Optional short description",
+    "SEARCH_PLACEHOLDER": "Search themes…",
+    "PREVIEW": "Anteprima"
   }
 }

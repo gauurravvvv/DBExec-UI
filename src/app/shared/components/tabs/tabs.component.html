@@ -1,0 +1,26 @@
+<!-- Themed tab strip. Header only — the caller renders the active body.
+     Roles: `tablist` / `tab`, with aria-selected + roving state. Every
+     colour/size comes from theme tokens via the SCSS. -->
+<div
+  class="app-tabs"
+  role="tablist"
+  [class.app-tabs--compact]="size === 'compact'"
+  [class.app-tabs--fill]="fill"
+>
+  <button
+    *ngFor="let t of visibleTabs; trackBy: trackByValue"
+    type="button"
+    role="tab"
+    class="app-tab"
+    [class.is-active]="isActive(t)"
+    [class.is-disabled]="!!t.disabled"
+    [attr.aria-selected]="isActive(t)"
+    [attr.tabindex]="isActive(t) ? 0 : -1"
+    [disabled]="t.disabled"
+    (click)="select(t)"
+  >
+    <i *ngIf="t.icon" class="app-tab__icon" [ngClass]="t.icon"></i>
+    <span class="app-tab__label">{{ t.label | translate }}</span>
+    <span *ngIf="hasCount(t)" class="app-tab__count">{{ t.count }}</span>
+  </button>
+</div>

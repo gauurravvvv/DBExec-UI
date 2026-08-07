@@ -13,7 +13,10 @@
       font-weight: var(--fw-medium);
       color: var(--text-color);
       opacity: 0.6;
-      background: var(--card-background);
+      // Notch matches the field fill (--input-background) so it cuts the
+      // input border seamlessly — see custom-dropdown SCSS. Was
+      // --card-background, which diverged from the field in the dark theme.
+      background: var(--input-background);
       padding: 0 8px;
       margin-left: -4px;
       z-index: var(--z-base);
@@ -47,7 +50,9 @@
 
   .p-inputtext {
     width: 100%;
-    background: var(--hover-background) !important;
+    // Field fill uses --input-background to match the floating-label notch
+    // (see custom-dropdown SCSS). Was --hover-background.
+    background: var(--input-background) !important;
     border: 1px solid var(--border-color) !important;
     color: var(--text-color) !important;
     border-radius: var(--radius-sm) !important;
@@ -74,10 +79,32 @@
     &:hover {
       border-color: var(--primary-color) !important;
       color: var(--primary-color) !important;
+
+      // Keep the SVG icon in step on hover too.
+      .p-icon {
+        color: var(--primary-color) !important;
+        fill: var(--primary-color) !important;
+      }
     }
 
+    // Trigger glyph — PrimeNG 18 renders this as an SVG (.p-icon) whose
+    // paths use fill="currentColor", NOT a .pi font glyph. Colour BOTH so
+    // the icon follows the theme regardless of which PrimeNG emits (the
+    // .pi-only rule left the SVG uncoloured — same class of bug as the
+    // grid sort icon).
     .pi {
       font-size: var(--fs-body);
+    }
+
+    .p-icon {
+      width: var(--fs-body);
+      height: var(--fs-body);
+      color: var(--secondary-color) !important;
+      fill: var(--secondary-color) !important;
+
+      path {
+        fill: currentColor;
+      }
     }
   }
 
@@ -131,6 +158,20 @@
 
       .pi {
         font-size: var(--fs-control);
+      }
+
+      // Nav chevrons render as SVG (.p-icon) in PrimeNG 18 — colour the SVG
+      // via currentColor so the arrows follow the theme (the .pi rule alone
+      // left them uncoloured).
+      .p-icon {
+        width: var(--fs-control);
+        height: var(--fs-control);
+        color: var(--text-color) !important;
+        fill: var(--text-color) !important;
+
+        path {
+          fill: currentColor;
+        }
       }
     }
   }

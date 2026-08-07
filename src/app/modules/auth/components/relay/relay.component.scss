@@ -15,8 +15,16 @@
   display: block;
   width: 100%;
   min-height: 100vh;
-  background: var(--surface-page, #fafafa);
-  color: var(--text-strong, #1a1a1a);
+  // Bind to the tokens the theme ACTUALLY injects (`--background-color` /
+  // `--text-color`). The old `--surface-page` / `--text-strong` were not in
+  // the theme registry nor the base SCSS, so they always fell back to the
+  // hardcoded literals — which is why the relay stayed white after login
+  // regardless of the org theme.
+  // Fallbacks match the theme registry's own defaults (background #ffffff,
+  // text #333333) — not an arbitrary off-white — so a cold load with no
+  // theme yet looks like the default light theme, never a random shade.
+  background: var(--background-color, #ffffff);
+  color: var(--text-color, #333333);
   font-family: var(--font-ui);
 }
 
@@ -56,7 +64,7 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  color: var(--text-strong, #1a1a1a);
+  color: var(--text-color, #333333);
   font-weight: var(--fw-semibold, 600);
   letter-spacing: -0.01em;
   // Subtle fade so the chrome doesn't compete with the centred
@@ -116,7 +124,7 @@
   margin: 0;
   letter-spacing: -0.01em;
   line-height: 1.3;
-  color: var(--text-strong);
+  color: var(--text-color);
   // Long firstNames wrap gracefully — keep the second-line tail
   // from clipping out on very narrow viewports.
   overflow-wrap: anywhere;
@@ -127,7 +135,7 @@
 // scopes it correctly without ::ng-deep.
 .relay__greeting-name {
   font-weight: var(--fw-semibold, 600);
-  color: var(--text-strong);
+  color: var(--text-color);
   // Keep the name itself unbreakable so it can't split mid-word
   // on narrow viewports. The greeting prefix/suffix wrap freely
   // around it. (For ZH/JA where a sentence-final mark immediately
@@ -170,7 +178,7 @@
   animation: relay-fade 160ms ease-out both;
 
   span {
-    color: var(--text-strong, #1a1a1a);
+    color: var(--text-color, #333333);
     font-family: var(--font-mono, ui-monospace, monospace);
     font-size: 11.5px;
     opacity: 0.8;
@@ -229,7 +237,7 @@
   appearance: none;
   border: 1px solid var(--border-color, rgba(0, 0, 0, 0.12));
   background: transparent;
-  color: var(--text-strong);
+  color: var(--text-color);
   padding: 8px 16px;
   border-radius: 8px;
   font: inherit;
@@ -241,7 +249,7 @@
     border-color 160ms ease-out;
 
   &:hover {
-    background: var(--surface-subtle, rgba(0, 0, 0, 0.04));
+    background: var(--hover-background, rgba(0, 0, 0, 0.04));
   }
 
   &:focus-visible {

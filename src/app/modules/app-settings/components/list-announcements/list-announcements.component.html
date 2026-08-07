@@ -1,24 +1,8 @@
+<!-- Announcements tab body — the hub owns the page title + the common "Add"
+     button, so this renders only the announcements table (with its inline
+     Group filter in the toolbar-left slot). -->
 <div class="dataset-page-wrapper">
   <div class="dataset-content-container">
-    <!-- Header Section -->
-    <div class="page-header-section">
-      <div class="header-content">
-        <h2>{{ 'ANNOUNCEMENT.TITLE' | translate }}</h2>
-      </div>
-
-      <div class="header-actions">
-        <!-- Add Button -->
-        <button
-          *hasPermission="'announcementManagement'; level: 'write'"
-          pButton
-          [label]="'COMMON.ADD' | translate"
-          icon="pi pi-plus"
-          (click)="onAdd()"
-          class="p-button-raised p-button-primary modern-button"
-        ></button>
-      </div>
-    </div>
-
     <!-- Content Card -->
     <div class="content-card">
       <!-- Unified simple table. Infinite scroll, global search + on-demand
@@ -183,14 +167,15 @@
       </ul>
     </div>
     <div class="popup-actions">
-      <button class="btn-cancel" (click)="cancelDelete()">
-        <i class="pi pi-times"></i>
+      <app-button variant="ghost" icon="pi pi-times" (clicked)="cancelDelete()">
         {{ 'COMMON.CANCEL' | translate }}
-      </button>
-      <button class="btn-confirm" (click)="proceedDelete()">
-        <i class="pi pi-trash"></i>
-        {{ 'COMMON.DELETE' | translate }}
-      </button>
+      </app-button>
+      <app-button
+        variant="danger"
+        icon="pi pi-trash"
+        (clicked)="proceedDelete()"
+        >{{ 'COMMON.DELETE' | translate }}</app-button
+      >
     </div>
   </div>
 </div>

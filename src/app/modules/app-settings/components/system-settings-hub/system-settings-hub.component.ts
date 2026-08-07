@@ -5,6 +5,8 @@ import { SsoSettingsComponent } from '../sso-settings/sso-settings.component';
 import { EmailConfigurationComponent } from '../email-configuration/email-configuration.component';
 import { SecurityPolicyComponent } from '../security-policy/security-policy.component';
 import { AiFeaturesComponent } from '../ai-features/ai-features.component';
+import { AppTab } from 'src/app/shared/components/tabs/tabs.component';
+import { PERMISSIONS } from 'src/app/core/constants/permissions.constant';
 
 /**
  * System Settings hub — a single tabbed screen hosting SSO, Email, Security
@@ -30,8 +32,16 @@ import { AiFeaturesComponent } from '../ai-features/ai-features.component';
   styleUrls: ['./system-settings-hub.component.scss'],
 })
 export class SystemSettingsHubComponent implements OnInit {
-  readonly tabs = ['sso', 'email', 'security', 'ai'] as const;
-  activeTab = 0;
+  /** Shared themed tab strip model. Every System tab is gated on its own
+   *  leaf, but the whole hub is already gated on ssoConfiguration at the
+   *  route; per-tab permissions keep the strip honest if that changes. */
+  readonly tabs: AppTab[] = [
+    { value: 'sso', label: 'SIDEBAR.ssoConfiguration', permission: PERMISSIONS.SSO_CONFIGURATION },
+    { value: 'email', label: 'SIDEBAR.emailConfiguration', permission: PERMISSIONS.EMAIL_CONFIGURATION },
+    { value: 'security', label: 'SIDEBAR.securityPolicy', permission: PERMISSIONS.SECURITY_POLICY },
+    { value: 'ai', label: 'SIDEBAR.aiFeatures', permission: PERMISSIONS.AI_FEATURES },
+  ];
+  activeTab = 'sso';
 
   // Only the active tab is instantiated (*ngIf), so at most one of these is
   // defined at a time — activeForm() returns whichever it is.
@@ -49,15 +59,14 @@ export class SystemSettingsHubComponent implements OnInit {
 
   ngOnInit(): void {
     const slug = this.route.snapshot.queryParamMap.get('tab');
-    const idx = this.tabs.indexOf((slug ?? '') as (typeof this.tabs)[number]);
-    if (idx >= 0) this.activeTab = idx;
+    if (slug && this.tabs.some(t => t.value === slug)) this.activeTab = slug;
   }
 
-  onTabChange(index: number): void {
-    this.activeTab = index;
+  onTabChange(value: string): void {
+    this.activeTab = value;
     this.router.navigate([], {
       relativeTo: this.route,
-      queryParams: { tab: this.tabs[index] },
+      queryParams: { tab: value },
       queryParamsHandling: 'merge',
       replaceUrl: true,
     });

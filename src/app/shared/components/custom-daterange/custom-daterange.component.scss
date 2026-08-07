@@ -15,6 +15,21 @@ app-custom-daterange {
       }
     }
 
+    // Floating-label notch — matches the field fill (--input-background) so
+    // it cuts the control's border seamlessly. Without this the label chip
+    // showed a mismatched dark rectangle in the org dark theme (the "Date
+    // range" screenshot). z-index keeps it above the border.
+    .p-float-label > label {
+      background: var(--input-background);
+      padding: 0 4px;
+      z-index: 2;
+
+      .required {
+        color: var(--error-color);
+        margin-left: 4px;
+      }
+    }
+
     .error-message {
       color: var(--error-color);
       font-size: var(--fs-label);
@@ -26,7 +41,9 @@ app-custom-daterange {
 
     .p-inputtext {
       width: 100%;
-      background: var(--card-background) !important;
+      // Field fill uses --input-background (canonical control surface) — see
+      // custom-dropdown SCSS. Was --card-background.
+      background: var(--input-background) !important;
       border: 1px solid var(--border-color) !important;
       color: var(--text-color) !important;
       border-radius: var(--radius-sm) !important;
@@ -45,7 +62,9 @@ app-custom-daterange {
     }
 
     .p-button {
-      background: var(--card-background) !important;
+      // Trigger button shares the field surface (--input-background) so the
+      // input + button read as one control. Was --card-background.
+      background: var(--input-background) !important;
       border: 1px solid var(--border-color) !important;
       color: var(--secondary-color) !important;
 
@@ -59,7 +78,7 @@ app-custom-daterange {
     &.p-calendar-w-btn {
       border: 1px solid var(--border-color);
       border-radius: var(--radius-sm);
-      background: var(--card-background);
+      background: var(--input-background);
 
       .p-inputtext {
         border: none !important;

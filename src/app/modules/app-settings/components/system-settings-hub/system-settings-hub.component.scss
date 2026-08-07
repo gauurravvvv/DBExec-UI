@@ -49,64 +49,21 @@
     }
   }
 
-  // ── Polished tab strip ────────────────────────────────────────────
-  ::ng-deep .p-tabview {
+  // ── Shared tab strip (app-tabs) ───────────────────────────────────
+  // The themed strip is the shared <app-tabs>; give it the hub's side
+  // padding + a bottom divider so it reads as part of the card head.
+  app-tabs {
+    padding: 0 var(--space-7);
+  }
+
+  // ── Active tab body — the card's scrollable content region ─────────
+  .settings-tab-body {
     flex: 1;
-    display: flex;
-    flex-direction: column;
     min-height: 0;
-
-    .p-tabview-nav-container {
-      flex: 0 0 auto;
-    }
-
-    .p-tabview-nav {
-      padding: 0 var(--space-7);
-      gap: var(--space-1);
-      border-bottom: 1px solid var(--border-color);
-      background: transparent;
-
-      li .p-tabview-nav-link {
-        margin: 0;
-        padding: var(--space-4) var(--space-4);
-        background: transparent;
-        border: none;
-        border-bottom: 2px solid transparent;
-        color: var(--text-muted);
-        font-size: var(--fs-control);
-        font-weight: var(--fw-medium);
-        transition:
-          color var(--motion-fast) ease,
-          border-color var(--motion-fast) ease;
-
-        &:not(.p-disabled):focus {
-          box-shadow: none;
-        }
-
-        &:hover {
-          color: var(--text-color);
-        }
-      }
-
-      li.p-highlight .p-tabview-nav-link {
-        color: var(--primary-color);
-        border-bottom-color: var(--primary-color);
-        font-weight: var(--fw-semibold);
-      }
-    }
-
-    .p-tabview-panels {
-      flex: 1;
-      min-height: 0;
-      overflow: auto;
-      // ONE source of padding for every tab's content.
-      padding: var(--space-7);
-      background: transparent;
-    }
-
-    .p-tabview-panel {
-      height: 100%;
-    }
+    overflow: auto;
+    // ONE source of padding for every tab's content.
+    padding: var(--space-7);
+    background: transparent;
   }
 
   // ── Flatten each child page into the tab (no card-in-card, no double

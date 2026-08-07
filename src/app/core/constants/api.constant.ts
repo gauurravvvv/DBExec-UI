@@ -413,6 +413,10 @@ export const THEME = {
 export const BRANDING = {
   GET: '/branding',
   SAVE: '/branding',
+  // Branding preset library
+  PRESETS: '/branding/presets',
+  preset: (id: string) => `/branding/presets/${id}`,
+  activatePreset: (id: string) => `/branding/presets/${id}/activate`,
 };
 
 export const ANNOUNCEMENT = {

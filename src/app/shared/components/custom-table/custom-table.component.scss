@@ -201,15 +201,65 @@
     top: 2rem !important;
   }
 
-  /* Sort icon — quiet, coloured only when active. */
-  .p-sortable-column .p-sorticon {
+  /* Sort icon — quiet by default, guided on hover, primary when active.
+     PrimeNG renders the sort indicator as an <svg class="p-icon
+     p-sortable-column-icon"> whose paths use fill="currentColor" — NOT a
+     `.p-sorticon` font glyph. So we colour the SVG via `color`/`fill` on
+     the real class; the old `.p-sorticon` selector matched nothing (which
+     is why the colour never changed). States:
+       • idle    → --text-subtle (quiet)
+       • hover   → --text-color (signals the column is clickable/sortable)
+       • active  → --primary-color (currently-sorted column, .p-highlight),
+                   stays primary on hover too. */
+  .p-sortable-column .p-sortable-column-icon,
+  .p-sortable-column p-sortIcon .p-icon {
     color: var(--text-subtle);
+    fill: var(--text-subtle);
+    width: var(--icon-xs);
+    height: var(--icon-xs);
     font-size: var(--icon-xs);
+    transition:
+      color var(--motion-fast) ease,
+      fill var(--motion-fast) ease;
+
+    path {
+      fill: currentColor;
+    }
   }
-  .p-sortable-column.p-highlight,
-  .p-sortable-column.p-highlight .p-sorticon {
-    color: var(--primary-color);
+
+  /* Hover (column not yet sorted) — lift the icon + label toward full text
+     colour so the header reads as interactive. */
+  .p-sortable-column:not(.p-highlight):hover {
+    .p-sortable-column-icon,
+    p-sortIcon .p-icon {
+      color: var(--text-color);
+      fill: var(--text-color);
+    }
   }
+
+  /* Active / selected — the currently-sorted column. Header label also
+     shifts to primary so the sort target is unmistakable; icon stays
+     primary even while hovered. */
+  .p-sortable-column.p-highlight {
+    .ct-th {
+      color: var(--primary-color);
+    }
+
+    .p-sortable-column-icon,
+    p-sortIcon .p-icon {
+      color: var(--primary-color);
+      fill: var(--primary-color);
+    }
+
+    &:hover {
+      .p-sortable-column-icon,
+      p-sortIcon .p-icon {
+        color: var(--primary-color);
+        fill: var(--primary-color);
+      }
+    }
+  }
+
   .p-sortable-column:focus {
     box-shadow: none;
     outline: none;

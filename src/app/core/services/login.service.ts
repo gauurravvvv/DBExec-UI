@@ -92,11 +92,15 @@ export class LoginService implements OnDestroy {
     );
     if (result.status) {
       this.stashLoginResponse(result.data, organisation);
-      // Pre-paint the org theme so the relay screen (navigated to next)
-      // and any subsequent auth page already render in the org's
-      // colours. Phase 2 (/auth/session) re-applies the authoritative
-      // theme; this is best-effort and never blocks the login flow.
-      void this.fetchAndApplyPublicTheme(organisation);
+      // Paint the org theme BEFORE we hand control back to the login
+      // component (which then navigates to /auth/relay). Awaiting here
+      // means the relay — and every page after the user leaves /login —
+      // renders in the org's colours from its first paint, with no
+      // default-theme flash. fetchAndApplyPublicTheme swallows all
+      // errors and the endpoint always 200s, so this never blocks or
+      // fails the login. Phase 2 (/auth/session) later re-applies the
+      // authoritative theme.
+      await this.fetchAndApplyPublicTheme(organisation);
     }
     return result;
   }
@@ -167,10 +171,11 @@ export class LoginService implements OnDestroy {
 
     // Apply the user's saved locale immediately so the relay's
     // greeting and status copy render in the right language from
-    // the first paint, before phase 2 returns. Theme + branding
-    // arrive in phase 2 — pass null here so the helper signature
-    // stays uniform.
-    this.applyAuthArtefacts(null, null, u.locale);
+    // the first paint, before phase 2 returns. Apply ONLY the locale
+    // here — do NOT touch theme/branding: `login()` awaits the org's
+    // public theme right after this, and passing null theme would
+    // clear that pre-paint (relay would flash the default palette).
+    if (u.locale) this.localeService.applyTempLocale(u.locale);
   }
 
   // ── SAML SSO ────────────────────────────────────────────────────
@@ -206,6 +211,9 @@ export class LoginService implements OnDestroy {
     );
     if (result?.status && result?.data) {
       this.stashLoginResponse(result.data, account);
+      // Paint the org theme before the SSO relay renders, same as the
+      // password path — so an SSO session's relay is themed too.
+      await this.fetchAndApplyPublicTheme(account);
     }
     return result;
   }

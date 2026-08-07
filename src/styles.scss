@@ -1493,7 +1493,7 @@ app-custom-table {
 
     .p-multiselect-filter-container {
       .p-inputtext {
-        background: var(--card-background) !important;
+        background: var(--input-background) !important;
         border: 1px solid var(--border-color) !important;
         color: var(--text-color) !important;
         font-size: 0.9rem !important;
@@ -2022,6 +2022,54 @@ app-custom-table {
 .p-tabview .p-tabview-panels {
   padding-left: 0px;
   padding-right: 0px;
+}
+
+// ── Canonical themed tab strip (app-wide default) ────────────────────
+// The shared <app-tabs> component is the preferred tab UI (see
+// shared/components/tabs). For the few screens still on PrimeNG's
+// p-tabView, this makes the default look MATCH app-tabs — same tokens,
+// same active underline, same type — so nothing reads as raw/unthemed.
+// A screen may still override locally via its own ::ng-deep block.
+.p-tabview .p-tabview-nav {
+  border-bottom: 1px solid var(--border-color);
+  background: transparent;
+  gap: var(--space-2);
+
+  li .p-tabview-nav-link {
+    margin: 0 0 -1px;
+    padding: var(--space-4) var(--space-4);
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid transparent;
+    color: var(--text-muted);
+    font-size: var(--fs-body);
+    font-weight: var(--fw-medium);
+    transition:
+      color var(--motion-fast) ease,
+      border-color var(--motion-fast) ease;
+
+    &:not(.p-disabled):focus,
+    &:not(.p-disabled):focus-visible {
+      box-shadow: none;
+    }
+
+    &:hover {
+      color: var(--text-color);
+      background: transparent;
+    }
+  }
+
+  li.p-highlight .p-tabview-nav-link {
+    color: var(--primary-color);
+    border-bottom-color: var(--primary-color);
+    font-weight: var(--fw-semibold);
+  }
+
+  // We draw the active underline via the link's border-bottom; hide
+  // PrimeNG's separate ink bar so there's exactly one indicator.
+  .p-tabview-ink-bar {
+    display: none;
+  }
 }
 
 .notifications-grid {
@@ -3124,7 +3172,10 @@ body {
   }
 
   .p-inputtext {
-    background: var(--card-background);
+    // Canonical input surface — the theme's input-background token so every
+    // text field / dropdown / etc. shares one fill (matches the shared
+    // app-custom-* controls + floating-label notches).
+    background: var(--input-background);
     color: var(--text-color);
     border-color: var(--border-color);
   }

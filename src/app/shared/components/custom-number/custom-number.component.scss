@@ -14,6 +14,20 @@
     }
   }
 
+  // Floating-label notch — matches the field fill (--input-background) so it
+  // cuts the input border seamlessly. Was absent, so the floated label had
+  // no chip and the border rendered through it. See custom-dropdown SCSS.
+  ::ng-deep .p-float-label > label {
+    background: var(--input-background);
+    padding: 0 4px;
+    z-index: 2;
+
+    .required {
+      color: var(--error-color);
+      margin-left: 4px;
+    }
+  }
+
   .error-message {
     color: var(--error-color);
     font-size: var(--fs-label);
@@ -26,7 +40,9 @@
   align-items: stretch;
 
   .p-inputtext {
-    background: var(--card-background) !important;
+    // Field fill uses --input-background to match the floating-label notch
+    // (see custom-dropdown SCSS). Was --card-background.
+    background: var(--input-background) !important;
     border: 1px solid var(--border-color) !important;
     color: var(--text-color) !important;
     border-radius: var(--radius-sm) !important;

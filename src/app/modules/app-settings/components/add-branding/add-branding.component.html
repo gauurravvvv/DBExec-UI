@@ -1,0 +1,167 @@
+<div class="add-admin-wrapper">
+  <div class="add-admin-container">
+    <div class="page-header">
+      <div class="left-section">
+        <button
+          pButton
+          class="p-button-text p-button-plain back-button"
+          (click)="onCancel()"
+        >
+          <i class="pi pi-arrow-left back-icon"></i>
+        </button>
+        <h2>
+          {{
+            (isView
+              ? 'BRANDING.VIEW_TITLE'
+              : isEdit
+                ? 'BRANDING.EDIT_TITLE'
+                : 'BRANDING.ADD_TITLE'
+            ) | translate
+          }}
+        </h2>
+      </div>
+
+      <div class="action-buttons">
+        <app-button variant="ghost" (clicked)="onCancel()">
+          {{ (isView ? 'COMMON.BACK' : 'COMMON.CANCEL') | translate }}
+        </app-button>
+        <app-button
+          *ngIf="isView"
+          variant="primary"
+          icon="pi pi-pencil"
+          (clicked)="onEditFromView()"
+          >{{ 'COMMON.EDIT' | translate }}</app-button
+        >
+        <app-button
+          *ngIf="!isView"
+          variant="primary"
+          icon="pi pi-save"
+          [loading]="saving"
+          [disabled]="saving || form.invalid || !form.dirty"
+          (clicked)="onSave()"
+          >{{ 'COMMON.SAVE' | translate }}</app-button
+        >
+      </div>
+    </div>
+
+    <form autocomplete="off" [formGroup]="form" class="admin-form">
+      <div class="form-grid">
+        <app-custom-input
+          formControlName="name"
+          [label]="'BRANDING.PRESET_NAME' | translate"
+          [placeholder]="'BRANDING.PRESET_NAME_PLACEHOLDER' | translate"
+          icon="pi-image"
+          [required]="true"
+          [readonly]="isView"
+          [showError]="showFieldError('name')"
+          [errorMessage]="'BRANDING.NAME_REQUIRED' | translate"
+        ></app-custom-input>
+
+        <app-custom-input
+          formControlName="description"
+          [label]="'COMMON.DESCRIPTION' | translate"
+          [placeholder]="'BRANDING.DESC_PLACEHOLDER' | translate"
+          icon="pi-align-left"
+          [readonly]="isView"
+        ></app-custom-input>
+
+        <app-custom-toggle
+          formControlName="showWatermark"
+          [label]="'BRANDING.SHOW_WATERMARK' | translate"
+          [trueValue]="true"
+          [falseValue]="false"
+          [trueLabel]="'COMMON.ENABLED' | translate"
+          [falseLabel]="'COMMON.DISABLED' | translate"
+        ></app-custom-toggle>
+
+        <ng-container *ngIf="form.value.showWatermark">
+          <app-custom-input
+            formControlName="watermarkText"
+            [label]="'BRANDING.WATERMARK_TEXT' | translate"
+            [placeholder]="'BRANDING.WATERMARK_PLACEHOLDER' | translate"
+            icon="pi-pencil"
+            [required]="true"
+            [readonly]="isView"
+            [maxLength]="maxTextLength"
+            [showError]="showFieldError('watermarkText')"
+            [errorMessage]="getTextError()"
+          ></app-custom-input>
+
+          <div class="color-row">
+            <app-custom-input
+              formControlName="watermarkBgColor"
+              [label]="'BRANDING.BACKGROUND_COLOR' | translate"
+              [placeholder]="'#0d47a1'"
+              icon="pi-palette"
+              [required]="true"
+              [readonly]="isView"
+              [showError]="showFieldError('watermarkBgColor')"
+              [errorMessage]="'BRANDING.HEX_INVALID' | translate"
+            ></app-custom-input>
+            <label
+              class="color-swatch"
+              [class.disabled]="isView"
+              [style.background-color]="swatchValue('watermarkBgColor')"
+            >
+              <input
+                type="color"
+                [value]="swatchValue('watermarkBgColor')"
+                [disabled]="isView"
+                (input)="onColorPicked('watermarkBgColor', $any($event.target).value)"
+                aria-hidden="true"
+                tabindex="-1"
+              />
+            </label>
+          </div>
+
+          <div class="color-row">
+            <app-custom-input
+              formControlName="watermarkTextColor"
+              [label]="'BRANDING.TEXT_COLOR' | translate"
+              [placeholder]="'#ffffff'"
+              icon="pi-pencil"
+              [required]="true"
+              [readonly]="isView"
+              [showError]="showFieldError('watermarkTextColor')"
+              [errorMessage]="'BRANDING.HEX_INVALID' | translate"
+            ></app-custom-input>
+            <label
+              class="color-swatch"
+              [class.disabled]="isView"
+              [style.background-color]="swatchValue('watermarkTextColor')"
+            >
+              <input
+                type="color"
+                [value]="swatchValue('watermarkTextColor')"
+                [disabled]="isView"
+                (input)="onColorPicked('watermarkTextColor', $any($event.target).value)"
+                aria-hidden="true"
+                tabindex="-1"
+              />
+            </label>
+          </div>
+
+          <!-- Live preview pill -->
+          <div class="watermark-preview">
+            <span class="preview-label">{{ 'BRANDING.PREVIEW' | translate }}</span>
+            <span
+              class="watermark-pill"
+              [style.background-color]="swatchValue('watermarkBgColor')"
+              [style.color]="swatchValue('watermarkTextColor')"
+            >
+              {{
+                form.value.watermarkText ||
+                  ('BRANDING.WATERMARK_PLACEHOLDER' | translate)
+              }}
+            </span>
+          </div>
+        </ng-container>
+      </div>
+
+      <p class="theme-hint">
+        <i class="pi pi-info-circle"></i>
+        {{ 'BRANDING.RE_LOGIN_HINT' | translate }}
+      </p>
+    </form>
+  </div>
+</div>
