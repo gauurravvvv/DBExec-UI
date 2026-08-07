@@ -5715,7 +5715,25 @@
       "MENU_BORDER": "Menu border",
       "MENU_HOVER": "Menu hover"
     },
-    "RESET": "Reset",
-    "RESET_SECTION": "Reset this section to defaults"
+    "LIBRARY": "Theme library",
+    "LIBRARY_HINT": "Pick a theme to apply across the application, or customise your own.",
+    "ACTIVE": "Active",
+    "BUILT_IN": "Built-in",
+    "TRY_OUT": "Try out",
+    "STOP_TRYOUT": "Stop preview",
+    "TRYOUT_ACTIVE": "Previewing a theme — not saved yet.",
+    "APPLY": "Apply",
+    "ALREADY_ACTIVE": "Already active",
+    "VIEW_COLOURS": "View colours",
+    "BUILT_IN_READONLY": "Built-in theme (view only)",
+    "CANT_DELETE_ACTIVE": "Switch to another theme before deleting this one",
+    "CUSTOMISE": "Customise colours",
+    "SAVE_AS_NEW": "Save as new",
+    "EDITING_ACTIVE": "Editing the active theme \"{{name}}\". Save updates it for everyone on next sign-in.",
+    "EDITING_SEEDED": "This is a built-in theme. Use \"Save as new\" to keep your changes as a custom theme.",
+    "PRESET_NAME": "Theme name",
+    "PRESET_NAME_PLACEHOLDER": "e.g. Company Brand",
+    "DELETE_TITLE": "Delete theme",
+    "DELETE_CONFIRM": "Delete the theme \"{{name}}\"?"
   }
 }

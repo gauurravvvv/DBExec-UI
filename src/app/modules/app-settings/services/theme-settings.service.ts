@@ -4,38 +4,49 @@ import { THEME } from 'src/app/core/constants/api.constant';
 import { HttpClientService } from 'src/app/core/services/http-client.service';
 import { ThemePayload } from 'src/app/core/services/theme.service';
 
+/** One palette in the org's theme library. */
+export interface ThemePreset {
+  id: string;
+  name: string;
+  description?: string | null;
+  colors: Record<string, string>;
+  isActive: boolean;
+  isSeeded: boolean;
+  sortOrder: number;
+  createdOn?: string;
+  updatedOn?: string;
+}
+
 /**
- * ThemeSettingsService — settings-form-facing CRUD for the org's
- * branding row.
+ * ThemeSettingsService — the Theme tab's data layer.
  *
- * Reads pipe through _cancelReads$ so the settings component can
- * cancel an in-flight GET on ngOnDestroy. Save and reset don't pipe
- * — half-applied branding writes leave the row in a weird state and
- * are worse than letting the request finish.
- *
- * Save / reset persist to the DB and update the local `current()`
- * signal so the form re-binds to the new values, but they do NOT
- * re-inject CSS variables for the current session. The editing
- * admin sees the new theme on their next sign-in, the same as every
- * other user in the org. The "Changes apply on next sign-in" hint
- * under the form communicates this contract to the admin.
+ * Holds the org's preset library + the active theme colours. Editing in
+ * the tab's colour editor saves to the ACTIVE preset (`save`); the
+ * gallery lists presets and switches the active one (`activatePreset`).
+ * Persisted changes apply to everyone on their next sign-in — the
+ * editing admin sees a live preview locally via ThemeService, but the
+ * server-side switch is what other users get.
  */
 @Injectable({ providedIn: 'root' })
 export class ThemeSettingsService {
   private readonly http = inject(HttpClientService);
 
   private _current = signal<ThemePayload | null>(null);
+  private _presets = signal<ThemePreset[]>([]);
   private _loading = signal(false);
   private _saving = signal(false);
-  private _resetting = signal(false);
+  private _busyPresetId = signal<string | null>(null);
 
   readonly current = this._current.asReadonly();
+  readonly presets = this._presets.asReadonly();
   readonly loading = this._loading.asReadonly();
   readonly saving = this._saving.asReadonly();
-  readonly resetting = this._resetting.asReadonly();
+  /** Id of the preset a switch/edit/delete is currently running for. */
+  readonly busyPresetId = this._busyPresetId.asReadonly();
 
   private _cancelReads$ = new Subject<void>();
 
+  /** Active theme colours (for the editor form). */
   async load(): Promise<void> {
     this._loading.set(true);
     try {
@@ -52,47 +63,76 @@ export class ThemeSettingsService {
     }
   }
 
+  /** The org's preset library, for the picker gallery. */
+  async loadPresets(): Promise<void> {
+    try {
+      const res: any = await lastValueFrom(
+        this.http
+          .apiGet(THEME.PRESETS, { skipLoader: true })
+          .pipe(takeUntil(this._cancelReads$)),
+      );
+      if (res?.status && Array.isArray(res.data)) this._presets.set(res.data);
+    } catch (err) {
+      if (!(err instanceof EmptyError)) throw err;
+    }
+  }
+
+  /** Save the editor's colours into the active preset. */
   async save(payload: Partial<ThemePayload>): Promise<any> {
     this._saving.set(true);
     try {
       const res: any = await lastValueFrom(
         this.http.apiPost(THEME.SAVE, payload, { skipLoader: true }),
       );
-      // Persist the returned row in the settings-form signal so the
-      // form re-binds (e.g. the "Reset to default" button updates
-      // its hidden state via isDefault). The visible theme does NOT
-      // change here — the editing admin sees the new colours after
-      // their next sign-in, same as everyone else.
-      if (res?.status && res?.data) {
-        this._current.set(res.data);
-      }
       return res;
     } finally {
       this._saving.set(false);
     }
   }
 
-  /**
-   * Reset the theme. With no argument, resets EVERY colour to platform
-   * defaults. With a `group` (a theme-tokens section) it resets only
-   * that section's colours, leaving the rest of the org's overrides in
-   * place. The BE returns the full resolved colour map either way.
-   */
-  async reset(group?: string): Promise<any> {
-    this._resetting.set(true);
+  /** Quick-switch — make a preset the org's active theme. */
+  async activatePreset(id: string): Promise<any> {
+    this._busyPresetId.set(id);
     try {
-      const body = group ? { group } : {};
       const res: any = await lastValueFrom(
-        this.http.apiPost(THEME.RESET, body, { skipLoader: true }),
+        this.http.apiPost(THEME.activatePreset(id), {}, { skipLoader: true }),
       );
-      // Same contract as save: persist the row but don't repaint
-      // the current session.
-      if (res?.status && res?.data) {
-        this._current.set(res.data);
-      }
+      if (res?.status) await this.loadPresets();
       return res;
     } finally {
-      this._resetting.set(false);
+      this._busyPresetId.set(null);
+    }
+  }
+
+  createPreset(body: {
+    name: string;
+    description?: string;
+    colors: Record<string, string>;
+  }): Promise<any> {
+    return lastValueFrom(
+      this.http.apiPost(THEME.PRESETS, body, { skipLoader: true }),
+    );
+  }
+
+  updatePreset(
+    id: string,
+    body: { name?: string; description?: string; colors?: Record<string, string> },
+  ): Promise<any> {
+    return lastValueFrom(
+      this.http.apiPut(THEME.preset(id), body, { skipLoader: true }),
+    );
+  }
+
+  async deletePreset(id: string): Promise<any> {
+    this._busyPresetId.set(id);
+    try {
+      const res: any = await lastValueFrom(
+        this.http.apiDelete(THEME.preset(id), { skipLoader: true }),
+      );
+      if (res?.status) await this.loadPresets();
+      return res;
+    } finally {
+      this._busyPresetId.set(null);
     }
   }
 

@@ -401,10 +401,13 @@ export const GLOBAL_SEARCH = {
 export const THEME = {
   GET: '/theme',
   SAVE: '/theme',
-  RESET: '/theme/reset',
   // Unauthenticated colour-only lookup by org name — used by the login
   // + relay pages to paint the org theme before a session exists.
   PUBLIC: '/theme/public',
+  // Theme preset library
+  PRESETS: '/theme/presets',
+  preset: (id: string) => `/theme/presets/${id}`,
+  activatePreset: (id: string) => `/theme/presets/${id}/activate`,
 };
 
 export const BRANDING = {

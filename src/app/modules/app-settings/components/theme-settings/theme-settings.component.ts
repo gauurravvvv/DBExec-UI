@@ -19,7 +19,10 @@ import {
   ThemeToken,
   ThemeTokenGroup,
 } from 'src/app/shared/theme/theme-tokens';
-import { ThemeSettingsService } from '../../services/theme-settings.service';
+import {
+  ThemePreset,
+  ThemeSettingsService,
+} from '../../services/theme-settings.service';
 import { SettingsTabForm } from '../../settings-tab-form';
 
 const HEX_PATTERN = /^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/;
@@ -27,24 +30,22 @@ const HEX_PATTERN = /^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/;
 interface TokenGroupView {
   group: ThemeTokenGroup;
   tokens: ThemeToken[];
-  /** Collapsed state — brand is open by default, the rest collapsed. */
   open: boolean;
 }
 
 /**
- * ThemeSettingsComponent — full colour-palette editor.
+ * ThemeSettingsComponent — theme LIBRARY picker + colour editor.
  *
- * Every configurable colour in the app (the `theme-tokens.ts` registry)
- * gets one swatch + hex control, grouped into collapsible sections. The
- * form is built dynamically from the registry so adding a token needs
- * no change here.
+ * Top: a gallery of the org's presets (seeded + custom). Each card can
+ * be Tried out (live preview only, revertible), Applied (persisted
+ * active), Viewed, and — for custom presets — Edited/Deleted. Below the
+ * gallery, the 44-control editor edits the ACTIVE preset (Save) or can
+ * "Save as new preset".
  *
- * Live preview: edits apply to the CURRENT session's `:root` immediately
- * via ThemeService so the admin sees the result as they type. On leaving
- * the page (or reset without save) the authoritative theme is restored.
- * Persisted save still follows the "applies to everyone on next sign-in"
- * contract (the BE returns the row; the visible theme for OTHER users
- * changes on their next session).
+ * Live preview: editor changes + try-out apply to THIS tab's :root via
+ * ThemeService immediately; the authoritative theme is restored on
+ * destroy or on "stop trying out". Persisted activation/save is what
+ * other users get on next sign-in.
  */
 @Component({
   selector: 'app-theme-settings',
@@ -56,18 +57,28 @@ export class ThemeSettingsComponent
   implements OnInit, OnDestroy, HasUnsavedChanges, SettingsTabForm
 {
   themeForm!: FormGroup;
-  isDefault = true;
 
-  /** Which section a per-section reset is currently running for (the
-   *  group id), so only that accordion's button shows a spinner. */
-  resettingGroup: ThemeTokenGroup | null = null;
-
-  /** The registry, grouped for the template. */
+  /** The registry, grouped for the editor accordion. */
   groups: TokenGroupView[] = [];
+
+  /** Preset currently being "tried out" (live-previewed, not saved). */
+  tryingOutId: string | null = null;
+  /** Whether the editor panel is expanded (collapsed by default; the
+   *  gallery is the primary surface). */
+  editorOpen = false;
+
+  // Save-as-new preset dialog
+  showSaveAsDialog = false;
+  newPresetName = '';
+  savingNew = false;
+
+  // Delete confirm
+  presetToDelete: ThemePreset | null = null;
 
   loading = this.themeService.loading;
   saving = this.themeService.saving;
-  resetting = this.themeService.resetting;
+  presets = this.themeService.presets;
+  busyPresetId = this.themeService.busyPresetId;
 
   private readonly destroyRef = inject(DestroyRef);
 
@@ -88,8 +99,7 @@ export class ThemeSettingsComponent
   hasUnsavedChanges(): boolean {
     return this.isFormDirty;
   }
-
-  // SettingsTabForm — lets the hub's single Save button drive this tab.
+  // SettingsTabForm — the hub Save drives the editor save (active preset).
   get dirty(): boolean {
     return this.isFormDirty;
   }
@@ -98,9 +108,7 @@ export class ThemeSettingsComponent
   }
 
   ngOnInit(): void {
-    this.loadTheme();
-    // Live-preview: any value change (typed hex or swatch pick) applies
-    // to THIS tab's :root, debounced so typing stays smooth.
+    this.loadAll();
     this.themeForm.valueChanges
       .pipe(debounceTime(120), takeUntilDestroyed(this.destroyRef))
       .subscribe(() => this.livePreview());
@@ -108,30 +116,116 @@ export class ThemeSettingsComponent
 
   ngOnDestroy(): void {
     this.themeService.cancelReads();
-    // Restore the authoritative session theme — the live preview only
-    // ever applied to this admin's current tab.
+    // Restore the authoritative session theme — try-out / editor preview
+    // only ever painted this admin's current tab.
     this.themeInjector.applyFromLogin(this.themeInjector.theme());
   }
 
-  // ── Form construction (registry-driven) ─────────────────────────
+  // ── Load ────────────────────────────────────────────────────
+  private async loadAll(): Promise<void> {
+    await Promise.all([this.themeService.load(), this.themeService.loadPresets()]);
+    const data = this.themeService.current();
+    if (data) this.patchFromColors(data.colors ?? {}, data);
+    this.themeForm.markAsPristine();
+    this.cdr.markForCheck();
+  }
+
+  get activePreset(): ThemePreset | undefined {
+    return this.presets().find(p => p.isActive);
+  }
+
+  // ── Gallery actions ─────────────────────────────────────────
+  /** Live-preview a preset WITHOUT persisting. Revertible. */
+  tryOut(preset: ThemePreset, event: MouseEvent): void {
+    event.stopPropagation();
+    this.tryingOutId = preset.id;
+    this.themeInjector.applyFromLogin({ colors: preset.colors } as any);
+    this.cdr.markForCheck();
+  }
+
+  /** Stop trying out — restore the authoritative (active) theme. */
+  stopTryOut(): void {
+    this.tryingOutId = null;
+    this.themeInjector.applyFromLogin(this.themeInjector.theme());
+    this.cdr.markForCheck();
+  }
+
+  /** Persist a preset as the org's active theme (quick-switch). */
+  async apply(preset: ThemePreset, event: MouseEvent): Promise<void> {
+    event.stopPropagation();
+    if (this.busyPresetId()) return;
+    const res = await this.themeService.activatePreset(preset.id);
+    if (this.globalService.handleSuccessService(res)) {
+      this.tryingOutId = null;
+      // Reload the active colours into the editor + repaint authoritatively.
+      await this.themeService.load();
+      const data = this.themeService.current();
+      if (data) {
+        this.patchFromColors(data.colors ?? {}, data);
+        this.themeForm.markAsPristine();
+        this.themeInjector.applyFromLogin({ colors: data.colors } as any);
+      }
+      this.cdr.markForCheck();
+    }
+  }
+
+  /** Load a preset's colours into the editor for viewing/editing. */
+  openInEditor(preset: ThemePreset): void {
+    this.patchFromColors(preset.colors, preset as any);
+    this.themeForm.markAsPristine();
+    this.editorOpen = true;
+    this.livePreview();
+    this.cdr.markForCheck();
+  }
+
+  confirmDeletePreset(preset: ThemePreset, event: MouseEvent): void {
+    event.stopPropagation();
+    this.presetToDelete = preset;
+  }
+  cancelDeletePreset(): void {
+    this.presetToDelete = null;
+  }
+  async proceedDeletePreset(): Promise<void> {
+    if (!this.presetToDelete) return;
+    const res = await this.themeService.deletePreset(this.presetToDelete.id);
+    this.presetToDelete = null;
+    this.globalService.handleSuccessService(res);
+    this.cdr.markForCheck();
+  }
+
+  /** A few representative swatches for a preset card's strip. */
+  swatchStrip(preset: ThemePreset): string[] {
+    const c = preset.colors || {};
+    return [
+      c['primary'],
+      c['background'],
+      c['cardBackground'],
+      c['textColor'],
+      c['successColor'],
+    ].filter(Boolean);
+  }
+
+  trackPreset(_i: number, p: ThemePreset): string {
+    return p.id;
+  }
+
+  // ── Editor (active preset) ──────────────────────────────────
   private buildGroups(): void {
     this.groups = THEME_TOKEN_GROUPS.map((group, i) => ({
       group,
       tokens: THEME_TOKENS.filter(t => t.group === group),
-      open: i === 0, // Brand open by default
+      open: i === 0,
     }));
   }
 
   private initForm(): void {
     const controls: Record<string, any> = {};
     for (const token of THEME_TOKENS) {
-      // Primary is required; every other colour is optional (blank →
-      // fall back to the platform default on the BE merge).
       const validators =
         token.key === 'primary'
           ? [Validators.required, Validators.pattern(HEX_PATTERN)]
           : token.key === 'primaryText'
-            ? [] // accepts white/black keyword or hex — validated on save
+            ? []
             : [Validators.pattern(HEX_PATTERN)];
       controls[token.key] = ['', validators];
     }
@@ -141,32 +235,24 @@ export class ThemeSettingsComponent
   toggleGroup(view: TokenGroupView): void {
     view.open = !view.open;
   }
-
   trackByGroup(_i: number, g: TokenGroupView): string {
     return g.group;
   }
-
-  private async loadTheme(): Promise<void> {
-    await this.themeService.load();
-    const data = this.themeService.current();
-    if (!data) return;
-    this.isDefault = data.isDefault ?? true;
-    this.patchFromColors(data.colors ?? {}, data);
-    this.themeForm.markAsPristine();
-    this.cdr.markForCheck();
+  toggleEditor(): void {
+    this.editorOpen = !this.editorOpen;
   }
 
-  /** Seed every control from the colours map, falling back to the
-   *  legacy brand fields for their four keys. */
   private patchFromColors(
     colors: Record<string, string>,
-    data: { primary?: string; primaryHover?: string; primaryLight?: string; primaryText?: string },
+    data: {
+      primary?: string;
+      primaryHover?: string;
+      primaryLight?: string;
+      primaryText?: string;
+    },
   ): void {
     const patch: Record<string, string> = {};
-    for (const token of THEME_TOKENS) {
-      patch[token.key] = colors[token.key] ?? '';
-    }
-    // Legacy fields win for their keys if the map didn't carry them.
+    for (const token of THEME_TOKENS) patch[token.key] = colors[token.key] ?? '';
     if (data.primary) patch['primary'] = colors['primary'] ?? data.primary;
     if (data.primaryHover)
       patch['primaryHover'] = colors['primaryHover'] ?? data.primaryHover;
@@ -177,34 +263,25 @@ export class ThemeSettingsComponent
     this.themeForm.patchValue(patch);
   }
 
-  /**
-   * Native swatch → form control. The swatch always emits a valid
-   * 6-char hex, so we preview IMMEDIATELY (bypassing the typed-hex
-   * debounce) — the workspace repaints on every drag frame so the
-   * admin sees the colour change under the cursor in real time.
-   */
   onColorPicked(controlName: string, value: string): void {
     this.themeForm.get(controlName)?.setValue(value, { emitEvent: false });
     this.themeForm.get(controlName)?.markAsDirty();
     this.livePreview();
   }
 
-  /**
-   * Apply the current form values to THIS tab's `:root` so the admin
-   * sees a live preview while editing. Only well-formed values are
-   * emitted (ThemeService re-validates); the persisted contract for
-   * other users is unchanged.
-   */
-  private livePreview(): void {
+  private editorColors(): Record<string, string> {
     const colors: Record<string, string> = {};
     for (const token of THEME_TOKENS) {
       const v = String(this.themeForm.get(token.key)?.value ?? '').trim();
       if (v) colors[token.key] = v;
     }
-    this.themeInjector.applyFromLogin({ colors } as any);
+    return colors;
   }
 
-  /** Native picker `value` — normalises to a 6-char hex or grey. */
+  private livePreview(): void {
+    this.themeInjector.applyFromLogin({ colors: this.editorColors() } as any);
+  }
+
   swatchValue(controlName: string): string {
     const raw = String(this.themeForm.get(controlName)?.value ?? '').trim();
     if (/^#[0-9a-fA-F]{6}$/.test(raw)) return raw.toLowerCase();
@@ -215,64 +292,62 @@ export class ThemeSettingsComponent
     return '#cccccc';
   }
 
-  /** True iff a control is invalid + touched (for the error border). */
   showFieldError(controlName: string): boolean {
     const c = this.themeForm.get(controlName);
     return !!(c?.invalid && c?.touched);
   }
 
-  // ── Save flow ───────────────────────────────────────────────
+  /** Whether the active preset is seeded (view-only → editor Save hidden). */
+  get activeIsSeeded(): boolean {
+    return !!this.activePreset?.isSeeded;
+  }
+
+  // Save the editor colours into the ACTIVE preset (hub Save calls this).
   async onSave(): Promise<void> {
+    if (this.activeIsSeeded) {
+      // Seeded active preset is view-only — steer to Save as new.
+      this.openSaveAsDialog();
+      return;
+    }
     if (this.themeForm.invalid) {
       this.themeForm.markAllAsTouched();
       return;
     }
     if (this.saving()) return;
-
-    // Send only the keys the admin actually set (non-blank), as a
-    // `colors` partial. The BE merges over existing/default.
-    const colors: Record<string, string> = {};
-    for (const token of THEME_TOKENS) {
-      const v = String(this.themeForm.get(token.key)?.value ?? '').trim();
-      if (v) colors[token.key] = v;
-    }
-
-    const res = await this.themeService.save({ colors } as any);
+    const res = await this.themeService.save({ colors: this.editorColors() } as any);
     if (this.globalService.handleSuccessService(res)) {
-      this.isDefault = false;
       this.themeForm.markAsPristine();
+      await this.themeService.loadPresets();
+      // repaint authoritatively from the saved active preset
+      this.themeInjector.applyFromLogin({ colors: this.editorColors() } as any);
       this.cdr.markForCheck();
     }
   }
 
-  // ── Reset flow (per-section only) ───────────────────────────
-  /**
-   * Per-section reset — restores just this group's colours to the
-   * platform defaults, leaving every other override intact. Runs
-   * inline (no confirm popup) since it's scoped and reversible; the
-   * header button spins only for the group being reset.
-   */
-  async resetSection(view: TokenGroupView, event: MouseEvent): Promise<void> {
-    event.stopPropagation(); // don't toggle the accordion
-    if (this.resetting() || this.resettingGroup) return;
-    this.resettingGroup = view.group;
-    this.cdr.markForCheck();
+  // ── Save as new preset ──────────────────────────────────────
+  openSaveAsDialog(): void {
+    this.newPresetName = '';
+    this.showSaveAsDialog = true;
+  }
+  cancelSaveAs(): void {
+    this.showSaveAsDialog = false;
+  }
+  async proceedSaveAs(): Promise<void> {
+    const name = this.newPresetName.trim();
+    if (!name || this.savingNew) return;
+    this.savingNew = true;
     try {
-      const res = await this.themeService.reset(view.group);
+      const res = await this.themeService.createPreset({
+        name,
+        colors: this.editorColors(),
+      });
       if (this.globalService.handleSuccessService(res)) {
-        const data = this.themeService.current();
-        if (data) {
-          this.isDefault = data.isDefault ?? true;
-          this.patchFromColors(data.colors ?? {}, data);
-          // Keep the section's controls "dirty-free" after a reset so
-          // the hub Save button doesn't light up from a reset alone.
-          this.themeForm.markAsPristine();
-          this.livePreview();
-          if (!view.open) view.open = true; // reveal what changed
-        }
+        this.showSaveAsDialog = false;
+        await this.themeService.loadPresets();
+        this.cdr.markForCheck();
       }
     } finally {
-      this.resettingGroup = null;
+      this.savingNew = false;
       this.cdr.markForCheck();
     }
   }
