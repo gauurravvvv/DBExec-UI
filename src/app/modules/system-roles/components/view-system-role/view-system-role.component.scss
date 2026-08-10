@@ -1,0 +1,399 @@
+.view-role-wrapper {
+  background-color: var(--card-background);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+
+  .view-role-container {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+
+    .page-header {
+      padding: var(--space-7);
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--card-background);
+      border-radius: 8px 8px 0 0;
+      position: sticky;
+      top: 0;
+      z-index: var(--z-elevated);
+
+      .left-section {
+        display: flex;
+        align-items: center;
+        gap: var(--space-5);
+
+        h2 {
+          margin: var(--space-0);
+          color: var(--text-color);
+        }
+      }
+
+      .header-actions {
+        display: flex;
+        gap: var(--space-5);
+
+        button {
+          display: inline-flex;
+          align-items: center;
+          gap: var(--space-4);
+          padding: 0.6rem 1.25rem;
+          border-radius: var(--radius-sm);
+          font-weight: var(--fw-semibold);
+          font-size: var(--fs-body);
+          cursor: pointer;
+          transition: all var(--motion-base) ease;
+          border: none;
+        }
+
+        .btn-primary {
+          background: linear-gradient(
+            135deg,
+            var(--primary-color),
+            var(--primary-hover)
+          );
+          color: var(--primary-text);
+          box-shadow: 0 4px 10px var(--primary-color-transparent);
+
+          &:hover {
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+          }
+        }
+      }
+    }
+
+    .profile-container {
+      padding: var(--space-9);
+      overflow-y: auto;
+      flex: 1;
+      height: calc(100% - 80px);
+
+      &::-webkit-scrollbar {
+        width: 8px;
+      }
+
+      &::-webkit-scrollbar-track {
+        background: var(--card-background);
+        border-radius: var(--radius-xs);
+      }
+
+      &::-webkit-scrollbar-thumb {
+        background: var(--border-color);
+        border-radius: var(--radius-xs);
+
+        &:hover {
+          background: var(--secondary-color);
+        }
+      }
+
+      .details-grid {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-10);
+
+        .first-row {
+          display: grid;
+          grid-template-columns: repeat(2, 1fr);
+          gap: var(--space-9);
+        }
+      }
+
+      .avatar-section {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: var(--space-7);
+
+        .role-icon-circle {
+          width: 120px;
+          height: 120px;
+          border-radius: 50%;
+          background: linear-gradient(
+            135deg,
+            var(--primary-color),
+            var(--primary-hover)
+          );
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          margin-bottom: 16px;
+          box-shadow: 0 8px 24px var(--primary-color-transparent);
+
+          i {
+            font-size: var(--fs-h1);
+            color: var(--primary-text);
+          }
+        }
+
+        .role-name {
+          margin: 10px 0 5px;
+          font-size: var(--fs-h1);
+          text-align: center;
+          color: var(--text-color);
+        }
+
+        .default-badge {
+          display: inline-block;
+          padding: 0.2rem 0.6rem;
+          background: var(--primary-color-transparent);
+          color: var(--primary-color);
+          border-radius: var(--radius-xs);
+          font-size: var(--fs-control);
+          font-weight: var(--fw-semibold);
+          margin-top: 4px;
+        }
+      }
+
+      .detail-group {
+        background: var(--card-background);
+        padding: var(--space-7);
+        border-radius: var(--radius-md);
+        height: fit-content;
+
+        h4 {
+          color: var(--text-color);
+          margin-bottom: 20px;
+          padding-bottom: 10px;
+          border-bottom: 2px solid var(--border-color);
+        }
+
+        .detail-item {
+          margin-bottom: 20px;
+
+          &:last-child {
+            margin-bottom: 0;
+          }
+
+          .label {
+            display: flex;
+            align-items: center;
+            gap: var(--space-4);
+            color: var(--secondary-color);
+            margin-bottom: 5px;
+
+            i {
+              font-size: var(--fs-h3);
+              color: var(--text-color);
+            }
+          }
+
+          .value {
+            display: block;
+            font-size: var(--fs-h2);
+            color: var(--text-color);
+            padding: 4px 0;
+
+            .status-badge {
+              display: inline-block;
+              padding: 0.3rem 0.6rem;
+              border-radius: var(--radius-xs);
+              font-size: var(--fs-body);
+              font-weight: var(--fw-medium);
+              background: rgba(var(--error-rgb), 0.15);
+              color: var(--error-color);
+
+              &.active {
+                background: rgba(var(--success-rgb), 0.15);
+                color: var(--success-color);
+              }
+            }
+          }
+        }
+      }
+
+      // Read-only permission grid: compact tree style, same shape
+      // as Add/Edit (see add-role.component.scss for design notes).
+      .permissions-section {
+        margin-top: 1.25rem;
+
+        .section-title {
+          font-size: var(--fs-h3);
+          font-weight: var(--fw-medium);
+          color: var(--text-color);
+          margin-bottom: 0.5rem;
+          padding-bottom: 0.5rem;
+          border-bottom: 1px solid var(--border-color);
+          display: block;
+          letter-spacing: -0.005em;
+        }
+
+        .permission-grid {
+          width: 100%;
+          border: 1px solid var(--border-color);
+          border-radius: var(--radius-md);
+          overflow: hidden;
+          background: var(--card-background);
+          font-size: var(--fs-body);
+        }
+
+        .grid-row {
+          display: grid;
+          grid-template-columns: minmax(220px, 2fr) minmax(120px, 1fr);
+          align-items: center;
+          border-bottom: 1px solid var(--border-color);
+          min-height: 32px;
+
+          &:last-child {
+            border-bottom: 0;
+          }
+        }
+
+        .grid-cell {
+          padding: 0.3rem 0.75rem;
+          display: flex;
+          align-items: center;
+          color: var(--text-color);
+          font-size: var(--fs-body);
+          line-height: 1.3;
+        }
+
+        .grid-cell--level {
+          justify-content: center;
+        }
+
+        .grid-row--header {
+          background: var(--hover-background);
+          border-bottom: 1px solid var(--border-color);
+
+          .grid-cell {
+            padding-top: 0.4rem;
+            padding-bottom: 0.4rem;
+            font-size: var(--fs-label);
+            font-weight: var(--fw-medium);
+            opacity: 0.7;
+          }
+        }
+
+        .grid-row--module .grid-cell--module {
+          font-weight: var(--fw-medium);
+
+          i {
+            margin-right: 0.45rem;
+            color: var(--primary-color);
+            font-size: var(--fs-body);
+          }
+        }
+
+        .grid-children {
+          .grid-row--leaf {
+            .grid-cell--leaf {
+              padding-left: 2.25rem;
+              position: relative;
+              opacity: 0.9;
+
+              &::before {
+                content: '';
+                position: absolute;
+                left: 1.15rem;
+                top: 0;
+                bottom: 0;
+                width: 1px;
+                background: var(--border-color);
+              }
+            }
+
+            &:hover {
+              background: var(--hover-background);
+            }
+          }
+
+          .grid-row--leaf:last-child .grid-cell--leaf::before {
+            bottom: 50%;
+          }
+        }
+
+        .level-chip {
+          display: inline-block;
+          padding: 0.2rem 0.65rem;
+          border-radius: var(--radius-lg, 999px);
+          font-size: var(--fs-label);
+          font-weight: var(--fw-semibold);
+          background: var(--hover-background);
+          color: var(--secondary-color);
+
+          // Colour per access-level code. Codes are lower-cased by the
+          // component (full / write / read / none) so we can match
+          // them on the `data-level` attribute.
+          &[data-level='none'] {
+            background: rgba(var(--secondary-rgb, 100, 116, 139), 0.12);
+            color: var(--secondary-color);
+          }
+          &[data-level='read'] {
+            background: rgba(var(--info-rgb, 14, 165, 233), 0.15);
+            color: var(--info-color, var(--primary-color));
+          }
+          &[data-level='write'] {
+            background: rgba(var(--warning-rgb, 234, 179, 8), 0.18);
+            color: var(--warning-color, var(--primary-color));
+          }
+          &[data-level='full'] {
+            background: rgba(var(--success-rgb, 34, 197, 94), 0.18);
+            color: var(--success-color);
+          }
+        }
+      }
+
+      .no-permissions {
+        margin-top: 20px;
+        padding: var(--space-7);
+        text-align: center;
+        color: var(--secondary-color);
+        background: var(--hover-background);
+        border-radius: var(--radius-md);
+      }
+    }
+  }
+}
+
+// Override PrimeNG button styles
+:host ::ng-deep {
+  .p-button {
+    &.p-button-text {
+      background: transparent !important;
+      border: none !important;
+      color: var(--text-color) !important;
+      min-width: 0;
+      padding: var(--space-0);
+      width: 36px;
+      height: 36px;
+      border-radius: 50% !important;
+
+      &:hover {
+        background: var(--hover-background) !important;
+      }
+
+      i {
+        color: var(--text-color) !important;
+      }
+    }
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .view-role-wrapper {
+    .profile-container {
+      .details-grid {
+        .first-row {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .permissions-section {
+        .permission-grid {
+          grid-template-columns: minmax(150px, 2fr) minmax(90px, 1fr);
+        }
+
+        .grid-cell {
+          padding: 0.5rem 0.75rem;
+        }
+      }
+    }
+  }
+}

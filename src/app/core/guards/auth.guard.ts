@@ -32,7 +32,7 @@ function getDefaultRouteByPermissions(
   permissionService: PermissionService,
 ): string {
   if (!authService.isLoggedIn()) return AUTH_ROUTES.LOGIN;
-  return permissionService.canRead(PERMISSIONS.SYSTEM_ADMIN)
+  return permissionService.canRead(PERMISSIONS.SYSTEM_USER_MANAGEMENT)
     ? HOME_ROUTES.SYSTEM_ADMIN
     : HOME_ROUTES.ORG_ADMIN;
 }

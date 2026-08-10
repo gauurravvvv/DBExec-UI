@@ -1,11 +1,7 @@
 import { Injectable, signal } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { EmptyError, Subject, lastValueFrom, takeUntil } from 'rxjs';
-import {
-  DATASET,
-  DATASOURCE,
-  SYSTEM_ADMIN,
-} from 'src/app/core/constants/api.constant';
+import { DATASET, DATASOURCE } from 'src/app/core/constants/api.constant';
 import { HttpClientService } from 'src/app/core/services/http-client.service';
 
 /**
@@ -208,36 +204,6 @@ export class DatasetService {
             payload.id +
             DATASET.UPDATE_VIA_BUILDER_SUFFIX,
           payload,
-          { skipLoader: true },
-        ),
-      );
-    } finally {
-      this._saving.set(false);
-    }
-  }
-
-  viewSystemAdmin(id: string) {
-    return lastValueFrom(
-      this.http.apiGet(SYSTEM_ADMIN.GET + `${id}`, { skipLoader: true }),
-    );
-  }
-
-  async updateSystemAdmin(systemAdminForm: FormGroup) {
-    const { id, fullName, username, email, mobile, status } =
-      systemAdminForm.value;
-    this._saving.set(true);
-    try {
-      return await lastValueFrom(
-        this.http.apiPut(
-          SYSTEM_ADMIN.UPDATE + id,
-          {
-            id,
-            fullName,
-            username,
-            email,
-            mobile,
-            status: status ? 1 : 0,
-          },
           { skipLoader: true },
         ),
       );

@@ -39,19 +39,6 @@ export const HOME = {
   SYSTEM_ADMIN: '/home/system-admin',
 };
 
-export const SYSTEM_ADMIN = {
-  BASE: '/system-admins',
-  LIST: '/system-admins',
-  ADD: '/system-admins',
-  GET: '/system-admins/', // GET /system-admins/:id
-  UPDATE: '/system-admins/', // PUT /system-admins/:id
-  DELETE: '/system-admins/', // DELETE /system-admins/:id
-  BULK_DELETE: '/system-admins/bulk-delete',
-  UPDATE_PASSWORD_PREFIX: '/system-admins/', // PUT /system-admins/:id/password
-  UPDATE_PASSWORD_SUFFIX: '/password',
-  UNLOCK_PREFIX: '/system-admins/', // POST /system-admins/:id/unlock
-  UNLOCK_SUFFIX: '/unlock',
-};
 
 export const ORGANISATION = {
   LIST: '/orgs',
@@ -306,6 +293,44 @@ export const ROLE = {
   DELETE: '/roles/',
   BULK_DELETE: '/roles/bulk-delete',
   LIST_PERMISSIONS: '/roles/permissions',
+};
+
+// ── System (master-DB) RBAC — platform equivalents of ROLE/GROUP/USER.
+// Same endpoint shapes, /system-* base paths. The permission grid still
+// reads the shared PERMISSIONS.LIST (/permissions?scope=SYSTEM) +
+// ACCESS_LEVELS.LIST.
+export const SYSTEM_ROLE = {
+  LIST: '/system-roles',
+  ADD: '/system-roles',
+  GET: '/system-roles/',
+  UPDATE: '/system-roles/',
+  DELETE: '/system-roles/',
+  BULK_DELETE: '/system-roles/bulk-delete',
+  LIST_PERMISSIONS: '/system-roles/permissions',
+};
+
+export const SYSTEM_GROUP = {
+  LIST: '/system-groups',
+  ADD: '/system-groups',
+  GET: '/system-groups/',
+  UPDATE: '/system-groups/',
+  DELETE: '/system-groups/',
+  BULK_DELETE: '/system-groups/bulk-delete',
+};
+
+export const SYSTEM_USER = {
+  LIST: '/system-users',
+  ADD: '/system-users',
+  GET: '/system-users/',
+  UPDATE: '/system-users/',
+  DELETE: '/system-users/',
+  BULK_DELETE: '/system-users/bulk-delete',
+  BULK_ADD_VALIDATE: '/system-users/bulk/validate',
+  BULK_ADD_COMMIT: '/system-users/bulk/commit',
+  UPDATE_PASSWORD_PREFIX: '/system-users/',
+  UPDATE_PASSWORD_SUFFIX: '/password',
+  UNLOCK_PREFIX: '/system-users/',
+  UNLOCK_SUFFIX: '/unlock',
 };
 
 // Relational RBAC — replaces the legacy permission-tree shape served

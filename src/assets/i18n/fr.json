@@ -2247,7 +2247,10 @@
     "EMBED_DASHBOARD": "Tableau de bord",
     "NOTIFICATIONS": "Notifications",
     "USER_ACTIVITY": "Activité",
-    "AI_WORKSPACE": "Assistant IA"
+    "AI_WORKSPACE": "Assistant IA",
+    "SYSTEM_ROLES": "Rôles système",
+    "SYSTEM_GROUPS": "Groupes système",
+    "SYSTEM_USERS": "Utilisateurs système"
   },
   "AUTH": {
     "HEADLINE_LOGIN": "Améliorez votre expérience\nde gestion de sources de données",
@@ -4183,6 +4186,10 @@
       },
       "users": {
         "idInvalid": "Un ou plusieurs identifiants d'utilisateur sont invalides"
+      },
+      "roleIds": {
+        "required": "Au moins un rôle doit être sélectionné",
+        "invalid": "Un ou plusieurs rôles sélectionnés sont invalides"
       }
     },
     "auth": {
@@ -5762,5 +5769,24 @@
     "DESC_PLACEHOLDER": "Optional short description",
     "SEARCH_PLACEHOLDER": "Search themes…",
     "PREVIEW": "Aperçu"
+  },
+  "SYSTEM_ROLE": {
+    "TITLE": "Rôles système",
+    "ADD_TITLE": "Ajouter un rôle système",
+    "EDIT_TITLE": "Modifier le rôle système",
+    "VIEW_TITLE": "Détails du rôle système"
+  },
+  "SYSTEM_GROUP": {
+    "TITLE": "Groupes système",
+    "ADD_TITLE": "Ajouter un groupe système",
+    "EDIT_TITLE": "Modifier le groupe système",
+    "VIEW_TITLE": "Détails du groupe système"
+  },
+  "SYSTEM_USER": {
+    "TITLE": "Utilisateurs système",
+    "ADD_TITLE": "Ajouter un utilisateur système",
+    "EDIT_TITLE": "Modifier l’utilisateur système",
+    "VIEW_TITLE": "Détails de l’utilisateur système",
+    "BULK_ADD_TITLE": "Ajout groupé d’utilisateurs système"
   }
 }

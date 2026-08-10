@@ -10,7 +10,11 @@
 // they would 404 if anyone added them. Removed.
 export const SIDEBAR_ITEMS_ROUTES = [
   { value: 'home', route: '/app/home' },
-  { value: 'systemAdmin', route: '/app/admins' },
+  // System (master-DB) RBAC — replaces the retired single 'systemAdmin'
+  // (/app/admins) entry with the three platform RBAC screens.
+  { value: 'systemRoleManagement', route: '/app/system-roles' },
+  { value: 'systemGroupManagement', route: '/app/system-groups' },
+  { value: 'systemUserManagement', route: '/app/system-users' },
   { value: 'orgManagement', route: '/app/organisations' },
   { value: 'userManagement', route: '/app/users' },
   { value: 'groupManagement', route: '/app/groups' },

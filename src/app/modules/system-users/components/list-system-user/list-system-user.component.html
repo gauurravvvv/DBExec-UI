@@ -1,0 +1,315 @@
+<div class="dataset-page-wrapper">
+  <div class="dataset-content-container">
+    <!-- Header Section -->
+    <div class="page-header-section">
+      <div class="header-content">
+        <h2>{{ 'SYSTEM_USER.TITLE' | translate }}</h2>
+      </div>
+
+      <div class="header-actions">
+        <!-- Bulk Add Button — routes to the bulk-add page -->
+        <button
+          *hasPermission="'systemUserManagement'; level: 'write'"
+          pButton
+          [label]="'USER.BULK_ADD_BTN' | translate"
+          icon="pi pi-upload"
+          (click)="onOpenBulkAdd()"
+          class="p-button-outlined modern-button"
+        ></button>
+
+        <!-- Add Button -->
+        <button
+          *hasPermission="'systemUserManagement'; level: 'write'"
+          pButton
+          [label]="'COMMON.ADD' | translate"
+          icon="pi pi-plus"
+          (click)="onAddNewAdmin()"
+          class="p-button-raised p-button-primary modern-button"
+        ></button>
+      </div>
+    </div>
+
+    <!-- Content Card -->
+    <div class="content-card">
+      <!-- Unified simple table. Infinite scroll, global search + on-demand
+           per-column filters (shared inputs), per-row actions. The Group
+           filter is projected into the toolbar's LEFT slot so it sits inline
+           with the search + action icons. Per-cell DOM via <ng-template
+           usGridCell>. -->
+      <div class="table-wrapper" *ngIf="adapter">
+        <app-custom-table
+          [columns]="cols"
+          [serverAdapter]="adapter"
+          [config]="tableConfig"
+          [hasProjectedEmpty]="true"
+          (refresh)="refreshList()"
+        >
+          <!-- Toolbar-left slot: server-driven Group filter dropdown. -->
+          <div tableToolbarStart class="users-toolbar-start">
+            <app-custom-dropdown
+              [(ngModel)]="selectedGroup"
+              [serverMode]="true"
+              [fetcher]="loadGroupsPage"
+              [pageSize]="10"
+              [preloadedItems]="preloadedGroups"
+              [preloadedTotal]="preloadedGroupsTotal"
+              optionLabel="name"
+              optionValue="id"
+              [filter]="true"
+              [floatingLabel]="true"
+              [label]="'COMMON.GROUP' | translate"
+              [showClear]="true"
+              [autoDisplayFirst]="false"
+              filterBy="name"
+              (onChangeEvent)="onGroupChange($event)"
+              icon="pi-users"
+            ></app-custom-dropdown>
+          </div>
+
+          <!-- Empty body — always projected so only one empty state shows. -->
+          <div tableEmpty class="ct-empty-body">
+            <i class="pi pi-inbox"></i>
+            <span>{{ 'COMMON.NO_RECORDS' | translate }}</span>
+          </div>
+          <ng-template usGridCell="username" let-user>
+            <span class="username-cell">
+              <a
+                class="dataset-name-link"
+                [routerLink]="['/app/system-users', user.id]"
+              >
+                {{ user.username }}
+              </a>
+              <!-- Self badge — the only identity marker now. The
+                   seeded admin is an ordinary user; the sole guard
+                   is self-protection, surfaced by this "You" chip. -->
+              <span
+                *ngIf="user.id === loggedInUserId"
+                class="row-badge row-badge--self"
+                >{{ 'COMMON.YOU_BADGE' | translate }}</span
+              >
+            </span>
+          </ng-template>
+
+          <ng-template usGridCell="fullName" let-user>
+            <span class="description-text">{{ user.fullName }}</span>
+          </ng-template>
+
+          <ng-template usGridCell="email" let-user>
+            <span class="description-text" [title]="user.email">{{
+              user.email
+            }}</span>
+          </ng-template>
+
+          <ng-template usGridCell="groups" let-user>
+            <span
+              class="description-text"
+              [title]="user.groupNames?.join(', ')"
+            >
+              {{
+                user.groupNames?.join(', ') || ('USER.NO_GROUPS' | translate)
+              }}
+            </span>
+          </ng-template>
+
+          <ng-template usGridCell="status" let-user>
+            <span
+              class="status-pill"
+              [ngClass]="{
+                locked: user.isLocked,
+                active: !user.isLocked && user.status === 1,
+                inactive: !user.isLocked && user.status !== 1,
+              }"
+            >
+              <span class="dot"></span>
+              <span class="label">
+                {{
+                  user.isLocked
+                    ? ('COMMON.LOCKED' | translate)
+                    : user.status === 1
+                      ? ('COMMON.ACTIVE' | translate)
+                      : ('COMMON.INACTIVE' | translate)
+                }}
+              </span>
+            </span>
+          </ng-template>
+
+          <ng-template usGridCell="lastLogin" let-user>
+            <span
+              class="date-text"
+              [title]="
+                user.lastLogin
+                  ? (user.lastLogin | date: 'dd MMM yyyy, HH:mm:ss')
+                  : ''
+              "
+            >
+              {{
+                user.lastLogin
+                  ? (user.lastLogin | relativeTime)
+                  : ('USER.NEVER_LOGGED_IN' | translate)
+              }}
+            </span>
+          </ng-template>
+
+          <ng-template usGridCell="createdOn" let-user>
+            <span
+              class="date-text"
+              [pTooltip]="
+                (user.createdOn | date: 'dd MMM yyyy, HH:mm:ss') || ''
+              "
+              tooltipPosition="top"
+            >
+              {{ user.createdOn | relativeTime }}
+            </span>
+          </ng-template>
+
+          <ng-template usGridCell="actions" let-user>
+            <div class="row-actions">
+              <!-- Unlock — gated on canUnlock from BE (false only for
+                   the caller's own row). Self-protection is the sole
+                   guard now; there is no default-user special case. -->
+              <button
+                *ngIf="user.isLocked"
+                class="icon-btn unlock-btn"
+                (click)="onUnlock(user.id)"
+                [disabled]="!user.canUnlock || isUnlocking(user.id)"
+                [attr.aria-label]="'COMMON.UNLOCK_ACCOUNT' | translate"
+                [pTooltip]="
+                  !user.canUnlock
+                    ? ('USER.CANNOT_MODIFY_SELF_HINT' | translate)
+                    : ('COMMON.UNLOCK_ACCOUNT' | translate)
+                "
+                tooltipPosition="bottom"
+              >
+                <i
+                  class="pi"
+                  [ngClass]="
+                    isUnlocking(user.id) ? 'pi-spin pi-spinner' : 'pi-lock-open'
+                  "
+                ></i>
+              </button>
+              <!-- Edit — gated on canEdit (false only for the caller's
+                   own row). Self changes go through /profile. -->
+              <button
+                *hasPermission="'systemUserManagement'; level: 'write'"
+                class="icon-btn edit-btn"
+                (click)="onEdit(user.id)"
+                [disabled]="!user.canEdit"
+                [attr.aria-label]="'COMMON.EDIT' | translate"
+                [pTooltip]="
+                  !user.canEdit
+                    ? ('USER.CANNOT_MODIFY_SELF_HINT' | translate)
+                    : ('COMMON.EDIT' | translate)
+                "
+                tooltipPosition="bottom"
+              >
+                <i class="pi pi-pencil"></i>
+              </button>
+              <button
+                *hasPermission="'systemUserManagement'; level: 'delete'"
+                class="icon-btn delete-btn"
+                (click)="confirmDelete(user.id)"
+                [attr.aria-label]="'COMMON.DELETE' | translate"
+                [pTooltip]="
+                  !user.canDelete
+                    ? ('USER.CANNOT_MODIFY_SELF_HINT' | translate)
+                    : ('COMMON.DELETE' | translate)
+                "
+                tooltipPosition="bottom"
+                [disabled]="!user.canDelete || isDeleting(user.id)"
+              >
+                <i
+                  class="pi"
+                  [ngClass]="
+                    isDeleting(user.id) ? 'pi-spin pi-spinner' : 'pi-trash'
+                  "
+                ></i>
+              </button>
+            </div>
+          </ng-template>
+        </app-custom-table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="confirmation-popup" *ngIf="showDeleteConfirm">
+  <div
+    class="popup-content"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="listUserDeleteTitle"
+  >
+    <!-- Header -->
+    <div class="popup-header">
+      <div class="popup-icon">
+        <i class="pi pi-trash"></i>
+      </div>
+      <h3 id="listUserDeleteTitle">
+        {{ 'COMMON.CONFIRM_DELETE' | translate }}
+      </h3>
+    </div>
+
+    <!-- Delete Info Section -->
+    <div class="standard-delete-section">
+      <p class="delete-intro">
+        {{ 'USER.CONFIRM_DELETE_SINGLE' | translate }}
+      </p>
+
+      <ul class="delete-info-list">
+        <li>
+          <i class="pi pi-info-circle"></i>
+          <span>{{ 'COMMON.DELETE_ACCESS_REVOKED' | translate }}</span>
+        </li>
+        <li>
+          <i class="pi pi-info-circle"></i>
+          <span>{{ 'COMMON.DELETE_CREDENTIALS_INVALIDATED' | translate }}</span>
+        </li>
+        <li>
+          <i class="pi pi-info-circle"></i>
+          <span>{{ 'COMMON.DELETE_CANNOT_UNDO' | translate }}</span>
+        </li>
+      </ul>
+
+      <div class="justification-section">
+        <label for="deleteJustification"
+          >{{ 'COMMON.JUSTIFICATION' | translate }}
+          <span class="required">*</span></label
+        >
+        <app-custom-textarea
+          inputId="deleteJustification"
+          [(ngModel)]="deleteJustification"
+          [placeholder]="'COMMON.JUSTIFICATION_DELETE_PLACEHOLDER' | translate"
+          [rows]="3"
+          [maxLength]="500"
+        ></app-custom-textarea>
+        <small class="char-count">{{ deleteJustification.length }}/500</small>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="popup-actions">
+      <button class="btn-cancel" (click)="cancelDelete()">
+        <i class="pi pi-times"></i>
+        {{ 'COMMON.CANCEL' | translate }}
+      </button>
+      <button
+        class="btn-confirm"
+        (click)="proceedDelete()"
+        [disabled]="
+          !deleteJustification.trim() ||
+          !!(userToDelete && isDeleting(userToDelete))
+        "
+      >
+        <i
+          class="pi"
+          [ngClass]="
+            !!(userToDelete && isDeleting(userToDelete))
+              ? 'pi-spin pi-spinner'
+              : 'pi-trash'
+          "
+        ></i>
+        {{ 'COMMON.DELETE' | translate }}
+      </button>
+    </div>
+  </div>
+</div>

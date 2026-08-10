@@ -2250,7 +2250,10 @@
     "EMBED_DASHBOARD": "Dashboard",
     "NOTIFICATIONS": "Notifications",
     "USER_ACTIVITY": "Activity",
-    "AI_WORKSPACE": "AI Assistant"
+    "AI_WORKSPACE": "AI Assistant",
+    "SYSTEM_ROLES": "System Roles",
+    "SYSTEM_GROUPS": "System Groups",
+    "SYSTEM_USERS": "System Users"
   },
   "AUTH": {
     "HEADLINE_LOGIN": "Elevate Your Datasource\nManagement Experience",
@@ -4206,6 +4209,10 @@
       },
       "users": {
         "idInvalid": "One or more user identifiers are invalid"
+      },
+      "roleIds": {
+        "required": "At least one role must be selected",
+        "invalid": "One or more selected roles are invalid"
       }
     },
     "auth": {
@@ -5759,5 +5766,24 @@
     "DESC_PLACEHOLDER": "Optional short description",
     "SEARCH_PLACEHOLDER": "Search themes…",
     "PREVIEW": "Preview"
+  },
+  "SYSTEM_ROLE": {
+    "TITLE": "System Roles",
+    "ADD_TITLE": "Add System Role",
+    "EDIT_TITLE": "Edit System Role",
+    "VIEW_TITLE": "System Role Details"
+  },
+  "SYSTEM_GROUP": {
+    "TITLE": "System Groups",
+    "ADD_TITLE": "Add System Group",
+    "EDIT_TITLE": "Edit System Group",
+    "VIEW_TITLE": "System Group Details"
+  },
+  "SYSTEM_USER": {
+    "TITLE": "System Users",
+    "ADD_TITLE": "Add System User",
+    "EDIT_TITLE": "Edit System User",
+    "VIEW_TITLE": "System User Details",
+    "BULK_ADD_TITLE": "Bulk Add System Users"
   }
 }

@@ -2247,7 +2247,10 @@
     "EMBED_DASHBOARD": "Dashboard",
     "NOTIFICATIONS": "Benachrichtigungen",
     "USER_ACTIVITY": "Aktivität",
-    "AI_WORKSPACE": "KI-Assistent"
+    "AI_WORKSPACE": "KI-Assistent",
+    "SYSTEM_ROLES": "Systemrollen",
+    "SYSTEM_GROUPS": "Systemgruppen",
+    "SYSTEM_USERS": "Systembenutzer"
   },
   "AUTH": {
     "HEADLINE_LOGIN": "Verbessern Sie Ihr Datenquellen-\nManagement-Erlebnis",
@@ -4183,6 +4186,10 @@
       },
       "users": {
         "idInvalid": "Eine oder mehrere Benutzerkennungen sind ungültig"
+      },
+      "roleIds": {
+        "required": "Es muss mindestens eine Rolle ausgewählt werden",
+        "invalid": "Eine oder mehrere ausgewählte Rollen sind ungültig"
       }
     },
     "auth": {
@@ -5762,5 +5769,24 @@
     "DESC_PLACEHOLDER": "Optional short description",
     "SEARCH_PLACEHOLDER": "Search themes…",
     "PREVIEW": "Vorschau"
+  },
+  "SYSTEM_ROLE": {
+    "TITLE": "Systemrollen",
+    "ADD_TITLE": "Systemrolle hinzufügen",
+    "EDIT_TITLE": "Systemrolle bearbeiten",
+    "VIEW_TITLE": "Systemrollendetails"
+  },
+  "SYSTEM_GROUP": {
+    "TITLE": "Systemgruppen",
+    "ADD_TITLE": "Systemgruppe hinzufügen",
+    "EDIT_TITLE": "Systemgruppe bearbeiten",
+    "VIEW_TITLE": "Systemgruppendetails"
+  },
+  "SYSTEM_USER": {
+    "TITLE": "Systembenutzer",
+    "ADD_TITLE": "Systembenutzer hinzufügen",
+    "EDIT_TITLE": "Systembenutzer bearbeiten",
+    "VIEW_TITLE": "Systembenutzerdetails",
+    "BULK_ADD_TITLE": "Systembenutzer per Massenimport hinzufügen"
   }
 }

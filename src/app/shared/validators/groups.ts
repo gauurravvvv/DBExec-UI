@@ -57,12 +57,19 @@ export const groupDescriptionSchema = z.preprocess(
     .optional(),
 );
 
-export const roleIdSchema = z.preprocess(
-  trimOrUndefined,
-  z
-    .string({ message: 'validation.groups.roleId.required' })
-    .regex(UUID_PATTERN, { message: 'validation.groups.roleId.invalid' }),
-);
+/**
+ * Role list — Group ↔ Role is now many-to-many. A group must carry at
+ * least one role (a group with no role grants nothing). Each entry is a
+ * UUID; duplicates are harmless (the controller de-dupes before the
+ * junction insert).
+ */
+export const roleIdsSchema = z
+  .array(
+    z
+      .string({ message: 'validation.groups.roleIds.invalid' })
+      .regex(UUID_PATTERN, { message: 'validation.groups.roleIds.invalid' }),
+  )
+  .min(1, { message: 'validation.groups.roleIds.required' });
 
 /**
  * Member list — empty array is valid at create time (group with no
@@ -83,7 +90,7 @@ export const userIdsSchema = z
 export const addGroupSchema = z.object({
   name: groupNameSchema,
   description: groupDescriptionSchema,
-  roleId: roleIdSchema,
+  roleIds: roleIdsSchema,
   users: userIdsSchema,
 });
 
@@ -92,11 +99,12 @@ export type AddGroupInput = z.infer<typeof addGroupSchema>;
 /**
  * PUT /api/v1/groups/:id body. Same fields as add — group renames
  * are allowed (no audit-log tenant binding the way org names have).
+ * Roles are mutable on update (unlike the old single immutable roleId).
  */
 export const updateGroupSchema = z.object({
   name: groupNameSchema,
   description: groupDescriptionSchema,
-  roleId: roleIdSchema,
+  roleIds: roleIdsSchema,
   users: userIdsSchema,
 });
 

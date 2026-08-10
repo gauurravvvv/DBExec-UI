@@ -11,7 +11,7 @@
  *
  * For "what should the home route look like?" check the appropriate
  * permission directly:
- *   permissionService.canRead(PERMISSIONS.SYSTEM_ADMIN) → platform op
+ *   permissionService.canRead(PERMISSIONS.SYSTEM_USER_MANAGEMENT) → platform op
  *   otherwise → org user
  *
  * This file is kept so external imports from the barrel don't break;

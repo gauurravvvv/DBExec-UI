@@ -1,0 +1,225 @@
+<div class="add-admin-wrapper">
+  <div class="add-admin-container">
+    <!-- Header Section -->
+    <div class="page-header">
+      <div class="left-section">
+        <button
+          pButton
+          class="p-button-text back-button"
+          routerLink="/app/system-groups"
+          [attr.aria-label]="'COMMON.BACK' | translate"
+        >
+          <i class="pi pi-arrow-left"></i>
+        </button>
+        <h2>{{ 'SYSTEM_GROUP.EDIT_TITLE' | translate }}</h2>
+      </div>
+      <div class="action-buttons">
+        <app-button
+          variant="secondary"
+          [disabled]="!isFormDirty"
+          (clicked)="onCancel()"
+          >{{ 'COMMON.CANCEL' | translate }}</app-button
+        >
+        <app-button
+          *hasPermission="'systemGroupManagement'; level: 'write'"
+          variant="primary"
+          icon="pi pi-save"
+          [loading]="saving()"
+          [disabled]="!canSubmit() || saving() || !groupLoaded"
+          (clicked)="onSubmit()"
+          >{{ 'COMMON.SAVE' | translate }}</app-button
+        >
+      </div>
+    </div>
+
+    <!-- Centered branded loader while the GET is in flight. Page
+         chrome stays clickable (back, cancel) — save is disabled
+         until loaded. -->
+    <app-content-loader *ngIf="loading() && !groupLoaded"></app-content-loader>
+
+    <!-- Form Section -->
+    <form
+      autocomplete="off"
+      [formGroup]="groupForm"
+      class="admin-form"
+      *ngIf="groupForm && groupLoaded"
+    >
+      <!-- Default Administrators group is locked — read-only, cannot save. -->
+      <div class="locked-banner" *ngIf="isLocked">
+        <i class="pi pi-lock"></i>
+        <span>{{ 'GROUP.DEFAULT_LOCKED_HINT' | translate }}</span>
+      </div>
+      <div class="form-grid">
+        <!-- Hidden ID Field -->
+        <input type="hidden" formControlName="id" />
+
+        <!-- Name Field -->
+        <app-custom-input
+          formControlName="name"
+          [label]="'COMMON.NAME' | translate"
+          [placeholder]="'COMMON.ENTER_NAME' | translate"
+          icon="pi-id-card"
+          [required]="true"
+          [showError]="
+            !!(groupForm.get('name')?.invalid && groupForm.get('name')?.touched)
+          "
+          [errorMessage]="getNameError()"
+        >
+        </app-custom-input>
+
+        <!-- Description Field -->
+        <app-custom-input
+          formControlName="description"
+          [label]="'COMMON.DESCRIPTION' | translate"
+          [placeholder]="'COMMON.ENTER_DESCRIPTION' | translate"
+          icon="pi-align-left"
+        >
+        </app-custom-input>
+
+        <!-- Roles Multiselect — Group ↔ Role is many-to-many and roles are
+             now EDITABLE on update (previously an immutable disabled input).
+             Server-mode, fetches SYSTEM roles; at least one is required.
+             roleIds patched from the GET response on load. -->
+        <app-custom-multiselect
+          formControlName="roleIds"
+          [label]="'COMMON.ROLE' | translate"
+          [placeholder]="'COMMON.SELECT_ROLE' | translate"
+          [serverMode]="true"
+          [fetcher]="loadRolesPage"
+          [resolveSelected]="resolveSelectedRole"
+          [pageSize]="10"
+          [preloadedItems]="preloadedRoles"
+          [preloadedTotal]="preloadedRolesTotal"
+          optionLabel="name"
+          optionValue="id"
+          [filter]="true"
+          filterBy="name"
+          display="chip"
+          [required]="true"
+          [showError]="
+            !!(
+              groupForm.get('roleIds')?.invalid &&
+              groupForm.get('roleIds')?.touched
+            )
+          "
+          [errorMessage]="'VALIDATION.ROLE_REQUIRED' | translate"
+          icon="pi-shield"
+        >
+        </app-custom-multiselect>
+
+        <!-- Locked member — the self-guard. The logged-in user is
+             pinned to any group they belong to so an admin can't
+             evict themselves mid-edit and lose the access they need
+             to finish the change (matches USER.CANNOT_MODIFY_SELF).
+             The picker handles the manageable subset; on save we
+             merge the locked self ID back into the payload so the
+             BE sees the complete membership list. -->
+        <div class="locked-members" *ngIf="lockedMembers.length">
+          <label>{{ 'GROUP.LOCKED_MEMBERS' | translate }}</label>
+          <div class="locked-members__chips">
+            <span
+              *ngFor="let m of lockedMembers"
+              class="locked-chip"
+              [pTooltip]="'GROUP.LOCKED_SELF' | translate"
+              tooltipPosition="top"
+            >
+              <i class="pi pi-lock"></i>
+              <span class="locked-chip__name">{{ m.username }}</span>
+              <span class="locked-chip__badge locked-chip__badge--self">{{
+                'GROUP.YOU' | translate
+              }}</span>
+            </span>
+          </div>
+        </div>
+
+        <!-- Users Multiselect (manageable subset only — locked
+             members are rendered above and reassembled on save). -->
+        <app-custom-multiselect
+          formControlName="users"
+          [label]="'GROUP.USERS' | translate"
+          [placeholder]="'GROUP.SELECT_USERS' | translate"
+          [serverMode]="true"
+          [fetcher]="loadUsersPage"
+          [resolveSelected]="resolveSelectedUser"
+          [pageSize]="10"
+          [preloadedItems]="preloadedUsers"
+          [preloadedTotal]="preloadedUsersTotal"
+          optionLabel="username"
+          optionValue="id"
+          [filter]="true"
+          filterBy="username"
+          display="chip"
+          icon="pi-users"
+        >
+        </app-custom-multiselect>
+
+        <!-- Status -->
+        <div>
+          <app-custom-toggle
+            formControlName="status"
+            [label]="'COMMON.STATUS' | translate"
+            [trueValue]="1"
+            [falseValue]="0"
+            [trueLabel]="'COMMON.ACTIVE' | translate"
+            [falseLabel]="'COMMON.INACTIVE' | translate"
+          >
+          </app-custom-toggle>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="confirmation-popup" *ngIf="showSaveConfirm">
+  <div
+    class="popup-content"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="editGroupSaveTitle"
+  >
+    <div class="popup-header">
+      <div class="popup-icon">
+        <i class="pi pi-save"></i>
+      </div>
+      <h3 id="editGroupSaveTitle">{{ 'COMMON.CONFIRM_UPDATE' | translate }}</h3>
+    </div>
+
+    <div class="standard-delete-section">
+      <p class="delete-intro">
+        {{ 'GROUP.CONFIRM_UPDATE_MESSAGE' | translate }}
+      </p>
+
+      <div class="justification-section">
+        <app-custom-input
+          [(ngModel)]="saveJustification"
+          [label]="'COMMON.JUSTIFICATION' | translate"
+          [placeholder]="'COMMON.JUSTIFICATION_UPDATE_PLACEHOLDER' | translate"
+          inputMode="textarea"
+          [rows]="3"
+          [maxLength]="500"
+          [required]="true"
+          icon="pi-info-circle"
+        ></app-custom-input>
+        <small class="char-count">{{ saveJustification.length }}/500</small>
+      </div>
+    </div>
+
+    <div class="popup-actions">
+      <button class="btn-cancel" (click)="cancelSave()">
+        <i class="pi pi-times"></i>
+        {{ 'COMMON.CANCEL' | translate }}
+      </button>
+      <button
+        class="btn-confirm"
+        (click)="proceedSave()"
+        [disabled]="!saveJustification.trim() || saving()"
+      >
+        <i
+          class="pi"
+          [ngClass]="saving() ? 'pi-spin pi-spinner' : 'pi-check'"
+        ></i>
+        {{ 'COMMON.UPDATE' | translate }}
+      </button>
+    </div>
+  </div>
+</div>

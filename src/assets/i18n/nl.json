@@ -2247,7 +2247,10 @@
     "EMBED_DASHBOARD": "Dashboard",
     "NOTIFICATIONS": "Meldingen",
     "USER_ACTIVITY": "Activiteit",
-    "AI_WORKSPACE": "AI-assistent"
+    "AI_WORKSPACE": "AI-assistent",
+    "SYSTEM_ROLES": "Systeemrollen",
+    "SYSTEM_GROUPS": "Systeemgroepen",
+    "SYSTEM_USERS": "Systeemgebruikers"
   },
   "AUTH": {
     "HEADLINE_LOGIN": "Verbeter uw ervaring met\ngegevensbronbeheer",
@@ -4183,6 +4186,10 @@
       },
       "users": {
         "idInvalid": "Een of meer gebruikersidentificatoren zijn ongeldig"
+      },
+      "roleIds": {
+        "required": "Er moet minstens één rol worden geselecteerd",
+        "invalid": "Een of meer geselecteerde rollen zijn ongeldig"
       }
     },
     "auth": {
@@ -5762,5 +5769,24 @@
     "DESC_PLACEHOLDER": "Optional short description",
     "SEARCH_PLACEHOLDER": "Search themes…",
     "PREVIEW": "Voorbeeld"
+  },
+  "SYSTEM_ROLE": {
+    "TITLE": "Systeemrollen",
+    "ADD_TITLE": "Systeemrol toevoegen",
+    "EDIT_TITLE": "Systeemrol bewerken",
+    "VIEW_TITLE": "Systeemroldetails"
+  },
+  "SYSTEM_GROUP": {
+    "TITLE": "Systeemgroepen",
+    "ADD_TITLE": "Systeemgroep toevoegen",
+    "EDIT_TITLE": "Systeemgroep bewerken",
+    "VIEW_TITLE": "Systeemgroepdetails"
+  },
+  "SYSTEM_USER": {
+    "TITLE": "Systeemgebruikers",
+    "ADD_TITLE": "Systeemgebruiker toevoegen",
+    "EDIT_TITLE": "Systeemgebruiker bewerken",
+    "VIEW_TITLE": "Systeemgebruikerdetails",
+    "BULK_ADD_TITLE": "Systeemgebruikers bulksgewijs toevoegen"
   }
 }

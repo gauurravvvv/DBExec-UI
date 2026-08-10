@@ -1,0 +1,168 @@
+<div class="add-admin-wrapper">
+  <div class="add-admin-container">
+    <!-- Header Section -->
+    <div class="page-header">
+      <div class="left-section">
+        <button
+          pButton
+          class="p-button-text back-button"
+          routerLink="/app/system-users"
+        >
+          <i class="pi pi-arrow-left"></i>
+        </button>
+        <h2>{{ 'SYSTEM_USER.ADD_TITLE' | translate }}</h2>
+      </div>
+      <div class="action-buttons">
+        <app-button
+          variant="secondary"
+          [disabled]="!isFormDirty"
+          (clicked)="onCancel()"
+          >{{ 'COMMON.CANCEL' | translate }}</app-button
+        >
+        <app-button
+          *hasPermission="'systemUserManagement'; level: 'write'"
+          variant="primary"
+          icon="pi pi-save"
+          [loading]="saving()"
+          [disabled]="userForm.invalid || saving()"
+          (clicked)="onSubmit()"
+          >{{ 'COMMON.SAVE' | translate }}</app-button
+        >
+      </div>
+    </div>
+
+    <!-- Form Section -->
+    <form autocomplete="off" [formGroup]="userForm" class="admin-form">
+      <div class="form-grid">
+        <!-- Full Name -->
+        <app-custom-input
+          formControlName="fullName"
+          [label]="'COMMON.FULL_NAME' | translate"
+          [placeholder]="'COMMON.ENTER_FULL_NAME' | translate"
+          icon="pi-user"
+          [required]="true"
+          [showError]="
+            !!(
+              userForm.get('fullName')?.invalid &&
+              userForm.get('fullName')?.touched
+            )
+          "
+          [errorMessage]="getFullNameError()"
+        >
+        </app-custom-input>
+
+        <!-- Username -->
+        <app-custom-input
+          formControlName="username"
+          [label]="'COMMON.USERNAME' | translate"
+          [placeholder]="'COMMON.ENTER_USERNAME' | translate"
+          icon="pi-user"
+          [required]="true"
+          [showError]="
+            !!(
+              userForm.get('username')?.invalid &&
+              userForm.get('username')?.touched
+            )
+          "
+          [errorMessage]="getUsernameError()"
+        >
+        </app-custom-input>
+
+        <!-- Email -->
+        <app-custom-input
+          formControlName="email"
+          [label]="'COMMON.EMAIL' | translate"
+          [placeholder]="'COMMON.ENTER_EMAIL' | translate"
+          icon="pi-envelope"
+          type="email"
+          [required]="true"
+          [showError]="
+            !!(userForm.get('email')?.invalid && userForm.get('email')?.touched)
+          "
+          [errorMessage]="
+            userForm.get('email')?.errors?.['required']
+              ? ('VALIDATION.EMAIL_REQUIRED' | translate)
+              : userForm.get('email')?.errors?.['email']
+                ? ('VALIDATION.EMAIL_INVALID' | translate)
+                : ''
+          "
+        >
+        </app-custom-input>
+
+        <!-- Groups -->
+        <div class="form-field">
+          <label
+            >{{ 'USER.GROUPS' | translate }}
+            <span class="required">*</span></label
+          >
+          <app-custom-multiselect
+            formControlName="groupIds"
+            [serverMode]="true"
+            [fetcher]="loadGroupsPage"
+            [pageSize]="10"
+            [preloadedItems]="preloadedGroups"
+            [preloadedTotal]="preloadedGroupsTotal"
+            optionLabel="name"
+            optionValue="id"
+            [placeholder]="'USER.SELECT_GROUPS' | translate"
+            display="chip"
+            [filter]="true"
+            icon="pi-users"
+            [attr.aria-describedby]="
+              userForm.get('groupIds')?.touched &&
+              userForm.get('groupIds')?.errors?.['minCount']
+                ? 'addUserGroupsError'
+                : null
+            "
+          ></app-custom-multiselect>
+          <small
+            id="addUserGroupsError"
+            class="error-message"
+            *ngIf="
+              userForm.get('groupIds')?.touched &&
+              userForm.get('groupIds')?.errors?.['minCount']
+            "
+          >
+            {{ 'USER.GROUP_REQUIRED' | translate }}
+          </small>
+        </div>
+
+        <!-- Language / Locale -->
+        <div class="form-field">
+          <label
+            >{{ 'USER.LANGUAGE' | translate }}
+            <span class="required">*</span></label
+          >
+          <app-custom-dropdown
+            formControlName="locale"
+            [options]="locales"
+            optionLabel="label"
+            optionValue="code"
+            [placeholder]="'USER.SELECT_LANGUAGE' | translate"
+            [filter]="true"
+            filterBy="label"
+            [required]="true"
+          >
+            <!-- Selected-item trigger: flag + native language name.
+                 Mirrors the brand-icon trigger pattern used by the
+                 Database Type dropdown in Add Datasource. -->
+            <ng-template #selectedItemTemplate let-locale>
+              <div class="locale-option">
+                <i [class]="locale.flagClass" aria-hidden="true"></i>
+                <span class="locale-option-label">{{ locale.label }}</span>
+              </div>
+            </ng-template>
+            <!-- Panel rows: same flag + label markup so the open
+                 dropdown reads the same as the trigger. -->
+            <ng-template #itemTemplate let-locale>
+              <div class="locale-option">
+                <i [class]="locale.flagClass" aria-hidden="true"></i>
+                <span class="locale-option-label">{{ locale.label }}</span>
+              </div>
+            </ng-template>
+          </app-custom-dropdown>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>

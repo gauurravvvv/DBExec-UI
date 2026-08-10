@@ -52,8 +52,11 @@ export class AnnouncementBannerComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    // Platform System Admin has no org context — no announcements to render.
-    if (this.permissionService.canRead(PERMISSIONS.SYSTEM_ADMIN)) return;
+    // Platform System user has no org context — no announcements to render.
+    // (systemUserManagement is the platform-operator sentinel; the retired
+    // systemAdmin permission was replaced by the System-RBAC set.)
+    if (this.permissionService.canRead(PERMISSIONS.SYSTEM_USER_MANAGEMENT))
+      return;
     this.loadAnnouncementsFromStorage();
   }
 

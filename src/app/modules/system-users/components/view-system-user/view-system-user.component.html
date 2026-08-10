@@ -1,0 +1,265 @@
+<div class="view-admin-wrapper">
+  <div class="view-admin-container">
+    <!-- Header Section -->
+    <div class="page-header">
+      <div class="left-section">
+        <button
+          pButton
+          class="p-button-text back-button"
+          routerLink="/app/system-users"
+          [attr.aria-label]="'COMMON.BACK' | translate"
+        >
+          <i class="pi pi-arrow-left"></i>
+        </button>
+        <h2>{{ 'SYSTEM_USER.VIEW_TITLE' | translate }}</h2>
+      </div>
+      <div class="header-actions">
+        <!-- Edit / Delete gated on BE-returned flags so deep-link
+             reloads get the right state. The sole guard is
+             self-protection — the caller can't edit/delete their own
+             account (canEdit / canDelete are false only for self). -->
+        <button
+          *hasPermission="'systemUserManagement'; level: 'write'"
+          class="btn-primary"
+          type="button"
+          [disabled]="!userData?.canEdit"
+          [pTooltip]="
+            !userData?.canEdit
+              ? ('USER.CANNOT_MODIFY_SELF_HINT' | translate)
+              : ('COMMON.EDIT' | translate)
+          "
+          tooltipPosition="bottom"
+          (click)="userData?.canEdit && goToEdit()"
+        >
+          <i class="pi pi-pencil"></i> {{ 'COMMON.EDIT' | translate }}
+        </button>
+        <button
+          *hasPermission="'systemUserManagement'; level: 'delete'"
+          class="btn-danger"
+          type="button"
+          [disabled]="!userData?.canDelete || isDeleting(userId)"
+          [pTooltip]="
+            !userData?.canDelete
+              ? ('USER.CANNOT_MODIFY_SELF_HINT' | translate)
+              : ('COMMON.DELETE' | translate)
+          "
+          tooltipPosition="bottom"
+          (click)="confirmDelete()"
+        >
+          <i
+            class="pi"
+            [ngClass]="isDeleting(userId) ? 'pi-spin pi-spinner' : 'pi-trash'"
+          ></i>
+          {{ 'COMMON.DELETE' | translate }}
+        </button>
+      </div>
+    </div>
+
+    <!-- Centered branded loader while the GET is in flight. -->
+    <app-content-loader *ngIf="loading() && !userData"></app-content-loader>
+
+    <!-- Profile Section -->
+    <div class="profile-container" *ngIf="userData">
+      <div class="details-grid">
+        <!-- First Row: Avatar and Personal Info -->
+        <div class="first-row">
+          <!-- Avatar Section -->
+          <div class="avatar-section">
+            <div
+              class="avatar-circle"
+              [style.background-color]="avatarBackground"
+            >
+              {{ userInitials }}
+            </div>
+            <h3 class="admin-name">
+              {{ userData?.fullName }}
+            </h3>
+            <p class="admin-username">&#64;{{ userData?.username }}</p>
+          </div>
+
+          <!-- Personal Information -->
+          <div class="detail-group">
+            <h4>{{ 'USER.PERSONAL_INFORMATION' | translate }}</h4>
+            <div class="detail-item">
+              <span class="label">
+                <i class="pi pi-user"></i>
+                {{ 'COMMON.FULL_NAME' | translate }}
+              </span>
+              <span class="value">{{ userData?.fullName }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Second Row: Contact and Account Info -->
+        <div class="second-row">
+          <!-- Contact Information -->
+          <div class="detail-group">
+            <h4>{{ 'USER.CONTACT_INFORMATION' | translate }}</h4>
+            <div class="detail-item">
+              <span class="label">
+                <i class="pi pi-envelope"></i>
+                {{ 'COMMON.EMAIL' | translate }}
+              </span>
+              <span class="value">{{ userData?.email }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="label">
+                <i class="pi pi-building"></i>
+                {{ 'COMMON.ORGANISATION' | translate }}
+              </span>
+              <span class="value">{{ userData?.organisationName }}</span>
+            </div>
+          </div>
+
+          <!-- Account Information -->
+          <div class="detail-group">
+            <h4>{{ 'USER.ACCOUNT_INFORMATION' | translate }}</h4>
+            <div class="detail-item">
+              <span class="label">
+                <i class="pi pi-id-card"></i>
+                {{ 'COMMON.ROLE' | translate }}
+              </span>
+              <span class="value">{{ userData?.roleName || '—' }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="label">
+                <i class="pi pi-clock"></i>
+                {{ 'COMMON.LAST_LOGIN' | translate }}
+              </span>
+              <span class="value">{{
+                userData?.lastLogin
+                  ? (userData?.lastLogin | date: 'medium')
+                  : ('USER.NEVER_LOGGED_IN' | translate)
+              }}</span>
+            </div>
+            <div class="detail-item">
+              <span class="label">
+                <i class="pi pi-check-circle"></i>
+                {{ 'COMMON.STATUS' | translate }}
+              </span>
+              <span class="value">
+                <span
+                  class="status-badge"
+                  [class.active]="!userData?.isLocked && userData?.status === 1"
+                  [class.locked]="userData?.isLocked"
+                >
+                  {{
+                    userData?.isLocked
+                      ? ('COMMON.LOCKED' | translate)
+                      : userData?.status === 1
+                        ? ('COMMON.ACTIVE' | translate)
+                        : ('COMMON.INACTIVE' | translate)
+                  }}
+                </span>
+                <ng-container
+                  *hasPermission="'systemUserManagement'; level: 'write'"
+                >
+                  <button
+                    *ngIf="userData?.isLocked"
+                    class="btn-unlock-inline"
+                    (click)="onUnlock()"
+                    [pTooltip]="'COMMON.UNLOCK_ACCOUNT' | translate"
+                    tooltipPosition="bottom"
+                    [disabled]="isUnlocking(userId)"
+                  >
+                    <i
+                      class="pi"
+                      [ngClass]="
+                        isUnlocking(userId)
+                          ? 'pi-spin pi-spinner'
+                          : 'pi-lock-open'
+                      "
+                    ></i>
+                    {{ 'COMMON.UNLOCK' | translate }}
+                  </button>
+                </ng-container>
+              </span>
+            </div>
+            <div class="detail-item">
+              <span class="label">
+                <i class="pi pi-calendar"></i>
+                {{ 'COMMON.CREATED_ON' | translate }}
+              </span>
+              <span class="value">{{
+                userData?.createdOn | date: 'medium'
+              }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="confirmation-popup" *ngIf="showDeleteConfirm">
+  <div
+    class="popup-content"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="viewUserDeleteTitle"
+  >
+    <!-- Header -->
+    <div class="popup-header">
+      <div class="popup-icon">
+        <i class="pi pi-trash"></i>
+      </div>
+      <h3 id="viewUserDeleteTitle">
+        {{ 'COMMON.CONFIRM_DELETE' | translate }}
+      </h3>
+    </div>
+
+    <!-- Delete Info Section -->
+    <div class="standard-delete-section">
+      <p class="delete-intro">{{ 'USER.CONFIRM_DELETE_SINGLE' | translate }}</p>
+
+      <ul class="delete-info-list">
+        <li>
+          <i class="pi pi-info-circle"></i>
+          <span>{{ 'COMMON.DELETE_ACCESS_REVOKED' | translate }}</span>
+        </li>
+        <li>
+          <i class="pi pi-info-circle"></i>
+          <span>{{ 'COMMON.DELETE_CREDENTIALS_INVALIDATED' | translate }}</span>
+        </li>
+        <li>
+          <i class="pi pi-info-circle"></i>
+          <span>{{ 'COMMON.DELETE_CANNOT_UNDO' | translate }}</span>
+        </li>
+      </ul>
+
+      <div class="justification-section">
+        <label for="deleteJustification"
+          >{{ 'COMMON.JUSTIFICATION' | translate }}
+          <span class="required">*</span></label
+        >
+        <app-custom-textarea
+          inputId="deleteJustification"
+          [(ngModel)]="deleteJustification"
+          [placeholder]="'COMMON.JUSTIFICATION_DELETE_PLACEHOLDER' | translate"
+          [rows]="3"
+          [maxLength]="500"
+        ></app-custom-textarea>
+        <small class="char-count">{{ deleteJustification.length }}/500</small>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="popup-actions">
+      <button class="btn-cancel" (click)="cancelDelete()">
+        <i class="pi pi-times"></i>
+        {{ 'COMMON.CANCEL' | translate }}
+      </button>
+      <button
+        class="btn-confirm"
+        (click)="proceedDelete()"
+        [disabled]="!deleteJustification.trim() || isDeleting(userId)"
+      >
+        <i
+          class="pi"
+          [ngClass]="isDeleting(userId) ? 'pi-spin pi-spinner' : 'pi-trash'"
+        ></i>
+        {{ 'COMMON.DELETE' | translate }}
+      </button>
+    </div>
+  </div>
+</div>

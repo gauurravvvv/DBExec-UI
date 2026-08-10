@@ -2247,7 +2247,10 @@
     "EMBED_DASHBOARD": "ダッシュボード",
     "NOTIFICATIONS": "通知",
     "USER_ACTIVITY": "アクティビティ",
-    "AI_WORKSPACE": "AIアシスタント"
+    "AI_WORKSPACE": "AIアシスタント",
+    "SYSTEM_ROLES": "システムロール",
+    "SYSTEM_GROUPS": "システムグループ",
+    "SYSTEM_USERS": "システムユーザー"
   },
   "AUTH": {
     "HEADLINE_LOGIN": "データソース管理体験を\n向上させましょう",
@@ -4183,6 +4186,10 @@
       },
       "users": {
         "idInvalid": "1つ以上のユーザーIDが無効です"
+      },
+      "roleIds": {
+        "required": "少なくとも1つのロールを選択してください",
+        "invalid": "選択されたロールのうち1つ以上が無効です"
       }
     },
     "auth": {
@@ -5762,5 +5769,24 @@
     "DESC_PLACEHOLDER": "Optional short description",
     "SEARCH_PLACEHOLDER": "Search themes…",
     "PREVIEW": "プレビュー"
+  },
+  "SYSTEM_ROLE": {
+    "TITLE": "システムロール",
+    "ADD_TITLE": "システムロールを追加",
+    "EDIT_TITLE": "システムロールを編集",
+    "VIEW_TITLE": "システムロールの詳細"
+  },
+  "SYSTEM_GROUP": {
+    "TITLE": "システムグループ",
+    "ADD_TITLE": "システムグループを追加",
+    "EDIT_TITLE": "システムグループを編集",
+    "VIEW_TITLE": "システムグループの詳細"
+  },
+  "SYSTEM_USER": {
+    "TITLE": "システムユーザー",
+    "ADD_TITLE": "システムユーザーを追加",
+    "EDIT_TITLE": "システムユーザーを編集",
+    "VIEW_TITLE": "システムユーザーの詳細",
+    "BULK_ADD_TITLE": "システムユーザーの一括追加"
   }
 }

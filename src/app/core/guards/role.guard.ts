@@ -20,7 +20,7 @@ import { PermissionService } from '../services/permission.service';
  * roles the user has. Org admins + org users share the same home.
  */
 function getHomeFromPermissions(permissionService: PermissionService): string {
-  return permissionService.canRead(PERMISSIONS.SYSTEM_ADMIN)
+  return permissionService.canRead(PERMISSIONS.SYSTEM_USER_MANAGEMENT)
     ? HOME_ROUTES.SYSTEM_ADMIN
     : HOME_ROUTES.ORG_ADMIN;
 }

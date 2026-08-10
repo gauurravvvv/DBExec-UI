@@ -212,6 +212,17 @@ export class ListGroupComponent implements OnInit, OnDestroy {
       });
   }
 
+  /**
+   * Group ↔ Role is many-to-many — join the group's role names for the
+   * list column. Falls back to an em-dash when a group has no roles.
+   */
+  roleNames(group: any): string {
+    const names = (group?.roles ?? [])
+      .map((r: any) => r?.name)
+      .filter(Boolean);
+    return names.length ? names.join(', ') : '—';
+  }
+
   onRoleChange(roleId: string | null) {
     this.selectedRole = roleId;
     // The adapter closes over selectedRole — rebuild so the next

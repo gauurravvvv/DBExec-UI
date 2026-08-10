@@ -92,7 +92,7 @@
           </ng-template>
 
           <ng-template usGridCell="roleName" let-group>
-            <span class="description-text">{{ group.roleName || '—' }}</span>
+            <span class="description-text">{{ roleNames(group) }}</span>
           </ng-template>
 
           <ng-template usGridCell="status" let-group>

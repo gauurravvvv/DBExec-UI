@@ -2247,7 +2247,10 @@
     "EMBED_DASHBOARD": "仪表板",
     "NOTIFICATIONS": "通知",
     "USER_ACTIVITY": "活动",
-    "AI_WORKSPACE": "AI 助手"
+    "AI_WORKSPACE": "AI 助手",
+    "SYSTEM_ROLES": "系统角色",
+    "SYSTEM_GROUPS": "系统组",
+    "SYSTEM_USERS": "系统用户"
   },
   "AUTH": {
     "HEADLINE_LOGIN": "提升您的数据源\n管理体验",
@@ -4183,6 +4186,10 @@
       },
       "users": {
         "idInvalid": "一个或多个用户标识符无效"
+      },
+      "roleIds": {
+        "required": "必须至少选择一个角色",
+        "invalid": "选择的一个或多个角色无效"
       }
     },
     "auth": {
@@ -5762,5 +5769,24 @@
     "DESC_PLACEHOLDER": "Optional short description",
     "SEARCH_PLACEHOLDER": "Search themes…",
     "PREVIEW": "预览"
+  },
+  "SYSTEM_ROLE": {
+    "TITLE": "系统角色",
+    "ADD_TITLE": "添加系统角色",
+    "EDIT_TITLE": "编辑系统角色",
+    "VIEW_TITLE": "系统角色详情"
+  },
+  "SYSTEM_GROUP": {
+    "TITLE": "系统组",
+    "ADD_TITLE": "添加系统组",
+    "EDIT_TITLE": "编辑系统组",
+    "VIEW_TITLE": "系统组详情"
+  },
+  "SYSTEM_USER": {
+    "TITLE": "系统用户",
+    "ADD_TITLE": "添加系统用户",
+    "EDIT_TITLE": "编辑系统用户",
+    "VIEW_TITLE": "系统用户详情",
+    "BULK_ADD_TITLE": "批量添加系统用户"
   }
 }

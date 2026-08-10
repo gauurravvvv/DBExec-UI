@@ -1,0 +1,465 @@
+// Premium Design Variables - Using Global Theme
+:host {
+  display: block;
+  height: 100%;
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+  background-color: var(--background-color);
+  border-radius: var(--radius-lg);
+}
+
+.dataset-page-wrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  padding: var(--space-0);
+  min-width: 0;
+  min-height: 0;
+
+  .dataset-content-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 1.5rem 2rem;
+    max-width: 100%;
+    margin: 0 auto;
+    width: 100%;
+    min-width: 0;
+    min-height: 0;
+    gap: var(--space-8);
+  }
+}
+
+// 1. Header Section
+.page-header-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+
+  .header-content {
+    h2 {
+      // Title carries the header on its own (no subtitle). Clamp
+      // sits between 1.25rem and 1.375rem — lands ~22px at typical
+      // desktop widths.
+      font-size: clamp(1.25rem, 1.05rem + 0.4vw, 1.375rem);
+      font-weight: var(--fw-semibold);
+      color: var(--text-color);
+      letter-spacing: -0.025em;
+      margin: 0;
+    }
+  }
+  flex-wrap: wrap;
+  gap: var(--space-6);
+
+  .header-actions {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    flex-shrink: 0;
+  }
+}
+
+// 2. Content Card & Toolbar
+.content-card {
+  // Flat surface — no outline, no shadow, no border. Table sits directly
+  // on the page background.
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+
+  .card-toolbar {
+    padding: 0 0 var(--space-5);
+    border-bottom: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--space-6);
+    background: transparent;
+
+    .toolbar-left,
+    .toolbar-right {
+      display: flex;
+      align-items: center;
+      gap: var(--space-6);
+    }
+
+    // Search Input
+    .search-input-wrapper {
+      i {
+        left: 1rem;
+        color: var(--secondary-color);
+      }
+
+      .modern-search {
+        border-radius: var(--radius-sm);
+        border: 1px solid var(--border-color);
+        padding: 0.65rem 1rem 0.65rem 2.5rem;
+        width: 280px;
+        font-size: var(--fs-body);
+        background: var(--hover-background);
+        transition: all var(--motion-base);
+        color: var(--text-color);
+
+        &:focus {
+          background: var(--card-background);
+          border-color: var(--primary-color);
+          box-shadow: 0 0 0 2px var(--primary-color-transparent);
+        }
+
+        &::placeholder {
+          color: var(--secondary-color);
+        }
+      }
+    }
+
+    // Modern Button
+    .modern-button {
+      border-radius: var(--radius-sm) !important;
+      font-weight: var(--fw-semibold);
+      padding: 0.65rem 1.25rem;
+
+      &.p-button-primary {
+        background: linear-gradient(
+          135deg,
+          var(--primary-color),
+          var(--primary-hover)
+        ) !important;
+        border: none !important;
+        color: white !important;
+        box-shadow: 0 4px 10px var(--primary-color-transparent);
+        transition: all var(--motion-base) ease;
+
+        &:hover {
+          transform: translateY(-1px);
+          box-shadow: var(--shadow-md);
+        }
+      }
+
+      ::ng-deep .p-button {
+        background: var(--primary-color);
+        border: none;
+
+        &:hover {
+          opacity: 0.9;
+          transform: translateY(-1px);
+          box-shadow: 0 1px 2px 0 var(--shadow-color);
+        }
+
+        &:focus {
+          box-shadow: 0 0 0 2px var(--primary-color-transparent);
+        }
+      }
+    }
+  }
+
+  // 3. Table Wrapper
+  .table-wrapper {
+    flex: 1;
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    width: 100%;
+    overflow: hidden;
+  }
+}
+
+// 5. Popups & Modals - Enhanced Premium Design
+.confirmation-popup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: var(--overlay-background);
+  backdrop-filter: blur(8px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: var(--z-overlay);
+  animation: fadeIn 0.2s ease-out;
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  .popup-content {
+    background: var(--card-background);
+    padding: var(--space-9);
+    border-radius: var(--radius-lg);
+    box-shadow:
+      var(--shadow-xl),
+      0 0 0 1px var(--border-color);
+    width: 100%;
+    max-width: 420px;
+    text-align: center;
+    animation: slideUp 0.25s ease-out;
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px) scale(0.95);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    .popup-header {
+      margin-bottom: 1.5rem;
+
+      .popup-icon {
+        width: 56px;
+        height: 56px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1rem;
+        background: var(--error-bg);
+
+        i {
+          font-size: var(--icon-lg);
+          color: var(--error-color);
+        }
+      }
+
+      h3 {
+        margin: var(--space-0);
+        color: var(--text-color);
+        font-size: var(--fs-h1);
+        font-weight: var(--fw-semibold);
+      }
+    }
+
+    .standard-delete-section {
+      text-align: left;
+      margin-bottom: 1.5rem;
+
+      .delete-intro {
+        color: var(--secondary-color);
+        font-size: var(--fs-h3);
+        line-height: 1.6;
+        margin-bottom: 1rem;
+        text-align: center;
+      }
+
+      .delete-info-list {
+        list-style: none;
+        padding: 0.75rem 1rem;
+        margin: var(--space-0);
+        background: var(--hover-background);
+        border-radius: var(--radius-sm);
+
+        li {
+          display: flex;
+          align-items: center;
+          gap: var(--space-5);
+          padding: 0.5rem 0;
+          color: var(--secondary-color);
+          font-size: var(--fs-control);
+          border-bottom: 1px dashed var(--border-color);
+
+          &:last-child {
+            border-bottom: none;
+          }
+          i {
+            color: var(--primary-color);
+            font-size: var(--fs-label);
+            flex-shrink: 0;
+          }
+        }
+      }
+
+      .justification-section {
+        margin-top: 1rem;
+        text-align: left;
+
+        label {
+          display: block;
+          margin-bottom: 0.5rem;
+          font-size: var(--fs-control);
+          font-weight: var(--fw-semibold);
+          color: var(--text-color);
+
+          .required {
+            color: var(--error-color);
+            margin-left: 2px;
+          }
+        }
+
+        textarea {
+          width: 100%;
+          padding: 0.65rem 0.75rem;
+          border: 1px solid var(--border-color);
+          border-radius: var(--radius-sm);
+          background: var(--card-background);
+          color: var(--text-color);
+          font-size: var(--fs-control);
+          font-family: inherit;
+          resize: vertical;
+          transition: border-color var(--motion-base);
+
+          &::placeholder {
+            color: var(--secondary-color);
+            opacity: 0.6;
+          }
+
+          &:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px var(--primary-color-transparent);
+          }
+        }
+
+        .char-count {
+          display: block;
+          text-align: right;
+          margin-top: 0.25rem;
+          font-size: var(--fs-label);
+          color: var(--secondary-color);
+          opacity: 0.6;
+        }
+      }
+    }
+
+    .popup-actions {
+      display: flex;
+      gap: var(--space-5);
+      justify-content: center;
+
+      button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: var(--space-3);
+        padding: 0.75rem 1.5rem;
+        border-radius: var(--radius-md);
+        border: none;
+        font-weight: var(--fw-semibold);
+        cursor: pointer;
+        transition: all var(--motion-base) ease;
+        font-size: var(--fs-body);
+
+        i {
+          font-size: var(--fs-control);
+        }
+
+        &.btn-cancel {
+          background: var(--hover-background);
+          color: var(--text-color);
+          border: 1px solid var(--border-color);
+          &:hover {
+            background: var(--border-color);
+          }
+        }
+
+        &.btn-confirm {
+          background: linear-gradient(
+            135deg,
+            var(--error-color),
+            var(--error-color)
+          );
+          color: var(--primary-text);
+          box-shadow: 0 4px 14px var(--error-bg);
+          &:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+          }
+          &:active {
+            transform: translateY(0);
+          }
+          &:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+          }
+        }
+      }
+    }
+  }
+}
+
+// Username cell — link + identity badges (Default / You). Mirrors
+// the system-admin list convention so the lock state is visible at
+// a glance, not just on hover.
+.username-cell {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.row-badge {
+  font-size: 10px;
+  font-weight: var(--fw-semibold, 600);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 1px 6px;
+  border-radius: 4px;
+  line-height: 1.4;
+  user-select: none;
+
+  &--default {
+    background: rgba(var(--primary-color-rgb, 33, 150, 243), 0.12);
+    color: var(--primary-color);
+  }
+
+  &--self {
+    background: rgba(0, 0, 0, 0.06);
+    color: var(--text-muted, #6b7280);
+  }
+}
+
+/* ── custom-table toolbar-left slot: the Group filter dropdown ──────────── */
+.users-toolbar-start {
+  display: flex;
+  align-items: center;
+  gap: var(--space-5);
+  min-width: 0;
+
+  // Give the server-mode Group dropdown a sensible fixed width so it sits
+  // neatly at the start of the toolbar row (opposite search + icons).
+  ::ng-deep app-custom-dropdown {
+    display: block;
+    width: 15rem;
+    max-width: 40vw;
+  }
+}
+
+/* ── projected empty body (centred; not a row) ─────────────────────────── */
+.ct-empty-body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-4);
+  padding: var(--space-9) var(--space-6);
+  color: var(--text-muted);
+  text-align: center;
+
+  i {
+    font-size: 1.6rem;
+    opacity: 0.6;
+  }
+  span {
+    font-size: var(--fs-body);
+  }
+}

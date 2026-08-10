@@ -92,11 +92,11 @@ export class GroupService {
   async add(form: FormGroup): Promise<any> {
     this._saving.set(true);
     try {
-      const { name, description, roleId, users } = form.value;
+      const { name, description, roleIds, users } = form.value;
       return await lastValueFrom(
         this.http.apiPost(
           GROUP.ADD,
-          { name, description, roleId, users },
+          { name, description, roleIds, users },
           { skipLoader: true },
         ),
       );
@@ -122,7 +122,7 @@ export class GroupService {
   ): Promise<any> {
     this._saving.set(true);
     try {
-      const { id, name, description, status, users, roleId } =
+      const { id, name, description, status, users, roleIds } =
         form.getRawValue();
       const finalUsers = usersOverride ?? users;
       return await lastValueFrom(
@@ -134,7 +134,7 @@ export class GroupService {
             description,
             status: status ? 1 : 0,
             users: finalUsers,
-            roleId,
+            roleIds,
             justification,
           },
           { skipLoader: true },

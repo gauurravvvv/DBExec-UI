@@ -159,8 +159,13 @@ export class SidebarComponent implements OnInit {
       this.globalService.getTokenDetails('email') ??
       this.globalService.getTokenDetails('username') ??
       '';
+    // "Platform operator" discriminator — the master-DB System user has no
+    // org context. The retired `systemAdmin` permission is replaced by the
+    // System-RBAC set; holding any of them marks a platform operator. Use
+    // systemUserManagement as the sentinel (the seeded Administrator role
+    // carries all three).
     this.isSystemAdmin = this.permissionService.canRead(
-      PERMISSIONS.SYSTEM_ADMIN,
+      PERMISSIONS.SYSTEM_USER_MANAGEMENT,
     );
 
     this.localeService.initFromToken();

@@ -8,17 +8,19 @@ import {
   OnInit,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { DEFAULT_PAGE } from 'src/app/core/constants';
 import { GROUP } from 'src/app/core/constants/routes.constant';
 import { HasUnsavedChanges } from 'src/app/core/models/has-unsaved-changes.model';
 import { GlobalService } from 'src/app/core/services/global.service';
+import { RoleService } from 'src/app/modules/role/services/role.service';
 import { UserService } from 'src/app/modules/users/services/user.service';
 import {
   groupDescriptionSchema,
   groupNameSchema,
+  roleIdsSchema,
 } from 'src/app/shared/validators/groups';
 import { zodValidator } from 'src/app/shared/validators/zod-validator';
 import { GroupService } from '../../services/group.service';
@@ -48,8 +50,10 @@ export class EditGroupComponent
   saveJustification = '';
 
   categoryId!: string;
-  selectedRoleName = '';
   originalFormValue: any;
+  // Server-mode preload for the Roles multiselect (Group ↔ Role m:m).
+  preloadedRoles: any[] | null = null;
+  preloadedRolesTotal: number | null = null;
 
   // The seeded default Administrators group is fully locked — the BE
   // rejects any update. When true the form renders read-only and Save
@@ -88,6 +92,7 @@ export class EditGroupComponent
     private route: ActivatedRoute,
     private groupService: GroupService,
     private userService: UserService,
+    private roleService: RoleService,
     private globalService: GlobalService,
     private cdr: ChangeDetectorRef,
     private translate: TranslateService,
@@ -104,22 +109,62 @@ export class EditGroupComponent
   }
 
   initForm(): void {
-    // Field validators sourced from the SHARED Zod schema. roleId
-    // stays Validators.required only — it's a disabled select with
-    // a pre-populated value from the role list, not a UUID input;
-    // the BE has its own UUID + existence check.
+    // Field validators sourced from the SHARED Zod schema. Group ↔ Role
+    // is many-to-many now — roleIds is an editable multi-select
+    // validated by roleIdsSchema (at least one role).
     this.groupForm = this.fb.group({
       id: [''],
       name: ['', [zodValidator(groupNameSchema)]],
       description: ['', [zodValidator(groupDescriptionSchema)]],
-      roleId: [{ value: '', disabled: true }, Validators.required],
+      roleIds: [[], [zodValidator(roleIdsSchema)]],
       users: [[]],
       status: [1],
     });
 
+    this.loadRoles();
+
     this.groupForm.valueChanges
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(() => this.checkFormDirty());
+  }
+
+  /** Server-mode fetcher for the Roles multiselect (active roles only). */
+  loadRolesPage = async ({
+    search,
+    page,
+    limit,
+  }: {
+    search: string;
+    page: number;
+    limit: number;
+  }): Promise<{ items: any[]; total: number }> => {
+    const params: any = { page, limit };
+    if (search) params.filter = { name: search };
+    try {
+      const res: any = await this.roleService.listRoles(params);
+      if (this.globalService.handleSuccessService(res, false)) {
+        const all = res?.data?.roles ?? [];
+        const active = all.filter((r: any) => r.status === 1);
+        return { items: active, total: res?.data?.count ?? active.length };
+      }
+      return { items: [], total: 0 };
+    } catch {
+      return { items: [], total: 0 };
+    }
+  };
+
+  loadRoles(): void {
+    this.roleService
+      .listRoles({ page: DEFAULT_PAGE, limit: 10 })
+      .then(response => {
+        if (this.globalService.handleSuccessService(response, false)) {
+          const all = response?.data?.roles ?? [];
+          const active = all.filter((r: any) => r.status === 1);
+          this.preloadedRoles = active;
+          this.preloadedRolesTotal = response?.data?.count ?? active.length;
+        }
+        this.cdr.markForCheck();
+      });
   }
 
   async loadGroupData(): Promise<void> {
@@ -127,8 +172,6 @@ export class EditGroupComponent
     const groupData = this.groupService.current();
 
     if (!groupData) return;
-
-    this.selectedRoleName = groupData.roleName || '';
 
     // Partition the loaded members into locked vs manageable. The
     // only lock is the logged-in user themselves — locked in every
@@ -171,7 +214,9 @@ export class EditGroupComponent
       id: groupData.id,
       name: groupData.name,
       description: groupData.description,
-      roleId: groupData.roleId,
+      // Group ↔ Role m:m — the GET response returns roleIds: string[]
+      // (and roles: {id,name}[]). Seed the multiselect from roleIds.
+      roleIds: groupData.roleIds ?? [],
       users: manageableIds,
       status: groupData.status,
     });
@@ -301,9 +346,6 @@ export class EditGroupComponent
         }
       } finally {
         this.groupForm.enable({ emitEvent: false });
-        // Re-apply the standing lock: roleId is always disabled
-        // (a group's role can't change on edit).
-        this.groupForm.get('roleId')?.disable({ emitEvent: false });
       }
     }
   }

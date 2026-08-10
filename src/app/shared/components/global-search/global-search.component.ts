@@ -84,7 +84,7 @@ export class GlobalSearchComponent implements OnInit {
   handleKeyboardEvent(event: KeyboardEvent) {
     if ((event.metaKey || event.ctrlKey) && event.key === 'k') {
       event.preventDefault();
-      if (!this.permissionService.canRead(PERMISSIONS.SYSTEM_ADMIN)) {
+      if (!this.permissionService.canRead(PERMISSIONS.SYSTEM_USER_MANAGEMENT)) {
         this.openSearchModal();
       }
       return;

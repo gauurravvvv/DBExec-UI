@@ -76,16 +76,32 @@
         >
         </app-custom-input>
 
-        <!-- Role (disabled) -->
-        <app-custom-input
-          [ngModel]="selectedRoleName"
-          [ngModelOptions]="{ standalone: true }"
+        <!-- Roles Multiselect — Group ↔ Role is many-to-many and editable. -->
+        <app-custom-multiselect
+          formControlName="roleIds"
           [label]="'COMMON.ROLE' | translate"
-          [placeholder]="'COMMON.ROLE' | translate"
-          icon="pi-id-card"
-          [inputDisabled]="true"
+          [placeholder]="'COMMON.SELECT_ROLE' | translate"
+          [serverMode]="true"
+          [fetcher]="loadRolesPage"
+          [pageSize]="10"
+          [preloadedItems]="preloadedRoles"
+          [preloadedTotal]="preloadedRolesTotal"
+          optionLabel="name"
+          optionValue="id"
+          [filter]="true"
+          filterBy="name"
+          display="chip"
+          [required]="true"
+          [showError]="
+            !!(
+              groupForm.get('roleIds')?.invalid &&
+              groupForm.get('roleIds')?.touched
+            )
+          "
+          [errorMessage]="'VALIDATION.ROLE_REQUIRED' | translate"
+          icon="pi-shield"
         >
-        </app-custom-input>
+        </app-custom-multiselect>
 
         <!-- Locked member — the self-guard. The logged-in user is
              pinned to any group they belong to so an admin can't

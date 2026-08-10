@@ -8,6 +8,12 @@ export const PERMISSIONS = {
   SYSTEM_ADMIN: 'systemAdmin',
   ORG_MANAGEMENT: 'orgManagement',
 
+  // System (master-DB) RBAC — platform equivalents of the per-org
+  // Users/Roles/Groups, nested under systemManagement on the BE catalog.
+  SYSTEM_ROLE_MANAGEMENT: 'systemRoleManagement',
+  SYSTEM_GROUP_MANAGEMENT: 'systemGroupManagement',
+  SYSTEM_USER_MANAGEMENT: 'systemUserManagement',
+
   // User Management (per-org)
   USER_MANAGEMENT: 'userManagement',
   ROLE_MANAGEMENT: 'roleManagement',

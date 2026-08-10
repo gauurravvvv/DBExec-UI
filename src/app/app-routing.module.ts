@@ -29,16 +29,42 @@ const routes: Routes = [
           import('./modules/home/home.module').then(m => m.HomeModule),
         data: { title: 'PAGE_TITLES.HOME' },
       },
+      // System (master-DB) RBAC — platform equivalents of the per-org
+      // Roles/Groups/Users. Replaces the retired single system-admin module.
       {
-        path: 'admins',
+        path: 'system-roles',
         loadChildren: () =>
-          import('./modules/system-admin/system-admin.module').then(
-            m => m.SystemAdminModule,
+          import('./modules/system-roles/system-roles.module').then(
+            m => m.SystemRoleModule,
           ),
         canActivate: [roleGuard],
         data: {
-          permission: PERMISSIONS.SYSTEM_ADMIN,
-          title: 'PAGE_TITLES.SYSTEM_ADMINS',
+          permission: PERMISSIONS.SYSTEM_ROLE_MANAGEMENT,
+          title: 'PAGE_TITLES.SYSTEM_ROLES',
+        },
+      },
+      {
+        path: 'system-groups',
+        loadChildren: () =>
+          import('./modules/system-groups/system-groups.module').then(
+            m => m.SystemGroupsModule,
+          ),
+        canActivate: [roleGuard],
+        data: {
+          permission: PERMISSIONS.SYSTEM_GROUP_MANAGEMENT,
+          title: 'PAGE_TITLES.SYSTEM_GROUPS',
+        },
+      },
+      {
+        path: 'system-users',
+        loadChildren: () =>
+          import('./modules/system-users/system-users.module').then(
+            m => m.SystemUsersModule,
+          ),
+        canActivate: [roleGuard],
+        data: {
+          permission: PERMISSIONS.SYSTEM_USER_MANAGEMENT,
+          title: 'PAGE_TITLES.SYSTEM_USERS',
         },
       },
       {

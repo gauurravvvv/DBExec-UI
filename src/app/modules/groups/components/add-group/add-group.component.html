@@ -60,9 +60,10 @@
         >
         </app-custom-input>
 
-        <!-- Role Dropdown — server-mode, scoped to the caller's org via JWT -->
-        <app-custom-dropdown
-          formControlName="roleId"
+        <!-- Roles Multiselect — Group ↔ Role is many-to-many. Server-mode,
+             scoped to the caller's org via JWT. At least one role required. -->
+        <app-custom-multiselect
+          formControlName="roleIds"
           [label]="'COMMON.ROLE' | translate"
           [placeholder]="'COMMON.SELECT_ROLE' | translate"
           [serverMode]="true"
@@ -74,17 +75,18 @@
           optionValue="id"
           [filter]="true"
           filterBy="name"
+          display="chip"
           [required]="true"
           [showError]="
             !!(
-              userGroupForm.get('roleId')?.invalid &&
-              userGroupForm.get('roleId')?.touched
+              userGroupForm.get('roleIds')?.invalid &&
+              userGroupForm.get('roleIds')?.touched
             )
           "
           [errorMessage]="'VALIDATION.ROLE_REQUIRED' | translate"
           icon="pi-shield"
         >
-        </app-custom-dropdown>
+        </app-custom-multiselect>
 
         <!-- Users Multiselect (optional - can add later) -->
         <app-custom-multiselect

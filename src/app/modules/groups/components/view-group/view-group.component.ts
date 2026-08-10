@@ -49,6 +49,17 @@ export class ViewGroupComponent implements OnInit, OnDestroy {
     this.cdr.markForCheck();
   }
 
+  /**
+   * Group ↔ Role is many-to-many — join the group's role names for the
+   * detail view. Falls back to an em-dash when a group has no roles.
+   */
+  roleNames(): string {
+    const names = (this.groupData?.roles ?? [])
+      .map((r: any) => r?.name)
+      .filter(Boolean);
+    return names.length ? names.join(', ') : '—';
+  }
+
   onEdit() {
     this.router.navigate([GROUP.edit(this.groupId)], {
       queryParams: {

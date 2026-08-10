@@ -1,0 +1,223 @@
+<div class="dataset-page-wrapper">
+  <div class="dataset-content-container">
+    <!-- Header Section -->
+    <div class="page-header-section">
+      <div class="header-content">
+        <h2>{{ 'SYSTEM_ROLE.TITLE' | translate }}</h2>
+      </div>
+
+      <div class="header-actions">
+        <!-- Add Button -->
+        <button
+          *hasPermission="'systemRoleManagement'; level: 'write'"
+          pButton
+          [label]="'COMMON.ADD' | translate"
+          icon="pi pi-plus"
+          (click)="onAddNewRole()"
+          class="p-button-raised p-button-primary modern-button"
+        ></button>
+      </div>
+    </div>
+
+    <!-- Content Card -->
+    <div class="content-card">
+      <!-- Unified simple table. Infinite scroll, global search + on-demand
+           per-column filters (shared inputs), per-row actions. System roles are
+           platform-wide with no secondary filter, so there's no toolbar-left slot.
+           Per-cell DOM via <ng-template usGridCell>. -->
+      <div class="table-wrapper" *ngIf="adapter">
+        <app-custom-table
+          [columns]="cols"
+          [serverAdapter]="adapter"
+          [config]="tableConfig"
+          [hasProjectedEmpty]="true"
+          (refresh)="refreshList()"
+        >
+          <!-- Empty body — always projected so only one empty state shows. -->
+          <div tableEmpty class="ct-empty-body">
+            <i class="pi pi-inbox"></i>
+            <span>{{ 'COMMON.NO_RECORDS' | translate }}</span>
+          </div>
+
+          <ng-template usGridCell="name" let-role>
+            <span class="role-name-cell">
+              <a
+                class="dataset-name-link"
+                [routerLink]="['/app/system-roles', role.id]"
+              >
+                {{ role.name }}
+              </a>
+              <span
+                *ngIf="role.isDefault === 1"
+                class="default-badge"
+                [pTooltip]="'ROLE.CANNOT_EDIT_DEFAULT' | translate"
+                tooltipPosition="top"
+              >
+                {{ 'ROLE.DEFAULT' | translate }}
+              </span>
+            </span>
+          </ng-template>
+
+          <ng-template usGridCell="description" let-role>
+            <span class="description-text" [title]="role.description">
+              {{ role.description }}
+            </span>
+          </ng-template>
+
+          <ng-template usGridCell="status" let-role>
+            <span
+              class="status-pill"
+              [ngClass]="{
+                active: role.status === 1,
+                inactive: role.status !== 1,
+              }"
+            >
+              <span class="dot"></span>
+              {{
+                role.status === 1
+                  ? ('COMMON.ACTIVE' | translate)
+                  : ('COMMON.INACTIVE' | translate)
+              }}
+            </span>
+          </ng-template>
+
+          <ng-template usGridCell="createdOn" let-role>
+            <span
+              class="date-text"
+              [pTooltip]="
+                (role.createdOn | date: 'dd MMM yyyy, HH:mm:ss') || ''
+              "
+              tooltipPosition="top"
+            >
+              {{ role.createdOn | relativeTime }}
+            </span>
+          </ng-template>
+
+          <ng-template usGridCell="actions" let-role>
+            <div class="row-actions">
+              <button
+                *hasPermission="'systemRoleManagement'; level: 'write'"
+                class="icon-btn edit-btn"
+                (click)="onEdit(role.id)"
+                [attr.aria-label]="'COMMON.EDIT' | translate"
+                [pTooltip]="
+                  (role.canEdit === false
+                    ? 'ROLE.CANNOT_EDIT_DEFAULT'
+                    : 'COMMON.EDIT'
+                  ) | translate
+                "
+                tooltipPosition="bottom"
+                [disabled]="role.canEdit === false"
+              >
+                <i class="pi pi-pencil"></i>
+              </button>
+              <button
+                *hasPermission="'systemRoleManagement'; level: 'delete'"
+                class="icon-btn delete-btn"
+                (click)="confirmDelete(role.id)"
+                [attr.aria-label]="'COMMON.DELETE' | translate"
+                [pTooltip]="
+                  (role.canDelete === false
+                    ? 'ROLE.CANNOT_DELETE_DEFAULT'
+                    : 'COMMON.DELETE'
+                  ) | translate
+                "
+                tooltipPosition="bottom"
+                [disabled]="role.canDelete === false || isDeleting(role.id)"
+              >
+                <i
+                  class="pi"
+                  [ngClass]="
+                    isDeleting(role.id) ? 'pi-spin pi-spinner' : 'pi-trash'
+                  "
+                ></i>
+              </button>
+            </div>
+          </ng-template>
+        </app-custom-table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="confirmation-popup" *ngIf="showDeleteConfirm">
+  <div
+    class="popup-content"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="listRoleDeleteTitle"
+  >
+    <!-- Header -->
+    <div class="popup-header">
+      <div class="popup-icon">
+        <i class="pi pi-trash"></i>
+      </div>
+      <h3 id="listRoleDeleteTitle">
+        {{ 'COMMON.CONFIRM_DELETE' | translate }}
+      </h3>
+    </div>
+
+    <!-- Delete Info Section -->
+    <div class="standard-delete-section">
+      <p class="delete-intro">
+        {{ 'ROLE.DELETE_SINGLE' | translate }}
+      </p>
+
+      <ul class="delete-info-list">
+        <li>
+          <i class="pi pi-info-circle"></i>
+          <span>{{ 'ROLE.DELETE_LOSE_PERMISSIONS' | translate }}</span>
+        </li>
+        <li>
+          <i class="pi pi-info-circle"></i>
+          <span>{{ 'ROLE.DELETE_CONFIG_REMOVED' | translate }}</span>
+        </li>
+        <li>
+          <i class="pi pi-info-circle"></i>
+          <span>{{ 'COMMON.DELETE_CANNOT_UNDO' | translate }}</span>
+        </li>
+      </ul>
+
+      <div class="justification-section">
+        <label for="deleteJustification"
+          >{{ 'COMMON.JUSTIFICATION' | translate }}
+          <span class="required">*</span></label
+        >
+        <app-custom-textarea
+          inputId="deleteJustification"
+          [(ngModel)]="deleteJustification"
+          [placeholder]="'COMMON.JUSTIFICATION_DELETE_PLACEHOLDER' | translate"
+          [rows]="3"
+          [maxLength]="500"
+        ></app-custom-textarea>
+        <small class="char-count">{{ deleteJustification.length }}/500</small>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="popup-actions">
+      <button class="btn-cancel" (click)="cancelDelete()">
+        <i class="pi pi-times"></i>
+        {{ 'COMMON.CANCEL' | translate }}
+      </button>
+      <button
+        class="btn-confirm"
+        (click)="proceedDelete()"
+        [disabled]="
+          !deleteJustification.trim() ||
+          !!(roleToDelete && isDeleting(roleToDelete))
+        "
+      >
+        <i
+          class="pi"
+          [ngClass]="
+            !!(roleToDelete && isDeleting(roleToDelete))
+              ? 'pi-spin pi-spinner'
+              : 'pi-trash'
+          "
+        ></i>
+        {{ 'COMMON.DELETE' | translate }}
+      </button>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,548 @@
+// Full-page bulk-add component — visually aligned with add-user.
+.bulk-add-wrapper {
+  background-color: var(--card-background);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+
+  .bulk-add-container {
+    padding: var(--space-8);
+    max-width: 100%;
+    margin: var(--space-0);
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    max-height: calc(100vh - 145px);
+
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+      flex-shrink: 0;
+
+      .left-section {
+        display: flex;
+        align-items: center;
+        gap: var(--space-6);
+
+        .back-button {
+          padding: var(--space-0) !important;
+          width: 36px;
+          height: 36px;
+          border-radius: 50% !important;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background: transparent !important;
+          color: var(--text-color) !important;
+          min-width: 0;
+          border: none !important;
+          transition: all var(--motion-base) ease;
+
+          &:hover {
+            background: var(--hover-background) !important;
+          }
+
+          i {
+            font-size: var(--fs-h2);
+          }
+        }
+
+        h2 {
+          color: var(--text-color);
+          margin: var(--space-0);
+          font-size: var(--fs-h1);
+          font-weight: var(--fw-semibold);
+        }
+      }
+
+      .action-buttons {
+        display: flex;
+        gap: var(--space-5);
+
+        .btn-cancel {
+          background: var(--card-background) !important;
+          border: 1px solid var(--border-color) !important;
+          color: var(--text-color) !important;
+          padding: 0.65rem 1.25rem;
+          border-radius: var(--radius-sm) !important;
+          font-weight: var(--fw-semibold);
+          box-shadow: var(--shadow-sm);
+
+          &:hover:not(:disabled) {
+            background: var(--hover-background) !important;
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+          }
+
+          &:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+          }
+        }
+
+        .btn-save {
+          background: linear-gradient(
+            135deg,
+            var(--primary-color),
+            var(--primary-hover)
+          ) !important;
+          color: white !important;
+          border: none !important;
+          padding: 0.65rem 1.25rem;
+          border-radius: var(--radius-sm) !important;
+          font-weight: var(--fw-semibold);
+          box-shadow: 0 4px 10px var(--primary-color-transparent);
+          transition: all var(--motion-base) ease;
+
+          &:hover:not(:disabled) {
+            opacity: 1;
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+          }
+
+          &:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            background: var(--secondary-color) !important;
+            box-shadow: none;
+          }
+
+          i {
+            font-size: var(--fs-body);
+          }
+        }
+      }
+    }
+
+    // Scrolling form column — mirrors add-user's .admin-form pattern.
+    .bulk-form {
+      flex: 1;
+      overflow-y: auto;
+      padding-right: 12px;
+
+      &::-webkit-scrollbar {
+        width: 8px;
+      }
+
+      &::-webkit-scrollbar-track {
+        background: var(--card-background);
+        border-radius: var(--radius-xs);
+      }
+
+      &::-webkit-scrollbar-thumb {
+        background: var(--border-color);
+        border-radius: var(--radius-xs);
+
+        &:hover {
+          background: var(--secondary-color);
+        }
+      }
+    }
+  }
+}
+
+// The single-column form grid — 50% width on desktop, full on small screens.
+// Mirrors add-user's .form-grid exactly.
+.form-grid {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+  width: 50%;
+  margin-bottom: 0;
+  padding-bottom: 24px;
+
+  @media (max-width: 768px) {
+    width: 100%;
+  }
+}
+
+.form-field {
+  width: 100%;
+
+  label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: var(--text-color);
+    font-weight: var(--fw-medium);
+
+    .required {
+      color: var(--error-color);
+    }
+  }
+
+  .error-message {
+    color: var(--error-color);
+    font-size: var(--fs-body);
+    margin-top: 0.25rem;
+    display: block;
+  }
+}
+
+.template-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-6);
+  padding: 1rem 1.25rem;
+  background: var(--hover-background);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+
+  .template-text {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+
+    strong {
+      color: var(--text-color);
+      font-size: var(--fs-h3);
+    }
+    small {
+      color: var(--secondary-color);
+      font-size: var(--fs-control);
+    }
+  }
+}
+
+.file-picker {
+  &.disabled .file-picker-label {
+    cursor: not-allowed;
+    opacity: 0.55;
+  }
+
+  .file-picker-label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-4);
+    padding: 1.5rem 1rem;
+    border: 2px dashed var(--border-color);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    color: var(--secondary-color);
+    transition:
+      border-color var(--motion-fast) ease,
+      background-color var(--motion-fast) ease,
+      color var(--motion-fast) ease,
+      opacity var(--motion-fast) ease;
+
+    &:hover:not(.is-disabled) {
+      border-color: var(--primary-color);
+      background: var(--primary-color-transparent);
+      color: var(--primary-color);
+    }
+
+    &.is-disabled {
+      pointer-events: none;
+    }
+
+    i {
+      font-size: var(--fs-h1);
+    }
+    .file-name {
+      font-weight: var(--fw-semibold);
+      color: var(--text-color);
+    }
+    .browse-link {
+      color: var(--primary-color);
+      font-weight: var(--fw-semibold);
+      text-decoration: underline;
+      margin-left: 0.25rem;
+    }
+  }
+
+  .file-error,
+  .error-text {
+    display: block;
+    margin-top: 0.4rem;
+    color: var(--error-color);
+    font-size: var(--fs-control);
+  }
+}
+
+.info-list {
+  list-style: none;
+  margin: var(--space-0);
+  padding: var(--space-0);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+
+  li {
+    display: flex;
+    gap: var(--space-4);
+    align-items: flex-start;
+    color: var(--secondary-color);
+    font-size: var(--fs-control);
+    line-height: 1.45;
+
+    i {
+      color: var(--primary-color);
+      margin-top: 2px;
+      flex-shrink: 0;
+    }
+  }
+}
+
+// Summary tiles — compact, sized for the half-width form column.
+.summary-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+  gap: var(--space-5);
+}
+
+.summary-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.2rem;
+  padding: 0.7rem 0.85rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+  background: var(--card-background);
+
+  .num {
+    font-size: var(--fs-h1);
+    font-weight: var(--fw-semibold);
+    line-height: 1;
+    color: var(--text-color);
+    font-variant-numeric: tabular-nums;
+  }
+  .lbl {
+    font-size: var(--fs-micro);
+    color: var(--secondary-color);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    font-weight: var(--fw-semibold);
+  }
+
+  &.success {
+    background: var(--success-bg, rgba(34, 197, 94, 0.08));
+    border-color: var(--success-color);
+    .num {
+      color: var(--success-color);
+    }
+  }
+  &.warning {
+    background: var(--warning-bg, rgba(234, 179, 8, 0.1));
+    border-color: var(--warning-color);
+    .num {
+      color: var(--warning-color);
+    }
+  }
+  &.total {
+    .num {
+      color: var(--text-color);
+    }
+  }
+}
+
+.invalid-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+
+  .list-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: var(--fs-control);
+    color: var(--secondary-color);
+    font-weight: var(--fw-semibold);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  .rows-scroll {
+    max-height: 320px;
+    overflow-y: auto;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    background: var(--card-background);
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: var(--fs-body);
+
+      thead th {
+        position: sticky;
+        top: 0;
+        background: var(--hover-background);
+        color: var(--secondary-color);
+        font-weight: var(--fw-semibold);
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        font-size: var(--fs-micro);
+        padding: 0.6rem 0.9rem;
+        text-align: left;
+        border-bottom: 1px solid var(--border-color);
+      }
+
+      tbody td {
+        padding: 0.6rem 0.9rem;
+        border-bottom: 1px solid var(--border-color);
+        color: var(--text-color);
+
+        &.num {
+          width: 4rem;
+          color: var(--secondary-color);
+          font-variant-numeric: tabular-nums;
+        }
+        &.reason {
+          color: var(--error-color);
+        }
+      }
+
+      tbody tr:last-child td {
+        border-bottom: none;
+      }
+    }
+  }
+}
+
+.proceed-prompt {
+  margin: var(--space-0);
+  padding: 0.9rem 1.1rem;
+  background: var(--primary-color-transparent);
+  border-radius: var(--radius-md);
+  color: var(--text-color);
+  font-size: var(--fs-body);
+  line-height: 1.5;
+
+  &.error {
+    background: var(--error-bg);
+    color: var(--error-color);
+  }
+}
+
+.busy-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-6);
+  padding: 4rem 2rem;
+  flex: 1;
+
+  .spinner i {
+    font-size: var(--fs-h1);
+    color: var(--primary-color);
+  }
+  p {
+    margin: var(--space-0);
+    color: var(--secondary-color);
+    font-size: var(--fs-h3);
+  }
+}
+
+.link-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: transparent;
+  border: none;
+  color: var(--primary-color);
+  font-weight: var(--fw-semibold);
+  font-size: var(--fs-body);
+  cursor: pointer;
+  padding: var(--space-0);
+
+  &:hover {
+    text-decoration: underline;
+  }
+  &:focus-visible {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
+    border-radius: var(--radius-xs);
+  }
+}
+
+// PrimeNG overrides — verbatim from add-user so light/dark themes render
+// identically across both components.
+:host ::ng-deep {
+  .p-button {
+    &.p-button-text {
+      background: transparent !important;
+      border: none !important;
+      color: var(--text-color) !important;
+      padding: var(--space-4) !important;
+
+      &:hover {
+        background: var(--hover-background) !important;
+      }
+
+      i {
+        color: var(--text-color) !important;
+      }
+    }
+
+    &.p-button-outlined {
+      background: transparent !important;
+      border: 1px solid var(--primary-color) !important;
+      color: var(--primary-color) !important;
+
+      &:hover:not(:disabled) {
+        background: var(--primary-color-transparent) !important;
+      }
+
+      &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+    }
+  }
+
+  .p-dropdown {
+    background: var(--card-background) !important;
+    border: 1px solid var(--border-color) !important;
+
+    &:not(.p-disabled):hover {
+      border-color: var(--primary-color) !important;
+    }
+
+    &.p-focus {
+      border-color: var(--primary-color) !important;
+      box-shadow: 0 0 0 1px var(--primary-color-transparent) !important;
+    }
+
+    .p-dropdown-label {
+      color: var(--text-color) !important;
+
+      &.p-placeholder {
+        color: var(--text-color) !important;
+        opacity: 0.7;
+      }
+    }
+  }
+
+  .p-dropdown-panel {
+    background: var(--card-background) !important;
+    border: 1px solid var(--border-color) !important;
+    margin-top: 2px;
+
+    .p-dropdown-items {
+      padding: 0.5rem 0;
+      background: var(--card-background) !important;
+
+      .p-dropdown-item {
+        color: var(--text-color) !important;
+        padding: 0.75rem 1rem;
+
+        &:hover {
+          background: var(--hover-background) !important;
+          color: var(--text-color) !important;
+        }
+
+        &.p-highlight {
+          background: var(--hover-background) !important;
+          color: var(--primary-color) !important;
+        }
+      }
+    }
+  }
+}

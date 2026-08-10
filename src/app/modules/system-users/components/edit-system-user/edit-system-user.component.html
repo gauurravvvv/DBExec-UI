@@ -1,0 +1,207 @@
+<div class="add-admin-wrapper">
+  <div class="add-admin-container">
+    <!-- Header Section -->
+    <div class="page-header">
+      <div class="left-section">
+        <button
+          pButton
+          class="p-button-text back-button"
+          routerLink="/app/system-users"
+          [attr.aria-label]="'COMMON.BACK' | translate"
+        >
+          <i class="pi pi-arrow-left"></i>
+        </button>
+        <h2>{{ 'SYSTEM_USER.EDIT_TITLE' | translate }}</h2>
+      </div>
+      <div class="action-buttons">
+        <app-button
+          variant="secondary"
+          [disabled]="!isFormDirty || isCancelClicked"
+          (clicked)="onCancel()"
+          >{{ 'COMMON.CANCEL' | translate }}</app-button
+        >
+        <app-button
+          *hasPermission="'systemUserManagement'; level: 'write'"
+          variant="primary"
+          icon="pi pi-save"
+          [loading]="saving()"
+          [disabled]="userForm.invalid || !isFormDirty || saving() || !userData"
+          (clicked)="onSubmit()"
+          >{{ 'COMMON.SAVE' | translate }}</app-button
+        >
+      </div>
+    </div>
+
+    <!-- Centered branded loader while the GET is in flight; page
+         chrome stays usable, save is disabled until userData is
+         hydrated. -->
+    <app-content-loader *ngIf="loading() && !userData"></app-content-loader>
+
+    <!-- Form Section -->
+    <form
+      autocomplete="off"
+      *ngIf="userData"
+      [formGroup]="userForm"
+      class="admin-form"
+    >
+      <div class="form-grid">
+        <!-- Full Name -->
+        <app-custom-input
+          formControlName="fullName"
+          [label]="'COMMON.FULL_NAME' | translate"
+          [placeholder]="'COMMON.ENTER_FULL_NAME' | translate"
+          icon="pi-user"
+          [required]="true"
+          [showError]="
+            !!(
+              userForm.get('fullName')?.invalid &&
+              userForm.get('fullName')?.touched
+            )
+          "
+          [errorMessage]="getFullNameError()"
+        >
+        </app-custom-input>
+
+        <!-- Username (disabled) -->
+        <app-custom-input
+          formControlName="username"
+          [label]="'COMMON.USERNAME' | translate"
+          [placeholder]="'COMMON.ENTER_USERNAME' | translate"
+          icon="pi-user"
+          [required]="true"
+          [inputDisabled]="true"
+        >
+        </app-custom-input>
+
+        <!-- Email -->
+        <app-custom-input
+          formControlName="email"
+          [label]="'COMMON.EMAIL' | translate"
+          [placeholder]="'COMMON.ENTER_EMAIL' | translate"
+          icon="pi-envelope"
+          type="email"
+          [required]="true"
+          [showError]="
+            !!(userForm.get('email')?.invalid && userForm.get('email')?.touched)
+          "
+          [errorMessage]="
+            userForm.get('email')?.errors?.['required']
+              ? ('VALIDATION.EMAIL_REQUIRED' | translate)
+              : userForm.get('email')?.errors?.['email']
+                ? ('VALIDATION.EMAIL_INVALID' | translate)
+                : ''
+          "
+        >
+        </app-custom-input>
+
+        <!-- Groups -->
+        <div class="form-field">
+          <label
+            >{{ 'USER.GROUPS' | translate }}
+            <span class="required">*</span></label
+          >
+          <app-custom-multiselect
+            formControlName="groupIds"
+            [serverMode]="true"
+            [fetcher]="loadGroupsPage"
+            [resolveSelected]="resolveSelectedGroup"
+            [pageSize]="10"
+            [preloadedItems]="preloadedGroups"
+            [preloadedTotal]="preloadedGroupsTotal"
+            optionLabel="name"
+            optionValue="id"
+            [placeholder]="'USER.SELECT_GROUPS' | translate"
+            display="chip"
+            [filter]="true"
+            icon="pi-users"
+            [attr.aria-describedby]="
+              userForm.get('groupIds')?.touched &&
+              userForm.get('groupIds')?.errors?.['minCount']
+                ? 'editUserGroupsError'
+                : null
+            "
+          ></app-custom-multiselect>
+          <small
+            id="editUserGroupsError"
+            class="error-message"
+            *ngIf="
+              userForm.get('groupIds')?.touched &&
+              userForm.get('groupIds')?.errors?.['minCount']
+            "
+          >
+            {{ 'USER.GROUP_REQUIRED' | translate }}
+          </small>
+        </div>
+
+        <!-- Status -->
+        <div>
+          <app-custom-toggle
+            formControlName="status"
+            [label]="'COMMON.STATUS' | translate"
+            [trueValue]="1"
+            [falseValue]="0"
+            [trueLabel]="'COMMON.ACTIVE' | translate"
+            [falseLabel]="'COMMON.INACTIVE' | translate"
+          >
+          </app-custom-toggle>
+          <small *ngIf="isLocked" class="locked-note">
+            <i class="pi pi-lock"></i>
+            {{ 'COMMON.LOCKED_NOTE' | translate }}
+          </small>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="confirmation-popup" *ngIf="showSaveConfirm">
+  <div
+    class="popup-content"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="editUserSaveTitle"
+  >
+    <div class="popup-header">
+      <div class="popup-icon">
+        <i class="pi pi-save"></i>
+      </div>
+      <h3 id="editUserSaveTitle">{{ 'COMMON.CONFIRM_UPDATE' | translate }}</h3>
+    </div>
+    <div class="standard-delete-section">
+      <p class="delete-intro">
+        {{ 'USER.CONFIRM_UPDATE_MESSAGE' | translate }}
+      </p>
+      <div class="justification-section">
+        <label for="saveJustification"
+          >{{ 'COMMON.JUSTIFICATION' | translate }}
+          <span class="required">*</span></label
+        >
+        <app-custom-textarea
+          inputId="saveJustification"
+          [(ngModel)]="saveJustification"
+          [placeholder]="'COMMON.JUSTIFICATION_UPDATE_PLACEHOLDER' | translate"
+          [rows]="3"
+          [maxLength]="500"
+        ></app-custom-textarea>
+        <small class="char-count">{{ saveJustification.length }}/500</small>
+      </div>
+    </div>
+    <div class="popup-actions">
+      <button class="btn-cancel" (click)="cancelSave()">
+        <i class="pi pi-times"></i>
+        {{ 'COMMON.CANCEL' | translate }}
+      </button>
+      <button
+        class="btn-confirm"
+        (click)="proceedSave()"
+        [disabled]="!saveJustification.trim() || saving()"
+      >
+        <i
+          class="pi"
+          [ngClass]="saving() ? 'pi-spin pi-spinner' : 'pi-check'"
+        ></i>
+        {{ 'COMMON.UPDATE' | translate }}
+      </button>
+    </div>
+  </div>
+</div>

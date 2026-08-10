@@ -55,8 +55,16 @@ function feature(base: string) {
   };
 }
 
-export const SYSTEM_ADMIN = feature('/app/admins');
 export const ORGANISATION = feature('/app/organisations');
+
+// System (master-DB) RBAC screens — platform equivalents of the per-org
+// Roles/Groups/Users, under /app/system-*.
+export const SYSTEM_ROLE = feature('/app/system-roles');
+export const SYSTEM_GROUP = feature('/app/system-groups');
+export const SYSTEM_USER = {
+  ...feature('/app/system-users'),
+  BULK_ADD: '/app/system-users/bulk-add',
+};
 
 export const GROUP = feature('/app/groups');
 

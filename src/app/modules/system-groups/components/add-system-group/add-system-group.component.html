@@ -1,0 +1,113 @@
+<div class="add-admin-wrapper">
+  <div class="add-admin-container">
+    <!-- Header Section -->
+    <div class="page-header">
+      <div class="left-section">
+        <button
+          pButton
+          class="p-button-text back-button"
+          routerLink="/app/system-groups"
+        >
+          <i class="pi pi-arrow-left"></i>
+        </button>
+        <h2>{{ 'SYSTEM_GROUP.ADD_TITLE' | translate }}</h2>
+      </div>
+      <div class="action-buttons">
+        <app-button
+          variant="secondary"
+          [disabled]="!isFormDirty"
+          (clicked)="onCancel()"
+          >{{ 'COMMON.CANCEL' | translate }}</app-button
+        >
+        <app-button
+          *hasPermission="'systemGroupManagement'; level: 'write'"
+          variant="primary"
+          icon="pi pi-save"
+          [loading]="saving()"
+          [disabled]="!canSubmit() || saving()"
+          (clicked)="onSubmit()"
+          >{{ 'COMMON.SAVE' | translate }}</app-button
+        >
+      </div>
+    </div>
+
+    <!-- Form Section -->
+    <form autocomplete="off" [formGroup]="userGroupForm" class="admin-form">
+      <div class="form-grid">
+        <!-- Name Field -->
+        <app-custom-input
+          formControlName="name"
+          [label]="'COMMON.NAME' | translate"
+          [placeholder]="'COMMON.ENTER_NAME' | translate"
+          icon="pi-id-card"
+          [required]="true"
+          [showError]="
+            !!(
+              userGroupForm.get('name')?.invalid &&
+              userGroupForm.get('name')?.touched
+            )
+          "
+          [errorMessage]="getNameError()"
+        >
+        </app-custom-input>
+
+        <!-- Description Field -->
+        <app-custom-input
+          formControlName="description"
+          [label]="'COMMON.DESCRIPTION' | translate"
+          [placeholder]="'COMMON.ENTER_DESCRIPTION' | translate"
+          icon="pi-align-left"
+        >
+        </app-custom-input>
+
+        <!-- Roles Multiselect — Group ↔ Role is many-to-many. Server-mode,
+             fetches SYSTEM roles; at least one role is required. Patterned
+             on the users multiselect below. -->
+        <app-custom-multiselect
+          formControlName="roleIds"
+          [label]="'COMMON.ROLE' | translate"
+          [placeholder]="'COMMON.SELECT_ROLE' | translate"
+          [serverMode]="true"
+          [fetcher]="loadRolesPage"
+          [pageSize]="10"
+          [preloadedItems]="preloadedRoles"
+          [preloadedTotal]="preloadedRolesTotal"
+          optionLabel="name"
+          optionValue="id"
+          [filter]="true"
+          filterBy="name"
+          display="chip"
+          [required]="true"
+          [showError]="
+            !!(
+              userGroupForm.get('roleIds')?.invalid &&
+              userGroupForm.get('roleIds')?.touched
+            )
+          "
+          [errorMessage]="'VALIDATION.ROLE_REQUIRED' | translate"
+          icon="pi-shield"
+        >
+        </app-custom-multiselect>
+
+        <!-- Users Multiselect (optional - can add later) -->
+        <app-custom-multiselect
+          formControlName="users"
+          [label]="'GROUP.USERS' | translate"
+          [placeholder]="'GROUP.SELECT_USERS_OPTIONAL' | translate"
+          [serverMode]="true"
+          [fetcher]="loadUsersPage"
+          [pageSize]="10"
+          [preloadedItems]="preloadedUsers"
+          [preloadedTotal]="preloadedUsersTotal"
+          optionLabel="username"
+          optionValue="id"
+          [filter]="true"
+          filterBy="username"
+          display="chip"
+          icon="pi-users"
+        >
+        </app-custom-multiselect>
+      </div>
+    </form>
+  </div>
+</div>

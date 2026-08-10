@@ -34,7 +34,7 @@ export class EmptyRootComponent implements OnInit {
       return;
     }
 
-    const target = this.permissionService.canRead(PERMISSIONS.SYSTEM_ADMIN)
+    const target = this.permissionService.canRead(PERMISSIONS.SYSTEM_USER_MANAGEMENT)
       ? '/app/home/system-admin'
       : '/app/home/org';
     this.router.navigate([target]);

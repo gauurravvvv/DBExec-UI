@@ -16,7 +16,7 @@ import { UserService } from 'src/app/modules/users/services/user.service';
 import {
   groupDescriptionSchema,
   groupNameSchema,
-  roleIdSchema,
+  roleIdsSchema,
 } from 'src/app/shared/validators/groups';
 import { zodValidator } from 'src/app/shared/validators/zod-validator';
 import { GroupService } from '../../services/group.service';
@@ -71,7 +71,8 @@ export class AddGroupComponent implements OnInit, HasUnsavedChanges {
     this.userGroupForm = this.fb.group({
       name: ['', [zodValidator(groupNameSchema)]],
       description: ['', [zodValidator(groupDescriptionSchema)]],
-      roleId: ['', [zodValidator(roleIdSchema)]],
+      // Group ↔ Role is many-to-many — a multi-select of role ids.
+      roleIds: [[], [zodValidator(roleIdsSchema)]],
       users: [[]],
     });
   }

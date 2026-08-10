@@ -2247,7 +2247,10 @@
     "EMBED_DASHBOARD": "대시보드",
     "NOTIFICATIONS": "알림",
     "USER_ACTIVITY": "활동",
-    "AI_WORKSPACE": "AI 어시스턴트"
+    "AI_WORKSPACE": "AI 어시스턴트",
+    "SYSTEM_ROLES": "시스템 역할",
+    "SYSTEM_GROUPS": "시스템 그룹",
+    "SYSTEM_USERS": "시스템 사용자"
   },
   "AUTH": {
     "HEADLINE_LOGIN": "데이터 소스\n관리 경험을 향상시키세요",
@@ -4183,6 +4186,10 @@
       },
       "users": {
         "idInvalid": "하나 이상의 사용자 식별자가 유효하지 않습니다"
+      },
+      "roleIds": {
+        "required": "하나 이상의 역할을 선택해야 합니다",
+        "invalid": "선택한 역할 중 하나 이상이 유효하지 않습니다"
       }
     },
     "auth": {
@@ -5762,5 +5769,24 @@
     "DESC_PLACEHOLDER": "Optional short description",
     "SEARCH_PLACEHOLDER": "Search themes…",
     "PREVIEW": "미리보기"
+  },
+  "SYSTEM_ROLE": {
+    "TITLE": "시스템 역할",
+    "ADD_TITLE": "시스템 역할 추가",
+    "EDIT_TITLE": "시스템 역할 편집",
+    "VIEW_TITLE": "시스템 역할 세부 정보"
+  },
+  "SYSTEM_GROUP": {
+    "TITLE": "시스템 그룹",
+    "ADD_TITLE": "시스템 그룹 추가",
+    "EDIT_TITLE": "시스템 그룹 편집",
+    "VIEW_TITLE": "시스템 그룹 세부 정보"
+  },
+  "SYSTEM_USER": {
+    "TITLE": "시스템 사용자",
+    "ADD_TITLE": "시스템 사용자 추가",
+    "EDIT_TITLE": "시스템 사용자 편집",
+    "VIEW_TITLE": "시스템 사용자 세부 정보",
+    "BULK_ADD_TITLE": "시스템 사용자 일괄 추가"
   }
 }

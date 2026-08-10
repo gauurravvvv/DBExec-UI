@@ -1,0 +1,239 @@
+<div class="view-category-wrapper">
+  <div class="view-category-container">
+    <!-- Header Section -->
+    <div class="page-header">
+      <div class="left-section">
+        <button
+          pButton
+          class="p-button-text back-button"
+          (click)="goBack()"
+          [attr.aria-label]="'COMMON.BACK' | translate"
+        >
+          <i class="pi pi-arrow-left"></i>
+        </button>
+        <h2>{{ 'SYSTEM_GROUP.VIEW_TITLE' | translate }}</h2>
+      </div>
+      <div class="header-actions" *ngIf="groupData">
+        <button
+          *hasPermission="'systemGroupManagement'; level: 'write'"
+          class="btn-primary"
+          (click)="onEdit()"
+          [disabled]="groupData.canEdit === false"
+          [pTooltip]="
+            groupData.canEdit === false
+              ? ('GROUP.CANNOT_EDIT_DEFAULT' | translate)
+              : null
+          "
+          tooltipPosition="bottom"
+        >
+          <i class="pi pi-pencil"></i>
+          {{ 'COMMON.EDIT' | translate }}
+        </button>
+        <ng-container *hasPermission="'systemGroupManagement'; level: 'delete'">
+          <button
+            class="btn-danger"
+            type="button"
+            [disabled]="
+              groupData.canDelete === false || isDeleting(groupData.id)
+            "
+            [pTooltip]="
+              groupData.canDelete === false
+                ? ('GROUP.CANNOT_DELETE_DEFAULT' | translate)
+                : null
+            "
+            tooltipPosition="bottom"
+            (click)="confirmDelete()"
+          >
+            <i
+              class="pi"
+              [ngClass]="
+                isDeleting(groupData.id) ? 'pi-spin pi-spinner' : 'pi-trash'
+              "
+            ></i>
+            {{ 'COMMON.DELETE' | translate }}
+          </button>
+        </ng-container>
+      </div>
+    </div>
+
+    <!-- Centered branded loader while the GET is in flight. -->
+    <app-content-loader *ngIf="loading() && !groupData"></app-content-loader>
+
+    <!-- Content Section -->
+    <div class="content-section" *ngIf="groupData">
+      <div class="details-grid">
+        <!-- Basic Information -->
+        <div class="info-section">
+          <h3>
+            <i class="pi pi-info-circle mr-2"></i>
+            {{ 'GROUP.BASIC_INFORMATION' | translate }}
+          </h3>
+          <div class="info-grid">
+            <div class="info-item">
+              <label>{{ 'COMMON.NAME' | translate }}</label>
+              <p>
+                {{ groupData.name }}
+                <span *ngIf="groupData.isDefault === 1" class="default-badge">
+                  {{ 'GROUP.DEFAULT' | translate }}
+                </span>
+              </p>
+            </div>
+            <div class="info-item">
+              <label>{{ 'COMMON.DESCRIPTION' | translate }}</label>
+              <p>
+                {{
+                  groupData.description || ('GROUP.NO_DESCRIPTION' | translate)
+                }}
+              </p>
+            </div>
+            <!-- Roles — many-to-many, joined for display. -->
+            <div class="info-item">
+              <label>{{ 'COMMON.ROLE' | translate }}</label>
+              <p class="with-icon">
+                <i class="pi pi-shield mr-2"></i>
+                {{ roleNames() || '—' }}
+              </p>
+            </div>
+            <div class="info-item">
+              <label>{{ 'COMMON.STATUS' | translate }}</label>
+              <span
+                class="status-badge"
+                [class.active]="groupData.status === 1"
+              >
+                <i
+                  class="pi"
+                  [ngClass]="
+                    groupData.status === 1
+                      ? 'pi-check-circle'
+                      : 'pi-times-circle'
+                  "
+                ></i>
+                {{
+                  groupData.status === 1
+                    ? ('COMMON.ACTIVE' | translate)
+                    : ('COMMON.INACTIVE' | translate)
+                }}
+              </span>
+            </div>
+            <div class="info-item">
+              <label>{{ 'COMMON.ORGANISATION' | translate }}</label>
+              <p class="with-icon">
+                <i class="pi pi-building mr-2"></i>
+                {{ groupData.organisationName }}
+              </p>
+            </div>
+            <div class="info-item">
+              <label>{{ 'COMMON.CREATED_ON' | translate }}</label>
+              <p class="with-icon">
+                <i class="pi pi-calendar mr-2"></i>
+                {{ groupData.createdOn | date: 'medium' }}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Fields Configuration -->
+        <div class="info-section">
+          <h3>
+            <i class="pi pi-users mr-2"></i>
+            {{ 'GROUP.USERS_MAPPING' | translate }}
+            <span class="count-badge">{{ groupData.userGroups.length }}</span>
+          </h3>
+          <div class="fields-list">
+            <div
+              class="field-item"
+              *ngFor="let field of groupData.userGroups; trackBy: trackByIndex"
+            >
+              <i class="pi pi-user"></i>
+              {{ field.user.username }}
+            </div>
+            <div *ngIf="groupData?.userGroups.length === 0" class="no-data">
+              {{ 'GROUP.NO_USERS_FOUND' | translate }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="confirmation-popup" *ngIf="showDeleteConfirm">
+  <div
+    class="popup-content"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="viewGroupDeleteTitle"
+  >
+    <!-- Header -->
+    <div class="popup-header">
+      <div class="popup-icon">
+        <i class="pi pi-trash"></i>
+      </div>
+      <h3 id="viewGroupDeleteTitle">
+        {{ 'COMMON.CONFIRM_DELETE' | translate }}
+      </h3>
+    </div>
+
+    <!-- Delete Info Section -->
+    <div class="standard-delete-section">
+      <p class="delete-intro">
+        {{ 'GROUP.CONFIRM_DELETE_SINGLE' | translate }}
+      </p>
+
+      <ul class="delete-info-list">
+        <li>
+          <i class="pi pi-info-circle"></i>
+          <span>{{ 'GROUP.DELETE_INFO_USERS_REMOVED' | translate }}</span>
+        </li>
+        <li>
+          <i class="pi pi-info-circle"></i>
+          <span>{{ 'GROUP.DELETE_INFO_PERMISSIONS_REVOKED' | translate }}</span>
+        </li>
+        <li>
+          <i class="pi pi-info-circle"></i>
+          <span>{{ 'COMMON.DELETE_CANNOT_UNDO' | translate }}</span>
+        </li>
+      </ul>
+
+      <div class="justification-section">
+        <label for="deleteJustification"
+          >{{ 'COMMON.JUSTIFICATION' | translate }}
+          <span class="required">*</span></label
+        >
+        <app-custom-textarea
+          inputId="deleteJustification"
+          [(ngModel)]="deleteJustification"
+          [placeholder]="'COMMON.JUSTIFICATION_DELETE_PLACEHOLDER' | translate"
+          [rows]="3"
+          [maxLength]="500"
+        ></app-custom-textarea>
+        <small class="char-count">{{ deleteJustification.length }}/500</small>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="popup-actions">
+      <button class="btn-cancel" (click)="cancelDelete()">
+        <i class="pi pi-times"></i>
+        {{ 'COMMON.CANCEL' | translate }}
+      </button>
+      <button
+        class="btn-confirm"
+        (click)="proceedDelete()"
+        [disabled]="
+          !deleteJustification.trim() || (groupData && isDeleting(groupData.id))
+        "
+      >
+        <i
+          class="pi"
+          [ngClass]="
+            groupData && isDeleting(groupData.id)
+              ? 'pi-spin pi-spinner'
+              : 'pi-trash'
+          "
+        ></i>
+        {{ 'COMMON.DELETE' | translate }}
+      </button>
+    </div>
+  </div>
+</div>

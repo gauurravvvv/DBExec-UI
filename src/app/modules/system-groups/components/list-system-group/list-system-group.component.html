@@ -1,0 +1,258 @@
+<div class="dataset-page-wrapper">
+  <div class="dataset-content-container">
+    <!-- Header Section -->
+    <div class="page-header-section">
+      <div class="header-content">
+        <h2>{{ 'SYSTEM_GROUP.TITLE' | translate }}</h2>
+      </div>
+
+      <div class="header-actions">
+        <!-- Add Button -->
+        <button
+          *hasPermission="'systemGroupManagement'; level: 'write'"
+          pButton
+          [label]="'COMMON.ADD' | translate"
+          icon="pi pi-plus"
+          (click)="onAddNewCategory()"
+          class="p-button-raised p-button-primary modern-button"
+        ></button>
+      </div>
+    </div>
+
+    <!-- Content Card -->
+    <div class="content-card">
+      <!-- Unified simple table. Infinite scroll, global search + on-demand
+           per-column filters (shared inputs), per-row actions. The Role
+           filter is projected into the toolbar's LEFT slot so it sits inline
+           with the search + action icons. Per-cell DOM via <ng-template
+           usGridCell>. -->
+      <div class="table-wrapper" *ngIf="adapter">
+        <app-custom-table
+          [columns]="cols"
+          [serverAdapter]="adapter"
+          [config]="tableConfig"
+          [hasProjectedEmpty]="true"
+          (refresh)="refreshList()"
+        >
+          <!-- Toolbar-left slot: server-driven Role filter dropdown. -->
+          <div tableToolbarStart class="group-toolbar-start">
+            <app-custom-dropdown
+              [(ngModel)]="selectedRole"
+              [serverMode]="true"
+              [fetcher]="loadRolesPage"
+              [pageSize]="10"
+              [preloadedItems]="preloadedRoles"
+              [preloadedTotal]="preloadedRolesTotal"
+              optionLabel="name"
+              optionValue="id"
+              [filter]="true"
+              [floatingLabel]="true"
+              [label]="'COMMON.ROLE' | translate"
+              [showClear]="true"
+              [autoDisplayFirst]="false"
+              filterBy="name"
+              (onChangeEvent)="onRoleChange($event)"
+              icon="pi-shield"
+            ></app-custom-dropdown>
+          </div>
+
+          <!-- Empty body — always projected so only one empty state shows. -->
+          <div tableEmpty class="ct-empty-body">
+            <i class="pi pi-inbox"></i>
+            <span>{{ 'COMMON.NO_RECORDS' | translate }}</span>
+          </div>
+
+          <ng-template usGridCell="name" let-group>
+            <span class="group-name-cell">
+              <a
+                class="dataset-name-link"
+                [routerLink]="['/app/system-groups', group.id]"
+              >
+                {{ group.name }}
+              </a>
+              <span
+                *ngIf="group.isDefault === 1"
+                class="default-badge"
+                [pTooltip]="'GROUP.CANNOT_EDIT_DEFAULT' | translate"
+                tooltipPosition="top"
+              >
+                {{ 'GROUP.DEFAULT' | translate }}
+              </span>
+            </span>
+          </ng-template>
+
+          <ng-template usGridCell="description" let-group>
+            <span
+              class="description-text"
+              [title]="group.description"
+              [class.is-truncatable]="!!group.description"
+            >
+              {{ group.description || '—' }}
+            </span>
+          </ng-template>
+
+          <ng-template usGridCell="roles" let-group>
+            <span class="description-text" [title]="roleNames(group)">{{
+              roleNames(group) || '—'
+            }}</span>
+          </ng-template>
+
+          <ng-template usGridCell="status" let-group>
+            <span
+              class="status-pill"
+              [ngClass]="{
+                active: group.status === 1,
+                inactive: group.status !== 1,
+              }"
+            >
+              <span class="dot"></span>
+              <span class="label">
+                {{
+                  group.status === 1
+                    ? ('COMMON.ACTIVE' | translate)
+                    : ('COMMON.INACTIVE' | translate)
+                }}
+              </span>
+            </span>
+          </ng-template>
+
+          <ng-template usGridCell="createdOn" let-group>
+            <span
+              class="date-text"
+              [pTooltip]="
+                (group.createdOn | date: 'dd MMM yyyy, HH:mm:ss') || ''
+              "
+              tooltipPosition="top"
+            >
+              {{ group.createdOn | relativeTime }}
+            </span>
+          </ng-template>
+
+          <ng-template usGridCell="actions" let-group>
+            <div class="row-actions">
+              <button
+                *hasPermission="'systemGroupManagement'; level: 'write'"
+                class="icon-btn edit-btn"
+                (click)="onEdit(group.id)"
+                [attr.aria-label]="'COMMON.EDIT' | translate"
+                [pTooltip]="
+                  (group.canEdit === false
+                    ? 'GROUP.CANNOT_EDIT_DEFAULT'
+                    : 'COMMON.EDIT'
+                  ) | translate
+                "
+                tooltipPosition="bottom"
+                [disabled]="group.canEdit === false"
+              >
+                <i class="pi pi-pencil"></i>
+              </button>
+              <button
+                *hasPermission="'systemGroupManagement'; level: 'delete'"
+                class="icon-btn delete-btn"
+                (click)="confirmDelete(group.id)"
+                [attr.aria-label]="'COMMON.DELETE' | translate"
+                [pTooltip]="
+                  (group.canDelete === false
+                    ? 'GROUP.CANNOT_DELETE_DEFAULT'
+                    : 'COMMON.DELETE'
+                  ) | translate
+                "
+                tooltipPosition="bottom"
+                [disabled]="group.canDelete === false || isDeleting(group.id)"
+              >
+                <i
+                  class="pi"
+                  [ngClass]="
+                    isDeleting(group.id) ? 'pi-spin pi-spinner' : 'pi-trash'
+                  "
+                ></i>
+              </button>
+            </div>
+          </ng-template>
+        </app-custom-table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="confirmation-popup" *ngIf="showDeleteConfirm">
+  <div
+    class="popup-content"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="listGroupDeleteTitle"
+  >
+    <!-- Header -->
+    <div class="popup-header">
+      <div class="popup-icon">
+        <i class="pi pi-trash"></i>
+      </div>
+      <h3 id="listGroupDeleteTitle">
+        {{ 'COMMON.CONFIRM_DELETE' | translate }}
+      </h3>
+    </div>
+
+    <!-- Delete Info Section -->
+    <div class="standard-delete-section">
+      <p class="delete-intro">
+        {{ 'GROUP.CONFIRM_DELETE_SINGLE' | translate }}
+      </p>
+
+      <ul class="delete-info-list">
+        <li>
+          <i class="pi pi-info-circle"></i>
+          <span>{{ 'GROUP.DELETE_INFO_USERS_REMOVED' | translate }}</span>
+        </li>
+        <li>
+          <i class="pi pi-info-circle"></i>
+          <span>{{ 'GROUP.DELETE_INFO_PERMISSIONS_REVOKED' | translate }}</span>
+        </li>
+        <li>
+          <i class="pi pi-info-circle"></i>
+          <span>{{ 'COMMON.DELETE_CANNOT_UNDO' | translate }}</span>
+        </li>
+      </ul>
+
+      <div class="justification-section">
+        <label for="deleteJustification"
+          >{{ 'COMMON.JUSTIFICATION' | translate }}
+          <span class="required">*</span></label
+        >
+        <app-custom-textarea
+          inputId="deleteJustification"
+          [(ngModel)]="deleteJustification"
+          [placeholder]="'COMMON.JUSTIFICATION_DELETE_PLACEHOLDER' | translate"
+          [rows]="3"
+          [maxLength]="500"
+        ></app-custom-textarea>
+        <small class="char-count">{{ deleteJustification.length }}/500</small>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="popup-actions">
+      <button class="btn-cancel" (click)="cancelDelete()">
+        <i class="pi pi-times"></i>
+        {{ 'COMMON.CANCEL' | translate }}
+      </button>
+      <button
+        class="btn-confirm"
+        (click)="proceedDelete()"
+        [disabled]="
+          !deleteJustification.trim() ||
+          !!(groupToDelete && isDeleting(groupToDelete))
+        "
+      >
+        <i
+          class="pi"
+          [ngClass]="
+            !!(groupToDelete && isDeleting(groupToDelete))
+              ? 'pi-spin pi-spinner'
+              : 'pi-trash'
+          "
+        ></i>
+        {{ 'COMMON.DELETE' | translate }}
+      </button>
+    </div>
+  </div>
+</div>

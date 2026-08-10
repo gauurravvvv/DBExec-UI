@@ -1,0 +1,164 @@
+<div class="add-admin-wrapper">
+  <div class="add-admin-container">
+    <!-- Header Section -->
+    <div class="page-header">
+      <div class="left-section">
+        <button
+          pButton
+          class="p-button-text"
+          routerLink="/app/system-roles"
+          [attr.aria-label]="'COMMON.BACK' | translate"
+        >
+          <i class="pi pi-arrow-left"></i>
+        </button>
+        <h2>{{ 'SYSTEM_ROLE.ADD_TITLE' | translate }}</h2>
+      </div>
+      <div class="action-buttons">
+        <app-button
+          variant="secondary"
+          [disabled]="!isFormDirty"
+          (clicked)="onCancel()"
+          >{{ 'COMMON.CANCEL' | translate }}</app-button
+        >
+        <app-button
+          *hasPermission="'systemRoleManagement'; level: 'write'"
+          variant="primary"
+          icon="pi pi-save"
+          [loading]="saving()"
+          [disabled]="!canSave"
+          (clicked)="onSubmit()"
+          >{{ 'COMMON.SAVE' | translate }}</app-button
+        >
+      </div>
+    </div>
+
+    <!-- Form Section -->
+    <form autocomplete="off" [formGroup]="roleForm" class="admin-form">
+      <!-- Basic Info Section -->
+      <div class="basic-info-section">
+        <!-- Role Name -->
+        <app-custom-input
+          formControlName="name"
+          [label]="'ROLE.ROLE_NAME' | translate"
+          [placeholder]="'ROLE.ENTER_ROLE_NAME' | translate"
+          icon="pi-id-card"
+          [required]="true"
+          [showError]="
+            !!(roleForm.get('name')?.invalid && roleForm.get('name')?.touched)
+          "
+          [errorMessage]="getNameError()"
+        >
+        </app-custom-input>
+
+        <!-- Description -->
+        <app-custom-input
+          formControlName="description"
+          [label]="'ROLE.ROLE_DESCRIPTION' | translate"
+          [placeholder]="'ROLE.ENTER_ROLE_DESCRIPTION' | translate"
+          icon="pi-align-left"
+        >
+        </app-custom-input>
+      </div>
+
+      <!-- Loader while the parallel metadata fetches resolve. The form
+           fields above stay interactive so the user can start typing
+           before the grid lands. -->
+      <div class="permissions-section" *ngIf="loadingMeta">
+        <label class="section-title">{{
+          'PERMISSIONS.TITLE' | translate
+        }}</label>
+        <app-content-loader minHeight="240px"></app-content-loader>
+      </div>
+
+      <!-- Permission grid -->
+      <div
+        class="permissions-section"
+        *ngIf="!loadingMeta && modules.length > 0"
+      >
+        <label class="section-title"
+          >{{ 'PERMISSIONS.TITLE' | translate
+          }}<span class="required"> *</span></label
+        >
+
+        <p class="grid-help" *ngIf="!hasAnyGrant">
+          {{ 'ROLE.GRANT_AT_LEAST_ONE' | translate }}
+        </p>
+
+        <div
+          class="permission-grid"
+          role="grid"
+          [style.--level-count]="accessLevels.length"
+        >
+          <!-- Sticky column header strip: empty label cell + one cell
+               per level. Stays pinned when the grid scrolls. -->
+          <div class="grid-row grid-row--header" role="row">
+            <div class="grid-cell grid-cell--label" role="columnheader"></div>
+            <div
+              class="grid-cell grid-cell--level"
+              role="columnheader"
+              *ngFor="let level of accessLevels; trackBy: trackByLevelValue"
+            >
+              {{ level.label }}
+            </div>
+          </div>
+
+          <ng-container
+            *ngFor="let module of modules; trackBy: trackByModuleId"
+          >
+            <!-- Module group: a single parent label row (no radios,
+                 no full-width divider) followed by indented children
+                 with a left rail. -->
+            <div class="grid-module">
+              <div class="grid-row grid-row--module" role="row">
+                <div
+                  class="grid-cell grid-cell--label grid-cell--module"
+                  role="rowheader"
+                >
+                  <i *ngIf="module.icon" class="pi" [ngClass]="module.icon"></i>
+                  {{ module.name }}
+                </div>
+                <div
+                  class="grid-cell grid-cell--level"
+                  *ngFor="let level of accessLevels; trackBy: trackByLevelValue"
+                  aria-hidden="true"
+                ></div>
+              </div>
+
+              <div class="grid-children">
+                <div
+                  class="grid-row grid-row--leaf"
+                  role="row"
+                  *ngFor="let leaf of module.submodules; trackBy: trackByLeafId"
+                >
+                  <div
+                    class="grid-cell grid-cell--label grid-cell--leaf"
+                    role="rowheader"
+                  >
+                    {{ leaf.name }}
+                  </div>
+                  <div
+                    class="grid-cell grid-cell--levels"
+                    role="gridcell"
+                    [style.--level-count]="accessLevels.length"
+                  >
+                    <app-custom-radio
+                      class="level-radio-group"
+                      [options]="accessLevels"
+                      [columns]="accessLevels.length"
+                      optionLabel="hidden"
+                      optionValue="value"
+                      gap="small"
+                      [ngModel]="levelByPermissionId[leaf.id]"
+                      [ngModelOptions]="{ standalone: true }"
+                      (ngModelChange)="onLevelChange(leaf.id, $event ?? 0)"
+                    ></app-custom-radio>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </ng-container>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>

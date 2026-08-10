@@ -1,0 +1,235 @@
+<div class="add-admin-wrapper">
+  <div class="add-admin-container">
+    <!-- Header Section -->
+    <div class="page-header">
+      <div class="left-section">
+        <button
+          pButton
+          class="p-button-text"
+          routerLink="/app/system-roles"
+          [attr.aria-label]="'COMMON.BACK' | translate"
+        >
+          <i class="pi pi-arrow-left"></i>
+        </button>
+        <h2>{{ 'SYSTEM_ROLE.EDIT_TITLE' | translate }}</h2>
+      </div>
+      <div class="action-buttons">
+        <app-button
+          variant="secondary"
+          [disabled]="!isFormDirty"
+          (clicked)="onCancel()"
+          >{{ 'COMMON.CANCEL' | translate }}</app-button
+        >
+        <app-button
+          *hasPermission="'systemRoleManagement'; level: 'write'"
+          variant="primary"
+          icon="pi pi-save"
+          [loading]="saving()"
+          [disabled]="!canSave"
+          (clicked)="onSubmit()"
+          >{{ 'COMMON.SAVE' | translate }}</app-button
+        >
+      </div>
+    </div>
+
+    <!-- Centered loader while role + permissions + access levels load -->
+    <app-content-loader *ngIf="loadingMeta && !roleData"></app-content-loader>
+
+    <!-- Form Section -->
+    <form
+      autocomplete="off"
+      *ngIf="roleData"
+      [formGroup]="roleForm"
+      class="admin-form"
+    >
+      <!-- Default Administrator role is locked — read-only, cannot be saved. -->
+      <div class="locked-banner" *ngIf="isLocked">
+        <i class="pi pi-lock"></i>
+        <span>{{ 'ROLE.DEFAULT_LOCKED_HINT' | translate }}</span>
+      </div>
+      <div class="basic-info-section">
+        <!-- Role Name — editable for every role, including the
+             seeded Administrator (no default special-casing). -->
+        <app-custom-input
+          formControlName="name"
+          [label]="'COMMON.NAME' | translate"
+          [placeholder]="'ROLE.ENTER_NAME' | translate"
+          icon="pi-id-card"
+          [required]="true"
+          [showError]="
+            !!(roleForm.get('name')?.invalid && roleForm.get('name')?.touched)
+          "
+          [errorMessage]="getNameError()"
+        >
+        </app-custom-input>
+
+        <!-- Description -->
+        <app-custom-input
+          formControlName="description"
+          [label]="'ROLE.DESCRIPTION' | translate"
+          [placeholder]="'ROLE.ENTER_DESCRIPTION' | translate"
+          icon="pi-align-left"
+        >
+        </app-custom-input>
+
+        <!-- Status -->
+        <div>
+          <app-custom-toggle
+            formControlName="status"
+            [label]="'COMMON.STATUS' | translate"
+            [trueValue]="1"
+            [falseValue]="0"
+            [trueLabel]="'ROLE.STATUS_ACTIVE' | translate"
+            [falseLabel]="'ROLE.STATUS_INACTIVE' | translate"
+          >
+          </app-custom-toggle>
+        </div>
+      </div>
+
+      <!-- Loader while the metadata feeds are in flight (after the
+           role record has landed but before the grid can render). -->
+      <div class="permissions-section" *ngIf="loadingMeta">
+        <label class="section-title">{{
+          'PERMISSIONS.TITLE' | translate
+        }}</label>
+        <app-content-loader minHeight="240px"></app-content-loader>
+      </div>
+
+      <!-- Permission grid -->
+      <div
+        class="permissions-section"
+        *ngIf="!loadingMeta && modules.length > 0"
+      >
+        <label class="section-title"
+          >{{ 'PERMISSIONS.TITLE' | translate
+          }}<span class="required"> *</span></label
+        >
+
+        <p class="grid-help" *ngIf="!hasAnyGrant">
+          {{ 'ROLE.GRANT_AT_LEAST_ONE' | translate }}
+        </p>
+
+        <div
+          class="permission-grid"
+          role="grid"
+          [style.--level-count]="accessLevels.length"
+        >
+          <div class="grid-row grid-row--header" role="row">
+            <div class="grid-cell grid-cell--label" role="columnheader"></div>
+            <div
+              class="grid-cell grid-cell--level"
+              role="columnheader"
+              *ngFor="let level of accessLevels; trackBy: trackByLevelValue"
+            >
+              {{ level.label }}
+            </div>
+          </div>
+
+          <ng-container
+            *ngFor="let module of modules; trackBy: trackByModuleId"
+          >
+            <div class="grid-module">
+              <div class="grid-row grid-row--module" role="row">
+                <div
+                  class="grid-cell grid-cell--label grid-cell--module"
+                  role="rowheader"
+                >
+                  <i *ngIf="module.icon" class="pi" [ngClass]="module.icon"></i>
+                  {{ module.name }}
+                </div>
+                <div
+                  class="grid-cell grid-cell--level"
+                  *ngFor="let level of accessLevels; trackBy: trackByLevelValue"
+                  aria-hidden="true"
+                ></div>
+              </div>
+
+              <div class="grid-children">
+                <div
+                  class="grid-row grid-row--leaf"
+                  role="row"
+                  *ngFor="let leaf of module.submodules; trackBy: trackByLeafId"
+                >
+                  <div
+                    class="grid-cell grid-cell--label grid-cell--leaf"
+                    role="rowheader"
+                  >
+                    {{ leaf.name }}
+                  </div>
+                  <div
+                    class="grid-cell grid-cell--levels"
+                    role="gridcell"
+                    [style.--level-count]="accessLevels.length"
+                  >
+                    <app-custom-radio
+                      class="level-radio-group"
+                      [options]="accessLevels"
+                      [columns]="accessLevels.length"
+                      optionLabel="hidden"
+                      optionValue="value"
+                      gap="small"
+                      [ngModel]="levelByPermissionId[leaf.id]"
+                      [ngModelOptions]="{ standalone: true }"
+                      [disabled]="isLocked"
+                      (ngModelChange)="onLevelChange(leaf.id, $event ?? 0)"
+                    ></app-custom-radio>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </ng-container>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="confirmation-popup" *ngIf="showSaveConfirm">
+  <div
+    class="popup-content"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="editRoleSaveTitle"
+  >
+    <div class="popup-header">
+      <div class="popup-icon">
+        <i class="pi pi-save"></i>
+      </div>
+      <h3 id="editRoleSaveTitle">{{ 'COMMON.CONFIRM_UPDATE' | translate }}</h3>
+    </div>
+    <div class="standard-delete-section">
+      <p class="delete-intro">{{ 'ROLE.UPDATE_CONFIRM' | translate }}</p>
+      <div class="justification-section">
+        <label for="saveJustification"
+          >{{ 'COMMON.JUSTIFICATION' | translate }}
+          <span class="required">*</span></label
+        >
+        <app-custom-textarea
+          inputId="saveJustification"
+          [(ngModel)]="saveJustification"
+          [placeholder]="'COMMON.JUSTIFICATION_UPDATE_PLACEHOLDER' | translate"
+          [rows]="3"
+          [maxLength]="500"
+        ></app-custom-textarea>
+        <small class="char-count">{{ saveJustification.length }}/500</small>
+      </div>
+    </div>
+    <div class="popup-actions">
+      <button class="btn-cancel" (click)="cancelSave()">
+        <i class="pi pi-times"></i>
+        {{ 'COMMON.CANCEL' | translate }}
+      </button>
+      <button
+        class="btn-confirm"
+        (click)="proceedSave()"
+        [disabled]="!saveJustification.trim() || saving()"
+      >
+        <i
+          class="pi"
+          [ngClass]="saving() ? 'pi-spin pi-spinner' : 'pi-check'"
+        ></i>
+        {{ 'COMMON.UPDATE' | translate }}
+      </button>
+    </div>
+  </div>
+</div>

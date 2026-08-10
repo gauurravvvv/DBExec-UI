@@ -2247,7 +2247,10 @@
     "EMBED_DASHBOARD": "Dashboard",
     "NOTIFICATIONS": "Notifiche",
     "USER_ACTIVITY": "Attività",
-    "AI_WORKSPACE": "Assistente IA"
+    "AI_WORKSPACE": "Assistente IA",
+    "SYSTEM_ROLES": "Ruoli di sistema",
+    "SYSTEM_GROUPS": "Gruppi di sistema",
+    "SYSTEM_USERS": "Utenti di sistema"
   },
   "AUTH": {
     "HEADLINE_LOGIN": "Migliora la tua esperienza\ndi gestione delle sorgenti dati",
@@ -4183,6 +4186,10 @@
       },
       "users": {
         "idInvalid": "Uno o più identificatori utente non sono validi"
+      },
+      "roleIds": {
+        "required": "È necessario selezionare almeno un ruolo",
+        "invalid": "Uno o più ruoli selezionati non sono validi"
       }
     },
     "auth": {
@@ -5762,5 +5769,24 @@
     "DESC_PLACEHOLDER": "Optional short description",
     "SEARCH_PLACEHOLDER": "Search themes…",
     "PREVIEW": "Anteprima"
+  },
+  "SYSTEM_ROLE": {
+    "TITLE": "Ruoli di sistema",
+    "ADD_TITLE": "Aggiungi ruolo di sistema",
+    "EDIT_TITLE": "Modifica ruolo di sistema",
+    "VIEW_TITLE": "Dettagli ruolo di sistema"
+  },
+  "SYSTEM_GROUP": {
+    "TITLE": "Gruppi di sistema",
+    "ADD_TITLE": "Aggiungi gruppo di sistema",
+    "EDIT_TITLE": "Modifica gruppo di sistema",
+    "VIEW_TITLE": "Dettagli gruppo di sistema"
+  },
+  "SYSTEM_USER": {
+    "TITLE": "Utenti di sistema",
+    "ADD_TITLE": "Aggiungi utente di sistema",
+    "EDIT_TITLE": "Modifica utente di sistema",
+    "VIEW_TITLE": "Dettagli utente di sistema",
+    "BULK_ADD_TITLE": "Aggiunta massiva utenti di sistema"
   }
 }

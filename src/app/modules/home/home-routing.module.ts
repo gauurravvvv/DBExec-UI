@@ -17,7 +17,7 @@ const routes: Routes = [
     path: 'system-admin',
     component: SystemAdminHomeComponent,
     canActivate: [roleGuard],
-    data: { permission: PERMISSIONS.SYSTEM_ADMIN },
+    data: { permission: PERMISSIONS.SYSTEM_USER_MANAGEMENT },
   },
   {
     // Org user's home — `home` is the GLOBAL mandatory permission,

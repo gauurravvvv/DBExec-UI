@@ -438,7 +438,7 @@ export class RelayComponent implements OnInit, OnDestroy {
   private navigateHome(): void {
     // Pick the home variant by permission, not by role string.
     // Only the platform System Admin can read `systemAdmin`.
-    const target = this.permissionService.canRead(PERMISSIONS.SYSTEM_ADMIN)
+    const target = this.permissionService.canRead(PERMISSIONS.SYSTEM_USER_MANAGEMENT)
       ? HOME_ROUTES.SYSTEM_ADMIN
       : HOME_ROUTES.ORG_ADMIN;
     this.router.navigateByUrl(target, { replaceUrl: true });

@@ -8,7 +8,6 @@ import {
   ANALYSIS_PARAMETER,
   DATASET,
   DATASOURCE,
-  SYSTEM_ADMIN,
 } from 'src/app/core/constants/api.constant';
 import { HttpClientService } from 'src/app/core/services/http-client.service';
 
@@ -403,31 +402,6 @@ export class AnalysesService {
     } finally {
       this._saving.set(false);
     }
-  }
-
-  viewSystemAdmin(id: string) {
-    return lastValueFrom(
-      this.http.apiGet(SYSTEM_ADMIN.GET + `${id}`, { skipLoader: true }),
-    );
-  }
-
-  updateSystemAdmin(systemAdminForm: FormGroup) {
-    const { id, fullName, username, email, mobile, status } =
-      systemAdminForm.value;
-    return lastValueFrom(
-      this.http.apiPut(
-        SYSTEM_ADMIN.UPDATE + id,
-        {
-          id,
-          fullName,
-          username,
-          email,
-          mobile,
-          status: status ? 1 : 0,
-        },
-        { skipLoader: true },
-      ),
-    );
   }
 
   viewDataset(id: string) {
