@@ -72,7 +72,6 @@ export class ListBrandingComponent implements OnInit, OnDestroy {
     this.cols = [
       { colId: 'name', field: 'name', header: t('BRANDING.PRESET'), width: '240px', frozen: true, filter: 'text' },
       { colId: 'preview', header: t('BRANDING.PREVIEW'), width: '200px', sortable: false },
-      { colId: 'watermark', field: 'showWatermark', header: t('BRANDING.WATERMARK'), width: '150px', sortable: false },
       { colId: 'status', field: 'isActive', header: t('COMMON.STATUS'), width: '140px', sortable: false },
       { colId: 'actions', header: t('COMMON.ACTIONS'), width: '180px', sortable: false },
     ];

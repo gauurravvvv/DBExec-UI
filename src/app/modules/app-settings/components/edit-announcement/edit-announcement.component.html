@@ -74,32 +74,6 @@
           </span>
         </div>
 
-        <!-- Target Group — server-mode with resolver for the persisted id -->
-        <app-custom-dropdown
-          formControlName="targetGroupId"
-          [label]="'ANNOUNCEMENT.TARGET_GROUP' | translate"
-          [placeholder]="'ANNOUNCEMENT.SELECT_GROUP' | translate"
-          [serverMode]="true"
-          [fetcher]="loadGroupsPage"
-          [resolveSelected]="resolveSelectedGroup"
-          [pageSize]="10"
-          [preloadedItems]="preloadedGroups"
-          [preloadedTotal]="preloadedGroupsTotal"
-          optionLabel="name"
-          optionValue="id"
-          [filter]="true"
-          filterBy="name"
-          [required]="true"
-          [showError]="
-            !!(
-              announcementForm.get('targetGroupId')?.invalid &&
-              announcementForm.get('targetGroupId')?.touched
-            )
-          "
-          [errorMessage]="'ANNOUNCEMENT.TARGET_GROUP_REQUIRED' | translate"
-          icon="pi-users"
-        ></app-custom-dropdown>
-
         <!-- Colours + Status — colours are hex inputs paired with
              native swatches (same chrome as Theme settings); status
              toggle keeps its place on the row. -->

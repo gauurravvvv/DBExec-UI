@@ -6,7 +6,6 @@ import { HttpClientService } from 'src/app/core/services/http-client.service';
 export interface AnnouncementPayload {
   name: string;
   description: string;
-  targetGroupId: string;
   startTime?: Date | string | null;
   endTime?: Date | string | null;
   bgColor?: string;

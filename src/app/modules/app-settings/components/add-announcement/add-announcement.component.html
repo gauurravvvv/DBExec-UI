@@ -74,31 +74,6 @@
           </span>
         </div>
 
-        <!-- Target Group — server-mode, scoped to the caller's org via JWT -->
-        <app-custom-dropdown
-          formControlName="targetGroupId"
-          [label]="'ANNOUNCEMENT.TARGET_GROUP' | translate"
-          [placeholder]="'ANNOUNCEMENT.SELECT_GROUP' | translate"
-          [serverMode]="true"
-          [fetcher]="loadGroupsPage"
-          [pageSize]="10"
-          [preloadedItems]="preloadedGroups"
-          [preloadedTotal]="preloadedGroupsTotal"
-          optionLabel="name"
-          optionValue="id"
-          [filter]="true"
-          filterBy="name"
-          [required]="true"
-          [showError]="
-            !!(
-              announcementForm.get('targetGroupId')?.invalid &&
-              announcementForm.get('targetGroupId')?.touched
-            )
-          "
-          [errorMessage]="'ANNOUNCEMENT.TARGET_GROUP_REQUIRED' | translate"
-          icon="pi-users"
-        ></app-custom-dropdown>
-
         <!-- Colours — hex text input paired with a native colour
              swatch. Shares the .color-row / .color-swatch chrome
              with the Theme settings page so both forms feel like

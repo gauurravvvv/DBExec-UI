@@ -1,5 +1,11 @@
 # DBExec-UI — Session Log (newest first)
 
+### 2026-08-10 — Branding watermark toggle removed, announcements org-wide, announcement list styling
+- **Branding**: removed the "Show Watermark" toggle from add/edit — a preset always defines a watermark (fields always shown + required), and enable/disable is the list active/inactive; `body()` always sends `showWatermark:true`. Removed the now-redundant "Watermark" column from list-branding.
+- **Announcements → org-wide**: removed all `targetGroupId` group targeting from add/edit (form control, GroupService, loadGroups/loadGroupsPage/resolveSelectedGroup, dropdown, payload), list (Group column, toolbar Group filter dropdown, selectedGroup/onGroupChange, adapter param), view (Target Group info-item), and the service `AnnouncementPayload`. Dead `ANNOUNCEMENT.TARGET_GROUP/SELECT_GROUP/GROUP/TARGET_GROUP_REQUIRED` i18n keys removed + `ANNOUNCEMENT.SUBTITLE` reworded across 10 locales. (BE companion drops the column + audience filter.)
+- **Styling**: list-announcements had no `.row-actions .icon-btn` styling (default hover, unlike theme/branding); added the shared icon-button cluster block so all three App-Settings lists match.
+- Verified: tsc 0, ngc 0, prod build 0.
+
 ### 2026-08-10 — Settings back-nav Not-Found fix, back-button spacing, sidebar brand colour
 - Fixed Add/Edit/View pages for Theme, Branding, Announcements routing back to bare list paths (`/app/settings/themes` etc.) that aren't registered routes → Not Found. Added `APP_SETTINGS_HUB` in routes.constant (`BASE` + `tab(slug)`); every back/cancel/return nav now targets `/app/settings/app?tab=theme|branding|announcements` (the hub reads `?tab=`). Left `ANNOUNCEMENT.LIST` untouched where it's an API path in announcement.service.
 - Back-button/title spacing: the fixed 36px icon-button box + wide gap pushed titles away from the arrow; tightened all three Add headers to a ~28–30px button + `--space-2` gap.

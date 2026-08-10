@@ -9,10 +9,8 @@ import {
 } from '@angular/core';
 import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
-import { DEFAULT_PAGE } from 'src/app/core/constants';
 import { ANNOUNCEMENT } from 'src/app/core/constants/routes.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
-import { GroupService } from 'src/app/modules/groups/services/group.service';
 import {
   UsServerListAdapter,
   UsListLoadParams,
@@ -30,11 +28,9 @@ import { AnnouncementService } from '../../services/announcement.service';
  * global search plus on-demand per-column filters (shared inputs), and per-row
  * actions. No bulk selection.
  *
- * No datasource gate; the adapter binds in `ngOnInit`. The Group filter (a
- * server-mode dropdown) is projected into the table's toolbar-left slot so it
- * sits inline with the search + action icons, and feeds an additional
- * `targetGroupId` param into the load fn — rebuilding the adapter on group
- * change keeps the closure in sync.
+ * No datasource gate; the adapter binds in `ngOnInit`. Announcements are
+ * org-wide (no per-group targeting), so the list is a straight org-scoped
+ * feed with search + per-column filters.
  */
 @Component({
   selector: 'app-list-announcements',
@@ -52,14 +48,6 @@ export class ListAnnouncementsComponent implements OnInit, OnDestroy {
   toDeleteId: string | null = null;
   today = new Date();
   statusOptions: { label: string; value: number }[] = [];
-
-  // Group filter — server-mode dropdown outside the grid. Lives in the
-  // table's toolbar-left slot because the BE expects `targetGroupId` as a
-  // top-level param, not inside the `filter` JSON.
-  groups: any[] = [];
-  selectedGroup: string | null = null;
-  preloadedGroups: any[] | null = null;
-  preloadedGroupsTotal: number | null = null;
 
   /* ── custom-table wiring (unified simple table; server-driven) ──────── */
 
@@ -86,7 +74,6 @@ export class ListAnnouncementsComponent implements OnInit, OnDestroy {
 
   constructor(
     private announcementService: AnnouncementService,
-    private groupService: GroupService,
     private router: Router,
     private globalService: GlobalService,
     private translate: TranslateService,
@@ -106,7 +93,6 @@ export class ListAnnouncementsComponent implements OnInit, OnDestroy {
         'ANNOUNCEMENT.SEARCH_PLACEHOLDER',
       ),
     };
-    this.loadGroups();
     this.bindAdapter();
   }
 
@@ -140,13 +126,6 @@ export class ListAnnouncementsComponent implements OnInit, OnDestroy {
         sortable: false,
       },
       {
-        colId: 'targetGroup',
-        field: 'targetGroup.name',
-        header: t('ANNOUNCEMENT.GROUP'),
-        width: '192px',
-        sortable: false,
-      },
-      {
         colId: 'status',
         field: 'status',
         header: t('COMMON.STATUS'),
@@ -173,70 +152,17 @@ export class ListAnnouncementsComponent implements OnInit, OnDestroy {
     ];
   }
 
-  /* ── group filter dropdown ───────────────────────────── */
-
-  loadGroupsPage = async ({
-    search,
-    page,
-    limit,
-  }: {
-    search: string;
-    page: number;
-    limit: number;
-  }): Promise<{ items: any[]; total: number }> => {
-    const params: any = { page, limit };
-    if (search) params.filter = JSON.stringify({ name: search });
-    try {
-      const res: any = await this.groupService.listGroups(params);
-      if (this.globalService.handleSuccessService(res, false)) {
-        return {
-          items: res?.data?.groups ?? [],
-          total: res?.data?.count ?? 0,
-        };
-      }
-      return { items: [], total: 0 };
-    } catch {
-      return { items: [], total: 0 };
-    }
-  };
-
-  loadGroups(): void {
-    this.groupService
-      .listGroups({ page: DEFAULT_PAGE, limit: 10 })
-      .then(res => {
-        if (this.globalService.handleSuccessService(res, false)) {
-          const groups = res?.data?.groups ?? [];
-          this.groups = groups;
-          this.preloadedGroups = groups;
-          this.preloadedGroupsTotal = res?.data?.count ?? groups.length;
-        }
-        this.cdr.markForCheck();
-      })
-      .catch(() => {
-        this.cdr.markForCheck();
-      });
-  }
-
-  onGroupChange(groupId: string | null): void {
-    this.selectedGroup = groupId;
-    // The adapter closes over selectedGroup — rebuild so the next
-    // load picks up the new value.
-    this.bindAdapter();
-  }
-
   /* ── adapter wiring ─────────────────────────────────── */
 
   private bindAdapter(): void {
     // Tear down any prior adapter so its in-flight call doesn't race
     // the new one's first load.
     this.adapter?.destroy();
-    const targetGroupId = this.selectedGroup;
     this.adapter = new UsServerListAdapter<any>({
       load: (params: UsListLoadParams) =>
         this.announcementService.listAnnouncements({
           page: params.page,
           limit: params.limit,
-          ...(targetGroupId ? { targetGroupId } : {}),
           ...(params.sort ? { sort: params.sort } : {}),
           ...(params.filter ? { filter: params.filter } : {}),
         }),

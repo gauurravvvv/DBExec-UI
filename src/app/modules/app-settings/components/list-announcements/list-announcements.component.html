@@ -18,31 +18,6 @@
           [hasProjectedEmpty]="true"
           (refresh)="refreshList()"
         >
-          <!-- Toolbar-left slot: server-driven Group filter dropdown. Lives
-               here (not the per-column filter row) because the BE expects
-               `targetGroupId` as a top-level param, not inside the `filter`
-               JSON. -->
-          <div tableToolbarStart class="ann-toolbar-start">
-            <app-custom-dropdown
-              [(ngModel)]="selectedGroup"
-              [serverMode]="true"
-              [fetcher]="loadGroupsPage"
-              [pageSize]="10"
-              [preloadedItems]="preloadedGroups"
-              [preloadedTotal]="preloadedGroupsTotal"
-              optionLabel="name"
-              optionValue="id"
-              [filter]="true"
-              [floatingLabel]="true"
-              [label]="'ANNOUNCEMENT.GROUP' | translate"
-              [showClear]="true"
-              [autoDisplayFirst]="false"
-              filterBy="name"
-              (onChangeEvent)="onGroupChange($event)"
-              icon="pi-users"
-            ></app-custom-dropdown>
-          </div>
-
           <!-- Empty body — always projected so only one empty state shows. -->
           <div tableEmpty class="ct-empty-body">
             <i class="pi pi-inbox"></i>
@@ -62,12 +37,6 @@
             <span class="description-text" [title]="a.description">
               {{ a.description || '—' }}
             </span>
-          </ng-template>
-
-          <ng-template usGridCell="targetGroup" let-a>
-            <span class="description-text">{{
-              a.targetGroup?.name || '—'
-            }}</span>
           </ng-template>
 
           <ng-template usGridCell="status" let-a>

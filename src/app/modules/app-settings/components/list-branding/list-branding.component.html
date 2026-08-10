@@ -35,19 +35,6 @@
             <ng-template #noPill><span class="muted">—</span></ng-template>
           </ng-template>
 
-          <ng-template usGridCell="watermark" let-p>
-            <span
-              class="status-pill"
-              [ngClass]="{ active: p.showWatermark, inactive: !p.showWatermark }"
-            >
-              <span class="dot"></span>
-              {{
-                (p.showWatermark ? 'COMMON.ENABLED' : 'COMMON.DISABLED')
-                  | translate
-              }}
-            </span>
-          </ng-template>
-
           <ng-template usGridCell="status" let-p>
             <span
               class="status-pill"

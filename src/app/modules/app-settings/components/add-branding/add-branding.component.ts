@@ -72,45 +72,33 @@ export class AddBrandingComponent implements OnInit, HasUnsavedChanges {
       this.mode = isEditSegment ? 'edit' : 'view';
       void this.loadPreset(this.presetId);
     }
-    this.applyWatermarkValidators(this.form.value.showWatermark);
-    this.form
-      .get('showWatermark')!
-      .valueChanges.subscribe(v => this.applyWatermarkValidators(v));
     if (this.isView) this.form.disable({ emitEvent: false });
   }
 
   private initForm(): void {
+    // A branding preset always carries a watermark — enabling/disabling one is
+    // handled by activating/deactivating the preset in the list, not by a form
+    // toggle. So the watermark fields are always present and required.
     this.form = this.fb.group({
       name: ['', [Validators.required, Validators.maxLength(80)]],
       description: ['', [Validators.maxLength(200)]],
-      showWatermark: [false],
-      watermarkText: [''],
-      watermarkBgColor: ['#0d47a1'],
-      watermarkTextColor: ['#ffffff'],
+      watermarkText: [
+        '',
+        [
+          Validators.required,
+          Validators.minLength(this.minTextLength),
+          Validators.maxLength(this.maxTextLength),
+        ],
+      ],
+      watermarkBgColor: [
+        '#0d47a1',
+        [Validators.required, Validators.pattern(HEX_PATTERN)],
+      ],
+      watermarkTextColor: [
+        '#ffffff',
+        [Validators.required, Validators.pattern(HEX_PATTERN)],
+      ],
     });
-  }
-
-  /** Watermark fields are required only when the toggle is on. */
-  private applyWatermarkValidators(on: boolean): void {
-    const text = this.form.get('watermarkText')!;
-    const bg = this.form.get('watermarkBgColor')!;
-    const fg = this.form.get('watermarkTextColor')!;
-    if (on) {
-      text.setValidators([
-        Validators.required,
-        Validators.minLength(this.minTextLength),
-        Validators.maxLength(this.maxTextLength),
-      ]);
-      bg.setValidators([Validators.required, Validators.pattern(HEX_PATTERN)]);
-      fg.setValidators([Validators.required, Validators.pattern(HEX_PATTERN)]);
-    } else {
-      text.clearValidators();
-      bg.clearValidators();
-      fg.clearValidators();
-    }
-    text.updateValueAndValidity({ emitEvent: false });
-    bg.updateValueAndValidity({ emitEvent: false });
-    fg.updateValueAndValidity({ emitEvent: false });
   }
 
   private async loadPreset(id: string): Promise<void> {
@@ -122,7 +110,6 @@ export class AddBrandingComponent implements OnInit, HasUnsavedChanges {
     this.form.patchValue({
       name: p.name,
       description: p.description ?? '',
-      showWatermark: p.showWatermark,
       watermarkText: p.watermarkText ?? '',
       watermarkBgColor: p.watermarkBgColor ?? '#0d47a1',
       watermarkTextColor: p.watermarkTextColor ?? '#ffffff',
@@ -165,18 +152,15 @@ export class AddBrandingComponent implements OnInit, HasUnsavedChanges {
 
   private body(): Partial<BrandingPreset> {
     const v = this.form.getRawValue();
-    const on = !!v.showWatermark;
+    // A preset always defines a watermark; whether it's shown is decided by
+    // activating the preset in the list, so persist showWatermark = true.
     return {
       name: (v.name ?? '').trim(),
       description: (v.description ?? '').trim(),
-      showWatermark: on,
-      ...(on
-        ? {
-            watermarkText: (v.watermarkText ?? '').trim(),
-            watermarkBgColor: v.watermarkBgColor,
-            watermarkTextColor: v.watermarkTextColor,
-          }
-        : {}),
+      showWatermark: true,
+      watermarkText: (v.watermarkText ?? '').trim(),
+      watermarkBgColor: v.watermarkBgColor,
+      watermarkTextColor: v.watermarkTextColor,
     };
   }
 

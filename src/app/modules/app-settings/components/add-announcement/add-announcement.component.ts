@@ -13,11 +13,9 @@ import {
 } from '@angular/forms';
 import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
-import { DEFAULT_PAGE } from 'src/app/core/constants';
 import { APP_SETTINGS_HUB } from 'src/app/core/constants/routes.constant';
 import { HasUnsavedChanges } from 'src/app/core/models/has-unsaved-changes.model';
 import { GlobalService } from 'src/app/core/services/global.service';
-import { GroupService } from 'src/app/modules/groups/services/group.service';
 import {
   AnnouncementPayload,
   AnnouncementService,
@@ -31,10 +29,6 @@ import {
 })
 export class AddAnnouncementComponent implements OnInit, HasUnsavedChanges {
   announcementForm!: FormGroup;
-  groups: any[] = [];
-  // Server-mode preload for the Target Group dropdown.
-  preloadedGroups: any[] | null = null;
-  preloadedGroupsTotal: number | null = null;
   maxDescriptionLength = 1000;
   minDate = new Date();
   showPreview = false;
@@ -47,7 +41,6 @@ export class AddAnnouncementComponent implements OnInit, HasUnsavedChanges {
     private router: Router,
     private globalService: GlobalService,
     private announcementService: AnnouncementService,
-    private groupService: GroupService,
     private cdr: ChangeDetectorRef,
     private translate: TranslateService,
   ) {
@@ -62,9 +55,7 @@ export class AddAnnouncementComponent implements OnInit, HasUnsavedChanges {
     return this.isFormDirty;
   }
 
-  ngOnInit(): void {
-    this.loadGroups();
-  }
+  ngOnInit(): void {}
 
   initForm(): void {
     this.announcementForm = this.fb.group(
@@ -84,7 +75,6 @@ export class AddAnnouncementComponent implements OnInit, HasUnsavedChanges {
             Validators.maxLength(this.maxDescriptionLength),
           ],
         ],
-        targetGroupId: [null, Validators.required],
         bgColor: ['#0d47a1'],
         textColor: ['#ffffff'],
         startTime: [null],
@@ -94,34 +84,6 @@ export class AddAnnouncementComponent implements OnInit, HasUnsavedChanges {
     );
   }
 
-  /**
-   * Server-mode fetcher for the Target Group dropdown.
-   */
-  loadGroupsPage = async ({
-    search,
-    page,
-    limit,
-  }: {
-    search: string;
-    page: number;
-    limit: number;
-  }): Promise<{ items: any[]; total: number }> => {
-    const params: any = { page, limit };
-    if (search) params.filter = JSON.stringify({ name: search });
-    try {
-      const res: any = await this.groupService.listGroups(params);
-      if (this.globalService.handleSuccessService(res, false)) {
-        return {
-          items: res?.data?.groups ?? [],
-          total: res?.data?.count ?? 0,
-        };
-      }
-      return { items: [], total: 0 };
-    } catch {
-      return { items: [], total: 0 };
-    }
-  };
-
   dateRangeValidator(group: AbstractControl): ValidationErrors | null {
     const start = group.get('startTime')?.value;
     const end = group.get('endTime')?.value;
@@ -129,23 +91,6 @@ export class AddAnnouncementComponent implements OnInit, HasUnsavedChanges {
       return { dateRange: true };
     }
     return null;
-  }
-
-  loadGroups(): void {
-    this.groupService
-      .listGroups({ page: DEFAULT_PAGE, limit: 10 })
-      .then(res => {
-        if (this.globalService.handleSuccessService(res, false)) {
-          const groups = res?.data?.groups ?? [];
-          this.groups = groups;
-          this.preloadedGroups = groups;
-          this.preloadedGroupsTotal = res?.data?.count ?? groups.length;
-        }
-        this.cdr.markForCheck();
-      })
-      .catch(() => {
-        this.cdr.markForCheck();
-      });
   }
 
   // sRGB relative luminance per WCAG
@@ -251,7 +196,6 @@ export class AddAnnouncementComponent implements OnInit, HasUnsavedChanges {
     const payload: AnnouncementPayload = {
       name: value.name,
       description: value.description,
-      targetGroupId: value.targetGroupId,
       startTime: value.startTime || null,
       endTime: value.endTime || null,
       bgColor: value.bgColor,

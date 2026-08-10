@@ -65,17 +65,7 @@
           [readonly]="isView"
         ></app-custom-input>
 
-        <app-custom-toggle
-          formControlName="showWatermark"
-          [label]="'BRANDING.SHOW_WATERMARK' | translate"
-          [trueValue]="true"
-          [falseValue]="false"
-          [trueLabel]="'COMMON.ENABLED' | translate"
-          [falseLabel]="'COMMON.DISABLED' | translate"
-        ></app-custom-toggle>
-
-        <ng-container *ngIf="form.value.showWatermark">
-          <app-custom-input
+        <app-custom-input
             formControlName="watermarkText"
             [label]="'BRANDING.WATERMARK_TEXT' | translate"
             [placeholder]="'BRANDING.WATERMARK_PLACEHOLDER' | translate"
@@ -155,7 +145,6 @@
               }}
             </span>
           </div>
-        </ng-container>
       </div>
 
       <p class="theme-hint">
