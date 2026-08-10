@@ -1,6 +1,6 @@
 # app-settings
 > Update the Progress log on every change.
-> Code path: `src/app/modules/app-settings` · Status: 🟢 · Last updated: 2026-08-07
+> Code path: `src/app/modules/app-settings` · Status: 🟢 · Last updated: 2026-08-10
 
 ## 1. Context
 - **Responsibility:** The org's Settings surface, delivered as **two tabbed hubs** reached from the sidebar Settings group:
@@ -24,6 +24,28 @@
 - **Out of scope:** Platform-wide (cross-org) settings; per-user preferences (none — theme is org-level).
 
 ## 3. Progress (newest first)
+### 2026-08-10 — Editors follow live theme switches + add-theme preview-revert fix
+- **SQL/formula editors now re-theme on a live switch.** Root cause: `shared/editor/code-editor.service.ts`
+  had a `refreshTheme()` (re-runs `defineDbexecThemes()` from the computed tokens + global
+  `monaco.editor.setTheme`) built for exactly this, but NOTHING called it — so an editor open before
+  a preset switch kept its create-time colours. Fix: `CodeEditorService` (root singleton) injects
+  `ThemeService` and registers a constructor `effect(() => { themeService.theme(); this.refreshTheme(); })`.
+  Every theme change funnels through `ThemeService.applyFromLogin` → `_theme` signal → effect →
+  `refreshTheme()` → global `setTheme` repaints ALL live Monaco editors (executor, add/edit-dataset,
+  prompt SQL dialog + value-source, qb-sql-preview, formula dialog) at once. `refreshTheme()` no-ops
+  until Monaco loads, so the initial read / login page is harmless. Ordering is safe: `applyFromLogin`
+  injects the `<style>` synchronously before the async effect runs, so `getComputedStyle` reads fresh vars.
+- **add-theme preview-revert bug fixed.** `add-theme.component` live-preview overwrites
+  `ThemeService.theme()`, and its old `ngOnDestroy` re-applied `theme()` — i.e. restored the PREVIEW,
+  leaving the workspace on unsaved colours after Cancel/back. Fixed by snapshotting the active theme in
+  `ngOnInit` FIRST (before seedDefaults/loadPreset call livePreview) and restoring that snapshot on
+  destroy (mirrors list-themes). Also guarded `livePreview()` with `if (this.readOnly) return` so
+  opening a preset in read-only VIEW no longer repaints the whole workspace.
+- Verified: `tsc` 0, `ngc -p tsconfig.app.json --noEmit` 0, `ng build --configuration production` 0.
+  Not live-clicked (dev stack down). version_261, awaiting push. (BE companion: 4 new seeded presets —
+  see api/docs theme.md.)
+- Files: shared/editor/code-editor.service.ts, modules/app-settings/components/add-theme/add-theme.component.ts.
+
 ### 2026-08-07 — Relay renders in the org theme (login sequence fix)
 - The relay flashed the DEFAULT palette because (a) `stashLoginResponse` called `applyAuthArtefacts(null, null, locale)` → `applyFromLogin(null)` CLEARED any pre-painted theme, and (b) `login()` pre-painted via `void fetchAndApplyPublicTheme(org)` (fire-and-forget), so it navigated to `/auth/relay` before the theme landed.
 - Fix (LoginService): `stashLoginResponse` now applies ONLY the locale (never nulls theme/branding); `login()` and `completeSamlLogin()` now **await** `fetchAndApplyPublicTheme(org)` before returning, so the login component navigates to `/relay` only after the org theme is painted. Net sequence: `POST /auth/login → GET /theme/public (awaited, paint) → navigate /relay → GET /auth/session (authoritative theme) → navigate home`. Every page after the user leaves /login is themed; no default-theme flash. The relay's own best-effort `fetchAndApplyPublicTheme` stays as a safety net for direct visits/refresh. `/theme/public` always 200s + all errors swallowed, so it never blocks login.

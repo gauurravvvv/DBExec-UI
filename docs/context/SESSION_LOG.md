@@ -1,5 +1,15 @@
 # DBExec-UI — Session Log (newest first)
 
+### 2026-08-10 — Live editor re-theming + add-theme preview revert
+- Wired `CodeEditorService` to `ThemeService.theme()` via a constructor `effect` so all open Monaco
+  editors follow a live theme switch (the pre-existing `refreshTheme()` had no caller). Global
+  `setTheme` covers every editor at once; no per-component change.
+- Fixed `add-theme.component` stranding the workspace on an unsaved preview: snapshot the active theme
+  on entry (before livePreview overwrites the signal) + restore it on destroy; skip preview in
+  read-only View.
+- Gates green: tsc 0, ngc 0, prod build 0. BE companion added 4 seeded presets (Daylight/Paper/
+  Amethyst/Arctic). version_261.
+
 ### 2026-08-06 — Datasource dropdown filter on Connections + Saved Queries lists
 - Added a server-mode `app-custom-dropdown` datasource picker above the table toolbar on both query-runner list screens (`.list-filter-bar` inside `.content-card`). FE-only: both BE list endpoints already accept the filter.
 - Data path per list matches its existing adapter/service contract: **Connections** → top-level `datasourceId` query param (first arg of `listConnections`); **Saved Queries** → `filter.datasourceId` inside the JSON `filter` (merged with the table's own search/column filters via `withDatasourceFilter()`). On change: set field → `adapter.reload()` → mirror to URL `?datasourceId=` (`queryParamsHandling: 'merge'`). On init: read the param and pre-select before first reload. Clearing shows all.

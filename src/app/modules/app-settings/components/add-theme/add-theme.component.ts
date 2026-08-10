@@ -74,6 +74,12 @@ export class AddThemeComponent implements OnInit, OnDestroy, HasUnsavedChanges {
 
   private readonly destroyRef = inject(DestroyRef);
 
+  /** The authoritative (active) theme captured on entry, BEFORE any
+   *  live-preview overwrites `ThemeService.theme()`. Restored on leave so
+   *  cancelling/backing out never strands the workspace on the unsaved
+   *  preview. (Mirrors the snapshot in list-themes.) */
+  private activeThemeSnapshot: unknown = null;
+
   constructor(
     private fb: FormBuilder,
     private route: ActivatedRoute,
@@ -92,6 +98,12 @@ export class AddThemeComponent implements OnInit, OnDestroy, HasUnsavedChanges {
   }
 
   ngOnInit(): void {
+    // Capture the active theme FIRST — before seedDefaults()/loadPreset()
+    // call livePreview(), which overwrites ThemeService.theme() with the
+    // preview. Restoring this on leave (not theme()) is what keeps a
+    // cancelled edit/view from stranding the workspace on the preview.
+    this.activeThemeSnapshot = this.themeInjector.theme();
+
     // Route shape: /new (no id) or /:id or /:id/edit.
     this.presetId = this.route.snapshot.paramMap.get('id');
     const isEditSegment = this.route.snapshot.url.some(s => s.path === 'edit');
@@ -110,8 +122,10 @@ export class AddThemeComponent implements OnInit, OnDestroy, HasUnsavedChanges {
   }
 
   ngOnDestroy(): void {
-    // Restore the authoritative theme — the editor preview was local.
-    this.themeInjector.applyFromLogin(this.themeInjector.theme());
+    // Restore the theme captured on entry — the editor preview was local.
+    // Must use the snapshot, NOT themeInjector.theme(), which livePreview()
+    // has overwritten with the (unsaved) preview.
+    this.themeInjector.applyFromLogin(this.activeThemeSnapshot as any);
   }
 
   // ── Form ────────────────────────────────────────────────────
@@ -196,6 +210,9 @@ export class AddThemeComponent implements OnInit, OnDestroy, HasUnsavedChanges {
   }
 
   private livePreview(): void {
+    // View is read-only: opening a preset to inspect it should not repaint
+    // the whole workspace in that preset's colours. Only new/edit preview.
+    if (this.readOnly) return;
     this.themeInjector.applyFromLogin({ colors: this.editorColors() } as any);
   }
 

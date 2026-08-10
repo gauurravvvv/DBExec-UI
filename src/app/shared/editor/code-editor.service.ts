@@ -23,9 +23,10 @@
  *     need disposing. `EditorHandle.dispose()` drops every disposable the handle
  *     collected, so a component only has to call one method.
  */
-import { Injectable, NgZone } from '@angular/core';
+import { Injectable, NgZone, effect } from '@angular/core';
 
 import { MonacoLoaderService } from '../../core/services/monaco-loader.service';
+import { ThemeService } from '../../core/services/theme.service';
 import { registerFormulaLanguage } from './formula-language';
 import { attachPlaceholder } from './editor-placeholder';
 import { formulaEditorOptions, sqlEditorOptions } from './monaco-options';
@@ -94,7 +95,24 @@ export class CodeEditorService {
   constructor(
     private readonly loader: MonacoLoaderService,
     private readonly zone: NgZone,
-  ) {}
+    private readonly themeService: ThemeService,
+  ) {
+    // Keep open editors in step with the org theme. Every theme change —
+    // activating a preset, previewing one in settings, a token-refresh
+    // re-applying the authoritative theme — flows through
+    // `ThemeService.applyFromLogin`, which updates the `theme` signal. Monaco
+    // captures colours at create time and its `setTheme` is global, so a
+    // single `refreshTheme()` re-reads the tokens and repaints every live
+    // editor at once. Without this, an editor opened before the switch keeps
+    // the old palette until it is recreated.
+    //
+    // `refreshTheme()` no-ops until Monaco is loaded, so the initial signal
+    // read (and any change before an editor exists) is harmless.
+    effect(() => {
+      this.themeService.theme();
+      this.refreshTheme();
+    });
+  }
 
   /** True once Monaco's global object is available. */
   get isLoaded(): boolean {
