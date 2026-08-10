@@ -1,0 +1,183 @@
+<div class="edit-wrapper">
+  <div class="edit-container">
+    <div class="page-header">
+      <div class="left-section">
+        <button pButton class="p-button-text back-button" (click)="goBack()">
+          <i class="pi pi-arrow-left"></i>
+        </button>
+        <h2>
+          {{
+            (isEdit ? 'DB_ACCESS.EDIT_TEMPLATE' : 'DB_ACCESS.NEW_TEMPLATE')
+              | translate
+          }}
+        </h2>
+      </div>
+      <div class="action-buttons">
+        <app-button variant="secondary" (clicked)="goBack()">{{
+          'COMMON.CANCEL' | translate
+        }}</app-button>
+        <app-button
+          variant="primary"
+          icon="pi pi-save"
+          [loading]="saving()"
+          [disabled]="!canSave"
+          (clicked)="onSubmit()"
+          >{{ 'COMMON.SAVE' | translate }}</app-button
+        >
+      </div>
+    </div>
+
+    <div class="form-body">
+      <!-- Identity -->
+      <app-custom-input
+        [(ngModel)]="name"
+        (ngModelChange)="markDirty()"
+        [label]="'DB_ACCESS.TEMPLATE_NAME' | translate"
+        [placeholder]="'DB_ACCESS.TEMPLATE_NAME_PLACEHOLDER' | translate"
+        icon="pi-bookmark"
+        [required]="true"
+      ></app-custom-input>
+
+      <app-custom-textarea
+        [(ngModel)]="description"
+        (ngModelChange)="markDirty()"
+        [label]="'COMMON.DESCRIPTION' | translate"
+        [maxLength]="250"
+      ></app-custom-textarea>
+
+      <!-- Scope -->
+      <div class="scope-row">
+        <label class="field-label">{{ 'DB_ACCESS.SCOPE' | translate }}</label>
+        <div class="scope-tabs">
+          <button
+            type="button"
+            [class.active]="scope === 'org'"
+            (click)="scope = 'org'; markDirty()"
+          >
+            {{ 'DB_ACCESS.SCOPE_ORG_WIDE' | translate }}
+          </button>
+          <button
+            type="button"
+            [class.active]="scope === 'datasource'"
+            (click)="scope = 'datasource'; markDirty()"
+          >
+            {{ 'DB_ACCESS.SCOPE_DATASOURCE' | translate }}
+          </button>
+        </div>
+      </div>
+
+      <app-datasource-picker
+        *ngIf="scope === 'datasource'"
+        [autoHydrate]="false"
+        [autoSelectFirst]="false"
+        [allowClear]="true"
+        [floatingLabel]="false"
+        [placeholder]="'DB_ACCESS.CHOOSE_DATASOURCE'"
+        (changed)="onDatasourceChange($event)"
+      ></app-datasource-picker>
+
+      <!-- Role attributes -->
+      <h3 class="form-section-title">
+        {{ 'DB_ACCESS.ATTRIBUTES' | translate }}
+      </h3>
+      <div class="attr-grid">
+        <app-custom-toggle
+          [(ngModel)]="attrs.login"
+          (ngModelChange)="markDirty()"
+          [label]="'DB_ACCESS.CAN_LOGIN' | translate"
+        ></app-custom-toggle>
+        <app-custom-toggle
+          [(ngModel)]="attrs.inherit"
+          (ngModelChange)="markDirty()"
+          label="INHERIT"
+        ></app-custom-toggle>
+        <app-custom-toggle
+          [(ngModel)]="attrs.createdb"
+          (ngModelChange)="markDirty()"
+          label="CREATEDB"
+        ></app-custom-toggle>
+        <app-custom-toggle
+          [(ngModel)]="attrs.createrole"
+          (ngModelChange)="markDirty()"
+          label="CREATEROLE"
+        ></app-custom-toggle>
+      </div>
+
+      <!-- Privilege rules -->
+      <div class="rules-header">
+        <h3 class="form-section-title">
+          {{ 'DB_ACCESS.PRIVILEGE_RULES' | translate }}
+        </h3>
+        <app-button variant="secondary" icon="pi pi-plus" (clicked)="addRule()">{{
+          'DB_ACCESS.ADD_RULE' | translate
+        }}</app-button>
+      </div>
+      <p class="rules-hint">{{ 'DB_ACCESS.TEMPLATE_RULES_HINT' | translate }}</p>
+
+      <div
+        class="rule-card"
+        *ngFor="let rule of rules; let i = index; trackBy: trackByIndex"
+      >
+        <div class="rule-grid">
+          <app-custom-dropdown
+            [(ngModel)]="rule.action"
+            (ngModelChange)="markDirty()"
+            [options]="actionOptions"
+            optionLabel="label"
+            optionValue="value"
+            [label]="'DB_ACCESS.ACTION' | translate"
+            appendTo="body"
+          ></app-custom-dropdown>
+
+          <app-custom-dropdown
+            [(ngModel)]="rule.level"
+            (ngModelChange)="onLevelChange(rule)"
+            [options]="levelOptions"
+            optionLabel="label"
+            optionValue="value"
+            [label]="'DB_ACCESS.LEVEL' | translate"
+            appendTo="body"
+          ></app-custom-dropdown>
+
+          <app-custom-multiselect
+            [(ngModel)]="rule.privileges"
+            (ngModelChange)="markDirty()"
+            [options]="privsFor(rule.level)"
+            optionLabel="label"
+            optionValue="value"
+            [label]="'DB_ACCESS.PRIVILEGES' | translate"
+            [placeholder]="'DB_ACCESS.SELECT_PRIVILEGES' | translate"
+            appendTo="body"
+          ></app-custom-multiselect>
+
+          <app-custom-dropdown
+            *ngIf="rule.level !== 'schema' && rule.level !== 'database'"
+            [(ngModel)]="rule.scope"
+            (ngModelChange)="markDirty()"
+            [options]="scopeOptions"
+            optionLabel="label"
+            optionValue="value"
+            [label]="'DB_ACCESS.SCOPE' | translate"
+            appendTo="body"
+          ></app-custom-dropdown>
+        </div>
+        <div class="rule-foot">
+          <app-custom-toggle
+            *ngIf="rule.action === 'grant'"
+            [(ngModel)]="rule.withGrantOption"
+            (ngModelChange)="markDirty()"
+            [label]="'DB_ACCESS.WITH_GRANT_OPTION' | translate"
+          ></app-custom-toggle>
+          <button
+            type="button"
+            class="rule-remove"
+            (click)="removeRule(i)"
+            [pTooltip]="'COMMON.REMOVE' | translate"
+          >
+            <i class="pi pi-trash"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

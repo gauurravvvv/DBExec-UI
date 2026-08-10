@@ -8,6 +8,13 @@
       <div class="header-actions">
         <button
           pButton
+          [label]="'DB_ACCESS.TEMPLATES_TITLE' | translate"
+          icon="pi pi-bookmark"
+          (click)="goToTemplates()"
+          class="p-button-outlined modern-button"
+        ></button>
+        <button
+          pButton
           [label]="'DB_ACCESS.ACTIVE_SESSIONS' | translate"
           icon="pi pi-bolt"
           (click)="goToSessions()"
@@ -489,15 +496,17 @@
   </div>
 </div>
 
-<!-- Plain-language change-summary confirm gate -->
+<!-- Review-SQL confirm gate (plain-language summary + exact SQL + danger) -->
 <app-change-summary-dialog
   [visible]="showConfirm"
   [title]="'DB_ACCESS.CONFIRM_PRIVILEGE_CHANGES' | translate"
   [summaries]="summaries"
+  [statements]="confirmStatements"
   [destructive]="confirmDestructive"
+  [confirmPhrase]="confirmPhrase"
   [loading]="confirmLoading"
   [executing]="saving()"
   [readOnly]="!canManage"
-  (confirmed)="confirmApply()"
+  (confirmed)="confirmApply($event)"
   (cancelled)="cancelConfirm()"
 ></app-change-summary-dialog>

@@ -16,7 +16,7 @@
           variant="primary"
           icon="pi pi-save"
           [loading]="saving()"
-          [disabled]="!datasourceId || roleForm.invalid || saving()"
+          [disabled]="!canSave"
           (clicked)="onSubmit()"
           >{{ 'COMMON.CREATE' | translate }}</app-button
         >
@@ -102,12 +102,57 @@
               optionLabel="label"
               optionValue="value"
               [label]="'DB_ACCESS.CLONE_FROM' | translate"
+              [required]="true"
               [filter]="true"
               filterBy="label"
               appendTo="body"
             ></app-custom-dropdown>
 
+            <!-- Clone: optionally copy the source role's object grants too. -->
+            <div class="attr-toggle" *ngIf="createMode === 'clone'">
+              <span class="attr-meta">
+                <span class="attr-name">{{
+                  'DB_ACCESS.COPY_PRIVILEGES' | translate
+                }}</span>
+                <span class="attr-desc">{{
+                  'DB_ACCESS.COPY_PRIVILEGES_DESC' | translate
+                }}</span>
+              </span>
+              <app-custom-toggle
+                [(ngModel)]="copyPrivileges"
+                [ngModelOptions]="{ standalone: true }"
+                [trueLabel]="'COMMON.YES' | translate"
+                [falseLabel]="'COMMON.NO' | translate"
+              ></app-custom-toggle>
+            </div>
+
             <ng-container *ngIf="createMode === 'scratch'">
+              <!-- Apply a template (PDM D10): prefill attributes from a
+                   reusable recipe. Privilege rules are composed later on the
+                   Privileges screen. -->
+              <app-custom-dropdown
+                *ngIf="templateOptions.length"
+                [ngModel]="selectedTemplateId"
+                [ngModelOptions]="{ standalone: true }"
+                (ngModelChange)="applyTemplate($event)"
+                [options]="templateOptions"
+                optionLabel="label"
+                optionValue="value"
+                [label]="'DB_ACCESS.APPLY_TEMPLATE' | translate"
+                [placeholder]="'DB_ACCESS.APPLY_TEMPLATE_PLACEHOLDER' | translate"
+                [filter]="true"
+                filterBy="label"
+                [showClear]="true"
+                appendTo="body"
+              ></app-custom-dropdown>
+              <p class="form-hint" *ngIf="appliedTemplateName">
+                {{
+                  'DB_ACCESS.TEMPLATE_APPLIED_HINT'
+                    | translate
+                      : { name: appliedTemplateName, count: appliedTemplateRuleCount }
+                }}
+              </p>
+
               <!-- Login-only credentials -->
               <ng-container *ngIf="canLogin">
                 <app-custom-input

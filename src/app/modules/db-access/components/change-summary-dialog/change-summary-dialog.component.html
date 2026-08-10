@@ -38,15 +38,47 @@
           </li>
         </ul>
 
-        <div class="summary-empty" *ngIf="!summaries.length">
+        <div class="summary-empty" *ngIf="!summaries.length && !statements.length">
           <i class="pi pi-info-circle"></i>
           {{ 'DB_ACCESS.NO_CHANGES' | translate }}
+        </div>
+
+        <!-- Exact SQL to run (collapsible; shown by default) -->
+        <div class="sql-section" *ngIf="statements.length">
+          <button type="button" class="sql-toggle" (click)="toggleSql()">
+            <i
+              class="pi"
+              [ngClass]="showSql ? 'pi-chevron-down' : 'pi-chevron-right'"
+            ></i>
+            {{ 'DB_ACCESS.REVIEW_SQL' | translate }}
+            <app-chip variant="count" size="sm">{{ statements.length }}</app-chip>
+          </button>
+
+          <div class="sql-list" *ngIf="showSql">
+            <div
+              class="sql-stmt"
+              *ngFor="let st of statements"
+              [class.danger]="st.dangerClass !== 'none'"
+              [class.critical]="st.dangerClass === 'critical'"
+            >
+              <div class="sql-stmt-head" *ngIf="st.dangerClass !== 'none'">
+                <app-chip variant="tag" [tone]="dangerTone(st.dangerClass)" size="sm">
+                  <i class="pi pi-exclamation-triangle"></i>
+                  {{ 'DB_ACCESS.DANGER_BADGE' | translate }}
+                </app-chip>
+                <span class="danger-reason" *ngIf="st.dangerReason">{{
+                  st.dangerReason | translate
+                }}</span>
+              </div>
+              <pre class="sql-code"><code>{{ st.sql }}</code></pre>
+            </div>
+          </div>
         </div>
 
         <!-- Destructive acknowledgement -->
         <div
           class="ack-section"
-          *ngIf="destructive && !readOnly && !confirmPhrase"
+          *ngIf="hasDanger && !readOnly && !confirmPhrase"
         >
           <app-custom-binary-checkbox
             class="ack-check"

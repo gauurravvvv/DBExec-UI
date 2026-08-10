@@ -1,5 +1,5 @@
-// Reuses the app confirmation-popup shell. Plain-language change summary
-// only — no SQL is ever rendered here.
+// Reuses the app confirmation-popup shell. Shows the plain-language change
+// summary AND the exact (masked) SQL that will run, with danger badges.
 .confirmation-popup {
   position: fixed;
   inset: 0;
@@ -240,5 +240,87 @@
   to {
     opacity: 1;
     transform: scale(1);
+  }
+}
+
+/* ── SQL review block (PDM A1/A2) ─────────────────────────────────── */
+.sql-section {
+  margin-top: var(--space-4);
+  border-top: 1px solid var(--border-color);
+  padding-top: var(--space-3);
+
+  .sql-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: var(--text-color);
+    font-size: var(--fs-control);
+    font-weight: var(--fw-medium, 500);
+    padding: var(--space-1) 0;
+
+    .pi {
+      font-size: 0.72rem;
+      color: var(--text-color-secondary);
+    }
+  }
+
+  .sql-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    margin-top: var(--space-3);
+    max-height: 260px;
+    overflow-y: auto;
+  }
+
+  .sql-stmt {
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm, 6px);
+    overflow: hidden;
+
+    &.danger {
+      border-color: var(--warning-color, #b7791f);
+    }
+    &.critical {
+      border-color: var(--error-color, #d64545);
+      box-shadow: 0 0 0 1px var(--error-color-transparent, rgba(214, 69, 69, 0.15));
+    }
+
+    .sql-stmt-head {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      padding: var(--space-2) var(--space-3);
+      background: var(--surface-50, rgba(0, 0, 0, 0.02));
+
+      .danger-reason {
+        font-size: var(--fs-micro);
+        color: var(--text-color-secondary);
+      }
+
+      .pi-exclamation-triangle {
+        font-size: 0.7rem;
+      }
+    }
+
+    .sql-code {
+      margin: 0;
+      padding: var(--space-3);
+      background: var(--surface-0, transparent);
+      font-family: var(--font-mono, 'JetBrains Mono', monospace);
+      font-size: var(--fs-micro);
+      line-height: 1.5;
+      color: var(--text-color);
+      white-space: pre-wrap;
+      word-break: break-word;
+      overflow-x: auto;
+
+      code {
+        font-family: inherit;
+      }
+    }
   }
 }

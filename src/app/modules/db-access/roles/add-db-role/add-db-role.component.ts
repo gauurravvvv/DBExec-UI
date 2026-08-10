@@ -15,6 +15,7 @@ import { HasUnsavedChanges } from 'src/app/core/models/has-unsaved-changes.model
 import { GlobalService } from 'src/app/core/services/global.service';
 import { DbAccessContextService } from '../../services/db-access-context.service';
 import { DbAccessService } from '../../services/db-access.service';
+import { DbTemplateService } from '../../services/db-template.service';
 
 /**
  * AddDbRoleComponent — full-page create for a PostgreSQL role.
@@ -43,9 +44,23 @@ export class AddDbRoleComponent implements OnInit, HasUnsavedChanges {
   allRoleOptions: { label: string; value: string }[] = [];
   saving = this.dbAccess.saving;
 
+  // Template apply (PDM D10) — pick a recipe to prefill attributes. The
+  // template's privilege RULES are surfaced as an info hint (the concrete
+  // grants are composed in the Privileges screen after the role exists).
+  templateOptions: { label: string; value: string; raw: any }[] = [];
+  selectedTemplateId: string | null = null;
+  appliedTemplateName = '';
+
+  // Clone: also copy the source role's object grants (PDM D1). When on,
+  // after the new role is created we fetch the source's direct grants and
+  // apply them as a change-set to the new role.
+  copyPrivileges = false;
+  cloningPrivileges = false;
+
   constructor(
     private dbAccess: DbAccessService,
     private ctx: DbAccessContextService,
+    private templates: DbTemplateService,
     private globalService: GlobalService,
     private translate: TranslateService,
     private route: ActivatedRoute,
@@ -143,7 +158,13 @@ export class AddDbRoleComponent implements OnInit, HasUnsavedChanges {
     }
 
     this.allRoleOptions = [];
-    if (next) this.loadCloneOptions(next);
+    this.templateOptions = [];
+    this.selectedTemplateId = null;
+    this.appliedTemplateName = '';
+    if (next) {
+      this.loadCloneOptions(next);
+      this.loadTemplates(next);
+    }
     this.cdr.markForCheck();
   }
 
@@ -160,8 +181,84 @@ export class AddDbRoleComponent implements OnInit, HasUnsavedChanges {
       .catch(() => {});
   }
 
+  /** Load org-wide + datasource-pinned templates for the apply picker. */
+  private loadTemplates(datasourceId: string): void {
+    this.templates
+      .list({ datasourceId, limit: 200 })
+      .then(res => {
+        const items = res?.status ? (res.data?.items ?? []) : [];
+        this.templateOptions = items.map((t: any) => ({
+          label: t.isBuiltIn
+            ? `${t.name} (${this.translate.instant('DB_ACCESS.BUILT_IN')})`
+            : t.name,
+          value: t.id,
+          raw: t,
+        }));
+        this.cdr.markForCheck();
+      })
+      .catch(() => {});
+  }
+
+  /**
+   * Apply a template: prefill the attribute toggles from its definition.
+   * The privilege RULES are informational here (composed later on the
+   * Privileges screen against a chosen schema), surfaced via the hint.
+   */
+  applyTemplate(id: string | null): void {
+    this.selectedTemplateId = id;
+    const opt = this.templateOptions.find(o => o.value === id);
+    if (!opt) {
+      this.appliedTemplateName = '';
+      return;
+    }
+    const def = opt.raw?.definition ?? {};
+    const a = def.attributes ?? {};
+    // Patch ONLY the attributes the template explicitly sets — leave any
+    // toggle the user already changed untouched (a template that omits a
+    // flag shouldn't silently reset it).
+    const patch: Record<string, unknown> = {};
+    for (const key of [
+      'login',
+      'inherit',
+      'createdb',
+      'createrole',
+      'superuser',
+      'replication',
+      'bypassrls',
+    ] as const) {
+      if (a[key] !== undefined) {
+        const formKey = key === 'login' ? 'canLogin' : key;
+        patch[formKey] = a[key];
+      }
+    }
+    this.roleForm.patchValue(patch);
+    this.roleForm.markAsDirty();
+    this.appliedTemplateName = opt.raw?.name ?? '';
+    this.cdr.markForCheck();
+  }
+
+  /** Rule-count hint for the applied template (privileges applied later). */
+  get appliedTemplateRuleCount(): number {
+    const opt = this.templateOptions.find(o => o.value === this.selectedTemplateId);
+    return opt?.raw?.definition?.rules?.length ?? 0;
+  }
+
   get canLogin(): boolean {
     return !!this.roleForm?.get('canLogin')?.value;
+  }
+
+  /**
+   * Save is allowed only when a datasource is chosen, the reactive form is
+   * valid, we're not mid-save, AND — in clone mode — a source role is
+   * selected. Drives the primary button's disabled state (button-state
+   * handling per the shared-component convention).
+   */
+  get canSave(): boolean {
+    if (!this.datasourceId || this.saving() || this.roleForm.invalid)
+      return false;
+    if (this.createMode === 'clone' && !this.roleForm.get('cloneFrom')?.value)
+      return false;
+    return true;
   }
 
   get isFormDirty(): boolean {
@@ -219,16 +316,71 @@ export class AddDbRoleComponent implements OnInit, HasUnsavedChanges {
       body.cloneFrom = v.cloneFrom;
     if (needsSuperuserConfirm) body.confirm = true;
 
+    const wantCopy =
+      this.createMode === 'clone' && !!v.cloneFrom && this.copyPrivileges;
+
     this.dbAccess
       .createRole(this.datasourceId, body)
-      .then(res => {
-        if (this.globalService.handleSuccessService(res)) {
-          this.roleForm.markAsPristine();
-          this.goBack();
+      .then(async res => {
+        if (!this.globalService.handleSuccessService(res)) return;
+        // Optionally copy the source role's object grants onto the new role.
+        if (wantCopy) {
+          await this.cloneGrants(v.cloneFrom as string, v.name);
         }
+        this.roleForm.markAsPristine();
+        this.goBack();
       })
       .catch(() => {})
       .finally(() => this.cdr.markForCheck());
+  }
+
+  /**
+   * Copy the SOURCE role's direct object grants onto the NEW role (PDM D1).
+   * Reads the source grants, groups them into per-(schema,table) GRANT
+   * statements, and applies them as one change-set. Best-effort: a failure
+   * here doesn't undo the created role (the toast surfaces the error).
+   */
+  private async cloneGrants(sourceRole: string, newRole: string): Promise<void> {
+    this.cloningPrivileges = true;
+    this.cdr.markForCheck();
+    try {
+      const res = await this.dbAccess.loadRoleGrants(
+        this.datasourceId,
+        sourceRole,
+      );
+      const grants: any[] = res?.status ? (res.data ?? []) : [];
+      if (!grants.length) return;
+
+      // Group privileges by schema.table → one GRANT statement each.
+      const byObj = new Map<string, { schema: string; table: string; privs: Set<string> }>();
+      for (const g of grants) {
+        const key = `${g.schema}.${g.table}`;
+        let e = byObj.get(key);
+        if (!e) {
+          e = { schema: g.schema, table: g.table, privs: new Set<string>() };
+          byObj.set(key, e);
+        }
+        e.privs.add(g.privilege);
+      }
+      const statements = Array.from(byObj.values()).map(e => ({
+        kind: 'grant',
+        objType: 'TABLE',
+        privileges: Array.from(e.privs),
+        toRole: newRole,
+        object: { parts: [e.schema, e.table] },
+      }));
+      if (!statements.length) return;
+
+      await this.dbAccess.applyChangeSet(this.datasourceId, {
+        statements,
+        confirm: true,
+      });
+    } catch {
+      /* interceptor toasts the error; role already created */
+    } finally {
+      this.cloningPrivileges = false;
+      this.cdr.markForCheck();
+    }
   }
 
   onCancel(): void {

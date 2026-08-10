@@ -9,6 +9,7 @@ import {
 } from '@angular/core';
 import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
+import { DB_ACCESS } from 'src/app/core/constants/routes.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { DbAccessContextService } from '../../services/db-access-context.service';
 import { DbAccessService } from '../../services/db-access.service';
@@ -138,11 +139,15 @@ export class PrivilegesAccessComponent implements OnInit, OnDestroy {
   effectiveObjectCount = 0;
   effectivePrivCount = 0;
 
-  // ── Change-summary confirm gate ─────────────────────────────────────────
+  // ── Review-SQL confirm gate ─────────────────────────────────────────────
   showConfirm = false;
   confirmLoading = false;
   summaries: string[] = [];
+  /** Exact SQL + danger per statement, from the BE preview. */
+  confirmStatements: any[] = [];
   confirmDestructive = false;
+  /** Typed-confirm phrase for a critical change-set (else null). */
+  confirmPhrase: string | null = null;
   private pendingStatements: any[] = [];
 
   constructor(
@@ -162,6 +167,11 @@ export class PrivilegesAccessComponent implements OnInit, OnDestroy {
     this.router.navigate(['/app/db-privileges/sessions'], {
       queryParams: this.datasourceId ? { ds: this.datasourceId } : {},
     });
+  }
+
+  /** Open the role/privilege templates manage screen (PDM D10). */
+  goToTemplates(): void {
+    this.router.navigate([DB_ACCESS.TEMPLATES_LIST]);
   }
 
   ngOnInit(): void {
@@ -641,8 +651,11 @@ export class PrivilegesAccessComponent implements OnInit, OnDestroy {
   private openConfirm(): void {
     this.showConfirm = true;
     this.confirmLoading = true;
+    this.confirmStatements = [];
+    this.confirmPhrase = null;
     this.cdr.markForCheck();
-    // Dry-run validate (previewOnly) — surface success only, never SQL.
+    // Dry-run (previewOnly) → the exact SQL + danger classification the
+    // Review-SQL dialog renders.
     this.dbAccess
       .applyChangeSet(this.datasourceId, {
         statements: this.pendingStatements,
@@ -652,7 +665,18 @@ export class PrivilegesAccessComponent implements OnInit, OnDestroy {
         if (!res?.status) {
           this.globalService.handleSuccessService(res);
           this.showConfirm = false;
+          return;
         }
+        const data = res.data ?? {};
+        this.confirmStatements = data.statements ?? [];
+        if (Array.isArray(data.summary) && data.summary.length) {
+          this.summaries = data.summary;
+        }
+        this.confirmDestructive = !!data.isDestructive;
+        this.confirmPhrase =
+          data.requiresTypedConfirm && data.confirmPhrase
+            ? data.confirmPhrase
+            : null;
       })
       .catch(() => (this.showConfirm = false))
       .finally(() => {
@@ -661,11 +685,12 @@ export class PrivilegesAccessComponent implements OnInit, OnDestroy {
       });
   }
 
-  confirmApply(): void {
+  confirmApply(confirmPhrase: string): void {
     this.dbAccess
       .applyChangeSet(this.datasourceId, {
         statements: this.pendingStatements,
         confirm: true,
+        confirmPhrase,
       })
       .then(res => {
         if (this.globalService.handleSuccessService(res)) {
@@ -737,24 +762,31 @@ export class PrivilegesAccessComponent implements OnInit, OnDestroy {
    * makes the panel scannable — one line per table instead of one per grant.
    */
   private groupEffective(): void {
+    // Track table-wide vs column-only privileges per object separately so a
+    // column-scoped grant (r.column set) is NOT rendered as whole-table
+    // access. A privilege present table-wide wins; one that only ever appears
+    // at column level is shown with a "(col)" suffix.
     const byKey = new Map<
       string,
-      { privs: Set<string>; sources: Set<string> }
+      { tablePrivs: Set<string>; colPrivs: Set<string>; sources: Set<string> }
     >();
-    let privCount = 0;
     for (const r of this.effectiveRaw) {
       const table = r.table || r.object || r.name || '';
       const key = (r.schema ? r.schema + '.' : '') + table;
       if (!key) continue;
       let g = byKey.get(key);
       if (!g) {
-        g = { privs: new Set<string>(), sources: new Set<string>() };
+        g = {
+          tablePrivs: new Set<string>(),
+          colPrivs: new Set<string>(),
+          sources: new Set<string>(),
+        };
         byKey.set(key, g);
       }
       const priv = r.privilege || r.priv;
-      if (priv && !g.privs.has(priv)) {
-        g.privs.add(priv);
-        privCount++;
+      if (priv) {
+        if (r.column) g.colPrivs.add(priv);
+        else g.tablePrivs.add(priv);
       }
       const via = r.via || 'direct';
       g.sources.add(via === 'direct' ? 'Direct' : via);
@@ -764,9 +796,19 @@ export class PrivilegesAccessComponent implements OnInit, OnDestroy {
     // every row a single fixed-height line (required by the virtual scroll).
     const MAX_CHIPS = 6;
 
+    let privCount = 0;
     this.effectiveGroups = Array.from(byKey.entries())
       .map(([key, g]) => {
-        const privileges = Array.from(g.privs).sort();
+        // Table-wide privileges as-is; a privilege that exists ONLY at column
+        // level (never table-wide) is suffixed "(col)" so it isn't misread as
+        // whole-table access. Column detail itself lives in the detail tree.
+        const tableWide = Array.from(g.tablePrivs);
+        const colOnly = Array.from(g.colPrivs).filter(p => !g.tablePrivs.has(p));
+        const privileges = [
+          ...tableWide.sort(),
+          ...colOnly.sort().map(p => `${p} (col)`),
+        ];
+        privCount += privileges.length;
         return {
           key,
           privileges,

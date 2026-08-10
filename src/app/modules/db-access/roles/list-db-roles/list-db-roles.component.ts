@@ -84,21 +84,29 @@ export class ListDbRolesComponent implements OnInit, OnDestroy {
   // open, with the Type column distinguishing login users from group roles.
   typeFilter: RoleTypeFilter = 'all';
 
-  // Membership dialog (group-role lifecycle).
+  // "Manage roles for X" dialog — current-state reflection + diff apply (B1).
   showMembership = false;
-  membershipMode: 'attach' | 'detach' = 'attach';
-  membershipRoles: string[] = [];
-  membershipTarget = '';
+  membershipTarget = ''; // the principal whose memberships we're editing
+  membershipRoles: string[] = []; // the TARGET set (pre-checked = current)
+  membershipCurrent: string[] = []; // the set at open, to diff against
+  membershipOptions: { label: string; value: string }[] = [];
+  membershipLoading = false;
+  // WITH ADMIN OPTION for newly-granted memberships (lets the grantee
+  // re-grant the role). Applies to the grant half of the diff only.
   membershipAdminOption = false;
 
-  // Change-summary confirm gate.
+  // Change-summary / Review-SQL confirm gate.
   showPreview = false;
   previewLoading = false;
   summaries: string[] = [];
+  previewStatements: any[] = [];
   previewDestructive = false;
   previewTitle = '';
   confirmPhrase: string | null = null;
-  private pendingExecute: (() => Promise<any>) | null = null;
+  // Execute takes the typed confirm phrase (empty when not a critical op) so
+  // the BE can re-check it server-side.
+  private pendingExecute: ((confirmPhrase: string) => Promise<any>) | null =
+    null;
 
   // Delete wizard.
   showDelete = false;
@@ -393,78 +401,198 @@ export class ListDbRolesComponent implements OnInit, OnDestroy {
           ...body,
           previewOnly: true,
         }),
-      () => this.dbAccess.updateRole(this.datasourceId, role.name, body),
+      confirmPhrase =>
+        this.dbAccess.updateRole(this.datasourceId, role.name, {
+          ...body,
+          confirmPhrase,
+        }),
     );
   }
 
-  // ── Membership ────────────────────────────────────────────────────────
-  openMembership(mode: 'attach' | 'detach', role?: any): void {
-    this.membershipMode = mode;
-    this.membershipRoles = role ? [role.name] : [];
-    this.membershipTarget = '';
+  // ── "Manage roles for X" — current-state reflection + diff apply (B1) ────
+  //
+  // Opens with EVERY role the principal is already a member of pre-checked.
+  // The user checks/unchecks to a target state; Apply computes the diff:
+  //   toGrant  = target \ current   → GRANT <role> TO <principal>
+  //   toRevoke = current \ target   → REVOKE <role> FROM <principal>
+  // and previews both together before executing (one Review-SQL gate).
+  openMembership(role: any): void {
+    this.membershipTarget = role.name;
+    this.membershipRoles = [];
+    this.membershipCurrent = [];
     this.membershipAdminOption = false;
+    this.membershipOptions = [];
+    this.membershipLoading = true;
     this.showMembership = true;
+    this.cdr.markForCheck();
+
+    // Load the full role list (candidates) + this principal's current
+    // memberships (pre-checked). A role cannot be a member of itself.
+    Promise.all([
+      this.dbAccess.loadRoles(this.datasourceId),
+      this.dbAccess.loadMemberships(this.datasourceId),
+    ])
+      .then(([, memRes]) => {
+        this.membershipOptions = (this.dbAccess.roles() ?? [])
+          .filter(r => r.name !== this.membershipTarget)
+          .map(r => ({ label: r.name, value: r.name }));
+        // Membership edges where this principal is the MEMBER → its member-of.
+        const edges = memRes?.status ? (memRes.data ?? []) : [];
+        const current = (Array.isArray(edges) ? edges : [])
+          .filter((e: any) => e.member === this.membershipTarget)
+          .map((e: any) => e.role);
+        this.membershipCurrent = current;
+        this.membershipRoles = [...current]; // pre-checked
+      })
+      .catch(() => {})
+      .finally(() => {
+        this.membershipLoading = false;
+        this.cdr.markForCheck();
+      });
+  }
+
+  /** Roles newly checked → to GRANT. */
+  private get membershipToGrant(): string[] {
+    return this.membershipRoles.filter(
+      r => !this.membershipCurrent.includes(r),
+    );
+  }
+
+  /** Roles unchecked → to REVOKE. */
+  private get membershipToRevoke(): string[] {
+    return this.membershipCurrent.filter(
+      r => !this.membershipRoles.includes(r),
+    );
+  }
+
+  /** True when the pending diff grants at least one new membership (drives the
+   *  WITH ADMIN OPTION toggle's visibility). */
+  get membershipHasGrants(): boolean {
+    return this.membershipToGrant.length > 0;
+  }
+
+  get hasMembershipChanges(): boolean {
+    return (
+      this.membershipToGrant.length > 0 || this.membershipToRevoke.length > 0
+    );
+  }
+
+  /** "Grant 1, revoke 2" style hint under the multiselect. */
+  get membershipDiffLabel(): string {
+    const g = this.membershipToGrant.length;
+    const r = this.membershipToRevoke.length;
+    if (!g && !r) return '';
+    return this.translate.instant('DB_ACCESS.MEMBERSHIP_DIFF', {
+      grant: g,
+      revoke: r,
+    });
   }
 
   submitMembership(): void {
-    if (!this.membershipRoles.length || !this.membershipTarget) return;
-    const roleArg =
-      this.membershipRoles.length === 1
-        ? this.membershipRoles[0]
-        : this.membershipRoles;
+    if (!this.hasMembershipChanges) return;
+    const toGrant = this.membershipToGrant;
+    const toRevoke = this.membershipToRevoke;
+    const principal = this.membershipTarget;
     this.confirmPhrase = null;
+    this.previewTitle = this.translate.instant('DB_ACCESS.MANAGE_ROLES_FOR', {
+      name: principal,
+    });
+    this.previewDestructive = toRevoke.length > 0;
+    this.showMembership = false;
 
-    if (this.membershipMode === 'attach') {
-      const body: any = {
-        role: roleArg,
-        toRole: this.membershipTarget,
-        adminOption: this.membershipAdminOption,
-      };
-      this.previewTitle = this.translate.instant(
-        'DB_ACCESS.PREVIEW_GRANT_MEMBERSHIP',
-      );
-      this.previewDestructive = false;
-      this.showMembership = false;
-      const intent: ChangeIntent = {
-        kind: 'grantMembership',
-        role: roleArg,
-        toRole: this.membershipTarget,
-      };
-      this.runPreviewAndArm(
-        [intent],
-        () =>
-          this.dbAccess.attachRole(this.datasourceId, {
-            ...body,
-            previewOnly: true,
-          }),
-        () => this.dbAccess.attachRole(this.datasourceId, body),
-      );
-    } else {
-      const body: any = {
-        role: roleArg,
-        toRole: this.membershipTarget,
-        confirm: true,
-      };
-      this.previewTitle = this.translate.instant(
-        'DB_ACCESS.PREVIEW_REVOKE_MEMBERSHIP',
-      );
-      this.previewDestructive = true;
-      this.showMembership = false;
-      const intent: ChangeIntent = {
+    // Build the intents for the plain-language summary.
+    const intents: ChangeIntent[] = [];
+    if (toGrant.length)
+      intents.push({ kind: 'grantMembership', role: toGrant, toRole: principal });
+    if (toRevoke.length)
+      intents.push({
         kind: 'revokeMembership',
-        role: roleArg,
-        toRole: this.membershipTarget,
-      };
-      this.runPreviewAndArm(
-        [intent],
-        () =>
-          this.dbAccess.detachRole(this.datasourceId, {
-            ...body,
-            previewOnly: true,
-          }),
-        () => this.dbAccess.detachRole(this.datasourceId, body),
-      );
+        role: toRevoke,
+        toRole: principal,
+      });
+
+    // Preview + execute call both endpoints as needed and merge results, so
+    // the Review-SQL dialog shows grants AND revokes as one change-set.
+    this.runPreviewAndArm(
+      intents,
+      () => this.membershipCall(toGrant, toRevoke, principal, true, ''),
+      confirmPhrase =>
+        this.membershipCall(toGrant, toRevoke, principal, false, confirmPhrase),
+    );
+  }
+
+  /**
+   * Call attach (grants) and/or detach (revokes) and MERGE their responses
+   * into one PreviewResponse-shaped object so the shared confirm flow can
+   * render a single SQL list. On execute (previewOnly=false) both run.
+   */
+  private async membershipCall(
+    toGrant: string[],
+    toRevoke: string[],
+    principal: string,
+    previewOnly: boolean,
+    confirmPhrase: string,
+  ): Promise<any> {
+    // Role-membership grant + revoke are two separate BE endpoints (there is
+    // no combined change-set for memberships), so a diff with both parts runs
+    // as two calls. We run them SEQUENTIALLY (grants first, then revokes) and,
+    // on the execute path, STOP at the first failure rather than firing both
+    // blind — so a failed revoke can't proceed after a committed grant with no
+    // signal. The response merges both parts for the Review-SQL dialog.
+    const results: any[] = [];
+
+    if (toGrant.length) {
+      // attachRole → POST /memberships: body { role, toRole }.
+      const g = await this.dbAccess.attachRole(this.datasourceId, {
+        role: toGrant,
+        toRole: principal,
+        adminOption: this.membershipAdminOption,
+        previewOnly,
+        confirmPhrase,
+      });
+      if (!g?.status) return g; // surface the grant failure verbatim
+      results.push(g);
     }
+
+    if (toRevoke.length) {
+      // detachRole → POST /memberships/remove: body requires `fromRole`
+      // (the principal the roles are revoked FROM), NOT `toRole`.
+      const r = await this.dbAccess.detachRole(this.datasourceId, {
+        role: toRevoke,
+        fromRole: principal,
+        confirm: true,
+        previewOnly,
+        confirmPhrase,
+      });
+      if (!r?.status) {
+        // On execute, a grant may already have committed. Make that explicit
+        // instead of a bare failure toast, so the user knows to re-open and
+        // reconcile (the dialog re-reads current state on next open).
+        if (!previewOnly && results.length) {
+          this.globalService.handleSuccessService({
+            ...r,
+            message: this.translate.instant('DB_ACCESS.MEMBERSHIP_PARTIAL'),
+          });
+        }
+        return r;
+      }
+      results.push(r);
+    }
+
+    // Merge summary/masked/statements across the (up to two) responses so the
+    // Review-SQL dialog shows grants AND revokes as one change-set.
+    return {
+      status: true,
+      data: {
+        summary: results.flatMap(r => r.data?.summary ?? []),
+        masked: results.flatMap(r => r.data?.masked ?? []),
+        statements: results.flatMap(r => r.data?.statements ?? []),
+        isDestructive: results.some(r => r.data?.isDestructive),
+        requiresTypedConfirm: results.some(r => r.data?.requiresTypedConfirm),
+        confirmPhrase: results.map(r => r.data?.confirmPhrase).find(Boolean),
+        count: results.reduce((n, r) => n + (r.data?.count ?? 0), 0),
+      },
+    };
   }
 
   cancelMembership(): void {
@@ -531,19 +659,25 @@ export class ListDbRolesComponent implements OnInit, OnDestroy {
           ...base,
           previewOnly: true,
         }),
-      () => this.dbAccess.deleteRole(this.datasourceId, name, base),
+      confirmPhrase =>
+        this.dbAccess.deleteRole(this.datasourceId, name, {
+          ...base,
+          confirmPhrase,
+        }),
     );
   }
 
-  // ── Shared confirm flow ─────────────────────────────────────────────────
+  // ── Shared Review-SQL confirm flow ──────────────────────────────────────
   private runPreviewAndArm(
     intents: ChangeIntent[],
     preview: () => Promise<any>,
-    execute: () => Promise<any>,
+    execute: (confirmPhrase: string) => Promise<any>,
   ): void {
     this.showPreview = true;
     this.previewLoading = true;
+    // Optimistic plain-language lines; the SQL + danger arrive from preview().
     this.summaries = intents.map(i => describeChange(i, this.translate));
+    this.previewStatements = [];
     this.pendingExecute = execute;
     this.cdr.markForCheck();
     preview()
@@ -551,6 +685,20 @@ export class ListDbRolesComponent implements OnInit, OnDestroy {
         if (!res?.status) {
           this.globalService.handleSuccessService(res);
           this.showPreview = false;
+          return;
+        }
+        // Bind the real SQL + danger classification returned by the BE.
+        const data = res.data ?? {};
+        this.previewStatements = data.statements ?? [];
+        if (Array.isArray(data.summary) && data.summary.length) {
+          this.summaries = data.summary;
+        }
+        this.previewDestructive = !!data.isDestructive;
+        // A critical change-set carries the exact phrase the user must type;
+        // only override when the BE says one is required (keeps the delete
+        // wizard's own role-name phrase otherwise).
+        if (data.requiresTypedConfirm && data.confirmPhrase) {
+          this.confirmPhrase = data.confirmPhrase;
         }
       })
       .catch(() => (this.showPreview = false))
@@ -560,9 +708,9 @@ export class ListDbRolesComponent implements OnInit, OnDestroy {
       });
   }
 
-  confirmPreview(): void {
+  confirmPreview(confirmPhrase: string): void {
     if (!this.pendingExecute) return;
-    this.pendingExecute()
+    this.pendingExecute(confirmPhrase)
       .then(res => {
         if (this.globalService.handleSuccessService(res)) {
           this.showPreview = false;
@@ -576,5 +724,6 @@ export class ListDbRolesComponent implements OnInit, OnDestroy {
   cancelPreview(): void {
     this.showPreview = false;
     this.pendingExecute = null;
+    this.previewStatements = [];
   }
 }

@@ -34,8 +34,6 @@ export class ViewDbRoleComponent implements OnInit {
   roleName = '';
   loading = true;
   role: any = null;
-  effective: any[] = [];
-  effectiveLoading = false;
   exporting = false;
 
   constructor(
@@ -70,23 +68,11 @@ export class ViewDbRoleComponent implements OnInit {
           this.goBack();
           return;
         }
-        this.loadEffective();
+        // Effective privileges are loaded lazily by <app-privilege-tree>.
       })
       .catch(() => this.goBack())
       .finally(() => {
         this.loading = false;
-        this.cdr.markForCheck();
-      });
-  }
-
-  private loadEffective(): void {
-    this.effectiveLoading = true;
-    this.dbAccess
-      .loadEffective(this.datasourceId, this.roleName)
-      .then(res => (this.effective = res?.status ? (res.data ?? []) : []))
-      .catch(() => (this.effective = []))
-      .finally(() => {
-        this.effectiveLoading = false;
         this.cdr.markForCheck();
       });
   }

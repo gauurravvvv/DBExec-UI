@@ -5,15 +5,9 @@
         <h2>{{ 'DB_ACCESS.ROLES_LIST_TITLE' | translate }}</h2>
       </div>
       <div class="header-actions">
-        <button
-          *hasPermission="'dbRoles'; level: 'write'"
-          pButton
-          [label]="'DB_ACCESS.MANAGE_MEMBERSHIP' | translate"
-          icon="pi pi-sitemap"
-          (click)="openMembership('attach')"
-          [disabled]="!datasourceId || !canManage"
-          class="p-button-outlined modern-button"
-        ></button>
+        <!-- Membership is managed per-principal via the row "Manage roles"
+             action (pre-checked current state → diff apply), so there is no
+             global membership button here. -->
         <!-- Always enabled: the datasource is chosen inside the Add-Role
              form (capability is per-datasource, so it can't be judged here).
              The form + BE enforce manage rights on the chosen datasource. -->
@@ -218,12 +212,12 @@
               <button
                 *hasPermission="'dbRoles'; level: 'write'"
                 class="icon-btn"
-                (click)="openMembership('attach', role)"
+                (click)="openMembership(role)"
                 [disabled]="!canManage"
-                [pTooltip]="'DB_ACCESS.ATTACH' | translate"
+                [pTooltip]="'DB_ACCESS.MANAGE_ROLES' | translate"
                 tooltipPosition="bottom"
               >
-                <i class="pi pi-link"></i>
+                <i class="pi pi-sitemap"></i>
               </button>
               <button
                 *hasPermission="'dbRoles'; level: 'write'"
@@ -270,55 +264,40 @@
   <div class="popup-content wide">
     <div class="popup-header">
       <div class="popup-icon"><i class="pi pi-sitemap"></i></div>
-      <h3>{{ 'DB_ACCESS.MANAGE_MEMBERSHIP' | translate }}</h3>
+      <h3>
+        {{ 'DB_ACCESS.MANAGE_ROLES_FOR' | translate: { name: membershipTarget } }}
+      </h3>
+      <p class="popup-subtitle">
+        {{ 'DB_ACCESS.MANAGE_ROLES_HINT' | translate }}
+      </p>
     </div>
     <div class="popup-body">
-      <div class="mode-tabs">
-        <button
-          type="button"
-          [class.active]="membershipMode === 'attach'"
-          (click)="membershipMode = 'attach'"
-        >
-          {{ 'DB_ACCESS.ATTACH' | translate }}
-        </button>
-        <button
-          type="button"
-          [class.active]="membershipMode === 'detach'"
-          (click)="membershipMode = 'detach'"
-        >
-          {{ 'DB_ACCESS.DETACH' | translate }}
-        </button>
+      <div class="membership-loading" *ngIf="membershipLoading">
+        <i class="pi pi-spin pi-spinner"></i>{{ 'COMMON.LOADING' | translate }}
       </div>
 
-      <div class="form-field">
+      <div class="form-field" *ngIf="!membershipLoading">
+        <!-- Current memberships arrive PRE-CHECKED; checking a new role =
+             GRANT, unchecking = REVOKE. Apply computes the diff. -->
         <app-custom-multiselect
           [(ngModel)]="membershipRoles"
-          [options]="allRoleOptions"
+          [options]="membershipOptions"
           optionLabel="label"
           optionValue="value"
           [filter]="true"
           filterBy="label"
           appendTo="body"
-          [label]="'DB_ACCESS.MEMBER_ROLES' | translate"
+          [label]="'DB_ACCESS.MEMBER_OF' | translate"
           [placeholder]="'DB_ACCESS.SELECT_MEMBER_ROLES' | translate"
         ></app-custom-multiselect>
+        <p class="form-hint" *ngIf="membershipDiffLabel">
+          {{ membershipDiffLabel }}
+        </p>
       </div>
 
-      <div class="form-field">
-        <app-custom-dropdown
-          [(ngModel)]="membershipTarget"
-          [options]="allRoleOptions"
-          optionLabel="label"
-          optionValue="value"
-          [filter]="true"
-          filterBy="label"
-          appendTo="body"
-          [label]="'DB_ACCESS.GRANT_TO_ROLE' | translate"
-        ></app-custom-dropdown>
-      </div>
-
+      <!-- WITH ADMIN OPTION applies to newly-granted memberships only. -->
       <app-custom-toggle
-        *ngIf="membershipMode === 'attach'"
+        *ngIf="!membershipLoading && membershipHasGrants"
         [(ngModel)]="membershipAdminOption"
         [label]="'DB_ACCESS.ADMIN_OPTION' | translate"
         [trueLabel]="'COMMON.YES' | translate"
@@ -331,8 +310,7 @@
       </button>
       <button
         class="btn-confirm"
-        [class.btn-danger]="membershipMode === 'detach'"
-        [disabled]="!membershipRoles.length || !membershipTarget"
+        [disabled]="membershipLoading || !hasMembershipChanges"
         (click)="submitMembership()"
       >
         <i class="pi pi-eye"></i>{{ 'DB_ACCESS.REVIEW_SQL' | translate }}
@@ -408,16 +386,17 @@
   </div>
 </div>
 
-<!-- Plain-language change-summary confirm gate -->
+<!-- Review-SQL confirm gate (plain-language summary + exact SQL + danger) -->
 <app-change-summary-dialog
   [visible]="showPreview"
   [title]="previewTitle"
   [summaries]="summaries"
+  [statements]="previewStatements"
   [destructive]="previewDestructive"
   [confirmPhrase]="confirmPhrase"
   [loading]="previewLoading"
   [executing]="saving()"
   [readOnly]="!canManage"
-  (confirmed)="confirmPreview()"
+  (confirmed)="confirmPreview($event)"
   (cancelled)="cancelPreview()"
 ></app-change-summary-dialog>

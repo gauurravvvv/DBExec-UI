@@ -1,0 +1,116 @@
+<div class="priv-tree">
+  <!-- Search bar -->
+  <div class="tree-toolbar">
+    <app-search-input
+      [placeholder]="'DB_ACCESS.SEARCH_SCHEMAS_PLACEHOLDER' | translate"
+      [value]="search"
+      (searchChange)="onSearchChange($event)"
+    ></app-search-input>
+  </div>
+
+  <!-- Loading roots -->
+  <div class="tree-empty" *ngIf="loading && !roots.length">
+    <i class="pi pi-spin pi-spinner"></i>{{ 'COMMON.LOADING' | translate }}
+  </div>
+
+  <!-- Empty -->
+  <div class="tree-empty" *ngIf="loaded && !loading && !roots.length">
+    {{ 'DB_ACCESS.NO_EFFECTIVE' | translate }}
+  </div>
+
+  <!-- Tree -->
+  <ul class="tree-list" *ngIf="roots.length">
+    <li *ngFor="let schema of roots; trackBy: trackById" class="tree-node">
+      <!-- Schema row -->
+      <button
+        type="button"
+        class="node-row schema-row"
+        (click)="toggleSchema(schema)"
+        [attr.aria-expanded]="schema.expanded"
+      >
+        <i
+          class="pi chevron"
+          [ngClass]="schema.expanded ? 'pi-chevron-down' : 'pi-chevron-right'"
+        ></i>
+        <i class="pi pi-folder node-icon"></i>
+        <span class="node-label">{{ schema.label }}</span>
+        <app-chip variant="count" size="sm">{{ schema.count }}</app-chip>
+      </button>
+
+      <!-- Schema children (tables) -->
+      <ul class="tree-list child-list" *ngIf="schema.expanded">
+        <li class="tree-empty child" *ngIf="schema.loading && !schema.children.length">
+          <i class="pi pi-spin pi-spinner"></i>{{ 'COMMON.LOADING' | translate }}
+        </li>
+
+        <li
+          *ngFor="let table of schema.children; trackBy: trackById"
+          class="tree-node"
+        >
+          <!-- Table row -->
+          <button
+            type="button"
+            class="node-row table-row"
+            (click)="toggleTable(schema.id, table)"
+            [attr.aria-expanded]="table.expanded"
+          >
+            <i
+              class="pi chevron"
+              [ngClass]="
+                table.expanded ? 'pi-chevron-down' : 'pi-chevron-right'
+              "
+            ></i>
+            <i class="pi pi-table node-icon"></i>
+            <span class="node-label">{{ table.label }}</span>
+            <app-chip variant="count" size="sm">{{ table.count }}</app-chip>
+          </button>
+
+          <!-- Table children (privilege chips) -->
+          <div class="priv-leaf" *ngIf="table.expanded">
+            <span class="tree-empty child" *ngIf="table.loading">
+              <i class="pi pi-spin pi-spinner"></i
+              >{{ 'COMMON.LOADING' | translate }}
+            </span>
+            <div class="priv-chips" *ngIf="!table.loading">
+              <span
+                class="priv-chip"
+                *ngFor="let p of table.privileges; trackBy: trackByPriv"
+              >
+                <app-chip variant="tag" tone="primary" size="sm">{{
+                  p.privilege
+                }}</app-chip>
+                <app-chip
+                  variant="tag"
+                  [tone]="viaTone(p.via)"
+                  size="sm"
+                  [pTooltip]="'DB_ACCESS.VIA' | translate"
+                >
+                  {{
+                    p.via === 'direct'
+                      ? ('DB_ACCESS.DIRECT' | translate)
+                      : ('DB_ACCESS.VIA_ROLE' | translate: { role: p.via })
+                  }}
+                </app-chip>
+                <i
+                  class="pi pi-share-alt grant-icon"
+                  *ngIf="p.grantable"
+                  [pTooltip]="'DB_ACCESS.GRANTABLE' | translate"
+                ></i>
+              </span>
+              <span class="tree-empty child" *ngIf="!table.privileges.length">
+                {{ 'DB_ACCESS.NO_EFFECTIVE' | translate }}
+              </span>
+            </div>
+          </div>
+        </li>
+
+        <!-- Load more tables -->
+        <li class="load-more" *ngIf="schema.loaded && hasMoreTables(schema)">
+          <button type="button" class="load-more-btn" (click)="loadMoreTables(schema)">
+            <i class="pi pi-angle-down"></i>{{ 'COMMON.LOAD_MORE' | translate }}
+          </button>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</div>

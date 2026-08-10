@@ -1,0 +1,103 @@
+<div class="list-wrapper">
+  <div class="list-container">
+    <div class="page-header">
+      <div class="left-section">
+        <button pButton class="p-button-text back-button" (click)="goBack()">
+          <i class="pi pi-arrow-left"></i>
+        </button>
+        <h2>{{ 'DB_ACCESS.TEMPLATES_TITLE' | translate }}</h2>
+      </div>
+      <div class="action-buttons">
+        <app-button
+          *hasPermission="'dbPrivileges'; level: 'write'"
+          variant="primary"
+          icon="pi pi-plus"
+          (clicked)="onAdd()"
+          >{{ 'DB_ACCESS.NEW_TEMPLATE' | translate }}</app-button
+        >
+      </div>
+    </div>
+
+    <p class="page-subtitle">{{ 'DB_ACCESS.TEMPLATES_SUBTITLE' | translate }}</p>
+
+    <app-custom-table
+      [columns]="cols"
+      [serverAdapter]="adapter"
+      [config]="tableConfig"
+    >
+      <ng-template usGridCell="name" let-row>
+        <span class="tpl-name">{{ row.name }}</span>
+      </ng-template>
+
+      <ng-template usGridCell="scope" let-row>
+        <app-chip variant="tag" size="sm" [tone]="row.datasourceId ? 'primary' : 'neutral'">
+          {{ scopeLabel(row) }}
+        </app-chip>
+      </ng-template>
+
+      <ng-template usGridCell="builtIn" let-row>
+        <app-chip
+          *ngIf="row.isBuiltIn"
+          variant="badge"
+          tone="neutral"
+          icon="pi pi-lock"
+          size="sm"
+          >{{ 'DB_ACCESS.BUILT_IN' | translate }}</app-chip
+        >
+        <app-chip
+          *ngIf="!row.isBuiltIn"
+          variant="badge"
+          tone="primary"
+          size="sm"
+          >{{ 'DB_ACCESS.CUSTOM' | translate }}</app-chip
+        >
+      </ng-template>
+
+      <ng-template usGridCell="description" let-row>
+        <span class="description-text">{{ row.description || '—' }}</span>
+      </ng-template>
+
+      <ng-template usGridCell="actions" let-row>
+        <div class="row-actions">
+          <button
+            *hasPermission="'dbPrivileges'; level: 'write'"
+            class="icon-btn edit-btn"
+            [disabled]="row.isBuiltIn"
+            (click)="onEdit(row)"
+            [pTooltip]="
+              (row.isBuiltIn ? 'DB_ACCESS.BUILT_IN_READONLY' : 'COMMON.EDIT')
+                | translate
+            "
+            tooltipPosition="bottom"
+          >
+            <i class="pi pi-pencil"></i>
+          </button>
+          <button
+            *hasPermission="'dbPrivileges'; level: 'full'"
+            class="icon-btn delete-btn"
+            [disabled]="row.isBuiltIn"
+            (click)="openDelete(row)"
+            [pTooltip]="
+              (row.isBuiltIn ? 'DB_ACCESS.BUILT_IN_READONLY' : 'COMMON.DELETE')
+                | translate
+            "
+            tooltipPosition="bottom"
+          >
+            <i class="pi pi-trash"></i>
+          </button>
+        </div>
+      </ng-template>
+    </app-custom-table>
+  </div>
+</div>
+
+<!-- Delete confirm -->
+<app-justification-dialog
+  *ngIf="showDelete"
+  mode="delete"
+  [requireJustification]="false"
+  [message]="'DB_ACCESS.DELETE_TEMPLATE_CONFIRM' | translate: { name: deleteTarget?.name }"
+  [busy]="saving()"
+  (confirm)="confirmDelete()"
+  (cancel)="cancelDelete()"
+></app-justification-dialog>

@@ -385,6 +385,61 @@ export class DbAccessService {
     );
   }
 
+  /**
+   * GET /:datasourceId/effective/:roleName/tree — lazy privilege tree.
+   * level 'schema' → schema roots; level 'table' (+schema) → tables;
+   * level 'table' (+schema+table) → one table's privilege chips.
+   * Server-paged + searchable. Returns `{ nodes, count }`.
+   */
+  loadEffectiveTree(
+    datasourceId: string,
+    roleName: string,
+    opts: {
+      level: 'schema' | 'table';
+      schema?: string;
+      table?: string;
+      page?: number;
+      limit?: number;
+      search?: string;
+    },
+  ): Promise<any> {
+    const params: Record<string, string> = { level: opts.level };
+    if (opts.schema) params['schema'] = opts.schema;
+    if (opts.table) params['table'] = opts.table;
+    if (opts.page) params['page'] = String(opts.page);
+    if (opts.limit) params['limit'] = String(opts.limit);
+    if (opts.search) params['search'] = opts.search;
+    return lastValueFrom(
+      this.http
+        .apiGet(
+          this.base(datasourceId) +
+            DB_ACCESS.EFFECTIVE_SEGMENT +
+            encodeURIComponent(roleName) +
+            DB_ACCESS.EFFECTIVE_TREE_SUFFIX,
+          { skipLoader: true, params },
+        )
+        .pipe(takeUntil(this._cancelReads$)),
+    );
+  }
+
+  /**
+   * GET /:datasourceId/roles/:roleName/grants — a role's DIRECT object
+   * grants. Pre-loads the privilege composer (diff-apply) + clone source.
+   */
+  loadRoleGrants(datasourceId: string, roleName: string): Promise<any> {
+    return lastValueFrom(
+      this.http
+        .apiGet(
+          this.base(datasourceId) +
+            DB_ACCESS.ROLE_SEGMENT +
+            encodeURIComponent(roleName) +
+            DB_ACCESS.ROLE_GRANTS_SUFFIX,
+          { skipLoader: true },
+        )
+        .pipe(takeUntil(this._cancelReads$)),
+    );
+  }
+
   // ── Export ────────────────────────────────────────────────────────────────
 
   /**

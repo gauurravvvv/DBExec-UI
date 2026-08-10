@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { unsavedChangesGuard } from 'src/app/core/guards/unsaved-changes.guard';
 import { DbAccessSharedModule } from '../db-access-shared.module';
+import { PrivilegeTreeComponent } from '../components/privilege-tree/privilege-tree.component';
 import { AddDbRoleComponent } from './add-db-role/add-db-role.component';
 import { EditDbRoleComponent } from './edit-db-role/edit-db-role.component';
 import { ListDbRolesComponent } from './list-db-roles/list-db-roles.component';
@@ -33,6 +34,7 @@ const routes: Routes = [
     AddDbRoleComponent,
     EditDbRoleComponent,
     ViewDbRoleComponent,
+    PrivilegeTreeComponent,
   ],
   imports: [DbAccessSharedModule, RouterModule.forChild(routes)],
 })

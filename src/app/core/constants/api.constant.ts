@@ -649,9 +649,13 @@ export const DB_ACCESS = {
   DEFAULT_PRIVILEGES_SUFFIX: '/default-privileges',
   // GET /db-access/:datasourceId/effective/:roleName
   EFFECTIVE_SEGMENT: '/effective/',
+  // GET /db-access/:datasourceId/effective/:roleName/tree — lazy privilege tree
+  EFFECTIVE_TREE_SUFFIX: '/tree',
   // GET /db-access/:datasourceId/roles/:roleName/owned
   ROLE_SEGMENT: '/roles/',
   OWNED_SUFFIX: '/owned',
+  // GET /db-access/:datasourceId/roles/:roleName/grants — role's direct grants
+  ROLE_GRANTS_SUFFIX: '/grants',
   // GET /db-access/:datasourceId/roles/:roleName/export → full access profile
   ACCESS_EXPORT_SUFFIX: '/export',
   RENAME_SUFFIX: '/rename',
@@ -665,6 +669,19 @@ export const DB_ACCESS = {
   SESSIONS_SEGMENT: '/sessions/',
   CANCEL_SUFFIX: '/cancel',
   TERMINATE_SUFFIX: '/terminate',
+  // POST /db-access/:datasourceId/roles/:roleName/reassign
+  REASSIGN_SUFFIX: '/reassign',
+  // GET /db-access/:datasourceId/public-grants
+  PUBLIC_GRANTS_SUFFIX: '/public-grants',
+  // GET /db-access/:datasourceId/database-privileges
+  DATABASE_PRIVILEGES_SUFFIX: '/database-privileges',
+  // GET /db-access/:datasourceId/rls?schema=&table=
+  RLS_SUFFIX: '/rls',
+  // GET /db-access/:datasourceId/objects/who-can-access?schema=&table=
+  WHO_CAN_ACCESS_SUFFIX: '/objects/who-can-access',
+  // Templates (org DB): /db-access/templates[/:id], /templates/bulk-delete
+  TEMPLATES_BASE: '/db-access/templates',
+  TEMPLATES_BULK_DELETE: '/db-access/templates/bulk-delete',
 };
 
 export const NOTIFICATION = {

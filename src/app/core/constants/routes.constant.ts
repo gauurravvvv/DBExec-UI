@@ -95,6 +95,13 @@ export const DB_ACCESS = {
   // Privileges & Access (composer + effective + saved sets)
   PRIVILEGES_LIST: '/app/db-privileges',
   privilegeView: (id: string | number) => `/app/db-privileges/${id}`,
+
+  // Role/privilege templates (PDM D10) — hosted under the Privileges section
+  // (no new sidebar entry). Reusable recipes managed here, applied in the
+  // create-role form + composer.
+  TEMPLATES_LIST: '/app/db-privileges/templates',
+  templateNew: () => '/app/db-privileges/templates/new',
+  templateEdit: (id: string) => `/app/db-privileges/templates/${id}/edit`,
 };
 
 export const QUERY_RUNNER = {
