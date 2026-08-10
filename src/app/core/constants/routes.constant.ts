@@ -181,6 +181,17 @@ export const THEME_PRESET = feature('/app/settings/themes');
 // are routed pages).
 export const BRANDING_PRESET = feature('/app/settings/branding-presets');
 
+// App Settings hub. Theme / Branding / Announcements are TABS inside this
+// single hub page — there is no standalone `/app/settings/themes` route.
+// The hub reads `?tab=<slug>` on load to pick the active tab, so returning
+// from an add/edit/view page must target the hub with the matching slug
+// (routing to the bare list base falls through to the Not Found page).
+export const APP_SETTINGS_HUB = {
+  BASE: '/app/settings/app',
+  tab: (slug: 'theme' | 'branding' | 'announcements') =>
+    `/app/settings/app?tab=${slug}`,
+};
+
 // Per-user notifications feed — the full-page view behind the bell
 // panel's "See all". Auth-gated only (not permission-gated), like the
 // profile screen.

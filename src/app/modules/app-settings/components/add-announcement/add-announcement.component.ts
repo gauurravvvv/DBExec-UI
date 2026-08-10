@@ -14,7 +14,7 @@ import {
 import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { DEFAULT_PAGE } from 'src/app/core/constants';
-import { ANNOUNCEMENT } from 'src/app/core/constants/routes.constant';
+import { APP_SETTINGS_HUB } from 'src/app/core/constants/routes.constant';
 import { HasUnsavedChanges } from 'src/app/core/models/has-unsaved-changes.model';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { GroupService } from 'src/app/modules/groups/services/group.service';
@@ -264,7 +264,9 @@ export class AddAnnouncementComponent implements OnInit, HasUnsavedChanges {
       .then(res => {
         if (this.globalService.handleSuccessService(res)) {
           this.announcementForm.markAsPristine();
-          this.router.navigate([ANNOUNCEMENT.LIST]);
+          this.router.navigate([APP_SETTINGS_HUB.BASE], {
+      queryParams: { tab: 'announcements' },
+    });
         }
       })
       .catch(() => {})
@@ -272,7 +274,9 @@ export class AddAnnouncementComponent implements OnInit, HasUnsavedChanges {
   }
 
   onCancel(): void {
-    this.router.navigate([ANNOUNCEMENT.LIST]);
+    this.router.navigate([APP_SETTINGS_HUB.BASE], {
+      queryParams: { tab: 'announcements' },
+    });
   }
 
   getNameError(): string {

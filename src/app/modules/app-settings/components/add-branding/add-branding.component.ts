@@ -9,7 +9,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { HasUnsavedChanges } from 'src/app/core/models/has-unsaved-changes.model';
-import { BRANDING_PRESET } from 'src/app/core/constants/routes.constant';
+import { APP_SETTINGS_HUB, BRANDING_PRESET } from 'src/app/core/constants/routes.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
 import {
   BrandingPreset,
@@ -116,7 +116,7 @@ export class AddBrandingComponent implements OnInit, HasUnsavedChanges {
   private async loadPreset(id: string): Promise<void> {
     const p = await this.brandingService.getPreset(id);
     if (!p) {
-      this.router.navigateByUrl(BRANDING_PRESET.LIST);
+      this.router.navigateByUrl(APP_SETTINGS_HUB.tab('branding'));
       return;
     }
     this.form.patchValue({
@@ -194,7 +194,7 @@ export class AddBrandingComponent implements OnInit, HasUnsavedChanges {
         : await this.brandingService.createPreset(this.body());
       if (this.globalService.handleSuccessService(res)) {
         this.form.markAsPristine();
-        this.router.navigateByUrl(BRANDING_PRESET.LIST);
+        this.router.navigateByUrl(APP_SETTINGS_HUB.tab('branding'));
       }
     } finally {
       this.saving = false;
@@ -203,7 +203,7 @@ export class AddBrandingComponent implements OnInit, HasUnsavedChanges {
   }
 
   onCancel(): void {
-    this.router.navigateByUrl(BRANDING_PRESET.LIST);
+    this.router.navigateByUrl(APP_SETTINGS_HUB.tab('branding'));
   }
   onEditFromView(): void {
     if (this.presetId) this.router.navigateByUrl(BRANDING_PRESET.edit(this.presetId));

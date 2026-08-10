@@ -12,7 +12,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { debounceTime } from 'rxjs';
 import { HasUnsavedChanges } from 'src/app/core/models/has-unsaved-changes.model';
-import { THEME_PRESET } from 'src/app/core/constants/routes.constant';
+import { APP_SETTINGS_HUB, THEME_PRESET } from 'src/app/core/constants/routes.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { ThemeService } from 'src/app/core/services/theme.service';
 import {
@@ -168,7 +168,7 @@ export class AddThemeComponent implements OnInit, OnDestroy, HasUnsavedChanges {
   private async loadPreset(id: string): Promise<void> {
     const p = await this.themeService.getPreset(id);
     if (!p) {
-      this.router.navigateByUrl(THEME_PRESET.LIST);
+      this.router.navigateByUrl(APP_SETTINGS_HUB.tab('theme'));
       return;
     }
     this.loadedPreset = p;
@@ -251,8 +251,8 @@ export class AddThemeComponent implements OnInit, OnDestroy, HasUnsavedChanges {
         : await this.themeService.createPreset(body);
       if (this.globalService.handleSuccessService(res)) {
         this.themeForm.markAsPristine();
-        // The list reloads via its own adapter on navigation.
-        this.router.navigateByUrl(THEME_PRESET.LIST);
+        // Back to the Theme tab of the hub (the list is a tab, not a route).
+        this.router.navigateByUrl(APP_SETTINGS_HUB.tab('theme'));
       }
     } finally {
       this.saving = false;
@@ -261,7 +261,7 @@ export class AddThemeComponent implements OnInit, OnDestroy, HasUnsavedChanges {
   }
 
   onCancel(): void {
-    this.router.navigateByUrl(THEME_PRESET.LIST);
+    this.router.navigateByUrl(APP_SETTINGS_HUB.tab('theme'));
   }
 
   onEditFromView(): void {

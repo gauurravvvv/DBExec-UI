@@ -5,7 +5,7 @@ import {
   OnInit,
 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ANNOUNCEMENT } from 'src/app/core/constants/routes.constant';
+import { ANNOUNCEMENT, APP_SETTINGS_HUB } from 'src/app/core/constants/routes.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { AnnouncementService } from '../../services/announcement.service';
 
@@ -57,7 +57,9 @@ export class ViewAnnouncementComponent implements OnInit {
   }
 
   goBack(): void {
-    this.router.navigate([ANNOUNCEMENT.LIST]);
+    this.router.navigate([APP_SETTINGS_HUB.BASE], {
+      queryParams: { tab: 'announcements' },
+    });
   }
 
   confirmDelete(): void {
@@ -73,7 +75,9 @@ export class ViewAnnouncementComponent implements OnInit {
       .delete(this.announcementId)
       .then(res => {
         if (this.globalService.handleSuccessService(res)) {
-          this.router.navigate([ANNOUNCEMENT.LIST]);
+          this.router.navigate([APP_SETTINGS_HUB.BASE], {
+            queryParams: { tab: 'announcements' },
+          });
         }
       })
       .catch(() => {})

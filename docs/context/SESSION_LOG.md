@@ -1,5 +1,11 @@
 # DBExec-UI — Session Log (newest first)
 
+### 2026-08-10 — Settings back-nav Not-Found fix, back-button spacing, sidebar brand colour
+- Fixed Add/Edit/View pages for Theme, Branding, Announcements routing back to bare list paths (`/app/settings/themes` etc.) that aren't registered routes → Not Found. Added `APP_SETTINGS_HUB` in routes.constant (`BASE` + `tab(slug)`); every back/cancel/return nav now targets `/app/settings/app?tab=theme|branding|announcements` (the hub reads `?tab=`). Left `ANNOUNCEMENT.LIST` untouched where it's an API path in announcement.service.
+- Back-button/title spacing: the fixed 36px icon-button box + wide gap pushed titles away from the arrow; tightened all three Add headers to a ~28–30px button + `--space-2` gap.
+- Sidebar brand now follows the theme: `.brand-highlight` ("Exec") gradient switched from hard-coded blue to `--primary-color`/`--primary-light`; the DB mark converted from a `content:url()` image to a CSS mask filled with `--primary-color` (single-colour silhouette SVG). "DB" already used `--text-color`.
+- Verified: tsc 0, ngc 0, prod build 0.
+
 ### 2026-08-10 — Live editor re-theming + add-theme preview revert
 - Wired `CodeEditorService` to `ThemeService.theme()` via a constructor `effect` so all open Monaco
   editors follow a live theme switch (the pre-existing `refreshTheme()` had no caller). Global

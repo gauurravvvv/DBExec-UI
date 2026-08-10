@@ -121,7 +121,17 @@
     width: 24px;
     height: 24px;
     flex-shrink: 0;
-    filter: var(--icon-filter);
+    // Tint the mark to the org's brand colour so the sidebar identity
+    // follows the active theme (the source SVG is a single-colour database
+    // silhouette, so masking it with --primary-color reads cleanly). The
+    // `content: url()` image is masked out and replaced by a solid fill.
+    content: none;
+    background-color: var(--primary-color);
+    // Runtime-served path (not bundler-resolved) so it works regardless of
+    // this file's nesting depth; `assets/` is a static served directory.
+    -webkit-mask: url('/assets/icons/dbexec_icon.svg') no-repeat center /
+      contain;
+    mask: url('/assets/icons/dbexec_icon.svg') no-repeat center / contain;
   }
 
   .brand-text {
@@ -135,8 +145,15 @@
     text-overflow: ellipsis;
     transition: opacity var(--motion-fast) ease;
 
+    // "Exec" follows the brand: gradient from the primary to its lighter
+    // companion, both theme tokens, so it tracks the org colour instead of
+    // the old hard-coded blue.
     .brand-highlight {
-      background: linear-gradient(135deg, #2196f3, #42a5f5);
+      background: linear-gradient(
+        135deg,
+        var(--primary-color),
+        var(--primary-light)
+      );
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
