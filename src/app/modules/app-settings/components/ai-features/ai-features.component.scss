@@ -86,3 +86,157 @@
     }
   }
 }
+
+/* ── AI Features — provider-driven config ─────────────────────── */
+.ai-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  max-width: 620px;
+  // Breathing room so the last field (Advanced) isn't flush to the panel
+  // edge / behind the bottom branding bar.
+  padding-bottom: var(--space-10, 48px);
+}
+
+.ai-sec {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-top: var(--space-2);
+
+  &__label {
+    font-size: var(--fs-label);
+    font-weight: var(--fw-semibold, 600);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--text-color-secondary);
+  }
+  &::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border-color);
+  }
+}
+
+.ai-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+.ai-label {
+  font-size: var(--fs-control);
+  font-weight: var(--fw-semibold, 600);
+  color: var(--text-color);
+}
+
+/* test connection */
+.ai-test {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+
+  &__banner {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: var(--fs-control);
+    padding: var(--space-2) var(--space-3);
+    border-radius: 9px;
+    border: 1px solid;
+
+    &.ok {
+      color: var(--green-600, #12a150);
+      background: var(--green-50, rgba(18, 161, 80, 0.08));
+      border-color: rgba(18, 161, 80, 0.3);
+    }
+    &.err {
+      color: var(--red-600, #d64545);
+      background: var(--red-50, rgba(214, 69, 69, 0.08));
+      border-color: rgba(214, 69, 69, 0.3);
+    }
+  }
+}
+
+/* model suggestion chips */
+.model-chips {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+
+  &__label {
+    font-size: var(--fs-label);
+    color: var(--text-color-secondary);
+    margin-right: var(--space-1);
+  }
+}
+.model-chip {
+  font-family: var(--font-mono, monospace);
+  font-size: var(--fs-label);
+  padding: 4px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  background: var(--surface-card);
+  color: var(--text-color-secondary);
+  cursor: pointer;
+
+  &:hover {
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+  }
+  &.on {
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+    background: var(--primary-color-transparent, rgba(91, 108, 255, 0.08));
+    font-weight: var(--fw-semibold, 600);
+  }
+}
+
+/* advanced accordion */
+.ai-adv {
+  border: 1px solid var(--border-color);
+  border-radius: 11px;
+  overflow: hidden;
+
+  &__hd {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    width: 100%;
+    padding: var(--space-3) var(--space-4);
+    border: 0;
+    background: transparent;
+    color: var(--text-color);
+    font-size: var(--fs-control);
+    font-weight: var(--fw-semibold, 600);
+    cursor: pointer;
+  }
+  &__chev {
+    margin-left: auto;
+    color: var(--text-color-secondary);
+    transition: transform 0.15s;
+  }
+  &.open &__chev {
+    transform: rotate(90deg);
+  }
+  &__bd {
+    padding: 0 var(--space-4) var(--space-4);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+  &__two {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-3);
+  }
+}
+
+@media (max-width: 560px) {
+  .ai-adv__two {
+    grid-template-columns: 1fr;
+  }
+}

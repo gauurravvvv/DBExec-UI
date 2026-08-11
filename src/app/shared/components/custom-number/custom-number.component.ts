@@ -30,6 +30,14 @@ export class CustomNumberComponent implements ControlValueAccessor {
   @Input() min: number | null = null;
   @Input() max: number | null = null;
   @Input() step = 1;
+  /**
+   * Decimal precision forwarded to PrimeNG's p-inputNumber. PrimeNG defaults
+   * both to 0, which makes the field reject decimals (e.g. an accuracy of
+   * 0.2 can't be typed). Set these to allow fractional input; null leaves
+   * PrimeNG's integer default untouched for every existing caller.
+   */
+  @Input() minFractionDigits: number | null = null;
+  @Input() maxFractionDigits: number | null = null;
   @Input() showButtons = false;
   /**
    * PrimeNG layout: 'stacked' renders large vertical +/- arrows on the

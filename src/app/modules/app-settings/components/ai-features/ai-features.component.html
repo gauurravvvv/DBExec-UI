@@ -15,113 +15,234 @@
       *ngIf="loaded()"
       autocomplete="off"
       [formGroup]="form"
-      class="admin-form mt-4"
+      class="ai-form mt-4"
     >
-      <div class="form-column">
-        <app-custom-toggle
-          formControlName="aiEnabled"
-          [label]="'APP_SETTINGS.AI_FEATURES.ENABLED' | translate"
-          [trueLabel]="'COMMON.ENABLED' | translate"
-          [falseLabel]="'COMMON.DISABLED' | translate"
-        ></app-custom-toggle>
+      <!-- Enable -->
+      <app-custom-toggle
+        formControlName="aiEnabled"
+        [label]="'APP_SETTINGS.AI_FEATURES.ENABLED' | translate"
+        [trueLabel]="'COMMON.ENABLED' | translate"
+        [falseLabel]="'COMMON.DISABLED' | translate"
+      ></app-custom-toggle>
 
-        <!-- Model & performance -->
-        <h3 class="section-label">
-          {{ 'APP_SETTINGS.AI_FEATURES.SECTION_MODEL' | translate }}
-        </h3>
+      <!-- PROVIDER -->
+      <div class="ai-sec">
+        <span class="ai-sec__label">{{
+          'APP_SETTINGS.AI_FEATURES.SECTION_PROVIDER' | translate
+        }}</span>
+      </div>
 
-        <app-custom-input
-          formControlName="aiProvider"
-          [label]="'APP_SETTINGS.AI_FEATURES.PROVIDER' | translate"
-          icon="pi-server"
+      <app-custom-dropdown
+        formControlName="aiProvider"
+        icon="pi-server"
+        [label]="'APP_SETTINGS.AI_FEATURES.PROVIDER' | translate"
+        [options]="providerOptions"
+        optionLabel="label"
+        optionValue="value"
+        [filter]="false"
+        [required]="form.get('aiEnabled')?.value === true"
+      ></app-custom-dropdown>
+      <p class="field-hint">
+        {{
+          (isCustom
+            ? 'APP_SETTINGS.AI_FEATURES.PROVIDER_CUSTOM_SUB'
+            : 'APP_SETTINGS.AI_FEATURES.PROVIDER_ANTHROPIC_SUB'
+          ) | translate
+        }}
+      </p>
+
+      <!-- Connection style — Custom only -->
+      <ng-container *ngIf="isCustom">
+        <app-custom-dropdown
+          formControlName="aiConnectionStyle"
+          icon="pi-sitemap"
+          [label]="'APP_SETTINGS.AI_FEATURES.CONNECTION_STYLE' | translate"
+          [options]="connectionStyleOptions"
+          optionLabel="label"
+          optionValue="value"
+          [filter]="false"
           [required]="form.get('aiEnabled')?.value === true"
-          [showError]="
-            !!(
-              form.get('aiProvider')?.invalid && form.get('aiProvider')?.touched
-            )
-          "
-          [errorMessage]="'APP_SETTINGS.AI_FEATURES.REQUIRED' | translate"
-          [placeholder]="
-            'APP_SETTINGS.AI_FEATURES.PROVIDER_PLACEHOLDER' | translate
-          "
-        ></app-custom-input>
-
-        <app-custom-input
-          formControlName="aiBaseUrl"
-          type="url"
-          [label]="'APP_SETTINGS.AI_FEATURES.BASE_URL' | translate"
-          icon="pi-link"
-          [required]="form.get('aiEnabled')?.value === true"
-          [showError]="
-            !!(form.get('aiBaseUrl')?.invalid && form.get('aiBaseUrl')?.touched)
-          "
-          [errorMessage]="
-            'APP_SETTINGS.AI_FEATURES.BASE_URL_INVALID' | translate
-          "
-          [placeholder]="
-            'APP_SETTINGS.AI_FEATURES.BASE_URL_PLACEHOLDER' | translate
-          "
-        ></app-custom-input>
-
-        <app-custom-input
-          formControlName="aiModelId"
-          [label]="'APP_SETTINGS.AI_FEATURES.MODEL' | translate"
-          icon="pi-sparkles"
-          [required]="form.get('aiEnabled')?.value === true"
-          [showError]="
-            !!(form.get('aiModelId')?.invalid && form.get('aiModelId')?.touched)
-          "
-          [errorMessage]="'APP_SETTINGS.AI_FEATURES.REQUIRED' | translate"
-          [placeholder]="
-            'APP_SETTINGS.AI_FEATURES.MODEL_PLACEHOLDER' | translate
-          "
-        ></app-custom-input>
-        <p class="field-hint field-hint--model">
-          <i class="pi pi-info-circle"></i>
-          {{ 'APP_SETTINGS.AI_FEATURES.MODEL_HINT' | translate }}
-        </p>
-
-        <app-custom-number
-          formControlName="aiTemperature"
-          [label]="'APP_SETTINGS.AI_FEATURES.ACCURACY' | translate"
-          [min]="0"
-          [max]="1"
-          [step]="0.1"
-          [required]="form.get('aiEnabled')?.value === true"
-          [showError]="
-            !!(
-              form.get('aiTemperature')?.invalid &&
-              form.get('aiTemperature')?.touched
-            )
-          "
-          [errorMessage]="
-            'APP_SETTINGS.AI_FEATURES.ACCURACY_INVALID' | translate
-          "
-        ></app-custom-number>
+        ></app-custom-dropdown>
         <p class="field-hint">
-          {{ 'APP_SETTINGS.AI_FEATURES.ACCURACY_HINT' | translate }}
+          {{ 'APP_SETTINGS.AI_FEATURES.CONNECTION_STYLE_HINT' | translate }}
         </p>
+      </ng-container>
 
-        <div class="secret-field">
+      <!-- CONNECTION -->
+      <div class="ai-sec">
+        <span class="ai-sec__label">{{
+          'APP_SETTINGS.AI_FEATURES.SECTION_CONNECTION' | translate
+        }}</span>
+      </div>
+
+      <app-custom-input
+        formControlName="aiBaseUrl"
+        type="url"
+        [label]="'APP_SETTINGS.AI_FEATURES.BASE_URL' | translate"
+        icon="pi-link"
+        [readonly]="!isCustom"
+        [required]="form.get('aiEnabled')?.value === true"
+        [showError]="
+          !!(form.get('aiBaseUrl')?.invalid && form.get('aiBaseUrl')?.touched)
+        "
+        [errorMessage]="'APP_SETTINGS.AI_FEATURES.BASE_URL_INVALID' | translate"
+        [placeholder]="'APP_SETTINGS.AI_FEATURES.BASE_URL_PLACEHOLDER' | translate"
+      ></app-custom-input>
+      <p class="field-hint">
+        {{
+          (isCustom
+            ? 'APP_SETTINGS.AI_FEATURES.BASE_URL_HINT_CUSTOM'
+            : 'APP_SETTINGS.AI_FEATURES.BASE_URL_HINT_LOCKED'
+          ) | translate
+        }}
+      </p>
+
+      <div class="secret-field">
+        <app-custom-input
+          formControlName="aiApiKey"
+          type="password"
+          [label]="'APP_SETTINGS.AI_FEATURES.API_KEY' | translate"
+          icon="pi-key"
+          [showPasswordToggle]="true"
+          [required]="form.get('aiEnabled')?.value === true"
+          [showError]="
+            !!(form.get('aiApiKey')?.invalid && form.get('aiApiKey')?.touched)
+          "
+          [errorMessage]="'APP_SETTINGS.AI_FEATURES.REQUIRED' | translate"
+          [placeholder]="'APP_SETTINGS.AI_FEATURES.API_KEY_PLACEHOLDER' | translate"
+        ></app-custom-input>
+        <span class="configured-badge" *ngIf="keyConfigured">
+          <i class="pi pi-check-circle"></i>
+          {{ 'APP_SETTINGS.AI_FEATURES.CONFIGURED' | translate }}
+        </span>
+      </div>
+
+      <!-- Test connection -->
+      <div class="ai-test">
+        <app-button
+          variant="secondary"
+          icon="pi pi-bolt"
+          [loading]="testing()"
+          (clicked)="testConnection()"
+        >{{ 'APP_SETTINGS.AI_FEATURES.TEST' | translate }}</app-button>
+        <div
+          class="ai-test__banner"
+          *ngIf="testResult() as tr"
+          [class.ok]="tr.ok"
+          [class.err]="!tr.ok"
+        >
+          <i class="pi" [class.pi-check-circle]="tr.ok" [class.pi-times-circle]="!tr.ok"></i>
+          <span>{{ tr.message }}</span>
+        </div>
+      </div>
+
+      <!-- MODEL -->
+      <div class="ai-sec">
+        <span class="ai-sec__label">{{
+          'APP_SETTINGS.AI_FEATURES.SECTION_MODEL' | translate
+        }}</span>
+      </div>
+
+      <app-custom-input
+        formControlName="aiModelId"
+        [label]="'APP_SETTINGS.AI_FEATURES.MODEL' | translate"
+        icon="pi-sparkles"
+        [required]="form.get('aiEnabled')?.value === true"
+        [showError]="
+          !!(form.get('aiModelId')?.invalid && form.get('aiModelId')?.touched)
+        "
+        [errorMessage]="'APP_SETTINGS.AI_FEATURES.REQUIRED' | translate"
+        [placeholder]="'APP_SETTINGS.AI_FEATURES.MODEL_PLACEHOLDER' | translate"
+      ></app-custom-input>
+      <div class="model-chips" *ngIf="suggestedModels().length">
+        <span class="model-chips__label">{{
+          'APP_SETTINGS.AI_FEATURES.SUGGESTED' | translate
+        }}</span>
+        <button
+          type="button"
+          class="model-chip"
+          *ngFor="let m of suggestedModels()"
+          [class.on]="form.get('aiModelId')?.value === m"
+          (click)="pickModel(m)"
+        >
+          {{ m }}
+        </button>
+      </div>
+      <p class="field-hint field-hint--model">
+        <i class="pi pi-info-circle"></i>
+        {{ 'APP_SETTINGS.AI_FEATURES.MODEL_HINT' | translate }}
+      </p>
+
+      <!-- TUNING -->
+      <div class="ai-sec">
+        <span class="ai-sec__label">{{
+          'APP_SETTINGS.AI_FEATURES.SECTION_TUNING' | translate
+        }}</span>
+      </div>
+
+      <app-custom-number
+        formControlName="aiTemperature"
+        [label]="'APP_SETTINGS.AI_FEATURES.ACCURACY' | translate"
+        [min]="0"
+        [max]="1"
+        [step]="0.1"
+        [minFractionDigits]="1"
+        [maxFractionDigits]="2"
+        [required]="form.get('aiEnabled')?.value === true"
+        [showError]="
+          !!(
+            form.get('aiTemperature')?.invalid &&
+            form.get('aiTemperature')?.touched
+          )
+        "
+        [errorMessage]="'APP_SETTINGS.AI_FEATURES.ACCURACY_INVALID' | translate"
+      ></app-custom-number>
+      <p class="field-hint">
+        {{ 'APP_SETTINGS.AI_FEATURES.ACCURACY_HINT' | translate }}
+      </p>
+
+      <!-- ADVANCED -->
+      <div class="ai-adv" [class.open]="advancedOpen()">
+        <button type="button" class="ai-adv__hd" (click)="toggleAdvanced()">
+          <i class="pi pi-sliders-h"></i>
+          <span>{{ 'APP_SETTINGS.AI_FEATURES.ADVANCED' | translate }}</span>
+          <i class="pi pi-chevron-right ai-adv__chev"></i>
+        </button>
+        <div class="ai-adv__bd" *ngIf="advancedOpen()">
+          <div class="ai-adv__two">
+            <app-custom-number
+              formControlName="aiMaxTokens"
+              [label]="'APP_SETTINGS.AI_FEATURES.MAX_TOKENS' | translate"
+              [min]="1"
+              [step]="256"
+              [placeholder]="'APP_SETTINGS.AI_FEATURES.MAX_TOKENS_PLACEHOLDER' | translate"
+            ></app-custom-number>
+            <app-custom-number
+              formControlName="aiTimeoutMs"
+              [label]="'APP_SETTINGS.AI_FEATURES.TIMEOUT' | translate"
+              [min]="1000"
+              [step]="1000"
+              [placeholder]="'APP_SETTINGS.AI_FEATURES.TIMEOUT_PLACEHOLDER' | translate"
+            ></app-custom-number>
+          </div>
           <app-custom-input
-            formControlName="aiApiKey"
-            type="password"
-            [label]="'APP_SETTINGS.AI_FEATURES.API_KEY' | translate"
-            icon="pi-key"
-            [showPasswordToggle]="true"
-            [required]="form.get('aiEnabled')?.value === true"
-            [showError]="
-              !!(form.get('aiApiKey')?.invalid && form.get('aiApiKey')?.touched)
-            "
-            [errorMessage]="'APP_SETTINGS.AI_FEATURES.REQUIRED' | translate"
-            [placeholder]="
-              'APP_SETTINGS.AI_FEATURES.API_KEY_PLACEHOLDER' | translate
-            "
+            formControlName="aiApiVersion"
+            [label]="'APP_SETTINGS.AI_FEATURES.API_VERSION' | translate"
+            icon="pi-hashtag"
+            [placeholder]="'APP_SETTINGS.AI_FEATURES.API_VERSION_PLACEHOLDER' | translate"
           ></app-custom-input>
-          <span class="configured-badge" *ngIf="keyConfigured">
-            <i class="pi pi-check-circle"></i>
-            {{ 'APP_SETTINGS.AI_FEATURES.CONFIGURED' | translate }}
-          </span>
+          <p class="field-hint">
+            {{ 'APP_SETTINGS.AI_FEATURES.API_VERSION_HINT' | translate }}
+          </p>
+          <app-custom-input
+            formControlName="aiExtraHeaders"
+            icon="pi-code"
+            [label]="'APP_SETTINGS.AI_FEATURES.EXTRA_HEADERS' | translate"
+            [placeholder]="'APP_SETTINGS.AI_FEATURES.EXTRA_HEADERS_PLACEHOLDER' | translate"
+          ></app-custom-input>
+          <p class="field-hint">
+            {{ 'APP_SETTINGS.AI_FEATURES.EXTRA_HEADERS_HINT' | translate }}
+          </p>
         </div>
       </div>
     </form>

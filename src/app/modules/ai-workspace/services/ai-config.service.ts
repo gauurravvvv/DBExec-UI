@@ -84,11 +84,13 @@ export class AiConfigService {
     }
     // Probe the DBExec-AI BFF's health when configured (absolute URL + token,
     // since the interceptor skips auth on absolute URLs); else the main API's
-    // embedded /ai/health via the interceptor.
+    // embedded /ai/health via the interceptor. NOTE: `aiServer` already ends
+    // in the BFF base path (`/ai/v1`), so the health path is just `/health` —
+    // NOT `/ai/health` (that would double the segment → `/ai/v1/ai/health`).
     const ai = environment.aiServer;
     const req = ai
       ? this.http.apiGet<{ data?: AiHealth }>(
-          `${ai.replace(/\/+$/, '')}/ai/health`,
+          `${ai.replace(/\/+$/, '')}/health`,
           {
             skipLoader: true,
             headers: new HttpHeaders({

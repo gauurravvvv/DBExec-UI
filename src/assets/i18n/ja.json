@@ -340,7 +340,8 @@
     "LANGUAGE": "言語",
     "SEARCH": "検索",
     "CLEAR": "クリア",
-    "DELETE_NOTIFICATION": "通知を削除"
+    "DELETE_NOTIFICATION": "通知を削除",
+    "READ_MORE": "詳細を見る"
   },
   "PROFILE": {
     "TITLE": "マイプロフィール",
@@ -4021,7 +4022,33 @@
       "REQUIRED": "この項目は必須です",
       "BASE_URL_INVALID": "http:// または https:// で始まる有効な URL を入力してください",
       "ACCURACY_INVALID": "0〜1 の値を入力してください",
-      "MODEL_HINT": "作成・編集・削除などの完全なエージェント操作には、OpenAI や Claude クラスの高性能なツール呼び出しモデルを使用してください。小規模なローカルモデルはチャットや読み取り専用の質問には適していますが、複数ステップの操作では信頼性が低くなります。"
+      "MODEL_HINT": "作成・編集・削除などの完全なエージェント操作には、OpenAI や Claude クラスの高性能なツール呼び出しモデルを使用してください。小規模なローカルモデルはチャットや読み取り専用の質問には適していますが、複数ステップの操作では信頼性が低くなります。",
+      "SECTION_PROVIDER": "Provider",
+      "SECTION_CONNECTION": "Connection",
+      "SECTION_TUNING": "Tuning",
+      "PROVIDER_ANTHROPIC": "Anthropic",
+      "PROVIDER_ANTHROPIC_SUB": "Claude · native /v1/messages",
+      "PROVIDER_CUSTOM": "Custom / Bring-your-own",
+      "PROVIDER_CUSTOM_SUB": "Bedrock · gateways · Ollama · any",
+      "CONNECTION_STYLE": "Connection style",
+      "CONNECTION_STYLE_HINT": "Pick the wire format your endpoint speaks. Bedrock and Anthropic-compatible gateways use Anthropic-native; Ollama, OpenAI, Azure and Groq use OpenAI-compatible.",
+      "STYLE_ANTHROPIC": "Anthropic-native",
+      "STYLE_OPENAI": "OpenAI-compatible",
+      "BASE_URL_HINT_LOCKED": "Locked for Anthropic. Choose Custom to enter your own endpoint.",
+      "BASE_URL_HINT_CUSTOM": "Your endpoint — a Bedrock region URL, an Anthropic-compatible gateway, a local model (http://127.0.0.1:11434/v1), or any OpenAI-compatible service.",
+      "TEST": "Test connection",
+      "SUGGESTED": "Suggested",
+      "ADVANCED": "Advanced",
+      "MAX_TOKENS": "Max output tokens",
+      "MAX_TOKENS_PLACEHOLDER": "default: model max",
+      "TIMEOUT": "Request timeout (ms)",
+      "TIMEOUT_PLACEHOLDER": "default: 120000",
+      "API_VERSION": "API version header",
+      "API_VERSION_PLACEHOLDER": "2023-06-01",
+      "API_VERSION_HINT": "Anthropic-native only (anthropic-version header). Leave blank for the default.",
+      "EXTRA_HEADERS": "Extra headers",
+      "EXTRA_HEADERS_PLACEHOLDER": "{\"anthropic-beta\":\"…\"}  ·  JSON, optional",
+      "EXTRA_HEADERS_HINT": "Forwarded verbatim on every provider request (e.g. beta flags or gateway keys). Must be a JSON object."
     }
   },
   "PERMISSIONS": {

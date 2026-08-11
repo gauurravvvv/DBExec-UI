@@ -148,6 +148,10 @@ export const AI_WORKSPACE = {
   // GET /ai/conversations(/:id)  → owner-private history
   CONVERSATIONS: '/ai/conversations',
   CONVERSATION: '/ai/conversations/', // + :id
+  // POST /config/test (BFF) — pre-flight the provider (reachable + key) without
+  // running a turn. BFF path is bare (base already /ai/v1); on the embedded
+  // main API it would be /ai/config/test.
+  CONFIG_TEST_BFF: '/config/test',
 };
 
 export const GROUP = {
