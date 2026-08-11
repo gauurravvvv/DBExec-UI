@@ -2,21 +2,13 @@ import {
   ChangeDetectionStrategy,
   Component,
   DestroyRef,
-  ElementRef,
   HostListener,
   inject,
   OnInit,
-  QueryList,
   signal,
-  ViewChildren,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import {
-  FormGroup,
-  UntypedFormBuilder,
-  UntypedFormControl,
-  Validators,
-} from '@angular/forms';
+import { FormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AUTH } from 'src/app/core/constants/routes.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
@@ -41,12 +33,9 @@ export class ResetPasswordComponent implements OnInit {
   passwordFocused = signal(false);
   userId!: string;
   orgId!: string;
-
-  otpControls: UntypedFormControl[] = [];
-  otpLength = 6;
-  otpInvalid = false;
-
-  @ViewChildren('otpInput') otpInputs!: QueryList<ElementRef<HTMLInputElement>>;
+  // The 64-char reset token carried in the magic-link URL. Verified
+  // server-side; the user never sees or types it.
+  token!: string;
 
   constructor(
     private fb: UntypedFormBuilder,
@@ -55,15 +44,6 @@ export class ResetPasswordComponent implements OnInit {
     private globalService: GlobalService,
     private route: ActivatedRoute,
   ) {
-    for (let i = 0; i < this.otpLength; i++) {
-      this.otpControls.push(
-        new UntypedFormControl('', [
-          Validators.required,
-          Validators.pattern(/^[A-Za-z0-9]$/),
-        ]),
-      );
-    }
-
     // newPassword has BOTH:
     //   - `zodValidator(newPasswordSchema)` — surfaces the FIRST error
     //     key (`errors['zod']`) matching exactly what the BE would
@@ -98,29 +78,17 @@ export class ResetPasswordComponent implements OnInit {
       .subscribe(params => {
         this.userId = params['id'];
         this.orgId = params['orgId'];
-        if (!this.userId || !this.orgId) {
+        this.token = params['token'];
+        // A magic link missing any of id / orgId / token can't complete a
+        // reset — bounce to login rather than render a dead form.
+        if (!this.userId || !this.orgId || !this.token) {
           this.router.navigate([AUTH.LOGIN]);
         }
       });
   }
 
-  trackByIndex(index: number): number {
-    return index;
-  }
-
-  get otpValue(): string {
-    return this.otpControls
-      .map(c => c.value)
-      .join('')
-      .toUpperCase();
-  }
-
-  get isOtpComplete(): boolean {
-    return this.otpControls.every(c => c.valid);
-  }
-
   get isFormValid(): boolean {
-    return this.isOtpComplete && this.resetPasswordForm.valid;
+    return this.resetPasswordForm.valid;
   }
 
   passwordMatchValidator(g: FormGroup) {
@@ -129,79 +97,17 @@ export class ResetPasswordComponent implements OnInit {
       : { mismatch: true };
   }
 
-  onOtpInput(event: Event, index: number) {
-    const input = event.target as HTMLInputElement;
-    const value = input.value;
-
-    // Only allow alphanumeric
-    if (value && !/^[A-Za-z0-9]$/.test(value)) {
-      this.otpControls[index].setValue('');
-      return;
-    }
-
-    // Auto-focus next box
-    if (value && index < this.otpLength - 1) {
-      const inputs = this.otpInputs.toArray();
-      inputs[index + 1].nativeElement.focus();
-    }
-
-    this.otpInvalid = false;
-  }
-
-  onOtpKeydown(event: KeyboardEvent, index: number) {
-    const inputs = this.otpInputs.toArray();
-
-    if (event.key === 'Backspace') {
-      if (!this.otpControls[index].value && index > 0) {
-        inputs[index - 1].nativeElement.focus();
-        this.otpControls[index - 1].setValue('');
-      }
-    } else if (event.key === 'ArrowLeft' && index > 0) {
-      inputs[index - 1].nativeElement.focus();
-    } else if (event.key === 'ArrowRight' && index < this.otpLength - 1) {
-      inputs[index + 1].nativeElement.focus();
-    }
-  }
-
-  onOtpPaste(event: ClipboardEvent) {
-    event.preventDefault();
-    const pasted = (event.clipboardData?.getData('text') || '')
-      .replace(/[^A-Za-z0-9]/g, '')
-      .slice(0, this.otpLength);
-    const inputs = this.otpInputs.toArray();
-
-    for (let i = 0; i < this.otpLength; i++) {
-      this.otpControls[i].setValue(i < pasted.length ? pasted[i] : '');
-    }
-
-    // Focus the next empty box or the last filled one
-    const focusIndex = Math.min(pasted.length, this.otpLength - 1);
-    inputs[focusIndex].nativeElement.focus();
-    this.otpInvalid = false;
-  }
-
   async onSubmit(): Promise<void> {
-    if (!this.isOtpComplete) {
-      this.otpInvalid = true;
-      this.otpControls.forEach(c => c.markAsTouched());
-      return;
-    }
-
     if (this.isFormValid) {
       this.error.set('');
       this.loading.set(true);
-      // Lock both the password form AND the 6 OTP controls (separate
-      // FormControls outside the FormGroup) so nothing is editable
-      // while the POST is in flight.
       this.resetPasswordForm.disable({ emitEvent: false });
-      this.otpControls.forEach(c => c.disable({ emitEvent: false }));
       try {
-        const otp = this.otpValue;
         const res: any = await this.loginService.resetPassword(
           this.resetPasswordForm,
           this.userId,
           this.orgId,
-          otp,
+          this.token,
         );
         if (this.globalService.handleSuccessService(res)) {
           this.router.navigate([AUTH.LOGIN], { replaceUrl: true });
@@ -215,7 +121,6 @@ export class ResetPasswordComponent implements OnInit {
       } finally {
         this.loading.set(false);
         this.resetPasswordForm.enable({ emitEvent: false });
-        this.otpControls.forEach(c => c.enable({ emitEvent: false }));
       }
     }
   }
