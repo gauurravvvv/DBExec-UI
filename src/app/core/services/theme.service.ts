@@ -147,6 +147,18 @@ export class ThemeService {
       if (this.isValidHex(value)) vars[token.cssVar] = value;
     }
 
+    // Surface fallbacks: an org that set a dark card surface but never set
+    // the input surface (it didn't exist when they configured the theme)
+    // would otherwise get a white input on a dark card — the date/select
+    // fields looked "off theme". Mirror the card surface onto input/secondary
+    // when those weren't explicitly provided, so one setting themes them all.
+    if (!vars['--input-background'] && vars['--card-background']) {
+      vars['--input-background'] = vars['--card-background'];
+    }
+    if (!vars['--secondary-background'] && vars['--card-background']) {
+      vars['--secondary-background'] = vars['--card-background'];
+    }
+
     // primaryText: accepts white/black keyword or hex; falls back to the
     // best-contrast colour against the resolved primary.
     const primary = colors['primary'];

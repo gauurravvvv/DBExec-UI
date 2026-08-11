@@ -20,35 +20,15 @@
           <span>{{ 'APP_SETTINGS.EMAIL_CONFIG.PROVIDER' | translate }}</span>
         </div>
 
-        <div class="email-provider-toggle">
-          <button
-            type="button"
-            class="provider-btn"
-            [class.active]="selectedProvider === 'NONE'"
-            (click)="setProvider('NONE')"
-          >
-            <i class="pi pi-cog"></i>
-            {{ 'APP_SETTINGS.EMAIL_CONFIG.PROVIDER_NONE' | translate }}
-          </button>
-          <button
-            type="button"
-            class="provider-btn"
-            [class.active]="selectedProvider === 'SMTP'"
-            (click)="setProvider('SMTP')"
-          >
-            <i class="pi pi-server"></i>
-            {{ 'APP_SETTINGS.EMAIL_CONFIG.PROVIDER_SMTP' | translate }}
-          </button>
-          <button
-            type="button"
-            class="provider-btn"
-            [class.active]="selectedProvider === 'SES'"
-            (click)="setProvider('SES')"
-          >
-            <i class="pi pi-cloud"></i>
-            {{ 'APP_SETTINGS.EMAIL_CONFIG.PROVIDER_SES' | translate }}
-          </button>
-        </div>
+        <app-custom-dropdown
+          formControlName="emailProvider"
+          icon="pi-envelope"
+          [label]="'APP_SETTINGS.EMAIL_CONFIG.PROVIDER' | translate"
+          [options]="providerOptions"
+          optionLabel="label"
+          optionValue="value"
+          [filter]="false"
+        ></app-custom-dropdown>
       </div>
 
       <!-- SMTP -->

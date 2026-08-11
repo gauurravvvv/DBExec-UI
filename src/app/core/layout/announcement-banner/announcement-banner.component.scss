@@ -69,23 +69,38 @@
     .banner-text-wrapper {
       display: flex;
       align-items: center;
-      gap: var(--space-5);
+      gap: var(--space-4);
+      min-width: 0;
+      flex: 1;
+      cursor: pointer;
+
+      // The whole strip is clickable → surface a hover cue on the message
+      // and the read-more chip.
+      &:hover .banner-message {
+        text-decoration: underline;
+        text-underline-offset: 2px;
+      }
+      &:hover .banner-more {
+        opacity: 1;
+        gap: 6px;
+      }
 
       .banner-label {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
         font-size: var(--fs-micro);
         font-weight: var(--fw-semibold);
-        letter-spacing: 1.5px;
+        letter-spacing: 1.2px;
         background: rgba(255, 255, 255, 0.18);
-        padding: 3px 8px;
-        border-radius: var(--radius-xs);
+        padding: 3px 9px;
+        border-radius: var(--radius-pill, 99px);
         white-space: nowrap;
-        cursor: pointer;
-        transition: background var(--motion-base);
+        flex: none;
 
-        &:hover {
-          background: rgba(255, 255, 255, 0.3);
+        .banner-label-ico {
+          font-size: 11px;
         }
-
         .banner-count {
           margin-left: 4px;
           font-weight: var(--fw-semibold);
@@ -95,17 +110,40 @@
 
       .banner-divider {
         opacity: 0.3;
+        flex: none;
       }
 
       .banner-message {
         line-height: 1.4;
         opacity: 0.95;
-        cursor: pointer;
+        // Truncate a long announcement to one line in the bar; the full
+        // (wrapped) text lives in the detail popup.
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        min-width: 0;
 
         .typewriter-cursor {
           font-weight: var(--fw-regular);
           animation: blink 0.7s step-end infinite;
           margin-left: 1px;
+        }
+      }
+
+      .banner-more {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        flex: none;
+        font-size: var(--fs-micro);
+        font-weight: var(--fw-semibold);
+        letter-spacing: 0.3px;
+        opacity: 0.75;
+        white-space: nowrap;
+        transition: opacity var(--motion-base), gap var(--motion-base);
+
+        i {
+          font-size: 10px;
         }
       }
     }
@@ -197,7 +235,16 @@
       font-size: var(--fs-body);
       line-height: 1.7;
       color: var(--secondary-color);
+      // pre-line keeps intentional newlines; the wrap rules make long
+      // unbroken strings (e.g. pasted tokens with no spaces) wrap inside
+      // the popup instead of overflowing and clipping on one line.
       white-space: pre-line;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+      // Long announcements scroll within the popup rather than growing it
+      // past the viewport.
+      max-height: 50vh;
+      overflow-y: auto;
     }
 
     .popup-footer-row {

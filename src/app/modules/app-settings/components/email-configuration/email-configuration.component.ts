@@ -76,6 +76,24 @@ export class EmailConfigurationComponent
       'NONE') as EmailProvider;
   }
 
+  /** Email-provider dropdown options (labels translated for app-custom-dropdown). */
+  get providerOptions(): Array<{ label: string; value: EmailProvider }> {
+    return [
+      {
+        label: this.translate.instant('APP_SETTINGS.EMAIL_CONFIG.PROVIDER_NONE'),
+        value: 'NONE',
+      },
+      {
+        label: this.translate.instant('APP_SETTINGS.EMAIL_CONFIG.PROVIDER_SMTP'),
+        value: 'SMTP',
+      },
+      {
+        label: this.translate.instant('APP_SETTINGS.EMAIL_CONFIG.PROVIDER_SES'),
+        value: 'SES',
+      },
+    ];
+  }
+
   ngOnInit(): void {
     this.loadPolicy();
   }
@@ -171,11 +189,6 @@ export class EmailConfigurationComponent
     );
     this.emailForm.markAsPristine();
     this.cdr.markForCheck();
-  }
-
-  setProvider(provider: EmailProvider): void {
-    this.emailForm.get('emailProvider')?.setValue(provider);
-    this.emailForm.get('emailProvider')?.markAsDirty();
   }
 
   async onSave(): Promise<void> {

@@ -11,17 +11,22 @@
   <div class="banner-glow-left"></div>
   <div class="banner-glow-right"></div>
   <div class="banner-content">
-    <div class="banner-text-wrapper">
-      <span class="banner-label" (click)="openAnnouncementPopup()">
+    <div class="banner-text-wrapper" (click)="openAnnouncementPopup()">
+      <span class="banner-label">
+        <i class="pi pi-megaphone banner-label-ico"></i>
         {{ 'HEADER.ANNOUNCEMENT' | translate }}
         <span *ngIf="announcements.length > 1" class="banner-count">
           ({{ currentAnnouncementIndex + 1 }}/{{ announcements.length }})
         </span>
       </span>
       <span class="banner-divider">|</span>
-      <span class="banner-message" (click)="openAnnouncementPopup()">
+      <span class="banner-message">
         {{ typedMessage
         }}<span class="typewriter-cursor" *ngIf="isTyping">|</span>
+      </span>
+      <span class="banner-more" *ngIf="!isTyping">
+        {{ 'HEADER.READ_MORE' | translate }}
+        <i class="pi pi-arrow-right"></i>
       </span>
     </div>
     <div class="banner-controls" *ngIf="announcements.length > 1">

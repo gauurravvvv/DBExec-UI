@@ -5,7 +5,10 @@
 .ai-fab {
   position: fixed;
   right: var(--space-6);
-  bottom: var(--space-6);
+  // Clear the app's bottom branding bar ("Created by …", ~24px tall) so the
+  // FAB never sits on top of it. --app-footer-h defaults to 24px; the shell
+  // can override it if the bar height changes.
+  bottom: calc(var(--space-6) + var(--app-footer-h, 24px));
   z-index: var(--z-overlay);
   display: inline-flex;
   align-items: center;
@@ -64,11 +67,12 @@
   background: var(--card-background);
   pointer-events: none;
 
-  // PANEL mode: right-edge slide-over.
+  // PANEL mode: right-edge slide-over. Stop short of the bottom branding bar
+  // so the composer isn't hidden behind it (matches the FAB clearance).
   &--panel {
     top: 0;
     right: 0;
-    bottom: 0;
+    bottom: var(--app-footer-h, 24px);
     width: 420px;
     max-width: 92vw;
     border-left: 1px solid var(--border-color);
