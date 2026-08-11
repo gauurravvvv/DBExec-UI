@@ -4230,8 +4230,8 @@
         "invalid": "Identifiant invalide"
       },
       "resetToken": {
-        "required": "Le jeton de configuration est obligatoire",
-        "invalid": "Format de jeton de configuration invalide"
+        "required": "Le jeton de réinitialisation est obligatoire",
+        "invalid": "Format de jeton de réinitialisation invalide"
       }
     },
     "datasources": {

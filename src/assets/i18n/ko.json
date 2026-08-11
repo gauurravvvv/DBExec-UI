@@ -4230,8 +4230,8 @@
         "invalid": "잘못된 식별자"
       },
       "resetToken": {
-        "required": "설정 토큰이 필요합니다",
-        "invalid": "잘못된 설정 토큰 형식"
+        "required": "재설정 토큰이 필요합니다",
+        "invalid": "재설정 토큰 형식이 잘못되었습니다"
       }
     },
     "datasources": {

@@ -4230,8 +4230,8 @@
         "invalid": "Ungültige Kennung"
       },
       "resetToken": {
-        "required": "Einrichtungstoken ist erforderlich",
-        "invalid": "Ungültiges Einrichtungstoken-Format"
+        "required": "Zurücksetzungs-Token ist erforderlich",
+        "invalid": "Ungültiges Zurücksetzungs-Token-Format"
       }
     },
     "datasources": {

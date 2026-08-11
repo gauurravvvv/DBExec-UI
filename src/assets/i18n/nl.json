@@ -4230,8 +4230,8 @@
         "invalid": "Ongeldige identificatie"
       },
       "resetToken": {
-        "required": "Configuratietoken is vereist",
-        "invalid": "Ongeldig configuratietoken-formaat"
+        "required": "Reset-token is vereist",
+        "invalid": "Ongeldig reset-tokenformaat"
       }
     },
     "datasources": {

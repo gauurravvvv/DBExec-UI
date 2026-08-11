@@ -4230,8 +4230,8 @@
         "invalid": "Identificatore non valido"
       },
       "resetToken": {
-        "required": "Il token di configurazione è obbligatorio",
-        "invalid": "Formato del token di configurazione non valido"
+        "required": "Il token di reimpostazione è obbligatorio",
+        "invalid": "Formato del token di reimpostazione non valido"
       }
     },
     "datasources": {

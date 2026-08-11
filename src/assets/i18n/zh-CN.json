@@ -4230,8 +4230,8 @@
         "invalid": "标识符无效"
       },
       "resetToken": {
-        "required": "设置令牌为必填项",
-        "invalid": "设置令牌格式无效"
+        "required": "需要重置令牌",
+        "invalid": "重置令牌格式无效"
       }
     },
     "datasources": {

@@ -51,10 +51,6 @@ export class ForgotPasswordComponent implements OnInit, OnDestroy {
     this.clearCountdown();
   }
 
-  trackByIndex(index: number): number {
-    return index;
-  }
-
   getErrorMessage(fieldName: string): string {
     const control = this.forgotPasswordForm.get(fieldName);
     if (!control?.errors) return '';
@@ -84,6 +80,10 @@ export class ForgotPasswordComponent implements OnInit, OnDestroy {
           this.forgotPasswordForm,
         );
         this.globalService.handleSuccessService(res);
+        // The BE returns `expiresAt` on EVERY success — real send, rate-limit,
+        // or an anti-enumeration masked non-send (synthetic expiry). So the
+        // countdown renders identically regardless of whether the account
+        // exists: the UI must not become an existence oracle.
         if (res.data?.expiresAt) {
           this.startCountdown(new Date(res.data.expiresAt));
         } else if (!res.status) {

@@ -4230,8 +4230,8 @@
         "invalid": "無効な識別子です"
       },
       "resetToken": {
-        "required": "セットアップトークンは必須です",
-        "invalid": "セットアップトークンの形式が無効です"
+        "required": "リセットトークンは必須です",
+        "invalid": "リセットトークンの形式が無効です"
       }
     },
     "datasources": {
