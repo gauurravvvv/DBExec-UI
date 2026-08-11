@@ -1,5 +1,9 @@
 # DBExec-UI — Session Log (newest first)
 
+### 2026-08-11 — Magic-link reset: code-review fixes
+- forgot-password countdown is now existence-agnostic (BE always returns `expiresAt` on success, incl. anti-enumeration masked non-sends), so the UI no longer leaks whether an account exists. Removed dead `trackByIndex`. Localised `validation.auth.resetToken.*` in the 9 non-English locales.
+- Verified: tsc + ngc + prod build green. version_261.
+
 ### 2026-08-11 — Password reset is now a magic-link (forgot + reset screens)
 - forgot-password: removed the `username` field (org + email only), copy → "Send reset link"/"Resend link", countdown now keys off `res.data.expiresAt` (renamed from `otpExpiresAt`).
 - reset-password: removed the 6 OTP boxes and every OTP handler; the page reads the 64-char `token` from the magic-link URL (`?token=&id=&orgId=`) and only collects the new password. Missing token/id/orgId → redirect to login.

@@ -22,6 +22,11 @@
 - **Out of scope:** Embedded OEM auto-login (`/auth/embed`) — designed only, lives in the `embed` module, not built here.
 
 ## 3. Progress (newest first)
+### 2026-08-11 — Code-review fixes on the magic-link reset
+- Done: forgot-password countdown is now existence-agnostic — the BE returns `expiresAt` on EVERY success (real send, rate-limit, or anti-enumeration masked non-send with a synthetic expiry), so the countdown renders identically whether or not the account exists (the UI is no longer an existence oracle); added a clarifying comment. Removed the dead `trackByIndex`. Localised `validation.auth.resetToken.*` in the 9 non-English locales (were copied from setup-token wording).
+- Next: live end-to-end.
+- Files touched: `components/forgot-password/forgot-password.component.ts`, `assets/i18n/*.json`.
+
 ### 2026-08-11 — Password reset → magic-link (forgot + reset screens)
 - Done: **forgot-password** dropped the `username` field — now org + email only; button copy "Send reset link" / "Resend link"; countdown reads `res.data.expiresAt` (was `otpExpiresAt`). **reset-password** dropped the 6 OTP input boxes and all OTP handling (controls, paste/keydown, `isOtpComplete`); it now reads the 64-char `token` from the URL query (with `id`/`orgId`) and only collects the new password + confirm; missing any of the three → redirect to login. `login.service.generateOTP` sends `{ organisation, email }`; `resetPassword(form, id, orgId, token)` sends `{ id, orgId, token, password }`. Removed the now-dead `.auth-otp*` SCSS from `auth-shell`. Validators mirrored from BE (`resetTokenSchema`, `requestPasswordResetSchema`, token-based `resetPasswordSchema`) + `validation.auth.resetToken.*` i18n across 10 locales.
 - In progress / Known issues: none for the FE. (BE side owns the email link + token verify.)
