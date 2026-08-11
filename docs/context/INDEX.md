@@ -18,7 +18,7 @@
 | analyses | `src/app/modules/analyses` | [analyses](./modules/analyses.md) | 🟢 | 2026-07-24 |
 | app-settings | `src/app/modules/app-settings` | [app-settings](./modules/app-settings.md) | 🟢 | 2026-08-10 |
 | audit-logs | `src/app/modules/audit-logs` | [audit-logs](./modules/audit-logs.md) | 🟢 | 2026-07-24 |
-| auth | `src/app/modules/auth` | [auth](./modules/auth.md) | 🟢 | 2026-07-24 |
+| auth | `src/app/modules/auth` | [auth](./modules/auth.md) | 🟢 | 2026-08-11 |
 | dashboard | `src/app/modules/dashboard` | [dashboard](./modules/dashboard.md) | 🟢 | 2026-07-24 |
 | data-transfer | `src/app/modules/data-transfer` | [data-transfer](./modules/data-transfer.md) | ⚪ | 2026-07-24 |
 | dataset | `src/app/modules/dataset` | [dataset](./modules/dataset.md) | 🟢 | 2026-07-29 |

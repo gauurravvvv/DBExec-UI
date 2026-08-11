@@ -1,6 +1,6 @@
 # auth
 > Update the Progress log on every change.
-> Code path: `src/app/modules/auth` · Status: 🟢 · Last updated: 2026-07-24
+> Code path: `src/app/modules/auth` · Status: 🟢 · Last updated: 2026-08-11
 
 ## 1. Context
 - **Responsibility:** All pre-app screens: credential login + SSO toggle, forgot-password (OTP), reset-password, set-password (first-login/invite), the post-login **relay** bootstrap screen, and the SAML **sso-relay** landing. This module owns the unauthenticated router surface; the actual login/session logic lives in the app-wide `core/services/login.service.ts` (a root singleton), not in a module service.
@@ -22,6 +22,12 @@
 - **Out of scope:** Embedded OEM auto-login (`/auth/embed`) — designed only, lives in the `embed` module, not built here.
 
 ## 3. Progress (newest first)
+### 2026-08-11 — Password reset → magic-link (forgot + reset screens)
+- Done: **forgot-password** dropped the `username` field — now org + email only; button copy "Send reset link" / "Resend link"; countdown reads `res.data.expiresAt` (was `otpExpiresAt`). **reset-password** dropped the 6 OTP input boxes and all OTP handling (controls, paste/keydown, `isOtpComplete`); it now reads the 64-char `token` from the URL query (with `id`/`orgId`) and only collects the new password + confirm; missing any of the three → redirect to login. `login.service.generateOTP` sends `{ organisation, email }`; `resetPassword(form, id, orgId, token)` sends `{ id, orgId, token, password }`. Removed the now-dead `.auth-otp*` SCSS from `auth-shell`. Validators mirrored from BE (`resetTokenSchema`, `requestPasswordResetSchema`, token-based `resetPasswordSchema`) + `validation.auth.resetToken.*` i18n across 10 locales.
+- In progress / Known issues: none for the FE. (BE side owns the email link + token verify.)
+- Next: live end-to-end (forgot → email link → reset → login).
+- Files touched: `components/forgot-password/*`, `components/reset-password/*`, `components/auth-shell/auth-shell.component.scss`, `core/services/login.service.ts`, `shared/validators/auth.ts`, `assets/i18n/*.json`.
+
 ### 2026-07-24 — Current state captured
 - Done: Full credential + SAML SSO login shipped. SSO FE = `isSSOLogin` toggle + `loginWithSso()` + public `sso-relay` component (commit fe254971, BE 5f68ab7). Login "account not activated / set your password" message fix (6c18ab89). Shared Zod auth schemas (11cd848d) mirrored to BE. Relay hardening: race-safe bootstrap + focus + retry review passes (a272be55, 3fb2d44b, 5a3248fc); two-phase login + branding watermark (60a452cf). RBAC drops FE role-string checks for permission checks (a512ff0d).
 - In progress / Known issues: SSO IdP round-trip unverified (no test IdP wired). UI commits local-only on `version_261` — user pushes.

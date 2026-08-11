@@ -1,6 +1,11 @@
 # DBExec-UI — Session Log (newest first)
 
-### 2026-08-10 — Branding watermark toggle removed, announcements org-wide, announcement list styling
+### 2026-08-11 — Password reset is now a magic-link (forgot + reset screens)
+- forgot-password: removed the `username` field (org + email only), copy → "Send reset link"/"Resend link", countdown now keys off `res.data.expiresAt` (renamed from `otpExpiresAt`).
+- reset-password: removed the 6 OTP boxes and every OTP handler; the page reads the 64-char `token` from the magic-link URL (`?token=&id=&orgId=`) and only collects the new password. Missing token/id/orgId → redirect to login.
+- `login.service`: `generateOTP` sends `{ organisation, email }`; `resetPassword` sends `{ id, orgId, token, password }`. Dead `.auth-otp*` styles removed from `auth-shell.component.scss`.
+- Validators mirrored from BE (`resetTokenSchema`, `requestPasswordResetSchema`, token `resetPasswordSchema`) + `validation.auth.resetToken.*` in all 10 locale files.
+- Verified: tsc 0 → ngc AOT 0 → prod build green. version_261 (local; user pushes).
 - **Branding**: removed the "Show Watermark" toggle from add/edit — a preset always defines a watermark (fields always shown + required), and enable/disable is the list active/inactive; `body()` always sends `showWatermark:true`. Removed the now-redundant "Watermark" column from list-branding.
 - **Announcements → org-wide**: removed all `targetGroupId` group targeting from add/edit (form control, GroupService, loadGroups/loadGroupsPage/resolveSelectedGroup, dropdown, payload), list (Group column, toolbar Group filter dropdown, selectedGroup/onGroupChange, adapter param), view (Target Group info-item), and the service `AnnouncementPayload`. Dead `ANNOUNCEMENT.TARGET_GROUP/SELECT_GROUP/GROUP/TARGET_GROUP_REQUIRED` i18n keys removed + `ANNOUNCEMENT.SUBTITLE` reworded across 10 locales. (BE companion drops the column + audience filter.)
 - **Styling**: list-announcements had no `.row-actions .icon-btn` styling (default hover, unlike theme/branding); added the shared icon-button cluster block so all three App-Settings lists match.
