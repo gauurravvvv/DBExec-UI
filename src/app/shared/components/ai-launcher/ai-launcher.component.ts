@@ -9,10 +9,7 @@ import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { MessageService } from 'primeng/api';
 import { HttpClientService } from 'src/app/core/services/http-client.service';
-import {
-  AI_WORKSPACE as AI_API,
-  DATASET as DATASET_API,
-} from 'src/app/core/constants/api.constant';
+import { DATASET as DATASET_API } from 'src/app/core/constants/api.constant';
 import {
   DATASET as DATASET_ROUTE,
   QUERY_RUNNER,
@@ -29,6 +26,7 @@ import {
 } from 'src/app/modules/ai-workspace/services/ai-chat.service';
 import { AiConfigService } from 'src/app/modules/ai-workspace/services/ai-config.service';
 import { AiLauncherService } from 'src/app/shared/services/ai-launcher.service';
+import { AiScreenContextService } from 'src/app/shared/services/ai-screen-context.service';
 
 /**
  * ai-launcher — the docked, always-available AI panel + its floating
@@ -120,10 +118,26 @@ export class AiLauncherComponent implements OnInit {
    * DBExec-flavoured tasks (schema / query / dataset).
    */
   readonly starters: ReadonlyArray<{ key: string; icon: string }> = [
-    { key: 'AI_WORKSPACE.LAUNCHER.STARTER_SCHEMA', icon: 'pi-sitemap' },
-    { key: 'AI_WORKSPACE.LAUNCHER.STARTER_QUERY', icon: 'pi-database' },
-    { key: 'AI_WORKSPACE.LAUNCHER.STARTER_DATASET', icon: 'pi-table' },
+    { key: 'DBEXEC_AI.STARTER_SCHEMA', icon: 'pi-sitemap' },
+    { key: 'DBEXEC_AI.STARTER_QUERY', icon: 'pi-database' },
+    { key: 'DBEXEC_AI.STARTER_DATASET', icon: 'pi-table' },
   ];
+
+  /** Starter prompts shown when scoped to the Access (Users) module. */
+  readonly accessStarters: ReadonlyArray<{ key: string; icon: string }> = [
+    { key: 'DBEXEC_AI.STARTER_USERS_COUNT', icon: 'pi-users' },
+    { key: 'DBEXEC_AI.STARTER_USERS_CREATE', icon: 'pi-user-plus' },
+    { key: 'DBEXEC_AI.STARTER_USERS_INACTIVE', icon: 'pi-search' },
+  ];
+
+  /** Pick the starter set for the current screen (module-aware). */
+  activeStarters(): ReadonlyArray<{ key: string; icon: string }> {
+    const sc = this.screenCtx.screen();
+    if (sc?.module === 'users' || sc?.module === 'groups' || sc?.module === 'role') {
+      return this.accessStarters;
+    }
+    return this.starters;
+  }
 
   /** Drop a starter prompt into the composer, focused for editing/sending. */
   useStarter(s: { key: string }): void {
@@ -133,6 +147,7 @@ export class AiLauncherComponent implements OnInit {
   constructor(
     public launcher: AiLauncherService,
     public chat: AiChatService,
+    public screenCtx: AiScreenContextService,
     private config: AiConfigService,
     private translate: TranslateService,
     private http: HttpClientService,
@@ -140,6 +155,26 @@ export class AiLauncherComponent implements OnInit {
     private message: MessageService,
     private cdr: ChangeDetectorRef,
   ) {}
+
+  /** True while a turn is streaming (used to lock the composer + show stop). */
+  get busy(): boolean {
+    return this.chat.streaming();
+  }
+
+  /** Whether the disclaimer footer has been dismissed this session. */
+  disclaimerDismissed = false;
+
+  dismissDisclaimer(): void {
+    this.disclaimerDismissed = true;
+  }
+
+  /** The steps of the currently-streaming assistant message (for the live
+   *  activity line's expandable detail). Empty when not streaming. */
+  get streamingSteps() {
+    const msgs = this.chat.messages();
+    const last = msgs[msgs.length - 1];
+    return last && last.role === 'assistant' ? last.steps : [];
+  }
 
   ngOnInit(): void {
     // Probe health once so the FAB can decide whether to show. Cheap and
@@ -183,6 +218,18 @@ export class AiLauncherComponent implements OnInit {
     if (ke.shiftKey) return;
     ke.preventDefault();
     this.composerSubmit();
+  }
+
+  /**
+   * Auto-grow the composer textarea up to a max height, then scroll. Keeps
+   * the input feeling like a modern chat composer without a fixed tiny box.
+   */
+  autosize(event: Event): void {
+    const el = event.target as HTMLTextAreaElement | null;
+    if (!el) return;
+    el.style.height = 'auto';
+    const max = 160; // px — ~6 lines, then it scrolls
+    el.style.height = `${Math.min(el.scrollHeight, max)}px`;
   }
 
   newChat(): void {
@@ -342,17 +389,13 @@ export class AiLauncherComponent implements OnInit {
       return;
     }
     s.busy = true;
-    this.http
-      .apiPost(
-        AI_API.CONFIRM,
-        {
-          endpoint: card.endpoint,
-          method: card.method,
-          payload: card.payload ?? {},
-          proposalId: card.proposalId ?? '',
-        },
-        { skipLoader: true },
-      )
+    this.chat
+      .confirmAction({
+        endpoint: card.endpoint,
+        method: card.method,
+        payload: card.payload ?? {},
+        proposalId: card.proposalId ?? '',
+      })
       .subscribe({
         next: (res: any) => {
           s.busy = false;
@@ -422,12 +465,8 @@ export class AiLauncherComponent implements OnInit {
     const target = s.undo;
     if (!target || s.busy) return;
     s.busy = true;
-    this.http
-      .apiPost(
-        AI_API.CONFIRM,
-        { endpoint: target.endpoint, method: 'DELETE', payload: {} },
-        { skipLoader: true },
-      )
+    this.chat
+      .confirmAction({ endpoint: target.endpoint, method: 'DELETE', payload: {} })
       .subscribe({
         next: (res: any) => {
           s.busy = false;

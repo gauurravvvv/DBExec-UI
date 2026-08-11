@@ -5832,5 +5832,26 @@
       "SELF_LOCKOUT": "针对管理登录本身 — 有被锁定风险。",
       "CASCADE": "撤销将级联到依赖的授权。"
     }
+  },
+  "DBEXEC_AI": {
+    "NAME": "DBExecAI",
+    "OPEN": "询问 DBExecAI",
+    "TAGLINE": "您的智能体助手",
+    "ON_MODULE": "您正在 {{module}} 模块",
+    "SCOPED_HINT": "正在为您处理 {{module}}",
+    "DISCLAIMER": "DBExecAI 是一个助手，可能会出错。请在确认前检查每一项操作。",
+    "RECONNECTING": "正在重新连接…",
+    "COMPOSER_PLACEHOLDER": "让 DBExecAI 为您做点什么…",
+    "WELCOME_TITLE": "我能为您做什么？",
+    "WELCOME_TITLE_SCOPED": "正在处理 {{module}}",
+    "WELCOME_BODY": "告诉我您的需求，我会在您的权限范围内规划步骤并完成工作。任何更改都会先由您审核确认。",
+    "WELCOME_BODY_SCOPED": "在此屏幕上我仅限于 {{module}}。告诉我您的需求，我会规划步骤并提出更改供您确认。",
+    "TRY": "试试",
+    "STARTER_SCHEMA": "解释我的数据库结构",
+    "STARTER_QUERY": "帮我写一个 SQL 查询",
+    "STARTER_DATASET": "总结一个数据集",
+    "STARTER_USERS_COUNT": "我们有多少用户？",
+    "STARTER_USERS_CREATE": "在 Administrator 组中创建用户",
+    "STARTER_USERS_INACTIVE": "哪些用户处于非活动状态？"
   }
 }

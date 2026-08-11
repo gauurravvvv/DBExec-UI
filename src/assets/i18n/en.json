@@ -5386,6 +5386,27 @@
     "REVOKE_FAILED": "Failed to remove access",
     "VIEW_ONLY_HINT": "Recipients get view access"
   },
+  "DBEXEC_AI": {
+    "NAME": "DBExecAI",
+    "OPEN": "Ask DBExecAI",
+    "TAGLINE": "Your agentic assistant",
+    "ON_MODULE": "You're on the {{module}} module",
+    "SCOPED_HINT": "Working on {{module}} for you",
+    "DISCLAIMER": "DBExecAI is an assistant and can make mistakes. Review every action before you confirm it.",
+    "RECONNECTING": "Reconnecting…",
+    "COMPOSER_PLACEHOLDER": "Ask DBExecAI to do something for you…",
+    "WELCOME_TITLE": "What can I do for you?",
+    "WELCOME_TITLE_SCOPED": "Working on {{module}}",
+    "WELCOME_BODY": "Tell me what you want and I'll plan the steps and do the work — within your access. You review and confirm any change before it happens.",
+    "WELCOME_BODY_SCOPED": "I'm scoped to {{module}} on this screen. Tell me what you need here — I'll plan the steps and propose changes for you to confirm.",
+    "TRY": "Try",
+    "STARTER_SCHEMA": "Explain my database schema",
+    "STARTER_QUERY": "Write a SQL query for me",
+    "STARTER_DATASET": "Summarise a dataset",
+    "STARTER_USERS_COUNT": "How many users do we have?",
+    "STARTER_USERS_CREATE": "Create a user in the Administrator group",
+    "STARTER_USERS_INACTIVE": "Which users are inactive?"
+  },
   "AI_WORKSPACE": {
     "NEW_CHAT": "New chat",
     "UNTITLED_CHAT": "Untitled chat",

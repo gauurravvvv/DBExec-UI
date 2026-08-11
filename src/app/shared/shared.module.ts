@@ -35,6 +35,8 @@ import { NotificationModalComponent } from './components/notification-modal/noti
 import { AiLauncherComponent } from './components/ai-launcher/ai-launcher.component';
 import { AiToolStepComponent } from './components/ai-tool-step/ai-tool-step.component';
 import { AiSubagentsComponent } from './components/ai-subagents/ai-subagents.component';
+import { AiActivityLineComponent } from './components/ai-activity-line/ai-activity-line.component';
+import { AiMarkdownPipe } from './pipes/ai-markdown.pipe';
 import { AppPrimeNGModule } from './modules/app-primeng.module';
 import { FileSizePipe } from './pipes/file-size.pipe';
 import {
@@ -74,6 +76,8 @@ import { ReplaceUnderscoresPipe } from './pipes/replace-underscores.pipe';
     AiLauncherComponent,
     AiToolStepComponent,
     AiSubagentsComponent,
+    AiActivityLineComponent,
+    AiMarkdownPipe,
     FieldSidebarComponent,
     FormulaFieldDialogComponent,
     SaveAnalysesDialogComponent,
@@ -126,6 +130,8 @@ import { ReplaceUnderscoresPipe } from './pipes/replace-underscores.pipe';
     AiLauncherComponent,
     AiToolStepComponent,
     AiSubagentsComponent,
+    AiActivityLineComponent,
+    AiMarkdownPipe,
     FieldSidebarComponent,
     FormulaFieldDialogComponent,
     SaveAnalysesDialogComponent,

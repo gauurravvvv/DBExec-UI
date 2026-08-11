@@ -8,8 +8,8 @@
       *ngIf="!launcher.isOpen()"
       type="button"
       class="ai-fab"
-      [attr.aria-label]="'AI_WORKSPACE.LAUNCHER.OPEN' | translate"
-      [title]="'AI_WORKSPACE.LAUNCHER.OPEN' | translate"
+      [attr.aria-label]="'DBEXEC_AI.OPEN' | translate"
+      [title]="'DBEXEC_AI.OPEN' | translate"
       (click)="toggle()"
     >
       <i class="pi pi-sparkles"></i>
@@ -31,7 +31,7 @@
       [class.ai-dock--overlay]="launcher.mode() === 'overlay'"
       role="dialog"
       [attr.aria-modal]="launcher.mode() === 'overlay'"
-      [attr.aria-label]="'AI_WORKSPACE.LAUNCHER.TITLE' | translate"
+      [attr.aria-label]="'DBEXEC_AI.NAME' | translate"
     >
       <header class="ai-dock__header">
         <div class="ai-dock__title">
@@ -40,7 +40,15 @@
           </span>
           <span class="ai-dock__title-meta">
             <span class="ai-dock__title-text">
-              {{ 'AI_WORKSPACE.LAUNCHER.NAME' | translate }}
+              {{ 'DBEXEC_AI.NAME' | translate }}
+              <!-- Module chip: the screen the user is on right now. -->
+              <span
+                class="ai-dock__module-chip"
+                *ngIf="screenCtx.screen() as sc"
+                [title]="'DBEXEC_AI.ON_MODULE' | translate: { module: sc.label }"
+              >
+                {{ sc.label }}
+              </span>
             </span>
             <span class="ai-dock__title-sub">
               <span
@@ -48,7 +56,18 @@
                 [class.ai-dock__status-dot--on]="configured()"
                 [class.ai-dock__status-dot--off]="!configured()"
               ></span>
-              {{ 'AI_WORKSPACE.LAUNCHER.TAGLINE' | translate }}
+              <!-- Scoped hint when the current module maps to a specialist. -->
+              <ng-container
+                *ngIf="screenCtx.screen()?.scoped; else globalTagline"
+              >
+                {{
+                  'DBEXEC_AI.SCOPED_HINT'
+                    | translate: { module: screenCtx.screen()?.label }
+                }}
+              </ng-container>
+              <ng-template #globalTagline>
+                {{ 'DBEXEC_AI.TAGLINE' | translate }}
+              </ng-template>
             </span>
           </span>
         </div>
@@ -98,20 +117,38 @@
             <i class="pi pi-sparkles"></i>
           </span>
           <h3 class="ai-hero__title">
-            {{ 'AI_WORKSPACE.LAUNCHER.WELCOME_TITLE' | translate }}
+            <ng-container *ngIf="screenCtx.screen()?.scoped; else globalTitle">
+              {{
+                'DBEXEC_AI.WELCOME_TITLE_SCOPED'
+                  | translate: { module: screenCtx.screen()?.label }
+              }}
+            </ng-container>
+            <ng-template #globalTitle>
+              {{ 'DBEXEC_AI.WELCOME_TITLE' | translate }}
+            </ng-template>
           </h3>
           <p class="ai-hero__body">
-            {{ 'AI_WORKSPACE.LAUNCHER.WELCOME_BODY' | translate }}
+            <ng-container *ngIf="screenCtx.screen()?.scoped; else globalBody">
+              {{
+                'DBEXEC_AI.WELCOME_BODY_SCOPED'
+                  | translate: { module: screenCtx.screen()?.label }
+              }}
+            </ng-container>
+            <ng-template #globalBody>
+              {{ 'DBEXEC_AI.WELCOME_BODY' | translate }}
+            </ng-template>
           </p>
 
+          <!-- Module-aware starter prompts: show the Users starters when the
+             screen is scoped to Access; otherwise the generic ones. -->
           <div class="ai-hero__starters">
             <span class="ai-hero__starters-label">
-              {{ 'AI_WORKSPACE.LAUNCHER.TRY' | translate }}
+              {{ 'DBEXEC_AI.TRY' | translate }}
             </span>
             <button
               type="button"
               class="ai-starter"
-              *ngFor="let s of starters"
+              *ngFor="let s of activeStarters()"
               (click)="useStarter(s)"
             >
               <i class="pi" [ngClass]="s.icon"></i>
@@ -122,21 +159,44 @@
 
         <div
           class="ai-msg"
-          *ngFor="let m of messages(); trackBy: trackMessage"
+          *ngFor="let m of messages(); trackBy: trackMessage; let last = last"
           [class.ai-msg--user]="m.role === 'user'"
           [class.ai-msg--assistant]="m.role === 'assistant'"
         >
-          <p class="ai-msg__text" *ngIf="m.text">{{ m.text }}</p>
+          <!-- User text is plain; assistant text is safe-rendered markdown. -->
+          <p class="ai-msg__text" *ngIf="m.role === 'user' && m.text">
+            {{ m.text }}
+          </p>
+          <div
+            class="ai-msg__text ai-md"
+            *ngIf="m.role === 'assistant' && m.text"
+            [innerHTML]="m.text | aiMarkdown"
+          ></div>
 
-          <!-- Live-computation tree: the tool steps Dex ran to compute this
-             answer. Dex's prose renders in the bubble above; these steps show
-             HOW it was computed (each is one tool call, expandable). -->
-          <div class="ai-msg__steps" *ngIf="m.steps?.length">
-            <app-ai-tool-step
-              *ngFor="let st of m.steps; trackBy: trackStep"
-              [step]="st"
-            ></app-ai-tool-step>
-          </div>
+          <!-- Live agent → API telemetry line, only under the message that is
+             currently streaming. Shows which agent + which API, with an
+             elapsed timer; expandable to the full step tree. -->
+          <app-ai-activity-line
+            *ngIf="
+              last && chat.streaming() && chat.activity() as act;
+              else stepsBlock
+            "
+            [agent]="act.agent"
+            [api]="act.api"
+            [active]="true"
+            [steps]="streamingSteps"
+          ></app-ai-activity-line>
+
+          <!-- Completed messages show their step tree inline (each tool call,
+             expandable). While streaming, the activity line above owns it. -->
+          <ng-template #stepsBlock>
+            <div class="ai-msg__steps" *ngIf="m.steps?.length">
+              <app-ai-tool-step
+                *ngFor="let st of m.steps; trackBy: trackStep"
+                [step]="st"
+              ></app-ai-tool-step>
+            </div>
+          </ng-template>
 
           <!-- Compact card views -->
           <div class="ai-msg__cards" *ngIf="m.cards.length">
@@ -365,7 +425,31 @@
         </div>
       </div>
 
-      <!-- Compact composer -->
+      <!-- Reconnecting banner (edge case: socket dropped mid-session). -->
+      <div
+        class="ai-dock__reconnect"
+        *ngIf="chat.socketState() === 'connecting' && !chat.isEmpty()"
+      >
+        <i class="pi pi-spin pi-spinner"></i>
+        {{ 'DBEXEC_AI.RECONNECTING' | translate }}
+      </div>
+
+      <!-- AI disclaimer — persistent, dismissible. DBExecAI is agentic and
+         can propose wrong actions; the user reviews before confirming. -->
+      <div class="ai-dock__disclaimer" *ngIf="!disclaimerDismissed">
+        <i class="pi pi-info-circle"></i>
+        <span>{{ 'DBEXEC_AI.DISCLAIMER' | translate }}</span>
+        <button
+          type="button"
+          class="ai-dock__disclaimer-x"
+          [attr.aria-label]="'COMMON.CLOSE' | translate"
+          (click)="dismissDisclaimer()"
+        >
+          <i class="pi pi-times"></i>
+        </button>
+      </div>
+
+      <!-- Composer -->
       <form
         class="ai-dock__composer"
         (ngSubmit)="composerSubmit()"
@@ -377,8 +461,9 @@
           name="ai-launcher-input"
           rows="1"
           autocomplete="off"
-          [placeholder]="'AI_WORKSPACE.COMPOSER_PLACEHOLDER' | translate"
+          [placeholder]="'DBEXEC_AI.COMPOSER_PLACEHOLDER' | translate"
           [disabled]="chat.streaming()"
+          (input)="autosize($event)"
           (keydown.enter)="onEnter($event)"
         ></textarea>
         <button

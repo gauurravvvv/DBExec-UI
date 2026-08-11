@@ -5832,5 +5832,26 @@
       "SELF_LOCKOUT": "관리 로그인 자체가 대상입니다 — 잠금 위험.",
       "CASCADE": "철회가 종속 권한까지 전파됩니다."
     }
+  },
+  "DBEXEC_AI": {
+    "NAME": "DBExecAI",
+    "OPEN": "DBExecAI에 요청",
+    "TAGLINE": "에이전트형 어시스턴트",
+    "ON_MODULE": "현재 {{module}} 모듈에 있습니다",
+    "SCOPED_HINT": "{{module}} 작업을 진행 중입니다",
+    "DISCLAIMER": "DBExecAI는 어시스턴트이며 실수할 수 있습니다. 확인하기 전에 각 작업을 검토하세요.",
+    "RECONNECTING": "다시 연결 중…",
+    "COMPOSER_PLACEHOLDER": "DBExecAI에게 작업을 요청하세요…",
+    "WELCOME_TITLE": "무엇을 도와드릴까요?",
+    "WELCOME_TITLE_SCOPED": "{{module}} 작업 중",
+    "WELCOME_BODY": "원하는 것을 말씀해 주시면 권한 범위 내에서 단계를 계획하고 작업을 수행합니다. 모든 변경은 확인 후 진행됩니다.",
+    "WELCOME_BODY_SCOPED": "이 화면에서는 {{module}}로 제한됩니다. 필요한 것을 말씀해 주시면 단계를 계획하고 확인할 변경안을 제안합니다.",
+    "TRY": "시도",
+    "STARTER_SCHEMA": "내 데이터베이스 스키마 설명",
+    "STARTER_QUERY": "SQL 쿼리 작성",
+    "STARTER_DATASET": "데이터셋 요약",
+    "STARTER_USERS_COUNT": "사용자가 몇 명인가요?",
+    "STARTER_USERS_CREATE": "Administrator 그룹에 사용자 생성",
+    "STARTER_USERS_INACTIVE": "어떤 사용자가 비활성 상태인가요?"
   }
 }

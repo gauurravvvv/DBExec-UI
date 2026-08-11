@@ -1,10 +1,12 @@
 import { Injectable, computed, signal } from '@angular/core';
+import { HttpHeaders } from '@angular/common/http';
 import { HttpClientService } from 'src/app/core/services/http-client.service';
 import { StorageService } from 'src/app/core/services/storage.service';
 import { StorageType } from 'src/app/core/constants/storage-type.constant';
 import { AI_WORKSPACE } from 'src/app/core/constants/api.constant';
 import { environment } from 'src/environments/environment';
 import type { AiCard } from 'src/app/shared/validators/ai-cards';
+import { AiScreenContextService } from 'src/app/shared/services/ai-screen-context.service';
 
 /**
  * A sub-agent's own streamed event, nested inside a `subagent_event`
@@ -16,11 +18,18 @@ import type { AiCard } from 'src/app/shared/validators/ai-cards';
  */
 type SubAgentEvent =
   | { type: 'message_delta'; text: string }
-  | { type: 'tool_start'; toolCallId: string; name: string; label: string }
+  | {
+      type: 'tool_start';
+      toolCallId: string;
+      name: string;
+      label: string;
+      apiLabel?: string;
+    }
   | {
       type: 'tool_end';
       toolCallId: string;
       name: string;
+      apiLabel?: string;
       card?: AiCard;
       resultPreview?: string;
       isError?: boolean;
@@ -44,12 +53,14 @@ type AgentEvent =
       toolCallId: string;
       name: string;
       label: string;
+      apiLabel?: string;
       startedAt: number;
     }
   | {
       type: 'tool_end';
       toolCallId: string;
       name: string;
+      apiLabel?: string;
       card?: AiCard;
       resultPreview?: string;
       isError?: boolean;
@@ -94,6 +105,8 @@ export interface ToolStep {
   toolCallId: string;
   name: string;
   label: string;
+  /** Short HTTP label for the live "which API" line, e.g. `GET /users`. */
+  apiLabel?: string;
   status: AiStepStatus;
   startedAt: number;
   endedAt?: number;
@@ -165,6 +178,10 @@ export class AiChatService {
   private _routedAgent = signal<string>('');
   private _conversations = signal<AiConversationSummary[]>([]);
   private _socketState = signal<AiSocketState>('idle');
+  /** The live tool step currently running (drives the activity line). */
+  private _activeStep = signal<{ apiLabel?: string; label: string } | null>(
+    null,
+  );
 
   readonly messages = this._messages.asReadonly();
   readonly streaming = this._streaming.asReadonly();
@@ -173,6 +190,26 @@ export class AiChatService {
   readonly conversations = this._conversations.asReadonly();
   readonly socketState = this._socketState.asReadonly();
   readonly isEmpty = computed(() => this._messages().length === 0);
+
+  /**
+   * The live agent/API activity line: which agent is handling the turn and
+   * the API it's calling right now, e.g. { agent: 'Access', api: 'GET
+   * /users' }. Null when nothing is running. Drives the compact real-time
+   * telemetry line in the panel.
+   */
+  readonly activity = computed<{ agent: string; api?: string; label?: string } | null>(
+    () => {
+      if (!this._streaming()) return null;
+      const step = this._activeStep();
+      const agent = this._routedAgent();
+      if (!step && !agent) return null;
+      return {
+        agent: agent || 'DBExecAI',
+        api: step?.apiLabel,
+        label: step?.label,
+      };
+    },
+  );
 
   private ws: WebSocket | null = null;
   private reconnectTimer: ReturnType<typeof setTimeout> | null = null;
@@ -184,7 +221,10 @@ export class AiChatService {
   /** Intentional close (newConversation / destroy) suppresses reconnect. */
   private closingIntentionally = false;
 
-  constructor(private http: HttpClientService) {}
+  constructor(
+    private http: HttpClientService,
+    private screenCtx: AiScreenContextService,
+  ) {}
 
   /** Start a fresh conversation (clears the transcript; keeps the socket). */
   newConversation(): void {
@@ -221,6 +261,8 @@ export class AiChatService {
     ]);
     this.streamingIdx = this._messages().length - 1;
     this._streaming.set(true);
+    this._activeStep.set(null);
+    this._routedAgent.set('');
 
     if (this.ws && this.ws.readyState === WebSocket.OPEN) {
       this.transmit(text);
@@ -241,6 +283,7 @@ export class AiChatService {
       }
     }
     this._streaming.set(false);
+    this._activeStep.set(null);
   }
 
   /** Tear down the socket (e.g. on logout). */
@@ -270,10 +313,16 @@ export class AiChatService {
     this.closingIntentionally = false;
     this._socketState.set('connecting');
     const token = StorageService.get(StorageType.ACCESS_TOKEN) || '';
-    // apiServer is like http://host:3000/api/v1 → derive the ws:// URL.
-    const apiServer = environment.apiServer ?? '';
-    const base = apiServer.replace(/^http/, 'ws');
-    const url = `${base}${AI_WORKSPACE.WS}?token=${encodeURIComponent(token)}`;
+    // The AI WebSocket lives on the DBExec-AI BFF when `aiServer` is set
+    // (e.g. http://host:3001/ai/v1 → ws://host:3001/ai/v1/ws). When it is
+    // not set, fall back to the embedded engine on the main API
+    // (apiServer + /ai/ws) so the FE works with either topology.
+    const aiServer = environment.aiServer;
+    const httpBase = aiServer
+      ? `${aiServer.replace(/\/+$/, '')}/ws`
+      : `${(environment.apiServer ?? '').replace(/\/+$/, '')}${AI_WORKSPACE.WS}`;
+    const base = httpBase.replace(/^http/, 'ws');
+    const url = `${base}?token=${encodeURIComponent(token)}`;
 
     try {
       this.ws = new WebSocket(url);
@@ -317,6 +366,7 @@ export class AiChatService {
           msg.cards.push({ kind: 'error', message: 'Connection lost.' });
         });
         this._streaming.set(false);
+        this._activeStep.set(null);
       }
       if (!this.closingIntentionally) this.scheduleReconnect();
     };
@@ -330,18 +380,31 @@ export class AiChatService {
   }
 
   /**
-   * Send a chat frame over the open socket. The frame carries only the
-   * message + optional conversation id — no screen context. Agents pull
-   * domain context (schema, session, datetime) via tools instead.
+   * Send a chat frame over the open socket. The frame carries the message,
+   * the optional conversation id, and — new — the SCREEN the user is on so
+   * the BE can scope the turn to the current module's specialist (e.g. on
+   * /users → the Access agent, limited to Users/Groups/Roles). The screen is
+   * a hint; the agent still pulls domain context (session, datetime) via
+   * tools.
    */
   private transmit(message: string): void {
     if (!this.ws || this.ws.readyState !== WebSocket.OPEN) return;
+    const screen = this.screenCtx.screen();
+    const framedScreen = screen
+      ? {
+          module: screen.module,
+          view: screen.view,
+          recordId: screen.recordId,
+          label: screen.label,
+        }
+      : undefined;
     try {
       this.ws.send(
         JSON.stringify({
           type: 'chat',
           message,
           conversationId: this._conversationId() ?? undefined,
+          screen: framedScreen,
         }),
       );
     } catch {
@@ -372,23 +435,27 @@ export class AiChatService {
         this.patchAssistant(idx, m => (m.text += event.text));
         break;
       case 'tool_start':
+        this._activeStep.set({ apiLabel: event.apiLabel, label: event.label });
         this.patchAssistant(idx, m => {
           m.progress = [...(m.progress ?? []), event.label];
           m.steps.push({
             toolCallId: event.toolCallId,
             name: event.name,
             label: event.label,
+            apiLabel: event.apiLabel,
             status: 'running',
             startedAt: event.startedAt,
           });
         });
         break;
       case 'tool_end':
+        this._activeStep.set(null);
         this.patchAssistant(idx, m => {
           const step = this.findStep(m.steps, event.toolCallId);
           if (step) {
             step.status = event.isError ? 'error' : 'done';
             step.endedAt = event.endedAt;
+            if (event.apiLabel !== undefined) step.apiLabel = event.apiLabel;
             if (event.resultPreview !== undefined)
               step.resultPreview = event.resultPreview;
             if (event.card) step.card = event.card;
@@ -447,6 +514,7 @@ export class AiChatService {
       case 'done':
         this._conversationId.set(event.conversationId);
         this.patchAssistant(idx, m => (m.progress = []));
+        this._activeStep.set(null);
         this._streaming.set(false);
         break;
       case 'error':
@@ -454,6 +522,7 @@ export class AiChatService {
           m.progress = [];
           m.cards.push({ kind: 'error', message: event.message });
         });
+        this._activeStep.set(null);
         this._streaming.set(false);
         break;
     }
@@ -470,6 +539,7 @@ export class AiChatService {
           toolCallId: ev.toolCallId,
           name: ev.name,
           label: ev.label,
+          apiLabel: ev.apiLabel,
           status: 'running',
           startedAt: Date.now(),
         });
@@ -479,6 +549,7 @@ export class AiChatService {
         if (step) {
           step.status = ev.isError ? 'error' : 'done';
           step.endedAt = Date.now();
+          if (ev.apiLabel !== undefined) step.apiLabel = ev.apiLabel;
           if (ev.resultPreview !== undefined)
             step.resultPreview = ev.resultPreview;
           if (ev.card) step.card = ev.card;
@@ -537,33 +608,75 @@ export class AiChatService {
   }
 
   // ── Conversation history (plain REST — cold reads) ─────────────────
+  //
+  // When the DBExec-AI BFF is configured (`aiServer`), AI REST goes there as
+  // an ABSOLUTE URL — and because the http interceptor skips auth on absolute
+  // URLs, we attach the x-auth-token ourselves. Endpoint shape differs: the
+  // BFF exposes /conversations (base path already /ai/v1); the embedded engine
+  // on the main API exposes /ai/conversations via the interceptor. `aiGet`
+  // hides that difference so callers use one relative-ish path.
+
+  /** Absolute BFF URL for an AI path, or '' when no BFF (use interceptor). */
+  private aiAbsolute(bffPath: string): string {
+    const ai = environment.aiServer;
+    return ai ? `${ai.replace(/\/+$/, '')}${bffPath}` : '';
+  }
+
+  /** GET an AI REST resource from the BFF (absolute + token) or the main API. */
+  private aiGet<T>(bffPath: string, mainApiPath: string) {
+    const abs = this.aiAbsolute(bffPath);
+    if (abs) {
+      const token = StorageService.get(StorageType.ACCESS_TOKEN) || '';
+      const headers = new HttpHeaders({ 'x-auth-token': token });
+      return this.http.apiGet<T>(abs, { skipLoader: true, headers });
+    }
+    return this.http.apiGet<T>(mainApiPath, { skipLoader: true });
+  }
+
+  /**
+   * Execute an approved write proposal through the guarded confirm path. Goes
+   * to the DBExec-AI BFF's POST /confirm when configured (absolute + token),
+   * else the main API's embedded /ai/confirm via the interceptor. Returns the
+   * relayed envelope so the caller decides success by { code/status }.
+   */
+  confirmAction(body: {
+    endpoint: string;
+    method: string;
+    payload: Record<string, unknown>;
+    proposalId?: string;
+  }) {
+    const abs = this.aiAbsolute('/confirm');
+    if (abs) {
+      const token = StorageService.get(StorageType.ACCESS_TOKEN) || '';
+      const headers = new HttpHeaders({ 'x-auth-token': token });
+      return this.http.apiPost(abs, body, { skipLoader: true, headers });
+    }
+    return this.http.apiPost(AI_WORKSPACE.CONFIRM, body, { skipLoader: true });
+  }
 
   loadConversations(): void {
-    this.http
-      .apiGet<{ data?: { items?: AiConversationSummary[] } }>(
-        AI_WORKSPACE.CONVERSATIONS,
-        { skipLoader: true },
-      )
-      .subscribe({
-        next: res => this._conversations.set(res?.data?.items ?? []),
-        error: () => this._conversations.set([]),
-      });
+    this.aiGet<{ data?: { items?: AiConversationSummary[] } }>(
+      '/conversations',
+      AI_WORKSPACE.CONVERSATIONS,
+    ).subscribe({
+      next: res => this._conversations.set(res?.data?.items ?? []),
+      error: () => this._conversations.set([]),
+    });
   }
 
   openConversation(id: string): void {
     this.cancel();
     this._conversationId.set(id);
-    this.http
-      .apiGet<{
-        data?: {
-          messages?: Array<{
-            role: string;
-            content: string | null;
-            cards: AiCard[] | null;
-            routedAgent: string | null;
-          }>;
-        };
-      }>(`${AI_WORKSPACE.CONVERSATION}${id}`, { skipLoader: true })
+    this.aiGet<{
+      data?: {
+        messages?: Array<{
+          role: string;
+          content: string | null;
+          cards: AiCard[] | null;
+          routedAgent: string | null;
+        }>;
+      };
+    }>(`/conversations/${id}`, `${AI_WORKSPACE.CONVERSATION}${id}`)
       .subscribe({
         next: res => {
           const msgs = res?.data?.messages ?? [];

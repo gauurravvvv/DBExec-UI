@@ -5832,5 +5832,26 @@
       "SELF_LOCKOUT": "Betrifft den Verwaltungs-Login selbst — Aussperrgefahr.",
       "CASCADE": "Der Entzug wird auf abhängige Rechte ausgeweitet."
     }
+  },
+  "DBEXEC_AI": {
+    "NAME": "DBExecAI",
+    "OPEN": "DBExecAI fragen",
+    "TAGLINE": "Ihr agentischer Assistent",
+    "ON_MODULE": "Sie sind im Modul {{module}}",
+    "SCOPED_HINT": "Arbeite an {{module}} für Sie",
+    "DISCLAIMER": "DBExecAI ist ein Assistent und kann Fehler machen. Prüfen Sie jede Aktion, bevor Sie sie bestätigen.",
+    "RECONNECTING": "Verbindung wird wiederhergestellt…",
+    "COMPOSER_PLACEHOLDER": "Bitten Sie DBExecAI, etwas für Sie zu tun…",
+    "WELCOME_TITLE": "Was kann ich für Sie tun?",
+    "WELCOME_TITLE_SCOPED": "Arbeite an {{module}}",
+    "WELCOME_BODY": "Sagen Sie mir, was Sie möchten, und ich plane die Schritte und erledige die Arbeit – im Rahmen Ihrer Berechtigungen. Sie prüfen und bestätigen jede Änderung.",
+    "WELCOME_BODY_SCOPED": "Ich bin auf diesem Bildschirm auf {{module}} beschränkt. Sagen Sie mir, was Sie brauchen – ich plane die Schritte und schlage Änderungen zur Bestätigung vor.",
+    "TRY": "Versuchen",
+    "STARTER_SCHEMA": "Erkläre mein Datenbankschema",
+    "STARTER_QUERY": "Schreibe eine SQL-Abfrage für mich",
+    "STARTER_DATASET": "Fasse ein Dataset zusammen",
+    "STARTER_USERS_COUNT": "Wie viele Benutzer haben wir?",
+    "STARTER_USERS_CREATE": "Erstelle einen Benutzer in der Gruppe Administrator",
+    "STARTER_USERS_INACTIVE": "Welche Benutzer sind inaktiv?"
   }
 }

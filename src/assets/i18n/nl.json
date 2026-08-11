@@ -5832,5 +5832,26 @@
       "SELF_LOCKOUT": "Betreft de beheerlogin zelf — risico op buitensluiting.",
       "CASCADE": "De intrekking werkt door op afhankelijke rechten."
     }
+  },
+  "DBEXEC_AI": {
+    "NAME": "DBExecAI",
+    "OPEN": "DBExecAI vragen",
+    "TAGLINE": "Uw agentische assistent",
+    "ON_MODULE": "U bent in de module {{module}}",
+    "SCOPED_HINT": "Ik werk aan {{module}} voor u",
+    "DISCLAIMER": "DBExecAI is een assistent en kan fouten maken. Controleer elke actie voordat u deze bevestigt.",
+    "RECONNECTING": "Opnieuw verbinden…",
+    "COMPOSER_PLACEHOLDER": "Vraag DBExecAI om iets voor u te doen…",
+    "WELCOME_TITLE": "Wat kan ik voor u doen?",
+    "WELCOME_TITLE_SCOPED": "Ik werk aan {{module}}",
+    "WELCOME_BODY": "Vertel me wat u wilt en ik plan de stappen en doe het werk, binnen uw rechten. U controleert en bevestigt elke wijziging.",
+    "WELCOME_BODY_SCOPED": "Ik ben op dit scherm beperkt tot {{module}}. Vertel me wat u nodig hebt: ik plan de stappen en stel wijzigingen voor ter bevestiging.",
+    "TRY": "Probeer",
+    "STARTER_SCHEMA": "Leg mijn databaseschema uit",
+    "STARTER_QUERY": "Schrijf een SQL-query voor mij",
+    "STARTER_DATASET": "Vat een dataset samen",
+    "STARTER_USERS_COUNT": "Hoeveel gebruikers hebben we?",
+    "STARTER_USERS_CREATE": "Maak een gebruiker in de groep Administrator",
+    "STARTER_USERS_INACTIVE": "Welke gebruikers zijn inactief?"
   }
 }

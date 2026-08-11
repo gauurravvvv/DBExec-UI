@@ -5832,5 +5832,26 @@
       "SELF_LOCKOUT": "Vise le compte de gestion lui-même — risque de blocage.",
       "CASCADE": "La révocation se propage aux droits dépendants."
     }
+  },
+  "DBEXEC_AI": {
+    "NAME": "DBExecAI",
+    "OPEN": "Demander à DBExecAI",
+    "TAGLINE": "Votre assistant agentique",
+    "ON_MODULE": "Vous êtes sur le module {{module}}",
+    "SCOPED_HINT": "Je travaille sur {{module}} pour vous",
+    "DISCLAIMER": "DBExecAI est un assistant et peut se tromper. Vérifiez chaque action avant de la confirmer.",
+    "RECONNECTING": "Reconnexion…",
+    "COMPOSER_PLACEHOLDER": "Demandez à DBExecAI de faire quelque chose pour vous…",
+    "WELCOME_TITLE": "Que puis-je faire pour vous ?",
+    "WELCOME_TITLE_SCOPED": "Je travaille sur {{module}}",
+    "WELCOME_BODY": "Dites-moi ce que vous voulez et je planifierai les étapes et ferai le travail, dans la limite de vos droits. Vous vérifiez et confirmez chaque changement.",
+    "WELCOME_BODY_SCOPED": "Je suis limité à {{module}} sur cet écran. Dites-moi ce dont vous avez besoin : je planifierai les étapes et proposerai des changements à confirmer.",
+    "TRY": "Essayer",
+    "STARTER_SCHEMA": "Explique le schéma de ma base de données",
+    "STARTER_QUERY": "Écris une requête SQL pour moi",
+    "STARTER_DATASET": "Résume un dataset",
+    "STARTER_USERS_COUNT": "Combien d’utilisateurs avons-nous ?",
+    "STARTER_USERS_CREATE": "Crée un utilisateur dans le groupe Administrator",
+    "STARTER_USERS_INACTIVE": "Quels utilisateurs sont inactifs ?"
   }
 }

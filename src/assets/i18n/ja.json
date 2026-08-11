@@ -5832,5 +5832,26 @@
       "SELF_LOCKOUT": "管理ログイン自体が対象です。ロックアウトの恐れ。",
       "CASCADE": "取り消しが依存する権限にも波及します。"
     }
+  },
+  "DBEXEC_AI": {
+    "NAME": "DBExecAI",
+    "OPEN": "DBExecAI に依頼",
+    "TAGLINE": "エージェント型アシスタント",
+    "ON_MODULE": "現在 {{module}} モジュールにいます",
+    "SCOPED_HINT": "{{module}} の作業を行っています",
+    "DISCLAIMER": "DBExecAI はアシスタントであり、誤ることがあります。確定する前に各操作を確認してください。",
+    "RECONNECTING": "再接続中…",
+    "COMPOSER_PLACEHOLDER": "DBExecAI に作業を依頼してください…",
+    "WELCOME_TITLE": "何をお手伝いしましょうか？",
+    "WELCOME_TITLE_SCOPED": "{{module}} を作業中",
+    "WELCOME_BODY": "ご要望をお伝えください。権限の範囲で手順を計画し作業します。変更は必ずあなたが確認・承認します。",
+    "WELCOME_BODY_SCOPED": "この画面では {{module}} に限定されています。必要なことをお伝えください。手順を計画し、確認用の変更案を提示します。",
+    "TRY": "試す",
+    "STARTER_SCHEMA": "データベーススキーマを説明して",
+    "STARTER_QUERY": "SQL クエリを書いて",
+    "STARTER_DATASET": "データセットを要約して",
+    "STARTER_USERS_COUNT": "ユーザーは何人いますか？",
+    "STARTER_USERS_CREATE": "Administrator グループにユーザーを作成して",
+    "STARTER_USERS_INACTIVE": "どのユーザーが非アクティブですか？"
   }
 }

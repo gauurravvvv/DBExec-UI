@@ -5832,5 +5832,26 @@
       "SELF_LOCKOUT": "Afeta o próprio login de gestão — risco de bloqueio.",
       "CASCADE": "A revogação se propaga para permissões dependentes."
     }
+  },
+  "DBEXEC_AI": {
+    "NAME": "DBExecAI",
+    "OPEN": "Perguntar ao DBExecAI",
+    "TAGLINE": "Seu assistente com agentes",
+    "ON_MODULE": "Você está no módulo {{module}}",
+    "SCOPED_HINT": "Trabalhando em {{module}} para você",
+    "DISCLAIMER": "O DBExecAI é um assistente e pode cometer erros. Revise cada ação antes de confirmá-la.",
+    "RECONNECTING": "Reconectando…",
+    "COMPOSER_PLACEHOLDER": "Peça ao DBExecAI para fazer algo por você…",
+    "WELCOME_TITLE": "O que posso fazer por você?",
+    "WELCOME_TITLE_SCOPED": "Trabalhando em {{module}}",
+    "WELCOME_BODY": "Diga o que você quer e eu planejarei as etapas e farei o trabalho, dentro das suas permissões. Você revisa e confirma cada alteração.",
+    "WELCOME_BODY_SCOPED": "Nesta tela estou limitado a {{module}}. Diga o que você precisa: vou planejar as etapas e propor alterações para você confirmar.",
+    "TRY": "Tente",
+    "STARTER_SCHEMA": "Explique o esquema do meu banco de dados",
+    "STARTER_QUERY": "Escreva uma consulta SQL para mim",
+    "STARTER_DATASET": "Resuma um dataset",
+    "STARTER_USERS_COUNT": "Quantos usuários temos?",
+    "STARTER_USERS_CREATE": "Crie um usuário no grupo Administrator",
+    "STARTER_USERS_INACTIVE": "Quais usuários estão inativos?"
   }
 }

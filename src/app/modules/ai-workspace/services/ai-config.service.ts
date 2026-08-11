@@ -1,8 +1,10 @@
 import { Injectable, signal } from '@angular/core';
+import { HttpHeaders } from '@angular/common/http';
 import { HttpClientService } from 'src/app/core/services/http-client.service';
 import { AI_WORKSPACE } from 'src/app/core/constants/api.constant';
 import { StorageService } from 'src/app/core/services/storage.service';
 import { StorageType } from 'src/app/core/constants/storage-type.constant';
+import { environment } from 'src/environments/environment';
 
 /** The org's AI config as returned by GET /ai/config (key masked). */
 export interface AiConfig {
@@ -80,15 +82,30 @@ export class AiConfigService {
       const seeded = StorageService.get(StorageType.AI_CONFIGURED) === 'true';
       this._health.set({ enabled: seeded, configured: seeded });
     }
-    this.http
-      .apiGet<{ data?: AiHealth }>(AI_WORKSPACE.HEALTH, { skipLoader: true })
-      .subscribe({
-        next: res =>
-          this._health.set(res?.data ?? { enabled: false, configured: false }),
-        error: () => {
-          // Keep the seeded value on a probe failure rather than forcing
-          // the launcher to disappear on a transient network blip.
-        },
-      });
+    // Probe the DBExec-AI BFF's health when configured (absolute URL + token,
+    // since the interceptor skips auth on absolute URLs); else the main API's
+    // embedded /ai/health via the interceptor.
+    const ai = environment.aiServer;
+    const req = ai
+      ? this.http.apiGet<{ data?: AiHealth }>(
+          `${ai.replace(/\/+$/, '')}/ai/health`,
+          {
+            skipLoader: true,
+            headers: new HttpHeaders({
+              'x-auth-token': StorageService.get(StorageType.ACCESS_TOKEN) || '',
+            }),
+          },
+        )
+      : this.http.apiGet<{ data?: AiHealth }>(AI_WORKSPACE.HEALTH, {
+          skipLoader: true,
+        });
+    req.subscribe({
+      next: res =>
+        this._health.set(res?.data ?? { enabled: false, configured: false }),
+      error: () => {
+        // Keep the seeded value on a probe failure rather than forcing the
+        // launcher to disappear on a transient network blip.
+      },
+    });
   }
 }
