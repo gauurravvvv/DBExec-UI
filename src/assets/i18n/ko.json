@@ -4228,6 +4228,10 @@
       "id": {
         "required": "식별자가 필요합니다",
         "invalid": "잘못된 식별자"
+      },
+      "resetToken": {
+        "required": "설정 토큰이 필요합니다",
+        "invalid": "잘못된 설정 토큰 형식"
       }
     },
     "datasources": {

@@ -4228,6 +4228,10 @@
       "id": {
         "required": "Identificatie is vereist",
         "invalid": "Ongeldige identificatie"
+      },
+      "resetToken": {
+        "required": "Configuratietoken is vereist",
+        "invalid": "Ongeldig configuratietoken-formaat"
       }
     },
     "datasources": {

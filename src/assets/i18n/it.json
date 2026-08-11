@@ -4228,6 +4228,10 @@
       "id": {
         "required": "L'identificatore è obbligatorio",
         "invalid": "Identificatore non valido"
+      },
+      "resetToken": {
+        "required": "Il token di configurazione è obbligatorio",
+        "invalid": "Formato del token di configurazione non valido"
       }
     },
     "datasources": {

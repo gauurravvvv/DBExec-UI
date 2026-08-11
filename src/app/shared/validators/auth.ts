@@ -139,6 +139,20 @@ export const setupTokenSchema = z.preprocess(
     }),
 );
 
+/**
+ * Reset token (64-char hex). Server-issued in the password-reset email
+ * (magic link); the user never types it, but the link can be malformed
+ * (truncated / mis-pasted). Same shape as the setup token.
+ */
+export const resetTokenSchema = z.preprocess(
+  trimOrUndefined,
+  z
+    .string({ message: 'validation.auth.resetToken.required' })
+    .regex(SETUP_TOKEN_PATTERN, {
+      message: 'validation.auth.resetToken.invalid',
+    }),
+);
+
 export const refreshTokenSchema = z.preprocess(
   trimOrUndefined,
   z
@@ -171,16 +185,23 @@ export const refreshTokenBodySchema = z.object({
   organisation: organisationSchema,
 });
 
-export const generateOTPSchema = z.object({
+/**
+ * Password-reset request — magic-link flow. Keyed on organisation +
+ * email only (email + org uniquely identifies an active user via the
+ * DB partial-unique index). Username was dropped from this form.
+ */
+export const requestPasswordResetSchema = z.object({
   organisation: organisationSchema,
-  username: usernameSchema,
   email: emailSchema,
 });
+
+// Back-compat alias — the route middleware imports `generateOTPSchema`.
+export const generateOTPSchema = requestPasswordResetSchema;
 
 export const resetPasswordSchema = z.object({
   id: idSchema,
   orgId: idSchema,
-  otp: otpSchema,
+  token: resetTokenSchema,
   password: newPasswordSchema,
 });
 

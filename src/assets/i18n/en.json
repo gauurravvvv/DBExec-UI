@@ -4251,6 +4251,10 @@
       "id": {
         "required": "Identifier is required",
         "invalid": "Invalid identifier"
+      },
+      "resetToken": {
+        "required": "Reset token is required",
+        "invalid": "Invalid reset token format"
       }
     },
     "datasources": {

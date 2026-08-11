@@ -4228,6 +4228,10 @@
       "id": {
         "required": "Kennung ist erforderlich",
         "invalid": "Ungültige Kennung"
+      },
+      "resetToken": {
+        "required": "Einrichtungstoken ist erforderlich",
+        "invalid": "Ungültiges Einrichtungstoken-Format"
       }
     },
     "datasources": {
