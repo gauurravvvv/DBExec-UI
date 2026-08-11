@@ -12,7 +12,6 @@ import { LoginService } from 'src/app/core/services/login.service';
 import {
   emailSchema,
   organisationSchema,
-  usernameSchema,
 } from 'src/app/shared/validators/auth';
 import { zodValidator } from 'src/app/shared/validators/zod-validator';
 
@@ -42,7 +41,6 @@ export class ForgotPasswordComponent implements OnInit, OnDestroy {
     // src/app/shared/validators/auth.ts (mirrored to BE).
     this.forgotPasswordForm = this.fb.group({
       organisation: ['', [zodValidator(organisationSchema)]],
-      username: ['', [zodValidator(usernameSchema)]],
       email: ['', [zodValidator(emailSchema)]],
     });
   }
@@ -64,8 +62,6 @@ export class ForgotPasswordComponent implements OnInit, OnDestroy {
       switch (fieldName) {
         case 'organisation':
           return 'Organisation is required';
-        case 'username':
-          return 'Username is required';
         case 'email':
           return 'Email is required';
         default:
@@ -88,13 +84,15 @@ export class ForgotPasswordComponent implements OnInit, OnDestroy {
           this.forgotPasswordForm,
         );
         this.globalService.handleSuccessService(res);
-        if (res.data?.otpExpiresAt) {
-          this.startCountdown(new Date(res.data.otpExpiresAt));
+        if (res.data?.expiresAt) {
+          this.startCountdown(new Date(res.data.expiresAt));
         } else if (!res.status) {
-          this.error.set(res.message || 'Failed to send OTP.');
+          this.error.set(res.message || 'Failed to send reset link.');
         }
       } catch (err: any) {
-        this.error.set(err?.message || 'Failed to send OTP. Please try again.');
+        this.error.set(
+          err?.message || 'Failed to send reset link. Please try again.',
+        );
       } finally {
         this.loading.set(false);
         this.forgotPasswordForm.enable({ emitEvent: false });

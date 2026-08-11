@@ -348,13 +348,14 @@ export class LoginService implements OnDestroy {
   }
 
   generateOTP(forgotPasswordForm: UntypedFormGroup) {
-    const { organisation, username, email } = forgotPasswordForm.value;
+    // Request a password-reset magic link. Keyed on organisation + email
+    // only (username was dropped from the form).
+    const { organisation, email } = forgotPasswordForm.value;
     return lastValueFrom(
       this.http.apiPost(
         AUTH.GENERATE_OTP,
         {
           organisation,
-          username,
           email,
         },
         { skipLoader: true },
@@ -366,16 +367,18 @@ export class LoginService implements OnDestroy {
     loginForm: UntypedFormGroup,
     id: string,
     orgId: string,
-    otp?: string,
+    token: string,
   ) {
-    const { otp: formOtp, newPassword } = loginForm.value;
+    // Magic-link reset: the 64-char token comes from the email URL; the
+    // form only carries the new password.
+    const { newPassword } = loginForm.value;
     return lastValueFrom(
       this.http.apiPost(
         AUTH.RESET_PASSWORD,
         {
           id,
           orgId,
-          otp: otp || formOtp,
+          token,
           password: newPassword,
         },
         { skipLoader: true },
