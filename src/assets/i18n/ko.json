@@ -363,7 +363,9 @@
     "LOADING_PROFILE": "프로필 로딩 중...",
     "ROLE_SYSTEM_ADMIN": "시스템 관리자",
     "ROLE_ORG_ADMIN": "조직 관리자",
-    "ROLE_ORG_USER": "사용자"
+    "ROLE_ORG_USER": "사용자",
+    "PREFERENCES": "환경설정",
+    "SHOW_TOUR_TOGGLE": "로그인 시 제품 둘러보기 표시"
   },
   "SYSTEM_ADMIN": {
     "TITLE": "시스템 관리자",
@@ -4073,27 +4075,27 @@
       "dbHost": {
         "required": "데이터베이스 호스트는 필수입니다",
         "tooLong": "데이터베이스 호스트는 255자를 초과할 수 없습니다",
-        "invalid": "데이터베이스 호스트는 유효한 호스트 이름 또는 IPv4 주소여야 합니다"
+        "invalid": "데이터베이스 호스트는 유효한 호스트명 또는 IP 주소여야 합니다"
       },
       "dbPort": {
         "required": "데이터베이스 포트는 필수입니다",
         "notInteger": "데이터베이스 포트는 정수여야 합니다",
-        "outOfRange": "데이터베이스 포트는 1과 65535 사이여야 합니다"
+        "outOfRange": "데이터베이스 포트는 1 이상 65535 이하여야 합니다"
       },
       "dbName": {
         "required": "데이터베이스 이름은 필수입니다",
         "tooLong": "데이터베이스 이름은 63자를 초과할 수 없습니다",
-        "invalid": "데이터베이스 이름은 문자 또는 밑줄로 시작해야 하며 문자, 숫자, 밑줄 또는 하이픈만 포함할 수 있습니다"
+        "invalid": "데이터베이스 이름은 문자 또는 밑줄로 시작해야 하며 문자, 숫자, 밑줄, 하이픈만 포함할 수 있습니다"
       },
       "dbSchema": {
-        "required": "스키마 이름은 필수입니다",
+        "required": "스키마명은 필수입니다",
         "tooLong": "스키마 이름은 63자를 초과할 수 없습니다",
-        "invalid": "스키마 이름은 소문자 또는 밑줄로 시작해야 하며 소문자, 숫자 또는 밑줄만 포함할 수 있습니다"
+        "invalid": "스키마 이름은 소문자이며 문자, 숫자, 밑줄만 포함해야 합니다"
       },
       "dbUsername": {
-        "required": "데이터베이스 사용자 이름은 필수입니다",
+        "required": "데이터베이스 사용자명은 필수입니다",
         "tooLong": "데이터베이스 사용자 이름은 128자를 초과할 수 없습니다",
-        "invalid": "데이터베이스 사용자 이름은 문자 또는 밑줄로 시작해야 하며 문자, 숫자, 밑줄 또는 하이픈만 포함할 수 있습니다"
+        "invalid": "데이터베이스 사용자명은 문자 또는 밑줄로 시작해야 하며 문자, 숫자, 밑줄, 하이픈만 포함할 수 있습니다"
       },
       "dbPassword": {
         "required": "데이터베이스 비밀번호는 필수입니다",
@@ -4134,10 +4136,18 @@
     },
     "common": {
       "id": {
-        "invalid": "잘못된 식별자"
+        "invalid": "잘못된 식별자",
+        "required": "식별자는 필수입니다"
       },
       "status": {
         "invalid": "상태는 0 또는 1이어야 합니다"
+      },
+      "sort": {
+        "field": "잘못된 정렬 필드",
+        "order": "정렬 순서는 asc 또는 desc여야 합니다",
+        "json": "정렬은 유효한 JSON 배열이어야 합니다",
+        "max": "정렬 필드가 너무 많습니다",
+        "unique": "중복된 정렬 필드"
       }
     },
     "users": {
@@ -4174,6 +4184,20 @@
         "tooShort": "이름은 2자 이상이어야 합니다",
         "tooLong": "이름은 60자를 초과할 수 없습니다",
         "invalid": "이름은 문자로 시작해야 하며 문자, 하이픈, 아포스트로피 또는 공백만 포함할 수 있습니다"
+      },
+      "groupNames": {
+        "required": "최소 하나의 그룹을 지정해야 합니다"
+      },
+      "row": {
+        "required": "행 번호는 필수입니다"
+      },
+      "users": {
+        "required": "사용자 목록은 필수입니다",
+        "min": "생성할 사용자가 없습니다",
+        "max": "단일 요청에서 500명 이상의 사용자를 생성할 수 없습니다"
+      },
+      "newPassword": {
+        "required": "새 비밀번호는 필수입니다"
       }
     },
     "roles": {
@@ -4190,6 +4214,9 @@
       "permissions": {
         "required": "최소한 하나의 권한을 선택해야 합니다",
         "entryInvalid": "권한 항목이 유효하지 않습니다"
+      },
+      "filter": {
+        "type": "필터는 문자열이어야 합니다"
       }
     },
     "groups": {
@@ -4205,7 +4232,8 @@
       },
       "roleId": {
         "required": "역할을 선택해야 합니다",
-        "invalid": "선택한 역할이 유효하지 않습니다"
+        "invalid": "선택한 역할이 유효하지 않습니다",
+        "type": "역할 ID는 문자열이어야 합니다"
       },
       "users": {
         "idInvalid": "하나 이상의 사용자 식별자가 유효하지 않습니다"
@@ -4316,6 +4344,12 @@
       },
       "justification": {
         "tooLong": "사유는 500자를 초과할 수 없습니다"
+      },
+      "schema": {
+        "required": "스키마명은 필수입니다"
+      },
+      "table": {
+        "required": "테이블명은 필수입니다"
       }
     },
     "connections": {
@@ -4389,6 +4423,13 @@
         "type": {
           "invalid": "잘못된 프롬프트 유형"
         }
+      },
+      "page": {
+        "invalid": "페이지 번호는 최소 1이어야 합니다"
+      },
+      "limit": {
+        "invalid": "제한은 최소 1이어야 합니다",
+        "tooLarge": "제한은 1000개를 초과할 수 없습니다"
       }
     },
     "analyses": {
@@ -4495,6 +4536,10 @@
           "required": "대시보드 이름이 필요합니다",
           "tooLong": "대시보드 이름은 255자를 초과할 수 없습니다"
         }
+      },
+      "fieldName": {
+        "required": "필드명은 필수입니다",
+        "tooLong": "필드명은 256자를 초과할 수 없습니다"
       }
     },
     "folders": {
@@ -4684,6 +4729,406 @@
         "format": {
           "invalid": "지원되지 않는 내보내기 형식입니다"
         }
+      }
+    },
+    "aiWorkspace": {
+      "confirm": {
+        "endpoint": {
+          "required": "엔드포인트는 필수입니다",
+          "tooLong": "엔드포인트는 256자 이하여야 합니다"
+        },
+        "method": {
+          "required": "HTTP 메서드는 필수입니다",
+          "invalid": "HTTP 메서드는 POST, PUT, 또는 DELETE여야 합니다"
+        },
+        "payload": {
+          "required": "페이로드는 필수입니다"
+        },
+        "proposalId": {
+          "invalid": "제안 ID가 잘못되었습니다",
+          "tooLong": "제안 ID는 128자 이하여야 합니다"
+        }
+      },
+      "config": {
+        "aiProvider": {
+          "tooLong": "제공자는 32자 이하여야 합니다"
+        },
+        "aiConnectionStyle": {
+          "invalid": "연결 스타일은 'anthropic' 또는 'openai'여야 합니다"
+        },
+        "aiBaseUrl": {
+          "invalid": "베이스 URL은 유효한 HTTP 또는 HTTPS URL이어야 합니다",
+          "tooLong": "베이스 URL은 512자 이하여야 합니다"
+        },
+        "aiModelId": {
+          "tooLong": "모델 ID는 128자 이하여야 합니다"
+        },
+        "aiTemperature": {
+          "invalid": "온도는 0 이상 1 이하의 숫자여야 합니다"
+        },
+        "aiApiKey": {
+          "tooLong": "API 키는 4096자 이하여야 합니다"
+        },
+        "aiMaxTokens": {
+          "invalid": "최대 토큰은 1 이상 200000 이하의 정수여야 합니다"
+        },
+        "aiTimeoutMs": {
+          "invalid": "타임아웃은 1000 이상 600000 이하의 정수(밀리초)여야 합니다"
+        },
+        "aiApiVersion": {
+          "tooLong": "API 버전은 32자 이하여야 합니다"
+        },
+        "aiExtraHeaders": {
+          "tooLong": "추가 헤더는 4096자 이하여야 합니다",
+          "invalid": "추가 헤더는 유효한 JSON 객체여야 합니다"
+        },
+        "atLeastOneField": "최소 하나의 설정 필드가 필요합니다"
+      }
+    },
+    "branding": {
+      "showWatermark": {
+        "required": "워터마크 설정은 필수입니다"
+      },
+      "watermarkText": {
+        "required": "워터마크가 활성화되었을 때 워터마크 텍스트는 필수입니다",
+        "tooShort": "워터마크 텍스트는 최소 3자여야 합니다",
+        "tooLong": "워터마크 텍스트는 30자 이하여야 합니다"
+      },
+      "watermarkBgColor": {
+        "invalid": "배경색은 유효한 16진수 코드(#rgb 또는 #rrggbb)여야 합니다",
+        "required": "워터마크가 활성화되었을 때 배경색은 필수입니다"
+      },
+      "watermarkTextColor": {
+        "invalid": "텍스트 색상은 유효한 16진수 코드(#rgb 또는 #rrggbb)여야 합니다",
+        "required": "워터마크가 활성화되었을 때 텍스트 색상은 필수입니다"
+      },
+      "preset": {
+        "name": {
+          "required": "프리셋명은 필수입니다",
+          "tooLong": "프리셋명은 80자 이하여야 합니다"
+        },
+        "description": {
+          "tooLong": "설명은 200자 이하여야 합니다"
+        },
+        "showWatermark": {
+          "required": "워터마크 설정은 필수입니다"
+        },
+        "watermarkText": {
+          "required": "워터마크가 활성화되었을 때 워터마크 텍스트는 필수입니다",
+          "tooShort": "워터마크 텍스트는 최소 3자여야 합니다",
+          "tooLong": "워터마크 텍스트는 30자 이하여야 합니다"
+        },
+        "watermarkBgColor": {
+          "invalid": "배경색은 유효한 16진수 코드(#rgb 또는 #rrggbb)여야 합니다",
+          "required": "워터마크가 활성화되었을 때 배경색은 필수입니다"
+        },
+        "watermarkTextColor": {
+          "invalid": "텍스트 색상은 유효한 16진수 코드(#rgb 또는 #rrggbb)여야 합니다",
+          "required": "워터마크가 활성화되었을 때 텍스트 색상은 필수입니다"
+        }
+      }
+    },
+    "theme": {
+      "primary": {
+        "invalid": "기본 색상은 유효한 16진수 코드(#rgb 또는 #rrggbb)여야 합니다"
+      },
+      "primaryHover": {
+        "invalid": "호버 색상은 유효한 16진수 코드(#rgb 또는 #rrggbb)여야 합니다"
+      },
+      "primaryLight": {
+        "invalid": "밝은 음영은 유효한 16진수 코드(#rgb 또는 #rrggbb)여야 합니다"
+      },
+      "primaryText": {
+        "invalid": "텍스트 색상은 'white', 'black', 또는 유효한 16진수 코드여야 합니다"
+      },
+      "atLeastOneField": "최소 하나의 색상 필드가 필요합니다",
+      "preset": {
+        "name": {
+          "required": "프리셋명은 필수입니다",
+          "tooLong": "프리셋명은 80자 이하여야 합니다"
+        },
+        "description": {
+          "tooLong": "설명은 200자 이하여야 합니다"
+        },
+        "colors": {
+          "required": "색상 맵은 필수입니다"
+        },
+        "atLeastOneField": "최소 하나의 필드가 필요합니다"
+      }
+    },
+    "announcements": {
+      "name": {
+        "required": "공지사항명은 필수입니다",
+        "tooLong": "공지사항명은 255자를 초과할 수 없습니다"
+      },
+      "description": {
+        "required": "설명은 필수입니다",
+        "tooLong": "설명은 2000자를 초과할 수 없습니다"
+      },
+      "startTime": {
+        "invalid": "시작 시간은 유효한 ISO 날짜/시간이어야 합니다"
+      },
+      "endTime": {
+        "invalid": "종료 시간은 유효한 ISO 날짜/시간이어야 합니다",
+        "afterStart": "종료 시간은 시작 시간보다 뒤여야 합니다"
+      },
+      "bgColor": {
+        "invalid": "배경색은 유효한 16진수 색상이어야 합니다"
+      },
+      "textColor": {
+        "invalid": "텍스트 색상은 유효한 16진수 색상이어야 합니다"
+      },
+      "status": {
+        "invalid": "상태는 0 또는 1이어야 합니다"
+      }
+    },
+    "dashboards": {
+      "fieldName": {
+        "required": "필드명은 필수입니다",
+        "tooShort": "필드명은 최소 1자여야 합니다",
+        "tooLong": "필드명은 256자를 초과할 수 없습니다"
+      },
+      "search": {
+        "tooLong": "검색어는 256자를 초과할 수 없습니다"
+      },
+      "page": {
+        "invalid": "페이지 번호는 최소 1이어야 합니다"
+      },
+      "pageSize": {
+        "invalid": "페이지 크기는 최소 1이어야 합니다",
+        "tooLarge": "페이지 크기는 500개를 초과할 수 없습니다"
+      },
+      "limit": {
+        "invalid": "제한은 최소 1이어야 합니다",
+        "tooLarge": "제한은 1000개를 초과할 수 없습니다"
+      },
+      "sourceAnalysisId": {
+        "invalid": "분석 ID는 유효한 UUID여야 합니다"
+      }
+    },
+    "auditLogs": {
+      "page": {
+        "invalid": "페이지 번호는 최소 1이어야 합니다"
+      },
+      "limit": {
+        "invalid": "제한은 최소 1이어야 합니다",
+        "tooLarge": "제한은 1000개를 초과할 수 없습니다"
+      }
+    },
+    "dbAccess": {
+      "dbIdent": {
+        "required": "식별자는 필수입니다",
+        "tooLong": "식별자는 63자를 초과할 수 없습니다"
+      },
+      "validUntil": {
+        "tooLong": "유효 기한은 64자를 초과할 수 없습니다",
+        "invalid": "유효 기한은 유효한 날짜/타임스탐프 또는 'infinity'여야 합니다"
+      },
+      "rolePassword": {
+        "tooLong": "비밀번호는 512자를 초과할 수 없습니다",
+        "invalid": "비밀번호는 제어 문자를 포함할 수 없습니다"
+      },
+      "connectionLimit": {
+        "invalid": "연결 제한은 -1 이상 2147483647 이하여야 합니다"
+      },
+      "backendPid": {
+        "invalid": "유효한 양수 백엔드 PID가 필요합니다"
+      },
+      "privilege": {
+        "required": "권한은 필수입니다"
+      },
+      "columns": {
+        "required": "최소 하나의 열이 필요합니다"
+      },
+      "objectRef": {
+        "required": "객체 참조는 parts, allInSchema, 또는 columns을 포함해야 합니다"
+      },
+      "objType": {
+        "invalid": "잘못된 객체 타입입니다"
+      },
+      "privileges": {
+        "invalid": "권한은 비어있을 수 없습니다",
+        "required": "최소 하나의 권한이 필요합니다"
+      },
+      "kind": {
+        "invalid": "잘못된 문 종류입니다"
+      },
+      "behavior": {
+        "invalid": "동작은 RESTRICT 또는 CASCADE여야 합니다"
+      },
+      "action": {
+        "invalid": "작업은 GRANT 또는 REVOKE여야 합니다"
+      },
+      "onObjectType": {
+        "invalid": "객체 타입은 TABLES, SEQUENCES, FUNCTIONS, TYPES, 또는 SCHEMAS여야 합니다"
+      },
+      "statements": {
+        "required": "최소 하나의 문이 필요합니다"
+      },
+      "reassignTo": {
+        "conflict": "reassignTo와 dropOwned를 동시에 지정할 수 없습니다"
+      }
+    },
+    "org-policy": {
+      "emailProvider": {
+        "invalid": "이메일 제공자는 SMTP, SES, 또는 null이어야 합니다"
+      },
+      "smtpHost": {
+        "invalid": "SMTP 호스트가 잘못되었습니다",
+        "tooLong": "SMTP 호스트는 255자를 초과할 수 없습니다"
+      },
+      "smtpPort": {
+        "invalid": "SMTP 포트는 1 이상 65535 이하의 정수여야 합니다"
+      },
+      "smtpUser": {
+        "invalid": "SMTP 사용자가 잘못되었습니다",
+        "tooLong": "SMTP 사용자는 255자를 초과할 수 없습니다"
+      },
+      "smtpPassword": {
+        "invalid": "SMTP 비밀번호가 잘못되었습니다",
+        "tooLong": "SMTP 비밀번호는 1024자를 초과할 수 없습니다"
+      },
+      "smtpFrom": {
+        "invalid": "SMTP 발신 주소는 유효한 이메일이어야 합니다"
+      },
+      "sesRegion": {
+        "invalid": "SES 지역은 xx-xxxx-n 패턴(예: us-east-1)과 일치해야 합니다",
+        "tooLong": "SES 지역은 50자를 초과할 수 없습니다"
+      },
+      "sesAccessKeyId": {
+        "invalid": "SES 액세스 키 ID가 잘못되었습니다",
+        "tooShort": "SES 액세스 키 ID는 최소 16자여야 합니다",
+        "tooLong": "SES 액세스 키 ID는 128자를 초과할 수 없습니다"
+      },
+      "sesSecretAccessKey": {
+        "invalid": "SES 비밀 액세스 키가 잘못되었습니다",
+        "tooLong": "SES 비밀 액세스 키는 1024자를 초과할 수 없습니다"
+      },
+      "sesFrom": {
+        "invalid": "SES 발신 주소는 유효한 이메일이어야 합니다"
+      },
+      "maxLoginAttempts": {
+        "invalid": "최대 로그인 시도는 3 이상 10 이하의 정수여야 합니다"
+      },
+      "accountLockDurationHours": {
+        "invalid": "계정 잠금 기간은 0 이상 24 이하의 시간이어야 합니다"
+      },
+      "passwordHistoryLimit": {
+        "invalid": "비밀번호 이력 제한은 1 이상 24 이하의 정수여야 합니다"
+      },
+      "sessionInactivityTimeout": {
+        "invalid": "세션 비활성 타임아웃은 5 이상 1440 이하의 정수(분)여야 합니다"
+      },
+      "ssoEnabled": {
+        "invalid": "SSO 활성화는 부울이어야 합니다"
+      },
+      "ssoIssuer": {
+        "invalid": "SSO 발급자가 잘못되었습니다",
+        "tooLong": "SSO 발급자는 255자를 초과할 수 없습니다"
+      },
+      "ssoEntryPoint": {
+        "invalid": "SSO 진입점은 유효한 HTTP 또는 HTTPS URL이어야 합니다",
+        "tooLong": "SSO 진입점은 2048자를 초과할 수 없습니다"
+      },
+      "ssoCertificate": {
+        "invalid": "SSO 인증서가 잘못되었습니다",
+        "tooLong": "SSO 인증서는 16384자를 초과할 수 없습니다"
+      },
+      "ssoConfig": {
+        "atLeastOne": "최소 하나의 SSO 설정 필드가 필요합니다"
+      }
+    },
+    "profile": {
+      "newPassword": {
+        "required": "새 비밀번호는 필수입니다",
+        "tooShort": "비밀번호는 최소 8자여야 합니다",
+        "tooLong": "비밀번호는 128자를 초과할 수 없습니다",
+        "noSpaces": "비밀번호는 공백을 포함할 수 없습니다",
+        "lowercase": "비밀번호는 최소 하나의 소문자를 포함해야 합니다",
+        "uppercase": "비밀번호는 최소 하나의 대문자를 포함해야 합니다",
+        "digit": "비밀번호는 최소 하나의 숫자를 포함해야 합니다",
+        "special": "비밀번호는 최소 하나의 특수 문자(@$!%*?&)를 포함해야 합니다"
+      },
+      "locale": {
+        "invalid": "로케일은 지원되는 언어 중 하나여야 합니다"
+      },
+      "showTour": {
+        "invalid": "투어 표시는 부울 값이어야 합니다"
+      }
+    },
+    "prompts": {
+      "name": {
+        "required": "프롬프트명은 필수입니다",
+        "tooShort": "프롬프트명은 최소 2자여야 합니다",
+        "tooLong": "프롬프트명은 64자를 초과할 수 없습니다",
+        "invalid": "프롬프트명은 문자 또는 숫자로 시작해야 하며 문자, 숫자, 공백, 점, 밑줄, 하이픈만 포함할 수 있습니다"
+      },
+      "type": {
+        "invalid": "잘못된 프롬프트 타입입니다"
+      },
+      "description": {
+        "tooShort": "설명은 최소 2자여야 합니다",
+        "tooLong": "설명은 500자를 초과할 수 없습니다"
+      },
+      "datasource": {
+        "required": "데이터 원본은 필수입니다",
+        "invalid": "데이터 원본은 유효한 UUID여야 합니다"
+      },
+      "status": {
+        "invalid": "상태는 0 또는 1이어야 합니다"
+      },
+      "prompts": {
+        "required": "최소 하나의 프롬프트가 필요합니다"
+      },
+      "ids": {
+        "required": "최소 하나의 프롬프트를 선택해야 합니다"
+      }
+    },
+    "queryBuilders": {
+      "name": {
+        "required": "쿼리 빌더 이름은 필수입니다",
+        "tooShort": "쿼리 빌더 이름은 최소 2자여야 합니다",
+        "tooLong": "쿼리 빌더 이름은 64자를 초과할 수 없습니다",
+        "invalid": "쿼리 빌더 이름은 문자 또는 숫자로 시작해야 하며 문자, 숫자, 공백, 점, 밑줄, 하이픈만 포함할 수 있습니다"
+      },
+      "description": {
+        "tooShort": "설명은 최소 2자여야 합니다",
+        "tooLong": "설명은 500자를 초과할 수 없습니다"
+      },
+      "datasource": {
+        "required": "데이터 원본은 필수입니다",
+        "invalid": "데이터 원본은 유효한 UUID여야 합니다"
+      },
+      "status": {
+        "invalid": "상태는 0 또는 1이어야 합니다"
+      },
+      "ids": {
+        "required": "최소 하나의 쿼리 빌더를 선택해야 합니다"
+      }
+    },
+    "analysisFilters": {
+      "parentConstraints": {
+        "column": {
+          "required": "상위 제약 조건 열명은 필수입니다",
+          "invalid": "상위 제약 조건 열은 유효한 식별자여야 합니다"
+        },
+        "values": {
+          "tooMany": "상위 제약 조건 값은 1000개를 초과할 수 없습니다",
+          "required": "상위 제약 조건 값은 최소 하나의 항목을 포함해야 합니다"
+        },
+        "tooMany": "상위 제약 조건은 20개를 초과할 수 없습니다"
+      },
+      "filterId": {
+        "invalid": "필터 ID는 유효한 UUID여야 합니다"
+      },
+      "analysisId": {
+        "invalid": "분석 ID는 유효한 UUID여야 합니다"
+      },
+      "mode": {
+        "invalid": "모드는 'open' 또는 'fetch'여야 합니다"
+      },
+      "requests": {
+        "required": "fetch 모드에서 요청 배열은 최소 하나의 항목을 포함해야 합니다"
       }
     }
   },
@@ -5880,5 +6325,147 @@
     "STARTER_USERS_COUNT": "사용자가 몇 명인가요?",
     "STARTER_USERS_CREATE": "Administrator 그룹에 사용자 생성",
     "STARTER_USERS_INACTIVE": "어떤 사용자가 비활성 상태인가요?"
+  },
+  "TOUR": {
+    "NEXT": "다음",
+    "BACK": "뒤로",
+    "FINISH": "완료",
+    "SKIP": "건너뛰기",
+    "DONT_SHOW_AGAIN": "다시 표시 안 함",
+    "PROGRESS": "{{total}}단계 중 {{current}}단계",
+    "WELCOME": {
+      "TITLE": "DBExec에 오신 것을 환영합니다 👋",
+      "DESC": "할 수 있는 작업을 간단히 안내합니다. 언제든지 중단할 수 있으며 '다시 표시 안 함'을 선택하면 다음 로그인 시 표시되지 않습니다."
+    },
+    "DONE": {
+      "TITLE": "모두 준비되었습니다 🎉",
+      "DESC": "둘러보기가 끝났습니다. 편하게 살펴보세요. 프로필에서 언제든지 다시 켤 수 있습니다."
+    },
+    "STEPS": {
+      "search": {
+        "TITLE": "전역 검색",
+        "DESC": "무엇이든 빠르게 이동하세요. 데이터셋, 대시보드, 연결 등을 검색하거나 어디서든 Ctrl/⌘ + K를 누르세요."
+      },
+      "notifications": {
+        "TITLE": "알림",
+        "DESC": "경고, 공유, 시스템 메시지가 실시간으로 도착합니다. 배지는 읽지 않은 수를 표시합니다."
+      },
+      "language": {
+        "TITLE": "언어 변경",
+        "DESC": "다른 언어를 원하시나요? 여기서 10개 언어 중 선택하세요. 앱이 즉시 업데이트되고 선택이 기억됩니다."
+      },
+      "logout": {
+        "TITLE": "로그아웃",
+        "DESC": "끝나면 여기서 안전하게 로그아웃하세요. 세션이 종료되고 로그인 화면으로 돌아갑니다."
+      },
+      "systemAdmin": {
+        "TITLE": "시스템 관리",
+        "DESC": "여러 조직에서 DBExec를 관리하는 운영자를 위한 플랫폼 수준 관리."
+      },
+      "orgManagement": {
+        "TITLE": "조직",
+        "DESC": "플랫폼의 조직(테넌트)을 생성하고 관리합니다."
+      },
+      "systemRoleManagement": {
+        "TITLE": "시스템 역할",
+        "DESC": "플랫폼 수준 역할과 각 역할이 부여하는 권한을 정의합니다."
+      },
+      "systemGroupManagement": {
+        "TITLE": "시스템 그룹",
+        "DESC": "플랫폼 운영자를 그룹화하고 시스템 역할을 일괄 할당합니다."
+      },
+      "systemUserManagement": {
+        "TITLE": "시스템 사용자",
+        "DESC": "DBExec를 운영하는 운영자 계정을 관리합니다."
+      },
+      "home": {
+        "TITLE": "홈",
+        "DESC": "시작점 — 빠른 개요와 모든 항목에 대한 바로가기."
+      },
+      "userManagement": {
+        "TITLE": "사용자",
+        "DESC": "조직에 구성원을 초대하고 계정과 접근을 관리합니다."
+      },
+      "roleManagement": {
+        "TITLE": "역할",
+        "DESC": "역할을 정의하고 각 역할이 여는 화면과 작업을 선택합니다."
+      },
+      "groupManagement": {
+        "TITLE": "그룹",
+        "DESC": "사용자를 그룹으로 묶어 그룹 전체에 역할을 부여합니다."
+      },
+      "setupDB": {
+        "TITLE": "데이터 소스",
+        "DESC": "DBExec가 읽는 데이터베이스를 연결합니다 — Postgres, MySQL, Snowflake 등."
+      },
+      "dbRoles": {
+        "TITLE": "데이터베이스 역할",
+        "DESC": "연결된 데이터베이스의 로그인 사용자와 역할을 관리합니다."
+      },
+      "dbPrivileges": {
+        "TITLE": "권한 및 접근",
+        "DESC": "테이블·스키마 수준 권한을 부여하고 검토합니다."
+      },
+      "connectionManager": {
+        "TITLE": "연결",
+        "DESC": "데이터 소스에 SQL을 실행하는 연결을 관리합니다."
+      },
+      "queryRunner": {
+        "TITLE": "SQL 작업 공간",
+        "DESC": "자동 완성, 저장된 쿼리, 실시간 결과 그리드로 SQL을 작성·실행합니다."
+      },
+      "queryBuilderTab": {
+        "TITLE": "탭",
+        "DESC": "안내형 쿼리 빌더 화면을 탭으로 정리합니다."
+      },
+      "queryBuilderSection": {
+        "TITLE": "섹션",
+        "DESC": "관련 프롬프트를 화면 내 섹션으로 묶습니다."
+      },
+      "queryBuilderPrompt": {
+        "TITLE": "프롬프트",
+        "DESC": "매개변수화된 노코드 쿼리를 구동하는 입력 프롬프트를 설계합니다."
+      },
+      "queryBuilderScreen": {
+        "TITLE": "쿼리 빌더",
+        "DESC": "탭, 섹션, 프롬프트를 조합해 노코드 화면을 만듭니다."
+      },
+      "datasetManager": {
+        "TITLE": "데이터셋",
+        "DESC": "재사용 가능한 데이터셋을 구성합니다 — 열, 계산 필드, 수식."
+      },
+      "analyses": {
+        "TITLE": "분석",
+        "DESC": "데이터셋을 기반으로 차트와 시각적 분석을 만듭니다."
+      },
+      "dashboard": {
+        "TITLE": "대시보드",
+        "DESC": "비주얼을 공유 가능한 대시보드로 결합하고 스냅샷을 게시합니다."
+      },
+      "rlsRules": {
+        "TITLE": "RLS 규칙",
+        "DESC": "행·열 수준 보안을 설정해 각 사용자가 필요한 데이터만 보게 합니다."
+      },
+      "alertManagement": {
+        "TITLE": "알림",
+        "DESC": "조건 충족 시 알려주는 데이터 점검을 예약합니다."
+      },
+      "auditLogs": {
+        "TITLE": "감사 로그",
+        "DESC": "누가 무엇을 언제 변경했는지 전체 이력을 검토합니다."
+      },
+      "loginActivity": {
+        "TITLE": "로그인 활동",
+        "DESC": "보안과 규정 준수를 위해 로그인 및 인증 이벤트를 추적합니다."
+      },
+      "appSettings": {
+        "TITLE": "앱 설정",
+        "DESC": "테마, 브랜딩, 공지 등 모양을 조정합니다."
+      },
+      "systemSettings": {
+        "TITLE": "시스템 설정",
+        "DESC": "보안, SSO, 이메일, AI 기능을 구성합니다."
+      }
+    }
   }
 }

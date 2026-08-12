@@ -75,6 +75,13 @@ export class NotificationModalComponent implements OnInit {
     this.notificationModalService.open$
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(() => this.open());
+    // Programmatic close (guided tour ending its notifications step).
+    this.notificationModalService.close$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        this.close();
+        this.cdr.markForCheck();
+      });
   }
 
   get hasNotifications(): boolean {

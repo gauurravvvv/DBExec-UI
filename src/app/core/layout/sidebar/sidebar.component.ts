@@ -24,6 +24,10 @@ import { NotificationService } from 'src/app/core/services/notification.service'
 import { PermissionService } from 'src/app/core/services/permission.service';
 import { StorageService } from 'src/app/core/services/storage.service';
 import { ThemeService } from 'src/app/core/services/theme.service';
+import {
+  TourService,
+  TourSidebarApi,
+} from 'src/app/core/services/tour.service';
 import { AddAnalysesActions } from 'src/app/modules/analyses/store';
 import { GlobalSearchService } from 'src/app/shared/services/global-search.service';
 import { NotificationModalService } from 'src/app/shared/services/notification-modal.service';
@@ -93,7 +97,7 @@ interface PermissionNode {
   styleUrls: ['./sidebar.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class SidebarComponent implements OnInit {
+export class SidebarComponent implements OnInit, TourSidebarApi {
   // ── Nav-tree state ──────────────────────────────────────────────
   // Hover-to-peek removed per UX call — sidebar now only opens on
   // explicit click of the chevron handle. `isExpanded` is just the
@@ -123,6 +127,10 @@ export class SidebarComponent implements OnInit {
   /** localStorage key for the user's expanded-branch set. */
   private static readonly EXPANDED_STORAGE_KEY = 'sidebar.expanded';
 
+  /** Snapshot of the pinned-open state before the tour forced it open, so
+   *  we can restore exactly what the user had after the tour ends. */
+  private prePinnedOpen: boolean | null = null;
+
   private destroyRef = inject(DestroyRef);
   private cdr = inject(ChangeDetectorRef);
 
@@ -138,6 +146,7 @@ export class SidebarComponent implements OnInit {
     private permissionService: PermissionService,
     private globalSearchService: GlobalSearchService,
     private notificationModalService: NotificationModalService,
+    private tourService: TourService,
   ) {
     const tree = this.readPermissionTree();
     this.menuItems = this.processMenuItems(tree);
@@ -186,8 +195,14 @@ export class SidebarComponent implements OnInit {
 
     const resizeHandler = () => this.checkScreenSize();
     window.addEventListener('resize', resizeHandler);
+
+    // Register with the guided tour so it can pin the sidebar open and
+    // drive the account menu / language flyout during its chrome steps.
+    this.tourService.registerSidebar(this);
+
     this.destroyRef.onDestroy(() => {
       window.removeEventListener('resize', resizeHandler);
+      this.tourService.unregisterSidebar(this);
     });
   }
 
@@ -447,6 +462,53 @@ export class SidebarComponent implements OnInit {
   }
 
   // ─────────────────────────────────────────────────────────────────
+  // Guided-tour API (TourSidebarApi) — driven by TourService only.
+  // ─────────────────────────────────────────────────────────────────
+
+  /** Pin the sidebar open so every nav row is rendered + anchorable.
+   *  Remembers the prior pinned state for restoreAfterTour(). */
+  forceExpandForTour(): void {
+    if (this.prePinnedOpen === null) this.prePinnedOpen = this.isPinnedOpen;
+    this.isPinnedOpen = true;
+    this.recomputeExpanded();
+    this.cdr.markForCheck();
+  }
+
+  /** Restore whatever pinned/expanded state the user had before the tour,
+   *  and close any tour-opened popovers. */
+  restoreAfterTour(): void {
+    if (this.prePinnedOpen !== null) {
+      this.isPinnedOpen = this.prePinnedOpen;
+      this.prePinnedOpen = null;
+    }
+    this.showProfileMenu = false;
+    this.showLanguageFlyout = false;
+    this.recomputeExpanded();
+    this.cdr.markForCheck();
+  }
+
+  /** Open the account (avatar) menu for the logout / language tour steps. */
+  openAccountMenuForTour(): void {
+    this.showProfileMenu = true;
+    this.showLanguageFlyout = false;
+    this.cdr.markForCheck();
+  }
+
+  /** Open the account menu AND the language flyout for the language step. */
+  openLanguageFlyoutForTour(): void {
+    this.showProfileMenu = true;
+    this.showLanguageFlyout = true;
+    this.cdr.markForCheck();
+  }
+
+  /** Close the account menu + language flyout (tour leaving those steps). */
+  closeTourPopovers(): void {
+    this.showProfileMenu = false;
+    this.showLanguageFlyout = false;
+    this.cdr.markForCheck();
+  }
+
+  // ─────────────────────────────────────────────────────────────────
   // Header chrome (moved from HeaderComponent)
   // ─────────────────────────────────────────────────────────────────
 
@@ -556,6 +618,11 @@ export class SidebarComponent implements OnInit {
    */
   @HostListener('document:click', ['$event'])
   handleClickOutside(event: Event): void {
+    // While the guided tour is running it owns the account menu / language
+    // flyout (opening them for the logout/language steps). A click on the
+    // driver.js overlay or popover would otherwise fall through here and
+    // slam them shut mid-step, so ignore outside-clicks during the tour.
+    if (this.tourService.running()) return;
     const target = event.target as HTMLElement;
     if (
       !target.closest('.user-profile') &&

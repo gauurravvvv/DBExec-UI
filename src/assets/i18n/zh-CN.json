@@ -363,7 +363,9 @@
     "LOADING_PROFILE": "正在加载资料...",
     "ROLE_SYSTEM_ADMIN": "系统管理员",
     "ROLE_ORG_ADMIN": "组织管理员",
-    "ROLE_ORG_USER": "用户"
+    "ROLE_ORG_USER": "用户",
+    "PREFERENCES": "偏好设置",
+    "SHOW_TOUR_TOGGLE": "登录时显示产品导览"
   },
   "SYSTEM_ADMIN": {
     "TITLE": "系统管理员",
@@ -4073,27 +4075,27 @@
       "dbHost": {
         "required": "数据库主机为必填项",
         "tooLong": "数据库主机不能超过 255 个字符",
-        "invalid": "数据库主机必须是有效的主机名或 IPv4 地址"
+        "invalid": "数据库主机必须是有效的主机名或IP地址"
       },
       "dbPort": {
         "required": "数据库端口为必填项",
-        "notInteger": "数据库端口必须为整数",
-        "outOfRange": "数据库端口必须介于 1 到 65535 之间"
+        "notInteger": "数据库端口必须是整数",
+        "outOfRange": "数据库端口必须在1到65535之间"
       },
       "dbName": {
         "required": "数据库名称为必填项",
         "tooLong": "数据库名称不能超过 63 个字符",
-        "invalid": "数据库名称必须以字母或下划线开头，且只能包含字母、数字、下划线或连字符"
+        "invalid": "数据库名称必须以字母或下划线开头，仅包含字母、数字、下划线和连字符"
       },
       "dbSchema": {
-        "required": "架构名称为必填项",
+        "required": "模式名称为必填项",
         "tooLong": "架构名称不能超过 63 个字符",
-        "invalid": "架构名称必须以小写字母或下划线开头，且只能包含小写字母、数字或下划线"
+        "invalid": "模式名称必须是小写字母，仅包含字母、数字和下划线"
       },
       "dbUsername": {
         "required": "数据库用户名为必填项",
         "tooLong": "数据库用户名不能超过 128 个字符",
-        "invalid": "数据库用户名必须以字母或下划线开头，且只能包含字母、数字、下划线或连字符"
+        "invalid": "数据库用户名必须以字母或下划线开头，仅包含字母、数字、下划线和连字符"
       },
       "dbPassword": {
         "required": "数据库密码为必填项",
@@ -4134,10 +4136,18 @@
     },
     "common": {
       "id": {
-        "invalid": "标识符无效"
+        "invalid": "标识符无效",
+        "required": "标识符为必填项"
       },
       "status": {
         "invalid": "状态必须为 0 或 1"
+      },
+      "sort": {
+        "field": "排序字段无效",
+        "order": "排序顺序必须为 asc 或 desc",
+        "json": "排序必须是有效的 JSON 数组",
+        "max": "排序字段过多",
+        "unique": "排序字段重复"
       }
     },
     "users": {
@@ -4174,6 +4184,20 @@
         "tooShort": "全名至少需要 2 个字符",
         "tooLong": "全名不能超过 60 个字符",
         "invalid": "全名必须以字母开头，且只能包含字母、连字符、撇号或空格"
+      },
+      "groupNames": {
+        "required": "至少需要指定一个组"
+      },
+      "row": {
+        "required": "行号为必填项"
+      },
+      "users": {
+        "required": "用户列表为必填项",
+        "min": "没有要创建的用户",
+        "max": "单个请求中无法创建超过500个用户"
+      },
+      "newPassword": {
+        "required": "新密码为必填项"
       }
     },
     "roles": {
@@ -4190,6 +4214,9 @@
       "permissions": {
         "required": "必须至少选择一个权限",
         "entryInvalid": "权限条目无效"
+      },
+      "filter": {
+        "type": "过滤器必须是字符串"
       }
     },
     "groups": {
@@ -4205,7 +4232,8 @@
       },
       "roleId": {
         "required": "必须选择一个角色",
-        "invalid": "所选角色无效"
+        "invalid": "所选角色无效",
+        "type": "角色ID必须是字符串"
       },
       "users": {
         "idInvalid": "一个或多个用户标识符无效"
@@ -4316,6 +4344,12 @@
       },
       "justification": {
         "tooLong": "理由不得超过 500 个字符"
+      },
+      "schema": {
+        "required": "模式名称为必填项"
+      },
+      "table": {
+        "required": "表名称为必填项"
       }
     },
     "connections": {
@@ -4389,6 +4423,13 @@
         "type": {
           "invalid": "无效的提示类型"
         }
+      },
+      "page": {
+        "invalid": "页码必须至少为1"
+      },
+      "limit": {
+        "invalid": "限制必须至少为1",
+        "tooLarge": "限制不得超过1000项"
       }
     },
     "analyses": {
@@ -4495,6 +4536,10 @@
           "required": "仪表板名称为必填项",
           "tooLong": "仪表板名称不得超过 255 个字符"
         }
+      },
+      "fieldName": {
+        "required": "字段名称为必填项",
+        "tooLong": "字段名称不得超过256个字符"
       }
     },
     "folders": {
@@ -4684,6 +4729,406 @@
         "format": {
           "invalid": "不支持的导出格式"
         }
+      }
+    },
+    "aiWorkspace": {
+      "confirm": {
+        "endpoint": {
+          "required": "端点为必填项",
+          "tooLong": "端点不得超过256个字符"
+        },
+        "method": {
+          "required": "HTTP方法为必填项",
+          "invalid": "HTTP方法必须是POST、PUT或DELETE"
+        },
+        "payload": {
+          "required": "有效负载为必填项"
+        },
+        "proposalId": {
+          "invalid": "提案ID无效",
+          "tooLong": "提案ID不得超过128个字符"
+        }
+      },
+      "config": {
+        "aiProvider": {
+          "tooLong": "提供商不得超过32个字符"
+        },
+        "aiConnectionStyle": {
+          "invalid": "连接风格必须为'anthropic'或'openai'"
+        },
+        "aiBaseUrl": {
+          "invalid": "基础URL必须是有效的HTTP或HTTPS URL",
+          "tooLong": "基础URL不得超过512个字符"
+        },
+        "aiModelId": {
+          "tooLong": "模型ID不得超过128个字符"
+        },
+        "aiTemperature": {
+          "invalid": "温度必须是0到1之间的数字"
+        },
+        "aiApiKey": {
+          "tooLong": "API密钥不得超过4096个字符"
+        },
+        "aiMaxTokens": {
+          "invalid": "最大令牌数必须是1到200000之间的整数"
+        },
+        "aiTimeoutMs": {
+          "invalid": "超时时间必须是1000到600000毫秒之间的整数"
+        },
+        "aiApiVersion": {
+          "tooLong": "API版本不得超过32个字符"
+        },
+        "aiExtraHeaders": {
+          "tooLong": "额外请求头不得超过4096个字符",
+          "invalid": "额外请求头必须是有效的JSON对象"
+        },
+        "atLeastOneField": "至少需要一个配置字段"
+      }
+    },
+    "branding": {
+      "showWatermark": {
+        "required": "水印设置为必填项"
+      },
+      "watermarkText": {
+        "required": "启用水印时水印文本为必填项",
+        "tooShort": "水印文本至少需要3个字符",
+        "tooLong": "水印文本不得超过30个字符"
+      },
+      "watermarkBgColor": {
+        "invalid": "背景颜色必须是有效的十六进制代码(#rgb或#rrggbb)",
+        "required": "启用水印时背景颜色为必填项"
+      },
+      "watermarkTextColor": {
+        "invalid": "文本颜色必须是有效的十六进制代码(#rgb或#rrggbb)",
+        "required": "启用水印时文本颜色为必填项"
+      },
+      "preset": {
+        "name": {
+          "required": "预设名称为必填项",
+          "tooLong": "预设名称不得超过80个字符"
+        },
+        "description": {
+          "tooLong": "描述不得超过200个字符"
+        },
+        "showWatermark": {
+          "required": "水印设置为必填项"
+        },
+        "watermarkText": {
+          "required": "启用水印时水印文本为必填项",
+          "tooShort": "水印文本至少需要3个字符",
+          "tooLong": "水印文本不得超过30个字符"
+        },
+        "watermarkBgColor": {
+          "invalid": "背景颜色必须是有效的十六进制代码(#rgb或#rrggbb)",
+          "required": "启用水印时背景颜色为必填项"
+        },
+        "watermarkTextColor": {
+          "invalid": "文本颜色必须是有效的十六进制代码(#rgb或#rrggbb)",
+          "required": "启用水印时文本颜色为必填项"
+        }
+      }
+    },
+    "theme": {
+      "primary": {
+        "invalid": "主色必须是有效的十六进制代码(#rgb或#rrggbb)"
+      },
+      "primaryHover": {
+        "invalid": "悬停色必须是有效的十六进制代码(#rgb或#rrggbb)"
+      },
+      "primaryLight": {
+        "invalid": "浅色必须是有效的十六进制代码(#rgb或#rrggbb)"
+      },
+      "primaryText": {
+        "invalid": "文本颜色必须是'white'、'black'或有效的十六进制代码"
+      },
+      "atLeastOneField": "至少需要一个颜色字段",
+      "preset": {
+        "name": {
+          "required": "预设名称为必填项",
+          "tooLong": "预设名称不得超过80个字符"
+        },
+        "description": {
+          "tooLong": "描述不得超过200个字符"
+        },
+        "colors": {
+          "required": "颜色映射为必填项"
+        },
+        "atLeastOneField": "至少需要一个字段"
+      }
+    },
+    "announcements": {
+      "name": {
+        "required": "公告名称为必填项",
+        "tooLong": "公告名称不得超过255个字符"
+      },
+      "description": {
+        "required": "描述为必填项",
+        "tooLong": "描述不得超过2000个字符"
+      },
+      "startTime": {
+        "invalid": "开始时间必须是有效的ISO日期时间"
+      },
+      "endTime": {
+        "invalid": "结束时间必须是有效的ISO日期时间",
+        "afterStart": "结束时间必须晚于开始时间"
+      },
+      "bgColor": {
+        "invalid": "背景颜色必须是有效的十六进制颜色"
+      },
+      "textColor": {
+        "invalid": "文本颜色必须是有效的十六进制颜色"
+      },
+      "status": {
+        "invalid": "状态必须为0或1"
+      }
+    },
+    "dashboards": {
+      "fieldName": {
+        "required": "字段名称为必填项",
+        "tooShort": "字段名称至少需要1个字符",
+        "tooLong": "字段名称不得超过256个字符"
+      },
+      "search": {
+        "tooLong": "搜索词不得超过256个字符"
+      },
+      "page": {
+        "invalid": "页码必须至少为1"
+      },
+      "pageSize": {
+        "invalid": "页面大小必须至少为1",
+        "tooLarge": "页面大小不得超过500项"
+      },
+      "limit": {
+        "invalid": "限制必须至少为1",
+        "tooLarge": "限制不得超过1000项"
+      },
+      "sourceAnalysisId": {
+        "invalid": "分析ID必须是有效的UUID"
+      }
+    },
+    "auditLogs": {
+      "page": {
+        "invalid": "页码必须至少为1"
+      },
+      "limit": {
+        "invalid": "限制必须至少为1",
+        "tooLarge": "限制不得超过1000项"
+      }
+    },
+    "dbAccess": {
+      "dbIdent": {
+        "required": "标识符为必填项",
+        "tooLong": "标识符不得超过63个字符"
+      },
+      "validUntil": {
+        "tooLong": "有效期不得超过64个字符",
+        "invalid": "有效期必须是有效的日期/时间戳或'infinity'"
+      },
+      "rolePassword": {
+        "tooLong": "密码不得超过512个字符",
+        "invalid": "密码不能包含控制字符"
+      },
+      "connectionLimit": {
+        "invalid": "连接限制必须在-1到2147483647之间"
+      },
+      "backendPid": {
+        "invalid": "需要有效的正整数后端PID"
+      },
+      "privilege": {
+        "required": "权限为必填项"
+      },
+      "columns": {
+        "required": "至少需要一个列"
+      },
+      "objectRef": {
+        "required": "对象引用必须包含parts、allInSchema或columns"
+      },
+      "objType": {
+        "invalid": "对象类型无效"
+      },
+      "privileges": {
+        "invalid": "权限不能为空",
+        "required": "至少需要一个权限"
+      },
+      "kind": {
+        "invalid": "语句类型无效"
+      },
+      "behavior": {
+        "invalid": "行为必须是RESTRICT或CASCADE"
+      },
+      "action": {
+        "invalid": "操作必须是GRANT或REVOKE"
+      },
+      "onObjectType": {
+        "invalid": "对象类型必须是TABLES、SEQUENCES、FUNCTIONS、TYPES或SCHEMAS"
+      },
+      "statements": {
+        "required": "至少需要一条语句"
+      },
+      "reassignTo": {
+        "conflict": "无法同时指定reassignTo和dropOwned"
+      }
+    },
+    "org-policy": {
+      "emailProvider": {
+        "invalid": "电子邮件提供商必须是SMTP、SES或null"
+      },
+      "smtpHost": {
+        "invalid": "SMTP主机无效",
+        "tooLong": "SMTP主机不得超过255个字符"
+      },
+      "smtpPort": {
+        "invalid": "SMTP端口必须是1到65535之间的整数"
+      },
+      "smtpUser": {
+        "invalid": "SMTP用户无效",
+        "tooLong": "SMTP用户不得超过255个字符"
+      },
+      "smtpPassword": {
+        "invalid": "SMTP密码无效",
+        "tooLong": "SMTP密码不得超过1024个字符"
+      },
+      "smtpFrom": {
+        "invalid": "SMTP发件人地址必须是有效的电子邮件"
+      },
+      "sesRegion": {
+        "invalid": "SES区域必须匹配模式xx-xxxx-n(例如us-east-1)",
+        "tooLong": "SES区域不得超过50个字符"
+      },
+      "sesAccessKeyId": {
+        "invalid": "SES访问密钥ID无效",
+        "tooShort": "SES访问密钥ID至少需要16个字符",
+        "tooLong": "SES访问密钥ID不得超过128个字符"
+      },
+      "sesSecretAccessKey": {
+        "invalid": "SES秘密访问密钥无效",
+        "tooLong": "SES秘密访问密钥不得超过1024个字符"
+      },
+      "sesFrom": {
+        "invalid": "SES发件人地址必须是有效的电子邮件"
+      },
+      "maxLoginAttempts": {
+        "invalid": "最大登录尝试次数必须是3到10之间的整数"
+      },
+      "accountLockDurationHours": {
+        "invalid": "账户锁定时长必须在0到24小时之间"
+      },
+      "passwordHistoryLimit": {
+        "invalid": "密码历史记录限制必须是1到24之间的整数"
+      },
+      "sessionInactivityTimeout": {
+        "invalid": "会话不活动超时必须是5到1440分钟之间的整数"
+      },
+      "ssoEnabled": {
+        "invalid": "SSO启用必须是布尔值"
+      },
+      "ssoIssuer": {
+        "invalid": "SSO发行者无效",
+        "tooLong": "SSO发行者不得超过255个字符"
+      },
+      "ssoEntryPoint": {
+        "invalid": "SSO入口点必须是有效的HTTP或HTTPS URL",
+        "tooLong": "SSO入口点不得超过2048个字符"
+      },
+      "ssoCertificate": {
+        "invalid": "SSO证书无效",
+        "tooLong": "SSO证书不得超过16384个字符"
+      },
+      "ssoConfig": {
+        "atLeastOne": "至少需要提供一个SSO配置字段"
+      }
+    },
+    "profile": {
+      "newPassword": {
+        "required": "新密码为必填项",
+        "tooShort": "密码至少需要8个字符",
+        "tooLong": "密码不得超过128个字符",
+        "noSpaces": "密码不能包含空格",
+        "lowercase": "密码必须包含至少一个小写字母",
+        "uppercase": "密码必须包含至少一个大写字母",
+        "digit": "密码必须包含至少一个数字",
+        "special": "密码必须包含至少一个特殊字符(@$!%*?&)"
+      },
+      "locale": {
+        "invalid": "地区必须是支持的语言之一"
+      },
+      "showTour": {
+        "invalid": "显示导览必须是布尔值"
+      }
+    },
+    "prompts": {
+      "name": {
+        "required": "提示名称为必填项",
+        "tooShort": "提示名称至少需要2个字符",
+        "tooLong": "提示名称不得超过64个字符",
+        "invalid": "提示名称必须以字母或数字开头，仅包含字母、数字、空格、点、下划线和连字符"
+      },
+      "type": {
+        "invalid": "提示类型无效"
+      },
+      "description": {
+        "tooShort": "描述至少需要2个字符",
+        "tooLong": "描述不得超过500个字符"
+      },
+      "datasource": {
+        "required": "数据源为必填项",
+        "invalid": "数据源必须是有效的UUID"
+      },
+      "status": {
+        "invalid": "状态必须为0或1"
+      },
+      "prompts": {
+        "required": "至少需要一个提示"
+      },
+      "ids": {
+        "required": "至少需要选择一个提示"
+      }
+    },
+    "queryBuilders": {
+      "name": {
+        "required": "查询生成器名称为必填项",
+        "tooShort": "查询生成器名称至少需要2个字符",
+        "tooLong": "查询生成器名称不得超过64个字符",
+        "invalid": "查询生成器名称必须以字母或数字开头，仅包含字母、数字、空格、点、下划线和连字符"
+      },
+      "description": {
+        "tooShort": "描述至少需要2个字符",
+        "tooLong": "描述不得超过500个字符"
+      },
+      "datasource": {
+        "required": "数据源为必填项",
+        "invalid": "数据源必须是有效的UUID"
+      },
+      "status": {
+        "invalid": "状态必须为0或1"
+      },
+      "ids": {
+        "required": "至少需要选择一个查询生成器"
+      }
+    },
+    "analysisFilters": {
+      "parentConstraints": {
+        "column": {
+          "required": "父约束列名称为必填项",
+          "invalid": "父约束列必须是有效的标识符"
+        },
+        "values": {
+          "tooMany": "父约束值不得超过1000项",
+          "required": "父约束值必须包含至少一项"
+        },
+        "tooMany": "父约束不得超过20项"
+      },
+      "filterId": {
+        "invalid": "过滤器ID必须是有效的UUID"
+      },
+      "analysisId": {
+        "invalid": "分析ID必须是有效的UUID"
+      },
+      "mode": {
+        "invalid": "模式必须为'open'或'fetch'"
+      },
+      "requests": {
+        "required": "在fetch模式下，请求数组必须包含至少一项"
       }
     }
   },
@@ -5880,5 +6325,147 @@
     "STARTER_USERS_COUNT": "我们有多少用户？",
     "STARTER_USERS_CREATE": "在 Administrator 组中创建用户",
     "STARTER_USERS_INACTIVE": "哪些用户处于非活动状态？"
+  },
+  "TOUR": {
+    "NEXT": "下一步",
+    "BACK": "上一步",
+    "FINISH": "完成",
+    "SKIP": "跳过",
+    "DONT_SHOW_AGAIN": "不再显示",
+    "PROGRESS": "第 {{current}} 步，共 {{total}} 步",
+    "WELCOME": {
+      "TITLE": "欢迎使用 DBExec 👋",
+      "DESC": "这里快速介绍您可以做的事情。您可以随时停止，勾选“不再显示”即可在以后登录时跳过。"
+    },
+    "DONE": {
+      "TITLE": "一切就绪 🎉",
+      "DESC": "导览到此结束。按您的节奏探索——随时可在个人资料中重新开启此导览。"
+    },
+    "STEPS": {
+      "search": {
+        "TITLE": "全局搜索",
+        "DESC": "快速跳转到任意位置。搜索数据集、仪表板、连接等，或在任意页面按 Ctrl/⌘ + K。"
+      },
+      "notifications": {
+        "TITLE": "通知",
+        "DESC": "警报、共享和系统消息将实时到达此处。徽标显示未读数量。"
+      },
+      "language": {
+        "TITLE": "更改语言",
+        "DESC": "想用其他语言？在此从十种语言中选择——应用会即时更新并记住您的选择。"
+      },
+      "logout": {
+        "TITLE": "退出登录",
+        "DESC": "完成后从此处安全退出。会话结束并返回登录界面。"
+      },
+      "systemAdmin": {
+        "TITLE": "系统管理",
+        "DESC": "面向跨组织管理 DBExec 的运营人员的平台级管理。"
+      },
+      "orgManagement": {
+        "TITLE": "组织",
+        "DESC": "创建并管理平台上的组织（租户）。"
+      },
+      "systemRoleManagement": {
+        "TITLE": "系统角色",
+        "DESC": "定义平台级角色及各自授予的权限。"
+      },
+      "systemGroupManagement": {
+        "TITLE": "系统组",
+        "DESC": "将平台运营人员分组并批量分配系统角色。"
+      },
+      "systemUserManagement": {
+        "TITLE": "系统用户",
+        "DESC": "管理运行 DBExec 本身的运营账户。"
+      },
+      "home": {
+        "TITLE": "主页",
+        "DESC": "您的起点——快速概览以及通往一切的快捷方式。"
+      },
+      "userManagement": {
+        "TITLE": "用户",
+        "DESC": "邀请成员加入您的组织并管理其账户与访问权限。"
+      },
+      "roleManagement": {
+        "TITLE": "角色",
+        "DESC": "定义角色并选择每个角色可解锁的界面和操作。"
+      },
+      "groupManagement": {
+        "TITLE": "组",
+        "DESC": "将用户归组，并一次性为整组授予角色。"
+      },
+      "setupDB": {
+        "TITLE": "数据源",
+        "DESC": "连接 DBExec 读取的数据库——Postgres、MySQL、Snowflake 等。"
+      },
+      "dbRoles": {
+        "TITLE": "数据库角色",
+        "DESC": "管理已连接数据库中的登录用户和角色。"
+      },
+      "dbPrivileges": {
+        "TITLE": "权限与访问",
+        "DESC": "授予并审查表级和模式级权限。"
+      },
+      "connectionManager": {
+        "TITLE": "连接",
+        "DESC": "管理用于对数据源执行 SQL 的连接。"
+      },
+      "queryRunner": {
+        "TITLE": "SQL 工作区",
+        "DESC": "使用自动补全、已保存查询和实时结果网格编写并运行 SQL。"
+      },
+      "queryBuilderTab": {
+        "TITLE": "标签页",
+        "DESC": "将向导式查询构建器界面组织为标签页。"
+      },
+      "queryBuilderSection": {
+        "TITLE": "分区",
+        "DESC": "将相关提示归入界面内的分区。"
+      },
+      "queryBuilderPrompt": {
+        "TITLE": "提示",
+        "DESC": "设计驱动参数化零代码查询的输入提示。"
+      },
+      "queryBuilderScreen": {
+        "TITLE": "查询构建器",
+        "DESC": "将标签页、分区和提示组合成向导式零代码界面。"
+      },
+      "datasetManager": {
+        "TITLE": "数据集",
+        "DESC": "构建可复用的数据集——列、计算字段和公式。"
+      },
+      "analyses": {
+        "TITLE": "分析",
+        "DESC": "基于数据集构建图表和可视化分析。"
+      },
+      "dashboard": {
+        "TITLE": "仪表板",
+        "DESC": "将可视化组合为可共享的仪表板并发布时间点快照。"
+      },
+      "rlsRules": {
+        "TITLE": "RLS 规则",
+        "DESC": "设置行级和列级安全，使每位用户只看到应看到的数据。"
+      },
+      "alertManagement": {
+        "TITLE": "警报",
+        "DESC": "安排数据检查，在满足条件时通过邮件或通知提醒您。"
+      },
+      "auditLogs": {
+        "TITLE": "审计日志",
+        "DESC": "查看谁在何时更改了什么的完整记录。"
+      },
+      "loginActivity": {
+        "TITLE": "登录活动",
+        "DESC": "跟踪登录和身份验证事件，用于安全与合规。"
+      },
+      "appSettings": {
+        "TITLE": "应用设置",
+        "DESC": "调整外观——主题、品牌和公告。"
+      },
+      "systemSettings": {
+        "TITLE": "系统设置",
+        "DESC": "配置安全、SSO、电子邮件和 AI 功能。"
+      }
+    }
   }
 }

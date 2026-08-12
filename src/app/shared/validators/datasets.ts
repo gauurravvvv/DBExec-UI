@@ -478,3 +478,36 @@ export const updateDatasetFieldSchema = z.object({
   isVisible: datasetFieldVisibleSchema,
   typeOverride: datasetFieldTypeOverrideSchema,
 });
+
+// ── List dataset query schema ──────────────────────────────────────────
+
+import { buildSortZod } from '../utility/listSort';
+
+export const DATASET_LIST_SORT_FIELDS = [
+  'name',
+  'status',
+  'createdOn',
+] as const;
+export type DatasetListSortField = (typeof DATASET_LIST_SORT_FIELDS)[number];
+
+export const listDatasetSchema = z
+  .object({
+    datasourceId: z
+      .string()
+      .optional()
+      .or(z.literal(null).transform(() => undefined)),
+    page: z.coerce
+      .number({ message: 'validation.datasets.page.invalid' })
+      .int()
+      .min(1, { message: 'validation.datasets.page.invalid' })
+      .optional(),
+    limit: z.coerce
+      .number({ message: 'validation.datasets.limit.invalid' })
+      .int()
+      .min(1, { message: 'validation.datasets.limit.invalid' })
+      .max(1000, { message: 'validation.datasets.limit.tooLarge' })
+      .optional(),
+    filter: z.string().optional(),
+    sort: buildSortZod(DATASET_LIST_SORT_FIELDS),
+  })
+  .strict();

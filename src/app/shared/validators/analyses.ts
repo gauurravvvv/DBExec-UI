@@ -534,6 +534,11 @@ export const AGGREGATE_VALUES = [
   'min',
   'max',
   'count_distinct',
+  // Slice 2: dialect-aware statistical / ordered-set aggregates. Emitted
+  // with engine-correct SQL by buildAggregationWrap or rejected with a
+  // typed error on engines that can't express them (e.g. MySQL has no
+  // PERCENTILE_CONT). 'percentile' additionally reads the numeric
+  // `percentile` field (0-100) below.
   'median',
   'percentile',
   'stddev',
@@ -549,13 +554,16 @@ const aggregationColumnSchema = z.preprocess(
 );
 
 /**
- * Percentile P for aggregate='percentile' — the 0..100 rank the dialect-aware
- * percentile aggregate resolves (e.g. PERCENTILE_CONT). Open interval (0,100);
- * optional (ignored by every other aggregate). Present on the top-level
- * aggregation and on each extraMeasures entry so a multi-measure combo can mix
- * percentiles at different ranks.
+ * Percentile point for aggregate === 'percentile' (human scale 0-100,
+ * exclusive of the bounds). Optional at the schema level so the other
+ * aggregates don't have to send it; the BE coerces it to a 0<p<1 SQL
+ * fraction and rejects out-of-range values with a typed AggregationError.
  */
-const percentileSchema = z.number().gt(0).lt(100).optional();
+const aggregationPercentileSchema = z
+  .number({ message: 'validation.analyses.run.aggregation.percentileInvalid' })
+  .gt(0, { message: 'validation.analyses.run.aggregation.percentileInvalid' })
+  .lt(100, { message: 'validation.analyses.run.aggregation.percentileInvalid' })
+  .optional();
 
 export const runAggregationSchema = z.object({
   aggregate: z.enum(AGGREGATE_VALUES, {
@@ -563,7 +571,8 @@ export const runAggregationSchema = z.object({
   }),
   dimensionColumn: aggregationColumnSchema,
   measureColumn: aggregationColumnSchema,
-  percentile: percentileSchema,
+  // Only meaningful when aggregate === 'percentile'.
+  percentile: aggregationPercentileSchema,
   extraMeasures: z
     .array(
       z.object({
@@ -572,7 +581,8 @@ export const runAggregationSchema = z.object({
           message: 'validation.analyses.run.aggregation.invalid',
         }),
         alias: aggregationColumnSchema,
-        percentile: percentileSchema,
+        // Only meaningful when aggregate === 'percentile'.
+        percentile: aggregationPercentileSchema,
       }),
     )
     .optional(),
@@ -589,8 +599,9 @@ export const runAnalysisQuerySchema = z.object({
   paramValues: z.record(z.string(), z.any()).optional(),
   // Track D: optional server-side aggregation for the visual being previewed.
   aggregation: runAggregationSchema.optional(),
-  // Feature B: optional pivot totals / subtotals config a table / pivot visual
-  // attaches so the run appends grand-total + per-group subtotal rows.
+  // Feature B: optional pivot/table totals config. When present, the run
+  // appends grand-total + per-group subtotal rows to the response meta
+  // (computed in application code over the already-aggregated result set).
   pivotTotals: pivotTotalsConfigSchema.optional(),
   // Advanced-analytics run specs (Wave 1): table calculations, time-
   // intelligence transforms and the date-spine config applied to this run.
@@ -896,6 +907,35 @@ export const updateRlsRuleSchema = z
   })
   .superRefine(refineRlsOperatorValues);
 export type UpdateRlsRuleInput = z.infer<typeof updateRlsRuleSchema>;
+
+// ── Distinct field values schemas (body) ────────────────────────────
+
+export const getDistinctFieldValuesSchema = z.object({
+  fieldName: z
+    .string({ message: 'validation.analyses.fieldName.required' })
+    .trim()
+    .min(1, { message: 'validation.analyses.fieldName.required' })
+    .max(256, { message: 'validation.analyses.fieldName.tooLong' }),
+  search: z.string().max(256).optional(),
+  page: z.coerce.number().int().min(1).optional(),
+  pageSize: z.coerce.number().int().min(1).max(500).optional(),
+});
+
+export type GetDistinctFieldValuesInput = z.infer<
+  typeof getDistinctFieldValuesSchema
+>;
+
+// ── List schemas (query params) ──────────────────────────────────────
+
+export const listAnalysesSchema = z.object({
+  datasourceId: z.string().optional(),
+  page: z.coerce.number().int().min(1).optional(),
+  limit: z.coerce.number().int().min(1).max(1000).optional(),
+  filter: z.string().trim().optional(),
+  sort: z.string().optional(),
+});
+
+export type ListAnalysesInput = z.infer<typeof listAnalysesSchema>;
 
 // ── Dashboard publish field schemas (used directly by FE form) ─────
 

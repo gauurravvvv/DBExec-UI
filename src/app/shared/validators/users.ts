@@ -146,3 +146,85 @@ export const updateUserSchema = z.object({
 });
 
 export type UpdateUserInput = z.infer<typeof updateUserSchema>;
+
+// ── Bulk user import/CSV schemas ──────────────────────────────────────────
+
+/**
+ * BulkAddUserValidate — per-row schema from CSV upload.
+ * groupNames is a pipe-separated string (user input), resolved to groupIds
+ * after validation. Both the users and system-users modules reuse this.
+ */
+export const bulkUserRowSchema = z
+  .object({
+    email: emailSchema,
+    username: usernameSchema,
+    fullName: fullNameSchema,
+    groupNames: z
+      .string({ message: 'validation.users.groupNames.required' })
+      .trim()
+      .min(1, { message: 'validation.users.groupNames.required' }),
+    locale: localeSchema,
+  })
+  .strict();
+
+export type BulkUserRow = z.infer<typeof bulkUserRowSchema>;
+
+/**
+ * BulkAddUserCommit — the list of fully-resolved users to create.
+ * Each entry has groupIds (not groupNames) resolved from the validate step.
+ * The schema trusts the shape so the controller can proceed to DB writes.
+ */
+export const bulkUserEntrySchema = z
+  .object({
+    row: z.number({ message: 'validation.users.row.required' }).int().min(1),
+    email: emailSchema,
+    username: usernameSchema,
+    fullName: fullNameSchema,
+    groupIds: z
+      .array(
+        z
+          .string({ message: 'validation.users.groupIds.idInvalid' })
+          .regex(UUID_PATTERN, { message: 'validation.users.groupIds.idInvalid' }),
+        { message: 'validation.users.groupIds.required' },
+      )
+      .min(1, { message: 'validation.users.groupIds.required' }),
+    groupNames: z.array(z.string()).optional(),
+    locale: localeSchema,
+  })
+  .strict();
+
+export type BulkUserEntry = z.infer<typeof bulkUserEntrySchema>;
+
+export const bulkAddUserCommitSchema = z.object({
+  users: z
+    .array(bulkUserEntrySchema, { message: 'validation.users.users.required' })
+    .min(1, { message: 'validation.users.users.min' })
+    .max(500, { message: 'validation.users.users.max' }),
+});
+
+export type BulkAddUserCommitInput = z.infer<typeof bulkAddUserCommitSchema>;
+
+// ── List user query schema ──────────────────────────────────────────────
+
+export const listUserQuerySchema = z.object({
+  groupId: z.string().optional(),
+  page: z.coerce.number().int().min(1).optional(),
+  limit: z.coerce.number().int().min(1).max(1000).optional(),
+  filter: z.string().optional(),
+  sort: z.string().optional(),
+  excludeSelf: z.coerce.boolean().default(false),
+});
+
+export type ListUserQuery = z.infer<typeof listUserQuerySchema>;
+
+// ── Update password schema ──────────────────────────────────────────────
+
+export const updatePasswordSchema = z.object({
+  id: z
+    .string({ message: 'validation.common.id.required' })
+    .trim()
+    .regex(UUID_PATTERN, { message: 'validation.common.id.invalid' }),
+  newPassword: z.string({ message: 'validation.users.newPassword.required' }).min(1),
+});
+
+export type UpdatePasswordInput = z.infer<typeof updatePasswordSchema>;

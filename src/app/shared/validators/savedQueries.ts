@@ -87,3 +87,14 @@ export const updateSavedQuerySchema = addSavedQuerySchema;
 
 export type AddSavedQueryInput = z.infer<typeof addSavedQuerySchema>;
 export type UpdateSavedQueryInput = z.infer<typeof updateSavedQuerySchema>;
+
+// ── List schemas (query params) ──────────────────────────────────────
+
+export const listSavedQueriesSchema = z.object({
+  page: z.coerce.number().int().min(1).optional(),
+  limit: z.coerce.number().int().min(1).max(1000).optional(),
+  filter: z.string().trim().optional(),
+  sort: z.string().optional(),
+});
+
+export type ListSavedQueriesInput = z.infer<typeof listSavedQueriesSchema>;

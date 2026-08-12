@@ -363,7 +363,9 @@
     "LOADING_PROFILE": "Chargement du profil...",
     "ROLE_SYSTEM_ADMIN": "Administrateur système",
     "ROLE_ORG_ADMIN": "Administrateur d'organisation",
-    "ROLE_ORG_USER": "Utilisateur"
+    "ROLE_ORG_USER": "Utilisateur",
+    "PREFERENCES": "Préférences",
+    "SHOW_TOUR_TOGGLE": "Afficher la visite guidée à la connexion"
   },
   "SYSTEM_ADMIN": {
     "TITLE": "Administrateurs système",
@@ -4071,32 +4073,32 @@
         "tooLong": "La description ne doit pas dépasser 500 caractères"
       },
       "dbHost": {
-        "required": "L'hôte de la base de données est obligatoire",
+        "required": "L'hôte de la base de données est requis",
         "tooLong": "L'hôte de la base de données ne doit pas dépasser 255 caractères",
-        "invalid": "L'hôte de la base de données doit être un nom d'hôte valide ou une adresse IPv4"
+        "invalid": "L'hôte de la base de données doit être un nom d'hôte ou une adresse IP valide"
       },
       "dbPort": {
-        "required": "Le port de la base de données est obligatoire",
+        "required": "Le port de la base de données est requis",
         "notInteger": "Le port de la base de données doit être un nombre entier",
-        "outOfRange": "Le port de la base de données doit être compris entre 1 et 65535"
+        "outOfRange": "Le port de la base de données doit être entre 1 et 65535"
       },
       "dbName": {
-        "required": "Le nom de la base de données est obligatoire",
+        "required": "Le nom de la base de données est requis",
         "tooLong": "Le nom de la base de données ne doit pas dépasser 63 caractères",
-        "invalid": "Le nom de la base de données doit commencer par une lettre ou un tiret bas et ne peut contenir que des lettres, des chiffres, des tirets bas ou des tirets"
+        "invalid": "Le nom de la base de données doit commencer par une lettre ou un tiret bas et contenir uniquement des lettres, des chiffres, des tirets bas et des tirets"
       },
       "dbSchema": {
-        "required": "Le nom du schéma est obligatoire",
+        "required": "Le nom du schéma est requis",
         "tooLong": "Le nom du schéma ne doit pas dépasser 63 caractères",
-        "invalid": "Le nom du schéma doit commencer par une lettre minuscule ou un tiret bas et ne peut contenir que des lettres minuscules, des chiffres ou des tirets bas"
+        "invalid": "Le nom du schéma doit être en minuscules et contenir uniquement des lettres, des chiffres et des tirets bas"
       },
       "dbUsername": {
-        "required": "Le nom d'utilisateur de la base de données est obligatoire",
+        "required": "Le nom d'utilisateur de la base de données est requis",
         "tooLong": "Le nom d'utilisateur de la base de données ne doit pas dépasser 128 caractères",
-        "invalid": "Le nom d'utilisateur de la base de données doit commencer par une lettre ou un tiret bas et ne peut contenir que des lettres, des chiffres, des tirets bas ou des tirets"
+        "invalid": "Le nom d'utilisateur de la base de données doit commencer par une lettre ou un tiret bas et contenir uniquement des lettres, des chiffres, des tirets bas et des tirets"
       },
       "dbPassword": {
-        "required": "Le mot de passe de la base de données est obligatoire",
+        "required": "Le mot de passe de la base de données est requis",
         "tooLong": "Le mot de passe de la base de données ne doit pas dépasser 256 caractères"
       },
       "adminEmail": {
@@ -4134,10 +4136,18 @@
     },
     "common": {
       "id": {
-        "invalid": "Identifiant non valide"
+        "invalid": "Identifiant non valide",
+        "required": "L'identifiant est requis"
       },
       "status": {
         "invalid": "Le statut doit être 0 ou 1"
+      },
+      "sort": {
+        "field": "Champ de tri non valide",
+        "order": "L'ordre de tri doit être asc ou desc",
+        "json": "Le tri doit être un tableau JSON valide",
+        "max": "Trop de champs de tri",
+        "unique": "Champ de tri en double"
       }
     },
     "users": {
@@ -4174,6 +4184,20 @@
         "tooShort": "Le nom complet doit comporter au moins 2 caractères",
         "tooLong": "Le nom complet ne doit pas dépasser 60 caractères",
         "invalid": "Le nom complet doit commencer par une lettre et ne peut contenir que des lettres, tirets, apostrophes ou espaces"
+      },
+      "groupNames": {
+        "required": "Au moins un groupe doit être spécifié"
+      },
+      "row": {
+        "required": "Le numéro de ligne est requis"
+      },
+      "users": {
+        "required": "La liste des utilisateurs est requise",
+        "min": "Aucun utilisateur à créer",
+        "max": "Impossible de créer plus de 500 utilisateurs dans une seule demande"
+      },
+      "newPassword": {
+        "required": "Le nouveau mot de passe est requis"
       }
     },
     "roles": {
@@ -4190,6 +4214,9 @@
       "permissions": {
         "required": "Au moins une autorisation doit être sélectionnée",
         "entryInvalid": "Une entrée d'autorisation est invalide"
+      },
+      "filter": {
+        "type": "Le filtre doit être une chaîne"
       }
     },
     "groups": {
@@ -4205,7 +4232,8 @@
       },
       "roleId": {
         "required": "Un rôle doit être sélectionné",
-        "invalid": "Le rôle sélectionné n'est pas valide"
+        "invalid": "Le rôle sélectionné n'est pas valide",
+        "type": "L'ID de rôle doit être une chaîne"
       },
       "users": {
         "idInvalid": "Un ou plusieurs identifiants d'utilisateur sont invalides"
@@ -4316,6 +4344,12 @@
       },
       "justification": {
         "tooLong": "La justification ne doit pas dépasser 500 caractères"
+      },
+      "schema": {
+        "required": "Le nom du schéma est requis"
+      },
+      "table": {
+        "required": "Le nom du tableau est requis"
       }
     },
     "connections": {
@@ -4389,6 +4423,13 @@
         "type": {
           "invalid": "Type d'invite invalide"
         }
+      },
+      "page": {
+        "invalid": "Le numéro de page doit être au moins 1"
+      },
+      "limit": {
+        "invalid": "La limite doit être au moins 1",
+        "tooLarge": "La limite ne doit pas dépasser 1000 éléments"
       }
     },
     "analyses": {
@@ -4495,6 +4536,10 @@
           "required": "Le nom du tableau de bord est obligatoire",
           "tooLong": "Le nom du tableau de bord ne doit pas dépasser 255 caractères"
         }
+      },
+      "fieldName": {
+        "required": "Le nom du champ est requis",
+        "tooLong": "Le nom du champ ne doit pas dépasser 256 caractères"
       }
     },
     "folders": {
@@ -4684,6 +4729,406 @@
         "format": {
           "invalid": "Format d'export non pris en charge"
         }
+      }
+    },
+    "aiWorkspace": {
+      "confirm": {
+        "endpoint": {
+          "required": "Le point de terminaison est requis",
+          "tooLong": "Le point de terminaison doit faire 256 caractères ou moins"
+        },
+        "method": {
+          "required": "La méthode HTTP est requise",
+          "invalid": "La méthode HTTP doit être POST, PUT ou DELETE"
+        },
+        "payload": {
+          "required": "La charge utile est requise"
+        },
+        "proposalId": {
+          "invalid": "L'ID de proposition n'est pas valide",
+          "tooLong": "L'ID de proposition doit faire 128 caractères ou moins"
+        }
+      },
+      "config": {
+        "aiProvider": {
+          "tooLong": "Le fournisseur doit faire 32 caractères ou moins"
+        },
+        "aiConnectionStyle": {
+          "invalid": "Le style de connexion doit être 'anthropic' ou 'openai'"
+        },
+        "aiBaseUrl": {
+          "invalid": "L'URL de base doit être une URL HTTP ou HTTPS valide",
+          "tooLong": "L'URL de base doit faire 512 caractères ou moins"
+        },
+        "aiModelId": {
+          "tooLong": "L'ID du modèle doit faire 128 caractères ou moins"
+        },
+        "aiTemperature": {
+          "invalid": "La température doit être un nombre entre 0 et 1"
+        },
+        "aiApiKey": {
+          "tooLong": "La clé API doit faire 4096 caractères ou moins"
+        },
+        "aiMaxTokens": {
+          "invalid": "Le nombre maximal de tokens doit être un entier entre 1 et 200000"
+        },
+        "aiTimeoutMs": {
+          "invalid": "Le délai d'attente doit être un entier entre 1000 et 600000 millisecondes"
+        },
+        "aiApiVersion": {
+          "tooLong": "La version de l'API doit faire 32 caractères ou moins"
+        },
+        "aiExtraHeaders": {
+          "tooLong": "Les en-têtes supplémentaires doivent faire 4096 caractères ou moins",
+          "invalid": "Les en-têtes supplémentaires doivent être un objet JSON valide"
+        },
+        "atLeastOneField": "Au moins un champ de configuration est requis"
+      }
+    },
+    "branding": {
+      "showWatermark": {
+        "required": "Le paramètre de filigrane est requis"
+      },
+      "watermarkText": {
+        "required": "Le texte du filigrane est requis quand activé",
+        "tooShort": "Le texte du filigrane doit faire au moins 3 caractères",
+        "tooLong": "Le texte du filigrane doit faire 30 caractères ou moins"
+      },
+      "watermarkBgColor": {
+        "invalid": "La couleur de fond doit être un code hexadécimal valide (#rgb ou #rrggbb)",
+        "required": "La couleur de fond est requise quand le filigrane est activé"
+      },
+      "watermarkTextColor": {
+        "invalid": "La couleur du texte doit être un code hexadécimal valide (#rgb ou #rrggbb)",
+        "required": "La couleur du texte est requise quand le filigrane est activé"
+      },
+      "preset": {
+        "name": {
+          "required": "Le nom de la présélection est requis",
+          "tooLong": "Le nom de la présélection doit faire 80 caractères ou moins"
+        },
+        "description": {
+          "tooLong": "La description doit faire 200 caractères ou moins"
+        },
+        "showWatermark": {
+          "required": "Le paramètre de filigrane est requis"
+        },
+        "watermarkText": {
+          "required": "Le texte du filigrane est requis quand activé",
+          "tooShort": "Le texte du filigrane doit faire au moins 3 caractères",
+          "tooLong": "Le texte du filigrane doit faire 30 caractères ou moins"
+        },
+        "watermarkBgColor": {
+          "invalid": "La couleur de fond doit être un code hexadécimal valide (#rgb ou #rrggbb)",
+          "required": "La couleur de fond est requise quand le filigrane est activé"
+        },
+        "watermarkTextColor": {
+          "invalid": "La couleur du texte doit être un code hexadécimal valide (#rgb ou #rrggbb)",
+          "required": "La couleur du texte est requise quand le filigrane est activé"
+        }
+      }
+    },
+    "theme": {
+      "primary": {
+        "invalid": "La couleur principale doit être un code hexadécimal valide (#rgb ou #rrggbb)"
+      },
+      "primaryHover": {
+        "invalid": "La couleur au survol doit être un code hexadécimal valide (#rgb ou #rrggbb)"
+      },
+      "primaryLight": {
+        "invalid": "La teinte claire doit être un code hexadécimal valide (#rgb ou #rrggbb)"
+      },
+      "primaryText": {
+        "invalid": "La couleur du texte doit être 'white', 'black' ou un code hexadécimal valide"
+      },
+      "atLeastOneField": "Au moins un champ de couleur est requis",
+      "preset": {
+        "name": {
+          "required": "Le nom de la présélection est requis",
+          "tooLong": "Le nom de la présélection doit faire 80 caractères ou moins"
+        },
+        "description": {
+          "tooLong": "La description doit faire 200 caractères ou moins"
+        },
+        "colors": {
+          "required": "La carte de couleurs est requise"
+        },
+        "atLeastOneField": "Au moins un champ est requis"
+      }
+    },
+    "announcements": {
+      "name": {
+        "required": "Le nom de l'annonce est requis",
+        "tooLong": "Le nom de l'annonce ne doit pas dépasser 255 caractères"
+      },
+      "description": {
+        "required": "La description est requise",
+        "tooLong": "La description ne doit pas dépasser 2000 caractères"
+      },
+      "startTime": {
+        "invalid": "L'heure de début doit être une date/heure ISO valide"
+      },
+      "endTime": {
+        "invalid": "L'heure de fin doit être une date/heure ISO valide",
+        "afterStart": "L'heure de fin doit être après l'heure de début"
+      },
+      "bgColor": {
+        "invalid": "La couleur de fond doit être une couleur hexadécimale valide"
+      },
+      "textColor": {
+        "invalid": "La couleur du texte doit être une couleur hexadécimale valide"
+      },
+      "status": {
+        "invalid": "Le statut doit être 0 ou 1"
+      }
+    },
+    "dashboards": {
+      "fieldName": {
+        "required": "Le nom du champ est requis",
+        "tooShort": "Le nom du champ doit faire au moins 1 caractère",
+        "tooLong": "Le nom du champ ne doit pas dépasser 256 caractères"
+      },
+      "search": {
+        "tooLong": "Le terme de recherche ne doit pas dépasser 256 caractères"
+      },
+      "page": {
+        "invalid": "Le numéro de page doit être au moins 1"
+      },
+      "pageSize": {
+        "invalid": "La taille de page doit être au moins 1",
+        "tooLarge": "La taille de page ne doit pas dépasser 500 éléments"
+      },
+      "limit": {
+        "invalid": "La limite doit être au moins 1",
+        "tooLarge": "La limite ne doit pas dépasser 1000 éléments"
+      },
+      "sourceAnalysisId": {
+        "invalid": "L'ID d'analyse doit être un UUID valide"
+      }
+    },
+    "auditLogs": {
+      "page": {
+        "invalid": "Le numéro de page doit être au moins 1"
+      },
+      "limit": {
+        "invalid": "La limite doit être au moins 1",
+        "tooLarge": "La limite ne doit pas dépasser 1000 éléments"
+      }
+    },
+    "dbAccess": {
+      "dbIdent": {
+        "required": "L'identifiant est requis",
+        "tooLong": "L'identifiant ne doit pas dépasser 63 caractères"
+      },
+      "validUntil": {
+        "tooLong": "Valide jusqu'à ne doit pas dépasser 64 caractères",
+        "invalid": "Valide jusqu'à doit être une date/timestamp valide ou 'infinity'"
+      },
+      "rolePassword": {
+        "tooLong": "Le mot de passe ne doit pas dépasser 512 caractères",
+        "invalid": "Le mot de passe ne doit pas contenir de caractères de contrôle"
+      },
+      "connectionLimit": {
+        "invalid": "La limite de connexion doit être entre -1 et 2147483647"
+      },
+      "backendPid": {
+        "invalid": "Un ID de processus backend valide et positif est requis"
+      },
+      "privilege": {
+        "required": "Le privilège est requis"
+      },
+      "columns": {
+        "required": "Au moins une colonne est requise"
+      },
+      "objectRef": {
+        "required": "La référence d'objet doit contenir parts, allInSchema ou columns"
+      },
+      "objType": {
+        "invalid": "Type d'objet invalide"
+      },
+      "privileges": {
+        "invalid": "Le privilège ne doit pas être vide",
+        "required": "Au moins un privilège est requis"
+      },
+      "kind": {
+        "invalid": "Type d'instruction invalide"
+      },
+      "behavior": {
+        "invalid": "Le comportement doit être RESTRICT ou CASCADE"
+      },
+      "action": {
+        "invalid": "L'action doit être GRANT ou REVOKE"
+      },
+      "onObjectType": {
+        "invalid": "Le type d'objet doit être TABLES, SEQUENCES, FUNCTIONS, TYPES ou SCHEMAS"
+      },
+      "statements": {
+        "required": "Au moins une instruction est requise"
+      },
+      "reassignTo": {
+        "conflict": "Impossible de spécifier à la fois reassignTo et dropOwned"
+      }
+    },
+    "org-policy": {
+      "emailProvider": {
+        "invalid": "Le fournisseur de messagerie doit être SMTP, SES ou null"
+      },
+      "smtpHost": {
+        "invalid": "L'hôte SMTP n'est pas valide",
+        "tooLong": "L'hôte SMTP ne doit pas dépasser 255 caractères"
+      },
+      "smtpPort": {
+        "invalid": "Le port SMTP doit être un entier entre 1 et 65535"
+      },
+      "smtpUser": {
+        "invalid": "L'utilisateur SMTP n'est pas valide",
+        "tooLong": "L'utilisateur SMTP ne doit pas dépasser 255 caractères"
+      },
+      "smtpPassword": {
+        "invalid": "Le mot de passe SMTP n'est pas valide",
+        "tooLong": "Le mot de passe SMTP ne doit pas dépasser 1024 caractères"
+      },
+      "smtpFrom": {
+        "invalid": "L'adresse SMTP from doit être un email valide"
+      },
+      "sesRegion": {
+        "invalid": "La région SES doit correspondre au modèle xx-xxxx-n (p. ex., us-east-1)",
+        "tooLong": "La région SES ne doit pas dépasser 50 caractères"
+      },
+      "sesAccessKeyId": {
+        "invalid": "L'ID de clé d'accès SES n'est pas valide",
+        "tooShort": "L'ID de clé d'accès SES doit faire au moins 16 caractères",
+        "tooLong": "L'ID de clé d'accès SES ne doit pas dépasser 128 caractères"
+      },
+      "sesSecretAccessKey": {
+        "invalid": "La clé d'accès secrète SES n'est pas valide",
+        "tooLong": "La clé d'accès secrète SES ne doit pas dépasser 1024 caractères"
+      },
+      "sesFrom": {
+        "invalid": "L'adresse SES from doit être un email valide"
+      },
+      "maxLoginAttempts": {
+        "invalid": "Le nombre maximal de tentatives de connexion doit être un entier entre 3 et 10"
+      },
+      "accountLockDurationHours": {
+        "invalid": "La durée du verrouillage du compte doit être entre 0 et 24 heures"
+      },
+      "passwordHistoryLimit": {
+        "invalid": "La limite d'historique des mots de passe doit être un entier entre 1 et 24"
+      },
+      "sessionInactivityTimeout": {
+        "invalid": "Le délai d'inactivité de session doit être un entier entre 5 et 1440 minutes"
+      },
+      "ssoEnabled": {
+        "invalid": "SSO enabled doit être un booléen"
+      },
+      "ssoIssuer": {
+        "invalid": "L'émetteur SSO n'est pas valide",
+        "tooLong": "L'émetteur SSO ne doit pas dépasser 255 caractères"
+      },
+      "ssoEntryPoint": {
+        "invalid": "Le point d'entrée SSO doit être une URL HTTP ou HTTPS valide",
+        "tooLong": "Le point d'entrée SSO ne doit pas dépasser 2048 caractères"
+      },
+      "ssoCertificate": {
+        "invalid": "Le certificat SSO n'est pas valide",
+        "tooLong": "Le certificat SSO ne doit pas dépasser 16384 caractères"
+      },
+      "ssoConfig": {
+        "atLeastOne": "Au moins un champ de configuration SSO doit être fourni"
+      }
+    },
+    "profile": {
+      "newPassword": {
+        "required": "Le nouveau mot de passe est requis",
+        "tooShort": "Le mot de passe doit faire au moins 8 caractères",
+        "tooLong": "Le mot de passe ne doit pas dépasser 128 caractères",
+        "noSpaces": "Le mot de passe ne doit pas contenir d'espaces",
+        "lowercase": "Le mot de passe doit contenir au moins une lettre minuscule",
+        "uppercase": "Le mot de passe doit contenir au moins une lettre majuscule",
+        "digit": "Le mot de passe doit contenir au moins un chiffre",
+        "special": "Le mot de passe doit contenir au moins un caractère spécial (@$!%*?&)"
+      },
+      "locale": {
+        "invalid": "La locale doit être l'une des langues prises en charge"
+      },
+      "showTour": {
+        "invalid": "Show tour doit être une valeur booléenne"
+      }
+    },
+    "prompts": {
+      "name": {
+        "required": "Le nom de l'invite est requis",
+        "tooShort": "Le nom de l'invite doit faire au moins 2 caractères",
+        "tooLong": "Le nom de l'invite ne doit pas dépasser 64 caractères",
+        "invalid": "Le nom de l'invite doit commencer par une lettre ou un chiffre et ne peut contenir que des lettres, des chiffres, des espaces, des points, des tirets bas et des tirets"
+      },
+      "type": {
+        "invalid": "Type d'invite invalide"
+      },
+      "description": {
+        "tooShort": "La description doit faire au moins 2 caractères",
+        "tooLong": "La description ne doit pas dépasser 500 caractères"
+      },
+      "datasource": {
+        "required": "La source de données est requise",
+        "invalid": "La source de données doit être un UUID valide"
+      },
+      "status": {
+        "invalid": "Le statut doit être 0 ou 1"
+      },
+      "prompts": {
+        "required": "Au moins une invite est requise"
+      },
+      "ids": {
+        "required": "Au moins une invite doit être sélectionnée"
+      }
+    },
+    "queryBuilders": {
+      "name": {
+        "required": "Le nom du générateur de requêtes est requis",
+        "tooShort": "Le nom du générateur de requêtes doit faire au moins 2 caractères",
+        "tooLong": "Le nom du générateur de requêtes ne doit pas dépasser 64 caractères",
+        "invalid": "Le nom du générateur de requêtes doit commencer par une lettre ou un chiffre et ne peut contenir que des lettres, des chiffres, des espaces, des points, des tirets bas et des tirets"
+      },
+      "description": {
+        "tooShort": "La description doit faire au moins 2 caractères",
+        "tooLong": "La description ne doit pas dépasser 500 caractères"
+      },
+      "datasource": {
+        "required": "La source de données est requise",
+        "invalid": "La source de données doit être un UUID valide"
+      },
+      "status": {
+        "invalid": "Le statut doit être 0 ou 1"
+      },
+      "ids": {
+        "required": "Au moins un générateur de requêtes doit être sélectionné"
+      }
+    },
+    "analysisFilters": {
+      "parentConstraints": {
+        "column": {
+          "required": "Le nom de colonne de contrainte parente est requis",
+          "invalid": "La colonne de contrainte parente doit être un identifiant valide"
+        },
+        "values": {
+          "tooMany": "Les valeurs de contrainte parente ne doivent pas dépasser 1000 éléments",
+          "required": "Les valeurs de contrainte parente doivent contenir au moins un élément"
+        },
+        "tooMany": "Les contraintes parentes ne doivent pas dépasser 20 éléments"
+      },
+      "filterId": {
+        "invalid": "L'ID de filtre doit être un UUID valide"
+      },
+      "analysisId": {
+        "invalid": "L'ID d'analyse doit être un UUID valide"
+      },
+      "mode": {
+        "invalid": "Le mode doit être 'open' ou 'fetch'"
+      },
+      "requests": {
+        "required": "Le tableau des demandes doit contenir au moins un élément en mode fetch"
       }
     }
   },
@@ -5880,5 +6325,147 @@
     "STARTER_USERS_COUNT": "Combien d’utilisateurs avons-nous ?",
     "STARTER_USERS_CREATE": "Crée un utilisateur dans le groupe Administrator",
     "STARTER_USERS_INACTIVE": "Quels utilisateurs sont inactifs ?"
+  },
+  "TOUR": {
+    "NEXT": "Suivant",
+    "BACK": "Retour",
+    "FINISH": "Terminer",
+    "SKIP": "Ignorer",
+    "DONT_SHOW_AGAIN": "Ne plus afficher",
+    "PROGRESS": "Étape {{current}} sur {{total}}",
+    "WELCOME": {
+      "TITLE": "Bienvenue dans DBExec 👋",
+      "DESC": "Voici un aperçu rapide de ce que vous pouvez faire. Vous pouvez arrêter à tout moment et cocher « Ne plus afficher » pour le passer aux prochaines connexions."
+    },
+    "DONE": {
+      "TITLE": "Tout est prêt 🎉",
+      "DESC": "C'est la fin de la visite. Explorez à votre rythme — vous pouvez la réactiver à tout moment depuis votre profil."
+    },
+    "STEPS": {
+      "search": {
+        "TITLE": "Recherche globale",
+        "DESC": "Accédez à tout rapidement. Recherchez vos datasets, tableaux de bord, connexions et plus — ou appuyez sur Ctrl/⌘ + K partout."
+      },
+      "notifications": {
+        "TITLE": "Notifications",
+        "DESC": "Alertes, partages et messages système arrivent ici en temps réel. Le badge indique les non-lus."
+      },
+      "language": {
+        "TITLE": "Changer de langue",
+        "DESC": "Vous préférez une autre langue ? Choisissez parmi dix langues ici — l'app se met à jour instantanément et votre choix est mémorisé."
+      },
+      "logout": {
+        "TITLE": "Se déconnecter",
+        "DESC": "Quand vous avez terminé, déconnectez-vous en toute sécurité ici. Votre session se termine et vous revenez à l'écran de connexion."
+      },
+      "systemAdmin": {
+        "TITLE": "Administration système",
+        "DESC": "Administration au niveau de la plateforme pour les opérateurs qui gèrent DBExec entre organisations."
+      },
+      "orgManagement": {
+        "TITLE": "Organisations",
+        "DESC": "Créez et gérez les organisations (locataires) de la plateforme."
+      },
+      "systemRoleManagement": {
+        "TITLE": "Rôles système",
+        "DESC": "Définissez des rôles au niveau de la plateforme et leurs autorisations."
+      },
+      "systemGroupManagement": {
+        "TITLE": "Groupes système",
+        "DESC": "Regroupez les opérateurs et attribuez des rôles système en masse."
+      },
+      "systemUserManagement": {
+        "TITLE": "Utilisateurs système",
+        "DESC": "Gérez les comptes opérateurs qui exécutent DBExec."
+      },
+      "home": {
+        "TITLE": "Accueil",
+        "DESC": "Votre point de départ — un aperçu rapide et des raccourcis vers tout."
+      },
+      "userManagement": {
+        "TITLE": "Utilisateurs",
+        "DESC": "Invitez des personnes dans votre organisation et gérez leurs comptes et accès."
+      },
+      "roleManagement": {
+        "TITLE": "Rôles",
+        "DESC": "Définissez des rôles et choisissez les écrans et actions que chacun débloque."
+      },
+      "groupManagement": {
+        "TITLE": "Groupes",
+        "DESC": "Regroupez des utilisateurs et accordez des rôles à tout le groupe."
+      },
+      "setupDB": {
+        "TITLE": "Sources de données",
+        "DESC": "Connectez les bases lues par DBExec — Postgres, MySQL, Snowflake et plus."
+      },
+      "dbRoles": {
+        "TITLE": "Rôles de base de données",
+        "DESC": "Gérez les utilisateurs de connexion et rôles dans vos bases connectées."
+      },
+      "dbPrivileges": {
+        "TITLE": "Privilèges et accès",
+        "DESC": "Accordez et vérifiez les privilèges au niveau table et schéma."
+      },
+      "connectionManager": {
+        "TITLE": "Connexions",
+        "DESC": "Gérez les connexions utilisées pour exécuter du SQL sur vos sources."
+      },
+      "queryRunner": {
+        "TITLE": "Espace SQL",
+        "DESC": "Écrivez et exécutez du SQL avec autocomplétion, requêtes enregistrées et résultats en direct."
+      },
+      "queryBuilderTab": {
+        "TITLE": "Onglets",
+        "DESC": "Organisez les écrans du générateur de requêtes en onglets."
+      },
+      "queryBuilderSection": {
+        "TITLE": "Sections",
+        "DESC": "Regroupez des prompts liés en sections dans un écran."
+      },
+      "queryBuilderPrompt": {
+        "TITLE": "Prompts",
+        "DESC": "Concevez les prompts d'entrée pour des requêtes paramétrées sans code."
+      },
+      "queryBuilderScreen": {
+        "TITLE": "Générateur de requêtes",
+        "DESC": "Assemblez onglets, sections et prompts en écrans guidés sans code."
+      },
+      "datasetManager": {
+        "TITLE": "Datasets",
+        "DESC": "Modélisez des datasets réutilisables — colonnes, champs calculés et formules."
+      },
+      "analyses": {
+        "TITLE": "Analyses",
+        "DESC": "Créez des graphiques et des analyses visuelles à partir de vos datasets."
+      },
+      "dashboard": {
+        "TITLE": "Tableaux de bord",
+        "DESC": "Combinez des visuels en tableaux de bord partageables et publiez des instantanés."
+      },
+      "rlsRules": {
+        "TITLE": "Règles RLS",
+        "DESC": "Définissez la sécurité par ligne et colonne pour que chacun ne voie que ses données."
+      },
+      "alertManagement": {
+        "TITLE": "Alertes",
+        "DESC": "Planifiez des vérifications de données qui vous notifient quand une condition est remplie."
+      },
+      "auditLogs": {
+        "TITLE": "Journaux d'audit",
+        "DESC": "Consultez l'historique complet de qui a modifié quoi et quand."
+      },
+      "loginActivity": {
+        "TITLE": "Activité de connexion",
+        "DESC": "Suivez les connexions et événements d'authentification pour la sécurité."
+      },
+      "appSettings": {
+        "TITLE": "Paramètres de l'app",
+        "DESC": "Ajustez l'apparence — thème, image de marque et annonces."
+      },
+      "systemSettings": {
+        "TITLE": "Paramètres système",
+        "DESC": "Configurez la sécurité, le SSO, l'e-mail et les fonctions IA."
+      }
+    }
   }
 }

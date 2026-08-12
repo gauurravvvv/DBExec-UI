@@ -136,6 +136,22 @@
               }}</span>
             </div>
           </div>
+
+          <!-- Preferences -->
+          <div class="info-group">
+            <h4>{{ 'PROFILE.PREFERENCES' | translate }}</h4>
+            <div class="detail-row tour-pref-row">
+              <span class="label"
+                ><i class="pi pi-compass"></i>
+                {{ 'PROFILE.SHOW_TOUR_TOGGLE' | translate }}</span
+              >
+              <app-custom-toggle
+                [ngModel]="showTour()"
+                [showStatusLabel]="false"
+                (onChange)="onShowTourChange($event.checked)"
+              ></app-custom-toggle>
+            </div>
+          </div>
         </div>
       </div>
     </div>

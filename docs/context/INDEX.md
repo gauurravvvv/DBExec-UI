@@ -1,6 +1,6 @@
 # DBExec-UI — Context Index
 > Master map of all frontend feature modules. Point any new session at this file first.
-> Last updated: 2026-07-29
+> Last updated: 2026-08-12
 
 ## Snapshot
 - What: Angular web client for DBExec — multi-tenant DB management, query execution & BI. Talks to DBExec-API over REST + WebSocket.
@@ -14,6 +14,7 @@
 | Module | Code path | Context | Status | Last updated |
 |---|---|---|---|---|
 | ai-workspace | `src/app/modules/ai-workspace` | [ai-workspace](./modules/ai-workspace.md) | 🟡 | 2026-07-24 |
+| app-tour | `src/app/core/services/tour.service.ts` | [app-tour](./modules/app-tour.md) | 🟢 | 2026-08-12 |
 | alerts | `src/app/modules/alerts` | [alerts](./modules/alerts.md) | 🟢 | 2026-07-24 |
 | analyses | `src/app/modules/analyses` | [analyses](./modules/analyses.md) | 🟢 | 2026-07-24 |
 | app-settings | `src/app/modules/app-settings` | [app-settings](./modules/app-settings.md) | 🟢 | 2026-08-10 |

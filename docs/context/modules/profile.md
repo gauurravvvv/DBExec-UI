@@ -1,6 +1,6 @@
 # profile
 > Update the Progress log on every change.
-> Code path: `src/app/modules/profile` · Status: 🟢 · Last updated: 2026-07-24
+> Code path: `src/app/modules/profile` · Status: 🟢 · Last updated: 2026-08-12
 
 ## 1. Context
 - **Responsibility:** The logged-in user's own profile — a **thin, read-mostly** module. View-only detail of the current user (name/email/username/org/groups) plus a **Change Password** dialog. No add/edit/list quartet; just one `view-profile` screen.
@@ -19,6 +19,9 @@
 - **Out of scope:** Editing another user (that's `users`); theme/locale preference (theme lives in `theme.service` / App Settings, not per-user here).
 
 ## 3. Progress (newest first)
+### 2026-08-12 — Show-tour preference toggle added
+- Done: `view-profile` gained a "Show product tour on login" toggle (`app-custom-toggle`) under a new Preferences group, backed by `profileService.updateShowTour(bool)` → `PUT /profile/tour`. `getProfile` now returns `showTour`. This is the re-enable path for the guided [app-tour](./app-tour.md). The old "theme/locale preference out of scope" note stands for theme; this per-user tour flag is a legitimate exception (a lightweight boolean, not a config surface).
+- Files touched: view-profile.component.ts/.html, profile.service.ts, docs/context/modules/profile.md
 ### 2026-07-24 — Current state captured
 - Done: View-profile + Change Password dialog wired through a lean signals service. RBAC multi-role cleanup — dropped single-role assumption (3a79eb2b) and role-string gates (a512ff0d). Skeleton-loading + cancellation rollout (66fe8f41). Org-dropdown plumbing removed app-wide (7fa4a2b5).
 - In progress / Known issues: none module-specific. UI commits local-only on `version_261`.

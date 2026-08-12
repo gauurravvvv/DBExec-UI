@@ -45,6 +45,7 @@
         *ngIf="showNotificationBell"
         class="icon-btn notification-btn"
         type="button"
+        data-tour="notifications"
         (click)="openNotificationModal()"
         pTooltip="View notifications"
         tooltipPosition="bottom"
@@ -59,6 +60,7 @@
         *ngIf="!isSystemAdmin"
         class="icon-btn search-btn"
         type="button"
+        data-tour="search"
         (click)="openSearchModal()"
         [pTooltip]="'HEADER.SEARCH' | translate"
         tooltipPosition="bottom"
@@ -81,6 +83,7 @@
           <div
             *ngIf="item.subPermissions?.length"
             class="nav-link expandable"
+            [attr.data-tour]="'nav-' + item.value"
             (click)="toggleSubmenuAndExpand(item)"
             [class.expanded]="item.isExpanded"
             [class.has-active-child]="hasActiveDescendant(item)"
@@ -105,6 +108,7 @@
             [routerLinkActiveOptions]="{ exact: item.exact ?? false }"
             #rla="routerLinkActive"
             [attr.aria-current]="rla.isActive ? 'page' : null"
+            [attr.data-tour]="'nav-' + item.value"
             class="nav-link"
           >
             <div class="link-content">
@@ -177,6 +181,7 @@
   <div class="sidebar-bottom">
     <div
       class="user-profile"
+      data-tour="account"
       (click)="toggleProfileMenu($event)"
       [pTooltip]="isExpanded ? undefined : userName + ' — open account menu'"
       tooltipPosition="right"
@@ -219,6 +224,7 @@
          user can move across the gap.  -->
     <li
       class="menu-item has-flyout"
+      data-tour="language"
       [class.is-open]="showLanguageFlyout"
       (mouseenter)="showLanguageFlyout = true"
       (mouseleave)="showLanguageFlyout = false"
@@ -230,7 +236,7 @@
       </a>
     </li>
     <div class="menu-divider"></div>
-    <li class="menu-item logout">
+    <li class="menu-item logout" data-tour="logout">
       <a (click)="logout()">
         <i class="pi pi-sign-out"></i>
         <span>{{ 'HEADER.SIGN_OUT' | translate }}</span>

@@ -307,3 +307,16 @@ export const updateOrganisationSchema = z.object({
 });
 
 export type UpdateOrganisationInput = z.infer<typeof updateOrganisationSchema>;
+
+/** GET /api/v1/orgs query (list). */
+export const listOrganisationSchema = z.object({
+  page: z.coerce.number().int().min(1).optional(),
+  limit: z.coerce.number().int().min(1).max(1000).optional(),
+  filter: z.preprocess(
+    trimOrUndefined,
+    z.string().optional(),
+  ),
+  sort: z.string().optional(),
+});
+
+export type ListOrganisationInput = z.infer<typeof listOrganisationSchema>;

@@ -44,4 +44,9 @@ export class ProfileService {
       this.http.apiPut(PROFILE.CHANGE_PASSWORD, { newPassword }),
     );
   }
+
+  /** Persist the "show guided tour on login" preference. */
+  updateShowTour(showTour: boolean) {
+    return lastValueFrom(this.http.apiPut(PROFILE.UPDATE_TOUR, { showTour }));
+  }
 }

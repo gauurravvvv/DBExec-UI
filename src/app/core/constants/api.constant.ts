@@ -477,6 +477,7 @@ export const PROFILE = {
   GET: '/profile',
   CHANGE_PASSWORD: '/profile/password',
   UPDATE_LOCALE: '/profile/locale',
+  UPDATE_TOUR: '/profile/tour',
 };
 
 export const DASHBOARD = {

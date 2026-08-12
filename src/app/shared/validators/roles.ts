@@ -114,3 +114,15 @@ export const updateRoleSchema = z.object({
 });
 
 export type UpdateRoleInput = z.infer<typeof updateRoleSchema>;
+
+/** GET /api/v1/roles query (list). */
+export const listRoleSchema = z.object({
+  page: z.coerce.number().int().min(1).optional(),
+  limit: z.coerce.number().int().min(1).optional(),
+  filter: z.preprocess(
+    nullableTrim,
+    z.string().optional(),
+  ),
+});
+
+export type ListRoleInput = z.infer<typeof listRoleSchema>;

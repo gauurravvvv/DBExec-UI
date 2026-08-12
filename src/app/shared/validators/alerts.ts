@@ -278,3 +278,23 @@ export const toggleAlertSchema = z.object({
 export type AddAlertInput = z.infer<typeof addAlertSchema>;
 export type AlertConditionBuilder = z.infer<typeof alertConditionBuilderSchema>;
 export type AlertPredicate = z.infer<typeof alertPredicateSchema>;
+
+// ── List schemas (query params) ──────────────────────────────────────
+
+export const listAlertsSchema = z.object({
+  page: z.coerce.number().int().min(1).optional(),
+  limit: z.coerce.number().int().min(1).max(1000).optional(),
+  filter: z.string().trim().optional(),
+  sort: z.string().optional(),
+});
+
+export type ListAlertsInput = z.infer<typeof listAlertsSchema>;
+
+export const listAlertEventsSchema = z.object({
+  page: z.coerce.number().int().min(1).optional(),
+  limit: z.coerce.number().int().min(1).max(1000).optional(),
+  filter: z.string().trim().optional(),
+  sort: z.string().optional(),
+});
+
+export type ListAlertEventsInput = z.infer<typeof listAlertEventsSchema>;

@@ -1,0 +1,135 @@
+// ================================================================
+// Guided application tour — driver.js theme override.
+//
+// Maps driver.js's popover CSS variables + our `.dbexec-tour` popover class
+// onto the DBExec design tokens so the tour reads as native chrome and picks
+// up each ORGANISATION'S theme automatically: ThemeService rewrites tokens
+// like --primary-color / --card-background per org at runtime, and because
+// everything here is `var(--token)` (no hardcoded colours), a red-themed org
+// gets a red tour, a green-themed org a green tour, etc.
+//
+// Tokens only — no magic numbers — matching the repo's styling rule and the
+// other override files. driver.css must be imported BEFORE this file (it
+// ships the base structure + the CSS vars we override here).
+// ================================================================
+
+:root {
+  // Popover shell — driver.js's own CSS vars, pointed at our tokens.
+  --driver-popover-bg: var(--card-background);
+  --driver-popover-color: var(--text-color);
+  --driver-popover-font-family: var(--font-ui);
+  --driver-popover-progress-text-color: var(--text-muted);
+}
+
+// ── Popover wrapper ──────────────────────────────────────────────
+.driver-popover.dbexec-tour {
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  border: 1px solid var(--border-color);
+  padding: var(--space-6);
+  max-width: 340px;
+
+  .driver-popover-title {
+    font-family: var(--font-ui);
+    font-size: var(--fs-h2);
+    font-weight: var(--fw-semibold);
+    color: var(--text-color);
+    margin-bottom: var(--space-2);
+    line-height: var(--lh-tight);
+  }
+
+  .driver-popover-description {
+    font-family: var(--font-ui);
+    font-size: var(--fs-body);
+    font-weight: var(--fw-regular);
+    color: var(--text-muted);
+    line-height: var(--lh-normal);
+  }
+
+  // Close (X) button — quiet, top-right.
+  .driver-popover-close-btn {
+    color: var(--text-muted);
+    font-size: var(--fs-h2);
+    transition: color 0.15s ease;
+
+    &:hover {
+      color: var(--text-color);
+    }
+  }
+
+  // ── Footer: progress + nav buttons ─────────────────────────────
+  .driver-popover-footer {
+    margin-top: var(--space-5);
+    gap: var(--space-3);
+
+    .driver-popover-progress-text {
+      font-size: var(--fs-label);
+      color: var(--text-muted);
+    }
+
+    button {
+      font-family: var(--font-ui);
+      font-size: var(--fs-control);
+      font-weight: var(--fw-medium);
+      border-radius: var(--radius-md);
+      padding: var(--space-2) var(--space-4);
+      text-shadow: none;
+      transition:
+        background-color 0.15s ease,
+        border-color 0.15s ease,
+        color 0.15s ease;
+    }
+
+    // Previous / Back — secondary (outline) style.
+    .driver-popover-prev-btn {
+      background: transparent;
+      color: var(--text-color);
+      border: 1px solid var(--border-color);
+
+      &:hover {
+        background: var(--hover-background);
+        border-color: var(--border-strong);
+      }
+    }
+
+    // Next / Finish — primary (brand) style. Uses the org's brand tokens.
+    .driver-popover-next-btn {
+      background: var(--primary-color);
+      color: var(--primary-text);
+      border: 1px solid var(--primary-color);
+
+      &:hover {
+        background: var(--primary-hover);
+        border-color: var(--primary-hover);
+      }
+    }
+  }
+
+  // ── Injected "Don't show again" checkbox row ────────────────────
+  .dbexec-tour-dsa {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin-top: var(--space-4);
+    padding-top: var(--space-3);
+    border-top: 1px solid var(--border-color);
+    font-size: var(--fs-label);
+    color: var(--text-muted);
+    cursor: pointer;
+    user-select: none;
+
+    .dbexec-tour-dsa-checkbox {
+      width: var(--space-4);
+      height: var(--space-4);
+      // accent-color paints the checked box in the org's brand colour.
+      accent-color: var(--primary-color);
+      cursor: pointer;
+      margin: 0;
+    }
+  }
+}
+
+// Spotlighted element — subtle rounded ring against the dim backdrop.
+.driver-active-element {
+  border-radius: var(--radius-md);
+}

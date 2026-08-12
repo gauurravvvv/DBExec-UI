@@ -363,7 +363,9 @@
     "LOADING_PROFILE": "Loading profile...",
     "ROLE_SYSTEM_ADMIN": "System Admin",
     "ROLE_ORG_ADMIN": "Organisation Admin",
-    "ROLE_ORG_USER": "User"
+    "ROLE_ORG_USER": "User",
+    "PREFERENCES": "Preferences",
+    "SHOW_TOUR_TOGGLE": "Show product tour on login"
   },
   "SYSTEM_ADMIN": {
     "TITLE": "System Admins",
@@ -4070,7 +4072,7 @@
       "dbHost": {
         "required": "Database host is required",
         "tooLong": "Database host must not exceed 255 characters",
-        "invalid": "Database host must be a valid hostname or IPv4 address"
+        "invalid": "Database host must be a valid hostname or IP address"
       },
       "dbPort": {
         "required": "Database port is required",
@@ -4080,17 +4082,17 @@
       "dbName": {
         "required": "Database name is required",
         "tooLong": "Database name must not exceed 63 characters",
-        "invalid": "Database name must start with a letter or underscore and contain only letters, digits, underscores, or hyphens"
+        "invalid": "Database name must start with a letter or underscore and contain only letters, numbers, underscores, and hyphens"
       },
       "dbSchema": {
         "required": "Schema name is required",
         "tooLong": "Schema name must not exceed 63 characters",
-        "invalid": "Schema name must start with a lowercase letter or underscore and contain only lowercase letters, digits, or underscores"
+        "invalid": "Schema name must be lowercase and contain only letters, numbers, and underscores"
       },
       "dbUsername": {
         "required": "Database username is required",
         "tooLong": "Database username must not exceed 128 characters",
-        "invalid": "Database username must start with a letter or underscore and contain only letters, digits, underscores, or hyphens"
+        "invalid": "Database username must start with a letter or underscore and contain only letters, numbers, underscores, and hyphens"
       },
       "dbPassword": {
         "required": "Database password is required",
@@ -4131,10 +4133,18 @@
     },
     "common": {
       "id": {
-        "invalid": "Invalid identifier"
+        "invalid": "Invalid identifier",
+        "required": "Identifier is required"
       },
       "status": {
         "invalid": "Status must be 0 or 1"
+      },
+      "sort": {
+        "field": "Invalid sort field",
+        "order": "Sort order must be asc or desc",
+        "json": "Sort must be a valid JSON-encoded array",
+        "max": "Too many sort fields",
+        "unique": "Duplicate sort field"
       }
     },
     "users": {
@@ -4171,6 +4181,20 @@
         "tooShort": "Full name must be at least 2 characters",
         "tooLong": "Full name must not exceed 60 characters",
         "invalid": "Full name must start with a letter and contain only letters, hyphens, apostrophes, or spaces"
+      },
+      "groupNames": {
+        "required": "At least one group must be specified"
+      },
+      "row": {
+        "required": "Row number is required"
+      },
+      "users": {
+        "required": "Users list is required",
+        "min": "No users to create",
+        "max": "Cannot create more than 500 users in a single request"
+      },
+      "newPassword": {
+        "required": "New password is required"
       }
     },
     "roles": {
@@ -4187,6 +4211,9 @@
       "permissions": {
         "required": "At least one permission must be selected",
         "entryInvalid": "A permission entry is malformed"
+      },
+      "filter": {
+        "type": "Filter must be a string"
       }
     },
     "savedQueries": {
@@ -4228,7 +4255,8 @@
       },
       "roleId": {
         "required": "A role must be selected",
-        "invalid": "Selected role is invalid"
+        "invalid": "Selected role is invalid",
+        "type": "Role ID must be a string"
       },
       "users": {
         "idInvalid": "One or more user identifiers are invalid"
@@ -4339,6 +4367,12 @@
       },
       "justification": {
         "tooLong": "Justification must not exceed 500 characters"
+      },
+      "schema": {
+        "required": "Schema name is required"
+      },
+      "table": {
+        "required": "Table name is required"
       }
     },
     "connections": {
@@ -4412,6 +4446,13 @@
         "type": {
           "invalid": "Invalid prompt type"
         }
+      },
+      "page": {
+        "invalid": "Page number must be at least 1"
+      },
+      "limit": {
+        "invalid": "Limit must be at least 1",
+        "tooLarge": "Limit must not exceed 1000 items"
       }
     },
     "analyses": {
@@ -4518,6 +4559,10 @@
           "required": "Dashboard name is required",
           "tooLong": "Dashboard name must not exceed 255 characters"
         }
+      },
+      "fieldName": {
+        "required": "Field name is required",
+        "tooLong": "Field name must not exceed 256 characters"
       }
     },
     "folders": {
@@ -4681,6 +4726,406 @@
         "format": {
           "invalid": "Unsupported export format"
         }
+      }
+    },
+    "aiWorkspace": {
+      "confirm": {
+        "endpoint": {
+          "required": "Endpoint is required",
+          "tooLong": "Endpoint must be 256 characters or less"
+        },
+        "method": {
+          "required": "HTTP method is required",
+          "invalid": "HTTP method must be POST, PUT, or DELETE"
+        },
+        "payload": {
+          "required": "Payload is required"
+        },
+        "proposalId": {
+          "invalid": "Proposal ID is invalid",
+          "tooLong": "Proposal ID must be 128 characters or less"
+        }
+      },
+      "config": {
+        "aiProvider": {
+          "tooLong": "Provider must be 32 characters or less"
+        },
+        "aiConnectionStyle": {
+          "invalid": "Connection style must be 'anthropic' or 'openai'"
+        },
+        "aiBaseUrl": {
+          "invalid": "Base URL must be a valid HTTP or HTTPS URL",
+          "tooLong": "Base URL must be 512 characters or less"
+        },
+        "aiModelId": {
+          "tooLong": "Model ID must be 128 characters or less"
+        },
+        "aiTemperature": {
+          "invalid": "Temperature must be a number between 0 and 1"
+        },
+        "aiApiKey": {
+          "tooLong": "API key must be 4096 characters or less"
+        },
+        "aiMaxTokens": {
+          "invalid": "Max tokens must be an integer between 1 and 200000"
+        },
+        "aiTimeoutMs": {
+          "invalid": "Timeout must be an integer between 1000 and 600000 milliseconds"
+        },
+        "aiApiVersion": {
+          "tooLong": "API version must be 32 characters or less"
+        },
+        "aiExtraHeaders": {
+          "tooLong": "Extra headers must be 4096 characters or less",
+          "invalid": "Extra headers must be a valid JSON object"
+        },
+        "atLeastOneField": "At least one configuration field is required"
+      }
+    },
+    "branding": {
+      "showWatermark": {
+        "required": "Watermark setting is required"
+      },
+      "watermarkText": {
+        "required": "Watermark text is required when enabled",
+        "tooShort": "Watermark text must be at least 3 characters",
+        "tooLong": "Watermark text must be 30 characters or less"
+      },
+      "watermarkBgColor": {
+        "invalid": "Background color must be a valid hex code (#rgb or #rrggbb)",
+        "required": "Background color is required when watermark is enabled"
+      },
+      "watermarkTextColor": {
+        "invalid": "Text color must be a valid hex code (#rgb or #rrggbb)",
+        "required": "Text color is required when watermark is enabled"
+      },
+      "preset": {
+        "name": {
+          "required": "Preset name is required",
+          "tooLong": "Preset name must be 80 characters or less"
+        },
+        "description": {
+          "tooLong": "Description must be 200 characters or less"
+        },
+        "showWatermark": {
+          "required": "Watermark setting is required"
+        },
+        "watermarkText": {
+          "required": "Watermark text is required when enabled",
+          "tooShort": "Watermark text must be at least 3 characters",
+          "tooLong": "Watermark text must be 30 characters or less"
+        },
+        "watermarkBgColor": {
+          "invalid": "Background color must be a valid hex code (#rgb or #rrggbb)",
+          "required": "Background color is required when watermark is enabled"
+        },
+        "watermarkTextColor": {
+          "invalid": "Text color must be a valid hex code (#rgb or #rrggbb)",
+          "required": "Text color is required when watermark is enabled"
+        }
+      }
+    },
+    "theme": {
+      "primary": {
+        "invalid": "Primary color must be a valid hex code (#rgb or #rrggbb)"
+      },
+      "primaryHover": {
+        "invalid": "Hover color must be a valid hex code (#rgb or #rrggbb)"
+      },
+      "primaryLight": {
+        "invalid": "Light shade must be a valid hex code (#rgb or #rrggbb)"
+      },
+      "primaryText": {
+        "invalid": "Text color must be 'white', 'black', or a valid hex code"
+      },
+      "atLeastOneField": "At least one color field is required",
+      "preset": {
+        "name": {
+          "required": "Preset name is required",
+          "tooLong": "Preset name must be 80 characters or less"
+        },
+        "description": {
+          "tooLong": "Description must be 200 characters or less"
+        },
+        "colors": {
+          "required": "Color map is required"
+        },
+        "atLeastOneField": "At least one field is required"
+      }
+    },
+    "announcements": {
+      "name": {
+        "required": "Announcement name is required",
+        "tooLong": "Announcement name must not exceed 255 characters"
+      },
+      "description": {
+        "required": "Description is required",
+        "tooLong": "Description must not exceed 2000 characters"
+      },
+      "startTime": {
+        "invalid": "Start time must be a valid ISO datetime"
+      },
+      "endTime": {
+        "invalid": "End time must be a valid ISO datetime",
+        "afterStart": "End time must be after start time"
+      },
+      "bgColor": {
+        "invalid": "Background color must be a valid hex color"
+      },
+      "textColor": {
+        "invalid": "Text color must be a valid hex color"
+      },
+      "status": {
+        "invalid": "Status must be 0 or 1"
+      }
+    },
+    "dashboards": {
+      "fieldName": {
+        "required": "Field name is required",
+        "tooShort": "Field name must be at least 1 character",
+        "tooLong": "Field name must not exceed 256 characters"
+      },
+      "search": {
+        "tooLong": "Search term must not exceed 256 characters"
+      },
+      "page": {
+        "invalid": "Page number must be at least 1"
+      },
+      "pageSize": {
+        "invalid": "Page size must be at least 1",
+        "tooLarge": "Page size must not exceed 500 items"
+      },
+      "limit": {
+        "invalid": "Limit must be at least 1",
+        "tooLarge": "Limit must not exceed 1000 items"
+      },
+      "sourceAnalysisId": {
+        "invalid": "Analysis ID must be a valid UUID"
+      }
+    },
+    "auditLogs": {
+      "page": {
+        "invalid": "Page number must be at least 1"
+      },
+      "limit": {
+        "invalid": "Limit must be at least 1",
+        "tooLarge": "Limit must not exceed 1000 items"
+      }
+    },
+    "dbAccess": {
+      "dbIdent": {
+        "required": "Identifier is required",
+        "tooLong": "Identifier must not exceed 63 characters"
+      },
+      "validUntil": {
+        "tooLong": "Valid until must not exceed 64 characters",
+        "invalid": "Valid until must be a valid date/timestamp or 'infinity'"
+      },
+      "rolePassword": {
+        "tooLong": "Password must not exceed 512 characters",
+        "invalid": "Password must not contain control characters"
+      },
+      "connectionLimit": {
+        "invalid": "Connection limit must be between -1 and 2147483647"
+      },
+      "backendPid": {
+        "invalid": "A valid positive backend pid is required"
+      },
+      "privilege": {
+        "required": "Privilege is required"
+      },
+      "columns": {
+        "required": "At least one column is required"
+      },
+      "objectRef": {
+        "required": "Object reference must contain parts, allInSchema, or columns"
+      },
+      "objType": {
+        "invalid": "Invalid object type"
+      },
+      "privileges": {
+        "invalid": "Privilege must not be empty",
+        "required": "At least one privilege is required"
+      },
+      "kind": {
+        "invalid": "Invalid statement kind"
+      },
+      "behavior": {
+        "invalid": "Behavior must be RESTRICT or CASCADE"
+      },
+      "action": {
+        "invalid": "Action must be GRANT or REVOKE"
+      },
+      "onObjectType": {
+        "invalid": "Object type must be TABLES, SEQUENCES, FUNCTIONS, TYPES, or SCHEMAS"
+      },
+      "statements": {
+        "required": "At least one statement is required"
+      },
+      "reassignTo": {
+        "conflict": "Cannot specify both reassignTo and dropOwned"
+      }
+    },
+    "org-policy": {
+      "emailProvider": {
+        "invalid": "Email provider must be SMTP, SES, or null"
+      },
+      "smtpHost": {
+        "invalid": "SMTP host is invalid",
+        "tooLong": "SMTP host must not exceed 255 characters"
+      },
+      "smtpPort": {
+        "invalid": "SMTP port must be an integer between 1 and 65535"
+      },
+      "smtpUser": {
+        "invalid": "SMTP user is invalid",
+        "tooLong": "SMTP user must not exceed 255 characters"
+      },
+      "smtpPassword": {
+        "invalid": "SMTP password is invalid",
+        "tooLong": "SMTP password must not exceed 1024 characters"
+      },
+      "smtpFrom": {
+        "invalid": "SMTP from address must be a valid email"
+      },
+      "sesRegion": {
+        "invalid": "SES region must match the pattern xx-xxxx-n (e.g., us-east-1)",
+        "tooLong": "SES region must not exceed 50 characters"
+      },
+      "sesAccessKeyId": {
+        "invalid": "SES access key ID is invalid",
+        "tooShort": "SES access key ID must be at least 16 characters",
+        "tooLong": "SES access key ID must not exceed 128 characters"
+      },
+      "sesSecretAccessKey": {
+        "invalid": "SES secret access key is invalid",
+        "tooLong": "SES secret access key must not exceed 1024 characters"
+      },
+      "sesFrom": {
+        "invalid": "SES from address must be a valid email"
+      },
+      "maxLoginAttempts": {
+        "invalid": "Max login attempts must be an integer between 3 and 10"
+      },
+      "accountLockDurationHours": {
+        "invalid": "Account lock duration must be between 0 and 24 hours"
+      },
+      "passwordHistoryLimit": {
+        "invalid": "Password history limit must be an integer between 1 and 24"
+      },
+      "sessionInactivityTimeout": {
+        "invalid": "Session inactivity timeout must be an integer between 5 and 1440 minutes"
+      },
+      "ssoEnabled": {
+        "invalid": "SSO enabled must be a boolean"
+      },
+      "ssoIssuer": {
+        "invalid": "SSO issuer is invalid",
+        "tooLong": "SSO issuer must not exceed 255 characters"
+      },
+      "ssoEntryPoint": {
+        "invalid": "SSO entry point must be a valid HTTP or HTTPS URL",
+        "tooLong": "SSO entry point must not exceed 2048 characters"
+      },
+      "ssoCertificate": {
+        "invalid": "SSO certificate is invalid",
+        "tooLong": "SSO certificate must not exceed 16384 characters"
+      },
+      "ssoConfig": {
+        "atLeastOne": "At least one SSO configuration field must be provided"
+      }
+    },
+    "profile": {
+      "newPassword": {
+        "required": "New password is required",
+        "tooShort": "Password must be at least 8 characters",
+        "tooLong": "Password must not exceed 128 characters",
+        "noSpaces": "Password must not contain spaces",
+        "lowercase": "Password must contain at least one lowercase letter",
+        "uppercase": "Password must contain at least one uppercase letter",
+        "digit": "Password must contain at least one number",
+        "special": "Password must contain at least one special character (@$!%*?&)"
+      },
+      "locale": {
+        "invalid": "Locale must be one of the supported languages"
+      },
+      "showTour": {
+        "invalid": "Show tour must be a boolean value"
+      }
+    },
+    "prompts": {
+      "name": {
+        "required": "Prompt name is required",
+        "tooShort": "Prompt name must be at least 2 characters",
+        "tooLong": "Prompt name must not exceed 64 characters",
+        "invalid": "Prompt name must start with a letter or number and can only contain letters, numbers, spaces, dots, underscores and hyphens"
+      },
+      "type": {
+        "invalid": "Invalid prompt type"
+      },
+      "description": {
+        "tooShort": "Description must be at least 2 characters",
+        "tooLong": "Description must not exceed 500 characters"
+      },
+      "datasource": {
+        "required": "Datasource is required",
+        "invalid": "Datasource must be a valid UUID"
+      },
+      "status": {
+        "invalid": "Status must be either 0 or 1"
+      },
+      "prompts": {
+        "required": "At least one prompt is required"
+      },
+      "ids": {
+        "required": "At least one prompt must be selected"
+      }
+    },
+    "queryBuilders": {
+      "name": {
+        "required": "Query Builder name is required",
+        "tooShort": "Query Builder name must be at least 2 characters",
+        "tooLong": "Query Builder name must not exceed 64 characters",
+        "invalid": "Query Builder name must start with a letter or number and can only contain letters, numbers, spaces, dots, underscores and hyphens"
+      },
+      "description": {
+        "tooShort": "Description must be at least 2 characters",
+        "tooLong": "Description must not exceed 500 characters"
+      },
+      "datasource": {
+        "required": "Datasource is required",
+        "invalid": "Datasource must be a valid UUID"
+      },
+      "status": {
+        "invalid": "Status must be either 0 or 1"
+      },
+      "ids": {
+        "required": "At least one query builder must be selected"
+      }
+    },
+    "analysisFilters": {
+      "parentConstraints": {
+        "column": {
+          "required": "Parent constraint column name is required",
+          "invalid": "Parent constraint column must be a valid identifier"
+        },
+        "values": {
+          "tooMany": "Parent constraint values must not exceed 1000 items",
+          "required": "Parent constraint values must contain at least one item"
+        },
+        "tooMany": "Parent constraints must not exceed 20 items"
+      },
+      "filterId": {
+        "invalid": "Filter ID must be a valid UUID"
+      },
+      "analysisId": {
+        "invalid": "Analysis ID must be a valid UUID"
+      },
+      "mode": {
+        "invalid": "Mode must be either 'open' or 'fetch'"
+      },
+      "requests": {
+        "required": "Requests array must contain at least one item in fetch mode"
       }
     }
   },
@@ -5876,6 +6321,148 @@
       "SUPERUSER": "Grants cluster-wide, unrestricted power. High blast radius.",
       "SELF_LOCKOUT": "Targets the management login itself — risks locking you out.",
       "CASCADE": "Cascades the revoke to dependent grants beyond this role."
+    }
+  },
+  "TOUR": {
+    "NEXT": "Next",
+    "BACK": "Back",
+    "FINISH": "Finish",
+    "SKIP": "Skip",
+    "DONT_SHOW_AGAIN": "Don't show this again",
+    "PROGRESS": "Step {{current}} of {{total}}",
+    "WELCOME": {
+      "TITLE": "Welcome to DBExec 👋",
+      "DESC": "Here's a quick tour of the things you can do. You can stop any time — and tick \"Don't show this again\" to skip it on future logins."
+    },
+    "DONE": {
+      "TITLE": "You're all set 🎉",
+      "DESC": "That's the tour. Explore at your own pace — and you can turn this tour back on any time from your profile."
+    },
+    "STEPS": {
+      "search": {
+        "TITLE": "Global search",
+        "DESC": "Jump to anything fast. Search across your datasets, dashboards, connections and more from here — or press Ctrl/⌘ + K anywhere."
+      },
+      "notifications": {
+        "TITLE": "Notifications",
+        "DESC": "Alerts, shares and system messages land here in real time. The badge shows how many are unread."
+      },
+      "language": {
+        "TITLE": "Change language",
+        "DESC": "Prefer another language? Pick from ten languages here — the whole app updates instantly and your choice is remembered."
+      },
+      "logout": {
+        "TITLE": "Sign out",
+        "DESC": "When you're done, sign out safely from here. Your session ends and you're returned to the login screen."
+      },
+      "systemAdmin": {
+        "TITLE": "System Admin",
+        "DESC": "Platform-level administration for operators who manage DBExec across organisations."
+      },
+      "orgManagement": {
+        "TITLE": "Organisations",
+        "DESC": "Create and manage the organisations (tenants) on the platform."
+      },
+      "systemRoleManagement": {
+        "TITLE": "System Roles",
+        "DESC": "Define platform-level roles and the permissions each one grants."
+      },
+      "systemGroupManagement": {
+        "TITLE": "System Groups",
+        "DESC": "Group platform operators and assign them system roles in bulk."
+      },
+      "systemUserManagement": {
+        "TITLE": "System Users",
+        "DESC": "Manage the platform operator accounts that run DBExec itself."
+      },
+      "home": {
+        "TITLE": "Home",
+        "DESC": "Your starting point — a quick overview and shortcuts to everything you work with."
+      },
+      "userManagement": {
+        "TITLE": "Users",
+        "DESC": "Invite people to your organisation and manage their accounts and access."
+      },
+      "roleManagement": {
+        "TITLE": "Roles",
+        "DESC": "Define roles and choose exactly which screens and actions each one unlocks."
+      },
+      "groupManagement": {
+        "TITLE": "Groups",
+        "DESC": "Bundle users into groups and grant roles to the whole group at once."
+      },
+      "setupDB": {
+        "TITLE": "Data Sources",
+        "DESC": "Connect the databases DBExec reads from — Postgres, MySQL, Snowflake and more."
+      },
+      "dbRoles": {
+        "TITLE": "Database Roles",
+        "DESC": "Manage the login users and roles inside your connected databases."
+      },
+      "dbPrivileges": {
+        "TITLE": "Privileges & Access",
+        "DESC": "Grant and review table- and schema-level privileges on your databases."
+      },
+      "connectionManager": {
+        "TITLE": "Connections",
+        "DESC": "Manage the live query connections used to run SQL against your data sources."
+      },
+      "queryRunner": {
+        "TITLE": "SQL Workspace",
+        "DESC": "Write and run SQL with autocomplete, saved queries and a live results grid."
+      },
+      "queryBuilderTab": {
+        "TITLE": "Tabs",
+        "DESC": "Organise guided query-builder screens into tabs."
+      },
+      "queryBuilderSection": {
+        "TITLE": "Sections",
+        "DESC": "Group related prompts into sections within a query-builder screen."
+      },
+      "queryBuilderPrompt": {
+        "TITLE": "Prompts",
+        "DESC": "Design the input prompts that drive parameterised, no-code queries."
+      },
+      "queryBuilderScreen": {
+        "TITLE": "Query Builder",
+        "DESC": "Assemble tabs, sections and prompts into guided, no-code query screens."
+      },
+      "datasetManager": {
+        "TITLE": "Datasets",
+        "DESC": "Shape reusable datasets — pick columns, add calculated fields and formulas."
+      },
+      "analyses": {
+        "TITLE": "Analyses",
+        "DESC": "Build charts and visual analyses on top of your datasets."
+      },
+      "dashboard": {
+        "TITLE": "Dashboards",
+        "DESC": "Combine visuals into shareable dashboards and publish point-in-time snapshots."
+      },
+      "rlsRules": {
+        "TITLE": "RLS Rules",
+        "DESC": "Set row- and column-level security so each user sees only the data they should."
+      },
+      "alertManagement": {
+        "TITLE": "Alerts",
+        "DESC": "Schedule data checks that email or notify you when a condition is met."
+      },
+      "auditLogs": {
+        "TITLE": "Audit Logs",
+        "DESC": "Review a full trail of who changed what, and when, across the platform."
+      },
+      "loginActivity": {
+        "TITLE": "Login Activity",
+        "DESC": "Track sign-ins and authentication events for security and compliance."
+      },
+      "appSettings": {
+        "TITLE": "App Settings",
+        "DESC": "Tune your organisation's look and feel — theme, branding and announcements."
+      },
+      "systemSettings": {
+        "TITLE": "System Settings",
+        "DESC": "Configure platform security, SSO, email and AI features."
+      }
     }
   }
 }

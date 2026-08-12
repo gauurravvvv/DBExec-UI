@@ -1,5 +1,22 @@
 # DBExec-UI — Session Log (newest first)
 
+### 2026-08-12 — Joi → Zod validation migration (FE mirror side)
+- BE-led migration of all 63 remaining Joi validators to Zod; the FE side received the byte-identical mirrored schema files under `src/app/shared/validators/*` (new: ai-workspace, announcements, audit-logs, branding, dashboards, db-access, org-policy, profile, prompts, query-builders, system-users, analysis-filters, theme; appended: alerts, analyses, datasets, datasources, groups, organisation, roles, savedQueries, users). Created FE `src/app/shared/utility/listSort.ts` with `buildSortZod` to match BE.
+- **189 new `validation.*` i18n keys added to all 10 FE locale files, fully translated** (mirrors BE), plus `validation.common.sort.*` + `validation.common.id.{required,invalid}`. Parity verified 189/189 × 10 locales.
+- These schemas back the add/edit/save forms (client `safeParse` before submit) with the SAME contract the BE now enforces. 21/22 schema files are byte-identical to BE; `theme.ts` differs only in the themeTokens import path (FE uses `theme-tokens`, BE `themeTokens`) — intended.
+- Verified: FE tsc 0 → ngc 0 → prod build 0. version_261 (local; user pushes). Full detail in DBExec-API SESSION_LOG.
+
+### 2026-08-12 — Guided application tour (permission-aware onboarding)
+- New feature: a driver.js-powered guided tour that auto-shows on login and walks the user through the sidebar chrome (global search, notifications, language switcher, logout) and **only the modules they hold permission for** — steps derive from the user's own permission tree, so User A (all perms) sees all module steps and User B (subset) sees only theirs. Chrome-first order: welcome → search → notifications → [permitted modules] → language → logout → done.
+- New core singleton `TourService` + `tour.constant.ts` step catalog. driver.js added (only new dep, ~5KB, MIT). Themed via `assets/sass/_driver-tour.scss`, **fully token-driven** so each org's theme paints the tour; backdrop mirrors the app's `--overlay-background` scrim.
+- Choreography: the search/notifications/language/logout steps open the real overlays (added `close()`/`closeSearch()` trigger channels to NotificationModalService/GlobalSearchService; sidebar gained a small `TourSidebarApi`). Logout step highlights but never logs out. Sidebar pinned open during the tour; `document:click` outside-close suppressed while running.
+- Persistence: single `showTour` flag (default true) on the user entity, surfaced in the session; `LoginService.applyBootstrap` stashes it in `StorageType.SHOW_TOUR`. Auto-shows every login until dismissed. "Don't show again" checkbox injected into **every** popover footer (a user may quit early) → `PUT /profile/tour`. Re-enable via a new "Show product tour on login" toggle on the profile page. `sessionStorage` guard stops a same-session reload from replaying a completed tour.
+- i18n: `TOUR.*` namespace (welcome/done + 4 chrome + 27 module steps, titles+descriptions) + `PROFILE.PREFERENCES`/`SHOW_TOUR_TOGGLE` in all 10 locales; `{{current}}/{{total}}` progress tokens preserved (handed to driver.js, not ngx-translate).
+- BE companion: `showTour` boolean (master + shared user entities), `PUT /profile/tour` (updateShowTour controller/validation/route — mirrors updateLocale, Joi to match the profile module), `profile.tour_updated` message in 10 BE locales, `getProfile` returns `showTour`.
+- Spec: `docs/superpowers/specs/2026-08-12-application-tour-design.md`. New module doc `modules/app-tour.md`.
+- Verified: BE tsc 0; FE tsc 0 → ngc AOT 0 → prod build 0 (no budget/warnings); i18n parity 10/10. version_261 (local; user pushes). Not yet live-verified in a browser.
+- Follow-up noted separately: migrate BE validation Joi→Zod incrementally (user's call, after this feature).
+
 ### 2026-08-11 — Magic-link reset: code-review fixes
 - forgot-password countdown is now existence-agnostic (BE always returns `expiresAt` on success, incl. anti-enumeration masked non-sends), so the UI no longer leaks whether an account exists. Removed dead `trackByIndex`. Localised `validation.auth.resetToken.*` in the 9 non-English locales.
 - Verified: tsc + ngc + prod build green. version_261.

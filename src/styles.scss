@@ -2,7 +2,13 @@
 @import 'src/assets/scss/_custom-icons.scss';
 @import 'primeng/resources/primeng.css';
 @import 'primeicons/primeicons.css';
+// driver.js base structure + CSS vars for the guided tour. Must load before
+// the token-driven override below (_driver-tour) so our overrides win.
+@import 'driver.js/dist/driver.css';
 @import './assets/sass/variables/theme-variables';
+// Guided-tour popover theme — maps driver.js onto the design tokens. After
+// theme-variables so every --* token resolves.
+@import './assets/sass/driver-tour';
 // Shared code-editor chrome. Must load after the theme variables so the design
 // tokens resolve. The two mixins included below target elements Monaco renders
 // into its OWN overflow container, outside any component's view encapsulation,

@@ -363,7 +363,9 @@
     "LOADING_PROFILE": "Profiel laden...",
     "ROLE_SYSTEM_ADMIN": "Systeembeheerder",
     "ROLE_ORG_ADMIN": "Organisatiebeheerder",
-    "ROLE_ORG_USER": "Gebruiker"
+    "ROLE_ORG_USER": "Gebruiker",
+    "PREFERENCES": "Voorkeuren",
+    "SHOW_TOUR_TOGGLE": "Producttour tonen bij aanmelden"
   },
   "SYSTEM_ADMIN": {
     "TITLE": "Systeembeheerders",
@@ -4073,7 +4075,7 @@
       "dbHost": {
         "required": "Database-host is vereist",
         "tooLong": "Database-host mag niet meer dan 255 tekens bevatten",
-        "invalid": "Database-host moet een geldige hostnaam of IPv4-adres zijn"
+        "invalid": "Database-host moet een geldige hostnaam of IP-adres zijn"
       },
       "dbPort": {
         "required": "Database-poort is vereist",
@@ -4083,17 +4085,17 @@
       "dbName": {
         "required": "Databasenaam is vereist",
         "tooLong": "Databasenaam mag niet meer dan 63 tekens bevatten",
-        "invalid": "Databasenaam moet beginnen met een letter of underscore en mag alleen letters, cijfers, underscores of streepjes bevatten"
+        "invalid": "Databasenaam moet beginnen met een letter of underscore en mag alleen letters, nummers, underscores en streepjes bevatten"
       },
       "dbSchema": {
         "required": "Schemanaam is vereist",
         "tooLong": "Schemanaam mag niet meer dan 63 tekens bevatten",
-        "invalid": "Schemanaam moet beginnen met een kleine letter of underscore en mag alleen kleine letters, cijfers of underscores bevatten"
+        "invalid": "Schemanaam moet lowercase zijn en mag alleen letters, nummers en underscores bevatten"
       },
       "dbUsername": {
-        "required": "Database-gebruikersnaam is vereist",
+        "required": "Database-gebruiker is vereist",
         "tooLong": "Database-gebruikersnaam mag niet meer dan 128 tekens bevatten",
-        "invalid": "Database-gebruikersnaam moet beginnen met een letter of underscore en mag alleen letters, cijfers, underscores of streepjes bevatten"
+        "invalid": "Database-gebruiker moet beginnen met een letter of underscore en mag alleen letters, nummers, underscores en streepjes bevatten"
       },
       "dbPassword": {
         "required": "Database-wachtwoord is vereist",
@@ -4134,10 +4136,18 @@
     },
     "common": {
       "id": {
-        "invalid": "Ongeldige identificatie"
+        "invalid": "Ongeldige identificatie",
+        "required": "Identificatie is vereist"
       },
       "status": {
         "invalid": "Status moet 0 of 1 zijn"
+      },
+      "sort": {
+        "field": "Ongeldig sorteerveld",
+        "order": "Sorteervolgorde moet asc of desc zijn",
+        "json": "Sortering moet een geldige JSON-array zijn",
+        "max": "Te veel sorteervelden",
+        "unique": "Dubbel sorteerveld"
       }
     },
     "users": {
@@ -4174,6 +4184,20 @@
         "tooShort": "Volledige naam moet minimaal 2 tekens bevatten",
         "tooLong": "Volledige naam mag niet meer dan 60 tekens bevatten",
         "invalid": "Volledige naam moet beginnen met een letter en mag alleen letters, streepjes, apostrofs of spaties bevatten"
+      },
+      "groupNames": {
+        "required": "Minstens één groep moet worden opgegeven"
+      },
+      "row": {
+        "required": "Rijnummer is vereist"
+      },
+      "users": {
+        "required": "Gebruikerslijst is vereist",
+        "min": "Geen gebruikers om aan te maken",
+        "max": "Kan niet meer dan 500 gebruikers in één verzoek aanmaken"
+      },
+      "newPassword": {
+        "required": "Nieuw wachtwoord is vereist"
       }
     },
     "roles": {
@@ -4190,6 +4214,9 @@
       "permissions": {
         "required": "Er moet ten minste één rechten worden geselecteerd",
         "entryInvalid": "Een rechteninvoer is ongeldig"
+      },
+      "filter": {
+        "type": "Filter moet een string zijn"
       }
     },
     "groups": {
@@ -4205,7 +4232,8 @@
       },
       "roleId": {
         "required": "Er moet een rol worden geselecteerd",
-        "invalid": "Geselecteerde rol is ongeldig"
+        "invalid": "Geselecteerde rol is ongeldig",
+        "type": "Rol-ID moet een string zijn"
       },
       "users": {
         "idInvalid": "Een of meer gebruikersidentificatoren zijn ongeldig"
@@ -4316,6 +4344,12 @@
       },
       "justification": {
         "tooLong": "De motivering mag niet langer zijn dan 500 tekens"
+      },
+      "schema": {
+        "required": "Schemanaam is vereist"
+      },
+      "table": {
+        "required": "Tabelnaam is vereist"
       }
     },
     "connections": {
@@ -4389,6 +4423,13 @@
         "type": {
           "invalid": "Ongeldig prompttype"
         }
+      },
+      "page": {
+        "invalid": "Paginanummer moet minstens 1 zijn"
+      },
+      "limit": {
+        "invalid": "Limiet moet minstens 1 zijn",
+        "tooLarge": "Limiet mag niet meer dan 1000 items zijn"
       }
     },
     "analyses": {
@@ -4495,6 +4536,10 @@
           "required": "Dashboardnaam is verplicht",
           "tooLong": "De dashboardnaam mag niet langer zijn dan 255 tekens"
         }
+      },
+      "fieldName": {
+        "required": "Veldnaam is vereist",
+        "tooLong": "Veldnaam mag niet meer dan 256 tekens zijn"
       }
     },
     "folders": {
@@ -4684,6 +4729,406 @@
         "format": {
           "invalid": "Niet-ondersteund exportformaat"
         }
+      }
+    },
+    "aiWorkspace": {
+      "confirm": {
+        "endpoint": {
+          "required": "Eindpunt is vereist",
+          "tooLong": "Eindpunt moet 256 tekens of minder zijn"
+        },
+        "method": {
+          "required": "HTTP-methode is vereist",
+          "invalid": "HTTP-methode moet POST, PUT of DELETE zijn"
+        },
+        "payload": {
+          "required": "Payload is vereist"
+        },
+        "proposalId": {
+          "invalid": "Voorstel-ID is ongeldig",
+          "tooLong": "Voorstel-ID moet 128 tekens of minder zijn"
+        }
+      },
+      "config": {
+        "aiProvider": {
+          "tooLong": "Provider moet 32 tekens of minder zijn"
+        },
+        "aiConnectionStyle": {
+          "invalid": "Verbindingsstijl moet 'anthropic' of 'openai' zijn"
+        },
+        "aiBaseUrl": {
+          "invalid": "URL moet een geldige HTTP of HTTPS URL zijn",
+          "tooLong": "URL moet 512 tekens of minder zijn"
+        },
+        "aiModelId": {
+          "tooLong": "Model-ID moet 128 tekens of minder zijn"
+        },
+        "aiTemperature": {
+          "invalid": "Temperatuur moet een getal tussen 0 en 1 zijn"
+        },
+        "aiApiKey": {
+          "tooLong": "API-sleutel moet 4096 tekens of minder zijn"
+        },
+        "aiMaxTokens": {
+          "invalid": "Max tokens moet een geheel getal tussen 1 en 200000 zijn"
+        },
+        "aiTimeoutMs": {
+          "invalid": "Time-out moet een geheel getal tussen 1000 en 600000 milliseconden zijn"
+        },
+        "aiApiVersion": {
+          "tooLong": "API-versie moet 32 tekens of minder zijn"
+        },
+        "aiExtraHeaders": {
+          "tooLong": "Extra headers moeten 4096 tekens of minder zijn",
+          "invalid": "Extra headers moeten een geldig JSON-object zijn"
+        },
+        "atLeastOneField": "Minstens één configuratieveld is vereist"
+      }
+    },
+    "branding": {
+      "showWatermark": {
+        "required": "Watermerk-instelling is vereist"
+      },
+      "watermarkText": {
+        "required": "Watermerk-tekst is vereist als ingeschakeld",
+        "tooShort": "Watermerk-tekst moet minstens 3 tekens zijn",
+        "tooLong": "Watermerk-tekst moet 30 tekens of minder zijn"
+      },
+      "watermarkBgColor": {
+        "invalid": "Achtergrondkleur moet een geldige hexcode zijn (#rgb of #rrggbb)",
+        "required": "Achtergrondkleur is vereist als watermerk is ingeschakeld"
+      },
+      "watermarkTextColor": {
+        "invalid": "Tekstkleur moet een geldige hexcode zijn (#rgb of #rrggbb)",
+        "required": "Tekstkleur is vereist als watermerk is ingeschakeld"
+      },
+      "preset": {
+        "name": {
+          "required": "Voorsetnaam is vereist",
+          "tooLong": "Voorsetnaam moet 80 tekens of minder zijn"
+        },
+        "description": {
+          "tooLong": "Beschrijving moet 200 tekens of minder zijn"
+        },
+        "showWatermark": {
+          "required": "Watermerk-instelling is vereist"
+        },
+        "watermarkText": {
+          "required": "Watermerk-tekst is vereist als ingeschakeld",
+          "tooShort": "Watermerk-tekst moet minstens 3 tekens zijn",
+          "tooLong": "Watermerk-tekst moet 30 tekens of minder zijn"
+        },
+        "watermarkBgColor": {
+          "invalid": "Achtergrondkleur moet een geldige hexcode zijn (#rgb of #rrggbb)",
+          "required": "Achtergrondkleur is vereist als watermerk is ingeschakeld"
+        },
+        "watermarkTextColor": {
+          "invalid": "Tekstkleur moet een geldige hexcode zijn (#rgb of #rrggbb)",
+          "required": "Tekstkleur is vereist als watermerk is ingeschakeld"
+        }
+      }
+    },
+    "theme": {
+      "primary": {
+        "invalid": "Primaire kleur moet een geldige hexcode zijn (#rgb of #rrggbb)"
+      },
+      "primaryHover": {
+        "invalid": "Hover-kleur moet een geldige hexcode zijn (#rgb of #rrggbb)"
+      },
+      "primaryLight": {
+        "invalid": "Lichte tint moet een geldige hexcode zijn (#rgb of #rrggbb)"
+      },
+      "primaryText": {
+        "invalid": "Tekstkleur moet 'white', 'black' of een geldige hexcode zijn"
+      },
+      "atLeastOneField": "Minstens één kleurveld is vereist",
+      "preset": {
+        "name": {
+          "required": "Voorsetnaam is vereist",
+          "tooLong": "Voorsetnaam moet 80 tekens of minder zijn"
+        },
+        "description": {
+          "tooLong": "Beschrijving moet 200 tekens of minder zijn"
+        },
+        "colors": {
+          "required": "Kleurenkaart is vereist"
+        },
+        "atLeastOneField": "Minstens één veld is vereist"
+      }
+    },
+    "announcements": {
+      "name": {
+        "required": "Aankondigingsnaam is vereist",
+        "tooLong": "Aankondigingsnaam mag niet meer dan 255 tekens zijn"
+      },
+      "description": {
+        "required": "Beschrijving is vereist",
+        "tooLong": "Beschrijving mag niet meer dan 2000 tekens zijn"
+      },
+      "startTime": {
+        "invalid": "Starttijd moet een geldige ISO datetime zijn"
+      },
+      "endTime": {
+        "invalid": "Eindtijd moet een geldige ISO datetime zijn",
+        "afterStart": "Eindtijd moet na starttijd liggen"
+      },
+      "bgColor": {
+        "invalid": "Achtergrondkleur moet een geldige hexadecimale kleur zijn"
+      },
+      "textColor": {
+        "invalid": "Tekstkleur moet een geldige hexadecimale kleur zijn"
+      },
+      "status": {
+        "invalid": "Status moet 0 of 1 zijn"
+      }
+    },
+    "dashboards": {
+      "fieldName": {
+        "required": "Veldnaam is vereist",
+        "tooShort": "Veldnaam moet minstens 1 teken zijn",
+        "tooLong": "Veldnaam mag niet meer dan 256 tekens zijn"
+      },
+      "search": {
+        "tooLong": "Zoekterm mag niet meer dan 256 tekens zijn"
+      },
+      "page": {
+        "invalid": "Paginanummer moet minstens 1 zijn"
+      },
+      "pageSize": {
+        "invalid": "Paginagrootte moet minstens 1 zijn",
+        "tooLarge": "Paginagrootte mag niet meer dan 500 items zijn"
+      },
+      "limit": {
+        "invalid": "Limiet moet minstens 1 zijn",
+        "tooLarge": "Limiet mag niet meer dan 1000 items zijn"
+      },
+      "sourceAnalysisId": {
+        "invalid": "Analyse-ID moet een geldige UUID zijn"
+      }
+    },
+    "auditLogs": {
+      "page": {
+        "invalid": "Paginanummer moet minstens 1 zijn"
+      },
+      "limit": {
+        "invalid": "Limiet moet minstens 1 zijn",
+        "tooLarge": "Limiet mag niet meer dan 1000 items zijn"
+      }
+    },
+    "dbAccess": {
+      "dbIdent": {
+        "required": "Identifier is vereist",
+        "tooLong": "Identifier mag niet meer dan 63 tekens zijn"
+      },
+      "validUntil": {
+        "tooLong": "Geldig tot mag niet meer dan 64 tekens zijn",
+        "invalid": "Geldig tot moet een geldige datum/tijdstempel of 'infinity' zijn"
+      },
+      "rolePassword": {
+        "tooLong": "Wachtwoord mag niet meer dan 512 tekens zijn",
+        "invalid": "Wachtwoord mag geen controlekarakters bevatten"
+      },
+      "connectionLimit": {
+        "invalid": "Verbindingslimiet moet tussen -1 en 2147483647 zijn"
+      },
+      "backendPid": {
+        "invalid": "Een geldig positief backend-PID is vereist"
+      },
+      "privilege": {
+        "required": "Privilege is vereist"
+      },
+      "columns": {
+        "required": "Minstens één kolom is vereist"
+      },
+      "objectRef": {
+        "required": "Objectverwijzing moet parts, allInSchema of columns bevatten"
+      },
+      "objType": {
+        "invalid": "Ongeldig objecttype"
+      },
+      "privileges": {
+        "invalid": "Privilege mag niet leeg zijn",
+        "required": "Minstens één privilege is vereist"
+      },
+      "kind": {
+        "invalid": "Ongeldig statement-type"
+      },
+      "behavior": {
+        "invalid": "Gedrag moet RESTRICT of CASCADE zijn"
+      },
+      "action": {
+        "invalid": "Actie moet GRANT of REVOKE zijn"
+      },
+      "onObjectType": {
+        "invalid": "Objecttype moet TABLES, SEQUENCES, FUNCTIONS, TYPES of SCHEMAS zijn"
+      },
+      "statements": {
+        "required": "Minstens één statement is vereist"
+      },
+      "reassignTo": {
+        "conflict": "Kan niet zowel reassignTo als dropOwned opgeven"
+      }
+    },
+    "org-policy": {
+      "emailProvider": {
+        "invalid": "E-mailprovider moet SMTP, SES of null zijn"
+      },
+      "smtpHost": {
+        "invalid": "SMTP-host is ongeldig",
+        "tooLong": "SMTP-host mag niet meer dan 255 tekens zijn"
+      },
+      "smtpPort": {
+        "invalid": "SMTP-poort moet een geheel getal tussen 1 en 65535 zijn"
+      },
+      "smtpUser": {
+        "invalid": "SMTP-gebruiker is ongeldig",
+        "tooLong": "SMTP-gebruiker mag niet meer dan 255 tekens zijn"
+      },
+      "smtpPassword": {
+        "invalid": "SMTP-wachtwoord is ongeldig",
+        "tooLong": "SMTP-wachtwoord mag niet meer dan 1024 tekens zijn"
+      },
+      "smtpFrom": {
+        "invalid": "SMTP-afzenderadres moet een geldig e-mailadres zijn"
+      },
+      "sesRegion": {
+        "invalid": "SES-regio moet het patroon xx-xxxx-n volgen (bijv. us-east-1)",
+        "tooLong": "SES-regio mag niet meer dan 50 tekens zijn"
+      },
+      "sesAccessKeyId": {
+        "invalid": "SES-toegangssleutel-ID is ongeldig",
+        "tooShort": "SES-toegangssleutel-ID moet minstens 16 tekens zijn",
+        "tooLong": "SES-toegangssleutel-ID mag niet meer dan 128 tekens zijn"
+      },
+      "sesSecretAccessKey": {
+        "invalid": "SES-geheime-toegangssleutel is ongeldig",
+        "tooLong": "SES-geheime-toegangssleutel mag niet meer dan 1024 tekens zijn"
+      },
+      "sesFrom": {
+        "invalid": "SES-afzenderadres moet een geldig e-mailadres zijn"
+      },
+      "maxLoginAttempts": {
+        "invalid": "Max inlogpogingen moet een geheel getal tussen 3 en 10 zijn"
+      },
+      "accountLockDurationHours": {
+        "invalid": "Accountslot-duur moet tussen 0 en 24 uur zijn"
+      },
+      "passwordHistoryLimit": {
+        "invalid": "Wachtwoordgeschiedenis-limiet moet een geheel getal tussen 1 en 24 zijn"
+      },
+      "sessionInactivityTimeout": {
+        "invalid": "Time-out voor sessie-inactiviteit moet een geheel getal tussen 5 en 1440 minuten zijn"
+      },
+      "ssoEnabled": {
+        "invalid": "SSO ingeschakeld moet een boolean zijn"
+      },
+      "ssoIssuer": {
+        "invalid": "SSO-uitgever is ongeldig",
+        "tooLong": "SSO-uitgever mag niet meer dan 255 tekens zijn"
+      },
+      "ssoEntryPoint": {
+        "invalid": "SSO-invoerpunt moet een geldige HTTP of HTTPS URL zijn",
+        "tooLong": "SSO-invoerpunt mag niet meer dan 2048 tekens zijn"
+      },
+      "ssoCertificate": {
+        "invalid": "SSO-certificaat is ongeldig",
+        "tooLong": "SSO-certificaat mag niet meer dan 16384 tekens zijn"
+      },
+      "ssoConfig": {
+        "atLeastOne": "Minstens één SSO-configuratieveld moet worden opgegeven"
+      }
+    },
+    "profile": {
+      "newPassword": {
+        "required": "Nieuw wachtwoord is vereist",
+        "tooShort": "Wachtwoord moet minstens 8 tekens zijn",
+        "tooLong": "Wachtwoord mag niet meer dan 128 tekens zijn",
+        "noSpaces": "Wachtwoord mag geen spaties bevatten",
+        "lowercase": "Wachtwoord moet minstens één kleine letter bevatten",
+        "uppercase": "Wachtwoord moet minstens één hoofdletter bevatten",
+        "digit": "Wachtwoord moet minstens één cijfer bevatten",
+        "special": "Wachtwoord moet minstens één speciaal teken bevatten (@$!%*?&)"
+      },
+      "locale": {
+        "invalid": "Taal moet één van de ondersteunde talen zijn"
+      },
+      "showTour": {
+        "invalid": "Show tour moet een boolean-waarde zijn"
+      }
+    },
+    "prompts": {
+      "name": {
+        "required": "Promptnaam is vereist",
+        "tooShort": "Promptnaam moet minstens 2 tekens zijn",
+        "tooLong": "Promptnaam mag niet meer dan 64 tekens zijn",
+        "invalid": "Promptnaam moet beginnen met een letter of nummer en mag alleen letters, nummers, spaties, punten, underscores en streepjes bevatten"
+      },
+      "type": {
+        "invalid": "Ongeldig prompttype"
+      },
+      "description": {
+        "tooShort": "Beschrijving moet minstens 2 tekens zijn",
+        "tooLong": "Beschrijving mag niet meer dan 500 tekens zijn"
+      },
+      "datasource": {
+        "required": "Gegevensbron is vereist",
+        "invalid": "Gegevensbron moet een geldige UUID zijn"
+      },
+      "status": {
+        "invalid": "Status moet 0 of 1 zijn"
+      },
+      "prompts": {
+        "required": "Minstens één prompt is vereist"
+      },
+      "ids": {
+        "required": "Minstens één prompt moet worden geselecteerd"
+      }
+    },
+    "queryBuilders": {
+      "name": {
+        "required": "Query Builder-naam is vereist",
+        "tooShort": "Query Builder-naam moet minstens 2 tekens zijn",
+        "tooLong": "Query Builder-naam mag niet meer dan 64 tekens zijn",
+        "invalid": "Query Builder-naam moet beginnen met een letter of nummer en mag alleen letters, nummers, spaties, punten, underscores en streepjes bevatten"
+      },
+      "description": {
+        "tooShort": "Beschrijving moet minstens 2 tekens zijn",
+        "tooLong": "Beschrijving mag niet meer dan 500 tekens zijn"
+      },
+      "datasource": {
+        "required": "Gegevensbron is vereist",
+        "invalid": "Gegevensbron moet een geldige UUID zijn"
+      },
+      "status": {
+        "invalid": "Status moet 0 of 1 zijn"
+      },
+      "ids": {
+        "required": "Minstens één query builder moet worden geselecteerd"
+      }
+    },
+    "analysisFilters": {
+      "parentConstraints": {
+        "column": {
+          "required": "Kolomnaam van parent-constraint is vereist",
+          "invalid": "Kolom van parent-constraint moet een geldige identifier zijn"
+        },
+        "values": {
+          "tooMany": "Parent-constraint-waarden mogen niet meer dan 1000 items zijn",
+          "required": "Parent-constraint-waarden moeten minstens één item bevatten"
+        },
+        "tooMany": "Parent-constraints mogen niet meer dan 20 items zijn"
+      },
+      "filterId": {
+        "invalid": "Filter-ID moet een geldige UUID zijn"
+      },
+      "analysisId": {
+        "invalid": "Analyse-ID moet een geldige UUID zijn"
+      },
+      "mode": {
+        "invalid": "Modus moet 'open' of 'fetch' zijn"
+      },
+      "requests": {
+        "required": "Requests-array moet minstens één item bevatten in fetch-modus"
       }
     }
   },
@@ -5880,5 +6325,147 @@
     "STARTER_USERS_COUNT": "Hoeveel gebruikers hebben we?",
     "STARTER_USERS_CREATE": "Maak een gebruiker in de groep Administrator",
     "STARTER_USERS_INACTIVE": "Welke gebruikers zijn inactief?"
+  },
+  "TOUR": {
+    "NEXT": "Volgende",
+    "BACK": "Terug",
+    "FINISH": "Voltooien",
+    "SKIP": "Overslaan",
+    "DONT_SHOW_AGAIN": "Niet meer weergeven",
+    "PROGRESS": "Stap {{current}} van {{total}}",
+    "WELCOME": {
+      "TITLE": "Welkom bij DBExec 👋",
+      "DESC": "Hier is een korte rondleiding langs wat je kunt doen. Je kunt op elk moment stoppen — vink «Niet meer weergeven» aan om het bij volgende aanmeldingen over te slaan."
+    },
+    "DONE": {
+      "TITLE": "Je bent klaar 🎉",
+      "DESC": "Dat was de rondleiding. Verken in je eigen tempo — je kunt hem altijd weer inschakelen vanuit je profiel."
+    },
+    "STEPS": {
+      "search": {
+        "TITLE": "Globaal zoeken",
+        "DESC": "Ga snel naar alles. Zoek in je datasets, dashboards, verbindingen en meer — of druk overal op Ctrl/⌘ + K."
+      },
+      "notifications": {
+        "TITLE": "Meldingen",
+        "DESC": "Waarschuwingen, gedeelde items en systeemberichten komen hier in realtime binnen. De badge toont het ongelezen aantal."
+      },
+      "language": {
+        "TITLE": "Taal wijzigen",
+        "DESC": "Liever een andere taal? Kies hier uit tien talen — de app wordt direct bijgewerkt en je keuze wordt onthouden."
+      },
+      "logout": {
+        "TITLE": "Afmelden",
+        "DESC": "Als je klaar bent, meld je hier veilig af. Je sessie eindigt en je keert terug naar het aanmeldscherm."
+      },
+      "systemAdmin": {
+        "TITLE": "Systeembeheer",
+        "DESC": "Beheer op platformniveau voor operators die DBExec over organisaties heen beheren."
+      },
+      "orgManagement": {
+        "TITLE": "Organisaties",
+        "DESC": "Maak en beheer de organisaties (tenants) op het platform."
+      },
+      "systemRoleManagement": {
+        "TITLE": "Systeemrollen",
+        "DESC": "Definieer rollen op platformniveau en de rechten die ze verlenen."
+      },
+      "systemGroupManagement": {
+        "TITLE": "Systeemgroepen",
+        "DESC": "Groepeer operators en wijs systeemrollen in bulk toe."
+      },
+      "systemUserManagement": {
+        "TITLE": "Systeemgebruikers",
+        "DESC": "Beheer de operatoraccounts die DBExec zelf draaien."
+      },
+      "home": {
+        "TITLE": "Start",
+        "DESC": "Je startpunt — een snel overzicht en snelkoppelingen naar alles."
+      },
+      "userManagement": {
+        "TITLE": "Gebruikers",
+        "DESC": "Nodig mensen uit in je organisatie en beheer hun accounts en toegang."
+      },
+      "roleManagement": {
+        "TITLE": "Rollen",
+        "DESC": "Definieer rollen en kies welke schermen en acties elke rol ontgrendelt."
+      },
+      "groupManagement": {
+        "TITLE": "Groepen",
+        "DESC": "Bundel gebruikers in groepen en verleen de hele groep rollen."
+      },
+      "setupDB": {
+        "TITLE": "Gegevensbronnen",
+        "DESC": "Verbind de databases die DBExec leest — Postgres, MySQL, Snowflake en meer."
+      },
+      "dbRoles": {
+        "TITLE": "Databaserollen",
+        "DESC": "Beheer de login-gebruikers en rollen in je verbonden databases."
+      },
+      "dbPrivileges": {
+        "TITLE": "Rechten en toegang",
+        "DESC": "Verleen en controleer rechten op tabel- en schemaniveau."
+      },
+      "connectionManager": {
+        "TITLE": "Verbindingen",
+        "DESC": "Beheer de verbindingen om SQL uit te voeren op je gegevensbronnen."
+      },
+      "queryRunner": {
+        "TITLE": "SQL-werkruimte",
+        "DESC": "Schrijf en voer SQL uit met aanvulling, opgeslagen query's en live resultaten."
+      },
+      "queryBuilderTab": {
+        "TITLE": "Tabbladen",
+        "DESC": "Organiseer de schermen van de querybuilder in tabbladen."
+      },
+      "queryBuilderSection": {
+        "TITLE": "Secties",
+        "DESC": "Groepeer gerelateerde prompts in secties binnen een scherm."
+      },
+      "queryBuilderPrompt": {
+        "TITLE": "Prompts",
+        "DESC": "Ontwerp de invoerprompts voor geparametriseerde no-code query's."
+      },
+      "queryBuilderScreen": {
+        "TITLE": "Querybuilder",
+        "DESC": "Combineer tabbladen, secties en prompts tot begeleide no-code schermen."
+      },
+      "datasetManager": {
+        "TITLE": "Datasets",
+        "DESC": "Modelleer herbruikbare datasets — kolommen, berekende velden en formules."
+      },
+      "analyses": {
+        "TITLE": "Analyses",
+        "DESC": "Bouw grafieken en visuele analyses op je datasets."
+      },
+      "dashboard": {
+        "TITLE": "Dashboards",
+        "DESC": "Combineer visuals tot deelbare dashboards en publiceer momentopnamen."
+      },
+      "rlsRules": {
+        "TITLE": "RLS-regels",
+        "DESC": "Stel beveiliging op rij- en kolomniveau in zodat iedereen alleen zijn data ziet."
+      },
+      "alertManagement": {
+        "TITLE": "Waarschuwingen",
+        "DESC": "Plan datacontroles die je melden wanneer aan een voorwaarde wordt voldaan."
+      },
+      "auditLogs": {
+        "TITLE": "Auditlogboeken",
+        "DESC": "Bekijk een volledig overzicht van wie wat heeft gewijzigd, en wanneer."
+      },
+      "loginActivity": {
+        "TITLE": "Aanmeldactiviteit",
+        "DESC": "Volg aanmeldingen en authenticatiegebeurtenissen voor beveiliging."
+      },
+      "appSettings": {
+        "TITLE": "App-instellingen",
+        "DESC": "Stem de uitstraling af — thema, branding en aankondigingen."
+      },
+      "systemSettings": {
+        "TITLE": "Systeeminstellingen",
+        "DESC": "Configureer beveiliging, SSO, e-mail en AI-functies."
+      }
+    }
   }
 }

@@ -109,3 +109,19 @@ export const updateGroupSchema = z.object({
 });
 
 export type UpdateGroupInput = z.infer<typeof updateGroupSchema>;
+
+/** GET /api/v1/groups query (list). */
+export const listGroupSchema = z.object({
+  roleId: z.preprocess(
+    nullableTrim,
+    z.string().optional(),
+  ),
+  page: z.coerce.number().int().min(1).optional(),
+  limit: z.coerce.number().int().min(1).max(1000).optional(),
+  filter: z.preprocess(
+    nullableTrim,
+    z.string().optional(),
+  ),
+});
+
+export type ListGroupInput = z.infer<typeof listGroupSchema>;

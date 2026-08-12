@@ -363,7 +363,9 @@
     "LOADING_PROFILE": "Caricamento profilo...",
     "ROLE_SYSTEM_ADMIN": "Amministratore di sistema",
     "ROLE_ORG_ADMIN": "Amministratore organizzazione",
-    "ROLE_ORG_USER": "Utente"
+    "ROLE_ORG_USER": "Utente",
+    "PREFERENCES": "Preferenze",
+    "SHOW_TOUR_TOGGLE": "Mostra il tour del prodotto all'accesso"
   },
   "SYSTEM_ADMIN": {
     "TITLE": "Amministratori di sistema",
@@ -4071,32 +4073,32 @@
         "tooLong": "La descrizione non deve superare i 500 caratteri"
       },
       "dbHost": {
-        "required": "Host del database è obbligatorio",
+        "required": "L'host del database è obbligatorio",
         "tooLong": "Host del database non deve superare i 255 caratteri",
-        "invalid": "Host del database deve essere un nome host valido o un indirizzo IPv4"
+        "invalid": "L'host del database deve essere un hostname o indirizzo IP valido"
       },
       "dbPort": {
-        "required": "Porta del database è obbligatoria",
-        "notInteger": "Porta del database deve essere un numero intero",
-        "outOfRange": "Porta del database deve essere compresa tra 1 e 65535"
+        "required": "La porta del database è obbligatoria",
+        "notInteger": "La porta del database deve essere un numero intero",
+        "outOfRange": "La porta del database deve essere tra 1 e 65535"
       },
       "dbName": {
-        "required": "Nome del database è obbligatorio",
+        "required": "Il nome del database è obbligatorio",
         "tooLong": "Nome del database non deve superare i 63 caratteri",
-        "invalid": "Nome del database deve iniziare con una lettera o un trattino basso e può contenere solo lettere, numeri, trattini bassi o trattini"
+        "invalid": "Il nome del database deve iniziare con una lettera o un underscore e contenere solo lettere, numeri, underscore e trattini"
       },
       "dbSchema": {
-        "required": "Nome dello schema è obbligatorio",
+        "required": "Il nome dello schema è obbligatorio",
         "tooLong": "Nome dello schema non deve superare i 63 caratteri",
-        "invalid": "Nome dello schema deve iniziare con una lettera minuscola o un trattino basso e può contenere solo lettere minuscole, numeri o trattini bassi"
+        "invalid": "Il nome dello schema deve essere minuscolo e contenere solo lettere, numeri e underscore"
       },
       "dbUsername": {
-        "required": "Nome utente del database è obbligatorio",
+        "required": "Il nome utente del database è obbligatorio",
         "tooLong": "Nome utente del database non deve superare i 128 caratteri",
-        "invalid": "Nome utente del database deve iniziare con una lettera o un trattino basso e può contenere solo lettere, numeri, trattini bassi o trattini"
+        "invalid": "Il nome utente del database deve iniziare con una lettera o un underscore e contenere solo lettere, numeri, underscore e trattini"
       },
       "dbPassword": {
-        "required": "Password del database è obbligatoria",
+        "required": "La password del database è obbligatoria",
         "tooLong": "Password del database non deve superare i 256 caratteri"
       },
       "adminEmail": {
@@ -4134,10 +4136,18 @@
     },
     "common": {
       "id": {
-        "invalid": "Identificatore non valido"
+        "invalid": "Identificatore non valido",
+        "required": "L'identificatore è obbligatorio"
       },
       "status": {
         "invalid": "Lo stato deve essere 0 o 1"
+      },
+      "sort": {
+        "field": "Campo di ordinamento non valido",
+        "order": "L'ordine deve essere asc o desc",
+        "json": "L'ordinamento deve essere un array JSON valido",
+        "max": "Troppi campi di ordinamento",
+        "unique": "Campo di ordinamento duplicato"
       }
     },
     "users": {
@@ -4174,6 +4184,20 @@
         "tooShort": "Il nome completo deve contenere almeno 2 caratteri",
         "tooLong": "Il nome completo non deve superare i 60 caratteri",
         "invalid": "Il nome completo deve iniziare con una lettera e può contenere solo lettere, trattini, apostrofi o spazi"
+      },
+      "groupNames": {
+        "required": "È necessario specificare almeno un gruppo"
+      },
+      "row": {
+        "required": "Il numero di riga è obbligatorio"
+      },
+      "users": {
+        "required": "L'elenco degli utenti è obbligatorio",
+        "min": "Nessun utente da creare",
+        "max": "Non è possibile creare più di 500 utenti in una singola richiesta"
+      },
+      "newPassword": {
+        "required": "La nuova password è obbligatoria"
       }
     },
     "roles": {
@@ -4190,6 +4214,9 @@
       "permissions": {
         "required": "Almeno un permesso deve essere selezionato",
         "entryInvalid": "Una voce di permesso non è valida"
+      },
+      "filter": {
+        "type": "Il filtro deve essere una stringa"
       }
     },
     "groups": {
@@ -4205,7 +4232,8 @@
       },
       "roleId": {
         "required": "Un ruolo deve essere selezionato",
-        "invalid": "Il ruolo selezionato non è valido"
+        "invalid": "Il ruolo selezionato non è valido",
+        "type": "L'ID ruolo deve essere una stringa"
       },
       "users": {
         "idInvalid": "Uno o più identificatori utente non sono validi"
@@ -4316,6 +4344,12 @@
       },
       "justification": {
         "tooLong": "La motivazione non deve superare i 500 caratteri"
+      },
+      "schema": {
+        "required": "Il nome dello schema è obbligatorio"
+      },
+      "table": {
+        "required": "Il nome della tabella è obbligatorio"
       }
     },
     "connections": {
@@ -4389,6 +4423,13 @@
         "type": {
           "invalid": "Tipo di prompt non valido"
         }
+      },
+      "page": {
+        "invalid": "Il numero di pagina deve essere almeno 1"
+      },
+      "limit": {
+        "invalid": "Il limite deve essere almeno 1",
+        "tooLarge": "Il limite non deve superare 1000 elementi"
       }
     },
     "analyses": {
@@ -4495,6 +4536,10 @@
           "required": "Il nome della dashboard è obbligatorio",
           "tooLong": "Il nome della dashboard non deve superare i 255 caratteri"
         }
+      },
+      "fieldName": {
+        "required": "Il nome del campo è obbligatorio",
+        "tooLong": "Il nome del campo non deve superare 256 caratteri"
       }
     },
     "folders": {
@@ -4684,6 +4729,406 @@
         "format": {
           "invalid": "Formato di esportazione non supportato"
         }
+      }
+    },
+    "aiWorkspace": {
+      "confirm": {
+        "endpoint": {
+          "required": "L'endpoint è obbligatorio",
+          "tooLong": "L'endpoint deve contenere al massimo 256 caratteri"
+        },
+        "method": {
+          "required": "Il metodo HTTP è obbligatorio",
+          "invalid": "Il metodo HTTP deve essere POST, PUT o DELETE"
+        },
+        "payload": {
+          "required": "Il payload è obbligatorio"
+        },
+        "proposalId": {
+          "invalid": "L'ID proposta non è valido",
+          "tooLong": "L'ID proposta deve contenere al massimo 128 caratteri"
+        }
+      },
+      "config": {
+        "aiProvider": {
+          "tooLong": "Il provider deve contenere al massimo 32 caratteri"
+        },
+        "aiConnectionStyle": {
+          "invalid": "Lo stile di connessione deve essere 'anthropic' o 'openai'"
+        },
+        "aiBaseUrl": {
+          "invalid": "L'URL base deve essere un URL HTTP o HTTPS valido",
+          "tooLong": "L'URL base deve contenere al massimo 512 caratteri"
+        },
+        "aiModelId": {
+          "tooLong": "L'ID del modello deve contenere al massimo 128 caratteri"
+        },
+        "aiTemperature": {
+          "invalid": "La temperatura deve essere un numero tra 0 e 1"
+        },
+        "aiApiKey": {
+          "tooLong": "La chiave API deve contenere al massimo 4096 caratteri"
+        },
+        "aiMaxTokens": {
+          "invalid": "I token massimi devono essere un numero intero tra 1 e 200000"
+        },
+        "aiTimeoutMs": {
+          "invalid": "Il timeout deve essere un numero intero tra 1000 e 600000 millisecondi"
+        },
+        "aiApiVersion": {
+          "tooLong": "La versione API deve contenere al massimo 32 caratteri"
+        },
+        "aiExtraHeaders": {
+          "tooLong": "Le intestazioni extra devono contenere al massimo 4096 caratteri",
+          "invalid": "Le intestazioni extra devono essere un oggetto JSON valido"
+        },
+        "atLeastOneField": "È necessario almeno un campo di configurazione"
+      }
+    },
+    "branding": {
+      "showWatermark": {
+        "required": "L'impostazione della filigrana è obbligatoria"
+      },
+      "watermarkText": {
+        "required": "Il testo della filigrana è obbligatorio quando abilitato",
+        "tooShort": "Il testo della filigrana deve contenere almeno 3 caratteri",
+        "tooLong": "Il testo della filigrana deve contenere al massimo 30 caratteri"
+      },
+      "watermarkBgColor": {
+        "invalid": "Il colore di sfondo deve essere un codice hex valido (#rgb o #rrggbb)",
+        "required": "Il colore di sfondo è obbligatorio quando la filigrana è abilitata"
+      },
+      "watermarkTextColor": {
+        "invalid": "Il colore del testo deve essere un codice hex valido (#rgb o #rrggbb)",
+        "required": "Il colore del testo è obbligatorio quando la filigrana è abilitata"
+      },
+      "preset": {
+        "name": {
+          "required": "Il nome del preset è obbligatorio",
+          "tooLong": "Il nome del preset deve contenere al massimo 80 caratteri"
+        },
+        "description": {
+          "tooLong": "La descrizione deve contenere al massimo 200 caratteri"
+        },
+        "showWatermark": {
+          "required": "L'impostazione della filigrana è obbligatoria"
+        },
+        "watermarkText": {
+          "required": "Il testo della filigrana è obbligatorio quando abilitato",
+          "tooShort": "Il testo della filigrana deve contenere almeno 3 caratteri",
+          "tooLong": "Il testo della filigrana deve contenere al massimo 30 caratteri"
+        },
+        "watermarkBgColor": {
+          "invalid": "Il colore di sfondo deve essere un codice hex valido (#rgb o #rrggbb)",
+          "required": "Il colore di sfondo è obbligatorio quando la filigrana è abilitata"
+        },
+        "watermarkTextColor": {
+          "invalid": "Il colore del testo deve essere un codice hex valido (#rgb o #rrggbb)",
+          "required": "Il colore del testo è obbligatorio quando la filigrana è abilitata"
+        }
+      }
+    },
+    "theme": {
+      "primary": {
+        "invalid": "Il colore primario deve essere un codice hex valido (#rgb o #rrggbb)"
+      },
+      "primaryHover": {
+        "invalid": "Il colore al passaggio del mouse deve essere un codice hex valido (#rgb o #rrggbb)"
+      },
+      "primaryLight": {
+        "invalid": "La tonalità chiara deve essere un codice hex valido (#rgb o #rrggbb)"
+      },
+      "primaryText": {
+        "invalid": "Il colore del testo deve essere 'white', 'black' o un codice hex valido"
+      },
+      "atLeastOneField": "È necessario almeno un campo colore",
+      "preset": {
+        "name": {
+          "required": "Il nome del preset è obbligatorio",
+          "tooLong": "Il nome del preset deve contenere al massimo 80 caratteri"
+        },
+        "description": {
+          "tooLong": "La descrizione deve contenere al massimo 200 caratteri"
+        },
+        "colors": {
+          "required": "La mappa dei colori è obbligatoria"
+        },
+        "atLeastOneField": "È necessario almeno un campo"
+      }
+    },
+    "announcements": {
+      "name": {
+        "required": "Il nome dell'annuncio è obbligatorio",
+        "tooLong": "Il nome dell'annuncio non deve superare 255 caratteri"
+      },
+      "description": {
+        "required": "La descrizione è obbligatoria",
+        "tooLong": "La descrizione non deve superare 2000 caratteri"
+      },
+      "startTime": {
+        "invalid": "L'ora di inizio deve essere un datetime ISO valido"
+      },
+      "endTime": {
+        "invalid": "L'ora di fine deve essere un datetime ISO valido",
+        "afterStart": "L'ora di fine deve essere successiva all'ora di inizio"
+      },
+      "bgColor": {
+        "invalid": "Il colore di sfondo deve essere un colore hex valido"
+      },
+      "textColor": {
+        "invalid": "Il colore del testo deve essere un colore hex valido"
+      },
+      "status": {
+        "invalid": "Lo stato deve essere 0 o 1"
+      }
+    },
+    "dashboards": {
+      "fieldName": {
+        "required": "Il nome del campo è obbligatorio",
+        "tooShort": "Il nome del campo deve contenere almeno 1 carattere",
+        "tooLong": "Il nome del campo non deve superare 256 caratteri"
+      },
+      "search": {
+        "tooLong": "Il termine di ricerca non deve superare 256 caratteri"
+      },
+      "page": {
+        "invalid": "Il numero di pagina deve essere almeno 1"
+      },
+      "pageSize": {
+        "invalid": "Le dimensioni della pagina devono essere almeno 1",
+        "tooLarge": "Le dimensioni della pagina non devono superare 500 elementi"
+      },
+      "limit": {
+        "invalid": "Il limite deve essere almeno 1",
+        "tooLarge": "Il limite non deve superare 1000 elementi"
+      },
+      "sourceAnalysisId": {
+        "invalid": "L'ID analisi deve essere un UUID valido"
+      }
+    },
+    "auditLogs": {
+      "page": {
+        "invalid": "Il numero di pagina deve essere almeno 1"
+      },
+      "limit": {
+        "invalid": "Il limite deve essere almeno 1",
+        "tooLarge": "Il limite non deve superare 1000 elementi"
+      }
+    },
+    "dbAccess": {
+      "dbIdent": {
+        "required": "L'identificatore è obbligatorio",
+        "tooLong": "L'identificatore non deve superare 63 caratteri"
+      },
+      "validUntil": {
+        "tooLong": "Valid until non deve superare 64 caratteri",
+        "invalid": "Valid until deve essere una data/timestamp valida o 'infinity'"
+      },
+      "rolePassword": {
+        "tooLong": "La password non deve superare 512 caratteri",
+        "invalid": "La password non deve contenere caratteri di controllo"
+      },
+      "connectionLimit": {
+        "invalid": "Il limite di connessione deve essere tra -1 e 2147483647"
+      },
+      "backendPid": {
+        "invalid": "È necessario un PID backend positivo e valido"
+      },
+      "privilege": {
+        "required": "Il privilegio è obbligatorio"
+      },
+      "columns": {
+        "required": "È necessario almeno una colonna"
+      },
+      "objectRef": {
+        "required": "Il riferimento all'oggetto deve contenere parts, allInSchema o columns"
+      },
+      "objType": {
+        "invalid": "Il tipo di oggetto non è valido"
+      },
+      "privileges": {
+        "invalid": "Il privilegio non deve essere vuoto",
+        "required": "È necessario almeno un privilegio"
+      },
+      "kind": {
+        "invalid": "Il tipo di statement non è valido"
+      },
+      "behavior": {
+        "invalid": "Il comportamento deve essere RESTRICT o CASCADE"
+      },
+      "action": {
+        "invalid": "L'azione deve essere GRANT o REVOKE"
+      },
+      "onObjectType": {
+        "invalid": "Il tipo di oggetto deve essere TABLES, SEQUENCES, FUNCTIONS, TYPES o SCHEMAS"
+      },
+      "statements": {
+        "required": "È necessario almeno uno statement"
+      },
+      "reassignTo": {
+        "conflict": "Non è possibile specificare sia reassignTo che dropOwned"
+      }
+    },
+    "org-policy": {
+      "emailProvider": {
+        "invalid": "Il provider email deve essere SMTP, SES o null"
+      },
+      "smtpHost": {
+        "invalid": "L'host SMTP non è valido",
+        "tooLong": "L'host SMTP non deve superare 255 caratteri"
+      },
+      "smtpPort": {
+        "invalid": "La porta SMTP deve essere un numero intero tra 1 e 65535"
+      },
+      "smtpUser": {
+        "invalid": "L'utente SMTP non è valido",
+        "tooLong": "L'utente SMTP non deve superare 255 caratteri"
+      },
+      "smtpPassword": {
+        "invalid": "La password SMTP non è valida",
+        "tooLong": "La password SMTP non deve superare 1024 caratteri"
+      },
+      "smtpFrom": {
+        "invalid": "L'indirizzo SMTP from deve essere un'email valida"
+      },
+      "sesRegion": {
+        "invalid": "La regione SES deve corrispondere al modello xx-xxxx-n (es. us-east-1)",
+        "tooLong": "La regione SES non deve superare 50 caratteri"
+      },
+      "sesAccessKeyId": {
+        "invalid": "L'ID della chiave di accesso SES non è valido",
+        "tooShort": "L'ID della chiave di accesso SES deve contenere almeno 16 caratteri",
+        "tooLong": "L'ID della chiave di accesso SES non deve superare 128 caratteri"
+      },
+      "sesSecretAccessKey": {
+        "invalid": "La chiave di accesso segreta SES non è valida",
+        "tooLong": "La chiave di accesso segreta SES non deve superare 1024 caratteri"
+      },
+      "sesFrom": {
+        "invalid": "L'indirizzo SES from deve essere un'email valida"
+      },
+      "maxLoginAttempts": {
+        "invalid": "I tentativi di accesso massimi devono essere un numero intero tra 3 e 10"
+      },
+      "accountLockDurationHours": {
+        "invalid": "La durata del blocco account deve essere tra 0 e 24 ore"
+      },
+      "passwordHistoryLimit": {
+        "invalid": "Il limite della cronologia delle password deve essere un numero intero tra 1 e 24"
+      },
+      "sessionInactivityTimeout": {
+        "invalid": "Il timeout di inattività della sessione deve essere un numero intero tra 5 e 1440 minuti"
+      },
+      "ssoEnabled": {
+        "invalid": "SSO enabled deve essere un valore booleano"
+      },
+      "ssoIssuer": {
+        "invalid": "L'issuer SSO non è valido",
+        "tooLong": "L'issuer SSO non deve superare 255 caratteri"
+      },
+      "ssoEntryPoint": {
+        "invalid": "Il punto di ingresso SSO deve essere un URL HTTP o HTTPS valido",
+        "tooLong": "Il punto di ingresso SSO non deve superare 2048 caratteri"
+      },
+      "ssoCertificate": {
+        "invalid": "Il certificato SSO non è valido",
+        "tooLong": "Il certificato SSO non deve superare 16384 caratteri"
+      },
+      "ssoConfig": {
+        "atLeastOne": "È necessario fornire almeno un campo di configurazione SSO"
+      }
+    },
+    "profile": {
+      "newPassword": {
+        "required": "La nuova password è obbligatoria",
+        "tooShort": "La password deve contenere almeno 8 caratteri",
+        "tooLong": "La password non deve superare 128 caratteri",
+        "noSpaces": "La password non deve contenere spazi",
+        "lowercase": "La password deve contenere almeno una lettera minuscola",
+        "uppercase": "La password deve contenere almeno una lettera maiuscola",
+        "digit": "La password deve contenere almeno un numero",
+        "special": "La password deve contenere almeno un carattere speciale (@$!%*?&)"
+      },
+      "locale": {
+        "invalid": "La locale deve essere una delle lingue supportate"
+      },
+      "showTour": {
+        "invalid": "Show tour deve essere un valore booleano"
+      }
+    },
+    "prompts": {
+      "name": {
+        "required": "Il nome del prompt è obbligatorio",
+        "tooShort": "Il nome del prompt deve contenere almeno 2 caratteri",
+        "tooLong": "Il nome del prompt non deve superare 64 caratteri",
+        "invalid": "Il nome del prompt deve iniziare con una lettera o un numero e può contenere solo lettere, numeri, spazi, punti, underscore e trattini"
+      },
+      "type": {
+        "invalid": "Il tipo di prompt non è valido"
+      },
+      "description": {
+        "tooShort": "La descrizione deve contenere almeno 2 caratteri",
+        "tooLong": "La descrizione non deve superare 500 caratteri"
+      },
+      "datasource": {
+        "required": "L'origine dati è obbligatoria",
+        "invalid": "L'origine dati deve essere un UUID valido"
+      },
+      "status": {
+        "invalid": "Lo stato deve essere 0 o 1"
+      },
+      "prompts": {
+        "required": "È necessario almeno un prompt"
+      },
+      "ids": {
+        "required": "È necessario selezionare almeno un prompt"
+      }
+    },
+    "queryBuilders": {
+      "name": {
+        "required": "Il nome del Query Builder è obbligatorio",
+        "tooShort": "Il nome del Query Builder deve contenere almeno 2 caratteri",
+        "tooLong": "Il nome del Query Builder non deve superare 64 caratteri",
+        "invalid": "Il nome del Query Builder deve iniziare con una lettera o un numero e può contenere solo lettere, numeri, spazi, punti, underscore e trattini"
+      },
+      "description": {
+        "tooShort": "La descrizione deve contenere almeno 2 caratteri",
+        "tooLong": "La descrizione non deve superare 500 caratteri"
+      },
+      "datasource": {
+        "required": "L'origine dati è obbligatoria",
+        "invalid": "L'origine dati deve essere un UUID valido"
+      },
+      "status": {
+        "invalid": "Lo stato deve essere 0 o 1"
+      },
+      "ids": {
+        "required": "È necessario selezionare almeno un query builder"
+      }
+    },
+    "analysisFilters": {
+      "parentConstraints": {
+        "column": {
+          "required": "Il nome della colonna del vincolo genitore è obbligatorio",
+          "invalid": "La colonna del vincolo genitore deve essere un identificatore valido"
+        },
+        "values": {
+          "tooMany": "I valori del vincolo genitore non devono superare 1000 elementi",
+          "required": "I valori del vincolo genitore devono contenere almeno un elemento"
+        },
+        "tooMany": "I vincoli genitore non devono superare 20 elementi"
+      },
+      "filterId": {
+        "invalid": "L'ID filtro deve essere un UUID valido"
+      },
+      "analysisId": {
+        "invalid": "L'ID analisi deve essere un UUID valido"
+      },
+      "mode": {
+        "invalid": "La modalità deve essere 'open' o 'fetch'"
+      },
+      "requests": {
+        "required": "L'array delle richieste deve contenere almeno un elemento in modalità fetch"
       }
     }
   },
@@ -5880,5 +6325,147 @@
     "STARTER_USERS_COUNT": "Quanti utenti abbiamo?",
     "STARTER_USERS_CREATE": "Crea un utente nel gruppo Administrator",
     "STARTER_USERS_INACTIVE": "Quali utenti sono inattivi?"
+  },
+  "TOUR": {
+    "NEXT": "Avanti",
+    "BACK": "Indietro",
+    "FINISH": "Fine",
+    "SKIP": "Salta",
+    "DONT_SHOW_AGAIN": "Non mostrare più",
+    "PROGRESS": "Passo {{current}} di {{total}}",
+    "WELCOME": {
+      "TITLE": "Benvenuto in DBExec 👋",
+      "DESC": "Ecco un breve tour di ciò che puoi fare. Puoi interromperlo in qualsiasi momento e selezionare «Non mostrare più» per saltarlo ai prossimi accessi."
+    },
+    "DONE": {
+      "TITLE": "Tutto pronto 🎉",
+      "DESC": "Il tour è finito. Esplora con calma — puoi riattivarlo quando vuoi dal tuo profilo."
+    },
+    "STEPS": {
+      "search": {
+        "TITLE": "Ricerca globale",
+        "DESC": "Raggiungi tutto velocemente. Cerca tra dataset, dashboard, connessioni e altro — o premi Ctrl/⌘ + K ovunque."
+      },
+      "notifications": {
+        "TITLE": "Notifiche",
+        "DESC": "Avvisi, condivisioni e messaggi di sistema arrivano qui in tempo reale. Il badge mostra i non letti."
+      },
+      "language": {
+        "TITLE": "Cambia lingua",
+        "DESC": "Preferisci un'altra lingua? Scegli tra dieci lingue qui — l'app si aggiorna subito e la scelta viene ricordata."
+      },
+      "logout": {
+        "TITLE": "Esci",
+        "DESC": "Quando hai finito, esci in sicurezza da qui. La sessione termina e torni alla schermata di accesso."
+      },
+      "systemAdmin": {
+        "TITLE": "Amministrazione di sistema",
+        "DESC": "Amministrazione a livello di piattaforma per operatori che gestiscono DBExec tra organizzazioni."
+      },
+      "orgManagement": {
+        "TITLE": "Organizzazioni",
+        "DESC": "Crea e gestisci le organizzazioni (tenant) della piattaforma."
+      },
+      "systemRoleManagement": {
+        "TITLE": "Ruoli di sistema",
+        "DESC": "Definisci ruoli a livello di piattaforma e i permessi concessi."
+      },
+      "systemGroupManagement": {
+        "TITLE": "Gruppi di sistema",
+        "DESC": "Raggruppa gli operatori e assegna ruoli di sistema in blocco."
+      },
+      "systemUserManagement": {
+        "TITLE": "Utenti di sistema",
+        "DESC": "Gestisci gli account operatore che eseguono DBExec."
+      },
+      "home": {
+        "TITLE": "Home",
+        "DESC": "Il tuo punto di partenza — una panoramica rapida e scorciatoie a tutto."
+      },
+      "userManagement": {
+        "TITLE": "Utenti",
+        "DESC": "Invita persone nella tua organizzazione e gestisci account e accessi."
+      },
+      "roleManagement": {
+        "TITLE": "Ruoli",
+        "DESC": "Definisci ruoli e scegli quali schermate e azioni sblocca ciascuno."
+      },
+      "groupManagement": {
+        "TITLE": "Gruppi",
+        "DESC": "Raggruppa utenti e assegna ruoli all'intero gruppo."
+      },
+      "setupDB": {
+        "TITLE": "Sorgenti dati",
+        "DESC": "Collega i database letti da DBExec — Postgres, MySQL, Snowflake e altri."
+      },
+      "dbRoles": {
+        "TITLE": "Ruoli database",
+        "DESC": "Gestisci gli utenti di accesso e i ruoli nei database collegati."
+      },
+      "dbPrivileges": {
+        "TITLE": "Privilegi e accessi",
+        "DESC": "Concedi e verifica i privilegi a livello di tabella e schema."
+      },
+      "connectionManager": {
+        "TITLE": "Connessioni",
+        "DESC": "Gestisci le connessioni per eseguire SQL sulle sorgenti dati."
+      },
+      "queryRunner": {
+        "TITLE": "Area SQL",
+        "DESC": "Scrivi ed esegui SQL con completamento, query salvate e risultati live."
+      },
+      "queryBuilderTab": {
+        "TITLE": "Schede",
+        "DESC": "Organizza le schermate del generatore di query in schede."
+      },
+      "queryBuilderSection": {
+        "TITLE": "Sezioni",
+        "DESC": "Raggruppa prompt correlati in sezioni di una schermata."
+      },
+      "queryBuilderPrompt": {
+        "TITLE": "Prompt",
+        "DESC": "Progetta i prompt di input per query parametrizzate senza codice."
+      },
+      "queryBuilderScreen": {
+        "TITLE": "Generatore di query",
+        "DESC": "Assembla schede, sezioni e prompt in schermate guidate senza codice."
+      },
+      "datasetManager": {
+        "TITLE": "Dataset",
+        "DESC": "Modella dataset riutilizzabili — colonne, campi calcolati e formule."
+      },
+      "analyses": {
+        "TITLE": "Analisi",
+        "DESC": "Crea grafici e analisi visive sui tuoi dataset."
+      },
+      "dashboard": {
+        "TITLE": "Dashboard",
+        "DESC": "Combina visual in dashboard condivisibili e pubblica istantanee."
+      },
+      "rlsRules": {
+        "TITLE": "Regole RLS",
+        "DESC": "Imposta la sicurezza per riga e colonna così ognuno vede solo i propri dati."
+      },
+      "alertManagement": {
+        "TITLE": "Avvisi",
+        "DESC": "Pianifica controlli sui dati che ti avvisano al verificarsi di una condizione."
+      },
+      "auditLogs": {
+        "TITLE": "Log di audit",
+        "DESC": "Rivedi lo storico completo di chi ha modificato cosa e quando."
+      },
+      "loginActivity": {
+        "TITLE": "Attività di accesso",
+        "DESC": "Traccia accessi ed eventi di autenticazione per la sicurezza."
+      },
+      "appSettings": {
+        "TITLE": "Impostazioni app",
+        "DESC": "Regola l'aspetto — tema, branding e annunci."
+      },
+      "systemSettings": {
+        "TITLE": "Impostazioni di sistema",
+        "DESC": "Configura sicurezza, SSO, email e funzioni IA."
+      }
+    }
   }
 }

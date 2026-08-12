@@ -13,6 +13,7 @@
  * ─────────────────────────────────────────────────────────────────────
  */
 import { z } from 'zod';
+import { buildSortZod } from '../utility/listSort';
 
 // ── Standard patterns ──────────────────────────────────────────────
 
@@ -286,10 +287,35 @@ const snowflakeAddBranch = z.object({
   schemaName: snowflakeSchemaSchema,
 });
 
-/** Body of POST /datasource/validate — test a credential set. */
-export const validateDatasourceSchema = z.discriminatedUnion('type', [
-  typeOrmAddBranch,
-  snowflakeAddBranch,
+/**
+ * Body of POST /datasource/validate — test a credential set.
+ *
+ * Two accepted shapes:
+ *   1. Saved-row test: `{ id }` — controller loads the stored config
+ *      + decrypts the password, then runs the connection test. Used by
+ *      the view page's health pill.
+ *   2. Pre-save test: full credential payload (type + host/port +
+ *      database + username + password, or Snowflake variants). Used
+ *      by the add/edit forms before the row exists or to verify a
+ *      changed password.
+ *
+ * Distinguishing the two by `type` is cleaner than a discriminated
+ * union since the saved-row test has no `type` to discriminate on.
+ * We use a passthrough union: id-only branch first; if rejected,
+ * fall through to the discriminated full-payload branch.
+ */
+const validateDatasourceByIdSchema = z.object({
+  id: z.preprocess(
+    trimOrUndefined,
+    z
+      .string({ message: 'validation.datasources.id.required' })
+      .min(1, { message: 'validation.datasources.id.required' }),
+  ),
+});
+
+export const validateDatasourceSchema = z.union([
+  validateDatasourceByIdSchema,
+  z.discriminatedUnion('type', [typeOrmAddBranch, snowflakeAddBranch]),
 ]);
 
 /** Body of POST /datasource/add — create a new datasource. */
@@ -391,3 +417,64 @@ export const updateDatasourceSchema = z.object({
   schemaName: snowflakeSchemaSchema,
 });
 export type UpdateDatasourceInput = z.infer<typeof updateDatasourceSchema>;
+
+// ── List & Param Schemas for middleware ────────────────────────────────
+
+/**
+ * GET /datasource/:id — fetch a single datasource configuration.
+ * UUID validation prevents malformed IDs from reaching TypeORM.
+ */
+export const getDatasourceSchema = z.object({
+  id: z.string({ message: 'validation.common.id.required' }).trim().uuid({ message: 'validation.common.id.invalid' }),
+});
+
+/**
+ * DELETE /datasource/:id — delete a datasource.
+ * UUID validation prevents malformed IDs from reaching TypeORM.
+ */
+export const deleteDatasourceSchema = z.object({
+  id: z.string({ message: 'validation.common.id.required' }).trim().uuid({ message: 'validation.common.id.invalid' }),
+});
+
+/**
+ * GET /datasource/list — paginated datasource list with sort + filter.
+ * Sort: JSON array of { field, order }; validated against DATASOURCE_LIST_SORT_FIELDS.
+ * Filter: optional search term; empty string is ok.
+ * Page/limit: coerced from query string (numbers on wire are strings).
+ */
+export const listDatasourceSchema = z.object({
+  page: z.coerce.number().int().min(1).optional(),
+  limit: z.coerce.number().int().min(1).max(1000).optional(),
+  filter: z.string().optional(),
+  sort: buildSortZod(['name', 'type', 'status', 'createdOn']),
+});
+
+/**
+ * GET /datasource/:datasourceId/schema — fetch the full schema tree (list of schemas).
+ * datasourceId: UUID of the target datasource.
+ */
+export const listSchemaSchema = z.object({
+  datasourceId: z.string({ message: 'validation.common.id.required' }).trim().uuid({ message: 'validation.common.id.invalid' }),
+});
+
+/**
+ * GET /datasource/:datasourceId/schema/:schema/table — fetch tables within a schema.
+ * datasourceId: UUID of the target datasource.
+ * schema: plain string (PostgreSQL schema name, not a UUID); trimmed to remove whitespace.
+ */
+export const listTableSchema = z.object({
+  datasourceId: z.string({ message: 'validation.common.id.required' }).trim().uuid({ message: 'validation.common.id.invalid' }),
+  schema: z.string({ message: 'validation.datasources.schema.required' }).trim().min(1, { message: 'validation.datasources.schema.required' }),
+});
+
+/**
+ * GET /datasource/:datasourceId/schema/:schema/table/:table/column — fetch columns within a table.
+ * datasourceId: UUID of the target datasource.
+ * schema: plain string (PostgreSQL schema name, not a UUID); trimmed to remove whitespace.
+ * table: plain string (table identifier, not a UUID); trimmed to remove whitespace.
+ */
+export const listTableColumnsSchema = z.object({
+  datasourceId: z.string({ message: 'validation.common.id.required' }).trim().uuid({ message: 'validation.common.id.invalid' }),
+  schema: z.string({ message: 'validation.datasources.schema.required' }).trim().min(1, { message: 'validation.datasources.schema.required' }),
+  table: z.string({ message: 'validation.datasources.table.required' }).trim().min(1, { message: 'validation.datasources.table.required' }),
+});

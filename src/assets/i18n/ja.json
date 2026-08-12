@@ -363,7 +363,9 @@
     "LOADING_PROFILE": "プロフィールを読み込み中...",
     "ROLE_SYSTEM_ADMIN": "システム管理者",
     "ROLE_ORG_ADMIN": "組織管理者",
-    "ROLE_ORG_USER": "ユーザー"
+    "ROLE_ORG_USER": "ユーザー",
+    "PREFERENCES": "設定",
+    "SHOW_TOUR_TOGGLE": "ログイン時にプロダクトツアーを表示"
   },
   "SYSTEM_ADMIN": {
     "TITLE": "システム管理者",
@@ -4073,27 +4075,27 @@
       "dbHost": {
         "required": "データベースホストは必須です",
         "tooLong": "データベースホストは255文字を超えてはいけません",
-        "invalid": "データベースホストは有効なホスト名またはIPv4アドレスである必要があります"
+        "invalid": "データベースホストは有効なホスト名またはIPアドレスである必要があります"
       },
       "dbPort": {
         "required": "データベースポートは必須です",
         "notInteger": "データベースポートは整数である必要があります",
-        "outOfRange": "データベースポートは1から65535の範囲である必要があります"
+        "outOfRange": "データベースポートは1〜65535の間である必要があります"
       },
       "dbName": {
         "required": "データベース名は必須です",
         "tooLong": "データベース名は63文字を超えてはいけません",
-        "invalid": "データベース名は英字またはアンダースコアで始まり、英字、数字、アンダースコア、ハイフンのみを含めることができます"
+        "invalid": "データベース名は文字またはアンダースコアで始まり、文字、数字、アンダースコア、およびハイフンのみを含む必要があります"
       },
       "dbSchema": {
         "required": "スキーマ名は必須です",
         "tooLong": "スキーマ名は63文字を超えてはいけません",
-        "invalid": "スキーマ名は小文字またはアンダースコアで始まり、小文字、数字、アンダースコアのみを含めることができます"
+        "invalid": "スキーマ名は小文字で、文字、数字、およびアンダースコアのみを含む必要があります"
       },
       "dbUsername": {
         "required": "データベースユーザー名は必須です",
         "tooLong": "データベースユーザー名は128文字を超えてはいけません",
-        "invalid": "データベースユーザー名は英字またはアンダースコアで始まり、英字、数字、アンダースコア、ハイフンのみを含めることができます"
+        "invalid": "データベースユーザー名は文字またはアンダースコアで始まり、文字、数字、アンダースコア、およびハイフンのみを含む必要があります"
       },
       "dbPassword": {
         "required": "データベースパスワードは必須です",
@@ -4134,10 +4136,18 @@
     },
     "common": {
       "id": {
-        "invalid": "無効な識別子"
+        "invalid": "無効な識別子です",
+        "required": "識別子は必須です"
       },
       "status": {
         "invalid": "ステータスは0または1である必要があります"
+      },
+      "sort": {
+        "field": "無効な並べ替えフィールドです",
+        "order": "並べ替え順は asc または desc である必要があります",
+        "json": "並べ替えは有効な JSON 配列である必要があります",
+        "max": "並べ替えフィールドが多すぎます",
+        "unique": "並べ替えフィールドが重複しています"
       }
     },
     "users": {
@@ -4174,6 +4184,20 @@
         "tooShort": "氏名は2文字以上である必要があります",
         "tooLong": "氏名は60文字を超えてはいけません",
         "invalid": "氏名は文字で始まり、文字、ハイフン、アポストロフィ、スペースのみを含めることができます"
+      },
+      "groupNames": {
+        "required": "少なくとも1つのグループを指定する必要があります"
+      },
+      "row": {
+        "required": "行番号は必須です"
+      },
+      "users": {
+        "required": "ユーザーリストは必須です",
+        "min": "作成するユーザーがありません",
+        "max": "単一のリクエストで500を超えるユーザーを作成することはできません"
+      },
+      "newPassword": {
+        "required": "新しいパスワードは必須です"
       }
     },
     "roles": {
@@ -4190,6 +4214,9 @@
       "permissions": {
         "required": "少なくとも1つの権限を選択する必要があります",
         "entryInvalid": "権限エントリが無効です"
+      },
+      "filter": {
+        "type": "フィルターは文字列である必要があります"
       }
     },
     "groups": {
@@ -4205,7 +4232,8 @@
       },
       "roleId": {
         "required": "ロールを選択する必要があります",
-        "invalid": "選択したロールは無効です"
+        "invalid": "選択したロールは無効です",
+        "type": "ロールIDは文字列である必要があります"
       },
       "users": {
         "idInvalid": "1つ以上のユーザーIDが無効です"
@@ -4316,6 +4344,12 @@
       },
       "justification": {
         "tooLong": "理由は 500 文字以内で入力してください"
+      },
+      "schema": {
+        "required": "スキーマ名は必須です"
+      },
+      "table": {
+        "required": "テーブル名は必須です"
       }
     },
     "connections": {
@@ -4389,6 +4423,13 @@
         "type": {
           "invalid": "無効なプロンプトタイプです"
         }
+      },
+      "page": {
+        "invalid": "ページ番号は1以上である必要があります"
+      },
+      "limit": {
+        "invalid": "制限は1以上である必要があります",
+        "tooLarge": "制限は1000項目を超えることはできません"
       }
     },
     "analyses": {
@@ -4495,6 +4536,10 @@
           "required": "ダッシュボード名は必須です",
           "tooLong": "ダッシュボード名は 255 文字以内で入力してください"
         }
+      },
+      "fieldName": {
+        "required": "フィールド名は必須です",
+        "tooLong": "フィールド名は256文字を超えることはできません"
       }
     },
     "folders": {
@@ -4684,6 +4729,406 @@
         "format": {
           "invalid": "サポートされていないエクスポート形式です"
         }
+      }
+    },
+    "aiWorkspace": {
+      "confirm": {
+        "endpoint": {
+          "required": "エンドポイントは必須です",
+          "tooLong": "エンドポイントは256文字以下である必要があります"
+        },
+        "method": {
+          "required": "HTTPメソッドは必須です",
+          "invalid": "HTTPメソッドはPOST、PUT、またはDELETEである必要があります"
+        },
+        "payload": {
+          "required": "ペイロードは必須です"
+        },
+        "proposalId": {
+          "invalid": "提案IDは無効です",
+          "tooLong": "提案IDは128文字以下である必要があります"
+        }
+      },
+      "config": {
+        "aiProvider": {
+          "tooLong": "プロバイダーは32文字以下である必要があります"
+        },
+        "aiConnectionStyle": {
+          "invalid": "接続スタイルは'anthropic'または'openai'である必要があります"
+        },
+        "aiBaseUrl": {
+          "invalid": "ベースURLは有効なHTTPまたはHTTPS URLである必要があります",
+          "tooLong": "ベースURLは512文字以下である必要があります"
+        },
+        "aiModelId": {
+          "tooLong": "モデルIDは128文字以下である必要があります"
+        },
+        "aiTemperature": {
+          "invalid": "温度は0〜1の数値である必要があります"
+        },
+        "aiApiKey": {
+          "tooLong": "APIキーは4096文字以下である必要があります"
+        },
+        "aiMaxTokens": {
+          "invalid": "最大トークン数は1〜200000の整数である必要があります"
+        },
+        "aiTimeoutMs": {
+          "invalid": "タイムアウトは1000〜600000 ms の整数である必要があります"
+        },
+        "aiApiVersion": {
+          "tooLong": "APIバージョンは32文字以下である必要があります"
+        },
+        "aiExtraHeaders": {
+          "tooLong": "追加ヘッダーは4096文字以下である必要があります",
+          "invalid": "追加ヘッダーは有効なJSONオブジェクトである必要があります"
+        },
+        "atLeastOneField": "少なくとも1つの設定フィールドが必須です"
+      }
+    },
+    "branding": {
+      "showWatermark": {
+        "required": "ウォーターマーク設定は必須です"
+      },
+      "watermarkText": {
+        "required": "ウォーターマークが有効な場合、ウォーターマークテキストは必須です",
+        "tooShort": "ウォーターマークテキストは3文字以上である必要があります",
+        "tooLong": "ウォーターマークテキストは30文字以下である必要があります"
+      },
+      "watermarkBgColor": {
+        "invalid": "背景色は有効な16進数コード（#rgb または #rrggbb）である必要があります",
+        "required": "ウォーターマークが有効な場合、背景色は必須です"
+      },
+      "watermarkTextColor": {
+        "invalid": "テキスト色は有効な16進数コード（#rgb または #rrggbb）である必要があります",
+        "required": "ウォーターマークが有効な場合、テキスト色は必須です"
+      },
+      "preset": {
+        "name": {
+          "required": "プリセット名は必須です",
+          "tooLong": "プリセット名は80文字以下である必要があります"
+        },
+        "description": {
+          "tooLong": "説明は200文字以下である必要があります"
+        },
+        "showWatermark": {
+          "required": "ウォーターマーク設定は必須です"
+        },
+        "watermarkText": {
+          "required": "ウォーターマークが有効な場合、ウォーターマークテキストは必須です",
+          "tooShort": "ウォーターマークテキストは3文字以上である必要があります",
+          "tooLong": "ウォーターマークテキストは30文字以下である必要があります"
+        },
+        "watermarkBgColor": {
+          "invalid": "背景色は有効な16進数コード（#rgb または #rrggbb）である必要があります",
+          "required": "ウォーターマークが有効な場合、背景色は必須です"
+        },
+        "watermarkTextColor": {
+          "invalid": "テキスト色は有効な16進数コード（#rgb または #rrggbb）である必要があります",
+          "required": "ウォーターマークが有効な場合、テキスト色は必須です"
+        }
+      }
+    },
+    "theme": {
+      "primary": {
+        "invalid": "プライマリ色は有効な16進数コード（#rgb または #rrggbb）である必要があります"
+      },
+      "primaryHover": {
+        "invalid": "ホバー色は有効な16進数コード（#rgb または #rrggbb）である必要があります"
+      },
+      "primaryLight": {
+        "invalid": "ライト色は有効な16進数コード（#rgb または #rrggbb）である必要があります"
+      },
+      "primaryText": {
+        "invalid": "テキスト色は'white'、'black'、または有効な16進数コードである必要があります"
+      },
+      "atLeastOneField": "少なくとも1つのカラーフィールドが必須です",
+      "preset": {
+        "name": {
+          "required": "プリセット名は必須です",
+          "tooLong": "プリセット名は80文字以下である必要があります"
+        },
+        "description": {
+          "tooLong": "説明は200文字以下である必要があります"
+        },
+        "colors": {
+          "required": "カラーマップは必須です"
+        },
+        "atLeastOneField": "少なくとも1つのフィールドが必須です"
+      }
+    },
+    "announcements": {
+      "name": {
+        "required": "お知らせ名は必須です",
+        "tooLong": "お知らせ名は255文字を超えることはできません"
+      },
+      "description": {
+        "required": "説明は必須です",
+        "tooLong": "説明は2000文字を超えることはできません"
+      },
+      "startTime": {
+        "invalid": "開始時刻は有効なISO形式の日時である必要があります"
+      },
+      "endTime": {
+        "invalid": "終了時刻は有効なISO形式の日時である必要があります",
+        "afterStart": "終了時刻は開始時刻より後である必要があります"
+      },
+      "bgColor": {
+        "invalid": "背景色は有効な16進数カラーである必要があります"
+      },
+      "textColor": {
+        "invalid": "テキスト色は有効な16進数カラーである必要があります"
+      },
+      "status": {
+        "invalid": "ステータスは0または1である必要があります"
+      }
+    },
+    "dashboards": {
+      "fieldName": {
+        "required": "フィールド名は必須です",
+        "tooShort": "フィールド名は最低1文字である必要があります",
+        "tooLong": "フィールド名は256文字を超えることはできません"
+      },
+      "search": {
+        "tooLong": "検索用語は256文字を超えることはできません"
+      },
+      "page": {
+        "invalid": "ページ番号は1以上である必要があります"
+      },
+      "pageSize": {
+        "invalid": "ページサイズは1以上である必要があります",
+        "tooLarge": "ページサイズは500項目を超えることはできません"
+      },
+      "limit": {
+        "invalid": "制限は1以上である必要があります",
+        "tooLarge": "制限は1000項目を超えることはできません"
+      },
+      "sourceAnalysisId": {
+        "invalid": "分析IDは有効なUUIDである必要があります"
+      }
+    },
+    "auditLogs": {
+      "page": {
+        "invalid": "ページ番号は1以上である必要があります"
+      },
+      "limit": {
+        "invalid": "制限は1以上である必要があります",
+        "tooLarge": "制限は1000項目を超えることはできません"
+      }
+    },
+    "dbAccess": {
+      "dbIdent": {
+        "required": "識別子は必須です",
+        "tooLong": "識別子は63文字を超えることはできません"
+      },
+      "validUntil": {
+        "tooLong": "有効期限は64文字を超えることはできません",
+        "invalid": "有効期限は有効な日付/タイムスタンプまたは'infinity'である必要があります"
+      },
+      "rolePassword": {
+        "tooLong": "パスワードは512文字を超えることはできません",
+        "invalid": "パスワードは制御文字を含まないようにする必要があります"
+      },
+      "connectionLimit": {
+        "invalid": "接続制限は-1〜2147483647の間である必要があります"
+      },
+      "backendPid": {
+        "invalid": "有効な正の数値のバックエンドPIDが必要です"
+      },
+      "privilege": {
+        "required": "権限は必須です"
+      },
+      "columns": {
+        "required": "少なくとも1つの列が必須です"
+      },
+      "objectRef": {
+        "required": "オブジェクト参照はparts、allInSchema、またはcolumnsを含む必要があります"
+      },
+      "objType": {
+        "invalid": "オブジェクト型が無効です"
+      },
+      "privileges": {
+        "invalid": "権限を空にすることはできません",
+        "required": "少なくとも1つの権限が必須です"
+      },
+      "kind": {
+        "invalid": "ステートメント種別が無効です"
+      },
+      "behavior": {
+        "invalid": "動作はRESTRICTまたはCASCADEである必要があります"
+      },
+      "action": {
+        "invalid": "アクションはGRANTまたはREVOKEである必要があります"
+      },
+      "onObjectType": {
+        "invalid": "オブジェクト型はTABLES、SEQUENCES、FUNCTIONS、TYPES、またはSCHEMASである必要があります"
+      },
+      "statements": {
+        "required": "少なくとも1つのステートメントが必須です"
+      },
+      "reassignTo": {
+        "conflict": "reassignToとdropOwnedの両方を指定することはできません"
+      }
+    },
+    "org-policy": {
+      "emailProvider": {
+        "invalid": "メールプロバイダーはSMTP、SES、またはnullである必要があります"
+      },
+      "smtpHost": {
+        "invalid": "SMTPホストは無効です",
+        "tooLong": "SMTPホストは255文字を超えることはできません"
+      },
+      "smtpPort": {
+        "invalid": "SMTPポートは1〜65535の整数である必要があります"
+      },
+      "smtpUser": {
+        "invalid": "SMTPユーザーは無効です",
+        "tooLong": "SMTPユーザーは255文字を超えることはできません"
+      },
+      "smtpPassword": {
+        "invalid": "SMTPパスワードは無効です",
+        "tooLong": "SMTPパスワードは1024文字を超えることはできません"
+      },
+      "smtpFrom": {
+        "invalid": "SMTP送信者アドレスは有効なメールアドレスである必要があります"
+      },
+      "sesRegion": {
+        "invalid": "SESリージョンはxx-xxxx-nパターンに一致する必要があります（例：us-east-1）",
+        "tooLong": "SESリージョンは50文字を超えることはできません"
+      },
+      "sesAccessKeyId": {
+        "invalid": "SESアクセスキーIDは無効です",
+        "tooShort": "SESアクセスキーIDは16文字以上である必要があります",
+        "tooLong": "SESアクセスキーIDは128文字を超えることはできません"
+      },
+      "sesSecretAccessKey": {
+        "invalid": "SESシークレットアクセスキーは無効です",
+        "tooLong": "SESシークレットアクセスキーは1024文字を超えることはできません"
+      },
+      "sesFrom": {
+        "invalid": "SES送信者アドレスは有効なメールアドレスである必要があります"
+      },
+      "maxLoginAttempts": {
+        "invalid": "最大ログイン試行回数は3〜10の整数である必要があります"
+      },
+      "accountLockDurationHours": {
+        "invalid": "アカウントロック期間は0〜24時間である必要があります"
+      },
+      "passwordHistoryLimit": {
+        "invalid": "パスワード履歴制限は1〜24の整数である必要があります"
+      },
+      "sessionInactivityTimeout": {
+        "invalid": "セッション非アクティビティタイムアウトは5〜1440分の整数である必要があります"
+      },
+      "ssoEnabled": {
+        "invalid": "SSO有効は論理値である必要があります"
+      },
+      "ssoIssuer": {
+        "invalid": "SSO発行者は無効です",
+        "tooLong": "SSO発行者は255文字を超えることはできません"
+      },
+      "ssoEntryPoint": {
+        "invalid": "SSO開始点は有効なHTTPまたはHTTPS URLである必要があります",
+        "tooLong": "SSO開始点は2048文字を超えることはできません"
+      },
+      "ssoCertificate": {
+        "invalid": "SSOサーティフィケートは無効です",
+        "tooLong": "SSOサーティフィケートは16384文字を超えることはできません"
+      },
+      "ssoConfig": {
+        "atLeastOne": "少なくとも1つのSSO設定フィールドを提供する必要があります"
+      }
+    },
+    "profile": {
+      "newPassword": {
+        "required": "新しいパスワードは必須です",
+        "tooShort": "パスワードは最低8文字である必要があります",
+        "tooLong": "パスワードは128文字を超えることはできません",
+        "noSpaces": "パスワードはスペースを含まないようにする必要があります",
+        "lowercase": "パスワードは少なくとも1つの小文字を含む必要があります",
+        "uppercase": "パスワードは少なくとも1つの大文字を含む必要があります",
+        "digit": "パスワードは少なくとも1つの数字を含む必要があります",
+        "special": "パスワードは少なくとも1つの特殊文字（@$!%*?&）を含む必要があります"
+      },
+      "locale": {
+        "invalid": "ロケールはサポートされている言語のいずれかである必要があります"
+      },
+      "showTour": {
+        "invalid": "ツアー表示は論理値である必要があります"
+      }
+    },
+    "prompts": {
+      "name": {
+        "required": "プロンプト名は必須です",
+        "tooShort": "プロンプト名は最低2文字である必要があります",
+        "tooLong": "プロンプト名は64文字を超えることはできません",
+        "invalid": "プロンプト名は文字または数字で始まり、文字、数字、スペース、ドット、アンダースコア、およびハイフンのみを含むことができます"
+      },
+      "type": {
+        "invalid": "プロンプト型が無効です"
+      },
+      "description": {
+        "tooShort": "説明は最低2文字である必要があります",
+        "tooLong": "説明は500文字を超えることはできません"
+      },
+      "datasource": {
+        "required": "データソースは必須です",
+        "invalid": "データソースは有効なUUIDである必要があります"
+      },
+      "status": {
+        "invalid": "ステータスは0または1である必要があります"
+      },
+      "prompts": {
+        "required": "少なくとも1つのプロンプトが必須です"
+      },
+      "ids": {
+        "required": "少なくとも1つのプロンプトを選択する必要があります"
+      }
+    },
+    "queryBuilders": {
+      "name": {
+        "required": "Query Builder名は必須です",
+        "tooShort": "Query Builder名は最低2文字である必要があります",
+        "tooLong": "Query Builder名は64文字を超えることはできません",
+        "invalid": "Query Builder名は文字または数字で始まり、文字、数字、スペース、ドット、アンダースコア、およびハイフンのみを含むことができます"
+      },
+      "description": {
+        "tooShort": "説明は最低2文字である必要があります",
+        "tooLong": "説明は500文字を超えることはできません"
+      },
+      "datasource": {
+        "required": "データソースは必須です",
+        "invalid": "データソースは有効なUUIDである必要があります"
+      },
+      "status": {
+        "invalid": "ステータスは0または1である必要があります"
+      },
+      "ids": {
+        "required": "少なくとも1つのQuery Builderを選択する必要があります"
+      }
+    },
+    "analysisFilters": {
+      "parentConstraints": {
+        "column": {
+          "required": "親制約列名は必須です",
+          "invalid": "親制約列は有効な識別子である必要があります"
+        },
+        "values": {
+          "tooMany": "親制約値は1000項目を超えることはできません",
+          "required": "親制約値は少なくとも1つの項目を含む必要があります"
+        },
+        "tooMany": "親制約は20項目を超えることはできません"
+      },
+      "filterId": {
+        "invalid": "フィルターIDは有効なUUIDである必要があります"
+      },
+      "analysisId": {
+        "invalid": "分析IDは有効なUUIDである必要があります"
+      },
+      "mode": {
+        "invalid": "モードは'open'または'fetch'である必要があります"
+      },
+      "requests": {
+        "required": "リクエスト配列はfetchモードで少なくとも1つの項目を含む必要があります"
       }
     }
   },
@@ -5880,5 +6325,147 @@
     "STARTER_USERS_COUNT": "ユーザーは何人いますか？",
     "STARTER_USERS_CREATE": "Administrator グループにユーザーを作成して",
     "STARTER_USERS_INACTIVE": "どのユーザーが非アクティブですか？"
+  },
+  "TOUR": {
+    "NEXT": "次へ",
+    "BACK": "戻る",
+    "FINISH": "完了",
+    "SKIP": "スキップ",
+    "DONT_SHOW_AGAIN": "今後は表示しない",
+    "PROGRESS": "ステップ {{current}} / {{total}}",
+    "WELCOME": {
+      "TITLE": "DBExec へようこそ 👋",
+      "DESC": "できることを簡単にご案内します。いつでも中止でき、「今後は表示しない」にチェックすると次回以降のログインではスキップされます。"
+    },
+    "DONE": {
+      "TITLE": "準備完了 🎉",
+      "DESC": "ツアーは以上です。ご自身のペースでお試しください。プロフィールからいつでも再表示できます。"
+    },
+    "STEPS": {
+      "search": {
+        "TITLE": "グローバル検索",
+        "DESC": "目的の場所へすばやく移動。データセット、ダッシュボード、接続などを検索できます。どこでも Ctrl/⌘ + K でも開けます。"
+      },
+      "notifications": {
+        "TITLE": "通知",
+        "DESC": "アラート、共有、システムメッセージがリアルタイムで届きます。バッジは未読件数を示します。"
+      },
+      "language": {
+        "TITLE": "言語の変更",
+        "DESC": "別の言語をご希望ですか？ここで10言語から選べます。アプリは即座に更新され、選択は保存されます。"
+      },
+      "logout": {
+        "TITLE": "サインアウト",
+        "DESC": "終了したらここから安全にサインアウトします。セッションが終了し、ログイン画面に戻ります。"
+      },
+      "systemAdmin": {
+        "TITLE": "システム管理",
+        "DESC": "組織横断で DBExec を管理する運用者向けのプラットフォームレベル管理。"
+      },
+      "orgManagement": {
+        "TITLE": "組織",
+        "DESC": "プラットフォーム上の組織（テナント）を作成・管理します。"
+      },
+      "systemRoleManagement": {
+        "TITLE": "システムロール",
+        "DESC": "プラットフォームレベルのロールと付与する権限を定義します。"
+      },
+      "systemGroupManagement": {
+        "TITLE": "システムグループ",
+        "DESC": "運用者をグループ化し、システムロールを一括で割り当てます。"
+      },
+      "systemUserManagement": {
+        "TITLE": "システムユーザー",
+        "DESC": "DBExec 自体を運用するオペレーターアカウントを管理します。"
+      },
+      "home": {
+        "TITLE": "ホーム",
+        "DESC": "起点となる画面。概要とすべてへのショートカットを表示します。"
+      },
+      "userManagement": {
+        "TITLE": "ユーザー",
+        "DESC": "組織にメンバーを招待し、アカウントとアクセスを管理します。"
+      },
+      "roleManagement": {
+        "TITLE": "ロール",
+        "DESC": "ロールを定義し、各ロールが解放する画面と操作を選びます。"
+      },
+      "groupManagement": {
+        "TITLE": "グループ",
+        "DESC": "ユーザーをグループにまとめ、グループ全体にロールを付与します。"
+      },
+      "setupDB": {
+        "TITLE": "データソース",
+        "DESC": "DBExec が読み取るデータベースを接続します（Postgres、MySQL、Snowflake など）。"
+      },
+      "dbRoles": {
+        "TITLE": "データベースロール",
+        "DESC": "接続先データベース内のログインユーザーとロールを管理します。"
+      },
+      "dbPrivileges": {
+        "TITLE": "権限とアクセス",
+        "DESC": "テーブル・スキーマ単位の権限を付与・確認します。"
+      },
+      "connectionManager": {
+        "TITLE": "接続",
+        "DESC": "データソースに対して SQL を実行する接続を管理します。"
+      },
+      "queryRunner": {
+        "TITLE": "SQL ワークスペース",
+        "DESC": "補完、保存クエリ、ライブ結果グリッドで SQL を作成・実行します。"
+      },
+      "queryBuilderTab": {
+        "TITLE": "タブ",
+        "DESC": "ガイド付きクエリビルダー画面をタブで整理します。"
+      },
+      "queryBuilderSection": {
+        "TITLE": "セクション",
+        "DESC": "関連するプロンプトを画面内のセクションにまとめます。"
+      },
+      "queryBuilderPrompt": {
+        "TITLE": "プロンプト",
+        "DESC": "パラメーター化されたノーコードクエリの入力プロンプトを設計します。"
+      },
+      "queryBuilderScreen": {
+        "TITLE": "クエリビルダー",
+        "DESC": "タブ、セクション、プロンプトを組み合わせてノーコード画面を作成します。"
+      },
+      "datasetManager": {
+        "TITLE": "データセット",
+        "DESC": "再利用可能なデータセットを作成します。列、計算フィールド、数式。"
+      },
+      "analyses": {
+        "TITLE": "分析",
+        "DESC": "データセットをもとにグラフや視覚的な分析を作成します。"
+      },
+      "dashboard": {
+        "TITLE": "ダッシュボード",
+        "DESC": "ビジュアルを共有可能なダッシュボードにまとめ、スナップショットを公開します。"
+      },
+      "rlsRules": {
+        "TITLE": "RLS ルール",
+        "DESC": "行・列レベルのセキュリティを設定し、各ユーザーに適切なデータのみ表示します。"
+      },
+      "alertManagement": {
+        "TITLE": "アラート",
+        "DESC": "条件を満たすと通知するデータチェックをスケジュールします。"
+      },
+      "auditLogs": {
+        "TITLE": "監査ログ",
+        "DESC": "誰が・いつ・何を変更したかの完全な履歴を確認します。"
+      },
+      "loginActivity": {
+        "TITLE": "ログイン履歴",
+        "DESC": "セキュリティとコンプライアンスのためサインインと認証イベントを追跡します。"
+      },
+      "appSettings": {
+        "TITLE": "アプリ設定",
+        "DESC": "外観を調整します。テーマ、ブランディング、お知らせ。"
+      },
+      "systemSettings": {
+        "TITLE": "システム設定",
+        "DESC": "セキュリティ、SSO、メール、AI 機能を設定します。"
+      }
+    }
   }
 }
