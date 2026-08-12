@@ -1,26 +1,13 @@
-<aside
-  class="sidebar"
-  [class.collapsed]="!isExpanded"
-  [class.mobile]="isMobile"
-  role="navigation"
-  aria-label="Main Navigation"
->
+<aside class="sidebar" [class.collapsed]="!isExpanded" [class.mobile]="isMobile" role="navigation"
+  aria-label="Main Navigation">
   <!-- ── Chevron handle: semi-circle floating on the right divider,
        same affordance as the original sidebar before the refactor. -->
-  <button
-    class="toggle-btn"
-    (click)="toggleSidebar()"
-    [pTooltip]="isExpanded ? 'Collapse sidebar' : 'Expand sidebar'"
-    tooltipPosition="right"
-    [attr.aria-label]="isExpanded ? 'Collapse sidebar' : 'Expand sidebar'"
-  >
-    <i
-      class="pi"
-      [ngClass]="{
+  <button class="toggle-btn" (click)="toggleSidebar()" [pTooltip]="isExpanded ? 'Collapse sidebar' : 'Expand sidebar'"
+    tooltipPosition="right" [attr.aria-label]="isExpanded ? 'Collapse sidebar' : 'Expand sidebar'">
+    <i class="pi" [ngClass]="{
         'pi-chevron-right': !isExpanded,
         'pi-chevron-left': isExpanded,
-      }"
-    ></i>
+      }"></i>
   </button>
 
   <!-- ── TOP: brand + bell + search ─────────────────────────────────
@@ -28,44 +15,23 @@
        the right. Collapsed: brand icon centred, action icons hidden
        (same as today's search behaviour). -->
   <div class="sidebar-top">
-    <a
-      class="brand"
-      [routerLink]="['/']"
-      [pTooltip]="isExpanded ? undefined : 'Go to home'"
-      tooltipPosition="right"
-      aria-label="DBExec — go to home"
-    >
+    <a class="brand" [routerLink]="['/']" [pTooltip]="isExpanded ? undefined : 'Go to home'" tooltipPosition="right"
+      aria-label="DBExec — go to home">
       <i class="ci ci-app-icon brand-icon"></i>
-      <span class="brand-text"
-        >DB<span class="brand-highlight">Exec</span></span
-      >
+      <span class="brand-text">DB<span class="brand-highlight">Exec</span></span>
     </a>
     <div class="sidebar-top-actions" *ngIf="isExpanded">
-      <button
-        *ngIf="showNotificationBell"
-        class="icon-btn notification-btn"
-        type="button"
-        data-tour="notifications"
-        (click)="openNotificationModal()"
-        pTooltip="View notifications"
-        tooltipPosition="bottom"
-        aria-label="View notifications"
-      >
+      <button *ngIf="showNotificationBell" class="icon-btn notification-btn" type="button" data-tour="notifications"
+        (click)="openNotificationModal()" pTooltip="View notifications" tooltipPosition="bottom"
+        aria-label="View notifications">
         <i class="pi pi-bell"></i>
         <span class="badge" *ngIf="notificationService.unreadCount() > 0">
           {{ notificationService.badgeLabel() }}
         </span>
       </button>
-      <button
-        *ngIf="!isSystemAdmin"
-        class="icon-btn search-btn"
-        type="button"
-        data-tour="search"
-        (click)="openSearchModal()"
-        [pTooltip]="'HEADER.SEARCH' | translate"
-        tooltipPosition="bottom"
-        [attr.aria-label]="'HEADER.SEARCH' | translate"
-      >
+      <button *ngIf="!isSystemAdmin" class="icon-btn search-btn" type="button" data-tour="search"
+        (click)="openSearchModal()" [pTooltip]="'HEADER.SEARCH' | translate" tooltipPosition="bottom"
+        [attr.aria-label]="'HEADER.SEARCH' | translate">
         <i class="pi pi-search"></i>
       </button>
     </div>
@@ -75,101 +41,62 @@
   <div class="sidebar-content">
     <nav class="sidebar-nav">
       <ul class="nav-list">
-        <li
-          *ngFor="let item of menuItems; trackBy: trackByIndex"
-          class="nav-item"
-        >
+        <li *ngFor="let item of menuItems; trackBy: trackByIndex" class="nav-item">
           <!-- Menu item with subPermissions -->
-          <div
-            *ngIf="item.subPermissions?.length"
-            class="nav-link expandable"
-            [attr.data-tour]="'nav-' + item.value"
-            (click)="toggleSubmenuAndExpand(item)"
-            [class.expanded]="item.isExpanded"
-            [class.has-active-child]="hasActiveDescendant(item)"
-          >
+          <div *ngIf="item.subPermissions?.length" class="nav-link expandable" [attr.data-tour]="'nav-' + item.value"
+            (click)="toggleSubmenuAndExpand(item)" [class.expanded]="item.isExpanded"
+            [class.has-active-child]="hasActiveDescendant(item)">
             <div class="link-content">
               <i [class]="item.icon"></i>
               <span class="nav-text">{{
                 'SIDEBAR.' + item.value | translate
-              }}</span>
+                }}</span>
             </div>
-            <i
-              class="pi pi-chevron-down submenu-arrow"
-              [class.expanded]="item.isExpanded"
-            ></i>
+            <i class="pi pi-chevron-down submenu-arrow" [class.expanded]="item.isExpanded"></i>
           </div>
 
           <!-- Menu item without subPermissions -->
-          <a
-            *ngIf="!item.subPermissions?.length"
-            [routerLink]="item.route"
-            routerLinkActive="active"
-            [routerLinkActiveOptions]="{ exact: item.exact ?? false }"
-            #rla="routerLinkActive"
-            [attr.aria-current]="rla.isActive ? 'page' : null"
-            [attr.data-tour]="'nav-' + item.value"
-            class="nav-link"
-          >
+          <a *ngIf="!item.subPermissions?.length" [routerLink]="item.route" routerLinkActive="active"
+            [routerLinkActiveOptions]="{ exact: item.exact ?? false }" #rla="routerLinkActive"
+            [attr.aria-current]="rla.isActive ? 'page' : null" [attr.data-tour]="'nav-' + item.value" class="nav-link">
             <div class="link-content">
               <i [class]="item.icon"></i>
               <span class="nav-text">{{
                 'SIDEBAR.' + item.value | translate
-              }}</span>
+                }}</span>
             </div>
           </a>
 
           <!-- Submenu -->
-          <ul
-            class="submenu"
-            [class.expanded]="item.isExpanded"
-            *ngIf="item.subPermissions"
-          >
-            <li
-              *ngFor="let subItem of item.subPermissions; trackBy: trackByIndex"
-              class="submenu-item"
-            >
-              <div
-                *ngIf="subItem.subPermissions?.length"
-                class="submenu-link"
-                (click)="toggleSubmenuAndExpand(subItem)"
-                [class.expanded]="subItem.isExpanded"
-                [class.has-active-child]="hasActiveDescendant(subItem)"
-              >
+          <ul class="submenu" [class.expanded]="item.isExpanded" *ngIf="item.subPermissions">
+            <li *ngFor="let subItem of item.subPermissions; trackBy: trackByIndex" class="submenu-item">
+              <div *ngIf="subItem.subPermissions?.length" class="submenu-link" [attr.data-tour]="'nav-' + subItem.value"
+                (click)="toggleSubmenuAndExpand(subItem)" [class.expanded]="subItem.isExpanded"
+                [class.has-active-child]="hasActiveDescendant(subItem)">
                 <div class="link-content">
                   <i [class]="subItem.icon"></i>
                   <span class="nav-text">{{
                     'SIDEBAR.' + subItem.value | translate
-                  }}</span>
+                    }}</span>
                 </div>
-                <i
-                  class="pi pi-chevron-down submenu-arrow"
-                  [class.expanded]="subItem.isExpanded"
-                ></i>
+                <i class="pi pi-chevron-down submenu-arrow" [class.expanded]="subItem.isExpanded"></i>
               </div>
 
-              <a
-                *ngIf="!subItem.subPermissions?.length"
-                [routerLink]="subItem.route"
-                routerLinkActive="active"
-                [routerLinkActiveOptions]="{ exact: subItem.exact ?? false }"
-                #rlaSub="routerLinkActive"
-                [attr.aria-current]="rlaSub.isActive ? 'page' : null"
-              >
+              <a *ngIf="!subItem.subPermissions?.length" [routerLink]="subItem.route" routerLinkActive="active"
+                [routerLinkActiveOptions]="{ exact: subItem.exact ?? false }" #rlaSub="routerLinkActive"
+                [attr.aria-current]="rlaSub.isActive ? 'page' : null" [attr.data-tour]="'nav-' + subItem.value">
                 <div class="link-content">
                   <i [class]="subItem.icon"></i>
                   <span class="nav-text">{{
                     'SIDEBAR.' + subItem.value | translate
-                  }}</span>
+                    }}</span>
                 </div>
               </a>
 
-              <ng-container
-                *ngTemplateOutlet="
+              <ng-container *ngTemplateOutlet="
                   nestedSubmenu;
                   context: { $implicit: subItem }
-                "
-              ></ng-container>
+                "></ng-container>
             </li>
           </ul>
         </li>
@@ -179,15 +106,8 @@
 
   <!-- ── BOTTOM: avatar only (bell moved to .sidebar-top) ─────────── -->
   <div class="sidebar-bottom">
-    <div
-      class="user-profile"
-      data-tour="account"
-      (click)="toggleProfileMenu($event)"
-      [pTooltip]="isExpanded ? undefined : userName + ' — open account menu'"
-      tooltipPosition="right"
-      role="button"
-      [attr.aria-label]="userName + ' — open account menu'"
-    >
+    <div class="user-profile" data-tour="account" (click)="toggleProfileMenu($event)"
+      [pTooltip]="isExpanded ? undefined : userName" tooltipPosition="right" role="button" [attr.aria-label]="userName">
       <div class="avatar">{{ userInitials }}</div>
       <div class="user-meta" *ngIf="isExpanded">
         <div class="user-name">{{ userName }}</div>
@@ -199,11 +119,7 @@
   </div>
 </aside>
 
-<div
-  class="profile-menu"
-  [class.show]="showProfileMenu"
-  [class.collapsed-anchor]="!isExpanded"
->
+<div class="profile-menu" [class.show]="showProfileMenu" [class.collapsed-anchor]="!isExpanded">
   <!-- Quiet identifier row — Claude pattern. No avatar/name here;
        the sidebar's bottom row already shows that. The email hints
        at "this is the account you're acting as" without restating
@@ -222,13 +138,8 @@
     <!-- Language row — Claude-style: clicking opens a side flyout
          showing the locale list. Hover keeps the flyout open so the
          user can move across the gap.  -->
-    <li
-      class="menu-item has-flyout"
-      data-tour="language"
-      [class.is-open]="showLanguageFlyout"
-      (mouseenter)="showLanguageFlyout = true"
-      (mouseleave)="showLanguageFlyout = false"
-    >
+    <li class="menu-item has-flyout" data-tour="language" [class.is-open]="showLanguageFlyout"
+      (mouseenter)="showLanguageFlyout = true" (mouseleave)="showLanguageFlyout = false">
       <a (click)="toggleLanguageFlyout($event)">
         <i class="pi pi-globe"></i>
         <span>{{ 'HEADER.LANGUAGE' | translate }}</span>
@@ -247,89 +158,50 @@
 
 <!-- Language flyout (sibling, positioned to the right of the profile menu).
      Shown when the user hovers the Language row or clicks it. -->
-<div
-  class="language-flyout"
-  [class.show]="showLanguageFlyout && showProfileMenu"
-  [class.collapsed-anchor]="!isExpanded"
-  (mouseenter)="showLanguageFlyout = true"
-  (mouseleave)="showLanguageFlyout = false"
->
+<div class="language-flyout" [class.show]="showLanguageFlyout && showProfileMenu" [class.collapsed-anchor]="!isExpanded"
+  (mouseenter)="showLanguageFlyout = true" (mouseleave)="showLanguageFlyout = false">
   <ul class="locale-list">
-    <li
-      *ngFor="let locale of locales"
-      class="locale-item"
-      [class.is-active]="locale.code === currentLocale"
-      [class.is-disabled]="changingLocale"
-      (click)="onLocaleChange(locale.code); $event.stopPropagation()"
-    >
+    <li *ngFor="let locale of locales" class="locale-item" [class.is-active]="locale.code === currentLocale"
+      [class.is-disabled]="changingLocale" (click)="onLocaleChange(locale.code); $event.stopPropagation()">
       <i [class]="locale.flagClass" aria-hidden="true"></i>
       <span class="locale-label">
         {{ locale.label
-        }}<span
-          class="locale-region"
-          *ngIf="locale.region && !locale.label.includes('(')"
-        >
-          ({{ locale.region }})</span
-        >
+        }}<span class="locale-region" *ngIf="locale.region && !locale.label.includes('(')">
+          ({{ locale.region }})</span>
       </span>
-      <i
-        *ngIf="locale.code === currentLocale"
-        class="pi pi-check locale-check"
-        aria-hidden="true"
-      ></i>
+      <i *ngIf="locale.code === currentLocale" class="pi pi-check locale-check" aria-hidden="true"></i>
     </li>
   </ul>
 </div>
 
 <!-- ── Recursive nested-submenu template ──────────────────────────── -->
 <ng-template #nestedSubmenu let-item>
-  <ul
-    class="nested-submenu"
-    [class.expanded]="item.isExpanded"
-    *ngIf="item.subPermissions"
-  >
-    <li
-      *ngFor="let nestedItem of item.subPermissions; trackBy: trackByIndex"
-      class="nested-submenu-item"
-    >
-      <div
-        *ngIf="nestedItem.subPermissions?.length"
-        class="submenu-link"
-        (click)="toggleSubmenuAndExpand(nestedItem)"
-        [class.expanded]="nestedItem.isExpanded"
-        [class.has-active-child]="hasActiveDescendant(nestedItem)"
-      >
+  <ul class="nested-submenu" [class.expanded]="item.isExpanded" *ngIf="item.subPermissions">
+    <li *ngFor="let nestedItem of item.subPermissions; trackBy: trackByIndex" class="nested-submenu-item">
+      <div *ngIf="nestedItem.subPermissions?.length" class="submenu-link" [attr.data-tour]="'nav-' + nestedItem.value"
+        (click)="toggleSubmenuAndExpand(nestedItem)" [class.expanded]="nestedItem.isExpanded"
+        [class.has-active-child]="hasActiveDescendant(nestedItem)">
         <div class="link-content">
           <i [class]="nestedItem.icon"></i>
           <span class="nav-text">{{
             'SIDEBAR.' + nestedItem.value | translate
-          }}</span>
+            }}</span>
         </div>
-        <i
-          class="pi pi-chevron-down submenu-arrow"
-          [class.expanded]="nestedItem.isExpanded"
-        ></i>
+        <i class="pi pi-chevron-down submenu-arrow" [class.expanded]="nestedItem.isExpanded"></i>
       </div>
 
-      <a
-        *ngIf="!nestedItem.subPermissions?.length"
-        [routerLink]="nestedItem.route"
-        routerLinkActive="active"
-        [routerLinkActiveOptions]="{ exact: nestedItem.exact ?? false }"
-        #rlaNested="routerLinkActive"
-        [attr.aria-current]="rlaNested.isActive ? 'page' : null"
-      >
+      <a *ngIf="!nestedItem.subPermissions?.length" [routerLink]="nestedItem.route" routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: nestedItem.exact ?? false }" #rlaNested="routerLinkActive"
+        [attr.aria-current]="rlaNested.isActive ? 'page' : null" [attr.data-tour]="'nav-' + nestedItem.value">
         <div class="link-content">
           <i [class]="nestedItem.icon"></i>
           <span class="nav-text">{{
             'SIDEBAR.' + nestedItem.value | translate
-          }}</span>
+            }}</span>
         </div>
       </a>
 
-      <ng-container
-        *ngTemplateOutlet="nestedSubmenu; context: { $implicit: nestedItem }"
-      ></ng-container>
+      <ng-container *ngTemplateOutlet="nestedSubmenu; context: { $implicit: nestedItem }"></ng-container>
     </li>
   </ul>
 </ng-template>

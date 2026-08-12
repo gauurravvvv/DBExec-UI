@@ -6466,6 +6466,7 @@
         "TITLE": "系统设置",
         "DESC": "配置安全、SSO、电子邮件和 AI 功能。"
       }
-    }
+    },
+    "MODULE_GENERIC_DESC": "打开{{name}}以使用这些功能。"
   }
 }

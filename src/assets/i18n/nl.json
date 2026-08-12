@@ -6466,6 +6466,7 @@
         "TITLE": "Systeeminstellingen",
         "DESC": "Configureer beveiliging, SSO, e-mail en AI-functies."
       }
-    }
+    },
+    "MODULE_GENERIC_DESC": "Open {{name}} om met deze functies te werken."
   }
 }

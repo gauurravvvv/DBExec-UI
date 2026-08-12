@@ -6466,6 +6466,7 @@
         "TITLE": "Paramètres système",
         "DESC": "Configurez la sécurité, le SSO, l'e-mail et les fonctions IA."
       }
-    }
+    },
+    "MODULE_GENERIC_DESC": "Ouvrez {{name}} pour utiliser ces fonctionnalités."
   }
 }

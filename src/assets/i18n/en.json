@@ -6463,6 +6463,7 @@
         "TITLE": "System Settings",
         "DESC": "Configure platform security, SSO, email and AI features."
       }
-    }
+    },
+    "MODULE_GENERIC_DESC": "Open {{name}} to work with these features."
   }
 }

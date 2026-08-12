@@ -6466,6 +6466,7 @@
         "TITLE": "Configurações do sistema",
         "DESC": "Configure segurança, SSO, e-mail e recursos de IA."
       }
-    }
+    },
+    "MODULE_GENERIC_DESC": "Abra {{name}} para usar esses recursos."
   }
 }

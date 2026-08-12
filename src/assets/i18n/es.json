@@ -6466,6 +6466,7 @@
         "TITLE": "Ajustes del sistema",
         "DESC": "Configura seguridad, SSO, correo y funciones de IA."
       }
-    }
+    },
+    "MODULE_GENERIC_DESC": "Abre {{name}} para trabajar con estas funciones."
   }
 }

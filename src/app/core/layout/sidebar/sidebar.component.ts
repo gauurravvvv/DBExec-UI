@@ -465,8 +465,10 @@ export class SidebarComponent implements OnInit, TourSidebarApi {
   // Guided-tour API (TourSidebarApi) — driven by TourService only.
   // ─────────────────────────────────────────────────────────────────
 
-  /** Pin the sidebar open so every nav row is rendered + anchorable.
-   *  Remembers the prior pinned state for restoreAfterTour(). */
+  /** Pin the sidebar open so every TOP-LEVEL nav row is visible + anchorable.
+   *  The tour targets top-level parents only (groups + top leaves), which are
+   *  always rendered — so we do NOT expand groups (that would reveal dozens of
+   *  submenu rows we deliberately don't tour). Remembers prior pinned state. */
   forceExpandForTour(): void {
     if (this.prePinnedOpen === null) this.prePinnedOpen = this.isPinnedOpen;
     this.isPinnedOpen = true;
@@ -474,8 +476,8 @@ export class SidebarComponent implements OnInit, TourSidebarApi {
     this.cdr.markForCheck();
   }
 
-  /** Restore whatever pinned/expanded state the user had before the tour,
-   *  and close any tour-opened popovers. */
+  /** Restore whatever pinned state the user had before the tour, and close
+   *  any tour-opened popovers. */
   restoreAfterTour(): void {
     if (this.prePinnedOpen !== null) {
       this.isPinnedOpen = this.prePinnedOpen;
@@ -485,6 +487,12 @@ export class SidebarComponent implements OnInit, TourSidebarApi {
     this.showLanguageFlyout = false;
     this.recomputeExpanded();
     this.cdr.markForCheck();
+  }
+
+  /** Top-level sidebar rows to tour — one per parent (group or top-level
+   *  leaf), in display order. Already permission-filtered by processMenuItems. */
+  getTourModuleTargets(): { value: string }[] {
+    return this.menuItems.filter(i => !!i.value).map(i => ({ value: i.value }));
   }
 
   /** Open the account (avatar) menu for the logout / language tour steps. */

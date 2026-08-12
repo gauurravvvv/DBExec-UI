@@ -6466,6 +6466,7 @@
         "TITLE": "Systemeinstellungen",
         "DESC": "Konfigurieren Sie Sicherheit, SSO, E-Mail und KI-Funktionen."
       }
-    }
+    },
+    "MODULE_GENERIC_DESC": "Öffnen Sie {{name}}, um mit diesen Funktionen zu arbeiten."
   }
 }

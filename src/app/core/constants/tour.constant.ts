@@ -89,15 +89,21 @@ export const TOUR_CHROME_TRAILING: TourStepDef[] = [
     key: 'language',
     anchor: '[data-tour="language"]',
     chrome: 'language',
-    side: 'right',
-    align: 'end',
+    // 'top' (not 'right'): the language flyout opens to the RIGHT of the
+    // profile menu, exactly where a right-side popover would land — they
+    // overlapped. Placing the card above the menu keeps it clear of the
+    // opened language chooser.
+    side: 'top',
+    align: 'start',
   },
   {
     key: 'logout',
     anchor: '[data-tour="logout"]',
     chrome: 'logout',
-    side: 'right',
-    align: 'end',
+    // 'top' too, for consistency with the language step and to stay clear of
+    // the account menu which floats at the bottom-left edge.
+    side: 'top',
+    align: 'start',
   },
 ];
 

@@ -32,7 +32,6 @@ import {
   TOUR_CHROME_LEADING,
   TOUR_CHROME_TRAILING,
   TOUR_DONE,
-  TOUR_MODULE_STEPS,
   TOUR_SESSION_SEEN_KEY,
   TOUR_WELCOME,
   type TourChrome,
@@ -41,8 +40,13 @@ import {
 import { GlobalSearchService } from 'src/app/shared/services/global-search.service';
 import { NotificationModalService } from 'src/app/shared/services/notification-modal.service';
 import { HttpClientService } from './http-client.service';
-import { PermissionService } from './permission.service';
 import { StorageService } from './storage.service';
+
+/** One tourable top-level sidebar row. */
+export interface TourModuleTarget {
+  /** The item's permission `value` — also its anchor suffix (nav-<value>). */
+  value: string;
+}
 
 /**
  * Minimal surface the sidebar registers so the tour can pin it open and
@@ -54,6 +58,10 @@ export interface TourSidebarApi {
   openAccountMenuForTour(): void;
   openLanguageFlyoutForTour(): void;
   closeTourPopovers(): void;
+  /** The top-level sidebar rows to tour (groups + top-level leaves), in
+   *  display order. The tour targets these PARENTS only — not the nested
+   *  submenu items — to keep the step count sane. */
+  getTourModuleTargets(): TourModuleTarget[];
 }
 
 /** A resolved, driver.js-ready step plus the metadata we need for hooks. */
@@ -75,7 +83,6 @@ export class TourService {
   private dontShowAgain = false;
 
   constructor(
-    private permissionService: PermissionService,
     private translate: TranslateService,
     private http: HttpClientService,
     private globalSearchService: GlobalSearchService,
@@ -101,16 +108,64 @@ export class TourService {
     const seenThisSession =
       sessionStorage.getItem(TOUR_SESSION_SEEN_KEY) === 'true';
     if (flag === 'false' || seenThisSession) return;
-    // Defer to the next macrotask so the sidebar + shell have painted and
-    // the nav/chrome anchors exist before we query them.
-    setTimeout(() => this.start(), 300);
+    // Don't start on a fixed guess — wait until everything the tour needs is
+    // actually in place. The org theme is already resolved by now (applyBoot-
+    // strap commits it — custom OR default-reset — BEFORE the shell mounts and
+    // calls this), so readiness is: the sidebar has registered its tour API AND
+    // at least one nav anchor is painted in the DOM. Then one rAF so the
+    // injected theme <style> has painted before driver.js reads its colours.
+    // Polled with a hard cap so a missing signal can never leave the tour off.
+    this.whenReady(() => this.start());
+  }
+
+  /**
+   * Resolve `cb` once the shell is ready to host the tour (sidebar registered
+   * + a nav anchor painted). Polls every 80ms up to ~4s; on the cap we start
+   * anyway (better a slightly-early tour than none).
+   */
+  private whenReady(cb: () => void): void {
+    let fired = false;
+    const fire = () => {
+      if (fired) return;
+      fired = true;
+      // A frame of headroom so the org theme's <style> (applied pre-mount)
+      // and the sidebar's latest render have painted before driver.js reads
+      // computed colours / element rects.
+      requestAnimationFrame(() => cb());
+    };
+    let waited = 0;
+    const STEP = 80;
+    const CAP = 4000;
+    const tick = () => {
+      if (fired) return;
+      const ready = !!this.sidebar && !!document.querySelector('[data-tour]');
+      if (ready || waited >= CAP) {
+        fire();
+        return;
+      }
+      waited += STEP;
+      setTimeout(tick, STEP);
+    };
+    tick();
   }
 
   /** Build steps and drive. Manual restart passes through here too. */
   start(): void {
     if (this.running()) return;
+    // Mark that the tour has started in this tab session. A page reload
+    // mid-tour then won't auto-restart it from step 1 (maybeAutoStart checks
+    // this) — the user can re-launch from the profile toggle. Set BEFORE the
+    // async build so a fast reload can't slip past it.
+    try {
+      sessionStorage.setItem(TOUR_SESSION_SEEN_KEY, 'true');
+    } catch {
+      /* sessionStorage unavailable — server flag still governs */
+    }
     this.sidebar?.forceExpandForTour();
-    // Build after the sidebar is pinned open so nav rows are in the DOM.
+    // forceExpandForTour() opens every group; Angular needs a change-detection
+    // cycle + paint to render the newly-revealed submenu rows before we can
+    // query their [data-tour] anchors. 150ms comfortably covers that (the
+    // sidebar is OnPush and we markForCheck inside the expand call).
     setTimeout(() => {
       this.steps = this.buildSteps();
       if (this.steps.length === 0) {
@@ -121,7 +176,7 @@ export class TourService {
       this.running.set(true);
       this.driverObj = driver(this.buildConfig());
       this.driverObj.drive();
-    }, 60);
+    }, 150);
   }
 
   /** Destroy the driver instance and restore chrome. Safe to call twice. */
@@ -159,20 +214,30 @@ export class TourService {
   // ── Step building ────────────────────────────────────────────────
 
   private buildSteps(): BuiltStep[] {
+    // Module steps come from the sidebar's rendered TOP-LEVEL rows (groups +
+    // top-level leaves) — one step per parent, never per submenu item, so a
+    // user with many modules gets ~8 steps, not ~24. The sidebar already
+    // filtered these by permission, so no extra permission check is needed.
+    const moduleSteps: TourStepDef[] = (
+      this.sidebar?.getTourModuleTargets() ?? []
+    ).map(t => ({
+      key: t.value,
+      anchor: `[data-tour="nav-${t.value}"]`,
+      side: 'right',
+      align: 'center',
+    }));
+
     const eligible: TourStepDef[] = [
       TOUR_WELCOME,
       ...TOUR_CHROME_LEADING,
-      ...TOUR_MODULE_STEPS.filter(s =>
-        s.permission ? this.permissionService.canRead(s.permission) : true,
-      ),
+      ...moduleSteps,
       ...TOUR_CHROME_TRAILING,
       TOUR_DONE,
     ];
 
     // Drop any anchored step whose element isn't currently in the DOM
-    // (e.g. the System Admin has no search/bell; a module row that didn't
-    // render). Bookends are element-less and always kept. This keeps the
-    // progress count ("Step x of N") honest.
+    // (e.g. the System Admin has no search/bell). Bookends are element-less
+    // and always kept. Keeps the progress count ("Step x of N") honest.
     return eligible
       .filter(def => {
         if (def.bookend || !def.anchor) return true;
@@ -184,10 +249,6 @@ export class TourService {
   // ── driver.js config ─────────────────────────────────────────────
 
   private buildConfig(): Config {
-    const prefersReducedMotion =
-      typeof window.matchMedia === 'function' &&
-      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
     return {
       steps: this.steps.map((s, i) => this.toDriveStep(s, i)),
       showProgress: true,
@@ -200,19 +261,20 @@ export class TourService {
       prevBtnText: this.translate.instant('TOUR.BACK'),
       doneBtnText: this.translate.instant('TOUR.FINISH'),
       allowClose: true,
-      animate: !prefersReducedMotion,
+      animate: false,
       smoothScroll: true,
-      stagePadding: 6,
-      stageRadius: 8,
+      // No spotlight box / cutout around the active element and NO dimming of
+      // the page: overlayOpacity 0 makes driver.js's overlay fully transparent,
+      // so the highlighted item stays crisp (no scrim, no anti-aliased cutout
+      // edge = no blur) and we rely on the popover's ARROW to point at it. The
+      // overlay layer still exists (it carries click-blocking + the arrow
+      // anchor), it's just invisible. stagePadding kept small — it only affects
+      // where the (now-invisible) cutout and the popover anchor sit.
+      stagePadding: 4,
+      stageRadius: 6,
       popoverClass: 'dbexec-tour',
-      // Matches the app's --overlay-background scrim (rgba(0,0,0,0.5)) that
-      // every modal uses. driver.js's overlayColor is a plain colour string
-      // (it can't read a CSS var), so we mirror the token's value here and
-      // apply the same 0.5 opacity via overlayOpacity — keeping the tour
-      // backdrop identical to the rest of the app across every org theme
-      // (the scrim is intentionally theme-neutral, like the modal backdrops).
       overlayColor: '#000000',
-      overlayOpacity: 0.5,
+      overlayOpacity: 0,
       allowKeyboardControl: true,
       // Skip a step whose element vanished between build and drive.
       // We already filtered, but this guards a mid-tour DOM change.
@@ -293,37 +355,36 @@ export class TourService {
   private onStepEnter(def: TourStepDef): void {
     if (!def.chrome) return;
     switch (def.chrome) {
+      // Search & notifications: highlight the icon ONLY — do NOT open the
+      // search modal / notification panel (they'd cover the page and the tour).
       case 'search':
-        this.globalSearchService.openSearch();
-        break;
       case 'notifications':
-        this.notificationModalService.open();
         break;
+      // Language & logout rows live inside the account (avatar) menu, so we
+      // must open THAT to point at them — but NOT the nested language-chooser
+      // flyout (the locale list). openAccountMenuForTour opens the menu without
+      // the flyout; openLanguageFlyoutForTour (which also opened the flyout) is
+      // intentionally no longer used.
       case 'language':
-        this.sidebar?.openLanguageFlyoutForTour();
-        break;
       case 'logout':
         this.sidebar?.openAccountMenuForTour();
         break;
     }
-    // Let the overlay paint, then re-anchor the popover to its final spot.
+    // Let the menu paint, then re-anchor the popover to its final spot.
     setTimeout(() => this.driverObj?.refresh(), 120);
   }
 
   private onStepLeave(def: TourStepDef): void {
     if (!def.chrome) return;
     switch (def.chrome) {
+      // Nothing was opened for search / notifications, so nothing to close.
       case 'search':
-        this.globalSearchService.closeSearch();
-        break;
       case 'notifications':
-        this.notificationModalService.close();
         break;
       case 'language':
       case 'logout':
         // Keep the account menu open across the adjacent language→logout
-        // pair; only close when leaving logout (the last chrome step) or
-        // when the next step isn't an account-menu one.
+        // pair; only close when the next step isn't an account-menu one.
         this.maybeCloseAccountMenu(def);
         break;
     }
@@ -384,7 +445,13 @@ export class TourService {
       return this.translate.instant('TOUR.WELCOME.TITLE');
     if (def.key === TOUR_DONE.key)
       return this.translate.instant('TOUR.DONE.TITLE');
-    return this.translate.instant(`TOUR.STEPS.${def.key}.TITLE`);
+    // Chrome + curated module steps have a dedicated TOUR.STEPS.<key>.TITLE.
+    // Dynamic sidebar rows (groups like userAndAccess, or leaves without a
+    // curated key) fall back to the sidebar's own label SIDEBAR.<key>.
+    const curated = `TOUR.STEPS.${def.key}.TITLE`;
+    return this.hasKey(curated)
+      ? this.translate.instant(curated)
+      : this.translate.instant(`SIDEBAR.${def.key}`);
   }
 
   private stepDesc(def: TourStepDef): string {
@@ -392,6 +459,20 @@ export class TourService {
       return this.translate.instant('TOUR.WELCOME.DESC');
     if (def.key === TOUR_DONE.key)
       return this.translate.instant('TOUR.DONE.DESC');
-    return this.translate.instant(`TOUR.STEPS.${def.key}.DESC`);
+    const curated = `TOUR.STEPS.${def.key}.DESC`;
+    // Fall back to one generic line for dynamic sidebar rows without curated
+    // copy, interpolating the row's label so it still reads specifically.
+    return this.hasKey(curated)
+      ? this.translate.instant(curated)
+      : this.translate.instant('TOUR.MODULE_GENERIC_DESC', {
+          name: this.translate.instant(`SIDEBAR.${def.key}`),
+        });
+  }
+
+  /** True when the translate layer has a real value for `key` (not just the
+   *  key echoed back). Used to decide curated-vs-fallback copy. */
+  private hasKey(key: string): boolean {
+    const v = this.translate.instant(key);
+    return typeof v === 'string' && v !== key && v.trim().length > 0;
   }
 }

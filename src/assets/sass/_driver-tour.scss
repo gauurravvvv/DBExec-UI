@@ -14,15 +14,20 @@
 // ================================================================
 
 :root {
-  // Popover shell — driver.js's own CSS vars, pointed at our tokens.
-  --driver-popover-bg: var(--card-background);
-  --driver-popover-color: var(--text-color);
+  // The ONLY --driver-popover-* var driver.js 1.8 actually reads. Its other
+  // colour vars (--driver-popover-bg/-color/etc.) are NOT consumed — the base
+  // driver.css hardcodes background-color:#fff and color:#2d2d2d on the
+  // wrapper — so we override those directly below instead of via a var.
   --driver-popover-font-family: var(--font-ui);
-  --driver-popover-progress-text-color: var(--text-muted);
 }
 
 // ── Popover wrapper ──────────────────────────────────────────────
 .driver-popover.dbexec-tour {
+  // Override driver.css's hardcoded white/#2d2d2d so the card follows the
+  // org theme (incl. dark). These are the fix for the light popover-on-dark-app
+  // bug — driver.js ignores its own --driver-popover-bg/-color vars.
+  background-color: var(--card-background);
+  color: var(--text-color);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-lg);
   border: 1px solid var(--border-color);
@@ -57,6 +62,24 @@
     }
   }
 
+  // Arrow — driver.css hardcodes it white (border:5px solid #fff) and colours
+  // only the side facing the popover. Recolour that side to --card-background
+  // so the arrow matches a themed (incl. dark) card instead of showing white.
+  .driver-popover-arrow {
+    &.driver-popover-arrow-side-left {
+      border-left-color: var(--card-background);
+    }
+    &.driver-popover-arrow-side-right {
+      border-right-color: var(--card-background);
+    }
+    &.driver-popover-arrow-side-top {
+      border-top-color: var(--card-background);
+    }
+    &.driver-popover-arrow-side-bottom {
+      border-bottom-color: var(--card-background);
+    }
+  }
+
   // ── Footer: progress + nav buttons ─────────────────────────────
   .driver-popover-footer {
     margin-top: var(--space-5);
@@ -67,32 +90,45 @@
       color: var(--text-muted);
     }
 
-    button {
+    // Buttons — match app-button exactly. Target the .driver-popover-footer-btn
+    // CLASS (not a bare `button`) so these longhands reliably win over
+    // driver.css's `.driver-popover-footer-btn { all: unset; padding: 3px 7px;
+    // font-size: 12px }` (same specificity, but ours loads after; and we spell
+    // out every property app-button sets so nothing leaks through from unset).
+    .driver-popover-footer-btn {
+      box-sizing: border-box;
       font-family: var(--font-ui);
       font-size: var(--fs-control);
-      font-weight: var(--fw-medium);
+      font-weight: var(--fw-semibold);
+      line-height: 1.2;
       border-radius: var(--radius-md);
-      padding: var(--space-2) var(--space-4);
+      padding: 8px 16px;
       text-shadow: none;
+      cursor: pointer;
       transition:
         background-color 0.15s ease,
         border-color 0.15s ease,
         color 0.15s ease;
     }
 
-    // Previous / Back — secondary (outline) style.
+    // Previous / Back — FILLED secondary (a subtle surface fill, not a faint
+    // transparent+outline). The old transparent style was hard to read on the
+    // themed card (especially disabled on step 1), so give it a real surface
+    // background + full-strength text so "Back" is always clearly visible.
     .driver-popover-prev-btn {
-      background: transparent;
+      background: var(--hover-background);
       color: var(--text-color);
       border: 1px solid var(--border-color);
+      opacity: 1;
 
       &:hover {
-        background: var(--hover-background);
+        background: var(--border-color);
         border-color: var(--border-strong);
+        color: var(--text-color);
       }
     }
 
-    // Next / Finish — primary (brand) style. Uses the org's brand tokens.
+    // Next / Finish — app-button primary (brand fill). Uses the org's tokens.
     .driver-popover-next-btn {
       background: var(--primary-color);
       color: var(--primary-text);
@@ -103,9 +139,24 @@
         border-color: var(--primary-hover);
       }
     }
+
+    // Disabled Back (step 1): keep it legible, not near-invisible. driver.css
+    // sets opacity .5 via .driver-popover-btn-disabled — bump it back up and
+    // mute the text with a token instead so "Back" stays readable.
+    .driver-popover-prev-btn.driver-popover-btn-disabled,
+    .driver-popover-btn-disabled {
+      opacity: 1 !important;
+      color: var(--text-muted) !important;
+      background: var(--hover-background) !important;
+      border-color: var(--border-color) !important;
+      cursor: default;
+    }
   }
 
   // ── Injected "Don't show again" checkbox row ────────────────────
+  // Matches the shared app-custom-checkbox look: a drawn box (not the native
+  // control) with a --border-color outline that fills --primary-color and
+  // shows a white tick when checked.
   .dbexec-tour-dsa {
     display: flex;
     align-items: center;
@@ -119,17 +170,61 @@
     user-select: none;
 
     .dbexec-tour-dsa-checkbox {
-      width: var(--space-4);
-      height: var(--space-4);
-      // accent-color paints the checked box in the org's brand colour.
-      accent-color: var(--primary-color);
-      cursor: pointer;
+      appearance: none;
+      -webkit-appearance: none;
+      flex: 0 0 auto;
+      width: 16px;
+      height: 16px;
       margin: 0;
+      border: 1.5px solid var(--border-color);
+      border-radius: var(--radius-sm, 4px);
+      background: var(--card-background);
+      cursor: pointer;
+      position: relative;
+      transition:
+        background-color 0.15s ease,
+        border-color 0.15s ease;
+
+      &:hover {
+        border-color: var(--primary-color);
+      }
+
+      &:checked {
+        background: var(--primary-color);
+        border-color: var(--primary-color);
+      }
+
+      // White tick, drawn with a rotated box-shadow-free border (CSS check).
+      &:checked::after {
+        content: '';
+        position: absolute;
+        left: 4.5px;
+        top: 1.5px;
+        width: 4px;
+        height: 8px;
+        border: solid var(--primary-text);
+        border-width: 0 2px 2px 0;
+        transform: rotate(45deg);
+      }
     }
   }
 }
 
-// Spotlighted element — subtle rounded ring against the dim backdrop.
+// Spotlighted element — rounded corners on the (now un-dimmed) active element.
+// With overlayOpacity:0 there's no cutout box; this just keeps a highlighted
+// button's corners tidy where driver.js clips it.
 .driver-active-element {
   border-radius: var(--radius-md);
+}
+
+// ── Lift the account menu above driver.js's (transparent) overlay layer ──
+// Even with overlayOpacity:0 the overlay LAYER still sits at z-index 1e9 and
+// blocks pointer events / stacks above normal content. The tour opens the
+// account (avatar) menu for the language & logout steps, so it must sit above
+// that layer to be visible. We sit just below the popover (1e9) so the card
+// still wins. `html.driver-active` is present only while a tour runs.
+html.driver-active {
+  .profile-menu.show {
+    z-index: 999999998 !important;
+  }
 }
