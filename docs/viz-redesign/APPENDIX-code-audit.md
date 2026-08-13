@@ -436,7 +436,7 @@ Perfect. Now let me compile my comprehensive inventory report:
 
 ### **Visual Box / Card Structure** (class `.visual-box`)
 
-**File:** `/Users/gaurav.goel/code/Personal/DBExec/DBExec-UI/src/app/modules/analyses/components/edit-analyses/edit-analyses.component.scss` (line 1668+)
+**File:** `/Users/gaurav.goel/code/Personal/DBExec/dbexec-ui/src/app/modules/analyses/components/edit-analyses/edit-analyses.component.scss` (line 1668+)
 
 **DOM Structure:**
 
@@ -528,7 +528,7 @@ Perfect. Now let me compile my comprehensive inventory report:
 
 ### **Chart Render Component** (`app-chart-renderer`)
 
-**File:** `/Users/gaurav.goel/code/Personal/DBExec/DBExec-UI/src/app/modules/analyses/components/chart-renderer/chart-renderer.component.ts/html`
+**File:** `/Users/gaurav.goel/code/Personal/DBExec/dbexec-ui/src/app/modules/analyses/components/chart-renderer/chart-renderer.component.ts/html`
 
 **Inputs:**
 
@@ -562,7 +562,7 @@ Perfect. Now let me compile my comprehensive inventory report:
 
 ### **EChart Visual Render** (`app-echart-visual`)
 
-**File:** `/Users/gaurav.goel/code/Personal/DBExec/DBExec-UI/src/app/shared/components/echart-visual/echart-visual.component.ts/html`
+**File:** `/Users/gaurav.goel/code/Personal/DBExec/dbexec-ui/src/app/shared/components/echart-visual/echart-visual.component.ts/html`
 
 **Render Gate:**
 
@@ -600,7 +600,7 @@ Perfect. Now let me compile my comprehensive inventory report:
 
 ### **Configurable Card Chart** (`app-configurable-card-chart`)
 
-**File:** `/Users/gaurav.goel/code/Personal/DBExec/DBExec-UI/src/app/shared/components/configurable-card-chart/`
+**File:** `/Users/gaurav.goel/code/Personal/DBExec/dbexec-ui/src/app/shared/components/configurable-card-chart/`
 
 **Inputs:**
 
@@ -663,7 +663,7 @@ interface CardChartConfig {
 
 ### **Table Visual** (`app-table-visual`)
 
-**File:** `/Users/gaurav.goel/code/Personal/DBExec/DBExec-UI/src/app/modules/analyses/components/table-visual/`
+**File:** `/Users/gaurav.goel/code/Personal/DBExec/dbexec-ui/src/app/modules/analyses/components/table-visual/`
 
 **Inputs:**
 
@@ -835,19 +835,19 @@ interface CardChartConfig {
 
 ### **File Paths (Absolute)**
 
-- `/Users/gaurav.goel/code/Personal/DBExec/DBExec-UI/src/app/shared/components/echart-visual/echart-visual.component.ts` (282 lines)
-- `/Users/gaurav.goel/code/Personal/DBExec/DBExec-UI/src/app/shared/components/echart-visual/echart-visual.component.html` (24 lines)
-- `/Users/gaurav.goel/code/Personal/DBExec/DBExec-UI/src/app/shared/components/echart-visual/echart-visual.component.scss` (37 lines)
-- `/Users/gaurav.goel/code/Personal/DBExec/DBExec-UI/src/app/shared/components/configurable-card-chart/configurable-card-chart.component.ts` (138 lines)
-- `/Users/gaurav.goel/code/Personal/DBExec/DBExec-UI/src/app/shared/components/configurable-card-chart/configurable-card-chart.component.html` (24 lines)
-- `/Users/gaurav.goel/code/Personal/DBExec/DBExec-UI/src/app/shared/components/configurable-card-chart/configurable-card-chart.component.scss` (106 lines)
-- `/Users/gaurav.goel/code/Personal/DBExec/DBExec-UI/src/app/modules/analyses/components/chart-renderer/chart-renderer.component.ts` (163 lines)
-- `/Users/gaurav.goel/code/Personal/DBExec/DBExec-UI/src/app/modules/analyses/components/chart-renderer/chart-renderer.component.html` (42 lines)
-- `/Users/gaurav.goel/code/Personal/DBExec/DBExec-UI/src/app/modules/analyses/components/chart-renderer/chart-renderer.component.scss` (29 lines)
-- `/Users/gaurav.goel/code/Personal/DBExec/DBExec-UI/src/app/modules/analyses/components/table-visual/table-visual.component.ts` (335 lines)
-- `/Users/gaurav.goel/code/Personal/DBExec/DBExec-UI/src/app/modules/analyses/components/table-visual/table-visual.component.html` (145 lines)
-- `/Users/gaurav.goel/code/Personal/DBExec/DBExec-UI/src/app/modules/analyses/components/table-visual/table-visual.component.scss` (169 lines)
-- `/Users/gaurav.goel/code/Personal/DBExec/DBExec-UI/src/app/modules/analyses/components/edit-analyses/edit-analyses.component.scss` (4953 lines — card chrome at lines 1668–2099, 3774+)
+- `/Users/gaurav.goel/code/Personal/DBExec/dbexec-ui/src/app/shared/components/echart-visual/echart-visual.component.ts` (282 lines)
+- `/Users/gaurav.goel/code/Personal/DBExec/dbexec-ui/src/app/shared/components/echart-visual/echart-visual.component.html` (24 lines)
+- `/Users/gaurav.goel/code/Personal/DBExec/dbexec-ui/src/app/shared/components/echart-visual/echart-visual.component.scss` (37 lines)
+- `/Users/gaurav.goel/code/Personal/DBExec/dbexec-ui/src/app/shared/components/configurable-card-chart/configurable-card-chart.component.ts` (138 lines)
+- `/Users/gaurav.goel/code/Personal/DBExec/dbexec-ui/src/app/shared/components/configurable-card-chart/configurable-card-chart.component.html` (24 lines)
+- `/Users/gaurav.goel/code/Personal/DBExec/dbexec-ui/src/app/shared/components/configurable-card-chart/configurable-card-chart.component.scss` (106 lines)
+- `/Users/gaurav.goel/code/Personal/DBExec/dbexec-ui/src/app/modules/analyses/components/chart-renderer/chart-renderer.component.ts` (163 lines)
+- `/Users/gaurav.goel/code/Personal/DBExec/dbexec-ui/src/app/modules/analyses/components/chart-renderer/chart-renderer.component.html` (42 lines)
+- `/Users/gaurav.goel/code/Personal/DBExec/dbexec-ui/src/app/modules/analyses/components/chart-renderer/chart-renderer.component.scss` (29 lines)
+- `/Users/gaurav.goel/code/Personal/DBExec/dbexec-ui/src/app/modules/analyses/components/table-visual/table-visual.component.ts` (335 lines)
+- `/Users/gaurav.goel/code/Personal/DBExec/dbexec-ui/src/app/modules/analyses/components/table-visual/table-visual.component.html` (145 lines)
+- `/Users/gaurav.goel/code/Personal/DBExec/dbexec-ui/src/app/modules/analyses/components/table-visual/table-visual.component.scss` (169 lines)
+- `/Users/gaurav.goel/code/Personal/DBExec/dbexec-ui/src/app/modules/analyses/components/edit-analyses/edit-analyses.component.scss` (4953 lines — card chrome at lines 1668–2099, 3774+)
 
 # Chart Types & Features
 

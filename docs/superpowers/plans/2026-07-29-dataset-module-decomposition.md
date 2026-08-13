@@ -214,7 +214,7 @@ The second commit on that branch (`00a39273`) is a measurement document; take it
 too, since Task 6 depends on its classification.
 
 ```bash
-cd /Users/gaurav.goel/code/Personal/DBExec/DBExec-UI
+cd /Users/gaurav.goel/code/Personal/DBExec/dbexec-ui
 git cherry-pick 5ae220bb
 git cherry-pick 00a39273
 ```
@@ -287,7 +287,7 @@ A static class cannot appear in a template without a component field, but check
 anyway — this step is the whole justification for deleting 739 lines.
 
 ```bash
-cd /Users/gaurav.goel/code/Personal/DBExec/DBExec-UI/src
+cd /Users/gaurav.goel/code/Personal/DBExec/dbexec-ui/src
 grep -rn "DummyDataHelper" --include=*.ts --include=*.html . | grep -v "helpers/dummy-data.helper.ts"
 grep -rn "QueryErrorKind" --include=*.ts . | grep -v "helpers/dummy-data.helper.ts"
 ```
@@ -316,7 +316,7 @@ true:
 - [ ] **Step 3: Repoint the five importers**
 
 ```bash
-cd /Users/gaurav.goel/code/Personal/DBExec/DBExec-UI/src
+cd /Users/gaurav.goel/code/Personal/DBExec/dbexec-ui/src
 grep -rln "dummy-data.helper" --include=*.ts . | xargs sed -i '' \
   -e "s#'\.\./\.\./helpers/dummy-data\.helper'#'../../models/dataset-schema.model'#g" \
   -e "s#'\.\./helpers/dummy-data\.helper'#'../models/dataset-schema.model'#g" \
@@ -610,7 +610,7 @@ a private instance.
 This determines which need proxy accessors and which are rebound at the call site.
 
 ```bash
-cd /Users/gaurav.goel/code/Personal/DBExec/DBExec-UI/src/app/modules/dataset/components
+cd /Users/gaurav.goel/code/Personal/DBExec/dbexec-ui/src/app/modules/dataset/components
 for m in resultSheetHeightPx isResultSheetCollapsed effectiveSheetHeightPx \
          expandedJsonCells columnWidths columnProfiles showColumnProfile \
          nullSeverity jsonCellKey toggleJsonCell hasAnyColumnType \
@@ -854,7 +854,7 @@ the screen's actual purpose and reasonably lives in the component.
 - [ ] **Step 1: Measure**
 
 ```bash
-cd /Users/gaurav.goel/code/Personal/DBExec/DBExec-UI/src/app/modules/dataset
+cd /Users/gaurav.goel/code/Personal/DBExec/dbexec-ui/src/app/modules/dataset
 find . -name '*.ts' -not -name '*.spec.ts' | xargs wc -l | sort -rn | head -12
 ```
 

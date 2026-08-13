@@ -1,9 +1,9 @@
-# DBExec-UI — Context Index
+# dbexec-ui — Context Index
 > Master map of all frontend feature modules. Point any new session at this file first.
 > Last updated: 2026-08-12
 
 ## Snapshot
-- What: Angular web client for DBExec — multi-tenant DB management, query execution & BI. Talks to DBExec-API over REST + WebSocket.
+- What: Angular web client for DBExec — multi-tenant DB management, query execution & BI. Talks to dbexec-api over REST + WebSocket.
 - Stack: Angular 18.2 (NgModule lazy) · PrimeNG 17 · **Monaco 0.52 (the ONLY code editor — CodeMirror retired 2026-07-28)** · AG Grid 32 (executor grid only) · ECharts 5 + ngx-echarts · RxJS 7 + signals · NgRx (analyses) · Zod 4 (mirrored FE↔BE) · @ngx-translate
 - **Start here:** [HANDOFF.md](./HANDOFF.md) — current state, verification gate, open items.
 - Global docs: [Architecture](./ARCHITECTURE.md) · [Session Log](./SESSION_LOG.md)

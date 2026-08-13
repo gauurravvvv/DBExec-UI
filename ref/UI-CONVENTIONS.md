@@ -1,4 +1,4 @@
-# DBExec-UI — UI Conventions & Design System
+# dbexec-ui — UI Conventions & Design System
 
 > The visual and structural contract every screen follows. Goal: the app
 > reads as **one consistent product**, not a bag of screens. A new module

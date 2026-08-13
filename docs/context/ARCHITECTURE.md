@@ -1,4 +1,4 @@
-# DBExec-UI — Architecture & Cross-Cutting Decisions
+# dbexec-ui — Architecture & Cross-Cutting Decisions
 > Decisions that span modules. Update here + SESSION_LOG when a global decision changes.
 > Last updated: 2026-07-24
 
@@ -7,7 +7,7 @@
 - **UI:** PrimeNG 17.18 + PrimeFlex 3.3 + PrimeIcons 7.
 - **Editors/data:** **Monaco 0.52 — the only code editor, everywhere**, created solely through `shared/editor/CodeEditorService` (see the section below). CodeMirror was retired 2026-07-28; `@codemirror/lang-sql` remains as keyword DATA for the six dialect specs, not as an editor. AG Grid 32 (**executor result grid ONLY** — retired for lists); pgsql-ast-parser, sql-formatter.
 - **Charts:** ECharts 5.6 + echarts-gl + ngx-echarts 18. (Chart.js legacy/minimal.)
-- **Validation:** Zod 4.4 — schemas in `src/app/shared/validators/` **byte-identical** with `DBExec-API/src/shared/validators/`.
+- **Validation:** Zod 4.4 — schemas in `src/app/shared/validators/` **byte-identical** with `dbexec-api/src/shared/validators/`.
 - **State:** signals (new), NgRx 18 (analyses/filters store), BehaviorSubject (legacy).
 - **i18n:** @ngx-translate 15 — 10 locales in `src/assets/i18n/`.
 - **Ports:** dev server `4200`; prod FE `8755`. API base `environment.apiServer` (dev `:3000/api/v1`, prod `:9058/api/v1`).

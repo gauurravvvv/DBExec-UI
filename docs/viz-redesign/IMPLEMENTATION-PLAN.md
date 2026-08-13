@@ -35,7 +35,7 @@
 
 ## Key files (current, verified)
 
-**FE — `DBExec-UI/src/app/modules/analyses/components/`**
+**FE — `dbexec-ui/src/app/modules/analyses/components/`**
 
 - `visual-config-sidebar/` — the config panel. `.ts` 1610 lines, `.html` 4181
   lines, 67 `config-section`s. **The central file of Wave 1.**
@@ -50,7 +50,7 @@
 **FE — shared** `src/app/shared/components/echart-visual/` (ECharts render),
 `configurable-card-chart/` (card wrapper).
 
-**BE — `DBExec-API/src/modules/`**
+**BE — `dbexec-api/src/modules/`**
 
 - `analyses/controllers/` — runAnalysisQuery, updateAnalysis, getAnalysis, …
 - `analysis-tabs/controllers/` — add/list/update/delete/reorder **(multitab BE

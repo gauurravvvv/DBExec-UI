@@ -2,8 +2,8 @@
 
 > Canonical, durable reference for the `db-access` module (BE `src/modules/db-access`,
 > FE `src/app/modules/db-access`). Read this before touching either screen.
-> **Full rationale + phasing:** `DBExec-API/docs/superpowers/specs/2026-08-10-pdm-postgres-access-mgmt-prd.md`.
-> **Mirror:** an identical copy lives at `DBExec-UI/ref/PDM-REFERENCE.md` — edit both together.
+> **Full rationale + phasing:** `dbexec-api/docs/superpowers/specs/2026-08-10-pdm-postgres-access-mgmt-prd.md`.
+> **Mirror:** an identical copy lives at `dbexec-ui/ref/PDM-REFERENCE.md` — edit both together.
 
 ---
 

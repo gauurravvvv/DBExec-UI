@@ -1,5 +1,5 @@
 # =====================================================================
-# DBExec-UI — production container
+# dbexec-ui — production container
 #
 # Multi-stage:
 #   1) build   — node:20 runs an OPTIMIZED production Angular build,

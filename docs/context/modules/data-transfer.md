@@ -11,9 +11,9 @@
   - `components/new-data-transfer/` — 4-step wizard: Endpoints → Select tables (schema→table tree, checkboxes, est rows + no-PK hint) → Map targets (create-new / existing + inline preflight + truncate-first) → Review & Start.
   - `components/view-data-transfer/` — overall + per-table progress bars, live counters, status chips, Cancel/Resume; WS subscribe with poll fallback.
   - `shared/validators/dataTransfer.ts` (mirrored byte-for-byte with BE); `core/constants/api.constant.ts` `DATA_TRANSFER` group; `core/constants/routes.constant.ts`; `permissions.constant.ts` `dataTransfer`.
-- Depends on / depended on by: `HttpClientService`; datasource picker service (endpoint selection); shared UI kit (`app-custom-table`, `app-chip`, `app-button`, `app-custom-dropdown`, stepper); the shared WebSocket client used by notifications. BE counterpart: `DBExec-API` `data-transfer` module.
+- Depends on / depended on by: `HttpClientService`; datasource picker service (endpoint selection); shared UI kit (`app-custom-table`, `app-chip`, `app-button`, `app-custom-dropdown`, stepper); the shared WebSocket client used by notifications. BE counterpart: `dbexec-api` `data-transfer` module.
 - How it works: wizard collects source/dest + table selections + per-table target mode, calls `POST /preflight` for a friendly compatibility report, then `POST /jobs` which returns instantly (BE enqueues to a separate worker via `pg-boss`; the API does no data work). FE navigates to the detail page and subscribes to the WS topic to render the live counter — progress originates in the worker and reaches the browser via the BE's `NOTIFY dt_progress` → API `LISTEN` → WS relay. The list badge flips Running→Completed live from the same WS events; if the socket drops, it falls back to polling `GET /jobs/:id` (DB row is source of truth). FE is unaffected by the worker/queue choice — it only talks to the API over REST + WS.
-- Decisions: mirror the BE spec (`../../DBExec-API/docs/superpowers/specs/2026-07-24-data-transfer-db-migration-design.md`, memory `data-transfer-feature`). No blocking loader — skeleton rows + per-row spinners (`{skipLoader:true}` convention). Postgres-only gating shown in the wizard. Named `data-transfer` to avoid colliding with the asset-export `migration` module.
+- Decisions: mirror the BE spec (`../../dbexec-api/docs/superpowers/specs/2026-07-24-data-transfer-db-migration-design.md`, memory `data-transfer-feature`). No blocking loader — skeleton rows + per-row spinners (`{skipLoader:true}` convention). Postgres-only gating shown in the wizard. Named `data-transfer` to avoid colliding with the asset-export `migration` module.
 - Gotchas / constraints: verify gate is `tsc → ngc --noEmit → ng build --configuration production` (ngc catches template refs). All strings are i18n keys across 10 locales. Tokens only (no hard-coded color/spacing). The Zod validator must stay byte-identical to the BE file. Overlays `appendTo="body"`. Sidebar nav entry gated by `data.permission='dataTransfer'` via `role.guard`.
 
 ## 2. Goals
@@ -31,7 +31,7 @@
 - Files touched: docs/context/modules/data-transfer.md
 
 ### 2026-07-24 — Designed (planned)
-- Done: FE design captured as part of the full spec (`../../DBExec-API/docs/superpowers/specs/2026-07-24-data-transfer-db-migration-design.md` §7). Screens, service surface, WS subscription + poll fallback, nav/permission defined.
+- Done: FE design captured as part of the full spec (`../../dbexec-api/docs/superpowers/specs/2026-07-24-data-transfer-db-migration-design.md` §7). Screens, service surface, WS subscription + poll fallback, nav/permission defined.
 - In progress: —
 - Next: FE Slice F (after BE A–E).
 - Blockers: — (awaiting user go-ahead to build).

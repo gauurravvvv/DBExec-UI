@@ -66,7 +66,7 @@ today. Industry standard is 8-12 first-party + community plugins.
 
 | Aspect                                         | Status                                                | File paths                                                                                         |
 | ---------------------------------------------- | ----------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
-| Datasource entity                              | ✅                                                    | `DBExec-API/src/shared/db/master_entity/database.entity.ts`, `shared_entity/datasourceS.entity.ts` |
+| Datasource entity                              | ✅                                                    | `dbexec-api/src/shared/db/master_entity/database.entity.ts`, `shared_entity/datasourceS.entity.ts` |
 | Datasource config (host/port/credentials/etc.) | ✅                                                    | `shared_entity/datasource_config.entity.ts`                                                        |
 | Connection entity                              | ✅                                                    | `shared_entity/connections.entity.ts`                                                              |
 | Drivers                                        | ✅ Postgres, MySQL, MariaDB, MSSQL, Oracle, Snowflake | `shared/services/connectionPool.service.ts`                                                        |

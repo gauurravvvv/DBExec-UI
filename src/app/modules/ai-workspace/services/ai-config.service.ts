@@ -82,7 +82,7 @@ export class AiConfigService {
       const seeded = StorageService.get(StorageType.AI_CONFIGURED) === 'true';
       this._health.set({ enabled: seeded, configured: seeded });
     }
-    // Probe the DBExec-AI BFF's health when configured (absolute URL + token,
+    // Probe the dbexec-ai BFF's health when configured (absolute URL + token,
     // since the interceptor skips auth on absolute URLs); else the main API's
     // embedded /ai/health via the interceptor. NOTE: `aiServer` already ends
     // in the BFF base path (`/ai/v1`), so the health path is just `/health` —

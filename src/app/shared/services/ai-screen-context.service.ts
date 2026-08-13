@@ -10,7 +10,7 @@ import { filter } from 'rxjs/operators';
  * Groups / Roles.
  *
  * MIRRORS the BE contract in
- * DBExec-API/src/modules/ai-workspace/engine/screen.ts — the `module` keys
+ * dbexec-api/src/modules/ai-workspace/engine/screen.ts — the `module` keys
  * and the set of scoped modules must stay in sync with `MODULE_TO_SPECIALIST`
  * there. This service is the FE half.
  */

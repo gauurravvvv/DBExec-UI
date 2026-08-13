@@ -3,7 +3,7 @@
 **Date:** 2026-07-19 · **Branch:** `version_261` (both repos) · **Spec:**
 `docs/superpowers/specs/2026-07-19-asset-sharing-design.md`
 
-Four commit slices, each gate-green. FE repo = `/DBExec-UI`, BE = `/DBExec-API`.
+Four commit slices, each gate-green. FE repo = `/dbexec-ui`, BE = `/dbexec-api`.
 NEVER push; never stage `.env`/`environment*.ts`. Commit trailer on every commit.
 
 ---

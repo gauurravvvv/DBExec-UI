@@ -1,6 +1,6 @@
 /**
  * Presentation metadata for the login-activity list — mirrors the BE
- * `LOGIN_EVENTS` enum (DBExec-API/src/shared/constants/audit.constants.ts).
+ * `LOGIN_EVENTS` enum (dbexec-api/src/shared/constants/audit.constants.ts).
  * Event → { icon, labelKey, cssClass }. Colour comes from theme tokens in the
  * component SCSS via the cssClass; nothing is hard-coded here.
  */

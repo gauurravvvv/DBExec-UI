@@ -1,7 +1,7 @@
 /**
  * ─── MIRRORED FILE ───────────────────────────────────────────────────
  * This file is duplicated VERBATIM at the same path in the sibling repo
- * (DBExec-API ↔ DBExec-UI). Edit BOTH when changing any rule.
+ * (dbexec-api ↔ dbexec-ui). Edit BOTH when changing any rule.
  *
  *   BE: src/shared/validators/prompts.ts
  *   FE: src/app/shared/validators/prompts.ts

@@ -1,6 +1,6 @@
 # Loading & busy behavior — one standard across all modules
 
-Date: 2026-08-05 · Repo: DBExec-UI
+Date: 2026-08-05 · Repo: dbexec-ui
 
 ## Problem
 

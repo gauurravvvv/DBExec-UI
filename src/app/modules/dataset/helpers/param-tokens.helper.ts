@@ -2,7 +2,7 @@
  * param-tokens.helper — FE port of the BE `{{name}}` tokenizer.
  *
  * Mirrors `extractParamTokens` from the sibling repo
- * (DBExec-API/src/shared/utility/datasetParams.ts) so the Parameters
+ * (dbexec-api/src/shared/utility/datasetParams.ts) so the Parameters
  * panel detects EXACTLY the same tokens the run path will bind. A naive
  * `/\{\{(\w+)\}\}/g` scan would treat `'{{fake}}'` inside a string
  * literal or `-- {{note}}` inside a comment as a real parameter and

@@ -11,7 +11,7 @@
 
 **Conventions used everywhere in this doc**
 
-- File paths assume `DBExec-API/src/...`.
+- File paths assume `dbexec-api/src/...`.
 - Entities use TypeORM 0.2 decorators (matching existing code).
 - Controllers default-export a single async function.
 - Response goes through `sendResponse(res, status, code, message, data)`.

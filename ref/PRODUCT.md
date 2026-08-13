@@ -1,7 +1,7 @@
 # DBExec — Product Reference
 
-> Repo-agnostic. This same file lives in both `DBExec-UI/ref/` and
-> `DBExec-API/ref/`. It answers **"what is DBExec and where is it going"** so
+> Repo-agnostic. This same file lives in both `dbexec-ui/ref/` and
+> `dbexec-api/ref/`. It answers **"what is DBExec and where is it going"** so
 > a fresh session has the product context behind any given code change.
 
 ## What DBExec is
@@ -48,9 +48,9 @@ get alerted on changes — without leaving the app or juggling separate tools
 
 ## Architecture at a glance
 
-- **Two repos:** `DBExec-UI` (Angular 18 + PrimeNG) and `DBExec-API`
-  (Express + TypeScript + TypeORM + PostgreSQL). A `DBExec-Desktop` wrapper
-  packages the FE as a Mac `.dmg` / Windows `.exe`. A `DBExec-CLI` exists for
+- **Two repos:** `dbexec-ui` (Angular 18 + PrimeNG) and `dbexec-api`
+  (Express + TypeScript + TypeORM + PostgreSQL). A `dbexec-desktop` wrapper
+  packages the FE as a Mac `.dmg` / Windows `.exe`. A `dbexec-cli` exists for
   scripted API calls.
 - **Multi-tenant, DB-per-org:** a **master DB** holds super admins,
   organisations, org configs, and master audit logs. **Each organisation

@@ -1,15 +1,15 @@
-# DBExec-UI — Frontend Reference
+# dbexec-ui — Frontend Reference
 
 ## Project Overview
 
 Angular 18 + PrimeNG frontend for **DBExec** — a multi-tenant database
 management, query execution, and visualization platform. Talks to the
-`DBExec-API` Express backend over REST. This repo is the entire web client
-(also wrapped as a desktop app via `DBExec-Desktop`).
+`dbexec-api` Express backend over REST. This repo is the entire web client
+(also wrapped as a desktop app via `dbexec-desktop`).
 
 For **what DBExec is and where it's going**, read `ref/PRODUCT.md`.
 For **the backend contract** (endpoints, tenancy, auth), read
-`../DBExec-API/CLAUDE.md`.
+`../dbexec-api/CLAUDE.md`.
 
 ## Quick Start
 
@@ -140,7 +140,7 @@ Use these for `routerLink` / `navigateByUrl`; don't string-build paths.
 ### Validation — Zod, mirrored with the backend
 
 Form validation schemas live in `src/app/shared/validators/<domain>.ts`.
-**Each file is byte-identical to `DBExec-API/src/shared/validators/<domain>.ts`** —
+**Each file is byte-identical to `dbexec-api/src/shared/validators/<domain>.ts`** —
 the FE form and BE endpoint share ONE contract. When you change a validator,
 edit BOTH files identically (limits object, schema, i18n message keys). Zod
 messages are i18n keys (`validation.<domain>.<field>.<rule>`), resolved by

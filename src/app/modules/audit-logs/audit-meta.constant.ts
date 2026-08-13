@@ -1,7 +1,7 @@
 /**
  * Presentation metadata for the audit list — mirrors the BE
  * `AUDIT_MODULES` / `AUDIT_ACTIONS` enums (see
- * DBExec-API/src/shared/constants/audit.constants.ts). Kept as data so the
+ * dbexec-api/src/shared/constants/audit.constants.ts). Kept as data so the
  * list + drawer stay declarative: a module → { icon, labelKey }, an action →
  * a semantic CSS class (colour is driven by tokens in the component SCSS, NOT
  * hard-coded here). No raw strings — labels are i18n keys.

@@ -99,7 +99,7 @@ These apply to every task. A task is not done until all of them hold.
 | `dataset/config/sql-dialects/snowflake.ts` | 2,120 | keyword/type/function data — 1 control-flow line |
 | `dataset/config/sql-dialects/postgres.ts` | 1,633 | same |
 | `dataset/constants/postgres-sql.constants.ts` | 932 | same (already < 1000) |
-| `DBExec-API/src/shared/formula/registry/docs.ts` | 1,024 | one `usage`/`description` pair per function — a data table |
+| `dbexec-api/src/shared/formula/registry/docs.ts` | 1,024 | one `usage`/`description` pair per function — a data table |
 
 Splitting a data table adds indirection and buys no comprehension. Leave them.
 

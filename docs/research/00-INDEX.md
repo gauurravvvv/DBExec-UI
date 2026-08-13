@@ -275,7 +275,7 @@ table — they bridge across modules.
 - **Effort**: `S` (≤3 days), `M` (1–2 weeks), `L` (1+ month).
 - DB schema is Postgres-flavoured (DBExec's master + shared DBs are
   Postgres). Equivalent MySQL/MSSQL paths called out when needed.
-- File paths assume DBExec-UI/DBExec-API layout.
+- File paths assume dbexec-ui/dbexec-api layout.
 - Code is TypeScript unless explicitly otherwise.
 - Endpoint envelope follows `sendResponse(res, status, code, msg, data)`
   — DBExec's existing convention.

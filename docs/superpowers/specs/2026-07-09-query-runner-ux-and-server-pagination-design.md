@@ -161,7 +161,7 @@ Copy the reference implementations' adapter shape (load → unwrap {rows,total},
   `modules/query-runner/middleware/execute.validation.ts` (allow `derived`).
 - Slice B: `query-runner/launcher/launcher.component.{html,scss}`.
 - Slice C: per-list components + services under `modules/*`; BE list
-  controllers under `DBExec-API/src/modules/*` where paging is missing;
+  controllers under `dbexec-api/src/modules/*` where paging is missing;
   i18n only if new strings appear.
 
 ## Verification

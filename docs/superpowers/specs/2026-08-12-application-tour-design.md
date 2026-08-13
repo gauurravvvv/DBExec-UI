@@ -1,6 +1,6 @@
 # Application Tour (Guided Onboarding) — Design
 
-> Date: 2026-08-12 · Repos: DBExec-UI (primary) + DBExec-API (flag + endpoint)
+> Date: 2026-08-12 · Repos: dbexec-ui (primary) + dbexec-api (flag + endpoint)
 > Status: approved design, ready to implement
 
 ## Problem
@@ -51,7 +51,7 @@ benefit over driver.js here).
 
 ## Architecture
 
-Three parts, all in DBExec-UI except the flag + endpoint:
+Three parts, all in dbexec-ui except the flag + endpoint:
 
 ### 1. `TourService` — `core/services/tour.service.ts`
 
@@ -304,7 +304,7 @@ Module step titles reuse `SIDEBAR.<value>` for the title where practical;
 descriptions are always new `TOUR.STEPS.<value>.DESC` keys (one short sentence
 each describing the module).
 
-## Backend (DBExec-API)
+## Backend (dbexec-api)
 
 - `shared_entity/user.entity.ts` + `master_entity/user.entity.ts`: add
   `showTour` column (`boolean`, `default: true`, not null).
@@ -320,7 +320,7 @@ each describing the module).
 
 ## Files touched (summary)
 
-**DBExec-UI**
+**dbexec-ui**
 - `package.json` — add `driver.js`.
 - `core/services/tour.service.ts` — new.
 - `core/constants/tour.constant.ts` — new.
@@ -337,7 +337,7 @@ each describing the module).
 - `assets/sass/_driver-tour.scss` + `styles.scss` import.
 - `assets/i18n/*.json` (10) — `TOUR.*` + `PROFILE.SHOW_TOUR_TOGGLE`.
 
-**DBExec-API**
+**dbexec-api**
 - `shared/db/shared_entity/user.entity.ts` + `master_entity/user.entity.ts`.
 - `modules/profile/controllers/updateShowTour.ts` + validation + route.
 - `shared/constants/response.messages.ts`.

@@ -21,7 +21,7 @@ Each module's deep test doc follows the same shape:
      - Expected result (observable)
      - Postconditions (cleanup or carry-over)
      - Linked spec sections in docs/research/modules/<n>.md
-     - Linked code paths in DBExec-API / DBExec-UI
+     - Linked code paths in dbexec-api / dbexec-ui
 5. Regression buckets  — which subsets to run when X changes
 6. Open questions
 ```

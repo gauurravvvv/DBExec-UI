@@ -1,10 +1,10 @@
-# DBExec-UI — Session Log (newest first)
+# dbexec-ui — Session Log (newest first)
 
 ### 2026-08-12 — Joi → Zod validation migration (FE mirror side)
 - BE-led migration of all 63 remaining Joi validators to Zod; the FE side received the byte-identical mirrored schema files under `src/app/shared/validators/*` (new: ai-workspace, announcements, audit-logs, branding, dashboards, db-access, org-policy, profile, prompts, query-builders, system-users, analysis-filters, theme; appended: alerts, analyses, datasets, datasources, groups, organisation, roles, savedQueries, users). Created FE `src/app/shared/utility/listSort.ts` with `buildSortZod` to match BE.
 - **189 new `validation.*` i18n keys added to all 10 FE locale files, fully translated** (mirrors BE), plus `validation.common.sort.*` + `validation.common.id.{required,invalid}`. Parity verified 189/189 × 10 locales.
 - These schemas back the add/edit/save forms (client `safeParse` before submit) with the SAME contract the BE now enforces. 21/22 schema files are byte-identical to BE; `theme.ts` differs only in the themeTokens import path (FE uses `theme-tokens`, BE `themeTokens`) — intended.
-- Verified: FE tsc 0 → ngc 0 → prod build 0. version_261 (local; user pushes). Full detail in DBExec-API SESSION_LOG.
+- Verified: FE tsc 0 → ngc 0 → prod build 0. version_261 (local; user pushes). Full detail in dbexec-api SESSION_LOG.
 
 ### 2026-08-12 — Guided application tour (permission-aware onboarding)
 - New feature: a driver.js-powered guided tour that auto-shows on login and walks the user through the sidebar chrome (global search, notifications, language switcher, logout) and **only the modules they hold permission for** — steps derive from the user's own permission tree, so User A (all perms) sees all module steps and User B (subset) sees only theirs. Chrome-first order: welcome → search → notifications → [permitted modules] → language → logout → done.

@@ -3,7 +3,7 @@
 > Login, forgot-password, OTP, set-password, set-up token, refresh
 > token, logout, route guard. Sources: `e2e/docs/modules/01-auth.md`,
 > `docs/research/modules/10-auth-rbac-sso.md`,
-> `DBExec-API/src/modules/auth/*`.
+> `dbexec-api/src/modules/auth/*`.
 
 ---
 

@@ -27,8 +27,8 @@
 
 | Piece                            | URL / DSN                                                       | Start command                               | Notes                                                                                                 |
 | -------------------------------- | --------------------------------------------------------------- | ------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
-| Frontend (Angular 18 + PrimeNG)  | `http://localhost:4200`                                         | `npm start` (`ng serve`) in `DBExec-UI`     | `package.json` → `"start": "ng serve"`. `environment.apiServer` dev = `http://localhost:3000/api/v1`. |
-| Backend (Express + TypeORM)      | `http://localhost:3000/api/v1`                                  | `npm run dev` in `DBExec-API`               | `.env` → `SERVER_PORT=3000`. Health route `GET /health`.                                              |
+| Frontend (Angular 18 + PrimeNG)  | `http://localhost:4200`                                         | `npm start` (`ng serve`) in `dbexec-ui`     | `package.json` → `"start": "ng serve"`. `environment.apiServer` dev = `http://localhost:3000/api/v1`. |
+| Backend (Express + TypeORM)      | `http://localhost:3000/api/v1`                                  | `npm run dev` in `dbexec-api`               | `.env` → `SERVER_PORT=3000`. Health route `GET /health`.                                              |
 | Warehouse Postgres (data source) | `localhost:5432` db `DbExec` user `postgres` pw `<DB_PASSWORD>` | user-managed (Postgres.app / Docker / brew) | Same server + db-name as the app's master DB — see the constraint below.                              |
 
 > **Ignore ports 8755 / 9058** — those are the prod/desktop build ports named
@@ -39,7 +39,7 @@
 ### The one hard constraint (read before running the SQL)
 
 The DBExec **application's own master database is _also_ named `DbExec`** on the
-same `localhost:5432` server (`DBExec-API/.env → DB_NAME=DbExec`). Its master
+same `localhost:5432` server (`dbexec-api/.env → DB_NAME=DbExec`). Its master
 tables live in the **`public`** schema; the **GauravOrg** per-org tables live in
 a **`dbexec`** schema (org onboarding "creates dbexec schema"). Therefore the
 sample data **must not** go in `public` or `dbexec`.
@@ -74,10 +74,10 @@ PGPASSWORD=<DB_PASSWORD> psql -h localhost -p 5432 -U postgres -d DbExec -tAc "s
 
 ### 1.2 Start anything that's down
 
-- **Backend:** in `DBExec-API`, `npm run dev` (nodemon + ts-node). It boots on
+- **Backend:** in `dbexec-api`, `npm run dev` (nodemon + ts-node). It boots on
   `:3000`. Do **not** pass `DB_SYNC=true` / `DB_CLEAR=true` — those mutate the
   app DB. Wait for readiness by polling `GET /health` until 200.
-- **Frontend:** in `DBExec-UI`, `npm start`. First compile can take 30–90 s.
+- **Frontend:** in `dbexec-ui`, `npm start`. First compile can take 30–90 s.
   Poll `http://localhost:4200/` until 200, then additionally wait for Angular
   to bootstrap in-browser (see harness `waitForAngular`, §6.3).
 - **Postgres:** user-managed. If down, ask the user to start it
@@ -114,7 +114,7 @@ the UI — every downstream assertion depends on this data.
 
 ### 1.4 Playwright install & launch
 
-- Install once (in `DBExec-UI` or a sibling e2e workspace):
+- Install once (in `dbexec-ui` or a sibling e2e workspace):
   `npm i -D @playwright/test && npx playwright install chromium`.
 - **Run headless** (this is a remote/automated context) with the video +
   screenshot + trace artifacts on. The build uses **Monaco** (dataset SQL
@@ -610,7 +610,7 @@ in the warehouse: `psql … -c "select count(*) from clinical.encounters"` = 500
 ## 5. Playwright harness sketch
 
 ```
-DBExec-UI/e2e/                         (or a sibling e2e workspace)
+dbexec-ui/e2e/                         (or a sibling e2e workspace)
 ├── playwright.config.ts               # chromium, baseURL 4200, 1920x1080, trace/video on
 ├── fixtures/
 │   ├── config.ts                      # BASE_URL, API_URL, creds, warehouse DSN, run-suffix

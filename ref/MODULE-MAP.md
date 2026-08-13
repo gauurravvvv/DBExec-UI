@@ -1,4 +1,4 @@
-# DBExec-UI — Module Map
+# dbexec-ui — Module Map
 
 > Every feature module under `src/app/modules/`, its landing route, and what
 > it does. Routes come from `src/app/core/constants/routes.constant.ts`; API

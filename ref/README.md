@@ -1,4 +1,4 @@
-# DBExec-UI — `ref/` reference library
+# dbexec-ui — `ref/` reference library
 
 Context files for anyone (human or agent) working in this repo. Read
 `../CLAUDE.md` first for the FE engineering contract, then these:
@@ -13,4 +13,4 @@ Context files for anyone (human or agent) working in this repo. Read
   component kit, screen/form structure, i18n, state/loading discipline.
 
 For the backend contract (endpoints, tenancy, entities), see
-`../../DBExec-API/CLAUDE.md` and `../../DBExec-API/ref/`.
+`../../dbexec-api/CLAUDE.md` and `../../dbexec-api/ref/`.

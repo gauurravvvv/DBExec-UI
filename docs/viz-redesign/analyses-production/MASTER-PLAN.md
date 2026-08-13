@@ -4,7 +4,7 @@ Now I'll produce the master implementation plan as markdown. This is my final re
 
 # DBExec Analyses — Master Implementation Plan to Production GA
 
-**Author:** Engineering Lead · **Target:** `version_261` lineage, fan-out across git worktrees · **Repos:** `DBExec-API` (Express + TypeORM + Postgres, per-org DBs) · `DBExec-UI` (Angular 18 + PrimeNG + ECharts)
+**Author:** Engineering Lead · **Target:** `version_261` lineage, fan-out across git worktrees · **Repos:** `dbexec-api` (Express + TypeORM + Postgres, per-org DBs) · `dbexec-ui` (Angular 18 + PrimeNG + ECharts)
 
 ---
 
@@ -51,11 +51,11 @@ These are **foundation seams**. Every wave depends on them. They must land in **
 - `semanticType: varchar null` — `'geo_country' | 'geo_state' | 'geo_city' | 'geo_postal' | 'geo_lat' | 'geo_lon' | 'url' | 'image' | null`.
 - `doNotAggregate: boolean null` — the "do-not-SUM" flag for ratios/rates.
 
-File: `DBExec-API/src/shared/db/shared_entity/datasetField.entity.ts`. **No migration** — comment the columns like the existing ones; org onboarding DDL sync picks them up. (Remember the `seedPermissionCatalog` / apostrophe-in-comment lesson — keep comments apostrophe-free.)
+File: `dbexec-api/src/shared/db/shared_entity/datasetField.entity.ts`. **No migration** — comment the columns like the existing ones; org onboarding DDL sync picks them up. (Remember the `seedPermissionCatalog` / apostrophe-in-comment lesson — keep comments apostrophe-free.)
 
 ### 1.3 One BE compute engine, exposed as presets
 
-The corpus is explicit and correct: table-calcs, time-intelligence, and computed reference lines should **share one server-side window/SQL engine**, surfaced in the config panel as presets — not one-off encodings. We build **`analyticsEngine`** (new folder `DBExec-API/src/shared/helpers/analytics/`) as the single home for window functions, date-spine joins, ratio-of-sums, and LOD subqueries. `runAnalysisQuery.ts` composes it **after** `buildAggregationWrap` and **before** the LIMIT/enrich steps, reusing the same `VALID_IDENTIFIER` guard and `$N` param discipline as `filterEngine`/`buildAggregationWrap`.
+The corpus is explicit and correct: table-calcs, time-intelligence, and computed reference lines should **share one server-side window/SQL engine**, surfaced in the config panel as presets — not one-off encodings. We build **`analyticsEngine`** (new folder `dbexec-api/src/shared/helpers/analytics/`) as the single home for window functions, date-spine joins, ratio-of-sums, and LOD subqueries. `runAnalysisQuery.ts` composes it **after** `buildAggregationWrap` and **before** the LIMIT/enrich steps, reusing the same `VALID_IDENTIFIER` guard and `$N` param discipline as `filterEngine`/`buildAggregationWrap`.
 
 ### 1.4 Serialization hazards — the files that MUST NOT be edited by two agents at once
 
@@ -105,12 +105,12 @@ Waves 1–5 are **largely independent** (different files/domains) and can overla
 **Worktree 0A — BE field model + config contract** (`feature/m-analyses-w0-be-foundation`)
 
 - `datasetField.entity.ts`: add `continuousDiscrete`, `semanticType`, `doNotAggregate` (nullable, commented, apostrophe-free). Register nothing new (existing entity). **Onboarding-safe** — verify with a fresh org boot that DDL sync adds columns.
-- New `DBExec-API/src/shared/helpers/analytics/analyticsEngine.ts` **skeleton only**: exported `applyTableCalcs(sql, specs, dialect, paramOffset)`, `applyTimeIntelligence(...)`, `applyRatioMeasure(...)`, all throwing `NotImplemented` for now, with the `AnalyticsError extends Error` typed-error class (mirrors `AggregationError`) so Wave 1 fills bodies without touching signatures.
-- Extend `runAnalysisQuery.validation.ts` Zod schema (`DBExec-API/src/shared/validators/analyses.ts`) with **optional** `tableCalcs?`, `timeIntel?`, `dateSpine?` blocks (all `.optional()`, default no-op) — mirror verbatim to `DBExec-UI/src/app/shared/validators/analyses.ts`. Remember Zod 4 `z.record(z.string(), z.any())`.
+- New `dbexec-api/src/shared/helpers/analytics/analyticsEngine.ts` **skeleton only**: exported `applyTableCalcs(sql, specs, dialect, paramOffset)`, `applyTimeIntelligence(...)`, `applyRatioMeasure(...)`, all throwing `NotImplemented` for now, with the `AnalyticsError extends Error` typed-error class (mirrors `AggregationError`) so Wave 1 fills bodies without touching signatures.
+- Extend `runAnalysisQuery.validation.ts` Zod schema (`dbexec-api/src/shared/validators/analyses.ts`) with **optional** `tableCalcs?`, `timeIntel?`, `dateSpine?` blocks (all `.optional()`, default no-op) — mirror verbatim to `dbexec-ui/src/app/shared/validators/analyses.ts`. Remember Zod 4 `z.record(z.string(), z.any())`.
 
 **Worktree 0B — FE config-schema types + i18n stubs** (`feature/m-analyses-w0-fe-foundation`)
 
-- New `DBExec-UI/src/app/modules/analyses/models/visual-config.model.ts`: TypeScript interface for the full `config` JSONB contract (all keys Waves 1–7 will write), so every FE agent types against one source. This is a **new file** — parallel-safe.
+- New `dbexec-ui/src/app/modules/analyses/models/visual-config.model.ts`: TypeScript interface for the full `config` JSONB contract (all keys Waves 1–7 will write), so every FE agent types against one source. This is a **new file** — parallel-safe.
 - Add **all** new i18n keys for the whole program to `en.json` up front (chart names, config labels, format presets, interaction labels, error messages), then fan the 9 non-en locales. Doing this once in Wave 0 removes the per-wave locale-file serialization bottleneck: later waves only _use_ keys, never _add_ them. (If a wave needs a new key, it appends to `en.json` and flags it for the Wave 8 parity sweep.)
 
 **Serialization:** 0A and 0B are fully parallel (disjoint repos/files). **Both must merge before any Wave 1–7 worktree starts.**
@@ -171,8 +171,8 @@ All Wave-1 worktrees write **new files** under `src/shared/helpers/analytics/` a
 
 **Worktree 2B — FE: format grammar + type UI** (`feature/m-analyses-w2-fe-format`)
 
-- New `DBExec-UI/src/app/modules/analyses/utils/format-grammar.util.ts`: **VBA/Excel placeholder grammar** (`0 # . , % E+ $ ;`-sections), named presets (General/Currency/Fixed/Standard/Percent/Scientific), locale separators, display-unit auto-scale (K/M/B) as a **toggle separate from the format string**, VBA **date tokens** (`d/dd/mmm/mmmm/yy/yyyy/dddd/hh/nn/tt`) + named date presets. This is a **new util** — parallel-safe, consumed by the option builder's `formatValueByHint`/`formatTooltipValue` and the config panel.
-- New `DBExec-UI/src/app/modules/analyses/utils/type-detection.util.ts`: client heuristic + override plumbing feeding `DatasetField.role`/`continuousDiscrete`/`typeOverride`.
+- New `dbexec-ui/src/app/modules/analyses/utils/format-grammar.util.ts`: **VBA/Excel placeholder grammar** (`0 # . , % E+ $ ;`-sections), named presets (General/Currency/Fixed/Standard/Percent/Scientific), locale separators, display-unit auto-scale (K/M/B) as a **toggle separate from the format string**, VBA **date tokens** (`d/dd/mmm/mmmm/yy/yyyy/dddd/hh/nn/tt`) + named date presets. This is a **new util** — parallel-safe, consumed by the option builder's `formatValueByHint`/`formatTooltipValue` and the config panel.
+- New `dbexec-ui/src/app/modules/analyses/utils/type-detection.util.ts`: client heuristic + override plumbing feeding `DatasetField.role`/`continuousDiscrete`/`typeOverride`.
 - Wire live **format preview** into the config panel (delivered as a config-panel accordion section — handed to the Wave-3 panel owner, or landed in the pill-menu overlay which is a new component, §Wave 7).
 
 **Serialization:** 2A (BE) and 2B (FE new utils) are fully parallel. 2B's _consumption points_ (option builder `formatValueByHint`, config panel) are edited in Wave 3 by the panel/builder owners — 2B delivers the util + a PR-ready patch snippet for those call sites.
@@ -202,7 +202,7 @@ This wave concentrates on **two serialized files** (`echarts-option-builder.ts` 
 
 **Worktree 3C — Color + palette system** (`feature/m-analyses-w3-color`) — **new files + one accordion section**
 
-- New `DBExec-UI/src/app/modules/analyses/utils/palette.util.ts`: categorical/sequential/diverging palettes, **colorblind-safe named schemes (Okabe-Ito, Viridis/Cividis, RdBu)**, deterministic category→color (stable hash) so colors are stable across charts/refreshes, per-value color pin, diverging midpoint, opacity, mark border/halo. **Do-not-force-red-green default.**
+- New `dbexec-ui/src/app/modules/analyses/utils/palette.util.ts`: categorical/sequential/diverging palettes, **colorblind-safe named schemes (Okabe-Ito, Viridis/Cividis, RdBu)**, deterministic category→color (stable hash) so colors are stable across charts/refreshes, per-value color pin, diverging midpoint, opacity, mark border/halo. **Do-not-force-red-green default.**
 - Swatch-picker component (new component dir) + one config-panel accordion section (handed to 3B's skeleton at integration).
 - Continuous-color stepped/binned → calls `buildVisualMap` (already exists) with new bin config.
 
@@ -223,7 +223,7 @@ This wave concentrates on **two serialized files** (`echarts-option-builder.ts` 
 
 **Worktree 4A — Geo pipeline (P0, BE-heavy)** (`feature/m-analyses-w4-geo-be`)
 
-- **New BE `DBExec-API/src/shared/helpers/geo/`**:
+- **New BE `dbexec-api/src/shared/helpers/geo/`**:
   - Region-code join: map dimension values (country/state names, ISO codes, FIPS, ZIP) to canonical region IDs for choropleth. Ship a bundled region lookup (countries + US/EU states) — no external service.
   - Lat/lon typing: honor `semanticType` `geo_lat/geo_lon` (from Wave 0/2); **never SUM lat/lon** (guard). Postal codes stay string (leading-zero preservation).
   - New endpoint or extend `runAnalysisQuery` output shape: return `{regionCode, value}` for choropleth and `{lat, lon, measure}` for point/bubble maps.
@@ -301,7 +301,7 @@ This wave concentrates on **two serialized files** (`echarts-option-builder.ts` 
 
 **Worktree 7A — Undo/redo engine** (`feature/m-analyses-w7-undo`) — **new service; splices into shell**
 
-- New `DBExec-UI/src/app/modules/analyses/services/undo-redo.service.ts`: a command/history stack over **all** authoring mutations (field bindings, format, layout, deletions, tab ops). Ctrl/Cmd-Z + redo. Survives whole session; survives Save (draft model already atomic per #1300). This is a **new service**; the shell owner wires every mutation method through it during shell-integration. Because the shell is serialized, 7A **delivers the service + a checklist of shell mutation call-sites**; the shell owner splices.
+- New `dbexec-ui/src/app/modules/analyses/services/undo-redo.service.ts`: a command/history stack over **all** authoring mutations (field bindings, format, layout, deletions, tab ops). Ctrl/Cmd-Z + redo. Survives whole session; survives Save (draft model already atomic per #1300). This is a **new service**; the shell owner wires every mutation method through it during shell-integration. Because the shell is serialized, 7A **delivers the service + a checklist of shell mutation call-sites**; the shell owner splices.
 
 **Worktree 7B — Canvas: multi-select, align, z-order, Selection pane, snap, duplicate** (`feature/m-analyses-w7-canvas`) — **new components + shell layout methods**
 
@@ -323,8 +323,8 @@ This wave concentrates on **two serialized files** (`echarts-option-builder.ts` 
 
 **Compile gates (run per worktree before merge; the memory is explicit — never trust a detached build's self-report):**
 
-- **BE:** `cd DBExec-API && npx tsc --noEmit` — must be clean.
-- **FE:** `cd DBExec-UI && npx tsc --noEmit` **and** a real `ng build --configuration production` (tsc misses template binding errors — mandatory for every FE worktree).
+- **BE:** `cd dbexec-api && npx tsc --noEmit` — must be clean.
+- **FE:** `cd dbexec-ui && npx tsc --noEmit` **and** a real `ng build --configuration production` (tsc misses template binding errors — mandatory for every FE worktree).
 - **i18n parity sweep:** every key in `en.json` exists in all 9 other locales (script the diff). Preserve `{{placeholders}}` verbatim.
 - **Onboarding safety:** boot a **fresh org** and confirm every new nullable column (`DatasetField` ×3) and new entity (`InteractionRule`) appears via DDL sync with **no migration** and **no apostrophe-in-comment 500** (the known onboarding-DDL trap). Run `npm run backfill:perms` if any new grantable permission was added (none planned, but verify).
 - **Versioning integrity:** a save (`updateAnalysis`) on an analysis carrying every new config key + an `InteractionRule` must clone cleanly (A→A'), leave A immutable, and return correct idMaps. Add a targeted test asserting the clone helper copies `InteractionRule` and remaps ids.

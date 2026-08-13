@@ -6,7 +6,7 @@
  * wire; an invalid card degrades to a text note rather than throwing.
  *
  * This file is MIRRORED byte-for-byte into
- *   DBExec-UI/src/app/shared/validators/ai-cards.ts
+ *   dbexec-ui/src/app/shared/validators/ai-cards.ts
  * so the FE renderer and BE producer share one contract. Edit both
  * together.
  *

@@ -3,7 +3,7 @@
  * organisation-configurable colour in the app.
  *
  * MIRRORED byte-for-byte with the FE at
- * `DBExec-UI/src/app/shared/theme/theme-tokens.ts`. Edit both together.
+ * `dbexec-ui/src/app/shared/theme/theme-tokens.ts`. Edit both together.
  *
  * Each entry maps a stable storage `key` (what we persist in the Theme
  * row's `colors` JSON) to the CSS custom property it drives, its default

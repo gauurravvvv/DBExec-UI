@@ -313,7 +313,7 @@ export class AiChatService {
     this.closingIntentionally = false;
     this._socketState.set('connecting');
     const token = StorageService.get(StorageType.ACCESS_TOKEN) || '';
-    // The AI WebSocket lives on the DBExec-AI BFF when `aiServer` is set
+    // The AI WebSocket lives on the dbexec-ai BFF when `aiServer` is set
     // (e.g. http://host:3001/ai/v1 → ws://host:3001/ai/v1/ws). When it is
     // not set, fall back to the embedded engine on the main API
     // (apiServer + /ai/ws) so the FE works with either topology.
@@ -609,7 +609,7 @@ export class AiChatService {
 
   // ── Conversation history (plain REST — cold reads) ─────────────────
   //
-  // When the DBExec-AI BFF is configured (`aiServer`), AI REST goes there as
+  // When the dbexec-ai BFF is configured (`aiServer`), AI REST goes there as
   // an ABSOLUTE URL — and because the http interceptor skips auth on absolute
   // URLs, we attach the x-auth-token ourselves. Endpoint shape differs: the
   // BFF exposes /conversations (base path already /ai/v1); the embedded engine
@@ -635,7 +635,7 @@ export class AiChatService {
 
   /**
    * Execute an approved write proposal through the guarded confirm path. Goes
-   * to the DBExec-AI BFF's POST /confirm when configured (absolute + token),
+   * to the dbexec-ai BFF's POST /confirm when configured (absolute + token),
    * else the main API's embedded /ai/confirm via the interceptor. Returns the
    * relayed envelope so the caller decides success by { code/status }.
    */

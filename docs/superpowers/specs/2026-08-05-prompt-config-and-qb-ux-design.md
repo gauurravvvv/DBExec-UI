@@ -1,6 +1,6 @@
 # Prompt config rework + QB polish + datasource dropdowns
 
-Date: 2026-08-05 · Repo: DBExec-UI (+ minor DBExec-API if needed)
+Date: 2026-08-05 · Repo: dbexec-ui (+ minor dbexec-api if needed)
 
 ## Mental model (locked with the user)
 
