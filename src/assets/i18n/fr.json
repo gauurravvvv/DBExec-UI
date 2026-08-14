@@ -341,7 +341,8 @@
     "SEARCH": "Rechercher",
     "CLEAR": "Effacer",
     "DELETE_NOTIFICATION": "Supprimer la notification",
-    "READ_MORE": "En savoir plus"
+    "READ_MORE": "En savoir plus",
+    "THEME": "Thème"
   },
   "PROFILE": {
     "TITLE": "Mon profil",

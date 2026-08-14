@@ -1,5 +1,22 @@
 # dbexec-ui — Session Log (newest first)
 
+### 2026-08-14 — Per-user theme picker (sidebar flyout mirroring the language picker)
+- Theme became a per-user choice. New `core/services/theme-picker.service.ts`
+  (`ThemePickerService`) = the theme sibling of `LocaleService`: `loadThemes()` →
+  `GET /profile/available-themes`; `changeTheme(id)` → apply instantly
+  (`ThemeService.applyFromLogin`) → `PUT /profile/theme` → refresh JWT. A new **Theme
+  flyout** in `core/layout/sidebar` cloned from the language flyout (a `pi-palette`
+  profile-menu row + a `.theme-flyout` list: swatch strip + name + ✓ on the active
+  pick), shown only when the org has themes. Wired into the click-outside allowlist +
+  tour open/close helpers; one flyout open at a time.
+- The session apply path was untouched — the BE now resolves the user's theme into the
+  login/refresh payload, so `applyAuthArtefacts` paints the user's pick everywhere for
+  free. `HEADER.THEME` ×10 locales; mirrored `profile.ts` validator kept byte-identical;
+  `PROFILE.{AVAILABLE_THEMES,UPDATE_THEME}` consts.
+- Verified: FE tsc 0 → ngc 0 → prod build 0 (2.x MB). version_261 (local; user pushes).
+  BE companion (entity/resolver/endpoints/creation-stamps) in dbexec-api SESSION_LOG +
+  the design spec `docs/superpowers/specs/2026-08-14-user-scoped-theme-design.md`.
+
 ### 2026-08-12 — Joi → Zod validation migration (FE mirror side)
 - BE-led migration of all 63 remaining Joi validators to Zod; the FE side received the byte-identical mirrored schema files under `src/app/shared/validators/*` (new: ai-workspace, announcements, audit-logs, branding, dashboards, db-access, org-policy, profile, prompts, query-builders, system-users, analysis-filters, theme; appended: alerts, analyses, datasets, datasources, groups, organisation, roles, savedQueries, users). Created FE `src/app/shared/utility/listSort.ts` with `buildSortZod` to match BE.
 - **189 new `validation.*` i18n keys added to all 10 FE locale files, fully translated** (mirrors BE), plus `validation.common.sort.*` + `validation.common.id.{required,invalid}`. Parity verified 189/189 × 10 locales.

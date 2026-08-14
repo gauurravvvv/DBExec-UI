@@ -341,7 +341,8 @@
     "SEARCH": "検索",
     "CLEAR": "クリア",
     "DELETE_NOTIFICATION": "通知を削除",
-    "READ_MORE": "詳細を見る"
+    "READ_MORE": "詳細を見る",
+    "THEME": "テーマ"
   },
   "PROFILE": {
     "TITLE": "マイプロフィール",

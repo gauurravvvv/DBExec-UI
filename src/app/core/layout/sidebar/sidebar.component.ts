@@ -23,7 +23,9 @@ import { LoginService } from 'src/app/core/services/login.service';
 import { NotificationService } from 'src/app/core/services/notification.service';
 import { PermissionService } from 'src/app/core/services/permission.service';
 import { StorageService } from 'src/app/core/services/storage.service';
+import { ThemePickerService } from 'src/app/core/services/theme-picker.service';
 import { ThemeService } from 'src/app/core/services/theme.service';
+import { ThemePreset } from 'src/app/modules/app-settings/services/theme-settings.service';
 import {
   TourService,
   TourSidebarApi,
@@ -124,6 +126,14 @@ export class SidebarComponent implements OnInit, TourSidebarApi {
   currentLocale = 'en';
   changingLocale = false;
 
+  /** True while the Theme flyout next to the profile menu is open. */
+  showThemeFlyout = false;
+  /** Org theme presets the user may pick from (empty for System Admins). */
+  themes: ThemePreset[] = [];
+  /** The preset id the user is currently on (JWT claim, else org default). */
+  currentThemeId: string | null = null;
+  changingTheme = false;
+
   /** localStorage key for the user's expanded-branch set. */
   private static readonly EXPANDED_STORAGE_KEY = 'sidebar.expanded';
 
@@ -142,6 +152,7 @@ export class SidebarComponent implements OnInit, TourSidebarApi {
     private loginService: LoginService,
     private localeService: LocaleService,
     private themeService: ThemeService,
+    private themePickerService: ThemePickerService,
     public notificationService: NotificationService,
     private permissionService: PermissionService,
     private globalSearchService: GlobalSearchService,
@@ -185,6 +196,14 @@ export class SidebarComponent implements OnInit, TourSidebarApi {
       // org context so the BE would 401 on every poll. Service is
       // idempotent so re-mount is safe.
       this.notificationService.start();
+
+      // Load the org theme library for the sidebar theme picker. Per-org
+      // only — System Admins have no theme storage (the BE returns []).
+      void this.themePickerService.loadThemes().then(() => {
+        this.themes = this.themePickerService.themes();
+        this.currentThemeId = this.themePickerService.currentThemeId();
+        this.cdr.markForCheck();
+      });
     }
 
     // Re-run change detection when language changes (required for
@@ -499,6 +518,7 @@ export class SidebarComponent implements OnInit, TourSidebarApi {
   openAccountMenuForTour(): void {
     this.showProfileMenu = true;
     this.showLanguageFlyout = false;
+    this.showThemeFlyout = false;
     this.cdr.markForCheck();
   }
 
@@ -506,13 +526,15 @@ export class SidebarComponent implements OnInit, TourSidebarApi {
   openLanguageFlyoutForTour(): void {
     this.showProfileMenu = true;
     this.showLanguageFlyout = true;
+    this.showThemeFlyout = false;
     this.cdr.markForCheck();
   }
 
-  /** Close the account menu + language flyout (tour leaving those steps). */
+  /** Close the account menu + flyouts (tour leaving those steps). */
   closeTourPopovers(): void {
     this.showProfileMenu = false;
     this.showLanguageFlyout = false;
+    this.showThemeFlyout = false;
     this.cdr.markForCheck();
   }
 
@@ -543,25 +565,54 @@ export class SidebarComponent implements OnInit, TourSidebarApi {
     // Close any other sidebar popovers so the modal owns the focus.
     this.showProfileMenu = false;
     this.showLanguageFlyout = false;
+    this.showThemeFlyout = false;
     this.notificationModalService.open();
   }
 
   toggleProfileMenu(event: Event): void {
     event.stopPropagation();
     this.showProfileMenu = !this.showProfileMenu;
-    // Closing the profile menu also closes any open Language flyout.
-    if (!this.showProfileMenu) this.showLanguageFlyout = false;
+    // Closing the profile menu also closes any open flyouts.
+    if (!this.showProfileMenu) {
+      this.showLanguageFlyout = false;
+      this.showThemeFlyout = false;
+    }
   }
 
   /**
    * Click the Language row in the profile menu. Click-toggles the
    * flyout (in addition to the hover-driven open/close on the row
    * itself). stopPropagation so the menu's outside-click handler
-   * doesn't immediately close everything.
+   * doesn't immediately close everything. Opening it closes the Theme
+   * flyout so only one flyout shows at a time.
    */
   toggleLanguageFlyout(event: Event): void {
     event.stopPropagation();
     this.showLanguageFlyout = !this.showLanguageFlyout;
+    if (this.showLanguageFlyout) this.showThemeFlyout = false;
+  }
+
+  /**
+   * Click the Theme row in the profile menu — same idiom as the
+   * Language flyout. Opening it closes the Language flyout.
+   */
+  toggleThemeFlyout(event: Event): void {
+    event.stopPropagation();
+    this.showThemeFlyout = !this.showThemeFlyout;
+    if (this.showThemeFlyout) this.showLanguageFlyout = false;
+  }
+
+  /**
+   * Theme list inside the avatar menu. Delegates to ThemePickerService
+   * (apply instantly → persist → refresh JWT), mirroring onLocaleChange.
+   */
+  async onThemeChange(presetId: string): Promise<void> {
+    if (this.changingTheme || presetId === this.currentThemeId) return;
+    this.changingTheme = true;
+    await this.themePickerService.changeTheme(presetId);
+    this.currentThemeId = this.themePickerService.currentThemeId();
+    this.changingTheme = false;
+    this.cdr.markForCheck();
   }
 
   viewProfile(): void {
@@ -635,10 +686,12 @@ export class SidebarComponent implements OnInit, TourSidebarApi {
     if (
       !target.closest('.user-profile') &&
       !target.closest('.profile-menu') &&
-      !target.closest('.language-flyout')
+      !target.closest('.language-flyout') &&
+      !target.closest('.theme-flyout')
     ) {
       this.showProfileMenu = false;
       this.showLanguageFlyout = false;
+      this.showThemeFlyout = false;
     }
   }
 }

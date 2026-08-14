@@ -146,6 +146,17 @@
         <i class="pi pi-chevron-right flyout-caret"></i>
       </a>
     </li>
+    <!-- Theme row — same flyout idiom as Language: clicking opens a side
+         flyout listing the org's active theme presets; hover keeps it
+         open. Shown only when the org has themes (System Admins get none). -->
+    <li *ngIf="themes.length" class="menu-item has-flyout" data-tour="theme" [class.is-open]="showThemeFlyout"
+      (mouseenter)="showThemeFlyout = true" (mouseleave)="showThemeFlyout = false">
+      <a (click)="toggleThemeFlyout($event)">
+        <i class="pi pi-palette"></i>
+        <span>{{ 'HEADER.THEME' | translate }}</span>
+        <i class="pi pi-chevron-right flyout-caret"></i>
+      </a>
+    </li>
     <div class="menu-divider"></div>
     <li class="menu-item logout" data-tour="logout">
       <a (click)="logout()">
@@ -170,6 +181,26 @@
           ({{ locale.region }})</span>
       </span>
       <i *ngIf="locale.code === currentLocale" class="pi pi-check locale-check" aria-hidden="true"></i>
+    </li>
+  </ul>
+</div>
+
+<!-- Theme flyout (sibling, same placement/behaviour as the language flyout).
+     Lists the org's active theme presets; a swatch strip + name, a ✓ on
+     the user's current pick. -->
+<div class="theme-flyout" [class.show]="showThemeFlyout && showProfileMenu" [class.collapsed-anchor]="!isExpanded"
+  (mouseenter)="showThemeFlyout = true" (mouseleave)="showThemeFlyout = false">
+  <ul class="theme-list">
+    <li *ngFor="let theme of themes" class="theme-item" [class.is-active]="theme.id === currentThemeId"
+      [class.is-disabled]="changingTheme" (click)="onThemeChange(theme.id); $event.stopPropagation()">
+      <span class="theme-swatch" aria-hidden="true">
+        <span class="sw" [style.background]="theme.colors['primary']"></span>
+        <span class="sw" [style.background]="theme.colors['background']"></span>
+        <span class="sw" [style.background]="theme.colors['cardBackground']"></span>
+        <span class="sw" [style.background]="theme.colors['successColor']"></span>
+      </span>
+      <span class="theme-label">{{ theme.name }}</span>
+      <i *ngIf="theme.id === currentThemeId" class="pi pi-check theme-check" aria-hidden="true"></i>
     </li>
   </ul>
 </div>

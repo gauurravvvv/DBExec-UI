@@ -32,7 +32,7 @@
 | migration | `src/app/modules/migration` | [migration](./modules/migration.md) | 🟢 | 2026-07-24 |
 | notifications | `src/app/modules/notifications` | [notifications](./modules/notifications.md) | 🟢 | 2026-07-24 |
 | organisation | `src/app/modules/organisation` | [organisation](./modules/organisation.md) | 🟢 | 2026-07-24 |
-| profile | `src/app/modules/profile` | [profile](./modules/profile.md) | 🟢 | 2026-07-24 |
+| profile | `src/app/modules/profile` | [profile](./modules/profile.md) | 🟢 | 2026-08-14 |
 | prompt | `src/app/modules/prompt` | [prompt](./modules/prompt.md) | 🟢 | 2026-08-06 |
 | query-builder | `src/app/modules/query-builder` | [query-builder](./modules/query-builder.md) | 🟢 | 2026-08-06 |
 | query-runner | `src/app/modules/query-runner` | [query-runner](./modules/query-runner.md) | 🟢 | 2026-08-06 |

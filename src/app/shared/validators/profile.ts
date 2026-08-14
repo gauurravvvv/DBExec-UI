@@ -87,6 +87,18 @@ export const showTourSchema = z.boolean({
   message: 'validation.profile.showTour.invalid',
 });
 
+/**
+ * Theme preset id — the id of a ThemePreset the user is selecting from
+ * the org's theme library (sidebar theme picker). Must be a UUID; the
+ * controller re-checks it exists in the caller's org.
+ */
+export const themePresetIdSchema = z.preprocess(
+  trimOrUndefined,
+  z
+    .string({ message: 'validation.profile.themePresetId.required' })
+    .uuid({ message: 'validation.profile.themePresetId.invalid' }),
+);
+
 // ── Composite schemas ──────────────────────────────────────────────
 
 /** POST /api/v1/profile/change-password body. */
@@ -109,3 +121,10 @@ export const updateShowTourSchema = z.object({
 });
 
 export type UpdateShowTourInput = z.infer<typeof updateShowTourSchema>;
+
+/** PUT /api/v1/profile/theme body. */
+export const updateThemeSchema = z.object({
+  themePresetId: themePresetIdSchema,
+});
+
+export type UpdateThemeInput = z.infer<typeof updateThemeSchema>;

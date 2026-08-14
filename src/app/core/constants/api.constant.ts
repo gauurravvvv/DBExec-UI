@@ -478,6 +478,8 @@ export const PROFILE = {
   CHANGE_PASSWORD: '/profile/password',
   UPDATE_LOCALE: '/profile/locale',
   UPDATE_TOUR: '/profile/tour',
+  AVAILABLE_THEMES: '/profile/available-themes',
+  UPDATE_THEME: '/profile/theme',
 };
 
 export const DASHBOARD = {

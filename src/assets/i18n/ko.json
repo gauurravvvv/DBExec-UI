@@ -341,7 +341,8 @@
     "SEARCH": "검색",
     "CLEAR": "지우기",
     "DELETE_NOTIFICATION": "알림 삭제",
-    "READ_MORE": "자세히 보기"
+    "READ_MORE": "자세히 보기",
+    "THEME": "테마"
   },
   "PROFILE": {
     "TITLE": "내 프로필",

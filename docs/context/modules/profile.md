@@ -1,6 +1,6 @@
 # profile
 > Update the Progress log on every change.
-> Code path: `src/app/modules/profile` · Status: 🟢 · Last updated: 2026-08-12
+> Code path: `src/app/modules/profile` · Status: 🟢 · Last updated: 2026-08-14
 
 ## 1. Context
 - **Responsibility:** The logged-in user's own profile — a **thin, read-mostly** module. View-only detail of the current user (name/email/username/org/groups) plus a **Change Password** dialog. No add/edit/list quartet; just one `view-profile` screen.
@@ -19,6 +19,31 @@
 - **Out of scope:** Editing another user (that's `users`); theme/locale preference (theme lives in `theme.service` / App Settings, not per-user here).
 
 ## 3. Progress (newest first)
+### 2026-08-14 — Per-user theme picker (sidebar flyout, mirrors the language picker)
+- Done: Theme is now a per-user preference. New `core/services/theme-picker.service.ts`
+  (`ThemePickerService`, root singleton) — the theme analogue of `LocaleService`:
+  `loadThemes()` → `GET /profile/available-themes`; `changeTheme(id)` applies instantly
+  via `ThemeService.applyFromLogin({colors})`, persists `PUT /profile/theme`, then
+  refreshes the JWT so the `themePresetId` claim updates (exact `changeLocale` shape).
+  `currentThemeId` = JWT claim, else the org default (isActive preset).
+- Sidebar picker: a **Theme flyout** cloned from the language flyout in
+  `core/layout/sidebar` (`.ts/.html/.scss`). New `pi-palette` "Theme" row in the
+  profile menu (shown only when `themes.length`), a sibling `.theme-flyout` with a
+  swatch-strip + name + `pi pi-check` on the active pick, `onThemeChange` mirroring
+  `onLocaleChange`. Added `.theme-flyout` to the click-outside allowlist + the tour
+  popover open/close helpers; only one flyout shows at a time.
+- `HEADER.THEME` added to all 10 FE locales. Mirrored `shared/validators/profile.ts`
+  (updateThemeSchema) kept byte-identical to BE. `PROFILE.{AVAILABLE_THEMES,UPDATE_THEME}`
+  endpoint consts. NOTE: this lives in core layout/services, NOT the profile feature
+  module — logged here because it's the per-user-preference sibling of locale/showTour.
+- The session apply path (`applyAuthArtefacts` on login/relay/refresh/440) needed NO
+  change — the BE now resolves the user's theme into the session payload, so every
+  existing apply point paints the user's pick automatically.
+- Reuses `ThemePreset` interface from `app-settings/services/theme-settings.service`.
+- Verified: FE tsc 0 → ngc 0 → prod build 0. version_261 (local; user pushes).
+- Files: core/services/theme-picker.service.ts(new), core/layout/sidebar/sidebar.component.{ts,html,scss},
+  core/constants/api.constant.ts, shared/validators/profile.ts, assets/i18n/*.json ×10.
+
 ### 2026-08-12 — Show-tour preference toggle added
 - Done: `view-profile` gained a "Show product tour on login" toggle (`app-custom-toggle`) under a new Preferences group, backed by `profileService.updateShowTour(bool)` → `PUT /profile/tour`. `getProfile` now returns `showTour`. This is the re-enable path for the guided [app-tour](./app-tour.md). The old "theme/locale preference out of scope" note stands for theme; this per-user tour flag is a legitimate exception (a lightweight boolean, not a config surface).
 - Files touched: view-profile.component.ts/.html, profile.service.ts, docs/context/modules/profile.md
