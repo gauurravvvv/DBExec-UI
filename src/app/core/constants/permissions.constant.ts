@@ -31,6 +31,7 @@ export const PERMISSIONS = {
   QUERY_RUNNER: 'queryRunner',
   QB_PROMPT: 'queryBuilderPrompt',
   QB_SCREEN: 'queryBuilderScreen',
+  FORM_BUILDER: 'formBuilderScreen', // Form Builder designer + list; runtime compose reuses this
 
   // Visualizations
   DATASET: 'datasetManager',

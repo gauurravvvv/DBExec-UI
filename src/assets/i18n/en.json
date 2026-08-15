@@ -2241,6 +2241,7 @@
     "SECTIONS": "Sections",
     "PROMPTS": "Prompts",
     "QUERY_BUILDERS": "Query Builders",
+    "FORM_BUILDER": "Form Builder",
     "AUDIT_LOGS": "Audit Logs",
     "LOGIN_ACTIVITY": "Login Activity",
     "APP_SETTINGS": "App Settings",

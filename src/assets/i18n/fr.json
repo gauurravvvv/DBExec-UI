@@ -2233,6 +2233,7 @@
     "SECTIONS": "Sections",
     "PROMPTS": "Invites",
     "QUERY_BUILDERS": "Constructeurs de requêtes",
+    "FORM_BUILDER": "Form Builder",
     "AUDIT_LOGS": "Journaux d'audit",
     "LOGIN_ACTIVITY": "Activité de connexion",
     "APP_SETTINGS": "Paramètres de l'application",

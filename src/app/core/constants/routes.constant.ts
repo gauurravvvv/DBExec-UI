@@ -164,6 +164,16 @@ export const QUERY_BUILDER = {
   design: (id: string | number) => `/app/query-builders/${id}/design`,
 };
 
+// Form Builder — client route group is /app/form-builder (distinct from the
+// API /forms HTTP paths in api.constant.ts FORM_BUILDER).
+export const FORM_BUILDER = {
+  LIST: '/app/form-builder',
+  NEW: '/app/form-builder/new',
+  view: (id: string | number) => `/app/form-builder/${id}`,
+  design: (id: string | number) => `/app/form-builder/${id}/design`,
+  compose: (id: string | number) => `/app/form-builder/${id}/compose`,
+};
+
 // Dashboards are view-only.
 export const DASHBOARD = {
   LIST: '/app/dashboards',

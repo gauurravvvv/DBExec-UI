@@ -2233,6 +2233,7 @@
     "SECTIONS": "セクション",
     "PROMPTS": "プロンプト",
     "QUERY_BUILDERS": "クエリビルダー",
+    "FORM_BUILDER": "Form Builder",
     "AUDIT_LOGS": "監査ログ",
     "LOGIN_ACTIVITY": "ログインアクティビティ",
     "APP_SETTINGS": "アプリ設定",

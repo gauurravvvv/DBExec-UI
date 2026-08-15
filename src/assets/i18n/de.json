@@ -2233,6 +2233,7 @@
     "SECTIONS": "Abschnitte",
     "PROMPTS": "Eingaben",
     "QUERY_BUILDERS": "Abfrage-Builder",
+    "FORM_BUILDER": "Form Builder",
     "AUDIT_LOGS": "Audit-Protokolle",
     "LOGIN_ACTIVITY": "Anmeldeaktivität",
     "APP_SETTINGS": "App-Einstellungen",

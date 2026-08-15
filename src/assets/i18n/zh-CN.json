@@ -2233,6 +2233,7 @@
     "SECTIONS": "部分",
     "PROMPTS": "提示",
     "QUERY_BUILDERS": "查询构建器",
+    "FORM_BUILDER": "Form Builder",
     "AUDIT_LOGS": "审计日志",
     "LOGIN_ACTIVITY": "登录活动",
     "APP_SETTINGS": "应用设置",

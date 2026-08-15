@@ -253,6 +253,18 @@ const routes: Routes = [
         },
       },
       {
+        path: 'form-builder',
+        loadChildren: () =>
+          import('./modules/form-builder/form-builder.module').then(
+            m => m.FormBuilderModule,
+          ),
+        canActivate: [roleGuard],
+        data: {
+          permission: PERMISSIONS.FORM_BUILDER,
+          title: 'PAGE_TITLES.FORM_BUILDER',
+        },
+      },
+      {
         path: 'audit',
         loadChildren: () =>
           import('./modules/audit-logs/audit-logs.module').then(

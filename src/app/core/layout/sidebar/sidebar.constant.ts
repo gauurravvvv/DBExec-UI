@@ -33,6 +33,7 @@ export const SIDEBAR_ITEMS_ROUTES = [
   { value: 'queryBuilderSection', route: '/app/sections' },
   { value: 'queryBuilderPrompt', route: '/app/prompts' },
   { value: 'queryBuilderScreen', route: '/app/query-builders' },
+  { value: 'formBuilderScreen', route: '/app/form-builder' },
   { value: 'myProfile', route: '/app/profile' },
   // exact: '/app/audit' is a prefix of loginActivity's '/app/audit/logins',
   // so it would also highlight on the Login Activity screen without exact match.

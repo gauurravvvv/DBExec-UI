@@ -2233,6 +2233,7 @@
     "SECTIONS": "Secties",
     "PROMPTS": "Prompts",
     "QUERY_BUILDERS": "Query-bouwers",
+    "FORM_BUILDER": "Form Builder",
     "AUDIT_LOGS": "Auditlogboeken",
     "LOGIN_ACTIVITY": "Inlogactiviteit",
     "APP_SETTINGS": "App-instellingen",
