@@ -1,439 +1,54 @@
-<div class="add-admin-wrapper">
-  <div class="add-admin-container">
-    <div class="page-header">
-      <div class="left-section">
-        <button
-          pButton
-          class="p-button-text p-button-plain back-button"
-          routerLink="/app/prompt"
-        >
-          <i class="pi pi-arrow-left back-icon"></i>
-        </button>
-        <h2>{{ 'PROMPT_MODULE.CONFIG_TITLE' | translate }}</h2>
-        <!-- Prompt metadata behind an info popover (was 3 inline rows). -->
-        <div class="meta-wrap">
-          <button
-            type="button"
-            class="meta-btn"
-            [class.open]="showMeta"
-            (click)="toggleMeta($event)"
-            [attr.aria-expanded]="showMeta"
-            [attr.aria-label]="'PROMPT_MODULE.PROMPT_DETAILS' | translate"
-          >
-            <i class="pi pi-info-circle"></i>
-          </button>
-          <div class="meta-pop" *ngIf="showMeta" role="dialog">
-            <div class="meta-row">
-              <span class="mk">{{ 'COMMON.NAME' | translate }}</span>
-              <span class="mv">{{ promptForm.get('name')?.value || '—' }}</span>
-            </div>
-            <div class="meta-row">
-              <span class="mk">{{ 'COMMON.TYPE' | translate }}</span>
-              <span class="mv"
-                ><span class="meta-tag">{{
-                  promptForm.get('type')?.value || '—'
-                }}</span></span
-              >
-            </div>
-            <div class="meta-row">
-              <span class="mk">{{ 'COMMON.DATASOURCE' | translate }}</span>
-              <span class="mv">{{ selectedDatasourceName || '—' }}</span>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="action-buttons">
-        <app-button variant="ghost" (clicked)="onCancel()"
-          >{{ 'COMMON.CANCEL' | translate }}</app-button
-        >
-        <app-button
-          *ngIf="currentStep > 0"
-          variant="secondary"
-          icon="pi pi-arrow-left"
-          (clicked)="previousStep()"
-          >{{ 'ORG.PREVIOUS' | translate }}</app-button
-        >
-        <app-button
-          *ngIf="currentStep < lastStep"
-          variant="primary"
-          trailingIcon="pi pi-arrow-right"
-          [disabled]="!isStepValid(currentStep)"
-          (clicked)="nextStep()"
-          >{{ 'ORG.NEXT' | translate }}</app-button
-        >
-        <ng-container
-          *hasPermission="'queryBuilderPrompt'; level: 'write'"
-        >
-          <app-button
-            *ngIf="currentStep === lastStep"
-            variant="primary"
-            icon="pi pi-save"
-            [loading]="saving()"
-            [disabled]="!canSave || saving()"
-            (clicked)="onSubmit()"
-            >{{ 'COMMON.SAVE' | translate }}</app-button
-          >
-        </ng-container>
-      </div>
-    </div>
-    <!-- Full-width wizard stepper strip (its own row under the header) -->
-    <div class="stepbar">
-      <div class="steps-container" [ngClass]="'step-' + (currentStep + 1)">
-        <ng-container
-          *ngFor="let step of steps; let i = index; trackBy: trackByIndex"
-        >
-          <div
-            class="step"
-            [class.active]="currentStep === i"
-            [class.completed]="currentStep > i"
-            (click)="onStepClick(i)"
-          >
-            <div class="step-dot">
-              <i class="pi pi-check" *ngIf="currentStep > i"></i>
-              <span *ngIf="currentStep <= i">{{ i + 1 }}</span>
-            </div>
-            <span class="step-label">{{ step.titleKey | translate }}</span>
-          </div>
-          <div class="step-line" *ngIf="i < lastStep"></div>
-        </ng-container>
-      </div>
-    </div>
-
-    <form
-      autocomplete="off"
-      [formGroup]="promptForm"
-      class="admin-form"
-      #formContainer
-      (submit)="$event.preventDefault()"
+<div class="cp">
+  <header class="cp__stepper">
+    <button
+      *ngFor="let s of steps; let i = index"
+      type="button"
+      class="cp__step"
+      [class.cp__step--active]="svc.currentStep() === i"
+      [class.cp__step--done]="svc.stepValid()[i] && svc.currentStep() > i"
+      (click)="svc.goto(i)"
     >
-      <div class="form-container">
-        <div class="form-grid left-column">
-          <!-- Step 1: Source (schema + tables) -->
-          <section class="wizard-step" *ngIf="currentStep === 0">
-          <div class="form-row schema-table-row">
-            <div class="form-field schema-field">
-              <app-custom-dropdown
-                formControlName="schema"
-                [label]="'PROMPT_MODULE.SCHEMA' | translate"
-                [placeholder]="'PROMPT_MODULE.SELECT_SCHEMA' | translate"
-                [options]="schemas"
-                optionLabel="name"
-                [optionValue]="null"
-                [filter]="true"
-                filterBy="name"
-                [required]="true"
-                [showError]="
-                  !!(
-                    promptForm.get('schema')?.invalid &&
-                    promptForm.get('schema')?.touched
-                  )
-                "
-                [errorMessage]="'PROMPT_MODULE.SCHEMA_REQUIRED' | translate"
-                icon="pi-sitemap"
-              >
-              </app-custom-dropdown>
-            </div>
-            <div class="form-field">
-              <span class="lazy-hint" *ngIf="isLoadingTables">
-                <i class="pi pi-spin pi-spinner"></i>
-                {{ 'PROMPT_MODULE.LOADING_TABLES' | translate }}
-              </span>
-              <app-custom-multiselect
-                formControlName="tables"
-                [label]="'PROMPT_MODULE.TABLES' | translate"
-                [placeholder]="'PROMPT_MODULE.SELECT_TABLES' | translate"
-                [options]="cachedAvailableTables"
-                optionLabel="name"
-                optionValue="value"
-                [filter]="true"
-                filterBy="name"
-                display="chip"
-                [required]="true"
-                [showError]="
-                  !!(
-                    promptForm.get('tables')?.invalid &&
-                    promptForm.get('tables')?.touched
-                  )
-                "
-                [errorMessage]="'PROMPT_MODULE.TABLE_REQUIRED' | translate"
-                icon="pi-table"
-              >
-              </app-custom-multiselect>
-            </div>
-          </div>
-          </section>
+      <i class="pi {{ s.icon }}"></i>
+      <span>{{ s.titleKey | translate }}</span>
+    </button>
+  </header>
 
-          <!-- Step 3: Column & Filter (columns + WHERE + SQL preview) -->
-          <section class="wizard-step" *ngIf="currentStep === 2">
-          <div class="form-row">
-            <div class="form-field full-width">
-              <span class="lazy-hint" *ngIf="isLoadingColumns">
-                <i class="pi pi-spin pi-spinner"></i>
-                {{ 'PROMPT_MODULE.LOADING_COLUMNS' | translate }}
-              </span>
-              <app-custom-multiselect
-                formControlName="columns"
-                [label]="'PROMPT_MODULE.COLUMNS' | translate"
-                [placeholder]="'PROMPT_MODULE.SELECT_COLUMNS' | translate"
-                [options]="availableColumns"
-                optionLabel="displayName"
-                [filter]="true"
-                filterBy="displayName,columnName"
-                display="chip"
-                [showToggleAll]="true"
-                [required]="true"
-                [showError]="
-                  !!(
-                    promptForm.get('columns')?.invalid &&
-                    promptForm.get('columns')?.touched
-                  )
-                "
-                [errorMessage]="'PROMPT_MODULE.COLUMN_REQUIRED' | translate"
-                icon="pi-id-card"
-              >
-              </app-custom-multiselect>
-            </div>
-          </div>
-          <!-- Filter column + operator (structured — no free-text SQL). The
-               compiler builds the WHERE from these; prompt_where is legacy. -->
-          <div class="form-row">
-            <div class="form-field full-width">
-              <app-custom-dropdown
-                [ngModel]="filterColumn"
-                (ngModelChange)="onFilterColumnChange($event)"
-                [ngModelOptions]="{ standalone: true }"
-                [label]="'PROMPT_MODULE.FILTER_COLUMN' | translate"
-                [placeholder]="'PROMPT_MODULE.SELECT_FILTER_COLUMN' | translate"
-                [options]="reachableColumns"
-                optionLabel="label"
-                optionValue="value"
-                [filter]="true"
-                filterBy="label"
-                icon="pi-filter"
-              >
-              </app-custom-dropdown>
-              <span class="step-help">
-                <i class="pi pi-info-circle"></i>
-                {{ 'PROMPT_MODULE.FILTER_COLUMN_HINT' | translate }}
-              </span>
-            </div>
-          </div>
-          <div class="form-row">
-            <div class="form-field full-width">
-              <app-custom-dropdown
-                [ngModel]="operator"
-                (ngModelChange)="onOperatorChange($event)"
-                [ngModelOptions]="{ standalone: true }"
-                [label]="'PROMPT_MODULE.OPERATOR' | translate"
-                [placeholder]="'PROMPT_MODULE.SELECT_OPERATOR' | translate"
-                [options]="operatorOptions"
-                optionLabel="label"
-                optionValue="value"
-                icon="pi-sliders-h"
-              >
-              </app-custom-dropdown>
-            </div>
-          </div>
+  <section class="cp__body">
+    <cp-source-step *ngIf="svc.currentStep() === 0" [svc]="svc"></cp-source-step>
+    <cp-joins-step *ngIf="svc.currentStep() === 1" [svc]="svc"></cp-joins-step>
+    <cp-column-filter-step
+      *ngIf="svc.currentStep() === 2"
+      [svc]="svc"
+    ></cp-column-filter-step>
+    <cp-values-step
+      *ngIf="svc.currentStep() === 3"
+      [svc]="svc"
+      [promptId]="promptId"
+    ></cp-values-step>
+  </section>
 
-          <!-- Read-only generated-SQL preview (restyled to the module standard) -->
-          <div
-            class="form-row"
-            *ngIf="promptForm.get('columns')?.value?.length > 0"
-          >
-            <div class="form-field full-width">
-              <div class="sql-preview">
-                <div class="sql-preview__bar">
-                  <span class="sql-preview__title">
-                    <i class="pi pi-code"></i>
-                    {{ 'PROMPT_MODULE.SQL_PREVIEW' | translate }}
-                  </span>
-                  <button
-                    type="button"
-                    class="sql-preview__copy"
-                    [title]="'PROMPT_MODULE.COPY_SQL' | translate"
-                    (click)="copySqlToClipboard()"
-                  >
-                    <i class="pi pi-copy"></i>
-                  </button>
-                </div>
-                <pre class="sql-preview__code"><code>{{ generateSqlPreview() }}</code></pre>
-              </div>
-            </div>
-          </div>
-          </section>
-
-          <!-- Step 2: Joins (structured multi-hop builder) -->
-          <section class="wizard-step" *ngIf="currentStep === 1">
-            <div class="form-row" *ngIf="promptBaseTable">
-              <div class="form-field full-width">
-                <prompt-join-builder
-                  [datasourceId]="sectionData?.datasourceId"
-                  [baseSchema]="promptBaseSchema"
-                  [baseTable]="promptBaseTable"
-                  [baseAlias]="promptBaseTable"
-                  [initialEdges]="initialJoinEdges"
-                  (edgesChange)="onJoinEdgesChange($event)"
-                  (reachableChange)="onReachableColumnsChange($event)"
-                >
-                </prompt-join-builder>
-              </div>
-            </div>
-            <p class="wizard-empty" *ngIf="!promptBaseTable">
-              {{ 'PROMPT_MODULE.JOINS_PICK_TABLE_FIRST' | translate }}
-            </p>
-          </section>
-
-          <!-- Step 4: Values (value list + value-source editor) -->
-          <section class="wizard-step" *ngIf="currentStep === 3">
-          <div class="form-row" *ngIf="showAddPromptValues">
-            <div class="form-field">
-              <div class="label-with-clear">
-                <label for="promptValues" class="label-with-clear__label">
-                  {{ 'PROMPT_MODULE.PROMPT_VALUES' | translate
-                  }}<span class="required">*</span>
-                  <i
-                    class="pi pi-info-circle info-icon"
-                    [pTooltip]="'PROMPT_MODULE.PROMPT_VALUES_HINT' | translate"
-                    tooltipPosition="right"
-                  ></i>
-                </label>
-                <div class="label-with-clear__actions">
-                  <button
-                    type="button"
-                    pButton
-                    class="p-button-text p-button-rounded p-button-success"
-                    icon="pi pi-refresh"
-                    [pTooltip]="'PROMPT_MODULE.REFRESH_VALUES' | translate"
-                    tooltipPosition="bottom"
-                    (click)="refreshPromptValues()"
-                  ></button>
-                  <button
-                    type="button"
-                    pButton
-                    class="p-button-text p-button-rounded p-button-warning"
-                    icon="pi pi-bolt"
-                    [pTooltip]="'PROMPT_MODULE.LOAD_VALUES_SQL' | translate"
-                    tooltipPosition="bottom"
-                    (click)="openSqlDialog()"
-                  ></button>
-                  <button
-                    type="button"
-                    pButton
-                    class="p-button-text p-button-rounded p-button-info"
-                    icon="pi pi-upload"
-                    [pTooltip]="'PROMPT_MODULE.UPLOAD_VALUES_FILE' | translate"
-                    tooltipPosition="bottom"
-                    (click)="fileInput.click()"
-                  ></button>
-                  <input
-                    type="file"
-                    #fileInput
-                    accept=".csv,.txt"
-                    hidden
-                    (change)="onPromptFileUpload($event)"
-                  />
-                  <button
-                    type="button"
-                    pButton
-                    class="p-button-text p-button-rounded p-button-danger"
-                    icon="pi pi-trash"
-                    [pTooltip]="'PROMPT_MODULE.CLEAR_ALL_VALUES' | translate"
-                    tooltipPosition="bottom"
-                    (click)="clearPromptValues()"
-                    [disabled]="!promptForm.get('promptValues')?.value?.length"
-                  ></button>
-                </div>
-              </div>
-              <p-chips
-                id="promptValues"
-                formControlName="promptValues"
-                [addOnBlur]="true"
-                [addOnTab]="true"
-                [allowDuplicate]="false"
-                [separator]="separator"
-                [placeholder]="'PROMPT_MODULE.ENTER_VALUES_HINT' | translate"
-                (onAdd)="onChipAdd($event)"
-                [ngClass]="{
-                  'ng-invalid ng-dirty':
-                    promptForm.get('promptValues')?.invalid &&
-                    promptForm.get('promptValues')?.touched,
-                }"
-              >
-                <ng-template let-item pTemplate="item">
-                  <span
-                    [class.editing]="editingChipValue === item"
-                    (dblclick)="onChipDoubleClick({ value: item })"
-                  >
-                    <span *ngIf="editingChipValue !== item">
-                      {{ item.value || item }}
-                    </span>
-                    <input
-                      *ngIf="editingChipValue === item"
-                      #chipInput
-                      type="text"
-                      [value]="item.value || item"
-                      (keydown.enter)="updateChip($event)"
-                      (keydown.escape)="cancelEdit()"
-                      (blur)="updateChip($event)"
-                      (input)="
-                        $any($event.target).style.width =
-                          $any($event.target).value.length + 2 + 'ch'
-                      "
-                    />
-                  </span>
-                </ng-template>
-              </p-chips>
-              <small
-                class="error-message"
-                *ngIf="
-                  promptForm.get('promptValues')?.invalid &&
-                  promptForm.get('promptValues')?.touched
-                "
-              >
-                {{ 'PROMPT_MODULE.PROMPT_VALUES_REQUIRED' | translate }}
-              </small>
-            </div>
-          </div>
-          <!-- value-source editor (its own Save) lives in the Values step -->
-          <div class="form-row" *ngIf="promptId">
-            <div class="form-field full-width">
-              <prompt-value-source [promptId]="promptId">
-              </prompt-value-source>
-            </div>
-          </div>
-          <p class="wizard-empty" *ngIf="!showAddPromptValues && !promptId">
-            {{ 'PROMPT_MODULE.VALUES_NOT_APPLICABLE' | translate }}
-          </p>
-          </section>
-
-          <!-- Step 5: Review & Appearance -->
-          <section class="wizard-step" *ngIf="currentStep === 4">
-            <div class="form-row" *ngIf="selectedPromptType">
-              <div class="form-field full-width">
-                <prompt-appearance-form
-                  [promptType]="selectedPromptType"
-                  [appearance]="loadedAppearance"
-                  [operatorOptions]="operatorOptions"
-                  (appearanceChange)="onAppearanceChange($event)"
-                  (validityChange)="onAppearanceValidity($event)"
-                >
-                </prompt-appearance-form>
-              </div>
-            </div>
-          </section>
-        </div>
-      </div>
-    </form>
-  </div>
+  <footer class="cp__nav">
+    <app-button
+      variant="secondary"
+      [disabled]="svc.currentStep() === 0"
+      (clicked)="svc.back()"
+    >
+      {{ 'COMMON.BACK' | translate }}
+    </app-button>
+    <app-button
+      *ngIf="svc.currentStep() < lastStep"
+      [disabled]="!svc.stepValid()[svc.currentStep()]"
+      (clicked)="svc.next()"
+    >
+      {{ 'COMMON.NEXT' | translate }}
+    </app-button>
+    <app-button
+      *ngIf="svc.currentStep() === lastStep"
+      [loading]="svc.saving()"
+      [disabled]="!svc.canSave()"
+      (clicked)="save()"
+    >
+      {{ 'COMMON.SAVE' | translate }}
+    </app-button>
+  </footer>
 </div>
-
-<!-- SQL Query Dialog Component -->
-<app-sql-query-dialog
-  [visible]="showSqlDialog"
-  [schemaData]="staticSchemaData"
-  [currentSchema]="promptForm.get('schema')?.value?.name"
-  [executing]="sqlExecuting"
-  (close)="closeSqlDialog()"
-  (execute)="executeSqlQuery($event)"
->
-</app-sql-query-dialog>

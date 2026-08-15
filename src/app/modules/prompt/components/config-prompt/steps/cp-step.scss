@@ -1,0 +1,47 @@
+.cp-step {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  max-width: 720px;
+}
+
+.cp-step__toggle {
+  display: flex;
+  align-items: center;
+}
+
+.cp-step__sql {
+  border: 1px solid var(--border-color);
+  border-radius: var(--space-2);
+  overflow: hidden;
+}
+
+.cp-step__monaco {
+  height: 220px;
+  width: 100%;
+}
+
+.cp-step--values {
+  max-width: none;
+}
+
+.cp-step__review {
+  border-top: 1px solid var(--border-color);
+  padding-top: var(--space-4);
+
+  h4 {
+    font-size: var(--fs-h2);
+    margin: 0 0 var(--space-2);
+  }
+
+  ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+    color: var(--text-color-secondary);
+    font-size: var(--fs-control);
+  }
+}

@@ -1,0 +1,27 @@
+<div class="cp-step">
+  <app-custom-dropdown
+    label="{{ 'PROMPT_MODULE.SCHEMA' | translate }}"
+    [options]="schemas()"
+    optionLabel="label"
+    optionValue="value"
+    [ngModel]="svc.source().schema"
+    (onChangeEvent)="onSchema($event)"
+    appendTo="body"
+  ></app-custom-dropdown>
+
+  <app-custom-dropdown
+    label="{{ 'PROMPT_MODULE.TABLE' | translate }}"
+    [options]="tables()"
+    optionLabel="label"
+    optionValue="value"
+    [ngModel]="svc.source().table"
+    (onChangeEvent)="onTable($event)"
+    appendTo="body"
+  ></app-custom-dropdown>
+
+  <app-custom-input
+    label="{{ 'PROMPT_MODULE.ALIAS' | translate }}"
+    [ngModel]="svc.source().alias"
+    (ngModelChange)="onAlias($event)"
+  ></app-custom-input>
+</div>

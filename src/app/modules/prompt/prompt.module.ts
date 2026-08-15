@@ -21,9 +21,12 @@ import { UsGridCellDirective } from 'src/app/shared/components/us-data-grid/us-g
 import { AppPrimeNGModule } from 'src/app/shared/modules/app-primeng.module';
 import { AddPromptComponent } from './components/add-prompt/add-prompt.component';
 import { ConfigPromptComponent } from './components/config-prompt/config-prompt.component';
+import { CpSourceStepComponent } from './components/config-prompt/steps/cp-source-step/cp-source-step.component';
+import { CpJoinsStepComponent } from './components/config-prompt/steps/cp-joins-step/cp-joins-step.component';
+import { CpColumnFilterStepComponent } from './components/config-prompt/steps/cp-column-filter-step/cp-column-filter-step.component';
+import { CpValuesStepComponent } from './components/config-prompt/steps/cp-values-step/cp-values-step.component';
 import { EditPromptComponent } from './components/edit-prompt/edit-prompt.component';
 import { ListPromptComponent } from './components/list-prompt/list-prompt.component';
-import { PromptAppearanceFormComponent } from './components/prompt-appearance-form/prompt-appearance-form.component';
 import { PromptJoinPickerComponent } from './components/prompt-join-picker/prompt-join-picker.component';
 import { PromptJoinBuilderComponent } from './components/prompt-join-builder/prompt-join-builder.component';
 import { PromptValueSourceComponent } from './components/prompt-value-source/prompt-value-source.component';
@@ -39,11 +42,15 @@ import { configPromptReducer, CONFIG_PROMPT_FEATURE_KEY } from './store';
     ListPromptComponent,
     ViewPromptComponent,
     ConfigPromptComponent,
+    // config-prompt 4-step stepper children (Source / Joins / Column+Filter /
+    // Values) — the shell is a thin host; each step owns its own controls.
+    CpSourceStepComponent,
+    CpJoinsStepComponent,
+    CpColumnFilterStepComponent,
+    CpValuesStepComponent,
     SqlQueryDialogComponent,
-    // Prompt-level config editors (appearance + operators, value source) —
-    // relocated from the query-builder module; this is now the single home
-    // for all prompt configuration.
-    PromptAppearanceFormComponent,
+    // Prompt-level config editors (value source) — relocated from the
+    // query-builder module; this is now the single home for prompt config.
     PromptValueSourceComponent,
     PromptJoinPickerComponent,
     PromptJoinBuilderComponent,

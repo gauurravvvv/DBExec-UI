@@ -1,0 +1,36 @@
+<div class="cp-step">
+  <app-custom-input
+    label="{{ 'PROMPT_MODULE.SELECT_EXPR' | translate }}"
+    [ngModel]="svc.columnFilter().selectExpr"
+    (ngModelChange)="onSelectExpr($event)"
+  ></app-custom-input>
+
+  <div class="cp-step__toggle">
+    <app-custom-toggle
+      label="{{ 'PROMPT_MODULE.ADVANCED_SQL' | translate }}"
+      [ngModel]="svc.columnFilter().useRaw"
+      (ngModelChange)="toggleAdvanced($event)"
+    ></app-custom-toggle>
+  </div>
+
+  <ng-container *ngIf="!svc.columnFilter().useRaw">
+    <app-custom-input
+      label="{{ 'PROMPT_MODULE.FILTER_COLUMN' | translate }}"
+      [ngModel]="svc.columnFilter().filterColumn"
+      (ngModelChange)="onFilterColumn($event)"
+    ></app-custom-input>
+    <app-custom-dropdown
+      label="{{ 'PROMPT_MODULE.OPERATOR' | translate }}"
+      [options]="operators()"
+      optionLabel="label"
+      optionValue="value"
+      [ngModel]="svc.columnFilter().operator"
+      (onChangeEvent)="onOperator($event)"
+      appendTo="body"
+    ></app-custom-dropdown>
+  </ng-container>
+
+  <div class="cp-step__sql" *ngIf="svc.columnFilter().useRaw">
+    <div #sqlHost class="cp-step__monaco"></div>
+  </div>
+</div>

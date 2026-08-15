@@ -6,7 +6,7 @@ import { HttpClientService } from 'src/app/core/services/http-client.service';
 
 /**
  * PromptService — list/view/CUD for prompts plus the config-prompt
- * helpers (config, values, appearance, refresh-values).
+ * helpers (config, values, value-source, upload, refresh-values).
  *
  * Loading-state follows the rollout convention. `saving` covers
  * writes, `loading` covers reads. Every call passes
@@ -226,33 +226,6 @@ export class PromptService {
     );
   }
 
-  async updateAppearance(params: any): Promise<any> {
-    this._saving.set(true);
-    try {
-      // PUT /prompts/:promptId/appearance — BE reads req.body.appearance.
-      return await lastValueFrom(
-        this.http.apiPut(
-          PROMPT.GET + params.id + PROMPT.APPEARANCE_SUFFIX,
-          {
-            id: params.id,
-            appearance: params.appearance,
-          },
-          { skipLoader: true },
-        ),
-      );
-    } finally {
-      this._saving.set(false);
-    }
-  }
-
-  async getAppearance(id: string): Promise<any> {
-    return lastValueFrom(
-      this.http.apiGet(PROMPT.GET + id + PROMPT.APPEARANCE_SUFFIX, {
-        skipLoader: true,
-      }),
-    );
-  }
-
   // ── Value source (spec 6.6.1) — prompt-level config ────────────────────
 
   getValueSource(promptId: string): Promise<any> {
@@ -377,11 +350,33 @@ export class PromptService {
     );
   }
 
-  getAppearence(id: string): Promise<any> {
+  // ── Value source: upload (spec 04 §8) — parse a CSV/XLSX and cache static.
+
+  /** Upload a CSV/XLSX of options (multipart) → parsed + cached as static. */
+  uploadValues(
+    promptId: string,
+    file: File,
+    map: {
+      valueColumn: string;
+      labelColumn?: string;
+      hasHeaderRow?: boolean;
+      sheet?: string;
+      justification?: string;
+    },
+  ): Promise<any> {
+    const fd = new FormData();
+    fd.append('file', file);
+    fd.append('valueColumn', map.valueColumn);
+    if (map.labelColumn) fd.append('labelColumn', map.labelColumn);
+    fd.append('hasHeaderRow', String(map.hasHeaderRow ?? true));
+    if (map.sheet) fd.append('sheet', map.sheet);
+    if (map.justification) fd.append('justification', map.justification);
     return lastValueFrom(
-      this.http.apiGet(PROMPT.GET + id + PROMPT.APPEARANCE_SUFFIX, {
-        skipLoader: true,
-      }),
+      this.http.apiPost(
+        PROMPT.GET + promptId + PROMPT.VALUES_UPLOAD_SUFFIX,
+        fd,
+        { skipLoader: true },
+      ),
     );
   }
 }

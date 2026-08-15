@@ -1,0 +1,22 @@
+<div class="cp-step cp-step--values">
+  <prompt-value-source [promptId]="promptId"></prompt-value-source>
+
+  <section class="cp-step__review">
+    <h4>{{ 'PROMPT_MODULE.REVIEW_SUMMARY' | translate }}</h4>
+    <ul>
+      <li>
+        {{ 'PROMPT_MODULE.SELECT_EXPR' | translate }}:
+        {{ svc.columnFilter().selectExpr || '—' }}
+      </li>
+      <li>
+        {{ 'PROMPT_MODULE.STEP_JOINS' | translate }}:
+        {{ svc.joins().edges.length }}
+      </li>
+      <li>
+        {{ 'PROMPT_MODULE.FILTER_COLUMN' | translate }}:
+        {{ svc.columnFilter().filterColumn || '—' }}
+        {{ svc.columnFilter().operator }}
+      </li>
+    </ul>
+  </section>
+</div>

@@ -1,0 +1,23 @@
+<div class="cp-step">
+  <div class="cp-step__toggle">
+    <app-custom-toggle
+      label="{{ 'PROMPT_MODULE.ADVANCED_SQL' | translate }}"
+      [ngModel]="svc.joins().useRaw"
+      (ngModelChange)="toggleAdvanced($event)"
+    ></app-custom-toggle>
+  </div>
+
+  <prompt-join-builder
+    *ngIf="!svc.joins().useRaw"
+    [datasourceId]="svc.datasourceId()"
+    [baseSchema]="svc.source().schema"
+    [baseTable]="svc.source().table"
+    [baseAlias]="svc.source().alias"
+    [initialEdges]="svc.joins().edges"
+    (edgesChange)="onEdges($event)"
+  ></prompt-join-builder>
+
+  <div class="cp-step__sql" *ngIf="svc.joins().useRaw">
+    <div #sqlHost class="cp-step__monaco"></div>
+  </div>
+</div>
