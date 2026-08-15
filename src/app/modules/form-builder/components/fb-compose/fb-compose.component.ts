@@ -73,11 +73,15 @@ export class FbComposeComponent implements OnInit, OnDestroy {
   constructor() {
     // Keep the fieldKey-keyed rule/RBAC values map in sync with the tree, so
     // live rules (Phase 5) + RBAC recompute as the user fills the composer.
-    effect(() => {
-      // Read the definition so this effect re-runs on every tree mutation.
-      this.store.definition();
-      this.store.syncRuleValues();
-    });
+    // syncRuleValues writes the store's `values` signal, so allowSignalWrites.
+    effect(
+      () => {
+        // Read the definition so this effect re-runs on every tree mutation.
+        this.store.definition();
+        this.store.syncRuleValues();
+      },
+      { allowSignalWrites: true },
+    );
 
     // Recompile the SQL preview whenever the definition changes (debounced).
     const def$ = toObservable(
