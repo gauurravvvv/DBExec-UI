@@ -1,5 +1,38 @@
 # dbexec-ui — Session Log (newest first)
 
+### 2026-08-15 — Prompt Builder Phase 7 (frontend): runtime composer = the published Query Builder
+- Extracted a routeless `QbRuntimeSharedModule` (query-builder) declaring +
+  exporting the six tree->SQL runtime components (qb-filter-tree, qb-group-node,
+  qb-condition-row, qb-value-control, qb-sql-preview, qb-summary). QueryBuilderModule
+  now imports it instead of declaring them; FormBuilderModule imports it too — the
+  components are REUSED verbatim, not forked (only change to any qb-* file: a
+  3-line default-safe `appearance` read in qb-value-control for no-appearance form
+  fields).
+- `FbRuntimeService`: getSchema/preview/validate/execute/count against
+  `/forms/:id/{schema,preview,validate,execute,count}` + the reused prompt value
+  search/resolve endpoints (server-mode typeahead + bulk paste).
+- `FormRuntimeStore extends QueryBuilderStore`: flattens the resolved
+  tabs->sections->fields (getRuntimeSchema payload) into the QB groups->prompts
+  shape the runtime tree consumes; tracks fieldKey-keyed `values`; folds RBAC
+  (read→disabled) + Phase-5 rules (`applyRules` over persisted triggers lowered by
+  `ruleAst.adapter`) into per-field `effectiveFlags`. Reused components inject
+  QueryBuilderStore, aliased via `useExisting` to the FormRuntimeStore instance.
+- `fb-compose` (route `:id/compose`): hydrate the published version, render the
+  reused qb-filter-tree (the per-condition operator dropdown offers the field's
+  resolved operators[] = dataType ∩ allowedOperators), debounced server-SQL
+  preview, count, execute-with-results. Live rules + RBAC via the store; execute
+  sends `values` for server re-enforcement. `?preview=1` runs the latest draft
+  (WRITE-guarded server-side).
+- `fb-preview`: keeps the Phase-6 RBAC access grid and additionally renders the
+  reused runtime composer read-only below it, hydrated via `?preview=1&asRole` so
+  the designer sees the real business-user composer for the previewed role.
+- FE mirror of `shared/validators/formCompose.ts` (byte-identical schema body).
+- i18n: `FORM_BUILDER.RUN`, `FORM_BUILDER.NO_PUBLISHED`,
+  `FORM_BUILDER.PREVIEW.COMPOSER` across all 10 locales.
+- Gates: `tsc` 0 · `ngc --noEmit` 0 · `ng build --configuration production`
+  success · `jest src/app/modules/form-builder` 27/27. Branch
+  `feature/prompt-builder`; not pushed. dbexec-api untouched.
+
 ### 2026-08-15 — Prompt Builder Phase 1 (frontend): appearance removed, config stepper rebuilt
 - Deleted the prompt appearance FE (form component, descriptor registry,
   mirrored validator, api suffix, service methods, `PROMPT_MODULE.APPEARANCE`/

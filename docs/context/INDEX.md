@@ -26,6 +26,7 @@
 | datasource | `src/app/modules/datasource` | [datasource](./modules/datasource.md) | 🟢 | 2026-07-24 |
 | db-access | `src/app/modules/db-access` | [db-access](./modules/db-access.md) | 🟢 | 2026-07-24 |
 | embed | `src/app/modules/embed` | [embed](./modules/embed.md) | 🟢 | 2026-07-24 |
+| form-builder | `src/app/modules/form-builder` | — | 🟡 | 2026-08-15 (Phase 7 composer) |
 | groups | `src/app/modules/groups` | [groups](./modules/groups.md) | 🟢 | 2026-07-24 |
 | home | `src/app/modules/home` | [home](./modules/home.md) | 🟢 | 2026-07-24 |
 | login-activity | `src/app/modules/login-activity` | [login-activity](./modules/login-activity.md) | 🟢 | 2026-07-24 |
@@ -34,7 +35,7 @@
 | organisation | `src/app/modules/organisation` | [organisation](./modules/organisation.md) | 🟢 | 2026-07-24 |
 | profile | `src/app/modules/profile` | [profile](./modules/profile.md) | 🟢 | 2026-08-14 |
 | prompt | `src/app/modules/prompt` | [prompt](./modules/prompt.md) | 🟢 | 2026-08-15 |
-| query-builder | `src/app/modules/query-builder` | [query-builder](./modules/query-builder.md) | 🟢 | 2026-08-06 |
+| query-builder | `src/app/modules/query-builder` | [query-builder](./modules/query-builder.md) | 🟢 | 2026-08-15 (QbRuntimeSharedModule extracted) |
 | query-runner | `src/app/modules/query-runner` | [query-runner](./modules/query-runner.md) | 🟢 | 2026-08-06 |
 | rls-rules | `src/app/modules/rls-rules` | [rls-rules](./modules/rls-rules.md) | 🟡 | 2026-07-24 |
 | role | `src/app/modules/role` | [role](./modules/role.md) | 🟢 | 2026-07-24 |
