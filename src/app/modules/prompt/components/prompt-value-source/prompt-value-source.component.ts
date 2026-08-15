@@ -33,7 +33,7 @@ import {
 import { GlobalService } from 'src/app/core/services/global.service';
 import { PromptService } from '../../services/prompt.service';
 
-type Kind = 'free' | 'static' | 'lookup_query' | 'distinct_column';
+type Kind = 'free' | 'static' | 'lookup_query' | 'distinct_column' | 'upload';
 
 interface StaticRow {
   value: string;
@@ -79,6 +79,17 @@ export class PromptValueSourceComponent
   readonly previewRows = signal<{ value: string; display: string }[]>([]);
   readonly previewTotal = signal<number | null>(null);
 
+  // upload (CSV/XLSX -> parsed + cached as static)
+  readonly uploadFile = signal<File | null>(null);
+  readonly valueColumn = signal('');
+  readonly labelColumn = signal('');
+  readonly hasHeaderRow = signal(true);
+  readonly uploadSample = signal<{ value: string; display: string }[]>([]);
+  readonly uploadRowCount = signal<number | null>(null);
+  readonly uploadServerMode = signal(false);
+  readonly uploading = signal(false);
+  readonly showReuploadDialog = signal(false);
+
   readonly kinds = [
     { key: 'free' as const, label: 'QUERY_BUILDER.VS.FREE', icon: 'pi pi-pencil' },
     { key: 'static' as const, label: 'QUERY_BUILDER.VS.STATIC', icon: 'pi pi-list' },
@@ -91,6 +102,11 @@ export class PromptValueSourceComponent
       key: 'distinct_column' as const,
       label: 'QUERY_BUILDER.VS.DISTINCT',
       icon: 'pi pi-database',
+    },
+    {
+      key: 'upload' as const,
+      label: 'PROMPT_MODULE.VS.UPLOAD',
+      icon: 'pi pi-upload',
     },
   ];
 
@@ -178,6 +194,49 @@ export class PromptValueSourceComponent
     this.pasteText.set('');
   }
 
+  // ── upload (CSV/XLSX) — parsed server-side, cached as static ───────────
+
+  onFile(file: File | null): void {
+    this.uploadFile.set(file);
+  }
+
+  /** First upload uploads directly; a re-upload over an existing set confirms. */
+  requestUpload(): void {
+    if ((this.cardinality() ?? 0) > 0) this.showReuploadDialog.set(true);
+    else this.doUpload();
+  }
+
+  async doUpload(justification?: string): Promise<void> {
+    const file = this.uploadFile();
+    if (!file || !this.valueColumn().trim()) {
+      this.global.showWarn('Choose a file and a value column');
+      return;
+    }
+    this.uploading.set(true);
+    try {
+      const res = await this.admin.uploadValues(this.promptId, file, {
+        valueColumn: this.valueColumn().trim(),
+        labelColumn: this.labelColumn().trim() || undefined,
+        hasHeaderRow: this.hasHeaderRow(),
+        justification,
+      });
+      if (res?.status) {
+        this.uploadSample.set(res.data?.sample ?? []);
+        this.uploadRowCount.set(res.data?.parsedRowCount ?? null);
+        this.uploadServerMode.set(!!res.data?.serverMode);
+        this.cardinality.set(res.data?.cardinality ?? null);
+        this.global.handleAPIResponse(res);
+      } else {
+        this.applyErrors(res);
+      }
+    } catch (e: any) {
+      this.applyErrors(e?.error);
+    } finally {
+      this.uploading.set(false);
+      this.showReuploadDialog.set(false);
+    }
+  }
+
   // ── build the PromptValueSource payload from the current UI state ──────
 
   private buildSource(): any {
@@ -249,8 +308,12 @@ export class PromptValueSourceComponent
   }
 
   private applyErrors(res: any): void {
+    // Value-source PUT/preview return { data: { errors: [{message}] } }; the
+    // upload endpoint returns { data: { code, message } }. Handle both.
     const err = res?.data?.errors?.[0];
-    this.global.showWarn(err?.message || res?.message || 'Operation failed');
+    this.global.showWarn(
+      err?.message || res?.data?.message || res?.message || 'Operation failed',
+    );
   }
 
   ngOnDestroy(): void {

@@ -109,8 +109,72 @@
       </div>
     </div>
 
+    <!-- upload CSV/XLSX -->
+    <div class="qb-vs__upload" *ngIf="kind() === 'upload'">
+      <app-custom-file
+        accept=".csv,.xlsx"
+        [maxSizeMb]="5"
+        (fileSelected)="onFile($event)"
+      ></app-custom-file>
+
+      <div class="qb-vs__grid">
+        <app-custom-input
+          [label]="'PROMPT_MODULE.VS.VALUE_COLUMN' | translate"
+          [ngModel]="valueColumn()"
+          (ngModelChange)="valueColumn.set($event)"
+        ></app-custom-input>
+        <app-custom-input
+          [label]="'PROMPT_MODULE.VS.LABEL_COLUMN' | translate"
+          [ngModel]="labelColumn()"
+          (ngModelChange)="labelColumn.set($event)"
+        ></app-custom-input>
+        <app-custom-toggle
+          [label]="'PROMPT_MODULE.VS.HAS_HEADER' | translate"
+          [ngModel]="hasHeaderRow()"
+          (ngModelChange)="hasHeaderRow.set($event)"
+        ></app-custom-toggle>
+      </div>
+
+      <app-button
+        variant="primary"
+        icon="pi pi-upload"
+        [loading]="uploading()"
+        [disabled]="!uploadFile() || !valueColumn()"
+        (clicked)="requestUpload()"
+      >
+        {{ 'PROMPT_MODULE.VS.UPLOAD' | translate }}
+      </app-button>
+
+      <div class="qb-vs__preview" *ngIf="uploadRowCount() !== null">
+        <p class="qb-vs__label">
+          {{ 'PROMPT_MODULE.VS.ROW_COUNT' | translate }}:
+          {{ uploadRowCount() | number }}
+        </p>
+        <p class="qb-vs__hint" *ngIf="uploadServerMode()">
+          {{ 'PROMPT_MODULE.VS.SERVER_MODE_HINT' | translate }}
+        </p>
+        <div class="qb-vs__preview-list">
+          <app-chip
+            *ngFor="let r of uploadSample(); trackBy: trackByIndex"
+            variant="tag"
+          >
+            {{ r.display }}
+          </app-chip>
+        </div>
+      </div>
+
+      <app-justification-dialog
+        *ngIf="showReuploadDialog()"
+        mode="save"
+        [message]="'PROMPT_MODULE.VS.REUPLOAD_REPLACE_WARN' | translate"
+        [busy]="uploading()"
+        (confirm)="doUpload($event)"
+        (cancel)="showReuploadDialog.set(false)"
+      ></app-justification-dialog>
+    </div>
+
     <!-- actions -->
-    <div class="qb-vs__actions" *ngIf="kind() !== 'free'">
+    <div class="qb-vs__actions" *ngIf="kind() !== 'free' && kind() !== 'upload'">
       <app-button
         variant="secondary"
         icon="pi pi-eye"
