@@ -5132,6 +5132,20 @@
       "requests": {
         "required": "Requests array must contain at least one item in fetch mode"
       }
+    },
+    "formBuilder": {
+      "rule": {
+        "not": {
+          "singleChild": "A NOT group must have exactly one condition."
+        },
+        "action": {
+          "missingField": "This action needs a required field to be filled."
+        },
+        "expr": {
+          "invalid": "The set-value expression is invalid."
+        },
+        "enforcement": "The submitted values do not satisfy the form's rules."
+      }
     }
   },
   "DB_ACCESS": {
@@ -6544,6 +6558,59 @@
       "LOCKED": "Locked",
       "ALLOWED_OPERATORS": "Allowed operators",
       "BLOCK_CONTENT": "Content"
+    },
+    "RULES": {
+      "TITLE": "Rules",
+      "NEW_RULE": "New rule",
+      "EMPTY": "No rules yet. Add a rule to show, hide, require, or compute fields based on other answers.",
+      "NAME": "Rule name",
+      "EDIT": "Edit",
+      "DELETE": "Delete",
+      "ENABLED": "Enabled",
+      "CANCEL": "Cancel",
+      "SAVE": "Save",
+      "WHEN": "When",
+      "THEN": "Then",
+      "COMBINATOR_ALL": "All conditions match",
+      "COMBINATOR_ANY": "Any condition matches",
+      "ADD_CONDITION": "Add condition",
+      "REMOVE_CONDITION": "Remove condition",
+      "FIELD": "Field",
+      "VALUE": "Value",
+      "ACTION_LABEL": "Action",
+      "TARGET_FIELDS": "Target fields",
+      "SET_VALUE_EXPR": "Set-value expression",
+      "VALIDATION_MESSAGE": "Validation message",
+      "EXPR_INVALID": "Invalid expression.",
+      "TRIGGER": "Trigger",
+      "ADVANCED_READONLY": "Advanced rule — this trigger uses nested or negated logic and is shown read-only. Recreate it to simplify.",
+      "MISSING_TARGET": "This rule references fields that are not on the form:",
+      "MISSING_TARGET_SHORT": "Missing field",
+      "OP": {
+        "EQ": "equals",
+        "NE": "does not equal",
+        "GT": "greater than",
+        "GTE": "greater than or equal",
+        "LT": "less than",
+        "LTE": "less than or equal",
+        "IN": "is one of",
+        "NOT_IN": "is not one of",
+        "CONTAINS": "contains",
+        "NOT_CONTAINS": "does not contain",
+        "IS_EMPTY": "is empty",
+        "IS_NOT_EMPTY": "is not empty"
+      },
+      "ACTION": {
+        "SHOW": "Show",
+        "HIDE": "Hide",
+        "ENABLE": "Enable",
+        "DISABLE": "Disable",
+        "REQUIRE": "Require",
+        "OPTIONAL": "Make optional",
+        "SET_VALUE": "Set value",
+        "CLEAR": "Clear value",
+        "VALIDATE": "Validate"
+      }
     }
   }
 }
