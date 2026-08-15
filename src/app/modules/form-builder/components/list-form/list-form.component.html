@@ -1,1 +1,124 @@
-<p>{{ 'FORM_BUILDER.TITLE' | translate }}</p>
+<div class="dataset-page-wrapper">
+  <div class="dataset-content-container">
+    <!-- Page header -->
+    <div class="page-header-section">
+      <div class="header-content">
+        <h2>{{ 'FORM_BUILDER.TITLE' | translate }}</h2>
+      </div>
+      <div class="header-actions">
+        <button
+          *hasPermission="'formBuilderScreen'; level: 'write'"
+          pButton
+          [label]="'FORM_BUILDER.NEW_FORM' | translate"
+          icon="pi pi-plus"
+          (click)="newForm()"
+          class="p-button-raised p-button-primary modern-button"
+        ></button>
+      </div>
+    </div>
+
+    <!-- Content card -->
+    <div class="content-card">
+      <div class="table-wrapper">
+        <app-custom-table
+          [columns]="cols"
+          [serverAdapter]="adapter"
+          [config]="tableConfig"
+          [hasProjectedEmpty]="true"
+          (refresh)="refreshList()"
+        >
+          <div tableEmpty class="ct-empty-body">
+            <i class="pi pi-inbox"></i>
+            <span>{{ 'COMMON.NO_RECORDS' | translate }}</span>
+          </div>
+
+          <ng-template usGridCell="name" let-form>
+            <a class="dataset-name-link" [routerLink]="routes.view(form.id)">
+              {{ form.name }}
+            </a>
+          </ng-template>
+
+          <ng-template usGridCell="datasourceName" let-form>
+            <span class="description-text">{{
+              form.datasourceName || form.datasourceId
+            }}</span>
+          </ng-template>
+
+          <ng-template usGridCell="status" let-form>
+            <span
+              class="status-pill"
+              [ngClass]="{
+                active: form.publishedVersion != null,
+                inactive: form.publishedVersion == null,
+              }"
+            >
+              <span class="dot"></span>
+              {{
+                form.publishedVersion != null
+                  ? ('FORM_BUILDER.VERSION.PUBLISHED'
+                    | translate) +
+                    ' v' +
+                    form.publishedVersion
+                  : ('FORM_BUILDER.VERSION.DRAFT' | translate)
+              }}
+            </span>
+          </ng-template>
+
+          <ng-template usGridCell="updatedAt" let-form>
+            <span
+              class="date-text"
+              [pTooltip]="
+                (form.updatedAt | date: 'dd MMM yyyy, HH:mm:ss') || ''
+              "
+              tooltipPosition="top"
+              >{{ form.updatedAt | relativeTime }}</span
+            >
+          </ng-template>
+
+          <ng-template usGridCell="actions" let-form>
+            <div class="row-actions">
+              <button
+                class="icon-btn config-btn"
+                *hasPermission="'formBuilderScreen'; level: 'write'"
+                (click)="onDesign(form.id)"
+                [attr.aria-label]="'FORM_BUILDER.DESIGN' | translate"
+                [pTooltip]="'FORM_BUILDER.DESIGN' | translate"
+                tooltipPosition="bottom"
+              >
+                <i class="pi pi-cog"></i>
+              </button>
+              <button
+                class="icon-btn execute-btn"
+                (click)="onRun(form.id)"
+                [attr.aria-label]="'FORM_BUILDER.COMPOSE' | translate"
+                [pTooltip]="'FORM_BUILDER.COMPOSE' | translate"
+                tooltipPosition="bottom"
+              >
+                <i class="pi pi-play"></i>
+              </button>
+              <button
+                class="icon-btn delete-btn"
+                *hasPermission="'formBuilderScreen'; level: 'delete'"
+                (click)="confirmDelete(form.id)"
+                [attr.aria-label]="'COMMON.DELETE' | translate"
+                [pTooltip]="'COMMON.DELETE' | translate"
+                tooltipPosition="bottom"
+              >
+                <i class="pi pi-trash"></i>
+              </button>
+            </div>
+          </ng-template>
+        </app-custom-table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<app-justification-dialog
+  *ngIf="showDeleteConfirm"
+  mode="delete"
+  [message]="'FORM_BUILDER.DELETE_SINGLE' | translate"
+  [(justification)]="deleteJustification"
+  (confirm)="proceedDelete()"
+  (cancel)="cancelDelete()"
+></app-justification-dialog>

@@ -1,1 +1,78 @@
-<p>{{ 'FORM_BUILDER.NEW_FORM' | translate }}</p>
+<div class="add-form-wrapper">
+  <div class="add-form-container">
+    <div class="page-header">
+      <div class="left-section">
+        <button
+          pButton
+          class="p-button-text p-button-plain back-button"
+          [routerLink]="'/app/form-builder'"
+        >
+          <i class="pi pi-arrow-left"></i>
+        </button>
+        <h2>{{ 'FORM_BUILDER.NEW_FORM' | translate }}</h2>
+      </div>
+      <div class="action-buttons">
+        <app-button variant="secondary" (clicked)="onCancel()">{{
+          'COMMON.CANCEL' | translate
+        }}</app-button>
+        <app-button
+          *hasPermission="'formBuilderScreen'; level: 'write'"
+          variant="primary"
+          icon="pi pi-save"
+          [loading]="saving()"
+          [disabled]="form.invalid || saving()"
+          (clicked)="onSubmit()"
+          >{{ 'COMMON.SAVE' | translate }}</app-button
+        >
+      </div>
+    </div>
+
+    <form autocomplete="off" [formGroup]="form" class="add-form">
+      <div class="form-grid">
+        <div class="form-field">
+          <app-custom-input
+            formControlName="name"
+            [label]="'COMMON.NAME' | translate"
+            [placeholder]="'COMMON.ENTER_NAME' | translate"
+            icon="pi-id-card"
+            [required]="true"
+            [showError]="
+              !!(form.get('name')?.invalid && form.get('name')?.touched)
+            "
+            [errorMessage]="getNameError()"
+          ></app-custom-input>
+        </div>
+
+        <div class="form-field">
+          <app-custom-textarea
+            formControlName="description"
+            [label]="'COMMON.DESCRIPTION' | translate"
+            [placeholder]="'COMMON.ENTER_DESCRIPTION' | translate"
+            [rows]="3"
+            [maxLength]="2000"
+          ></app-custom-textarea>
+        </div>
+
+        <div class="form-field">
+          <app-custom-dropdown
+            formControlName="datasource"
+            [label]="'COMMON.DATASOURCE' | translate"
+            [placeholder]="'COMMON.SELECT_DATASOURCE' | translate"
+            [serverMode]="true"
+            [fetcher]="loadDatasourcesPage"
+            [pageSize]="10"
+            [preloadedItems]="preloadedDatasources"
+            [preloadedTotal]="preloadedDatasourcesTotal"
+            optionLabel="name"
+            optionValue="id"
+            [filter]="true"
+            filterBy="name"
+            appendTo="body"
+            [required]="true"
+            icon="pi-database"
+          ></app-custom-dropdown>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>

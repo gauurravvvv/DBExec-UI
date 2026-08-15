@@ -1,0 +1,130 @@
+:host {
+  display: block;
+  height: 100%;
+  background-color: var(--background-color);
+}
+
+.view-form-wrapper {
+  height: 100%;
+  overflow: auto;
+}
+
+.view-form-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+  padding: var(--space-8) var(--space-9);
+  max-width: 60rem;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-6);
+  flex-wrap: wrap;
+
+  .left-section {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+
+    h2 {
+      font-size: var(--fs-h1);
+      font-weight: var(--fw-semibold);
+      color: var(--text-color);
+      margin: 0;
+    }
+  }
+
+  .action-buttons {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+  }
+}
+
+.detail-card,
+.versions-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: var(--space-6);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg, 12px);
+  background: var(--surface-card, var(--background-color));
+
+  h3 {
+    font-size: var(--fs-h2);
+    font-weight: var(--fw-semibold);
+    color: var(--text-color);
+    margin: 0 0 var(--space-2);
+  }
+}
+
+.detail-row {
+  display: flex;
+  gap: var(--space-4);
+
+  .detail-label {
+    min-width: 8rem;
+    color: var(--text-color);
+    font-weight: var(--fw-medium);
+    font-size: var(--fs-label);
+  }
+
+  .detail-value {
+    color: var(--text-color);
+    font-size: var(--fs-body);
+  }
+}
+
+.version-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+
+  .version-num {
+    font-family: var(--font-mono, monospace);
+    font-weight: var(--fw-semibold);
+    color: var(--text-color);
+  }
+
+  .version-date {
+    color: var(--text-color);
+    font-size: var(--fs-label);
+    opacity: 0.7;
+  }
+}
+
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-pill, 999px);
+  font-size: var(--fs-label);
+  font-weight: var(--fw-medium);
+
+  &.active {
+    color: var(--primary-color);
+    background: var(--primary-color-transparent);
+  }
+
+  &.draft {
+    color: var(--warning-color);
+    background: var(--warning-color-transparent, var(--surface-hover));
+  }
+
+  &.inactive {
+    color: var(--text-color);
+    background: var(--surface-hover);
+  }
+}
+
+.version-empty {
+  color: var(--text-color);
+  opacity: 0.7;
+  font-size: var(--fs-control);
+}
