@@ -1,0 +1,70 @@
+<section class="fb-preview">
+  <label class="fb-preview__label" for="fb-preview-role">
+    {{ 'FORM_BUILDER.PREVIEW.VIEW_AS_ROLE' | translate }}
+  </label>
+  <app-custom-dropdown
+    inputId="fb-preview-role"
+    [options]="roles()"
+    optionLabel="name"
+    optionValue="id"
+    [showClear]="true"
+    [filter]="true"
+    appendTo="body"
+    [placeholder]="'FORM_BUILDER.PREVIEW.ALL_ACCESS' | translate"
+    [ngModel]="viewAsRole()"
+    (onChangeEvent)="onRoleChange($event)"
+  ></app-custom-dropdown>
+
+  <p class="fb-preview__hint">
+    {{ 'FORM_BUILDER.PREVIEW.RBAC_HINT' | translate }}
+  </p>
+
+  @if (loading()) {
+    <div class="fb-preview__loading">
+      <p-skeleton height="2rem"></p-skeleton>
+      <p-skeleton height="2rem"></p-skeleton>
+    </div>
+  } @else if (!activeTab()) {
+    <p class="fb-preview__empty">
+      {{ 'FORM_BUILDER.PREVIEW.NOTHING_VISIBLE' | translate }}
+    </p>
+  } @else {
+    <div class="fb-preview__canvas">
+      @for (section of sections(activeTab()); track trackSection($index, section)) {
+        <div class="fb-preview__section">
+          <div class="fb-preview__section-title">
+            {{ section.name || ('FORM_BUILDER.UNTITLED_SECTION' | translate) }}
+          </div>
+          @if (section.fields.length === 0) {
+            <div class="fb-preview__section-empty">
+              {{ 'FORM_BUILDER.PREVIEW.NO_FIELDS' | translate }}
+            </div>
+          } @else {
+            @for (field of section.fields; track trackField($index, field)) {
+              <div
+                class="fb-preview__field"
+                [class.fb-preview__field--readonly]="isReadOnly(field)"
+              >
+                <span class="fb-preview__field-label">
+                  {{ fieldLabel(field) }}
+                  @if (field.isMandatory) {
+                    <span class="fb-preview__req">*</span>
+                  }
+                </span>
+                @if (isReadOnly(field)) {
+                  <span class="fb-preview__badge fb-preview__badge--read">
+                    {{ 'FORM_BUILDER.RBAC.ACCESS.READ' | translate }}
+                  </span>
+                } @else {
+                  <span class="fb-preview__badge fb-preview__badge--write">
+                    {{ 'FORM_BUILDER.RBAC.ACCESS.WRITE' | translate }}
+                  </span>
+                }
+              </div>
+            }
+          }
+        </div>
+      }
+    </div>
+  }
+</section>
