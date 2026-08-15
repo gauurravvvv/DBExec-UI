@@ -6642,7 +6642,8 @@
       "ALL_ACCESS": "Designer (full access)",
       "RBAC_HINT": "Choose a role to preview the form as that role sees it: fields set to none are hidden, read are shown read-only.",
       "NOTHING_VISIBLE": "This role sees no fields on the form.",
-      "NO_FIELDS": "No fields in this section for this role."
+      "NO_FIELDS": "No fields in this section for this role.",
+      "COMPOSER": "Composer preview"
     },
     "RUN": "Run",
     "NO_PUBLISHED": "This form has no published version yet."

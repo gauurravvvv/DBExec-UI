@@ -6645,7 +6645,8 @@
       "ALL_ACCESS": "Designer (acesso total)",
       "RBAC_HINT": "Escolha um perfil para visualizar o formulário como esse perfil o vê: campos com «nenhum» ficam ocultos e «somente leitura» aparecem não editáveis.",
       "NOTHING_VISIBLE": "Este perfil não vê nenhum campo no formulário.",
-      "NO_FIELDS": "Nenhum campo nesta seção para este perfil."
+      "NO_FIELDS": "Nenhum campo nesta seção para este perfil.",
+      "COMPOSER": "Prévia do compositor"
     },
     "RUN": "Executar",
     "NO_PUBLISHED": "Este formulário ainda não tem uma versão publicada."

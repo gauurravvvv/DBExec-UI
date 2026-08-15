@@ -6645,7 +6645,8 @@
       "ALL_ACCESS": "Concepteur (accès complet)",
       "RBAC_HINT": "Choisissez un rôle pour prévisualiser le formulaire tel que ce rôle le voit : les champs « aucun » sont masqués, « lecture seule » s'affichent non modifiables.",
       "NOTHING_VISIBLE": "Ce rôle ne voit aucun champ sur le formulaire.",
-      "NO_FIELDS": "Aucun champ dans cette section pour ce rôle."
+      "NO_FIELDS": "Aucun champ dans cette section pour ce rôle.",
+      "COMPOSER": "Aperçu du compositeur"
     },
     "RUN": "Exécuter",
     "NO_PUBLISHED": "Ce formulaire n'a pas encore de version publiée."

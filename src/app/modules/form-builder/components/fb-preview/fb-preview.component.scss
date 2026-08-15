@@ -100,3 +100,27 @@
     color: var(--primary-color);
   }
 }
+
+.fb-preview__composer {
+  margin-top: var(--space-5);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.fb-preview__composer-title {
+  font-size: var(--fs-label);
+  font-weight: var(--fw-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  color: var(--text-color-secondary);
+}
+
+.fb-preview__composer-tree {
+  // Read-only preview surface: the runtime tree renders as the previewed role
+  // sees it. Pointer events are dampened so the inspector preview is not editable.
+  pointer-events: none;
+  opacity: 0.95;
+}

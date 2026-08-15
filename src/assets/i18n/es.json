@@ -6645,7 +6645,8 @@
       "ALL_ACCESS": "Diseñador (acceso total)",
       "RBAC_HINT": "Elija un rol para previsualizar el formulario como lo ve ese rol: los campos con «ninguno» se ocultan y los de «solo lectura» se muestran no editables.",
       "NOTHING_VISIBLE": "Este rol no ve ningún campo en el formulario.",
-      "NO_FIELDS": "No hay campos en esta sección para este rol."
+      "NO_FIELDS": "No hay campos en esta sección para este rol.",
+      "COMPOSER": "Vista previa del compositor"
     },
     "RUN": "Ejecutar",
     "NO_PUBLISHED": "Este formulario aún no tiene una versión publicada."

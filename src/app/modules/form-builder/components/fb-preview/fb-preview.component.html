@@ -67,4 +67,16 @@
       }
     </div>
   }
+
+  <!-- The reused runtime composer, read-only, as the previewed role sees it. -->
+  @if (composerReady()) {
+    <div class="fb-preview__composer">
+      <div class="fb-preview__composer-title">
+        {{ 'FORM_BUILDER.PREVIEW.COMPOSER' | translate }}
+      </div>
+      <div class="fb-preview__composer-tree">
+        <qb-filter-tree></qb-filter-tree>
+      </div>
+    </div>
+  }
 </section>

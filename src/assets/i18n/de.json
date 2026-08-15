@@ -6645,7 +6645,8 @@
       "ALL_ACCESS": "Designer (voller Zugriff)",
       "RBAC_HINT": "Wählen Sie eine Rolle, um das Formular so anzuzeigen, wie diese Rolle es sieht: Felder mit „Kein“ sind ausgeblendet, „Nur lesen“ werden schreibgeschützt angezeigt.",
       "NOTHING_VISIBLE": "Diese Rolle sieht keine Felder im Formular.",
-      "NO_FIELDS": "Keine Felder in diesem Abschnitt für diese Rolle."
+      "NO_FIELDS": "Keine Felder in diesem Abschnitt für diese Rolle.",
+      "COMPOSER": "Composer-Vorschau"
     },
     "RUN": "Ausführen",
     "NO_PUBLISHED": "Dieses Formular hat noch keine veröffentlichte Version."
