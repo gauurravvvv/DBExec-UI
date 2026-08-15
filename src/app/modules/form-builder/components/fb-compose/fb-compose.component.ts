@@ -29,6 +29,7 @@ import {
   takeUntil,
 } from 'rxjs';
 import { GlobalService } from 'src/app/core/services/global.service';
+import { QueryBuilderStore } from 'src/app/modules/query-builder/services/query-builder-store';
 import { FormRuntimeStore } from '../../services/form-runtime-store';
 import { FbRuntimeService } from '../../services/fb-runtime.service';
 
@@ -37,7 +38,12 @@ import { FbRuntimeService } from '../../services/fb-runtime.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './fb-compose.component.html',
   styleUrls: ['./fb-compose.component.scss'],
-  providers: [FormRuntimeStore],
+  // The reused qb-* runtime components inject QueryBuilderStore; alias it to this
+  // component's FormRuntimeStore instance so they drive the SAME tree.
+  providers: [
+    FormRuntimeStore,
+    { provide: QueryBuilderStore, useExisting: FormRuntimeStore },
+  ],
 })
 export class FbComposeComponent implements OnInit, OnDestroy {
   readonly store = inject(FormRuntimeStore);
