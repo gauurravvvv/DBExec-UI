@@ -63,6 +63,7 @@
     "CANCEL": "Annulla",
     "EXPAND": "Espandi",
     "COLLAPSE": "Comprimi",
+    "EXPAND_COLLAPSE": "Expand / collapse",
     "CONTINUE": "Continua",
     "OPTIONAL": "Opzionale",
     "SAVE": "Salva",
@@ -6472,5 +6473,80 @@
       }
     },
     "MODULE_GENERIC_DESC": "Apri {{name}} per lavorare con queste funzioni."
+  },
+  "FORM_BUILDER": {
+    "TITLE": "Form Builder",
+    "NEW_FORM": "New Form",
+    "DESIGN": "Design",
+    "COMPOSE": "Run",
+    "DELETE_SINGLE": "Are you sure you want to delete this form?",
+    "COL_NAME": "Name",
+    "COL_DATASOURCE": "Datasource",
+    "COL_STATUS": "Status",
+    "COL_UPDATED": "Updated",
+    "VERSIONS": "Versions",
+    "NAME_REQUIRED": "Name is required",
+    "NAME_MIN": "Name must be at least {{min}} characters",
+    "NAME_MAX": "Name must be at most {{max}} characters",
+    "NAME_PATTERN": "Name contains invalid characters",
+    "ADD_TAB": "Add Tab",
+    "ADD_SECTION": "Add Section",
+    "REMOVE_TAB": "Remove tab",
+    "REMOVE_SECTION": "Remove section",
+    "NO_SECTIONS": "This tab has no sections yet.",
+    "DROP_PROMPTS_HERE": "Drag prompts here",
+    "UNTITLED_SECTION": "Untitled section",
+    "N_COL": "{{n}} col",
+    "VERSION": {
+      "DRAFT": "Draft",
+      "PUBLISHED": "Published",
+      "READ_ONLY_BANNER": "This version is read-only. Fork it to make changes.",
+      "PUBLISH": "Publish",
+      "FORK": "Fork"
+    },
+    "INSPECTOR": {
+      "DESIGN": "Design",
+      "RULES": "Rules",
+      "ACCESS": "Access",
+      "PREVIEW": "Preview",
+      "COMING_SOON": "Coming soon"
+    },
+    "LAYOUT": {
+      "GROUP": "Layout",
+      "HEADING": "Section heading",
+      "TEXT": "Static text",
+      "DIVIDER": "Divider",
+      "SPACER": "Spacer"
+    },
+    "OP": {
+      "EQ": "Equals",
+      "NE": "Not equal",
+      "GT": "Greater than",
+      "GTE": "Greater than or equal",
+      "LT": "Less than",
+      "LTE": "Less than or equal",
+      "IN": "In",
+      "NOT_IN": "Not in",
+      "BETWEEN": "Between",
+      "CONTAINS": "Contains",
+      "IS_NULL": "Is empty",
+      "IS_NOT_NULL": "Is not empty"
+    },
+    "PROP": {
+      "LABEL": "Label",
+      "ICON": "Icon",
+      "ACTIVE": "Active by default",
+      "COLUMNS": "Columns",
+      "COLLAPSIBLE": "Collapsible",
+      "HELP": "Help text",
+      "PLACEHOLDER": "Placeholder",
+      "COL_SPAN": "Column span",
+      "MANDATORY": "Mandatory",
+      "VISIBLE": "Visible",
+      "READ_ONLY": "Read-only",
+      "LOCKED": "Locked",
+      "ALLOWED_OPERATORS": "Allowed operators",
+      "BLOCK_CONTENT": "Content"
+    }
   }
 }
