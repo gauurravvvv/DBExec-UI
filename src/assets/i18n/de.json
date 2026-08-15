@@ -5148,6 +5148,15 @@
           "invalid": "The set-value expression is invalid."
         },
         "enforcement": "The submitted values do not satisfy the form's rules."
+      },
+      "permission": {
+        "roleId": {
+          "required": "Eine Rolle ist erforderlich.",
+          "uuid": "Die Rollen-ID ist ungültig."
+        },
+        "access": {
+          "invalid": "Der Zugriffswert ist ungültig."
+        }
       }
     }
   },
@@ -6614,6 +6623,29 @@
         "CLEAR": "Clear value",
         "VALIDATE": "Validate"
       }
+    },
+    "RBAC": {
+      "TITLE": "Feldzugriff",
+      "PERMISSIVE_HINT": "Keine Berechtigung für ein Feld = für alle vollständig beschreibbar (freizügig). Fügen Sie eine Berechtigung hinzu, um es einzuschränken — eine nicht aufgeführte Rolle erhält dann keinen Zugriff.",
+      "FIELD": "Feld",
+      "ROLE": "Rolle",
+      "PICK_FIELD": "Wählen Sie ein Feld, um den Rollenzugriff festzulegen.",
+      "NO_ROLES": "Keine Rollen für diese Organisation gefunden.",
+      "READONLY_NOTE": "Diese Version ist kein Entwurf — Zugriffsberechtigungen sind schreibgeschützt.",
+      "ACCESS": {
+        "HEADER": "Zugriff",
+        "DEFAULT": "— (Standard: Schreiben)",
+        "NONE": "Kein (ausgeblendet)",
+        "READ": "Nur lesen",
+        "WRITE": "Schreiben"
+      }
+    },
+    "PREVIEW": {
+      "VIEW_AS_ROLE": "Als Rolle anzeigen",
+      "ALL_ACCESS": "Designer (voller Zugriff)",
+      "RBAC_HINT": "Wählen Sie eine Rolle, um das Formular so anzuzeigen, wie diese Rolle es sieht: Felder mit „Kein“ sind ausgeblendet, „Nur lesen“ werden schreibgeschützt angezeigt.",
+      "NOTHING_VISIBLE": "Diese Rolle sieht keine Felder im Formular.",
+      "NO_FIELDS": "Keine Felder in diesem Abschnitt für diese Rolle."
     }
   }
 }

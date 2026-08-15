@@ -5148,6 +5148,15 @@
           "invalid": "The set-value expression is invalid."
         },
         "enforcement": "The submitted values do not satisfy the form's rules."
+      },
+      "permission": {
+        "roleId": {
+          "required": "Een rol is vereist.",
+          "uuid": "De rol-id is ongeldig."
+        },
+        "access": {
+          "invalid": "De toegangswaarde is ongeldig."
+        }
       }
     }
   },
@@ -6614,6 +6623,29 @@
         "CLEAR": "Clear value",
         "VALIDATE": "Validate"
       }
+    },
+    "RBAC": {
+      "TITLE": "Veldtoegang",
+      "PERMISSIVE_HINT": "Geen toekenning op een veld = volledig bewerkbaar voor iedereen (permissief). Voeg een toekenning toe om het te beperken — een niet-vermelde rol krijgt dan geen toegang.",
+      "FIELD": "Veld",
+      "ROLE": "Rol",
+      "PICK_FIELD": "Kies een veld om de roltoegang in te stellen.",
+      "NO_ROLES": "Geen rollen gevonden voor deze organisatie.",
+      "READONLY_NOTE": "Deze versie is geen concept — toegangstoekenningen zijn alleen-lezen.",
+      "ACCESS": {
+        "HEADER": "Toegang",
+        "DEFAULT": "— (standaard: schrijven)",
+        "NONE": "Geen (verborgen)",
+        "READ": "Alleen-lezen",
+        "WRITE": "Schrijven"
+      }
+    },
+    "PREVIEW": {
+      "VIEW_AS_ROLE": "Bekijken als rol",
+      "ALL_ACCESS": "Ontwerper (volledige toegang)",
+      "RBAC_HINT": "Kies een rol om het formulier te bekijken zoals die rol het ziet: velden met 'geen' zijn verborgen, 'alleen-lezen' worden niet-bewerkbaar getoond.",
+      "NOTHING_VISIBLE": "Deze rol ziet geen velden op het formulier.",
+      "NO_FIELDS": "Geen velden in deze sectie voor deze rol."
     }
   }
 }

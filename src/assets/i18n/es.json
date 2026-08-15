@@ -5148,6 +5148,15 @@
           "invalid": "The set-value expression is invalid."
         },
         "enforcement": "The submitted values do not satisfy the form's rules."
+      },
+      "permission": {
+        "roleId": {
+          "required": "Se requiere un rol.",
+          "uuid": "El id del rol no es válido."
+        },
+        "access": {
+          "invalid": "El valor de acceso no es válido."
+        }
       }
     }
   },
@@ -6614,6 +6623,29 @@
         "CLEAR": "Clear value",
         "VALIDATE": "Validate"
       }
+    },
+    "RBAC": {
+      "TITLE": "Acceso a campos",
+      "PERMISSIVE_HINT": "Sin concesión en un campo = totalmente editable para todos (permisivo). Añada una concesión para restringirlo; un rol no listado no obtendrá acceso.",
+      "FIELD": "Campo",
+      "ROLE": "Rol",
+      "PICK_FIELD": "Elija un campo para definir el acceso por rol.",
+      "NO_ROLES": "No se encontraron roles para esta organización.",
+      "READONLY_NOTE": "Esta versión no es un borrador: las concesiones de acceso son de solo lectura.",
+      "ACCESS": {
+        "HEADER": "Acceso",
+        "DEFAULT": "— (predeterminado: escritura)",
+        "NONE": "Ninguno (oculto)",
+        "READ": "Solo lectura",
+        "WRITE": "Escritura"
+      }
+    },
+    "PREVIEW": {
+      "VIEW_AS_ROLE": "Ver como rol",
+      "ALL_ACCESS": "Diseñador (acceso total)",
+      "RBAC_HINT": "Elija un rol para previsualizar el formulario como lo ve ese rol: los campos con «ninguno» se ocultan y los de «solo lectura» se muestran no editables.",
+      "NOTHING_VISIBLE": "Este rol no ve ningún campo en el formulario.",
+      "NO_FIELDS": "No hay campos en esta sección para este rol."
     }
   }
 }

@@ -5148,6 +5148,15 @@
           "invalid": "The set-value expression is invalid."
         },
         "enforcement": "The submitted values do not satisfy the form's rules."
+      },
+      "permission": {
+        "roleId": {
+          "required": "Um perfil é obrigatório.",
+          "uuid": "O id do perfil é inválido."
+        },
+        "access": {
+          "invalid": "O valor de acesso é inválido."
+        }
       }
     }
   },
@@ -6614,6 +6623,29 @@
         "CLEAR": "Clear value",
         "VALIDATE": "Validate"
       }
+    },
+    "RBAC": {
+      "TITLE": "Acesso a campos",
+      "PERMISSIVE_HINT": "Sem concessão em um campo = totalmente editável por todos (permissivo). Adicione uma concessão para restringi-lo — um perfil não listado então não terá acesso.",
+      "FIELD": "Campo",
+      "ROLE": "Perfil",
+      "PICK_FIELD": "Escolha um campo para definir o acesso por perfil.",
+      "NO_ROLES": "Nenhum perfil encontrado para esta organização.",
+      "READONLY_NOTE": "Esta versão não é um rascunho — as concessões de acesso são somente leitura.",
+      "ACCESS": {
+        "HEADER": "Acesso",
+        "DEFAULT": "— (padrão: escrita)",
+        "NONE": "Nenhum (oculto)",
+        "READ": "Somente leitura",
+        "WRITE": "Escrita"
+      }
+    },
+    "PREVIEW": {
+      "VIEW_AS_ROLE": "Ver como perfil",
+      "ALL_ACCESS": "Designer (acesso total)",
+      "RBAC_HINT": "Escolha um perfil para visualizar o formulário como esse perfil o vê: campos com «nenhum» ficam ocultos e «somente leitura» aparecem não editáveis.",
+      "NOTHING_VISIBLE": "Este perfil não vê nenhum campo no formulário.",
+      "NO_FIELDS": "Nenhum campo nesta seção para este perfil."
     }
   }
 }

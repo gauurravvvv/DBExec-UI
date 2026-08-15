@@ -5148,6 +5148,15 @@
           "invalid": "The set-value expression is invalid."
         },
         "enforcement": "The submitted values do not satisfy the form's rules."
+      },
+      "permission": {
+        "roleId": {
+          "required": "È richiesto un ruolo.",
+          "uuid": "L'id del ruolo non è valido."
+        },
+        "access": {
+          "invalid": "Il valore di accesso non è valido."
+        }
       }
     }
   },
@@ -6614,6 +6623,29 @@
         "CLEAR": "Clear value",
         "VALIDATE": "Validate"
       }
+    },
+    "RBAC": {
+      "TITLE": "Accesso ai campi",
+      "PERMISSIVE_HINT": "Nessuna concessione su un campo = completamente modificabile per tutti (permissivo). Aggiungi una concessione per limitarlo — un ruolo non elencato non avrà accesso.",
+      "FIELD": "Campo",
+      "ROLE": "Ruolo",
+      "PICK_FIELD": "Scegli un campo per impostare l'accesso per ruolo.",
+      "NO_ROLES": "Nessun ruolo trovato per questa organizzazione.",
+      "READONLY_NOTE": "Questa versione non è una bozza — le concessioni di accesso sono di sola lettura.",
+      "ACCESS": {
+        "HEADER": "Accesso",
+        "DEFAULT": "— (predefinito: scrittura)",
+        "NONE": "Nessuno (nascosto)",
+        "READ": "Sola lettura",
+        "WRITE": "Scrittura"
+      }
+    },
+    "PREVIEW": {
+      "VIEW_AS_ROLE": "Visualizza come ruolo",
+      "ALL_ACCESS": "Progettista (accesso completo)",
+      "RBAC_HINT": "Scegli un ruolo per vedere il modulo come lo vede quel ruolo: i campi «nessuno» sono nascosti, «sola lettura» sono mostrati non modificabili.",
+      "NOTHING_VISIBLE": "Questo ruolo non vede alcun campo nel modulo.",
+      "NO_FIELDS": "Nessun campo in questa sezione per questo ruolo."
     }
   }
 }

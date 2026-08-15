@@ -5148,6 +5148,15 @@
           "invalid": "The set-value expression is invalid."
         },
         "enforcement": "The submitted values do not satisfy the form's rules."
+      },
+      "permission": {
+        "roleId": {
+          "required": "ロールが必要です。",
+          "uuid": "ロールIDが無効です。"
+        },
+        "access": {
+          "invalid": "アクセス値が無効です。"
+        }
       }
     }
   },
@@ -6614,6 +6623,29 @@
         "CLEAR": "Clear value",
         "VALIDATE": "Validate"
       }
+    },
+    "RBAC": {
+      "TITLE": "フィールドアクセス",
+      "PERMISSIVE_HINT": "フィールドに権限がない場合 = 全員が完全に編集可能（許可型）。制限するには権限を追加します。リストにないロールはアクセスできなくなります。",
+      "FIELD": "フィールド",
+      "ROLE": "ロール",
+      "PICK_FIELD": "ロールアクセスを設定するフィールドを選択してください。",
+      "NO_ROLES": "この組織のロールが見つかりません。",
+      "READONLY_NOTE": "このバージョンはドラフトではありません。アクセス権限は読み取り専用です。",
+      "ACCESS": {
+        "HEADER": "アクセス",
+        "DEFAULT": "—（既定: 書き込み）",
+        "NONE": "なし（非表示）",
+        "READ": "読み取り専用",
+        "WRITE": "書き込み"
+      }
+    },
+    "PREVIEW": {
+      "VIEW_AS_ROLE": "ロールとして表示",
+      "ALL_ACCESS": "デザイナー（フルアクセス）",
+      "RBAC_HINT": "ロールを選択すると、そのロールに見えるとおりにフォームをプレビューできます。「なし」のフィールドは非表示、「読み取り専用」は編集不可で表示されます。",
+      "NOTHING_VISIBLE": "このロールにはフォーム上に表示されるフィールドがありません。",
+      "NO_FIELDS": "このロールにはこのセクションのフィールドがありません。"
     }
   }
 }

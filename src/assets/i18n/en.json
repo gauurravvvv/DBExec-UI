@@ -5145,6 +5145,15 @@
           "invalid": "The set-value expression is invalid."
         },
         "enforcement": "The submitted values do not satisfy the form's rules."
+      },
+      "permission": {
+        "roleId": {
+          "required": "A role is required.",
+          "uuid": "The role id is not valid."
+        },
+        "access": {
+          "invalid": "The access value is not valid."
+        }
       }
     }
   },
@@ -6611,6 +6620,29 @@
         "CLEAR": "Clear value",
         "VALIDATE": "Validate"
       }
+    },
+    "RBAC": {
+      "TITLE": "Field access",
+      "PERMISSIVE_HINT": "No grant on a field = fully writable for everyone (permissive). Add a grant to restrict it — an unlisted role then gets no access.",
+      "FIELD": "Field",
+      "ROLE": "Role",
+      "PICK_FIELD": "Pick a field to set its role access.",
+      "NO_ROLES": "No roles found for this organisation.",
+      "READONLY_NOTE": "This version is not a draft — access grants are read-only.",
+      "ACCESS": {
+        "HEADER": "Access",
+        "DEFAULT": "— (default: write)",
+        "NONE": "None (hidden)",
+        "READ": "Read only",
+        "WRITE": "Write"
+      }
+    },
+    "PREVIEW": {
+      "VIEW_AS_ROLE": "View as role",
+      "ALL_ACCESS": "Designer (full access)",
+      "RBAC_HINT": "Choose a role to preview the form as that role sees it: fields set to none are hidden, read are shown read-only.",
+      "NOTHING_VISIBLE": "This role sees no fields on the form.",
+      "NO_FIELDS": "No fields in this section for this role."
     }
   }
 }

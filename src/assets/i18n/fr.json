@@ -5148,6 +5148,15 @@
           "invalid": "The set-value expression is invalid."
         },
         "enforcement": "The submitted values do not satisfy the form's rules."
+      },
+      "permission": {
+        "roleId": {
+          "required": "Un rôle est requis.",
+          "uuid": "L'identifiant du rôle n'est pas valide."
+        },
+        "access": {
+          "invalid": "La valeur d'accès n'est pas valide."
+        }
       }
     }
   },
@@ -6614,6 +6623,29 @@
         "CLEAR": "Clear value",
         "VALIDATE": "Validate"
       }
+    },
+    "RBAC": {
+      "TITLE": "Accès aux champs",
+      "PERMISSIVE_HINT": "Aucune autorisation sur un champ = entièrement modifiable pour tous (permissif). Ajoutez une autorisation pour le restreindre — un rôle non listé n'aura alors aucun accès.",
+      "FIELD": "Champ",
+      "ROLE": "Rôle",
+      "PICK_FIELD": "Choisissez un champ pour définir l'accès par rôle.",
+      "NO_ROLES": "Aucun rôle trouvé pour cette organisation.",
+      "READONLY_NOTE": "Cette version n'est pas un brouillon — les autorisations d'accès sont en lecture seule.",
+      "ACCESS": {
+        "HEADER": "Accès",
+        "DEFAULT": "— (par défaut : écriture)",
+        "NONE": "Aucun (masqué)",
+        "READ": "Lecture seule",
+        "WRITE": "Écriture"
+      }
+    },
+    "PREVIEW": {
+      "VIEW_AS_ROLE": "Afficher en tant que rôle",
+      "ALL_ACCESS": "Concepteur (accès complet)",
+      "RBAC_HINT": "Choisissez un rôle pour prévisualiser le formulaire tel que ce rôle le voit : les champs « aucun » sont masqués, « lecture seule » s'affichent non modifiables.",
+      "NOTHING_VISIBLE": "Ce rôle ne voit aucun champ sur le formulaire.",
+      "NO_FIELDS": "Aucun champ dans cette section pour ce rôle."
     }
   }
 }

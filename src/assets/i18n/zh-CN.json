@@ -5148,6 +5148,15 @@
           "invalid": "The set-value expression is invalid."
         },
         "enforcement": "The submitted values do not satisfy the form's rules."
+      },
+      "permission": {
+        "roleId": {
+          "required": "需要一个角色。",
+          "uuid": "角色 ID 无效。"
+        },
+        "access": {
+          "invalid": "访问值无效。"
+        }
       }
     }
   },
@@ -6614,6 +6623,29 @@
         "CLEAR": "Clear value",
         "VALIDATE": "Validate"
       }
+    },
+    "RBAC": {
+      "TITLE": "字段访问",
+      "PERMISSIVE_HINT": "字段没有授权 = 对所有人完全可写（宽松）。添加授权即可限制它——未列出的角色将无法访问。",
+      "FIELD": "字段",
+      "ROLE": "角色",
+      "PICK_FIELD": "选择一个字段以设置其角色访问权限。",
+      "NO_ROLES": "未找到此组织的角色。",
+      "READONLY_NOTE": "此版本不是草稿——访问授权为只读。",
+      "ACCESS": {
+        "HEADER": "访问",
+        "DEFAULT": "—（默认：写入）",
+        "NONE": "无（隐藏）",
+        "READ": "只读",
+        "WRITE": "写入"
+      }
+    },
+    "PREVIEW": {
+      "VIEW_AS_ROLE": "以角色查看",
+      "ALL_ACCESS": "设计者（完全访问）",
+      "RBAC_HINT": "选择一个角色以按该角色的视角预览表单：设为“无”的字段将隐藏，设为“只读”的字段将以不可编辑的方式显示。",
+      "NOTHING_VISIBLE": "此角色在表单上看不到任何字段。",
+      "NO_FIELDS": "此角色在该部分没有字段。"
     }
   }
 }

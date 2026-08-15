@@ -5148,6 +5148,15 @@
           "invalid": "The set-value expression is invalid."
         },
         "enforcement": "The submitted values do not satisfy the form's rules."
+      },
+      "permission": {
+        "roleId": {
+          "required": "역할이 필요합니다.",
+          "uuid": "역할 ID가 올바르지 않습니다."
+        },
+        "access": {
+          "invalid": "접근 값이 올바르지 않습니다."
+        }
       }
     }
   },
@@ -6614,6 +6623,29 @@
         "CLEAR": "Clear value",
         "VALIDATE": "Validate"
       }
+    },
+    "RBAC": {
+      "TITLE": "필드 접근",
+      "PERMISSIVE_HINT": "필드에 권한이 없으면 = 모두에게 완전히 편집 가능(허용). 제한하려면 권한을 추가하세요. 목록에 없는 역할은 접근할 수 없습니다.",
+      "FIELD": "필드",
+      "ROLE": "역할",
+      "PICK_FIELD": "역할 접근을 설정할 필드를 선택하세요.",
+      "NO_ROLES": "이 조직에 대한 역할을 찾을 수 없습니다.",
+      "READONLY_NOTE": "이 버전은 초안이 아니므로 접근 권한은 읽기 전용입니다.",
+      "ACCESS": {
+        "HEADER": "접근",
+        "DEFAULT": "— (기본값: 쓰기)",
+        "NONE": "없음 (숨김)",
+        "READ": "읽기 전용",
+        "WRITE": "쓰기"
+      }
+    },
+    "PREVIEW": {
+      "VIEW_AS_ROLE": "역할로 보기",
+      "ALL_ACCESS": "디자이너 (전체 접근)",
+      "RBAC_HINT": "역할을 선택하면 해당 역할이 보는 대로 양식을 미리 볼 수 있습니다. '없음' 필드는 숨겨지고 '읽기 전용'은 편집 불가로 표시됩니다.",
+      "NOTHING_VISIBLE": "이 역할은 양식에서 볼 수 있는 필드가 없습니다.",
+      "NO_FIELDS": "이 역할에 대해 이 섹션에 필드가 없습니다."
     }
   }
 }
