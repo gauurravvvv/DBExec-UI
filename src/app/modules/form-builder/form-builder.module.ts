@@ -22,7 +22,9 @@ import { FbComposeComponent } from './components/fb-compose/fb-compose.component
 import { FbDesignComponent } from './components/fb-design/fb-design.component';
 import { FbFieldCardComponent } from './components/fb-field-card/fb-field-card.component';
 import { FbInspectorComponent } from './components/fb-inspector/fb-inspector.component';
+import { FbPreviewComponent } from './components/fb-preview/fb-preview.component';
 import { FbPromptPaletteComponent } from './components/fb-prompt-palette/fb-prompt-palette.component';
+import { FbRbacEditorComponent } from './components/fb-rbac-editor/fb-rbac-editor.component';
 import { FbPropFieldComponent } from './components/fb-properties-panel/fb-prop-field.component';
 import { FbPropSectionComponent } from './components/fb-properties-panel/fb-prop-section.component';
 import { FbPropTabComponent } from './components/fb-properties-panel/fb-prop-tab.component';
@@ -57,6 +59,8 @@ import { FormBuilderRoutingModule } from './form-builder-routing.module';
     FbPropFieldComponent,
     FbRuleBuilderComponent,
     FbRuleEditorComponent,
+    FbRbacEditorComponent,
+    FbPreviewComponent,
   ],
   imports: [
     CommonModule,

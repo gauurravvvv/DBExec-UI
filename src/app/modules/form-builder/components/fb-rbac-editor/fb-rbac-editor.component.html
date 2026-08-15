@@ -1,0 +1,70 @@
+<section class="fb-rbac">
+  <h3 class="fb-rbac__title">{{ 'FORM_BUILDER.RBAC.TITLE' | translate }}</h3>
+  <p class="fb-rbac__hint">{{ 'FORM_BUILDER.RBAC.PERMISSIVE_HINT' | translate }}</p>
+
+  <label class="fb-rbac__label" for="fb-rbac-field">
+    {{ 'FORM_BUILDER.RBAC.FIELD' | translate }}
+  </label>
+  <app-custom-dropdown
+    inputId="fb-rbac-field"
+    [options]="fieldOptions()"
+    optionLabel="path"
+    optionValue="formFieldId"
+    [filter]="true"
+    [showClear]="true"
+    appendTo="body"
+    [placeholder]="'FORM_BUILDER.RBAC.PICK_FIELD' | translate"
+    [ngModel]="selectedFieldId()"
+    (onChangeEvent)="pickField($event)"
+  ></app-custom-dropdown>
+
+  @if (selectedFieldId()) {
+    @if (!isDraft()) {
+      <p class="fb-rbac__readonly-note">
+        {{ 'FORM_BUILDER.RBAC.READONLY_NOTE' | translate }}
+      </p>
+    }
+    @if (loading()) {
+      <div class="fb-rbac__loading">
+        <p-skeleton height="2rem" styleClass="fb-rbac__skeleton"></p-skeleton>
+        <p-skeleton height="2rem" styleClass="fb-rbac__skeleton"></p-skeleton>
+        <p-skeleton height="2rem" styleClass="fb-rbac__skeleton"></p-skeleton>
+      </div>
+    } @else if (rows().length === 0) {
+      <p class="fb-rbac__empty">{{ 'FORM_BUILDER.RBAC.NO_ROLES' | translate }}</p>
+    } @else {
+      <table
+        class="fb-rbac__grid"
+        [class.fb-rbac__grid--readonly]="!isDraft()"
+      >
+        <thead>
+          <tr>
+            <th>{{ 'FORM_BUILDER.RBAC.ROLE' | translate }}</th>
+            <th>{{ 'FORM_BUILDER.RBAC.ACCESS.HEADER' | translate }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (row of rows(); track row.roleId) {
+            <tr>
+              <td class="fb-rbac__role">{{ row.roleName }}</td>
+              <td class="fb-rbac__access">
+                <app-custom-dropdown
+                  [options]="accessOptions()"
+                  optionLabel="label"
+                  optionValue="value"
+                  [filter]="false"
+                  [disabled]="!isDraft() || saving()"
+                  appendTo="body"
+                  [ngModel]="row.access"
+                  (onChangeEvent)="onAccessChange(row, $event)"
+                ></app-custom-dropdown>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    }
+  } @else {
+    <p class="fb-rbac__empty">{{ 'FORM_BUILDER.RBAC.PICK_FIELD' | translate }}</p>
+  }
+</section>
