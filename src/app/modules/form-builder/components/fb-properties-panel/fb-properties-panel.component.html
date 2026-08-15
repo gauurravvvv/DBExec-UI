@@ -1,0 +1,6 @@
+<fb-prop-tab *ngIf="store.selectedTab() as t" [tab]="t"></fb-prop-tab>
+<fb-prop-section
+  *ngIf="store.selectedSection() as s"
+  [section]="s"
+></fb-prop-section>
+<fb-prop-field *ngIf="store.selectedField() as f" [field]="f"></fb-prop-field>

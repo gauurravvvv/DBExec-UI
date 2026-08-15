@@ -1,0 +1,40 @@
+<div
+  class="fb-field"
+  [class.fb-field--selected]="isSelected()"
+  [class.fb-field--layout]="isLayout"
+  (click)="onClick()"
+>
+  <i class="pi pi-bars fb-field__grip" cdkDragHandle></i>
+  <ng-container *ngIf="!isLayout; else layoutTpl">
+    <i class="fb-field__type-icon" [class]="icon(placement.type)"></i>
+    <span class="fb-field__label">{{ placement.label }}</span>
+    <app-chip size="sm">{{ placement.type }}</app-chip>
+    <span class="fb-field__badges">
+      <i
+        *ngIf="placement.isMandatory"
+        class="pi pi-asterisk"
+        [title]="'FORM_BUILDER.PROP.MANDATORY' | translate"
+      ></i>
+      <i
+        *ngIf="placement.isReadonly"
+        class="pi pi-lock"
+        [title]="'FORM_BUILDER.PROP.READ_ONLY' | translate"
+      ></i>
+      <i
+        *ngIf="!placement.isVisible"
+        class="pi pi-eye-slash"
+        [title]="'FORM_BUILDER.PROP.VISIBLE' | translate"
+      ></i>
+      <i
+        *ngIf="placement.isLocked"
+        class="pi pi-key"
+        [title]="'FORM_BUILDER.PROP.LOCKED' | translate"
+      ></i>
+    </span>
+  </ng-container>
+  <ng-template #layoutTpl>
+    <span class="fb-field__layout-preview">{{
+      placement.blockContent || (placement.type | translate)
+    }}</span>
+  </ng-template>
+</div>

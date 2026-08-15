@@ -1,0 +1,20 @@
+<p-selectButton
+  class="fb-inspector__switch"
+  [options]="viewOptions"
+  [ngModel]="view()"
+  (onChange)="view.set($event.value)"
+  optionValue="value"
+>
+  <ng-template let-item pTemplate>{{ item.label | translate }}</ng-template>
+</p-selectButton>
+
+<div class="fb-inspector__body">
+  <fb-properties-panel
+    *ngIf="view() === 'design'"
+    [selected]="selected()"
+  ></fb-properties-panel>
+  <div class="fb-inspector__stub" *ngIf="view() !== 'design'">
+    <i class="pi pi-clock"></i>
+    <span>{{ 'FORM_BUILDER.INSPECTOR.COMING_SOON' | translate }}</span>
+  </div>
+</div>

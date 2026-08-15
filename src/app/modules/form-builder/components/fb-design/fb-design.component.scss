@@ -1,0 +1,73 @@
+:host {
+  display: block;
+  height: 100%;
+  min-height: 0;
+  background-color: var(--background-color);
+}
+
+.fb-design-shell {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  height: 100%;
+  min-height: 0;
+  padding: var(--space-6);
+}
+
+.fb-design {
+  display: grid;
+  grid-template-columns: 15rem 1fr 21rem; // palette | canvas | inspector
+  gap: var(--space-4);
+  flex: 1;
+  min-height: 0;
+
+  &__palette,
+  &__inspector,
+  &__canvas {
+    overflow: auto;
+    min-height: 0;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md, 8px);
+    background: var(--surface-card, var(--background-color));
+  }
+
+  &__palette {
+    padding: var(--space-4);
+  }
+
+  &__inspector {
+    padding: 0;
+  }
+
+  // When nothing is selected the shell drops the inspector column via *ngIf,
+  // so collapse the grid to two columns.
+  &--no-selection {
+    grid-template-columns: 15rem 1fr;
+  }
+}
+
+.fb-design__loading {
+  padding: var(--space-6);
+}
+
+@media (max-width: 1100px) {
+  .fb-design {
+    grid-template-columns: 1fr;
+
+    &--no-selection {
+      grid-template-columns: 1fr;
+    }
+  }
+  .fb-design__palette {
+    order: 1;
+    max-height: 16rem;
+  }
+  .fb-design__canvas {
+    order: 2;
+  }
+  .fb-design__inspector {
+    order: 3;
+    position: sticky;
+    bottom: 0;
+  }
+}

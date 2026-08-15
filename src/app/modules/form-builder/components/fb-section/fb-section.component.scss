@@ -1,0 +1,94 @@
+.fb-section {
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md, 8px);
+  background: var(--surface-card, var(--background-color));
+  overflow: hidden;
+
+  &--selected {
+    box-shadow: 0 0 0 2px var(--primary-color-transparent);
+    border-color: var(--primary-color);
+  }
+
+  &__head {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-3) var(--space-4);
+    background: var(--surface-hover);
+    cursor: pointer;
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  &__grip {
+    color: var(--text-color);
+    opacity: 0.5;
+    cursor: grab;
+  }
+
+  &__title {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-weight: var(--fw-medium);
+    color: var(--text-color);
+    font-size: var(--fs-control);
+  }
+
+  &__badge {
+    font-size: var(--fs-micro);
+    color: var(--text-color);
+    opacity: 0.6;
+    padding: var(--space-1) var(--space-2);
+    border-radius: var(--radius-pill, 999px);
+    background: var(--surface-card, var(--background-color));
+  }
+
+  &__btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.75rem;
+    height: 1.75rem;
+    border: none;
+    border-radius: var(--radius-sm, 6px);
+    background: transparent;
+    color: var(--text-color);
+    cursor: pointer;
+
+    &:hover {
+      background: var(--surface-card, var(--background-color));
+    }
+  }
+
+  &__del:hover {
+    color: var(--warning-color);
+  }
+
+  &__grid {
+    display: grid;
+    gap: var(--space-3);
+    padding: var(--space-4);
+    min-height: 3rem;
+  }
+
+  &__empty {
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-6);
+    color: var(--text-color);
+    opacity: 0.5;
+    font-size: var(--fs-control);
+    border: 1px dashed var(--border-color);
+    border-radius: var(--radius-sm, 6px);
+  }
+}
+
+:host ::ng-deep .cdk-drag-placeholder {
+  opacity: 0.4;
+  border: 1px dashed var(--border-color);
+  background: var(--surface-hover);
+}

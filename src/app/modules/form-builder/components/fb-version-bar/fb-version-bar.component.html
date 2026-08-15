@@ -1,0 +1,46 @@
+<div class="fb-version-bar" [class.fb-version-bar--readonly]="status !== 'draft'">
+  <div class="fb-version-bar__status">
+    <i
+      class="pi"
+      [class.pi-pencil]="status === 'draft'"
+      [class.pi-lock]="status !== 'draft'"
+    ></i>
+    <span *ngIf="status === 'draft'">{{
+      'FORM_BUILDER.VERSION.DRAFT' | translate
+    }}</span>
+    <span *ngIf="status !== 'draft'">{{
+      'FORM_BUILDER.VERSION.READ_ONLY_BANNER' | translate
+    }}</span>
+  </div>
+
+  <div class="fb-version-bar__controls">
+    <app-custom-dropdown
+      *ngIf="versionOptions.length"
+      class="fb-version-bar__picker"
+      [options]="versionOptions"
+      optionLabel="label"
+      optionValue="version"
+      appendTo="body"
+      [ngModel]="version"
+      [autoDisplayFirst]="false"
+      (onChangeEvent)="versionChange.emit($event.value ?? $event)"
+    >
+    </app-custom-dropdown>
+
+    <app-button
+      *ngIf="status === 'draft'"
+      variant="primary"
+      icon="pi pi-check"
+      [disabled]="!canPublish"
+      (clicked)="publish.emit()"
+      >{{ 'FORM_BUILDER.VERSION.PUBLISH' | translate }}</app-button
+    >
+    <app-button
+      *ngIf="status !== 'draft'"
+      variant="secondary"
+      icon="pi pi-clone"
+      (clicked)="fork.emit()"
+      >{{ 'FORM_BUILDER.VERSION.FORK' | translate }}</app-button
+    >
+  </div>
+</div>

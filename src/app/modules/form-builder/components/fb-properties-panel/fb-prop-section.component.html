@@ -1,0 +1,26 @@
+<div class="fb-prop">
+  <app-custom-input
+    [label]="'FORM_BUILDER.PROP.LABEL' | translate"
+    [ngModel]="section.name"
+    [inputDisabled]="!store.isDraft()"
+    (ngModelChange)="onName($event)"
+  ></app-custom-input>
+
+  <app-custom-dropdown
+    [label]="'FORM_BUILDER.PROP.COLUMNS' | translate"
+    [options]="columnOptions"
+    optionLabel="label"
+    optionValue="value"
+    appendTo="body"
+    [ngModel]="section.columns"
+    [disabled]="!store.isDraft()"
+    (onChangeEvent)="onColumns($event.value ?? $event)"
+  ></app-custom-dropdown>
+
+  <app-custom-toggle
+    [label]="'FORM_BUILDER.PROP.COLLAPSIBLE' | translate"
+    [ngModel]="section.collapsible"
+    [disabled]="!store.isDraft()"
+    (onChange)="onCollapsible($event.checked)"
+  ></app-custom-toggle>
+</div>

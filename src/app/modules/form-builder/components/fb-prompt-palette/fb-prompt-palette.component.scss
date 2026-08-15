@@ -1,0 +1,75 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  height: 100%;
+  min-height: 0;
+}
+
+.fb-palette {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  overflow: auto;
+  min-height: 0;
+
+  &__group-label {
+    font-size: var(--fs-micro);
+    font-weight: var(--fw-semibold);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--text-color);
+    opacity: 0.6;
+    margin: var(--space-3) 0 var(--space-1);
+  }
+
+  &__tile {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-3);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm, 6px);
+    background: var(--surface-card, var(--background-color));
+    color: var(--text-color);
+    font-size: var(--fs-control);
+    cursor: grab;
+
+    &:hover {
+      background: var(--surface-hover);
+    }
+
+    i {
+      color: var(--primary-color);
+    }
+
+    &--placed {
+      opacity: 0.4;
+    }
+  }
+
+  &__preview {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-3);
+    border: 1px solid var(--primary-color);
+    border-radius: var(--radius-sm, 6px);
+    background: var(--surface-card, var(--background-color));
+    color: var(--text-color);
+    font-size: var(--fs-control);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  }
+
+  &__empty {
+    color: var(--text-color);
+    opacity: 0.6;
+    font-size: var(--fs-control);
+    padding: var(--space-4);
+  }
+}
+
+// CDK placeholder shown at the drop location while dragging.
+:host ::ng-deep .cdk-drag-placeholder {
+  opacity: 0.4;
+}

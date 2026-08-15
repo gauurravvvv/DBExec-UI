@@ -1,0 +1,56 @@
+<div class="fb-section" [class.fb-section--selected]="isSelected()">
+  <div class="fb-section__head" cdkDragHandle (click)="onHeadClick()">
+    <i class="pi pi-bars fb-section__grip"></i>
+    <span class="fb-section__title">{{
+      section.name || ('FORM_BUILDER.UNTITLED_SECTION' | translate)
+    }}</span>
+    <span class="fb-section__badge">{{
+      'FORM_BUILDER.N_COL' | translate: { n: section.columns }
+    }}</span>
+    <button
+      class="fb-section__btn"
+      (click)="toggleCollapse($event)"
+      [attr.aria-label]="'COMMON.EXPAND_COLLAPSE' | translate"
+    >
+      <i
+        class="pi"
+        [class.pi-chevron-down]="!collapsed()"
+        [class.pi-chevron-right]="collapsed()"
+      ></i>
+    </button>
+    <button
+      *ngIf="store.isDraft()"
+      class="fb-section__btn fb-section__del"
+      (click)="onDelete($event)"
+      [attr.aria-label]="'FORM_BUILDER.REMOVE_SECTION' | translate"
+    >
+      <i class="pi pi-trash"></i>
+    </button>
+  </div>
+
+  <div
+    class="fb-section__grid"
+    *ngIf="!collapsed()"
+    [id]="dropId"
+    cdkDropList
+    [cdkDropListData]="section.fields"
+    [cdkDropListConnectedTo]="store.allDropIds()"
+    cdkDropListOrientation="mixed"
+    (cdkDropListDropped)="onFieldDrop($event)"
+    [style.grid-template-columns]="
+      'repeat(' + section.columns + ', minmax(0, 1fr))'
+    "
+  >
+    <fb-field-card
+      *ngFor="let p of section.fields; trackBy: trackByPlacement"
+      cdkDrag
+      [cdkDragData]="p"
+      [cdkDragDisabled]="!store.isDraft()"
+      [placement]="p"
+      [style.grid-column]="'span ' + p.colSpan"
+    ></fb-field-card>
+    <p class="fb-section__empty" *ngIf="!section.fields.length">
+      {{ 'FORM_BUILDER.DROP_PROMPTS_HERE' | translate }}
+    </p>
+  </div>
+</div>

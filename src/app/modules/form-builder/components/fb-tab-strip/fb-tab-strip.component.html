@@ -1,0 +1,35 @@
+<div
+  class="fb-tabs"
+  cdkDropList
+  cdkDropListOrientation="horizontal"
+  (cdkDropListDropped)="onDrop($event)"
+>
+  <div
+    class="fb-tab"
+    *ngFor="let t of store.tabs(); trackBy: trackByTab"
+    cdkDrag
+    [cdkDragDisabled]="!store.isDraft()"
+    [class.fb-tab--active]="store.activeTabId() === t.id"
+    [class.fb-tab--selected]="isSelected(t.id)"
+    (click)="onTabClick(t.id)"
+  >
+    <i *ngIf="t.icon" [class]="t.icon"></i>
+    <span>{{ t.name }}</span>
+    <button
+      *ngIf="store.isDraft()"
+      class="fb-tab__del"
+      (click)="onDeleteTab($event, t.id)"
+      [attr.aria-label]="'FORM_BUILDER.REMOVE_TAB' | translate"
+    >
+      <i class="pi pi-times"></i>
+    </button>
+  </div>
+  <app-button
+    *ngIf="store.isDraft()"
+    variant="ghost"
+    size="sm"
+    icon="pi pi-plus"
+    (clicked)="store.addTab()"
+    >{{ 'FORM_BUILDER.ADD_TAB' | translate }}</app-button
+  >
+</div>

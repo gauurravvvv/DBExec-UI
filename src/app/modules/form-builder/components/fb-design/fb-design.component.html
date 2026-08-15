@@ -1,1 +1,36 @@
-<p>{{ 'FORM_BUILDER.DESIGN' | translate }}</p>
+<div class="fb-design-shell">
+  <fb-version-bar
+    [status]="store.versionState()"
+    [canPublish]="store.canPublish()"
+    [versions]="versions()"
+    [version]="store.version()"
+    (publish)="publish()"
+    (fork)="fork()"
+    (versionChange)="onVersionChange($event)"
+  ></fb-version-bar>
+
+  <div
+    class="fb-design"
+    [class.fb-design--no-selection]="!store.selected()"
+    *ngIf="!loading()"
+  >
+    <aside class="fb-design__palette">
+      <fb-prompt-palette
+        [datasourceId]="datasourceId()"
+        [placedIds]="store.placedIds()"
+        [connectedTo]="store.allDropIds()"
+        [disabled]="!store.isDraft()"
+      ></fb-prompt-palette>
+    </aside>
+
+    <section class="fb-design__canvas"><fb-canvas></fb-canvas></section>
+
+    <aside class="fb-design__inspector" *ngIf="store.selected() as sel">
+      <fb-inspector [selected]="sel"></fb-inspector>
+    </aside>
+  </div>
+
+  <div class="fb-design__loading" *ngIf="loading()">
+    <p-skeleton height="6rem"></p-skeleton>
+  </div>
+</div>

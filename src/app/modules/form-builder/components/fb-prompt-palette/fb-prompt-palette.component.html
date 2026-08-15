@@ -1,0 +1,38 @@
+<app-search-input
+  [placeholder]="'COMMON.SEARCH' | translate"
+  (searchChange)="onSearch($event)"
+></app-search-input>
+
+<div
+  class="fb-palette"
+  cdkDropList
+  [cdkDropListConnectedTo]="connectedTo"
+  cdkDropListSortingDisabled
+  [cdkDropListData]="[]"
+>
+  <div
+    class="fb-palette__group"
+    *ngFor="let g of groups(); trackBy: trackByGroup"
+  >
+    <div class="fb-palette__group-label">{{ g.label | translate }}</div>
+    <div
+      class="fb-palette__tile"
+      *ngFor="let p of g.prompts; trackBy: trackByPrompt"
+      cdkDrag
+      [cdkDragData]="p"
+      [cdkDragDisabled]="disabled"
+      [class.fb-palette__tile--placed]="isPlaced(p.promptId)"
+    >
+      <i [class]="icon(p.type)"></i>
+      <span>{{ p.blockType ? (p.name | translate) : p.name }}</span>
+      <div class="fb-palette__preview" *cdkDragPreview>
+        <i [class]="icon(p.type)"></i>
+        <span>{{ p.blockType ? (p.name | translate) : p.name }}</span>
+      </div>
+    </div>
+  </div>
+
+  <p class="fb-palette__empty" *ngIf="!loading() && !filtered().length">
+    {{ 'COMMON.NO_RECORDS' | translate }}
+  </p>
+</div>

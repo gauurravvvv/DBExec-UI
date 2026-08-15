@@ -1,0 +1,25 @@
+:host {
+  display: block;
+}
+
+// Children (fb-prop-tab/-section/-field) render `.fb-prop` blocks with no
+// encapsulated styles of their own; style them from the parent via ::ng-deep.
+::ng-deep .fb-prop {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+
+  .fb-prop__head {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding-bottom: var(--space-3);
+    border-bottom: 1px solid var(--border-color);
+
+    .fb-prop__name {
+      font-weight: var(--fw-semibold);
+      color: var(--text-color);
+      font-size: var(--fs-control);
+    }
+  }
+}

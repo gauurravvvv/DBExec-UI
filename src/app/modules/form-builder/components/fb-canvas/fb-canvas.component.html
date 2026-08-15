@@ -1,0 +1,35 @@
+<fb-tab-strip></fb-tab-strip>
+
+<div
+  class="fb-canvas__sections"
+  cdkDropList
+  cdkDropListOrientation="vertical"
+  [cdkDropListData]="store.sectionsForActiveTab()"
+  (cdkDropListDropped)="onSectionDrop($event)"
+>
+  <fb-section
+    *ngFor="let s of store.sectionsForActiveTab(); trackBy: trackBySection"
+    cdkDrag
+    [cdkDragData]="s"
+    [cdkDragDisabled]="!store.isDraft()"
+    [section]="s"
+  ></fb-section>
+
+  <div class="fb-canvas__empty" *ngIf="!store.sectionsForActiveTab().length">
+    <span>{{ 'FORM_BUILDER.NO_SECTIONS' | translate }}</span>
+    <app-button
+      *ngIf="store.isDraft() && store.activeTabId()"
+      icon="pi pi-plus"
+      (clicked)="store.addSection()"
+      >{{ 'FORM_BUILDER.ADD_SECTION' | translate }}</app-button
+    >
+  </div>
+
+  <app-button
+    *ngIf="store.isDraft() && store.sectionsForActiveTab().length"
+    variant="ghost"
+    icon="pi pi-plus"
+    (clicked)="store.addSection()"
+    >{{ 'FORM_BUILDER.ADD_SECTION' | translate }}</app-button
+  >
+</div>

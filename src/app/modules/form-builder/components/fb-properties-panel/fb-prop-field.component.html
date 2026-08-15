@@ -1,0 +1,99 @@
+<div class="fb-prop">
+  <div class="fb-prop__head">
+    <span class="fb-prop__name">{{ field.prompt?.name || field.type }}</span>
+    <app-chip size="sm">{{ field.type }}</app-chip>
+  </div>
+
+  <ng-container *ngIf="!isLayout">
+    <app-custom-input
+      [label]="'FORM_BUILDER.PROP.LABEL' | translate"
+      [ngModel]="field.label"
+      [placeholder]="field.prompt?.name || ''"
+      [inputDisabled]="!store.isDraft()"
+      (ngModelChange)="patch({ label: $event })"
+    ></app-custom-input>
+
+    <app-custom-textarea
+      [label]="'FORM_BUILDER.PROP.HELP' | translate"
+      [ngModel]="field.help"
+      [rows]="2"
+      [disabled]="!store.isDraft()"
+      (ngModelChange)="patch({ help: $event })"
+    ></app-custom-textarea>
+
+    <app-custom-input
+      [label]="'FORM_BUILDER.PROP.PLACEHOLDER' | translate"
+      [ngModel]="field.placeholder"
+      [inputDisabled]="!store.isDraft()"
+      (ngModelChange)="patch({ placeholder: $event })"
+    ></app-custom-input>
+
+    <app-custom-dropdown
+      [label]="'FORM_BUILDER.PROP.COL_SPAN' | translate"
+      [options]="colSpanOptions"
+      optionLabel="label"
+      optionValue="value"
+      appendTo="body"
+      [ngModel]="field.colSpan"
+      [disabled]="!store.isDraft()"
+      (onChangeEvent)="patch({ colSpan: ($event.value ?? $event) })"
+    ></app-custom-dropdown>
+
+    <app-custom-toggle
+      [label]="'FORM_BUILDER.PROP.MANDATORY' | translate"
+      [ngModel]="field.isMandatory"
+      [disabled]="!store.isDraft()"
+      (onChange)="patch({ isMandatory: $event.checked })"
+    ></app-custom-toggle>
+    <app-custom-toggle
+      [label]="'FORM_BUILDER.PROP.VISIBLE' | translate"
+      [ngModel]="field.isVisible"
+      [disabled]="!store.isDraft()"
+      (onChange)="patch({ isVisible: $event.checked })"
+    ></app-custom-toggle>
+    <app-custom-toggle
+      [label]="'FORM_BUILDER.PROP.READ_ONLY' | translate"
+      [ngModel]="field.isReadonly"
+      [disabled]="!store.isDraft()"
+      (onChange)="patch({ isReadonly: $event.checked })"
+    ></app-custom-toggle>
+    <app-custom-toggle
+      [label]="'FORM_BUILDER.PROP.LOCKED' | translate"
+      [ngModel]="field.isLocked"
+      [disabled]="!store.isDraft()"
+      (onChange)="patch({ isLocked: $event.checked })"
+    ></app-custom-toggle>
+
+    <!-- Allowed-operators multiselect. Options filtered by dataType; empty ⇒ all. -->
+    <app-custom-multiselect
+      [label]="'FORM_BUILDER.PROP.ALLOWED_OPERATORS' | translate"
+      [options]="operatorOptions"
+      optionLabel="label"
+      optionValue="code"
+      appendTo="body"
+      [ngModel]="field.allowedOperators || []"
+      [disabled]="!store.isDraft()"
+      (ngModelChange)="patch({ allowedOperators: $event })"
+    ></app-custom-multiselect>
+  </ng-container>
+
+  <ng-container *ngIf="isLayout">
+    <app-custom-textarea
+      [label]="'FORM_BUILDER.PROP.BLOCK_CONTENT' | translate"
+      [ngModel]="field.blockContent"
+      [rows]="3"
+      [disabled]="!store.isDraft()"
+      (ngModelChange)="patch({ blockContent: $event })"
+    ></app-custom-textarea>
+    <app-custom-dropdown
+      [label]="'FORM_BUILDER.PROP.COL_SPAN' | translate"
+      [options]="colSpanOptions"
+      optionLabel="label"
+      optionValue="value"
+      appendTo="body"
+      [ngModel]="field.colSpan"
+      [disabled]="!store.isDraft()"
+      (onChangeEvent)="patch({ colSpan: ($event.value ?? $event) })"
+    ></app-custom-dropdown>
+  </ng-container>
+</div>

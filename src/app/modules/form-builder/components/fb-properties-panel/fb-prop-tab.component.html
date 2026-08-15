@@ -1,0 +1,22 @@
+<div class="fb-prop">
+  <app-custom-input
+    [label]="'FORM_BUILDER.PROP.LABEL' | translate"
+    [ngModel]="tab.name"
+    [inputDisabled]="!store.isDraft()"
+    (ngModelChange)="onName($event)"
+  ></app-custom-input>
+
+  <app-custom-input
+    [label]="'FORM_BUILDER.PROP.ICON' | translate"
+    [ngModel]="tab.icon"
+    [inputDisabled]="!store.isDraft()"
+    (ngModelChange)="onIcon($event)"
+  ></app-custom-input>
+
+  <app-custom-toggle
+    [label]="'FORM_BUILDER.PROP.ACTIVE' | translate"
+    [ngModel]="tab.isActive"
+    [disabled]="!store.isDraft()"
+    (onChange)="onActive($event.checked)"
+  ></app-custom-toggle>
+</div>
