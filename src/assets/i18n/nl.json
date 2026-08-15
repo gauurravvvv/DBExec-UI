@@ -6646,6 +6646,8 @@
       "RBAC_HINT": "Kies een rol om het formulier te bekijken zoals die rol het ziet: velden met 'geen' zijn verborgen, 'alleen-lezen' worden niet-bewerkbaar getoond.",
       "NOTHING_VISIBLE": "Deze rol ziet geen velden op het formulier.",
       "NO_FIELDS": "Geen velden in deze sectie voor deze rol."
-    }
+    },
+    "RUN": "Uitvoeren",
+    "NO_PUBLISHED": "Dit formulier heeft nog geen gepubliceerde versie."
   }
 }

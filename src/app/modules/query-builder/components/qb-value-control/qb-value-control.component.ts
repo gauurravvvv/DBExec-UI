@@ -61,7 +61,8 @@ export class QbValueControlComponent {
     const vs = this.prompt.valueSource;
     if (vs.kind === 'static') {
       const opts = vs.values.map(o => ({ label: o.display, value: o.value }));
-      const sort = this.prompt.appearance?.sortValues;
+      // Form placements carry no appearance blob (appearance:{}), so default-safe.
+      const sort = (this.prompt.appearance ?? {}).sortValues;
       if (sort === 'asc') opts.sort((a, b) => a.label.localeCompare(b.label));
       if (sort === 'desc') opts.sort((a, b) => b.label.localeCompare(a.label));
       return opts;

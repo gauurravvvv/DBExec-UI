@@ -6646,6 +6646,8 @@
       "RBAC_HINT": "Scegli un ruolo per vedere il modulo come lo vede quel ruolo: i campi «nessuno» sono nascosti, «sola lettura» sono mostrati non modificabili.",
       "NOTHING_VISIBLE": "Questo ruolo non vede alcun campo nel modulo.",
       "NO_FIELDS": "Nessun campo in questa sezione per questo ruolo."
-    }
+    },
+    "RUN": "Esegui",
+    "NO_PUBLISHED": "Questo modulo non ha ancora una versione pubblicata."
   }
 }

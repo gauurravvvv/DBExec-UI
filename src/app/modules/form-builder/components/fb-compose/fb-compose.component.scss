@@ -1,0 +1,122 @@
+.fb-compose {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+
+  &__title {
+    h2 {
+      margin: 0;
+      font-size: var(--fs-h1);
+      font-weight: var(--fw-semibold);
+      color: var(--text-color);
+    }
+    p {
+      margin: var(--space-1) 0 0;
+      font-size: var(--fs-control);
+      color: var(--text-color-secondary);
+    }
+  }
+
+  &__header-actions {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+  }
+
+  &__loading {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  &__empty {
+    padding: var(--space-8);
+    text-align: center;
+    color: var(--text-color-secondary);
+    font-size: var(--fs-body);
+  }
+
+  &__grid {
+    display: grid;
+    grid-template-columns: 1fr 22rem;
+    gap: var(--space-6);
+    align-items: start;
+    min-height: 0;
+  }
+
+  &__builder,
+  &__aside {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+
+  &__section-title {
+    margin: 0;
+    font-size: var(--fs-h2);
+    font-weight: var(--fw-semibold);
+    color: var(--text-color);
+  }
+
+  &__panel {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  &__panel-title {
+    margin: 0;
+    font-size: var(--fs-label);
+    font-weight: var(--fw-semibold);
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    color: var(--text-color-secondary);
+  }
+
+  &__actions {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    flex-wrap: wrap;
+  }
+
+  &__count {
+    font-variant-numeric: tabular-nums;
+    font-size: var(--fs-control);
+    color: var(--text-color);
+  }
+
+  &__results {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  &__results-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  &__results-meta {
+    margin-left: var(--space-3);
+    font-size: var(--fs-control);
+    font-weight: var(--fw-regular);
+    color: var(--text-color-secondary);
+    font-variant-numeric: tabular-nums;
+  }
+
+  &__truncated {
+    align-self: flex-start;
+  }
+
+  &__table-wrap {
+    overflow: auto;
+  }
+}
+
+@media (max-width: 1100px) {
+  .fb-compose__grid {
+    grid-template-columns: 1fr;
+  }
+}

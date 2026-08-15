@@ -16,6 +16,7 @@ import { CustomTableComponent } from 'src/app/shared/components/custom-table/cus
 import { CustomTableEmptyDirective } from 'src/app/shared/components/custom-table/custom-table-empty.directive';
 import { UsGridCellDirective } from 'src/app/shared/components/us-data-grid/us-grid-cell.directive';
 import { AppPrimeNGModule } from 'src/app/shared/modules/app-primeng.module';
+import { QbRuntimeSharedModule } from 'src/app/modules/query-builder/qb-runtime-shared.module';
 import { AddFormComponent } from './components/add-form/add-form.component';
 import { FbCanvasComponent } from './components/fb-canvas/fb-canvas.component';
 import { FbComposeComponent } from './components/fb-compose/fb-compose.component';
@@ -70,6 +71,10 @@ import { FormBuilderRoutingModule } from './form-builder-routing.module';
     SharedModule,
     AppPrimeNGModule,
     FormBuilderRoutingModule,
+    // The reused tree->SQL runtime components (qb-filter-tree / -condition-row /
+    // -value-control / -sql-preview / -summary) for the fb-compose composer +
+    // fb-preview. Same declarations QueryBuilderModule imports — no duplication.
+    QbRuntimeSharedModule,
     // CDK drag-drop — aliased because PrimeNG's DragDropModule shares the name
     // (FB uses CDK only).
     CdkDragDropModule,
