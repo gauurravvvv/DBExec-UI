@@ -1,6 +1,6 @@
 # prompt
 > Update the Progress log on every change.
-> Code path: `src/app/modules/prompt` · Status: 🟢 · Last updated: 2026-07-31
+> Code path: `src/app/modules/prompt` · Status: 🟢 · Last updated: 2026-08-15
 
 ## 1. Context
 - Responsibility: DBExec **Studio** primitive — a reusable parameterised input control (a "prompt"). Each prompt has a control **type** (one of ~9: text, number, dropdown, multiselect, checkbox, radio, calendar, daterange, rangeslider), is bound to a datasource + tab + section, and supplies values either statically or from a SQL query. Prompts are the form fields that `query-builder` (and older Studio flows) arrange and run.
@@ -23,6 +23,12 @@
 - Out of scope: chart/BI parameters (analyses), dataset `{{name}}` params (dataset).
 
 ## 3. Progress (newest first)
+### 2026-08-15 — Phase 1: appearance removed; config-prompt rebuilt as a modular 4-step stepper
+- **Appearance subsystem deleted (FE):** removed `prompt-appearance-form`, the `prompt-appearance-fields` registry, and the mirrored `promptAppearance` validator; dropped `APPEARANCE_SUFFIX` from the PROMPT api constant and the `updateAppearance`/`getAppearance`/`getAppearence` service methods; removed the `PROMPT_MODULE.APPEARANCE`/`CUSTOMISE_*` i18n keys across all 10 locales. (The `QUERY_BUILDER.APPEARANCE` i18n block is the QB-runtime namespace — deliberately left; out of scope.)
+- **config-prompt rebuilt** from the 1768-line monolith into a thin shell (`config-prompt.component`) + a signal-based `prompt-config.service.ts` + four small step children under `config-prompt/steps/`: `cp-source-step` (schema/table/alias from DatasourceService), `cp-joins-step` (visual `prompt-join-builder` + Advanced Monaco raw-SQL escape), `cp-column-filter-step` (select expr + filter column/operator from the `filter_operator` catalog + Advanced Monaco), `cp-values-step` (hosts `prompt-value-source` + a review summary). Shared `cp-step.scss`. Save gated valid+dirty → `POST /prompts/:id/config`. No file over ~400 lines. The NgRx `store/` slice is retained (shared schema cache used by dataset/analyses) but the new stepper is signals-only.
+- **Value source unified to include upload:** `prompt-value-source` gains an `upload` kind (dropzone + column map + parsed-sample preview + re-upload justification dialog) wired to `PromptService.uploadValues` (multipart) → BE `/prompts/:id/values/upload`. Mirrored `promptValuesUpload.ts` validator. New `PROMPT_MODULE.VS.*` + stepper i18n keys ×10 locales.
+- Gates: `tsc --noEmit` 0 · `ngc -p tsconfig.app.json --noEmit` 0 · `ng build --configuration production` success. Branch `feature/prompt-builder`, not pushed.
+
 ### 2026-08-06 — Step 3 (Column & filter) simplified: no free-text SQL
 - Replaced step 3's free-text `promptWhere` box + inline `promptJoin` input + autocomplete-suggestions dropdown with three stacked `app-custom-dropdown`s: output **Columns** (multiselect) → **Filter column** (`filterColumn`, options = `reachableColumns` from the join builder) → **Operator** (`operator`, options = `operatorOptions` from `filter_operator` catalog) → read-only bordered **SQL preview** (`.sql-preview`). New standalone `[ngModel]` state `filterColumn`/`operator` (+ `onFilterColumnChange`/`onOperatorChange`), `onSubmit` sends `filterExpr=selectExpr=filterColumn`+`operator`+`promptWhere:''`, `loadConfigData` seeds them from `config.filter_expr||select_expr`+`config.operator`. `multiTableNeedsJoin` now gates only on `joinEdges.length`. `generateSqlPreview()` rebuilt from the structured filter + joinEdges. Dead autocomplete helpers left declared-but-unreferenced (harmless). New scss `.step-help` + `.sql-preview*` (token-driven; replaced dead `.sql-preview-header/-container/-code`); `.wizard-step` now `flex column; gap:--space-7`. New i18n ×10: `FILTER_COLUMN`,`SELECT_FILTER_COLUMN`,`FILTER_COLUMN_HINT`,`OPERATOR`,`SELECT_OPERATOR`. Verified `tsc`+`ngc`+prod-build 0; live screenshots `simp-step1-source.png`/`simp-step2-joins.png`/`simp-step3-column-filter.png`. version_261, awaiting push.
 

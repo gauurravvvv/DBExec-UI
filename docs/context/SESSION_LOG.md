@@ -1,5 +1,21 @@
 # dbexec-ui — Session Log (newest first)
 
+### 2026-08-15 — Prompt Builder Phase 1 (frontend): appearance removed, config stepper rebuilt
+- Deleted the prompt appearance FE (form component, descriptor registry,
+  mirrored validator, api suffix, service methods, `PROMPT_MODULE.APPEARANCE`/
+  `CUSTOMISE_*` i18n across 10 locales).
+- Rebuilt `config-prompt` from a 1768-line monolith into a thin shell +
+  signal-based `prompt-config.service` + four step children
+  (`cp-source-step` / `cp-joins-step` / `cp-column-filter-step` /
+  `cp-values-step`) + helpers; each file well under ~400 lines. Joins and
+  Column+Filter offer a visual mode plus an Advanced Monaco raw-SQL escape.
+- Added a CSV/XLSX `upload` kind to `prompt-value-source` (dropzone + column
+  map + parsed preview + re-upload justification) wired to
+  `PromptService.uploadValues` → BE `/prompts/:id/values/upload`; mirrored
+  `promptValuesUpload.ts` validator; new `PROMPT_MODULE.VS.*` + stepper keys ×10.
+- Gates: `tsc` 0 · `ngc --noEmit` 0 · `ng build --configuration production`
+  success. Branch `feature/prompt-builder`; not pushed.
+
 ### 2026-08-14 — Per-user theme picker (sidebar flyout mirroring the language picker)
 - Theme became a per-user choice. New `core/services/theme-picker.service.ts`
   (`ThemePickerService`) = the theme sibling of `LocaleService`: `loadThemes()` →
