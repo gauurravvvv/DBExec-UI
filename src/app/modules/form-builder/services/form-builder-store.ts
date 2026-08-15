@@ -16,6 +16,7 @@ import {
   VersionState,
 } from './fb-types';
 import type { PalettePrompt } from '../components/fb-prompt-palette/fb-prompt-palette.component';
+import type { FieldPathOption } from '../models/rbac.types';
 import {
   applyRules,
   evaluateExpression,
@@ -175,6 +176,29 @@ export class FormBuilderStore {
   readonly knownFieldKeys = computed(
     () => new Set(this.fieldKeys().map(f => f.key)),
   );
+
+  /**
+   * Every real (non-layout) placement flattened into a "Tab › Section › Field"
+   * path option (U+203A separators, mirroring USG). Feeds the RBAC editor's
+   * field picker so a grant can be set per placement.
+   */
+  readonly fieldPaths = computed<FieldPathOption[]>(() => {
+    const out: FieldPathOption[] = [];
+    for (const tab of this.tabs()) {
+      for (const section of tab.sections) {
+        const sectionName = section.name || 'Section';
+        for (const field of section.fields) {
+          if (field.blockType) continue; // layout block — no access grid
+          const label = field.label || field.prompt?.name || field.formFieldId;
+          out.push({
+            formFieldId: field.formFieldId,
+            path: `${tab.name} › ${sectionName} › ${label}`,
+          });
+        }
+      }
+    }
+    return out;
+  });
 
   /** Static per-field {visible,required,disabled}, keyed by fieldKey. */
   readonly baseState = computed<Record<string, FieldBaseState>>(() => {

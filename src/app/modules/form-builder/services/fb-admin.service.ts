@@ -66,7 +66,18 @@ export class FbAdminService {
   }
 
   // ── Resolved design tree for a version ────────────────────────────────
-  getFormVersion(id: string, version: number): Promise<any> {
+  // asRole (designer-only, WRITE-guarded server-side) re-projects the tree
+  // through that role's effectiveAccess — `none` fields omitted, `read`
+  // forced read-only — so the designer can preview the form as any role.
+  getFormVersion(id: string, version: number, asRole?: string | null): Promise<any> {
+    if (asRole) {
+      return lastValueFrom(
+        this.http.apiGet(FORM_BUILDER.version(id, version), {
+          params: { asRole },
+          skipLoader: true,
+        }),
+      );
+    }
     return this.get(FORM_BUILDER.version(id, version));
   }
 
@@ -174,6 +185,35 @@ export class FbAdminService {
     if (asRole) body['asRole'] = asRole;
     const res = await this.post(`${FORM_BUILDER.rules(id, v)}/validate`, body);
     return res?.data as ValidateRulesData;
+  }
+
+  // ── Field-level RBAC (Phase 6 — version-scoped; CUD draft-only) ───────
+  // The full role×access grid is returned after every mutation, so the editor
+  // stays server-authoritative. A blank access on setFieldPermission deletes
+  // the grant (revert to permissive default); the editor uses the explicit
+  // DELETE when a row is reset to default.
+  listFieldPermissions(
+    id: string,
+    v: number,
+    formFieldId: string,
+  ): Promise<any> {
+    return this.get(FORM_BUILDER.fieldPerms(id, v, formFieldId));
+  }
+  setFieldPermission(
+    id: string,
+    v: number,
+    formFieldId: string,
+    body: { roleId: string; access: '' | 'none' | 'read' | 'write' },
+  ): Promise<any> {
+    return this.post(FORM_BUILDER.fieldPerms(id, v, formFieldId), body);
+  }
+  deleteFieldPermission(
+    id: string,
+    v: number,
+    formFieldId: string,
+    roleId: string,
+  ): Promise<any> {
+    return this.del(`${FORM_BUILDER.fieldPerms(id, v, formFieldId)}/${roleId}`);
   }
 
   // ── Prompt library (palette source — read only) ───────────────────────
