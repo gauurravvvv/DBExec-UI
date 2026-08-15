@@ -14,7 +14,12 @@ import { Injectable, inject, signal } from '@angular/core';
 import { lastValueFrom } from 'rxjs';
 import { FORM_BUILDER, PROMPT } from 'src/app/core/constants/api.constant';
 import { HttpClientService } from 'src/app/core/services/http-client.service';
-import { ReorderBody } from './fb-types';
+import {
+  CreateRuleBody,
+  FbFormRule,
+  ReorderBody,
+  ValidateRulesData,
+} from './fb-types';
 
 @Injectable({ providedIn: 'root' })
 export class FbAdminService {
@@ -122,6 +127,53 @@ export class FbAdminService {
   }
   fork(id: string, v: number): Promise<any> {
     return this.post(FORM_BUILDER.fork(id, v), {});
+  }
+
+  // ── Rules (Phase 5 — version-scoped; CUD draft-only) ──────────────────
+  async listRules(id: string, v: number): Promise<FbFormRule[]> {
+    const res = await this.get(FORM_BUILDER.rules(id, v));
+    return (res?.data ?? []) as FbFormRule[];
+  }
+  async createRule(
+    id: string,
+    v: number,
+    body: CreateRuleBody,
+  ): Promise<FbFormRule> {
+    this._saving.set(true);
+    try {
+      const res = await this.post(FORM_BUILDER.rules(id, v), body);
+      return res?.data as FbFormRule;
+    } finally {
+      this._saving.set(false);
+    }
+  }
+  async updateRule(
+    id: string,
+    v: number,
+    ruleId: string,
+    body: Partial<CreateRuleBody>,
+  ): Promise<FbFormRule> {
+    this._saving.set(true);
+    try {
+      const res = await this.patch(`${FORM_BUILDER.rules(id, v)}/${ruleId}`, body);
+      return res?.data as FbFormRule;
+    } finally {
+      this._saving.set(false);
+    }
+  }
+  deleteRule(id: string, v: number, ruleId: string): Promise<any> {
+    return this.del(`${FORM_BUILDER.rules(id, v)}/${ruleId}`);
+  }
+  async validateRules(
+    id: string,
+    v: number,
+    values: Record<string, unknown>,
+    asRole?: string,
+  ): Promise<ValidateRulesData> {
+    const body: Record<string, unknown> = { values };
+    if (asRole) body['asRole'] = asRole;
+    const res = await this.post(`${FORM_BUILDER.rules(id, v)}/validate`, body);
+    return res?.data as ValidateRulesData;
   }
 
   // ── Prompt library (palette source — read only) ───────────────────────

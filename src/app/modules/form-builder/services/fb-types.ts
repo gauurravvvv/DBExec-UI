@@ -110,3 +110,62 @@ export interface ReorderBody {
   parentId?: string;
   orderedIds: string[];
 }
+
+// ── Rules (Phase 5) ──────────────────────────────────────────────────────────
+// The persisted trigger AST is the extended-op shape (`PersistedAst` in
+// logic/ruleAst.adapter); the runtime lowers it to the engine Condition. The
+// nine rule actions come from `RULE_ACTIONS` in shared/validators/formRules.
+import type { PersistedAst } from '../logic/ruleAst.adapter';
+import type { RuleActionValue } from 'src/app/shared/validators/formRules';
+
+export type RuleTriggerAst = PersistedAst;
+export type RuleAction = RuleActionValue;
+
+/** A persisted form_rule row as returned by the rule CRUD endpoints. */
+export interface FbFormRule {
+  id: string;
+  formVersionId: string;
+  name: string;
+  trigger: RuleTriggerAst;
+  action: RuleAction;
+  targetFieldKeys: string[];
+  setValueExpr: string | null;
+  message: string | null;
+  messageI18n: Record<string, string> | null;
+  ruleOrder: number;
+  isEnabled: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+/** Create/update payload — the mirrored Zod (createRuleSchema) validates it. */
+export interface CreateRuleBody {
+  name: string;
+  trigger: RuleTriggerAst;
+  action: RuleAction;
+  targetFieldKeys: string[];
+  setValueExpr?: string;
+  message?: string;
+  messageI18n?: Record<string, string>;
+  ruleOrder?: number;
+  isEnabled?: boolean;
+}
+
+/** The `POST …/rules/validate` report (API §3.10 ValidateRulesData). */
+export interface RuleEffect {
+  fieldKey: string;
+  visible: boolean;
+  enabled: boolean;
+  required: boolean;
+  value?: unknown;
+}
+export interface RuleError {
+  fieldKey: string;
+  code: 'REQUIRED' | 'RULE_VALIDATION';
+  message: string;
+}
+export interface ValidateRulesData {
+  ok: boolean;
+  effects: RuleEffect[];
+  errors: RuleError[];
+}
