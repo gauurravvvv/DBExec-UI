@@ -13,7 +13,11 @@
     *ngIf="view() === 'design'"
     [selected]="selected()"
   ></fb-properties-panel>
-  <div class="fb-inspector__stub" *ngIf="view() !== 'design'">
+  <fb-rule-builder
+    *ngIf="view() === 'rules'"
+    [selected]="selected()"
+  ></fb-rule-builder>
+  <div class="fb-inspector__stub" *ngIf="view() === 'access' || view() === 'preview'">
     <i class="pi pi-clock"></i>
     <span>{{ 'FORM_BUILDER.INSPECTOR.COMING_SOON' | translate }}</span>
   </div>

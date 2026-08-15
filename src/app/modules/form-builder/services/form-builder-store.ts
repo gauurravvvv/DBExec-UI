@@ -8,8 +8,22 @@ import {
 } from '@angular/cdk/drag-drop';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { FbAdminService } from './fb-admin.service';
-import { ResolvedField, ResolvedSection, ResolvedTab, VersionState } from './fb-types';
+import {
+  FbFormRule,
+  ResolvedField,
+  ResolvedSection,
+  ResolvedTab,
+  VersionState,
+} from './fb-types';
 import type { PalettePrompt } from '../components/fb-prompt-palette/fb-prompt-palette.component';
+import {
+  applyRules,
+  evaluateExpression,
+  FieldBaseState,
+  FieldEffectiveState,
+  FormRuleLike,
+  toEngineCondition,
+} from '../logic';
 
 export type SelectedElement =
   | { kind: 'tab'; id: string }
@@ -28,6 +42,25 @@ export function applyReorder<T extends { id: string }>(
 ): T[] {
   const byId = new Map(list.map(x => [x.id, x]));
   return orderedIds.map(id => byId.get(id)).filter((x): x is T => !!x);
+}
+
+/**
+ * Adapt persisted rule rows → the engine's FormRuleLike (trigger lowered via the
+ * AST adapter), skipping disabled rows. The SAME shape the BE runtime feeds
+ * `enforceRules`, so the live preview and the server agree.
+ */
+export function toEngineRules(rules: FbFormRule[]): FormRuleLike[] {
+  return (rules ?? [])
+    .filter(r => r.isEnabled !== false)
+    .map(r => ({
+      name: r.name,
+      order: r.ruleOrder,
+      trigger: toEngineCondition(r.trigger),
+      action: r.action,
+      targetFieldKeys: r.targetFieldKeys ?? [],
+      setValueExpr: r.setValueExpr,
+      message: r.message,
+    }));
 }
 
 /**
@@ -118,6 +151,62 @@ export class FormBuilderStore {
     return `fb-sec-${sectionId}`;
   }
 
+  // ── Rules (Phase 5) ───────────────────────────────────────────────────
+  readonly rules = signal<FbFormRule[]>([]);
+  /** Live values the designer Preview feeds the engine (keyed by fieldKey). */
+  readonly previewValues = signal<Record<string, unknown>>({});
+
+  /** Every real (non-layout) placement flattened → the rule field/target source. */
+  readonly fieldKeys = computed<
+    Array<{ key: string; label: string; dataType: string | null }>
+  >(() =>
+    this.tabs()
+      .flatMap(t => t.sections)
+      .flatMap(s => s.fields)
+      .filter(f => !f.blockType && !!f.fieldKey)
+      .map(f => ({
+        key: f.fieldKey as string,
+        label: f.label || f.prompt?.name || (f.fieldKey as string),
+        dataType: f.dataType,
+      })),
+  );
+
+  /** The set of known placement fieldKeys — for missing-target warnings. */
+  readonly knownFieldKeys = computed(
+    () => new Set(this.fieldKeys().map(f => f.key)),
+  );
+
+  /** Static per-field {visible,required,disabled}, keyed by fieldKey. */
+  readonly baseState = computed<Record<string, FieldBaseState>>(() => {
+    const base: Record<string, FieldBaseState> = {};
+    for (const f of this.tabs().flatMap(t => t.sections).flatMap(s => s.fields)) {
+      if (f.blockType || !f.fieldKey) continue;
+      base[f.fieldKey] = {
+        visible: f.isVisible,
+        required: f.isMandatory,
+        disabled: f.isReadonly || f.isLocked,
+      };
+    }
+    return base;
+  });
+
+  /**
+   * Effective per-field state after the rules fire against previewValues.
+   * The designer Preview and the Phase-7 runtime composer both derive per-field
+   * visible/required/disabled from `applyRules(toEngineRules(rules), values,
+   * base)` — this is that path. The server re-enforces the identical result via
+   * `enforceRules` on validate/execute, so preview, published render, and
+   * server enforcement always agree. Feed live values with `setPreviewValue`.
+   */
+  readonly effectiveFlags = computed<Record<string, FieldEffectiveState>>(() =>
+    applyRules(
+      toEngineRules(this.rules()),
+      this.previewValues(),
+      this.baseState(),
+      (expr, v) => evaluateExpression(expr, v),
+    ),
+  );
+
   // ── One-deep snapshot for optimistic rollback ─────────────────────────
   private snap: TreeSnapshot | null = null;
   snapshot(): void {
@@ -173,6 +262,40 @@ export class FormBuilderStore {
 
   setActiveTab(id: string): void {
     this.activeTabId.set(id);
+  }
+
+  // ── Rule state ops (Phase 5) ──────────────────────────────────────────
+  async loadRules(): Promise<void> {
+    const id = this.formId();
+    if (!id) return;
+    try {
+      const rows = await this.admin.listRules(id, this.version());
+      this.rules.set(rows ?? []);
+    } catch {
+      this.rules.set([]);
+    }
+  }
+
+  setRules(rows: FbFormRule[]): void {
+    this.rules.set(rows ?? []);
+  }
+
+  upsertRule(rule: FbFormRule): void {
+    this.rules.update(list => {
+      const idx = list.findIndex(r => r.id === rule.id);
+      if (idx === -1) return [...list, rule];
+      const next = [...list];
+      next[idx] = rule;
+      return next;
+    });
+  }
+
+  removeRule(ruleId: string): void {
+    this.rules.update(list => list.filter(r => r.id !== ruleId));
+  }
+
+  setPreviewValue(fieldKey: string, value: unknown): void {
+    this.previewValues.update(v => ({ ...v, [fieldKey]: value }));
   }
 
   // ── Selection (toggle-to-deselect — Task 8) ───────────────────────────

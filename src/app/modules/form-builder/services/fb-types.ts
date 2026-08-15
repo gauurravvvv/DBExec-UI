@@ -35,6 +35,8 @@ export interface FormSummary {
 
 export interface ResolvedField {
   formFieldId: string;
+  /** Stable placement key — the rule engine's condition/target key (data-model §3.5). */
+  fieldKey?: string | null;
   promptId: string | null;
   blockType: BlockType | null;
   blockContent: string | null;

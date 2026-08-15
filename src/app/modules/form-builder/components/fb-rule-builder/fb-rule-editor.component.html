@@ -1,0 +1,150 @@
+<div class="fb-rule-editor">
+  <!-- Advanced / unsupported AST — read-only -->
+  <div class="fb-rule-editor__advanced" *ngIf="advancedAst()">
+    <div class="fb-rule-editor__advanced-banner">
+      <i class="pi pi-exclamation-triangle"></i>
+      <span>{{ 'FORM_BUILDER.RULES.ADVANCED_READONLY' | translate }}</span>
+    </div>
+    <app-custom-textarea
+      [label]="'FORM_BUILDER.RULES.TRIGGER' | translate"
+      [ngModel]="advancedJson()"
+      [rows]="8"
+      [disabled]="true"
+    ></app-custom-textarea>
+  </div>
+
+  <ng-container *ngIf="!advancedAst()">
+    <app-custom-input
+      [label]="'FORM_BUILDER.RULES.NAME' | translate"
+      [ngModel]="name()"
+      [inputDisabled]="!store.isDraft()"
+      (ngModelChange)="name.set($event)"
+    ></app-custom-input>
+
+    <!-- WHEN — combinator + leaf rows -->
+    <div class="fb-rule-editor__block">
+      <div class="fb-rule-editor__block-head">
+        <span class="fb-rule-editor__label">{{ 'FORM_BUILDER.RULES.WHEN' | translate }}</span>
+        <app-custom-dropdown
+          *ngIf="leaves().length > 1"
+          class="fb-rule-editor__combinator"
+          [options]="combinatorOptions"
+          optionLabel="label"
+          optionValue="value"
+          appendTo="body"
+          [ngModel]="combinator()"
+          [disabled]="!store.isDraft()"
+          (onChangeEvent)="combinator.set(($event.value ?? $event))"
+        ></app-custom-dropdown>
+      </div>
+
+      <div class="fb-rule-editor__leaf" *ngFor="let leaf of leaves(); let i = index">
+        <app-custom-dropdown
+          class="fb-rule-editor__leaf-field"
+          [placeholder]="'FORM_BUILDER.RULES.FIELD' | translate"
+          [options]="fieldKeys"
+          optionLabel="label"
+          optionValue="key"
+          appendTo="body"
+          [ngModel]="leaf.fieldKey"
+          [disabled]="!store.isDraft()"
+          (onChangeEvent)="patchLeaf(i, { fieldKey: ($event.value ?? $event) })"
+        ></app-custom-dropdown>
+        <app-custom-dropdown
+          class="fb-rule-editor__leaf-op"
+          [options]="opOptions"
+          optionLabel="label"
+          optionValue="value"
+          appendTo="body"
+          [ngModel]="leaf.op"
+          [disabled]="!store.isDraft()"
+          (onChangeEvent)="patchLeaf(i, { op: ($event.value ?? $event) })"
+        ></app-custom-dropdown>
+        <app-custom-input
+          class="fb-rule-editor__leaf-value"
+          *ngIf="!isValueless(leaf.op)"
+          [placeholder]="'FORM_BUILDER.RULES.VALUE' | translate"
+          [ngModel]="leaf.value"
+          [inputDisabled]="!store.isDraft()"
+          (ngModelChange)="patchLeaf(i, { value: $event })"
+        ></app-custom-input>
+        <app-button
+          variant="ghost"
+          size="sm"
+          icon="pi pi-times"
+          [title]="'FORM_BUILDER.RULES.REMOVE_CONDITION' | translate"
+          [disabled]="!store.isDraft() || leaves().length <= 1"
+          (clicked)="removeLeaf(i)"
+        ></app-button>
+      </div>
+
+      <app-button
+        variant="ghost"
+        size="sm"
+        icon="pi pi-plus"
+        [disabled]="!store.isDraft()"
+        (clicked)="addLeaf()"
+      >{{ 'FORM_BUILDER.RULES.ADD_CONDITION' | translate }}</app-button>
+    </div>
+
+    <!-- THEN — action + targets -->
+    <div class="fb-rule-editor__block">
+      <span class="fb-rule-editor__label">{{ 'FORM_BUILDER.RULES.THEN' | translate }}</span>
+      <app-custom-dropdown
+        [label]="'FORM_BUILDER.RULES.ACTION_LABEL' | translate"
+        [options]="actionOptions"
+        optionLabel="label"
+        optionValue="value"
+        appendTo="body"
+        [ngModel]="action()"
+        [disabled]="!store.isDraft()"
+        (onChangeEvent)="action.set(($event.value ?? $event))"
+      ></app-custom-dropdown>
+
+      <app-custom-multiselect
+        [label]="'FORM_BUILDER.RULES.TARGET_FIELDS' | translate"
+        [options]="fieldKeys"
+        optionLabel="label"
+        optionValue="key"
+        appendTo="body"
+        [ngModel]="targetKeys()"
+        [disabled]="!store.isDraft()"
+        (ngModelChange)="targetKeys.set($event)"
+      ></app-custom-multiselect>
+
+      <div *ngIf="needsExpr()">
+        <app-custom-input
+          [label]="'FORM_BUILDER.RULES.SET_VALUE_EXPR' | translate"
+          [ngModel]="setValueExpr()"
+          [inputDisabled]="!store.isDraft()"
+          (ngModelChange)="setValueExpr.set($event)"
+        ></app-custom-input>
+        <small class="fb-rule-editor__expr-error" *ngIf="exprError()">
+          {{ 'FORM_BUILDER.RULES.EXPR_INVALID' | translate }}
+        </small>
+      </div>
+
+      <app-custom-input
+        *ngIf="needsMessage()"
+        [label]="'FORM_BUILDER.RULES.VALIDATION_MESSAGE' | translate"
+        [ngModel]="message()"
+        [inputDisabled]="!store.isDraft()"
+        (ngModelChange)="message.set($event)"
+      ></app-custom-input>
+    </div>
+  </ng-container>
+
+  <!-- Actions -->
+  <div class="fb-rule-editor__actions">
+    <app-button variant="ghost" size="sm" (clicked)="cancel()">
+      {{ 'FORM_BUILDER.RULES.CANCEL' | translate }}
+    </app-button>
+    <app-button
+      variant="primary"
+      size="sm"
+      [loading]="saving()"
+      [disabled]="!canSave() || !store.isDraft()"
+      (clicked)="save()"
+    >{{ 'FORM_BUILDER.RULES.SAVE' | translate }}</app-button>
+  </div>
+</div>

@@ -1,0 +1,73 @@
+<div class="fb-rule-builder">
+  <!-- List mode -->
+  <ng-container *ngIf="editing() === null">
+    <div class="fb-rule-builder__head">
+      <span class="fb-rule-builder__title">{{ 'FORM_BUILDER.RULES.TITLE' | translate }}</span>
+      <app-button
+        variant="primary"
+        size="sm"
+        icon="pi pi-plus"
+        [disabled]="!store.isDraft()"
+        (clicked)="startNew()"
+      >{{ 'FORM_BUILDER.RULES.NEW_RULE' | translate }}</app-button>
+    </div>
+
+    <div class="fb-rule-builder__empty" *ngIf="visibleRules().length === 0">
+      <i class="pi pi-sliders-h"></i>
+      <span>{{ 'FORM_BUILDER.RULES.EMPTY' | translate }}</span>
+    </div>
+
+    <ul class="fb-rule-builder__list" *ngIf="visibleRules().length > 0">
+      <li class="fb-rule-builder__item" *ngFor="let rule of visibleRules()">
+        <div class="fb-rule-builder__item-main">
+          <div class="fb-rule-builder__item-name">
+            <span>{{ rule.name }}</span>
+            <app-chip
+              size="sm"
+              *ngIf="missingKeys(rule).length > 0"
+              [title]="('FORM_BUILDER.RULES.MISSING_TARGET' | translate) + ' ' + missingKeys(rule).join(', ')"
+            >
+              <i class="pi pi-exclamation-triangle"></i>
+              {{ 'FORM_BUILDER.RULES.MISSING_TARGET_SHORT' | translate }}
+            </app-chip>
+          </div>
+          <span class="fb-rule-builder__item-summary">{{ summary(rule) }}</span>
+        </div>
+        <div class="fb-rule-builder__item-actions">
+          <app-custom-toggle
+            [ngModel]="rule.isEnabled"
+            [disabled]="!store.isDraft()"
+            [title]="'FORM_BUILDER.RULES.ENABLED' | translate"
+            (onChange)="toggleEnabled(rule)"
+          ></app-custom-toggle>
+          <app-button
+            variant="ghost"
+            size="sm"
+            icon="pi pi-pencil"
+            [title]="'FORM_BUILDER.RULES.EDIT' | translate"
+            [disabled]="!store.isDraft()"
+            (clicked)="edit(rule)"
+          ></app-button>
+          <app-button
+            variant="ghost"
+            size="sm"
+            icon="pi pi-trash"
+            [title]="'FORM_BUILDER.RULES.DELETE' | translate"
+            [loading]="deletingId() === rule.id"
+            [disabled]="!store.isDraft()"
+            (clicked)="remove(rule)"
+          ></app-button>
+        </div>
+      </li>
+    </ul>
+  </ng-container>
+
+  <!-- Editor mode -->
+  <fb-rule-editor
+    *ngIf="editing() !== null"
+    [rule]="editing()!"
+    [fieldKeys]="fieldKeys()"
+    (saved)="onSaved($event)"
+    (cancelled)="onCancelled()"
+  ></fb-rule-editor>
+</div>

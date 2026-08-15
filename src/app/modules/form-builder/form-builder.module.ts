@@ -27,6 +27,8 @@ import { FbPropFieldComponent } from './components/fb-properties-panel/fb-prop-f
 import { FbPropSectionComponent } from './components/fb-properties-panel/fb-prop-section.component';
 import { FbPropTabComponent } from './components/fb-properties-panel/fb-prop-tab.component';
 import { FbPropertiesPanelComponent } from './components/fb-properties-panel/fb-properties-panel.component';
+import { FbRuleBuilderComponent } from './components/fb-rule-builder/fb-rule-builder.component';
+import { FbRuleEditorComponent } from './components/fb-rule-builder/fb-rule-editor.component';
 import { FbSectionComponent } from './components/fb-section/fb-section.component';
 import { FbTabStripComponent } from './components/fb-tab-strip/fb-tab-strip.component';
 import { FbVersionBarComponent } from './components/fb-version-bar/fb-version-bar.component';
@@ -53,6 +55,8 @@ import { FormBuilderRoutingModule } from './form-builder-routing.module';
     FbPropTabComponent,
     FbPropSectionComponent,
     FbPropFieldComponent,
+    FbRuleBuilderComponent,
+    FbRuleEditorComponent,
   ],
   imports: [
     CommonModule,
