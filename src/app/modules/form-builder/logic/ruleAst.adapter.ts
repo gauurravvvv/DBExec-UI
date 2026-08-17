@@ -10,10 +10,11 @@
  * `{ op, field, value? }` / `{ op:'and'|'or', conditions[] }` / `{ op:'not',
  * condition }` with the NARROWER op set (eq,ne,gt,lt,in,contains,isEmpty).
  *
- * toEngineCondition lowers the persisted AST → engine Condition (extended ops
- * expressed via not-wrapping / isEmpty value:false). toPersistedAst is the
- * inverse for the round-trip from the builder, lifting the not-wraps back to the
- * extended ops so a saved-then-reloaded rule keeps its authored shape.
+ * toEngineCondition maps the persisted AST → engine Condition. The engine now
+ * has first-class null-aware `gte`/`lte`/`notIn`/`notContains` operators, so
+ * those map 1:1 (no not-wrapping); only `isNotEmpty` still lowers onto
+ * `isEmpty value:false`. toPersistedAst is the exact inverse — each engine op
+ * maps straight back, and an authored `not`-group round-trips AS a `not`-group.
  */
 import { Condition, LeafCondition, LeafOperator, NotCondition } from './ruleEngine';
 
@@ -34,21 +35,26 @@ export interface PersistedGroup {
 }
 export type PersistedAst = PersistedLeaf | PersistedGroup;
 
-/** How each persisted leaf op lowers onto an engine leaf op. */
+/**
+ * How each persisted leaf op maps onto an engine leaf op. The four extended
+ * comparators (`gte`/`lte`/`notIn`/`notContains`) are now first-class engine
+ * ops with null-aware semantics, so they map 1:1 — no `not`-wrapping. Only
+ * `isNotEmpty` still lowers onto `isEmpty` with `value:false`.
+ */
 export const ENGINE_OP_MAP: Record<
   PersistedLeafOp,
-  { op: LeafOperator; wrapNot?: boolean; valueFalse?: boolean } | null
+  { op: LeafOperator; valueFalse?: boolean } | null
 > = {
   eq: { op: 'eq' },
   ne: { op: 'ne' },
   gt: { op: 'gt' },
   lt: { op: 'lt' },
-  gte: { op: 'lt', wrapNot: true },
-  lte: { op: 'gt', wrapNot: true },
+  gte: { op: 'gte' },
+  lte: { op: 'lte' },
   in: { op: 'in' },
-  notIn: { op: 'in', wrapNot: true },
+  notIn: { op: 'notIn' },
   contains: { op: 'contains' },
-  notContains: { op: 'contains', wrapNot: true },
+  notContains: { op: 'notContains' },
   isEmpty: { op: 'isEmpty' },
   isNotEmpty: { op: 'isEmpty', valueFalse: true },
 };
@@ -56,10 +62,10 @@ export const ENGINE_OP_MAP: Record<
 const isGroup = (ast: PersistedAst): ast is PersistedGroup => ast.kind === 'group';
 
 /**
- * Persisted trigger → engine Condition. Extended ops are lowered per the map (a
- * `wrapNot` leaf becomes `{op:'not', condition:<leaf>}`; a `valueFalse` leaf
- * becomes `{op:'isEmpty', field, value:false}`). An unmappable/unknown op throws
- * (the caller must have Zod-gated the trigger to the persisted op set).
+ * Persisted trigger → engine Condition. Each leaf op maps directly per the map;
+ * a `valueFalse` leaf (only `isNotEmpty`) becomes `{op:'isEmpty', field,
+ * value:false}`. An unmappable/unknown op throws (the caller must have Zod-gated
+ * the trigger to the persisted op set).
  */
 export const toEngineCondition = (ast: PersistedAst): Condition => {
   if (isGroup(ast)) {
@@ -76,27 +82,29 @@ export const toEngineCondition = (ast: PersistedAst): Condition => {
   if (mapped.valueFalse) {
     return { op: mapped.op, field: ast.fieldKey, value: false };
   }
-  const leaf: Condition = { op: mapped.op, field: ast.fieldKey, value: ast.value };
-  return mapped.wrapNot ? { op: 'not', condition: leaf } : leaf;
+  return { op: mapped.op, field: ast.fieldKey, value: ast.value };
 };
 
-/** Engine leaf op that a `not`-wrap lifts back to its extended persisted op. */
-const NOT_LIFT: Partial<Record<LeafOperator, PersistedLeafOp>> = {
-  lt: 'gte',
-  gt: 'lte',
-  in: 'notIn',
-  contains: 'notContains',
+/** Engine leaf op → its persisted op. Identity for all except the empty pair. */
+const PERSISTED_OP: Partial<Record<LeafOperator, PersistedLeafOp>> = {
+  eq: 'eq',
+  ne: 'ne',
+  gt: 'gt',
+  lt: 'lt',
+  gte: 'gte',
+  lte: 'lte',
+  in: 'in',
+  notIn: 'notIn',
+  contains: 'contains',
+  notContains: 'notContains',
 };
-
-const isLeafCondition = (cond: Condition): cond is LeafCondition =>
-  cond.op !== 'and' && cond.op !== 'or' && cond.op !== 'not';
 
 /**
  * Engine Condition → persisted trigger (round-trip for save from the builder).
- * `not` over a single leaf whose op has an extended inverse lifts back to that
- * op (`not(lt)→gte`, `not(gt)→lte`, `not(in)→notIn`, `not(contains)→notContains`;
- * `isEmpty value:false → isNotEmpty`); any other `not` stays a `combinator:'not'`
- * group with one child.
+ * Each engine leaf op maps straight back to its persisted op (`isEmpty` with
+ * `value:false` lifts to `isNotEmpty`). A `not`-group round-trips AS a
+ * `combinator:'not'` group — the adapter no longer rewrites an authored NOT into
+ * an inverse leaf, so `not(comparator)` keeps its authored shape.
  */
 export const toPersistedAst = (cond: Condition): PersistedAst => {
   if (cond.op === 'and' || cond.op === 'or') {
@@ -104,12 +112,6 @@ export const toPersistedAst = (cond: Condition): PersistedAst => {
   }
   if (cond.op === 'not') {
     const inner = (cond as NotCondition).condition;
-    if (isLeafCondition(inner)) {
-      const lifted = NOT_LIFT[inner.op];
-      if (lifted) {
-        return { kind: 'leaf', fieldKey: inner.field, op: lifted, value: inner.value };
-      }
-    }
     return { kind: 'group', combinator: 'not', children: [toPersistedAst(inner)] };
   }
   // A bare leaf. isEmpty with value:false lifts to isNotEmpty.
@@ -117,5 +119,5 @@ export const toPersistedAst = (cond: Condition): PersistedAst => {
   if (leaf.op === 'isEmpty' && leaf.value === false) {
     return { kind: 'leaf', fieldKey: leaf.field, op: 'isNotEmpty' };
   }
-  return { kind: 'leaf', fieldKey: leaf.field, op: leaf.op, value: leaf.value };
+  return { kind: 'leaf', fieldKey: leaf.field, op: PERSISTED_OP[leaf.op] ?? leaf.op, value: leaf.value };
 };

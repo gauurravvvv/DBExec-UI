@@ -17,7 +17,18 @@
 
 /* PARITY:START — everything below must stay byte-identical to the FE copy. */
 
-export type LeafOperator = 'eq' | 'ne' | 'gt' | 'lt' | 'in' | 'contains' | 'isEmpty';
+export type LeafOperator =
+  | 'eq'
+  | 'ne'
+  | 'gt'
+  | 'lt'
+  | 'gte'
+  | 'lte'
+  | 'in'
+  | 'notIn'
+  | 'contains'
+  | 'notContains'
+  | 'isEmpty';
 export type LogicalOperator = 'and' | 'or' | 'not';
 export type ConditionOperator = LeafOperator | LogicalOperator;
 
@@ -120,21 +131,49 @@ const evaluateLeaf = (cond: LeafCondition, values: Record<string, unknown>): boo
     case 'ne':
       return !looseEqual(actual, cond.value);
     case 'gt':
-    case 'lt': {
+    case 'lt':
+    case 'gte':
+    case 'lte': {
+      // An empty/null/incomparable operand does NOT satisfy an ordered
+      // comparison — an unset field is never `>= x` / `<= x` / `> x` / `< x`.
       const a = toComparable(actual);
       const b = toComparable(cond.value);
       if (a == null || b == null || typeof a !== typeof b) return false;
-      return cond.op === 'gt' ? a > b : a < b;
+      switch (cond.op) {
+        case 'gt':
+          return a > b;
+        case 'lt':
+          return a < b;
+        case 'gte':
+          return a >= b;
+        default:
+          return a <= b;
+      }
     }
     case 'in': {
       const list = Array.isArray(cond.value) ? cond.value : [];
       if (Array.isArray(actual)) return actual.some(x => list.some(y => looseEqual(x, y)));
       return list.some(y => looseEqual(actual, y));
     }
+    case 'notIn': {
+      // Empty/null field → false: an unset field does not satisfy a "not in"
+      // constraint (consistent with "unset never satisfies a constraint").
+      if (isEmptyValue(actual)) return false;
+      const list = Array.isArray(cond.value) ? cond.value : [];
+      if (Array.isArray(actual)) return !actual.some(x => list.some(y => looseEqual(x, y)));
+      return !list.some(y => looseEqual(actual, y));
+    }
     case 'contains': {
       if (Array.isArray(actual)) return actual.some(x => looseEqual(x, cond.value));
       if (actual == null) return false;
       return String(actual).includes(String(cond.value));
+    }
+    case 'notContains': {
+      // Empty/null field → false: an unset field does not satisfy a
+      // "not contains" constraint (matches notIn / the ordered ops above).
+      if (isEmptyValue(actual)) return false;
+      if (Array.isArray(actual)) return !actual.some(x => looseEqual(x, cond.value));
+      return !String(actual).includes(String(cond.value));
     }
     case 'isEmpty': {
       const empty = isEmptyValue(actual);

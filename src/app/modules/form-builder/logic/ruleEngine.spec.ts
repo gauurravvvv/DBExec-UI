@@ -55,6 +55,24 @@ describe('ruleEngine — leaf operators', () => {
     expect(isEmptyValue([])).toBe(true);
     expect(isEmptyValue(null)).toBe(true);
   });
+  it('gte/lte/notIn/notContains are null-aware — an EMPTY operand does NOT fire (C1)', () => {
+    // The bug: an unset field must NOT satisfy >= 18 / <= x / notIn / notContains.
+    expect(evaluateCondition({ op: 'gte', field: 'age', value: 18 }, {})).toBe(false);
+    expect(evaluateCondition({ op: 'lte', field: 'age', value: 18 }, {})).toBe(false);
+    expect(evaluateCondition({ op: 'notIn', field: 'country', value: ['UK'] }, {})).toBe(false);
+    expect(evaluateCondition({ op: 'notContains', field: 'tags', value: 'z' }, {})).toBe(false);
+    expect(evaluateCondition({ op: 'gte', field: 'age', value: 18 }, { age: '' })).toBe(false);
+  });
+  it('gte/lte/notIn/notContains compare correctly for a populated operand', () => {
+    expect(evaluateCondition({ op: 'gte', field: 'age', value: 18 }, { age: 18 })).toBe(true);
+    expect(evaluateCondition({ op: 'gte', field: 'age', value: 18 }, { age: 17 })).toBe(false);
+    expect(evaluateCondition({ op: 'lte', field: 'age', value: 18 }, { age: 18 })).toBe(true);
+    expect(evaluateCondition({ op: 'lte', field: 'age', value: 17 }, { age: 18 })).toBe(false);
+    expect(evaluateCondition({ op: 'notIn', field: 'country', value: ['UK'] }, { country: 'US' })).toBe(true);
+    expect(evaluateCondition({ op: 'notIn', field: 'country', value: ['US'] }, { country: 'US' })).toBe(false);
+    expect(evaluateCondition({ op: 'notContains', field: 'tags', value: 'z' }, { tags: ['a'] })).toBe(true);
+    expect(evaluateCondition({ op: 'notContains', field: 'tags', value: 'a' }, { tags: ['a'] })).toBe(false);
+  });
 });
 
 describe('ruleEngine — logical nesting + applyRules folding', () => {
@@ -187,5 +205,29 @@ describe('ruleAst.adapter — persisted <-> engine', () => {
       ],
     };
     expect(toPersistedAst(toEngineCondition(ast))).toEqual(ast);
+  });
+  it('maps extended ops 1:1 with no not-wrapping, and round-trips them (C1)', () => {
+    expect(toEngineCondition({ kind: 'leaf', fieldKey: 'age', op: 'gte', value: 18 })).toEqual({
+      op: 'gte', field: 'age', value: 18,
+    });
+    const cases: PersistedAst[] = [
+      { kind: 'leaf', fieldKey: 'age', op: 'gte', value: 30 },
+      { kind: 'leaf', fieldKey: 'age', op: 'lte', value: 18 },
+      { kind: 'leaf', fieldKey: 'country', op: 'notIn', value: ['UK', 'FR'] },
+      { kind: 'leaf', fieldKey: 'tags', op: 'notContains', value: 'z' },
+    ];
+    for (const ast of cases) {
+      expect(toPersistedAst(toEngineCondition(ast))).toEqual(ast);
+    }
+  });
+  it('an authored not(comparator) group round-trips AS a not-group (C2)', () => {
+    const ast: PersistedAst = {
+      kind: 'group',
+      combinator: 'not',
+      children: [{ kind: 'leaf', fieldKey: 'age', op: 'lt', value: 18 }],
+    };
+    const round = toPersistedAst(toEngineCondition(ast));
+    expect(round).toEqual(ast);
+    expect((round as { kind: string }).kind).toBe('group');
   });
 });
