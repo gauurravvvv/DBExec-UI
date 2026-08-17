@@ -5165,6 +5165,49 @@
       },
       "description": {
         "max": "Description is too long"
+      },
+      "tab": {
+        "name": {
+          "required": "Tab name is required",
+          "max": "Tab name is too long (max 80 characters)"
+        }
+      },
+      "section": {
+        "name": {
+          "required": "Section name is required",
+          "max": "Section name is too long (max 120 characters)"
+        },
+        "tabId": {
+          "uuid": "The tab id is not valid"
+        }
+      },
+      "field": {
+        "promptOrBlock": "A field must reference either a prompt or a layout block",
+        "sectionId": {
+          "uuid": "The section id is not valid"
+        }
+      },
+      "reorder": {
+        "orderedIds": {
+          "required": "At least one item is required to reorder"
+        },
+        "parentId": {
+          "required": "A parent is required to reorder"
+        }
+      },
+      "datasourceId": {
+        "invalid": "The data source is not valid"
+      },
+      "iconKey": {
+        "max": "The icon key is too long"
+      },
+      "ids": {
+        "invalid": "One or more ids are not valid",
+        "required": "At least one id is required",
+        "max": "Too many ids (max 200)"
+      },
+      "update": {
+        "empty": "No changes were provided to update"
       }
     }
   },
