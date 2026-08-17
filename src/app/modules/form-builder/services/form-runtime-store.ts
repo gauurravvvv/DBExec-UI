@@ -22,6 +22,7 @@ import {
   applyRules,
 } from '../logic/ruleEngine';
 import { PersistedAst, toEngineCondition } from '../logic/ruleAst.adapter';
+import { evaluateExpression } from '../logic/exprEngine';
 
 /** The runtime hydration payload (getRuntimeSchema data). */
 export interface FormRuntimeSchema {
@@ -131,7 +132,12 @@ export class FormRuntimeStore extends QueryBuilderStore {
       };
     }
 
-    const state = applyRules(this.toEngineRules(fs.rules), this.values(), base);
+    const state = applyRules(
+      this.toEngineRules(fs.rules),
+      this.values(),
+      base,
+      (expr, v) => evaluateExpression(expr, v),
+    );
     const flags: Record<string, EffectiveFieldFlags> = {};
     for (const key of Object.keys(state)) {
       flags[key] = {
