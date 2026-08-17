@@ -1,0 +1,14 @@
+<div class="feed-item">
+  <span
+    class="feed-av"
+    [style.background]="'var(' + avatarVar + ')'"
+    >{{ initials }}</span
+  >
+  <div class="feed-txt">
+    <b>{{ actorLabel }}</b>
+    <span class="feed-verb">{{ verb }}</span>
+    <b *ngIf="entry.entityName">{{ entry.entityName }}</b>
+    <span class="feed-tag" [ngClass]="tagKind">{{ entry.action | lowercase }}</span>
+  </div>
+  <span class="feed-time">{{ entry.createdOn | relativeTime }}</span>
+</div>

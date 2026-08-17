@@ -36,7 +36,20 @@ export const AUTH = {
 };
 
 export const HOME = {
+  // Legacy thin summary (kept for compatibility).
   SYSTEM_ADMIN: '/home/system-admin',
+
+  // Per-org landing dashboard.
+  SUMMARY: '/home/summary',
+  TRENDS_QUERIES: '/home/trends/queries',
+  TRENDS_LOGINS: '/home/trends/logins',
+  ACTIVITY: '/home/activity',
+  EXECUTIONS_BY_MODULE: '/home/executions-by-module',
+
+  // System-admin platform dashboard.
+  SA_SUMMARY: '/home/system-admin/summary',
+  SA_TRENDS: '/home/system-admin/trends',
+  SA_ORGS_CREATED: '/home/system-admin/orgs-created',
 };
 
 

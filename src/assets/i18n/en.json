@@ -2062,6 +2062,102 @@
     "AXIS_AGG_OF": "{{agg}} of {{field}}",
     "AUTO_TITLE_BY": "{{measure}} by {{dimension}}"
   },
+  "HOME_DASH": {
+    "GREETING": "Welcome back, {{name}}",
+    "SUBTITLE": "Here's what's happening in {{org}}",
+    "RANGE": "Date range",
+    "RANGE_7": "7d",
+    "RANGE_30": "30d",
+    "RANGE_90": "90d",
+    "CUSTOM_RANGE": "Custom range",
+    "REFRESH": "Refresh",
+    "RETRY": "Retry",
+    "ERROR": "Couldn't load this widget",
+    "PERMISSION_DENIED": "Permission Denied",
+    "KPI": {
+      "QUERIES": "Queries executed",
+      "ACTIVE_USERS": "Active users",
+      "DATASETS": "Datasets",
+      "DASHBOARDS": "Dashboards",
+      "IN_RANGE": "in selected range",
+      "VS_PREV": "vs previous period"
+    },
+    "WIDGET": {
+      "QUERY_ACTIVITY": "Query activity",
+      "EXEC_BY_MODULE": "Executions by module",
+      "RECENT_ACTIVITY": "Recent activity",
+      "QUICK_ACTIONS": "Quick actions",
+      "LOGINS": "Logins over time"
+    },
+    "LINK": {
+      "AUDIT": "Audit logs",
+      "VIEW_ALL": "View all",
+      "LOGIN_ACTIVITY": "Login activity"
+    },
+    "EMPTY": {
+      "NO_QUERIES": "No query activity in this period",
+      "NO_ACTIVITY": "No recent activity yet",
+      "NO_LOGINS": "No logins in this period"
+    },
+    "QA": {
+      "NEW_QUERY": "New Query",
+      "NEW_QUERY_D": "SQL Workspace",
+      "DATASETS": "Datasets",
+      "DATASETS_D": "Curate fields",
+      "ANALYSES": "New Analysis",
+      "ANALYSES_D": "Build a chart",
+      "DASHBOARDS": "Dashboards",
+      "DASHBOARDS_D": "Compose views",
+      "INVITE_USER": "Invite User",
+      "INVITE_USER_D": "Add to a group",
+      "QUERY_BUILDER": "Query Builder",
+      "QUERY_BUILDER_D": "No-SQL prompt"
+    },
+    "VERB": {
+      "EXECUTE": "executed",
+      "CREATE": "created",
+      "UPDATE": "updated",
+      "DELETE": "deleted",
+      "EXPORT": "exported",
+      "IMPORT": "imported",
+      "LOGIN": "logged in",
+      "LOGOUT": "logged out",
+      "CONFIG": "configured",
+      "DEFAULT": "acted on"
+    },
+    "ADMIN": {
+      "TITLE": "Platform overview",
+      "SUBTITLE": "All organisations at a glance",
+      "ORGS": "Organisations",
+      "ACTIVE_ORGS": "Active orgs",
+      "TOTAL_USERS": "Total users",
+      "PLATFORM_QUERIES": "Platform queries",
+      "NEW_IN_PERIOD": "new in period",
+      "ACTIVE_CAPTION": "currently active",
+      "ALL_ORGS": "across all orgs",
+      "IN_RANGE": "in selected range",
+      "PLATFORM_ACTIVITY": "Platform activity",
+      "ORGS_CREATED": "Organisations created",
+      "NO_ORGS_CREATED": "No organisations created in this period",
+      "ROLLUP": "Organisations — usage rollup",
+      "ALL_ORGS_LINK": "All organisations",
+      "NO_ORGS": "No organisations yet",
+      "ORG_STATUS": "Organisation status",
+      "COL_ORG": "Organisation",
+      "COL_STATUS": "Status",
+      "COL_USERS": "Users",
+      "COL_DATASETS": "Datasets",
+      "COL_QUERIES": "Queries",
+      "ACTIVE": "Active",
+      "INACTIVE": "Inactive",
+      "DBSTATUS": {
+        "connected": "Connected",
+        "not_configured": "Not configured",
+        "connection_failed": "Connection failed",
+        "timeout": "Timed out"
+      }
+    }
+  },
   "DASHBOARD": {
     "TITLE": "Dashboards",
     "SUBTITLE": "View and manage published dashboards",

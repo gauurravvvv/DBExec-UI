@@ -1,0 +1,34 @@
+<div class="stat" [attr.data-tone]="tone">
+  <div class="stat-top">
+    <span class="stat-ic" *ngIf="icon"><i [class]="icon"></i></span>
+    <span class="stat-label">{{ label }}</span>
+  </div>
+
+  <div class="stat-val tnum">
+    {{ displayValue }}
+    <span class="stat-secondary tnum" *ngIf="secondary !== null && secondary !== undefined">
+      / {{ secondary }}
+    </span>
+  </div>
+
+  <div class="stat-foot">
+    <span
+      class="stat-delta"
+      *ngIf="delta !== null"
+      [class.up]="deltaPositive"
+      [class.down]="delta !== 0 && !deltaPositive"
+      [class.flat]="delta === 0"
+    >
+      {{ deltaLabel }}
+    </span>
+    <span class="stat-caption" *ngIf="caption">{{ caption }}</span>
+  </div>
+
+  <div
+    class="stat-spark"
+    *ngIf="sparkOption"
+    echarts
+    [options]="sparkOption"
+    [autoResize]="true"
+  ></div>
+</div>

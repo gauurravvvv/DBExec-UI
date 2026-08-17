@@ -2059,6 +2059,102 @@
     "AXIS_AGG_OF": "{{field}}의 {{agg}}",
     "AUTO_TITLE_BY": "{{dimension}}별 {{measure}}"
   },
+  "HOME_DASH": {
+    "GREETING": "다시 오신 것을 환영합니다, {{name}}님",
+    "SUBTITLE": "{{org}}의 최신 현황입니다",
+    "RANGE": "기간",
+    "RANGE_7": "7일",
+    "RANGE_30": "30일",
+    "RANGE_90": "90일",
+    "CUSTOM_RANGE": "사용자 지정 기간",
+    "REFRESH": "새로고침",
+    "RETRY": "다시 시도",
+    "ERROR": "이 위젯을 불러올 수 없습니다",
+    "PERMISSION_DENIED": "권한이 거부되었습니다",
+    "KPI": {
+      "QUERIES": "실행된 쿼리",
+      "ACTIVE_USERS": "활성 사용자",
+      "DATASETS": "데이터셋",
+      "DASHBOARDS": "대시보드",
+      "IN_RANGE": "선택한 기간 내",
+      "VS_PREV": "이전 기간 대비"
+    },
+    "WIDGET": {
+      "QUERY_ACTIVITY": "쿼리 활동",
+      "EXEC_BY_MODULE": "모듈별 실행",
+      "RECENT_ACTIVITY": "최근 활동",
+      "QUICK_ACTIONS": "빠른 작업",
+      "LOGINS": "시간별 로그인"
+    },
+    "LINK": {
+      "AUDIT": "감사 로그",
+      "VIEW_ALL": "모두 보기",
+      "LOGIN_ACTIVITY": "로그인 활동"
+    },
+    "EMPTY": {
+      "NO_QUERIES": "이 기간에 쿼리 활동이 없습니다",
+      "NO_ACTIVITY": "아직 최근 활동이 없습니다",
+      "NO_LOGINS": "이 기간에 로그인이 없습니다"
+    },
+    "QA": {
+      "NEW_QUERY": "새 쿼리",
+      "NEW_QUERY_D": "SQL 작업 공간",
+      "DATASETS": "데이터셋",
+      "DATASETS_D": "필드 관리",
+      "ANALYSES": "새 분석",
+      "ANALYSES_D": "차트 만들기",
+      "DASHBOARDS": "대시보드",
+      "DASHBOARDS_D": "뷰 구성",
+      "INVITE_USER": "사용자 초대",
+      "INVITE_USER_D": "그룹에 추가",
+      "QUERY_BUILDER": "쿼리 빌더",
+      "QUERY_BUILDER_D": "SQL 없이"
+    },
+    "VERB": {
+      "EXECUTE": "실행함",
+      "CREATE": "생성함",
+      "UPDATE": "업데이트함",
+      "DELETE": "삭제함",
+      "EXPORT": "내보냄",
+      "IMPORT": "가져옴",
+      "LOGIN": "로그인함",
+      "LOGOUT": "로그아웃함",
+      "CONFIG": "구성함",
+      "DEFAULT": "작업함"
+    },
+    "ADMIN": {
+      "TITLE": "플랫폼 개요",
+      "SUBTITLE": "모든 조직을 한눈에",
+      "ORGS": "조직",
+      "ACTIVE_ORGS": "활성 조직",
+      "TOTAL_USERS": "전체 사용자",
+      "PLATFORM_QUERIES": "플랫폼 쿼리",
+      "NEW_IN_PERIOD": "기간 내 신규",
+      "ACTIVE_CAPTION": "현재 활성",
+      "ALL_ORGS": "모든 조직 합계",
+      "IN_RANGE": "선택한 기간 내",
+      "PLATFORM_ACTIVITY": "플랫폼 활동",
+      "ORGS_CREATED": "생성된 조직",
+      "NO_ORGS_CREATED": "이 기간에 생성된 조직이 없습니다",
+      "ROLLUP": "조직 — 사용 요약",
+      "ALL_ORGS_LINK": "모든 조직",
+      "NO_ORGS": "아직 조직이 없습니다",
+      "ORG_STATUS": "조직 상태",
+      "COL_ORG": "조직",
+      "COL_STATUS": "상태",
+      "COL_USERS": "사용자",
+      "COL_DATASETS": "데이터셋",
+      "COL_QUERIES": "쿼리",
+      "ACTIVE": "활성",
+      "INACTIVE": "비활성",
+      "DBSTATUS": {
+        "connected": "연결됨",
+        "not_configured": "구성되지 않음",
+        "connection_failed": "연결 실패",
+        "timeout": "시간 초과"
+      }
+    }
+  },
   "DASHBOARD": {
     "TITLE": "대시보드",
     "SUBTITLE": "게시된 대시보드를 조회하고 관리합니다",

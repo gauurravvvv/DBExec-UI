@@ -2059,6 +2059,102 @@
     "AXIS_AGG_OF": "{{field}} 的{{agg}}",
     "AUTO_TITLE_BY": "按{{dimension}}的{{measure}}"
   },
+  "HOME_DASH": {
+    "GREETING": "欢迎回来，{{name}}",
+    "SUBTITLE": "以下是 {{org}} 的最新动态",
+    "RANGE": "日期范围",
+    "RANGE_7": "7天",
+    "RANGE_30": "30天",
+    "RANGE_90": "90天",
+    "CUSTOM_RANGE": "自定义范围",
+    "REFRESH": "刷新",
+    "RETRY": "重试",
+    "ERROR": "无法加载此组件",
+    "PERMISSION_DENIED": "权限不足",
+    "KPI": {
+      "QUERIES": "已执行查询",
+      "ACTIVE_USERS": "活跃用户",
+      "DATASETS": "数据集",
+      "DASHBOARDS": "仪表板",
+      "IN_RANGE": "在所选范围内",
+      "VS_PREV": "较上一周期"
+    },
+    "WIDGET": {
+      "QUERY_ACTIVITY": "查询活动",
+      "EXEC_BY_MODULE": "按模块统计执行",
+      "RECENT_ACTIVITY": "最近活动",
+      "QUICK_ACTIONS": "快捷操作",
+      "LOGINS": "登录趋势"
+    },
+    "LINK": {
+      "AUDIT": "审计日志",
+      "VIEW_ALL": "查看全部",
+      "LOGIN_ACTIVITY": "登录活动"
+    },
+    "EMPTY": {
+      "NO_QUERIES": "此期间没有查询活动",
+      "NO_ACTIVITY": "暂无最近活动",
+      "NO_LOGINS": "此期间没有登录"
+    },
+    "QA": {
+      "NEW_QUERY": "新建查询",
+      "NEW_QUERY_D": "SQL 工作区",
+      "DATASETS": "数据集",
+      "DATASETS_D": "整理字段",
+      "ANALYSES": "新建分析",
+      "ANALYSES_D": "创建图表",
+      "DASHBOARDS": "仪表板",
+      "DASHBOARDS_D": "组合视图",
+      "INVITE_USER": "邀请用户",
+      "INVITE_USER_D": "添加到组",
+      "QUERY_BUILDER": "查询构建器",
+      "QUERY_BUILDER_D": "无需 SQL"
+    },
+    "VERB": {
+      "EXECUTE": "执行了",
+      "CREATE": "创建了",
+      "UPDATE": "更新了",
+      "DELETE": "删除了",
+      "EXPORT": "导出了",
+      "IMPORT": "导入了",
+      "LOGIN": "登录了",
+      "LOGOUT": "退出了",
+      "CONFIG": "配置了",
+      "DEFAULT": "操作了"
+    },
+    "ADMIN": {
+      "TITLE": "平台概览",
+      "SUBTITLE": "一览所有组织",
+      "ORGS": "组织",
+      "ACTIVE_ORGS": "活跃组织",
+      "TOTAL_USERS": "用户总数",
+      "PLATFORM_QUERIES": "平台查询",
+      "NEW_IN_PERIOD": "本期新增",
+      "ACTIVE_CAPTION": "当前活跃",
+      "ALL_ORGS": "所有组织合计",
+      "IN_RANGE": "在所选范围内",
+      "PLATFORM_ACTIVITY": "平台活动",
+      "ORGS_CREATED": "已创建组织",
+      "NO_ORGS_CREATED": "此期间未创建组织",
+      "ROLLUP": "组织 — 使用汇总",
+      "ALL_ORGS_LINK": "所有组织",
+      "NO_ORGS": "暂无组织",
+      "ORG_STATUS": "组织状态",
+      "COL_ORG": "组织",
+      "COL_STATUS": "状态",
+      "COL_USERS": "用户",
+      "COL_DATASETS": "数据集",
+      "COL_QUERIES": "查询",
+      "ACTIVE": "活跃",
+      "INACTIVE": "不活跃",
+      "DBSTATUS": {
+        "connected": "已连接",
+        "not_configured": "未配置",
+        "connection_failed": "连接失败",
+        "timeout": "已超时"
+      }
+    }
+  },
   "DASHBOARD": {
     "TITLE": "仪表盘",
     "SUBTITLE": "查看和管理已发布的仪表盘",

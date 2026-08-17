@@ -1,0 +1,82 @@
+<div class="wcard" [class.is-loading]="state === 'loading'">
+  <!-- header -->
+  <div class="wcard-head" *ngIf="title">
+    <span class="wc-ic" *ngIf="icon"><i [class]="icon"></i></span>
+    <h3 class="wc-title">{{ title }}</h3>
+    <button
+      *ngIf="link && state === 'ready'"
+      type="button"
+      class="wc-link"
+      (click)="linkClick.emit()"
+    >
+      {{ link.label }} <i class="pi pi-arrow-right"></i>
+    </button>
+  </div>
+
+  <!-- body -->
+  <div class="wcard-body">
+    <!-- READY: the real widget -->
+    <ng-container *ngIf="state === 'ready'">
+      <ng-content></ng-content>
+    </ng-container>
+
+    <!-- LOADING: skeleton silhouettes per variant -->
+    <ng-container *ngIf="state === 'loading'">
+      <!-- stat -->
+      <ng-container *ngIf="skeletonVariant === 'stat'">
+        <div class="sk sk-line" style="width: 45%"></div>
+        <div class="sk sk-val"></div>
+        <div class="sk sk-line" style="width: 60%"></div>
+      </ng-container>
+      <!-- chart -->
+      <ng-container *ngIf="skeletonVariant === 'chart'">
+        <div class="sk sk-line" style="width: 35%"></div>
+        <div class="sk sk-block"></div>
+      </ng-container>
+      <!-- list -->
+      <ng-container *ngIf="skeletonVariant === 'list'">
+        <div class="sk-row" *ngFor="let _ of rows">
+          <div class="sk sk-avatar"></div>
+          <div class="sk-row-lines">
+            <div class="sk sk-line" style="width: 80%"></div>
+            <div class="sk sk-line" style="width: 40%"></div>
+          </div>
+        </div>
+      </ng-container>
+      <!-- table -->
+      <ng-container *ngIf="skeletonVariant === 'table'">
+        <div class="sk sk-line" style="width: 100%; height: 28px"></div>
+        <div class="sk sk-line" style="width: 100%" *ngFor="let _ of rows"></div>
+      </ng-container>
+    </ng-container>
+
+    <!-- EMPTY -->
+    <div class="wc-state wc-empty" *ngIf="state === 'empty'">
+      <span class="wc-state-ic"><i [class]="emptyIcon"></i></span>
+      <div class="wc-state-title">{{ emptyText }}</div>
+      <button
+        *ngIf="emptyCta"
+        type="button"
+        class="wc-state-cta"
+        (click)="ctaClick.emit()"
+      >
+        {{ emptyCta.label }} <i class="pi pi-arrow-right"></i>
+      </button>
+    </div>
+
+    <!-- DENIED (fixed slot — never hidden) -->
+    <div class="wc-state wc-denied" *ngIf="state === 'denied'">
+      <span class="wc-state-ic wc-lock"><i class="pi pi-lock"></i></span>
+      <div class="wc-state-title">{{ deniedText }}</div>
+    </div>
+
+    <!-- ERROR -->
+    <div class="wc-state wc-error" *ngIf="state === 'error'">
+      <span class="wc-state-ic wc-err"><i class="pi pi-exclamation-triangle"></i></span>
+      <div class="wc-state-title">{{ errorText }}</div>
+      <button type="button" class="wc-state-cta" (click)="retry.emit()">
+        <i class="pi pi-refresh"></i> {{ 'HOME_DASH.RETRY' | translate }}
+      </button>
+    </div>
+  </div>
+</div>

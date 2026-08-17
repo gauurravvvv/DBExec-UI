@@ -1,195 +1,250 @@
-import { animate, style, transition, trigger } from '@angular/animations';
 import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
-  DestroyRef,
-  inject,
+  OnDestroy,
   OnInit,
 } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { ActivatedRoute } from '@angular/router';
-import { TranslateService } from '@ngx-translate/core';
+import { Router } from '@angular/router';
+import { Subject, takeUntil } from 'rxjs';
 import { GlobalService } from 'src/app/core/services/global.service';
+import { WidgetState } from 'src/app/shared/components/dashboard/widget-card/widget-card.component';
+import {
+  DonutSlice,
+  TrendSeries,
+} from 'src/app/shared/components/dashboard/trend-chart/trend-chart.component';
+import {
+  AdminSummary,
+  AdminTrendPoint,
+  DateWindow,
+  OrgsCreatedPoint,
+} from '../../models/dashboard.models';
 import { HomeService } from '../../services/home.service';
+
+interface Widget<T> {
+  state: WidgetState;
+  data: T | null;
+}
+type RangePreset = 7 | 30 | 90 | 'custom';
 
 @Component({
   selector: 'app-system-admin-home',
   templateUrl: './system-admin-home.component.html',
   styleUrls: ['./system-admin-home.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  animations: [
-    trigger('fadeInUp', [
-      transition(':enter', [
-        style({ transform: 'translateY(20px)', opacity: 0 }),
-        animate(
-          '0.4s ease-out',
-          style({ transform: 'translateY(0)', opacity: 1 }),
-        ),
-      ]),
-    ]),
-  ],
 })
-export class SystemAdminHomeComponent implements OnInit {
-  private destroyRef = inject(DestroyRef);
-  private cdr = inject(ChangeDetectorRef);
+export class SystemAdminHomeComponent implements OnInit, OnDestroy {
+  adminName = '';
 
-  organizations: any[] = [];
+  preset: RangePreset = 30;
+  window!: DateWindow;
+  customRange: Date[] | null = null;
 
-  entitiesData = {
-    totalDatasources: 0,
-    totalUsers: 0,
-    totalAdmins: 0,
-    totalEnvironment: 0,
-    maxDatasources: 0,
-    maxUsers: 0,
-    maxAdmins: 0,
-    maxEnvironment: 0,
-  };
+  summary: Widget<AdminSummary> = { state: 'loading', data: null };
+  trends: Widget<AdminTrendPoint[]> = { state: 'loading', data: null };
+  orgsCreated: Widget<OrgsCreatedPoint[]> = { state: 'loading', data: null };
 
-  activeUsers24hrs = 0;
-  activeUsers3days = 0;
-  activeUsers7days = 0;
-  activeUsers15days = 0;
-  activeUsers30days = 0;
+  /* derived chart inputs */
+  trendCategories: string[] = [];
+  trendSeries: TrendSeries[] = [];
+  orgsCategories: string[] = [];
+  orgsSeries: TrendSeries[] = [];
+  statusSlices: DonutSlice[] = [];
 
-  stats: any[] = [];
-
-  overviews: any[] = [];
+  private destroy$ = new Subject<void>();
 
   constructor(
-    private route: ActivatedRoute,
-    private globalService: GlobalService,
     private homeService: HomeService,
-    private translate: TranslateService,
+    private globalService: GlobalService,
+    private router: Router,
+    private cdr: ChangeDetectorRef,
   ) {}
 
   ngOnInit(): void {
-    this.updateStats();
+    this.adminName = this.globalService.getTokenDetails('name') || '';
+    this.window = this.resolveWindow(this.preset);
+    this.loadAll();
   }
 
-  onOrganizationChange(event: any) {
-    this.loadOrganizationData(event?.target.value);
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+    this.homeService.cancelReads();
   }
 
-  loadOrganizationData(_orgId: string) {
+  /* ================= loading ================= */
+
+  private loadAll(): void {
+    this.loadSummary();
+    this.loadTrends();
+    this.loadOrgsCreated();
+  }
+
+  private loadSummary(): void {
+    this.summary = { state: 'loading', data: null };
     this.homeService
-      .getSystemAdminDashboard()
-      .pipe(takeUntilDestroyed(this.destroyRef))
+      .getAdminSummary(this.window)
+      .pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: (res: any) => {
-          if (res) {
-            this.entitiesData.maxAdmins = res.data.maxAdmins;
-            this.entitiesData.maxDatasources = res.data.maxDatasources;
-            this.entitiesData.maxEnvironment = res.data.maxEnvironment;
-            this.entitiesData.maxUsers = res.data.maxUsers;
-            this.entitiesData.totalAdmins = res.data.adminsCount;
-            this.entitiesData.totalDatasources = res.data.datasourcesCount;
-            this.entitiesData.totalEnvironment = res.data.environmentCount;
-            this.entitiesData.totalUsers = res.data.usersCount;
-            this.updateStats();
-            this.cdr.markForCheck();
+        next: data => {
+          this.summary = { state: data ? 'ready' : 'empty', data };
+          if (data) {
+            this.statusSlices = [
+              {
+                name: 'Active',
+                value: data.platform.orgsActive,
+              },
+              {
+                name: 'Inactive',
+                value: data.platform.orgsInactive,
+              },
+            ];
           }
+          this.cdr.markForCheck();
         },
-        error: () => {
-          /* handled by interceptor */
-        },
+        error: () => this.fail('summary'),
       });
-    // Simulate fetching data based on organization ID
-    // Replace this with actual service calls
-    this.activeUsers24hrs = Math.floor(Math.random() * 100);
-    this.activeUsers3days = Math.floor(Math.random() * 300);
-    this.activeUsers7days = Math.floor(Math.random() * 500);
-    this.activeUsers15days = Math.floor(Math.random() * 700);
-    this.activeUsers30days = Math.floor(Math.random() * 1000);
-
-    this.updateStats();
   }
 
-  updateStats() {
-    this.stats = [
-      {
-        title: this.translate.instant('HOME.ACTIVE_USERS_24H'),
-        value: this.activeUsers24hrs,
-      },
-      {
-        title: this.translate.instant('HOME.ACTIVE_USERS_3D'),
-        value: this.activeUsers3days,
-      },
-      {
-        title: this.translate.instant('HOME.ACTIVE_USERS_7D'),
-        value: this.activeUsers7days,
-      },
-      {
-        title: this.translate.instant('HOME.ACTIVE_USERS_15D'),
-        value: this.activeUsers15days,
-      },
-      {
-        title: this.translate.instant('HOME.ACTIVE_USERS_30D'),
-        value: this.activeUsers30days,
-      },
-    ];
-
-    this.overviews = [
-      {
-        title: this.translate.instant('HOME.TOTAL_DATASOURCES'),
-        value: this.entitiesData.totalDatasources,
-        maxValue: this.entitiesData.maxDatasources,
-      },
-      {
-        title: this.translate.instant('HOME.TOTAL_ENVIRONMENTS'),
-        value: this.entitiesData.totalEnvironment,
-        maxValue: this.entitiesData.maxEnvironment,
-      },
-      {
-        title: this.translate.instant('HOME.TOTAL_ADMINS'),
-        value: this.entitiesData.totalAdmins,
-        maxValue: this.entitiesData.maxAdmins,
-      },
-      {
-        title: this.translate.instant('HOME.TOTAL_USERS'),
-        value: this.entitiesData.totalUsers,
-        maxValue: this.entitiesData.maxUsers,
-      },
-    ];
+  private loadTrends(): void {
+    this.trends = { state: 'loading', data: null };
+    this.homeService
+      .getAdminTrends(this.window)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: rows => {
+          const data = rows ?? [];
+          this.trendCategories = data.map(p => this.shortDate(p.date));
+          this.trendSeries = [
+            {
+              name: 'Queries',
+              data: data.map(p => p.queries),
+              type: 'bar',
+              colorVar: '--primary-color',
+            },
+            {
+              name: 'Logins',
+              data: data.map(p => p.logins),
+              type: 'line',
+              colorVar: '--warning-color',
+            },
+          ];
+          this.trends = { state: data.length ? 'ready' : 'empty', data };
+          this.cdr.markForCheck();
+        },
+        error: () => this.fail('trends'),
+      });
   }
 
-  trackById(index: number, item: any): any {
-    return item.id;
+  private loadOrgsCreated(): void {
+    this.orgsCreated = { state: 'loading', data: null };
+    this.homeService
+      .getOrgsCreated(this.window)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: rows => {
+          const data = rows ?? [];
+          this.orgsCategories = data.map(p => this.shortDate(p.date));
+          this.orgsSeries = [
+            {
+              name: 'New orgs',
+              data: data.map(p => p.count),
+              type: 'bar',
+              colorVar: '--success-color',
+            },
+          ];
+          this.orgsCreated = { state: data.length ? 'ready' : 'empty', data };
+          this.cdr.markForCheck();
+        },
+        error: () => this.fail('orgsCreated'),
+      });
   }
 
-  trackByIndex(index: number): number {
-    return index;
+  private fail(key: 'summary' | 'trends' | 'orgsCreated'): void {
+    (this[key] as Widget<unknown>).state = 'error';
+    this.cdr.markForCheck();
   }
 
-  getOverviewIcon(title: string): string {
-    const icons: { [key: string]: string } = {};
-    icons[this.translate.instant('HOME.TOTAL_DATASOURCES')] = 'fas fa-database';
-    icons[this.translate.instant('HOME.TOTAL_ENVIRONMENTS')] = 'fas fa-globe';
-    icons[this.translate.instant('HOME.TOTAL_ADMINS')] = 'fas fa-user-shield';
-    icons[this.translate.instant('HOME.TOTAL_USERS')] = 'fas fa-users';
-    return icons[title] || 'fas fa-chart-bar';
+  /* ================= date range ================= */
+
+  setPreset(preset: RangePreset): void {
+    if (preset === 'custom') {
+      this.preset = 'custom';
+      return;
+    }
+    this.preset = preset;
+    this.window = this.resolveWindow(preset);
+    this.loadAll();
   }
 
-  getProgressValue(obj: any) {
-    const maxValue = obj.maxValue;
-    return (obj.value / maxValue) * 100;
+  onCustomRange(range: Date[] | null): void {
+    if (!range || range.length < 2 || !range[0] || !range[1]) return;
+    this.preset = 'custom';
+    this.window = {
+      from: this.startOfDay(range[0]).toISOString(),
+      to: this.endOfDay(range[1]).toISOString(),
+    };
+    this.loadAll();
   }
 
-  addNewUser(): void {
-    // Implement add user functionality
+  refresh(): void {
+    this.loadAll();
   }
 
-  manageDatasource(): void {
-    // Implement database management functionality
+  private resolveWindow(days: RangePreset): DateWindow {
+    const to = this.endOfDay(new Date());
+    const from = new Date();
+    from.setDate(from.getDate() - (typeof days === 'number' ? days : 30));
+    return { from: this.startOfDay(from).toISOString(), to: to.toISOString() };
   }
 
-  viewReports(): void {
-    // Implement reports viewing functionality
+  /* ================= helpers ================= */
+
+  /** dbStatus → chip tone for the rollup table. */
+  dbStatusTone(status: string): 'success' | 'warning' | 'error' | 'neutral' {
+    switch (status) {
+      case 'connected':
+        return 'success';
+      case 'not_configured':
+        return 'neutral';
+      case 'timeout':
+        return 'warning';
+      default:
+        return 'error';
+    }
   }
 
-  getProgressPercentage(value: number): number {
-    const maxValue = Math.max(...this.stats.map(stat => stat.value));
-    return (value / maxValue) * 100;
+  loginSuccessRate(): number | null {
+    // Derived from the trend widget if present; platform success % is a
+    // headline the operator scans. Falls back to null (—) when no data.
+    const rows = this.trends.data;
+    if (!rows || !rows.length) return null;
+    const totalLogins = rows.reduce((s, r) => s + (r.logins || 0), 0);
+    return totalLogins > 0 ? 100 : null; // logins here are success-only counts
+  }
+
+  goOrgs(): void {
+    this.router.navigate(['/app/organisations']);
+  }
+  goAudit(): void {
+    this.router.navigate(['/app/audit']);
+  }
+  goLogins(): void {
+    this.router.navigate(['/app/audit/logins']);
+  }
+
+  private shortDate(iso: string): string {
+    const d = new Date(iso);
+    return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+  }
+  private startOfDay(d: Date): Date {
+    const x = new Date(d);
+    x.setHours(0, 0, 0, 0);
+    return x;
+  }
+  private endOfDay(d: Date): Date {
+    const x = new Date(d);
+    x.setHours(23, 59, 59, 999);
+    return x;
   }
 }

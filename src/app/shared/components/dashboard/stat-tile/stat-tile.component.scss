@@ -1,0 +1,110 @@
+.stat {
+  padding: var(--space-6);
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.stat-top {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
+}
+
+.stat-ic {
+  width: 30px;
+  height: 30px;
+  border-radius: var(--radius-md);
+  display: grid;
+  place-items: center;
+  font-size: 14px;
+  flex: 0 0 30px;
+}
+
+/* Accent per tone — soft background + strong icon, off theme tokens. */
+[data-tone='blue'] .stat-ic {
+  background: var(--primary-light);
+  color: var(--primary-hover);
+}
+[data-tone='green'] .stat-ic {
+  background: var(--success-bg);
+  color: var(--success-color);
+}
+[data-tone='amber'] .stat-ic {
+  background: var(--warning-bg);
+  color: var(--warning-color);
+}
+[data-tone='purple'] .stat-ic {
+  background: var(--info-bg);
+  color: var(--info-color);
+}
+[data-tone='red'] .stat-ic {
+  background: var(--error-bg);
+  color: var(--error-color);
+}
+
+.stat-label {
+  font-size: var(--fs-label);
+  color: var(--text-muted);
+  font-weight: var(--fw-semibold);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.stat-val {
+  font-size: 30px;
+  font-weight: var(--fw-bold);
+  line-height: 1;
+  letter-spacing: -0.5px;
+  color: var(--text-color);
+}
+
+.stat-secondary {
+  font-size: 16px;
+  color: var(--text-subtle);
+  font-weight: var(--fw-medium);
+}
+
+.stat-foot {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-top: var(--space-3);
+  min-height: 20px;
+}
+
+.stat-delta {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: var(--fs-micro);
+  font-weight: var(--fw-bold);
+  padding: 3px 8px;
+  border-radius: var(--radius-pill);
+
+  &.up {
+    background: var(--success-bg);
+    color: var(--success-color);
+  }
+  &.down {
+    background: var(--error-bg);
+    color: var(--error-color);
+  }
+  &.flat {
+    background: var(--secondary-background);
+    color: var(--text-muted);
+  }
+}
+
+.stat-caption {
+  font-size: var(--fs-micro);
+  color: var(--text-subtle);
+}
+
+.stat-spark {
+  height: 34px;
+  margin-top: var(--space-2);
+  width: 100%;
+}

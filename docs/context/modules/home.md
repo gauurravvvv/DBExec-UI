@@ -1,6 +1,6 @@
 # home
 > Update the Progress log on every change.
-> Code path: `src/app/modules/home` · Status: 🟢 · Last updated: 2026-07-24
+> Code path: `src/app/modules/home` · Status: 🟢 · Last updated: 2026-08-17
 
 ## 1. Context
 - **Responsibility:** The `/app/home` landing surface inside the shell. A tiny router-plus-two-dashboards module: an `empty-root` redirector picks the right home by permission, then renders either the **org-user** home or the **platform System-Admin** home.
@@ -22,6 +22,40 @@
 - **Out of scope:** Actual BI dashboards (that's the `dashboard` module); asset lists (their own modules).
 
 ## 3. Progress (newest first)
+### 2026-08-17 — Landing dashboards rebuilt (live data)
+- Done: Rebuilt both homes from static/placeholder into live, permission-aware
+  analytics dashboards (branch `feature/landing-dashboard`).
+  - **OrgHome**: greeting + global date controls (7/30/90 toggle +
+    `app-custom-daterange`); KPI row (queries/active-users/datasets/dashboards)
+    via `GET /home/summary`; charts (query-activity line, executions-by-module
+    donut, logins stacked bar) via `/home/trends/*` + `/home/executions-by-module`;
+    recent-activity feed via `/home/activity`; permission-aware quick actions.
+  - **SystemAdminHome**: rebuilt to `/home/system-admin/{summary,trends,orgs-created}`
+    — platform KPIs, platform activity + orgs-created charts, cross-org usage
+    rollup table, org-status donut. **Removed the `Math.random()` fake metric.**
+  - New shared kit `src/app/shared/components/dashboard/` (DashboardWidgetsModule):
+    `app-widget-card` (loading/ready/empty/**denied**/error states — the denied
+    state is a FIXED slot so gating never reflows the grid), `app-stat-tile`
+    (number + delta chip + animated ECharts sparkline), `app-trend-chart`
+    (animated line/bar/donut off theme tokens), `app-activity-item`,
+    `app-empty-state`. Re-exports the standalone `app-chip` (SharedModule imports
+    but doesn't export it).
+  - Per-widget parallel fetch (each widget owns its state + skeleton; fastest
+    paints first). Reads use `{ skipLoader: true }` — no global overlay.
+  - i18n: new top-level `HOME_DASH.*` namespace (NOT merged into the existing
+    `DASHBOARD` block, which belongs to the dashboards module), 78 keys × 10 locales.
+  - Announcement "at the very top" is already served app-wide by the shell
+    `announcement-banner` (conditional) — the dashboards add no announcement block.
+- Gates: `tsc --noEmit` ✓ · `ngc -p tsconfig.app.json --noEmit` ✓ ·
+  `ng build --configuration production` ✓. BE booted on :3000; all 8 new routes
+  return 401 unauth (registered + gated). Authenticated browser render deferred
+  (user testing locally).
+- Gotchas fixed during build: AOT flagged 4 `load*` handlers as private
+  (template `(retry)` calls) → made public; `app-chip` NG8001 → re-exported via
+  DashboardWidgetsModule.
+- Files: home module (org-home, system-admin-home, home.service, models/,
+  home.module), shared/components/dashboard/*, api.constant HOME.*, 10 i18n files.
+
 ### 2026-07-24 — Current state captured
 - Done: empty-root permission-based redirect + org-home (admin-gated cards) + system-admin-home (org-scoped stat cards). RBAC cleanup — permission-driven routing (a512ff0d), multi-role assumption dropped (3a79eb2b). Skeleton-loading + read cancellation (66fe8f41). Org-dropdown plumbing removed app-wide (7fa4a2b5).
 - In progress / Known issues: System-Admin home per-org data is light (legacy observable path + placeholder scaffolding). UI commits local-only on `version_261`.
