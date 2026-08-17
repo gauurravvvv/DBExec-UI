@@ -105,7 +105,7 @@ export class PromptService {
       // v2: a prompt is datasource-scoped (no tab/section). The API accepts a
       // batch — POST { datasource, prompts: [...] } — so wrap the single flat
       // form into a one-element prompts array.
-      const { datasource, name, description, type, groupName } = promptForm;
+      const { datasource, name, description, type } = promptForm;
       return await lastValueFrom(
         this.http.apiPost(
           PROMPT.ADD,
@@ -116,7 +116,6 @@ export class PromptService {
                 name,
                 description: description || '',
                 type,
-                groupName: groupName || null,
               },
             ],
           },
@@ -131,8 +130,7 @@ export class PromptService {
   async update(form: FormGroup, justification?: string): Promise<any> {
     this._saving.set(true);
     try {
-      const { id, datasource, name, description, groupName, status } =
-        form.value;
+      const { id, datasource, name, description, status } = form.value;
       // PUT /prompts/:promptId
       return await lastValueFrom(
         this.http.apiPut(
@@ -142,7 +140,6 @@ export class PromptService {
             datasource,
             name,
             description,
-            groupName: groupName || null,
             status: status ? 1 : 0,
             justification,
           },

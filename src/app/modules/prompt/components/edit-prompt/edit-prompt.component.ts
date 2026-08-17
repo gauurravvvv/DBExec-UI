@@ -86,7 +86,6 @@ export class EditPromptComponent implements OnInit, HasUnsavedChanges {
       ],
       description: [''],
       datasource: [''],
-      groupName: [''],
       status: [false],
     });
   }
@@ -105,7 +104,6 @@ export class EditPromptComponent implements OnInit, HasUnsavedChanges {
             name: data.name,
             description: data.description,
             datasource: data.datasourceId,
-            groupName: data.groupName ?? '',
             status: data.status,
           });
 
@@ -176,7 +174,6 @@ export class EditPromptComponent implements OnInit, HasUnsavedChanges {
         name: this.promptData.name,
         description: this.promptData.description,
         datasource: this.promptData.datasourceId,
-        groupName: this.promptData.groupName ?? '',
         status: this.promptData.status,
       });
 

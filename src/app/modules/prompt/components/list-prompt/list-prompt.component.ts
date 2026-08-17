@@ -140,13 +140,6 @@ export class ListPromptComponent implements OnInit, OnDestroy {
         filter: 'text',
       },
       {
-        colId: 'groupName',
-        field: 'groupName',
-        header: t('PROMPT_MODULE.GROUP'),
-        width: '176px',
-        filter: 'text',
-      },
-      {
         colId: 'type',
         field: 'type',
         header: t('COMMON.TYPE'),

@@ -85,7 +85,6 @@ export class AddPromptComponent implements OnInit, HasUnsavedChanges {
       ],
       description: [''],
       type: ['', Validators.required],
-      groupName: [''],
     });
   }
 
