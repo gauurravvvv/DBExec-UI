@@ -14,8 +14,8 @@
   flex-direction: column;
   gap: var(--space-8);
   padding: var(--space-8) var(--space-9);
-  max-width: 60rem;
-  margin: 0 auto;
+  // Left-aligned, full-width (app convention — NOT centered).
+  margin: var(--space-0);
   width: 100%;
 }
 

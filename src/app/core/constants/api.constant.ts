@@ -298,41 +298,41 @@ export const QUERY_BUILDER = {
 };
 
 export const FORM_BUILDER = {
-  BASE: 'forms/', // list + create (POST/GET /api/v1/forms)
-  GET: 'forms/', // + id (GET /forms/:id — family header + version list)
+  BASE: '/forms/', // list + create (POST/GET /api/v1/forms)
+  GET: '/forms/', // + id (GET /forms/:id — family header + version list)
   // runtime composer hydration — published version; ?preview=1 falls back to latest draft
-  schema: (id: string) => `forms/${id}/schema`,
+  schema: (id: string) => `/forms/${id}/schema`,
   // runtime compose → SQL (all ACCESS.READ)
-  preview: (id: string) => `forms/${id}/preview`,
-  validate: (id: string) => `forms/${id}/validate`,
-  execute: (id: string) => `forms/${id}/execute`,
-  count: (id: string) => `forms/${id}/count`,
+  preview: (id: string) => `/forms/${id}/preview`,
+  validate: (id: string) => `/forms/${id}/validate`,
+  execute: (id: string) => `/forms/${id}/execute`,
+  count: (id: string) => `/forms/${id}/count`,
   // version-scoped structure writes (DRAFT-ONLY → 422 NOT_DRAFT otherwise)
-  tabs: (id: string, v: number) => `forms/${id}/versions/${v}/tabs`, // + `/${tabId}` PATCH/DELETE
-  sections: (id: string, v: number) => `forms/${id}/versions/${v}/sections`, // + `/${sectionId}`
-  fields: (id: string, v: number) => `forms/${id}/versions/${v}/fields`, // + `/${formFieldId}`
-  reorder: (id: string, v: number) => `forms/${id}/versions/${v}/reorder`,
-  rules: (id: string, v: number) => `forms/${id}/versions/${v}/rules`, // + `/${ruleId}`; `/validate`
+  tabs: (id: string, v: number) => `/forms/${id}/versions/${v}/tabs`, // + `/${tabId}` PATCH/DELETE
+  sections: (id: string, v: number) => `/forms/${id}/versions/${v}/sections`, // + `/${sectionId}`
+  fields: (id: string, v: number) => `/forms/${id}/versions/${v}/fields`, // + `/${formFieldId}`
+  reorder: (id: string, v: number) => `/forms/${id}/versions/${v}/reorder`,
+  rules: (id: string, v: number) => `/forms/${id}/versions/${v}/rules`, // + `/${ruleId}`; `/validate`
   fieldPerms: (id: string, v: number, formFieldId: string) =>
-    `forms/${id}/versions/${v}/fields/${formFieldId}/permissions`, // + `/${roleId}` DELETE
+    `/forms/${id}/versions/${v}/fields/${formFieldId}/permissions`, // + `/${roleId}` DELETE
   // lifecycle (version-scoped)
-  publish: (id: string, v: number) => `forms/${id}/versions/${v}/publish`,
-  retire: (id: string, v: number) => `forms/${id}/versions/${v}/retire`,
-  fork: (id: string, v: number) => `forms/${id}/versions/${v}/fork`,
+  publish: (id: string, v: number) => `/forms/${id}/versions/${v}/publish`,
+  retire: (id: string, v: number) => `/forms/${id}/versions/${v}/retire`,
+  fork: (id: string, v: number) => `/forms/${id}/versions/${v}/fork`,
   // full resolved design tree for a version (designer + preview)
-  version: (id: string, v: number) => `forms/${id}/versions/${v}`,
+  version: (id: string, v: number) => `/forms/${id}/versions/${v}`,
   // ── Portability (Phase 8) ────────────────────────────────────────────
   // Export streams a file (blob). Import + save-as-template + clone are WRITE.
   exportVersion: (id: string, v: number) =>
-    `forms/${id}/versions/${v}/export`,
+    `/forms/${id}/versions/${v}/export`,
   saveAsTemplate: (id: string, v: number) =>
-    `forms/${id}/versions/${v}/save-as-template`,
+    `/forms/${id}/versions/${v}/save-as-template`,
   cloneVersion: (id: string, v: number) =>
-    `forms/${id}/versions/${v}/clone`,
-  IMPORT: 'forms/import',
-  TEMPLATES: 'forms/templates',
-  template: (id: string) => `forms/templates/${id}`,
-  cloneTemplate: (id: string) => `forms/templates/${id}/clone`,
+    `/forms/${id}/versions/${v}/clone`,
+  IMPORT: '/forms/import',
+  TEMPLATES: '/forms/templates',
+  template: (id: string) => `/forms/templates/${id}`,
+  cloneTemplate: (id: string) => `/forms/templates/${id}/clone`,
 };
 
 export const QUERY = {
