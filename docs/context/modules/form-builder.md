@@ -30,6 +30,12 @@
 - Out of scope: hand-written SQL (dataset/query-runner), chart authoring (analyses).
 
 ## 3. Progress (newest first)
+### 2026-08-17 — F2 fix (designer↔runtime contract drift): no FE source change needed
+- **Finding:** `getFormVersion` (the design read) returned the runtime `ResolvedFieldNode` shape, so on reload the properties panel's Allowed-operators multiselect (`[ngModel]="field.allowedOperators || []"`) was empty, the field header (`field.prompt?.name`) fell back to raw `type`, and per-locale label/help overrides didn't round-trip.
+- **Root cause was BE-only:** the FE `ResolvedField` type + `FormBuilderStore` (`toFieldBody`, `fieldKeys`, `createPlacement`) + `fb-prop-field` template were ALREADY authored to read `allowedOperators`/`prompt`/`localeLabels`/`localeHelps` — the BE just never sent them. The fix is a BE designer serializer (`serializers/serializeDesignFields.ts`) that enriches `getFormVersion`'s fields with the authored placement values; `store.hydrate` passes them through verbatim. **Zero FE source changes** — `form-runtime-store.ts` (the runtime path) + `fb-types.ts` untouched.
+- **Test added:** `services/form-builder-store.hydrate.spec.ts` (4 jest cases) — hydrating a wire field preserves `allowedOperators` (the multiselect binds the saved set), null stays null, `prompt?.name` present, locale maps round-trip.
+- **Gates: `tsc` 0 · `ngc` 0 · `jest src/app/modules/form-builder` 38/38 · `build-prod` success.** Committed on `feature/prompt-builder` (not pushed).
+
 ### 2026-08-17 — Phase 8 (FE): portability UI — export, import, templates + clone
 - Added `FormPortabilityService` (signal busy state) with blob export (Content-Disposition filename + JSON-error-envelope detection, interceptor-safe), import, save-as-template, list + clone templates — copying `MigrationService`'s blob discipline verbatim.
 - Three small components: `import-form-dialog` (file picker → JSON.parse → mirrored `importFormSchema` → POST /forms/import → navigate to the new family), `save-as-template-dialog` (name + description → save-as-template, validated by `saveTemplateSchema`), `list-form-templates` (template gallery + Clone-to-new-family, per-row spinner). Wired Export / Save-as-template / Import / Templates buttons into the `view-form` header + a `templates` route (before `:id`).
