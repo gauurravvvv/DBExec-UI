@@ -6579,7 +6579,8 @@
       "PUBLISHED": "Published",
       "READ_ONLY_BANNER": "This version is read-only. Fork it to make changes.",
       "PUBLISH": "Publish",
-      "FORK": "Fork"
+      "FORK": "Fork",
+      "RETIRED": "Retired"
     },
     "INSPECTOR": {
       "DESIGN": "Design",
