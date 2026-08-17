@@ -2063,6 +2063,7 @@
     "GREETING": "Bienvenido de nuevo, {{name}}",
     "SUBTITLE": "Esto es lo que ocurre en {{org}}",
     "RANGE": "Rango de fechas",
+    "RANGE_ALL": "Todo",
     "RANGE_7": "7 d",
     "RANGE_30": "30 d",
     "RANGE_90": "90 d",
@@ -2152,7 +2153,18 @@
         "not_configured": "No configurado",
         "connection_failed": "Error de conexión",
         "timeout": "Tiempo agotado"
-      }
+      },
+      "INACTIVE_ORGS": "Orgs inactivas",
+      "INACTIVE_CAPTION": "desactivadas",
+      "SYSTEM_USERS": "Usuarios del sistema",
+      "SYSTEM_USERS_CAPTION": "operadores de la plataforma",
+      "ORG_LIST": "Organizaciones",
+      "COL_CREATED": "Creada",
+      "LOGIN_HEALTH": "Estado de inicio de sesión",
+      "NO_LOGINS": "Sin actividad de inicio de sesión en este período",
+      "SUCCESS_RATE": "tasa de éxito",
+      "OK_FAILED": "correctos / fallidos",
+      "PLATFORM_FEED": "Actividad reciente de la plataforma"
     }
   },
   "DASHBOARD": {

@@ -5,217 +5,270 @@
   <div class="dash-card">
     <!-- static header + date controls -->
     <div class="dash-head">
-    <div class="dash-greeting">
-      <h1>{{ 'HOME_DASH.ADMIN.TITLE' | translate }}</h1>
-      <p class="dash-sub">{{ 'HOME_DASH.ADMIN.SUBTITLE' | translate }}</p>
-    </div>
-    <div class="dash-controls">
-      <div class="seg" role="group">
-        <button type="button" [class.on]="preset === 7" (click)="setPreset(7)">
-          {{ 'HOME_DASH.RANGE_7' | translate }}
-        </button>
-        <button type="button" [class.on]="preset === 30" (click)="setPreset(30)">
-          {{ 'HOME_DASH.RANGE_30' | translate }}
-        </button>
-        <button type="button" [class.on]="preset === 90" (click)="setPreset(90)">
-          {{ 'HOME_DASH.RANGE_90' | translate }}
+      <div class="dash-greeting">
+        <h1>{{ 'HOME_DASH.ADMIN.TITLE' | translate }}</h1>
+        <p class="dash-sub">{{ 'HOME_DASH.ADMIN.SUBTITLE' | translate }}</p>
+      </div>
+      <div class="dash-controls">
+        <div class="seg" role="group">
+          <button
+            type="button"
+            [class.on]="preset === 'all'"
+            (click)="setAllTime()"
+          >
+            {{ 'HOME_DASH.RANGE_ALL' | translate }}
+          </button>
+          <button type="button" [class.on]="preset === 7" (click)="setPreset(7)">
+            {{ 'HOME_DASH.RANGE_7' | translate }}
+          </button>
+          <button type="button" [class.on]="preset === 30" (click)="setPreset(30)">
+            {{ 'HOME_DASH.RANGE_30' | translate }}
+          </button>
+          <button type="button" [class.on]="preset === 90" (click)="setPreset(90)">
+            {{ 'HOME_DASH.RANGE_90' | translate }}
+          </button>
+        </div>
+        <app-custom-daterange
+          class="dash-range"
+          [(ngModel)]="customRange"
+          [placeholder]="'HOME_DASH.CUSTOM_RANGE' | translate"
+          (ngModelChange)="onCustomRange($event)"
+        ></app-custom-daterange>
+        <button type="button" class="dash-refresh" (click)="refresh()">
+          <i class="pi pi-refresh"></i> {{ 'HOME_DASH.REFRESH' | translate }}
         </button>
       </div>
-      <app-custom-daterange
-        class="dash-range"
-        [(ngModel)]="customRange"
-        [placeholder]="'HOME_DASH.CUSTOM_RANGE' | translate"
-        (ngModelChange)="onCustomRange($event)"
-      ></app-custom-daterange>
-      <button type="button" class="dash-refresh" (click)="refresh()">
-        <i class="pi pi-refresh"></i> {{ 'HOME_DASH.REFRESH' | translate }}
-      </button>
     </div>
-  </div>
 
     <!-- scrolling widget body (only this region scrolls) -->
     <div class="dash-body">
-  <!-- KPI row -->
-  <div class="dash-grid kpi-row">
-    <app-widget-card
-      skeletonVariant="stat"
-      [state]="summary.state"
-      [errorText]="'HOME_DASH.ERROR' | translate"
-      (retry)="refresh()"
-    >
-      <app-stat-tile
-        [label]="'HOME_DASH.ADMIN.ORGS' | translate"
-        [value]="summary.data?.platform?.orgsTotal ?? null"
-        format="number"
-        tone="blue"
-        icon="pi pi-building"
-        [delta]="summary.data?.platform?.orgsNewInPeriod ?? null"
-        deltaUnit=""
-        [caption]="'HOME_DASH.ADMIN.NEW_IN_PERIOD' | translate"
-      ></app-stat-tile>
-    </app-widget-card>
+      <!-- KPI row — master-DB facts only -->
+      <div class="dash-grid kpi-row">
+        <app-widget-card
+          skeletonVariant="stat"
+          [state]="summary.state"
+          [errorText]="'HOME_DASH.ERROR' | translate"
+          (retry)="refresh()"
+        >
+          <app-stat-tile
+            [label]="'HOME_DASH.ADMIN.ORGS' | translate"
+            [value]="summary.data?.platform?.orgsTotal ?? null"
+            format="number"
+            tone="blue"
+            icon="ci ci-building"
+            [delta]="summary.data?.platform?.orgsNewInPeriod ?? null"
+            deltaUnit=""
+            [caption]="'HOME_DASH.ADMIN.NEW_IN_PERIOD' | translate"
+          ></app-stat-tile>
+        </app-widget-card>
 
-    <app-widget-card
-      skeletonVariant="stat"
-      [state]="summary.state"
-      [errorText]="'HOME_DASH.ERROR' | translate"
-      (retry)="refresh()"
-    >
-      <app-stat-tile
-        [label]="'HOME_DASH.ADMIN.ACTIVE_ORGS' | translate"
-        [value]="summary.data?.platform?.orgsActive ?? null"
-        [secondary]="summary.data?.platform?.orgsTotal ?? null"
-        format="number"
-        tone="green"
-        icon="pi pi-check-circle"
-        [caption]="'HOME_DASH.ADMIN.ACTIVE_CAPTION' | translate"
-      ></app-stat-tile>
-    </app-widget-card>
+        <app-widget-card
+          skeletonVariant="stat"
+          [state]="summary.state"
+          [errorText]="'HOME_DASH.ERROR' | translate"
+          (retry)="refresh()"
+        >
+          <app-stat-tile
+            [label]="'HOME_DASH.ADMIN.ACTIVE_ORGS' | translate"
+            [value]="summary.data?.platform?.orgsActive ?? null"
+            [secondary]="summary.data?.platform?.orgsTotal ?? null"
+            format="number"
+            tone="green"
+            icon="ci ci-shield-check"
+            [caption]="'HOME_DASH.ADMIN.ACTIVE_CAPTION' | translate"
+          ></app-stat-tile>
+        </app-widget-card>
 
-    <app-widget-card
-      skeletonVariant="stat"
-      [state]="summary.state"
-      [errorText]="'HOME_DASH.ERROR' | translate"
-      (retry)="refresh()"
-    >
-      <app-stat-tile
-        [label]="'HOME_DASH.ADMIN.TOTAL_USERS' | translate"
-        [value]="summary.data?.totals?.usersAllOrgs ?? null"
-        format="compact"
-        tone="purple"
-        icon="pi pi-users"
-        [caption]="'HOME_DASH.ADMIN.ALL_ORGS' | translate"
-      ></app-stat-tile>
-    </app-widget-card>
+        <app-widget-card
+          skeletonVariant="stat"
+          [state]="summary.state"
+          [errorText]="'HOME_DASH.ERROR' | translate"
+          (retry)="refresh()"
+        >
+          <app-stat-tile
+            [label]="'HOME_DASH.ADMIN.INACTIVE_ORGS' | translate"
+            [value]="summary.data?.platform?.orgsInactive ?? null"
+            format="number"
+            tone="amber"
+            icon="ci ci-building"
+            [caption]="'HOME_DASH.ADMIN.INACTIVE_CAPTION' | translate"
+          ></app-stat-tile>
+        </app-widget-card>
 
-    <app-widget-card
-      skeletonVariant="stat"
-      [state]="summary.state"
-      [errorText]="'HOME_DASH.ERROR' | translate"
-      (retry)="refresh()"
-    >
-      <app-stat-tile
-        [label]="'HOME_DASH.ADMIN.PLATFORM_QUERIES' | translate"
-        [value]="summary.data?.totals?.queriesAllOrgs ?? null"
-        format="compact"
-        tone="amber"
-        icon="pi pi-bolt"
-        [caption]="'HOME_DASH.ADMIN.IN_RANGE' | translate"
-      ></app-stat-tile>
-    </app-widget-card>
-  </div>
-
-  <!-- charts -->
-  <div class="dash-grid cols-2">
-    <app-widget-card
-      [title]="'HOME_DASH.ADMIN.PLATFORM_ACTIVITY' | translate"
-      icon="pi pi-chart-line"
-      skeletonVariant="chart"
-      [state]="trends.state"
-      [link]="{ label: ('HOME_DASH.LINK.AUDIT' | translate) }"
-      [emptyText]="'HOME_DASH.EMPTY.NO_QUERIES' | translate"
-      [errorText]="'HOME_DASH.ERROR' | translate"
-      (linkClick)="goAudit()"
-      (retry)="refresh()"
-    >
-      <app-trend-chart
-        [categories]="trendCategories"
-        [series]="trendSeries"
-        [height]="260"
-      ></app-trend-chart>
-    </app-widget-card>
-
-    <app-widget-card
-      [title]="'HOME_DASH.ADMIN.ORGS_CREATED' | translate"
-      icon="pi pi-building"
-      skeletonVariant="chart"
-      [state]="orgsCreated.state"
-      [emptyText]="'HOME_DASH.ADMIN.NO_ORGS_CREATED' | translate"
-      [errorText]="'HOME_DASH.ERROR' | translate"
-      (retry)="refresh()"
-    >
-      <app-trend-chart
-        [categories]="orgsCategories"
-        [series]="orgsSeries"
-        [legend]="false"
-        [height]="260"
-      ></app-trend-chart>
-    </app-widget-card>
-  </div>
-
-  <!-- rollup table + status donut -->
-  <div class="dash-grid cols-rollup">
-    <app-widget-card
-      [title]="'HOME_DASH.ADMIN.ROLLUP' | translate"
-      icon="pi pi-table"
-      skeletonVariant="table"
-      [skeletonRows]="5"
-      [state]="rollupState"
-      [link]="{ label: ('HOME_DASH.ADMIN.ALL_ORGS_LINK' | translate) }"
-      [emptyText]="'HOME_DASH.ADMIN.NO_ORGS' | translate"
-      [errorText]="'HOME_DASH.ERROR' | translate"
-      (linkClick)="goOrgs()"
-      (retry)="refresh()"
-    >
-      <div class="rollup-scroll">
-        <table class="rollup">
-          <thead>
-            <tr>
-              <th>{{ 'HOME_DASH.ADMIN.COL_ORG' | translate }}</th>
-              <th>{{ 'HOME_DASH.ADMIN.COL_STATUS' | translate }}</th>
-              <th class="num">{{ 'HOME_DASH.ADMIN.COL_USERS' | translate }}</th>
-              <th class="num">{{ 'HOME_DASH.ADMIN.COL_DATASETS' | translate }}</th>
-              <th class="num">{{ 'HOME_DASH.ADMIN.COL_QUERIES' | translate }}</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let row of summary.data?.rollup">
-              <td>
-                <b>{{ row.orgName }}</b>
-                <app-chip
-                  *ngIf="row.dbStatus !== 'connected'"
-                  variant="badge"
-                  [tone]="dbStatusTone(row.dbStatus)"
-                  size="sm"
-                  >{{ 'HOME_DASH.ADMIN.DBSTATUS.' + row.dbStatus | translate }}</app-chip
-                >
-              </td>
-              <td>
-                <app-chip
-                  variant="status"
-                  [tone]="row.status === 1 ? 'success' : 'warning'"
-                  >{{
-                    (row.status === 1
-                      ? 'HOME_DASH.ADMIN.ACTIVE'
-                      : 'HOME_DASH.ADMIN.INACTIVE'
-                    ) | translate
-                  }}</app-chip
-                >
-              </td>
-              <td class="num tnum">{{ row.users }}</td>
-              <td class="num tnum">{{ row.datasets }}</td>
-              <td class="num tnum">{{ row.queries30d }}</td>
-            </tr>
-          </tbody>
-        </table>
+        <!-- System users = master (.env) DB operators only. -->
+        <app-widget-card
+          skeletonVariant="stat"
+          [state]="summary.state"
+          [errorText]="'HOME_DASH.ERROR' | translate"
+          (retry)="refresh()"
+        >
+          <app-stat-tile
+            [label]="'HOME_DASH.ADMIN.SYSTEM_USERS' | translate"
+            [value]="summary.data?.systemUsers?.active ?? null"
+            [secondary]="summary.data?.systemUsers?.total ?? null"
+            format="number"
+            tone="purple"
+            icon="ci ci-user-tie"
+            [caption]="'HOME_DASH.ADMIN.SYSTEM_USERS_CAPTION' | translate"
+          ></app-stat-tile>
+        </app-widget-card>
       </div>
-    </app-widget-card>
 
-    <app-widget-card
-      [title]="'HOME_DASH.ADMIN.ORG_STATUS' | translate"
-      icon="pi pi-chart-pie"
-      skeletonVariant="chart"
-      [state]="summary.state"
-      [errorText]="'HOME_DASH.ERROR' | translate"
-      (retry)="refresh()"
-    >
-      <app-trend-chart
-        variant="donut"
-        [slices]="statusSlices"
-        [height]="240"
-      ></app-trend-chart>
-    </app-widget-card>
-  </div>
+      <!-- charts (master activity + orgs created) -->
+      <div class="dash-grid cols-2">
+        <app-widget-card
+          [title]="'HOME_DASH.ADMIN.PLATFORM_ACTIVITY' | translate"
+          icon="ci ci-chart-simple"
+          skeletonVariant="chart"
+          [state]="trends.state"
+          [link]="{ label: ('HOME_DASH.LINK.AUDIT' | translate) }"
+          [emptyText]="'HOME_DASH.EMPTY.NO_QUERIES' | translate"
+          [errorText]="'HOME_DASH.ERROR' | translate"
+          (linkClick)="goAudit()"
+          (retry)="refresh()"
+        >
+          <app-trend-chart
+            [categories]="trendCategories"
+            [series]="trendSeries"
+            [height]="260"
+          ></app-trend-chart>
+        </app-widget-card>
+
+        <app-widget-card
+          [title]="'HOME_DASH.ADMIN.ORGS_CREATED' | translate"
+          icon="ci ci-building"
+          skeletonVariant="chart"
+          [state]="orgsCreated.state"
+          [emptyText]="'HOME_DASH.ADMIN.NO_ORGS_CREATED' | translate"
+          [errorText]="'HOME_DASH.ERROR' | translate"
+          (retry)="refresh()"
+        >
+          <app-trend-chart
+            [categories]="orgsCategories"
+            [series]="orgsSeries"
+            [legend]="false"
+            [height]="260"
+          ></app-trend-chart>
+        </app-widget-card>
+      </div>
+
+      <!-- Organisations table (master-DB only) + org-status donut -->
+      <div class="dash-grid cols-rollup">
+        <app-widget-card
+          [title]="'HOME_DASH.ADMIN.ORG_LIST' | translate"
+          icon="ci ci-building"
+          skeletonVariant="table"
+          [skeletonRows]="6"
+          [state]="organisations.state"
+          [link]="{ label: ('HOME_DASH.ADMIN.ALL_ORGS_LINK' | translate) }"
+          [emptyText]="'HOME_DASH.ADMIN.NO_ORGS' | translate"
+          [errorText]="'HOME_DASH.ERROR' | translate"
+          (linkClick)="goOrgs()"
+          (retry)="loadOrganisations()"
+        >
+          <div class="rollup-scroll">
+            <table class="rollup">
+              <thead>
+                <tr>
+                  <th>{{ 'HOME_DASH.ADMIN.COL_ORG' | translate }}</th>
+                  <th>{{ 'HOME_DASH.ADMIN.COL_STATUS' | translate }}</th>
+                  <th>{{ 'HOME_DASH.ADMIN.COL_CREATED' | translate }}</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let org of organisations.data">
+                  <td><b>{{ org.name }}</b></td>
+                  <td>
+                    <app-chip
+                      variant="status"
+                      [tone]="org.status === 1 ? 'success' : 'warning'"
+                      >{{
+                        (org.status === 1
+                          ? 'HOME_DASH.ADMIN.ACTIVE'
+                          : 'HOME_DASH.ADMIN.INACTIVE'
+                        ) | translate
+                      }}</app-chip
+                    >
+                  </td>
+                  <td>{{ fmtDate(org.createdOn) }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </app-widget-card>
+
+        <app-widget-card
+          [title]="'HOME_DASH.ADMIN.ORG_STATUS' | translate"
+          icon="ci ci-visualization"
+          skeletonVariant="chart"
+          [state]="summary.state"
+          [errorText]="'HOME_DASH.ERROR' | translate"
+          (retry)="refresh()"
+        >
+          <app-trend-chart
+            variant="donut"
+            [slices]="statusSlices"
+            [height]="240"
+          ></app-trend-chart>
+        </app-widget-card>
+      </div>
+
+      <!-- System-user login health + platform activity feed -->
+      <div class="dash-grid cols-2">
+        <app-widget-card
+          [title]="'HOME_DASH.ADMIN.LOGIN_HEALTH' | translate"
+          icon="ci ci-login-activity"
+          skeletonVariant="chart"
+          [state]="loginHealth.state"
+          [link]="{ label: ('HOME_DASH.LINK.LOGIN_ACTIVITY' | translate) }"
+          [emptyText]="'HOME_DASH.ADMIN.NO_LOGINS' | translate"
+          [errorText]="'HOME_DASH.ERROR' | translate"
+          (linkClick)="goAudit()"
+          (retry)="loadLoginHealth()"
+        >
+          <div class="login-health">
+            <div class="lh-summary" *ngIf="loginHealth.data?.summary as s">
+              <div class="lh-rate">
+                <span class="lh-rate-val tnum">{{ s.successRate | number: '1.0-1' }}%</span>
+                <span class="lh-rate-lbl">{{ 'HOME_DASH.ADMIN.SUCCESS_RATE' | translate }}</span>
+              </div>
+              <div class="lh-counts">
+                <span class="lh-ok tnum">{{ s.success }}</span>
+                <span class="lh-sep">/</span>
+                <span class="lh-fail tnum">{{ s.failed }}</span>
+                <span class="lh-lbl">{{ 'HOME_DASH.ADMIN.OK_FAILED' | translate }}</span>
+              </div>
+            </div>
+            <app-trend-chart
+              [categories]="loginHealthCategories"
+              [series]="loginHealthSeries"
+              [stacked]="true"
+              [height]="200"
+            ></app-trend-chart>
+          </div>
+        </app-widget-card>
+
+        <app-widget-card
+          [title]="'HOME_DASH.ADMIN.PLATFORM_FEED' | translate"
+          icon="ci ci-audit-logs"
+          skeletonVariant="list"
+          [skeletonRows]="6"
+          [state]="activity.state"
+          [link]="{ label: ('HOME_DASH.LINK.AUDIT' | translate) }"
+          [emptyText]="'HOME_DASH.EMPTY.NO_ACTIVITY' | translate"
+          [errorText]="'HOME_DASH.ERROR' | translate"
+          (linkClick)="goAudit()"
+          (retry)="loadActivity()"
+        >
+          <div class="feed">
+            <app-activity-item
+              *ngFor="let row of activity.data"
+              [entry]="toEntry(row)"
+              [verb]="verbKey(row.action) | translate"
+            ></app-activity-item>
+          </div>
+        </app-widget-card>
+      </div>
     </div>
   </div>
 </div>

@@ -2063,6 +2063,7 @@
     "GREETING": "Welkom terug, {{name}}",
     "SUBTITLE": "Dit gebeurt er in {{org}}",
     "RANGE": "Datumbereik",
+    "RANGE_ALL": "Alles",
     "RANGE_7": "7 d",
     "RANGE_30": "30 d",
     "RANGE_90": "90 d",
@@ -2152,7 +2153,18 @@
         "not_configured": "Niet geconfigureerd",
         "connection_failed": "Verbinding mislukt",
         "timeout": "Time-out"
-      }
+      },
+      "INACTIVE_ORGS": "Inactieve orgs",
+      "INACTIVE_CAPTION": "gedeactiveerd",
+      "SYSTEM_USERS": "Systeemgebruikers",
+      "SYSTEM_USERS_CAPTION": "platformbeheerders",
+      "ORG_LIST": "Organisaties",
+      "COL_CREATED": "Aangemaakt",
+      "LOGIN_HEALTH": "Aanmeldstatus",
+      "NO_LOGINS": "Geen aanmeldactiviteit in deze periode",
+      "SUCCESS_RATE": "slagingspercentage",
+      "OK_FAILED": "ok / mislukt",
+      "PLATFORM_FEED": "Recente platformactiviteit"
     }
   },
   "DASHBOARD": {

@@ -2066,6 +2066,7 @@
     "GREETING": "Welcome back, {{name}}",
     "SUBTITLE": "Here's what's happening in {{org}}",
     "RANGE": "Date range",
+    "RANGE_ALL": "All",
     "RANGE_7": "7d",
     "RANGE_30": "30d",
     "RANGE_90": "90d",
@@ -2155,7 +2156,18 @@
         "not_configured": "Not configured",
         "connection_failed": "Connection failed",
         "timeout": "Timed out"
-      }
+      },
+      "INACTIVE_ORGS": "Inactive orgs",
+      "INACTIVE_CAPTION": "deactivated",
+      "SYSTEM_USERS": "System users",
+      "SYSTEM_USERS_CAPTION": "platform operators",
+      "ORG_LIST": "Organisations",
+      "COL_CREATED": "Created",
+      "LOGIN_HEALTH": "Login health",
+      "NO_LOGINS": "No login activity in this period",
+      "SUCCESS_RATE": "success rate",
+      "OK_FAILED": "ok / failed",
+      "PLATFORM_FEED": "Recent platform activity"
     }
   },
   "DASHBOARD": {

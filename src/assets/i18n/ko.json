@@ -2063,6 +2063,7 @@
     "GREETING": "다시 오신 것을 환영합니다, {{name}}님",
     "SUBTITLE": "{{org}}의 최신 현황입니다",
     "RANGE": "기간",
+    "RANGE_ALL": "전체",
     "RANGE_7": "7일",
     "RANGE_30": "30일",
     "RANGE_90": "90일",
@@ -2152,7 +2153,18 @@
         "not_configured": "구성되지 않음",
         "connection_failed": "연결 실패",
         "timeout": "시간 초과"
-      }
+      },
+      "INACTIVE_ORGS": "비활성 조직",
+      "INACTIVE_CAPTION": "비활성화됨",
+      "SYSTEM_USERS": "시스템 사용자",
+      "SYSTEM_USERS_CAPTION": "플랫폼 운영자",
+      "ORG_LIST": "조직",
+      "COL_CREATED": "생성일",
+      "LOGIN_HEALTH": "로그인 상태",
+      "NO_LOGINS": "이 기간에 로그인 활동이 없습니다",
+      "SUCCESS_RATE": "성공률",
+      "OK_FAILED": "성공 / 실패",
+      "PLATFORM_FEED": "최근 플랫폼 활동"
     }
   },
   "DASHBOARD": {

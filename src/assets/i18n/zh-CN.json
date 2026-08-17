@@ -2063,6 +2063,7 @@
     "GREETING": "欢迎回来，{{name}}",
     "SUBTITLE": "以下是 {{org}} 的最新动态",
     "RANGE": "日期范围",
+    "RANGE_ALL": "全部",
     "RANGE_7": "7天",
     "RANGE_30": "30天",
     "RANGE_90": "90天",
@@ -2152,7 +2153,18 @@
         "not_configured": "未配置",
         "connection_failed": "连接失败",
         "timeout": "已超时"
-      }
+      },
+      "INACTIVE_ORGS": "停用的组织",
+      "INACTIVE_CAPTION": "已停用",
+      "SYSTEM_USERS": "系统用户",
+      "SYSTEM_USERS_CAPTION": "平台运营者",
+      "ORG_LIST": "组织",
+      "COL_CREATED": "创建时间",
+      "LOGIN_HEALTH": "登录健康度",
+      "NO_LOGINS": "此期间没有登录活动",
+      "SUCCESS_RATE": "成功率",
+      "OK_FAILED": "成功 / 失败",
+      "PLATFORM_FEED": "近期平台活动"
     }
   },
   "DASHBOARD": {

@@ -4,9 +4,11 @@ import { HOME } from 'src/app/core/constants/api.constant';
 import { HttpClientService } from 'src/app/core/services/http-client.service';
 import {
   ActivityRow,
+  AdminOrgRow,
   AdminSummary,
   AdminTrendPoint,
   DateWindow,
+  LoginHealth,
   LoginTrendPoint,
   ModuleExecution,
   OrgsCreatedPoint,
@@ -73,19 +75,27 @@ export class HomeService {
     );
   }
 
-  private windowParams(w: DateWindow, bucket?: TrendBucket): Record<string, string> {
-    const p: Record<string, string> = { from: w.from, to: w.to };
+  private windowParams(
+    w: DateWindow | null,
+    bucket?: TrendBucket,
+  ): Record<string, string> {
+    const p: Record<string, string> = {};
+    // null window = all-time: send no from/to so the BE returns complete data.
+    if (w) {
+      p['from'] = w.from;
+      p['to'] = w.to;
+    }
     if (bucket) p['bucket'] = bucket;
     return p;
   }
 
   /* ---------------- ORG dashboard ---------------- */
 
-  getOrgSummary(w: DateWindow): Observable<OrgSummary> {
+  getOrgSummary(w: DateWindow | null): Observable<OrgSummary> {
     return this.unwrap<OrgSummary>(HOME.SUMMARY, this.windowParams(w));
   }
 
-  getQueryTrend(w: DateWindow, bucket: TrendBucket = 'day'): Observable<QueryTrendPoint[]> {
+  getQueryTrend(w: DateWindow | null, bucket: TrendBucket = 'day'): Observable<QueryTrendPoint[]> {
     // BE returns a bare array; unwrapArray guarantees an array regardless.
     return this.unwrapArray<QueryTrendPoint>(
       HOME.TRENDS_QUERIES,
@@ -94,7 +104,7 @@ export class HomeService {
     );
   }
 
-  getLoginTrend(w: DateWindow, bucket: TrendBucket = 'day'): Observable<LoginTrendPoint[]> {
+  getLoginTrend(w: DateWindow | null, bucket: TrendBucket = 'day'): Observable<LoginTrendPoint[]> {
     return this.unwrapArray<LoginTrendPoint>(
       HOME.TRENDS_LOGINS,
       'trend',
@@ -108,7 +118,7 @@ export class HomeService {
     });
   }
 
-  getExecutionsByModule(w: DateWindow): Observable<ModuleExecution[]> {
+  getExecutionsByModule(w: DateWindow | null): Observable<ModuleExecution[]> {
     return this.unwrapArray<ModuleExecution>(
       HOME.EXECUTIONS_BY_MODULE,
       'executions',
@@ -118,11 +128,11 @@ export class HomeService {
 
   /* ---------------- SYSTEM-ADMIN dashboard ---------------- */
 
-  getAdminSummary(w: DateWindow): Observable<AdminSummary> {
+  getAdminSummary(w: DateWindow | null): Observable<AdminSummary> {
     return this.unwrap<AdminSummary>(HOME.SA_SUMMARY, this.windowParams(w));
   }
 
-  getAdminTrends(w: DateWindow, bucket: TrendBucket = 'day'): Observable<AdminTrendPoint[]> {
+  getAdminTrends(w: DateWindow | null, bucket: TrendBucket = 'day'): Observable<AdminTrendPoint[]> {
     // BE returns `data: { window, bucket, trend: [...] }`.
     return this.unwrapArray<AdminTrendPoint>(
       HOME.SA_TRENDS,
@@ -131,11 +141,36 @@ export class HomeService {
     );
   }
 
-  getOrgsCreated(w: DateWindow, bucket: TrendBucket = 'day'): Observable<OrgsCreatedPoint[]> {
+  getOrgsCreated(w: DateWindow | null, bucket: TrendBucket = 'day'): Observable<OrgsCreatedPoint[]> {
     // BE returns `data: { window, bucket, series: [...] }`.
     return this.unwrapArray<OrgsCreatedPoint>(
       HOME.SA_ORGS_CREATED,
       'series',
+      this.windowParams(w, bucket),
+    );
+  }
+
+  /** Master-DB organisation list (no per-org internals). */
+  getAdminOrganisations(limit = 50): Observable<AdminOrgRow[]> {
+    return this.unwrapArray<AdminOrgRow>(HOME.SA_ORGANISATIONS, 'organisations', {
+      limit: String(limit),
+    });
+  }
+
+  /** Master-DB platform-operator activity feed. */
+  getAdminActivity(limit = 8): Observable<ActivityRow[]> {
+    return this.unwrapArray<ActivityRow>(HOME.SA_ACTIVITY, 'activity', {
+      limit: String(limit),
+    });
+  }
+
+  /** Master-DB system-user login health (series + summary). */
+  getAdminLoginHealth(
+    w: DateWindow | null,
+    bucket: TrendBucket = 'day',
+  ): Observable<LoginHealth> {
+    return this.unwrap<LoginHealth>(
+      HOME.SA_LOGIN_HEALTH,
       this.windowParams(w, bucket),
     );
   }

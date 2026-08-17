@@ -14,6 +14,9 @@
 
     <div class="dash-controls">
       <div class="seg" role="group" [attr.aria-label]="'HOME_DASH.RANGE' | translate">
+        <button type="button" [class.on]="preset === 'all'" (click)="setAllTime()">
+          {{ 'HOME_DASH.RANGE_ALL' | translate }}
+        </button>
         <button type="button" [class.on]="preset === 7" (click)="setPreset(7)">
           {{ 'HOME_DASH.RANGE_7' | translate }}
         </button>
@@ -53,7 +56,7 @@
         [value]="(execTotal !== null ? execTotal : null)"
         format="compact"
         tone="blue"
-        icon="pi pi-bolt"
+        icon="ci ci-bolt"
         [caption]="'HOME_DASH.KPI.IN_RANGE' | translate"
       ></app-stat-tile>
     </app-widget-card>
@@ -70,7 +73,7 @@
         [secondary]="summary.data?.usersTotal?.current ?? null"
         format="number"
         tone="green"
-        icon="pi pi-users"
+        icon="ci ci-users"
         [delta]="deltaOf(summary.data?.usersActive)"
         deltaUnit=""
         [caption]="'HOME_DASH.KPI.VS_PREV' | translate"
@@ -88,7 +91,7 @@
         [value]="summary.data?.datasets?.current ?? null"
         format="number"
         tone="purple"
-        icon="pi pi-table"
+        icon="ci ci-dataset"
         [delta]="deltaOf(summary.data?.datasets)"
         deltaUnit=""
         [caption]="'HOME_DASH.KPI.VS_PREV' | translate"
@@ -108,7 +111,7 @@
         [value]="summary.data?.dashboards?.current ?? null"
         format="number"
         tone="amber"
-        icon="pi pi-th-large"
+        icon="ci ci-dashboard"
         [delta]="deltaOf(summary.data?.dashboards)"
         deltaUnit=""
         [caption]="'HOME_DASH.KPI.VS_PREV' | translate"
@@ -120,7 +123,7 @@
   <div class="dash-grid cols-2">
     <app-widget-card
       [title]="'HOME_DASH.WIDGET.QUERY_ACTIVITY' | translate"
-      icon="pi pi-chart-line"
+      icon="ci ci-chart-simple"
       skeletonVariant="chart"
       [state]="queryTrend.state"
       [link]="{ label: ('HOME_DASH.LINK.AUDIT' | translate) }"
@@ -139,7 +142,7 @@
 
     <app-widget-card
       [title]="'HOME_DASH.WIDGET.EXEC_BY_MODULE' | translate"
-      icon="pi pi-chart-pie"
+      icon="ci ci-visualization"
       skeletonVariant="chart"
       [state]="execByModule.state"
       [emptyText]="'HOME_DASH.EMPTY.NO_QUERIES' | translate"
@@ -159,7 +162,7 @@
   <div class="dash-grid cols-2">
     <app-widget-card
       [title]="'HOME_DASH.WIDGET.RECENT_ACTIVITY' | translate"
-      icon="pi pi-history"
+      icon="ci ci-audit-logs"
       skeletonVariant="list"
       [skeletonRows]="6"
       [state]="activity.state"
@@ -183,7 +186,7 @@
          user can reach that screen (permission-aware). -->
     <app-widget-card
       [title]="'HOME_DASH.WIDGET.QUICK_ACTIONS' | translate"
-      icon="pi pi-bolt"
+      icon="ci ci-bolt"
       [state]="'ready'"
     >
       <div class="qa-grid">
@@ -193,7 +196,7 @@
           *ngIf="permission.canRead(P.QUERY_RUNNER)"
           (click)="goNewQuery()"
         >
-          <span class="qa-ic"><i class="pi pi-bolt"></i></span>
+          <span class="qa-ic"><i class="ci ci-bolt dash-ci"></i></span>
           <span class="qa-txt">
             <span class="qa-t">{{ 'HOME_DASH.QA.NEW_QUERY' | translate }}</span>
             <span class="qa-d">{{ 'HOME_DASH.QA.NEW_QUERY_D' | translate }}</span>
@@ -206,7 +209,7 @@
           *ngIf="permission.canRead(P.DATASET)"
           (click)="goDatasets()"
         >
-          <span class="qa-ic"><i class="pi pi-file"></i></span>
+          <span class="qa-ic"><i class="ci ci-dataset dash-ci"></i></span>
           <span class="qa-txt">
             <span class="qa-t">{{ 'HOME_DASH.QA.DATASETS' | translate }}</span>
             <span class="qa-d">{{ 'HOME_DASH.QA.DATASETS_D' | translate }}</span>
@@ -219,7 +222,7 @@
           *ngIf="permission.canRead(P.ANALYSES)"
           (click)="goAnalyses()"
         >
-          <span class="qa-ic"><i class="pi pi-chart-bar"></i></span>
+          <span class="qa-ic"><i class="ci ci-analyses dash-ci"></i></span>
           <span class="qa-txt">
             <span class="qa-t">{{ 'HOME_DASH.QA.ANALYSES' | translate }}</span>
             <span class="qa-d">{{ 'HOME_DASH.QA.ANALYSES_D' | translate }}</span>
@@ -232,7 +235,7 @@
           *ngIf="permission.canRead(P.DASHBOARD)"
           (click)="goDashboards()"
         >
-          <span class="qa-ic"><i class="pi pi-th-large"></i></span>
+          <span class="qa-ic"><i class="ci ci-dashboard dash-ci"></i></span>
           <span class="qa-txt">
             <span class="qa-t">{{ 'HOME_DASH.QA.DASHBOARDS' | translate }}</span>
             <span class="qa-d">{{ 'HOME_DASH.QA.DASHBOARDS_D' | translate }}</span>
@@ -245,7 +248,7 @@
           *ngIf="permission.canWrite(P.USER_MANAGEMENT)"
           (click)="goUsers()"
         >
-          <span class="qa-ic"><i class="pi pi-user-plus"></i></span>
+          <span class="qa-ic"><i class="ci ci-user-group dash-ci"></i></span>
           <span class="qa-txt">
             <span class="qa-t">{{ 'HOME_DASH.QA.INVITE_USER' | translate }}</span>
             <span class="qa-d">{{ 'HOME_DASH.QA.INVITE_USER_D' | translate }}</span>
@@ -258,7 +261,7 @@
           *ngIf="permission.canRead(P.QB_SCREEN)"
           (click)="navigateTo('/app/query-builders')"
         >
-          <span class="qa-ic"><i class="pi pi-sitemap"></i></span>
+          <span class="qa-ic"><i class="ci ci-query-builder dash-ci"></i></span>
           <span class="qa-txt">
             <span class="qa-t">{{ 'HOME_DASH.QA.QUERY_BUILDER' | translate }}</span>
             <span class="qa-d">{{ 'HOME_DASH.QA.QUERY_BUILDER_D' | translate }}</span>
@@ -272,7 +275,7 @@
   <div class="dash-grid cols-1">
     <app-widget-card
       [title]="'HOME_DASH.WIDGET.LOGINS' | translate"
-      icon="pi pi-sign-in"
+      icon="ci ci-login-activity"
       skeletonVariant="chart"
       [state]="loginTrend.state"
       [link]="{ label: ('HOME_DASH.LINK.LOGIN_ACTIVITY' | translate) }"

@@ -105,9 +105,12 @@
   }
 }
 
-/* ---------- fixed-height parent card ---------- */
+/* ---------- parent card: fits content, caps at the pane ---------- */
 .dash-card {
-  flex: 1;
+  /* Size to content, but never taller than the pane — then the body
+     scrolls. A light dashboard shows a short card (no huge empty area);
+     a full one fills the pane and scrolls inside. */
+  max-height: 100%;
   min-height: 0;
   background: var(--card-background);
   border: 1px solid var(--border-color);
@@ -115,7 +118,7 @@
   box-shadow: var(--shadow-sm);
   display: flex;
   flex-direction: column;
-  overflow: hidden; /* card never grows with content — the body scrolls */
+  overflow: hidden;
 }
 
 /* ---------- scrolling widget body (only this region scrolls) ---------- */
@@ -200,16 +203,20 @@
     transform: translateY(-1px);
   }
 }
+/* No box — icon inline (sidebar style). */
 .qa-ic {
-  width: 32px;
-  height: 32px;
-  border-radius: var(--radius-md);
-  background: var(--primary-color);
-  color: var(--primary-text, #fff);
-  display: grid;
-  place-items: center;
-  font-size: 14px;
-  flex: 0 0 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--primary-color);
+  font-size: 16px;
+  flex: 0 0 auto;
+
+  i.ci {
+    width: 18px;
+    height: 18px;
+    margin: 0;
+  }
 }
 .qa-txt {
   display: flex;

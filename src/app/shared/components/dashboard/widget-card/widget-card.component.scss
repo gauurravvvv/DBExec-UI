@@ -23,16 +23,21 @@
   gap: var(--space-3);
   padding: var(--space-5) var(--space-6) 0;
 
+  /* No box — icon inline like the sidebar; primary-tinted for pi, default
+     dark glyph for .ci (app-standard). */
   .wc-ic {
-    width: 28px;
-    height: 28px;
-    border-radius: var(--radius-sm);
-    background: var(--primary-light);
-    color: var(--primary-hover);
-    display: grid;
-    place-items: center;
-    font-size: 14px;
-    flex: 0 0 28px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--primary-color);
+    font-size: 16px;
+    flex: 0 0 auto;
+
+    i.ci {
+      width: 18px;
+      height: 18px;
+      margin: 0;
+    }
   }
 
   .wc-title {

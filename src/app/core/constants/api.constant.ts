@@ -50,6 +50,9 @@ export const HOME = {
   SA_SUMMARY: '/home/system-admin/summary',
   SA_TRENDS: '/home/system-admin/trends',
   SA_ORGS_CREATED: '/home/system-admin/orgs-created',
+  SA_ORGANISATIONS: '/home/system-admin/organisations',
+  SA_ACTIVITY: '/home/system-admin/activity',
+  SA_LOGIN_HEALTH: '/home/system-admin/login-health',
 };
 
 

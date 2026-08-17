@@ -56,31 +56,23 @@ export interface ModuleExecution {
 
 /* -------- system-admin -------- */
 
-/** GET /home/system-admin/summary */
+/**
+ * GET /home/system-admin/summary — MASTER-DB ONLY.
+ * The system admin sees platform-level facts (orgs + system users from the
+ * master/.env DB), never any organisation's internal data.
+ */
 export interface AdminSummary {
-  window: { from: string; to: string };
+  window: { from: string; to: string } | null;
   platform: {
     orgsTotal: number;
     orgsActive: number;
     orgsInactive: number;
     orgsNewInPeriod: number;
   };
-  rollup: AdminOrgRollupRow[];
-  totals: {
-    usersAllOrgs: number;
-    datasetsAllOrgs: number;
-    queriesAllOrgs: number;
+  systemUsers: {
+    total: number;
+    active: number;
   };
-}
-
-export interface AdminOrgRollupRow {
-  orgId: string;
-  orgName: string;
-  status: number;
-  users: number;
-  datasets: number;
-  queries30d: number;
-  dbStatus: 'connected' | 'not_configured' | 'connection_failed' | 'timeout';
 }
 
 /** GET /home/system-admin/trends */
@@ -94,6 +86,30 @@ export interface AdminTrendPoint {
 export interface OrgsCreatedPoint {
   date: string;
   count: number;
+}
+
+/** GET /home/system-admin/organisations — master-DB org list (no internals). */
+export interface AdminOrgRow {
+  id: string;
+  name: string | null;
+  status: number;
+  createdOn: string;
+}
+
+/** GET /home/system-admin/login-health */
+export interface LoginHealthPoint {
+  date: string;
+  success: number;
+  failed: number;
+}
+export interface LoginHealth {
+  series: LoginHealthPoint[];
+  summary: {
+    total: number;
+    success: number;
+    failed: number;
+    successRate: number;
+  };
 }
 
 /** The date window every trend widget shares. */

@@ -12,38 +12,41 @@
   margin-bottom: var(--space-3);
 }
 
+/* No background box — icon sits inline like the sidebar nav icons. */
 .stat-ic {
-  width: 36px;
-  height: 36px;
-  border-radius: var(--radius-md);
-  display: grid;
-  place-items: center;
-  font-size: 16px;
-  flex: 0 0 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  flex: 0 0 auto;
 }
 .stat-ic i {
   font-weight: 600;
 }
+/* Custom (.ci) SVG icons: neutralise the global .ci margin so they sit
+   flush; keep them at a legible size. Colour handled per-tone below. */
+.stat-ic i.ci {
+  width: 20px;
+  height: 20px;
+  margin: 0;
+}
 
-/* Accent per tone — soft background + strong icon, off theme tokens. */
+/* Accent per tone for pi icons (color). The monochrome .ci SVG icons keep
+   the app-standard dark-glyph treatment (same as the sidebar) — no box,
+   no per-tone tint — so they read consistently across the app. */
 [data-tone='blue'] .stat-ic {
-  background: var(--primary-light);
-  color: var(--primary-hover);
+  color: var(--primary-color);
 }
 [data-tone='green'] .stat-ic {
-  background: var(--success-bg);
   color: var(--success-color);
 }
 [data-tone='amber'] .stat-ic {
-  background: var(--warning-bg);
   color: var(--warning-color);
 }
 [data-tone='purple'] .stat-ic {
-  background: var(--info-bg);
   color: var(--info-color);
 }
 [data-tone='red'] .stat-ic {
-  background: var(--error-bg);
   color: var(--error-color);
 }
 

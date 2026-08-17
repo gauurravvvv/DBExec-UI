@@ -41,8 +41,8 @@ interface Widget<T> {
   data: T | null;
 }
 
-/** Quick range presets for the date control. */
-type RangePreset = 7 | 30 | 90 | 'custom';
+/** Quick range presets. 'all' = no filter (complete data). */
+type RangePreset = 'all' | 'custom' | 7 | 30 | 90;
 
 @Component({
   selector: 'app-org-home',
@@ -54,9 +54,10 @@ export class OrgHomeComponent implements OnInit, OnDestroy {
   userName = '';
   organisationName = '';
 
-  /** Selected range preset + resolved window. */
-  preset: RangePreset = 30;
-  window!: DateWindow;
+  /** Selected range preset + resolved window. Default = all-time (no filter). */
+  preset: RangePreset = 'all';
+  /** null = all-time (send no from/to). */
+  window: DateWindow | null = null;
   /** For the custom date-range picker (two-date array). */
   customRange: Date[] | null = null;
 
@@ -91,7 +92,7 @@ export class OrgHomeComponent implements OnInit, OnDestroy {
     this.userName = this.globalService.getTokenDetails('name') || '';
     this.organisationName =
       this.globalService.getTokenDetails('organisation') || '';
-    this.window = this.resolveWindow(this.preset);
+    // Default is all-time: window stays null, no from/to sent.
     this.loadAll();
   }
 
@@ -268,13 +269,22 @@ export class OrgHomeComponent implements OnInit, OnDestroy {
 
   /* ================= date range ================= */
 
-  setPreset(preset: RangePreset): void {
-    if (preset === 'custom') {
-      this.preset = 'custom';
-      return; // window changes when the picker emits a value
+  setPreset(preset: 7 | 30 | 90): void {
+    if (this.preset === preset) {
+      // Re-clicking the active pill clears back to all-time (complete data).
+      this.setAllTime();
+      return;
     }
     this.preset = preset;
     this.window = this.resolveWindow(preset);
+    this.reloadWindowed();
+  }
+
+  /** All-time: no date filter, complete data. */
+  setAllTime(): void {
+    this.preset = 'all';
+    this.window = null;
+    this.customRange = null;
     this.reloadWindowed();
   }
 
@@ -288,10 +298,10 @@ export class OrgHomeComponent implements OnInit, OnDestroy {
     this.reloadWindowed();
   }
 
-  private resolveWindow(days: RangePreset): DateWindow {
+  private resolveWindow(days: 7 | 30 | 90): DateWindow {
     const to = this.endOfDay(new Date());
     const from = new Date();
-    from.setDate(from.getDate() - (typeof days === 'number' ? days : 30));
+    from.setDate(from.getDate() - days);
     return { from: this.startOfDay(from).toISOString(), to: to.toISOString() };
   }
 

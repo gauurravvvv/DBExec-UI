@@ -2063,6 +2063,7 @@
     "GREETING": "おかえりなさい、{{name}} さん",
     "SUBTITLE": "{{org}} の最新の状況です",
     "RANGE": "期間",
+    "RANGE_ALL": "すべて",
     "RANGE_7": "7日",
     "RANGE_30": "30日",
     "RANGE_90": "90日",
@@ -2152,7 +2153,18 @@
         "not_configured": "未設定",
         "connection_failed": "接続失敗",
         "timeout": "タイムアウト"
-      }
+      },
+      "INACTIVE_ORGS": "非アクティブな組織",
+      "INACTIVE_CAPTION": "無効化済み",
+      "SYSTEM_USERS": "システムユーザー",
+      "SYSTEM_USERS_CAPTION": "プラットフォーム運用者",
+      "ORG_LIST": "組織",
+      "COL_CREATED": "作成日",
+      "LOGIN_HEALTH": "ログイン状態",
+      "NO_LOGINS": "この期間のログインアクティビティはありません",
+      "SUCCESS_RATE": "成功率",
+      "OK_FAILED": "成功 / 失敗",
+      "PLATFORM_FEED": "最近のプラットフォームアクティビティ"
     }
   },
   "DASHBOARD": {

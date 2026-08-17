@@ -2063,6 +2063,7 @@
     "GREETING": "Willkommen zurück, {{name}}",
     "SUBTITLE": "Das passiert gerade in {{org}}",
     "RANGE": "Zeitraum",
+    "RANGE_ALL": "Alle",
     "RANGE_7": "7 T",
     "RANGE_30": "30 T",
     "RANGE_90": "90 T",
@@ -2152,7 +2153,18 @@
         "not_configured": "Nicht konfiguriert",
         "connection_failed": "Verbindung fehlgeschlagen",
         "timeout": "Zeitüberschreitung"
-      }
+      },
+      "INACTIVE_ORGS": "Inaktive Orgs",
+      "INACTIVE_CAPTION": "deaktiviert",
+      "SYSTEM_USERS": "Systembenutzer",
+      "SYSTEM_USERS_CAPTION": "Plattformbetreiber",
+      "ORG_LIST": "Organisationen",
+      "COL_CREATED": "Erstellt",
+      "LOGIN_HEALTH": "Anmeldezustand",
+      "NO_LOGINS": "Keine Anmeldeaktivität in diesem Zeitraum",
+      "SUCCESS_RATE": "Erfolgsrate",
+      "OK_FAILED": "ok / fehlgeschlagen",
+      "PLATFORM_FEED": "Letzte Plattformaktivität"
     }
   },
   "DASHBOARD": {
