@@ -138,6 +138,18 @@ export class FormRuntimeStore extends QueryBuilderStore {
       base,
       (expr, v) => evaluateExpression(expr, v),
     );
+
+    // Mandatory beats rule-hide: mirror the server's enforceRules, which forces
+    // every mandatory field visible AFTER folding rules so a `hide` rule can't
+    // strip a required field out of the submit (an un-fixable execute error).
+    for (const key of Object.keys(base)) {
+      if (base[key].required) {
+        if (!state[key])
+          state[key] = { visible: true, required: true, disabled: false };
+        state[key].visible = true;
+      }
+    }
+
     const flags: Record<string, EffectiveFieldFlags> = {};
     for (const key of Object.keys(state)) {
       flags[key] = {

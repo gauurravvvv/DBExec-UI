@@ -222,14 +222,27 @@ export class FormBuilderStore {
    * `enforceRules` on validate/execute, so preview, published render, and
    * server enforcement always agree. Feed live values with `setPreviewValue`.
    */
-  readonly effectiveFlags = computed<Record<string, FieldEffectiveState>>(() =>
-    applyRules(
+  readonly effectiveFlags = computed<Record<string, FieldEffectiveState>>(() => {
+    const base = this.baseState();
+    const state = applyRules(
       toEngineRules(this.rules()),
       this.previewValues(),
-      this.baseState(),
+      base,
       (expr, v) => evaluateExpression(expr, v),
-    ),
-  );
+    );
+    // Mandatory beats rule-hide: the server's enforceRules forces every
+    // mandatory field visible AFTER folding the rules, so a `hide` rule can't
+    // strip a required field out of the submit. Mirror that here so preview
+    // matches what the server will require on execute.
+    for (const key of Object.keys(base)) {
+      if (base[key].required) {
+        if (!state[key])
+          state[key] = { visible: true, required: true, disabled: false };
+        state[key].visible = true;
+      }
+    }
+    return state;
+  });
 
   // ── One-deep snapshot for optimistic rollback ─────────────────────────
   private snap: TreeSnapshot | null = null;
