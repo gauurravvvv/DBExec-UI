@@ -35,9 +35,13 @@ export class FbInspectorComponent {
 
   constructor() {
     // Snap the view back to Design on every selection change (§4.4).
-    effect(() => {
-      this.selected();
-      this.view.set('design');
-    });
+    // Writes the `view` signal, so allowSignalWrites (matches fb-compose).
+    effect(
+      () => {
+        this.selected();
+        this.view.set('design');
+      },
+      { allowSignalWrites: true },
+    );
   }
 }
