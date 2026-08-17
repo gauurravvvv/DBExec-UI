@@ -1,4 +1,5 @@
-import { Injectable, computed, inject, signal } from '@angular/core';
+import { DestroyRef, Injectable, computed, inject, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Subject } from 'rxjs';
 import { debounceTime } from 'rxjs/operators';
 import {
@@ -87,6 +88,7 @@ export function nextSelection(
 export class FormBuilderStore {
   private readonly admin = inject(FbAdminService);
   private readonly global = inject(GlobalService);
+  private readonly destroyRef = inject(DestroyRef);
 
   readonly formId = signal<string>('');
   readonly version = signal<number>(1);
@@ -265,21 +267,30 @@ export class FormBuilderStore {
   initPatchPumps(): void {
     if (this.pumpsReady) return;
     this.pumpsReady = true;
-    this.tabPatch$.pipe(debounceTime(400)).subscribe(({ id, patch }) =>
-      this.admin
-        .updateTab(this.formId(), this.version(), id, patch)
-        .catch(() => this.revert()),
-    );
-    this.sectionPatch$.pipe(debounceTime(400)).subscribe(({ id, patch }) =>
-      this.admin
-        .updateSection(this.formId(), this.version(), id, patch)
-        .catch(() => this.revert()),
-    );
-    this.fieldPatch$.pipe(debounceTime(400)).subscribe(({ id, patch }) =>
-      this.admin
-        .updateField(this.formId(), this.version(), id, patch)
-        .catch(() => this.revert()),
-    );
+    // takeUntilDestroyed tears each pump down with the providing component, so
+    // an in-flight debounce can't fire a stray PATCH (+ revert toast) for a
+    // form the user has already navigated away from.
+    this.tabPatch$
+      .pipe(takeUntilDestroyed(this.destroyRef), debounceTime(400))
+      .subscribe(({ id, patch }) =>
+        this.admin
+          .updateTab(this.formId(), this.version(), id, patch)
+          .catch(() => this.revert()),
+      );
+    this.sectionPatch$
+      .pipe(takeUntilDestroyed(this.destroyRef), debounceTime(400))
+      .subscribe(({ id, patch }) =>
+        this.admin
+          .updateSection(this.formId(), this.version(), id, patch)
+          .catch(() => this.revert()),
+      );
+    this.fieldPatch$
+      .pipe(takeUntilDestroyed(this.destroyRef), debounceTime(400))
+      .subscribe(({ id, patch }) =>
+        this.admin
+          .updateField(this.formId(), this.version(), id, patch)
+          .catch(() => this.revert()),
+      );
   }
 
   // ── Hydration ─────────────────────────────────────────────────────────
