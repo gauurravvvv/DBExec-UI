@@ -1,11 +1,10 @@
 <div class="dash">
-  <!-- Everything — Platform Overview title + date controls + refresh +
-       widgets — lives inside one parent card. The page owns its vertical
-       scroll (shell .router-pane is overflow:hidden). -->
-  <div class="dash-scroll">
-    <div class="dash-card">
-  <!-- header + date controls -->
-  <div class="dash-head">
+  <!-- One fixed-height parent card (like the add/edit screens): the header
+       (Platform Overview + date controls + refresh) is a static top band
+       that never scrolls; only the widget body below scrolls. -->
+  <div class="dash-card">
+    <!-- static header + date controls -->
+    <div class="dash-head">
     <div class="dash-greeting">
       <h1>{{ 'HOME_DASH.ADMIN.TITLE' | translate }}</h1>
       <p class="dash-sub">{{ 'HOME_DASH.ADMIN.SUBTITLE' | translate }}</p>
@@ -34,6 +33,8 @@
     </div>
   </div>
 
+    <!-- scrolling widget body (only this region scrolls) -->
+    <div class="dash-body">
   <!-- KPI row -->
   <div class="dash-grid kpi-row">
     <app-widget-card

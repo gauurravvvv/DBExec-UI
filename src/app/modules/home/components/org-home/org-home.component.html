@@ -1,11 +1,10 @@
 <div class="dash">
-  <!-- Everything — header + date controls + widgets — lives inside one
-       parent card. The page owns its vertical scroll (shell .router-pane
-       is overflow:hidden). -->
-  <div class="dash-scroll">
-    <div class="dash-card">
-  <!-- ============ header + date controls ============ -->
-  <div class="dash-head">
+  <!-- One fixed-height parent card (like the add/edit screens): the header
+       is a static top band that never scrolls; only the widget body below
+       scrolls. The card fills the pane and never grows with content. -->
+  <div class="dash-card">
+    <!-- ============ static header + date controls ============ -->
+    <div class="dash-head">
     <div class="dash-greeting">
       <h1>{{ 'HOME_DASH.GREETING' | translate: { name: userName } }}</h1>
       <p class="dash-sub">
@@ -39,6 +38,8 @@
     </div>
   </div>
 
+    <!-- scrolling widget body (only this region scrolls) -->
+    <div class="dash-body">
   <!-- ============ KPI row ============ -->
   <div class="dash-grid kpi-row">
     <app-widget-card

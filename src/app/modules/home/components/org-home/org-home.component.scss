@@ -15,21 +15,21 @@
   flex-direction: column;
   height: 100%;
   min-height: 0;
-  padding: var(--space-6) var(--space-8) 0;
+  padding: var(--space-6) var(--space-8);
   max-width: 1440px;
   margin: 0 auto;
   width: 100%;
 }
 
-/* ---------- header (fixed, above the scroll) ---------- */
+/* ---------- static header (never scrolls) ---------- */
 .dash-head {
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
   gap: var(--space-5);
   flex-wrap: wrap;
-  padding-bottom: var(--space-5);
-  margin-bottom: var(--space-1);
+  flex-shrink: 0;
+  padding: var(--space-6) var(--space-6) var(--space-5);
   border-bottom: 1px solid var(--border-color);
 }
 .dash-greeting h1 {
@@ -105,26 +105,30 @@
   }
 }
 
-/* ---------- scroll region + parent card ---------- */
-.dash-scroll {
+/* ---------- fixed-height parent card ---------- */
+.dash-card {
   flex: 1;
   min-height: 0;
-  overflow-y: auto;
-  overflow-x: hidden;
-  padding-bottom: var(--space-8);
-  /* subtle scrollbar */
-  scrollbar-width: thin;
-}
-
-.dash-card {
   background: var(--card-background);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden; /* card never grows with content — the body scrolls */
+}
+
+/* ---------- scrolling widget body (only this region scrolls) ---------- */
+.dash-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
   padding: var(--space-6);
   display: flex;
   flex-direction: column;
   gap: var(--space-5);
+  scrollbar-width: thin;
 }
 
 /* ---------- grids (tighter gaps) ---------- */
