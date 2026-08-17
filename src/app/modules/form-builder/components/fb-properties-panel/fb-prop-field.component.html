@@ -67,7 +67,7 @@
     <!-- Allowed-operators multiselect. Options filtered by dataType; empty ⇒ all. -->
     <app-custom-multiselect
       [label]="'FORM_BUILDER.PROP.ALLOWED_OPERATORS' | translate"
-      [options]="operatorOptions"
+      [options]="operatorOptions()"
       optionLabel="label"
       optionValue="code"
       appendTo="body"
