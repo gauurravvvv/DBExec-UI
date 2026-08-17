@@ -50,6 +50,29 @@ export class HomeService {
       .pipe(map(res => (res?.data ?? null) as T));
   }
 
+  /**
+   * Some endpoints wrap their array under a named key
+   * (`data: { trend: [...] }`, `data: { series: [...] }`). Unwrap the
+   * envelope, then pull that key, always returning an array so the
+   * component's `.map` never sees a non-array (which would throw inside
+   * a `next` handler and leave the widget stuck on its skeleton).
+   */
+  private unwrapArray<T>(
+    url: string,
+    key: string,
+    params?: Record<string, string>,
+  ): Observable<T[]> {
+    const qs = params ? '?' + new URLSearchParams(params).toString() : '';
+    return this.http.apiGet<any>(url + qs, { skipLoader: true }).pipe(
+      map(res => {
+        const data = res?.data;
+        // Accept either a bare array or a { key: [...] } wrapper.
+        const arr = Array.isArray(data) ? data : data?.[key];
+        return (Array.isArray(arr) ? arr : []) as T[];
+      }),
+    );
+  }
+
   private windowParams(w: DateWindow, bucket?: TrendBucket): Record<string, string> {
     const p: Record<string, string> = { from: w.from, to: w.to };
     if (bucket) p['bucket'] = bucket;
@@ -63,26 +86,32 @@ export class HomeService {
   }
 
   getQueryTrend(w: DateWindow, bucket: TrendBucket = 'day'): Observable<QueryTrendPoint[]> {
-    return this.unwrap<QueryTrendPoint[]>(
+    // BE returns a bare array; unwrapArray guarantees an array regardless.
+    return this.unwrapArray<QueryTrendPoint>(
       HOME.TRENDS_QUERIES,
+      'trend',
       this.windowParams(w, bucket),
     );
   }
 
   getLoginTrend(w: DateWindow, bucket: TrendBucket = 'day'): Observable<LoginTrendPoint[]> {
-    return this.unwrap<LoginTrendPoint[]>(
+    return this.unwrapArray<LoginTrendPoint>(
       HOME.TRENDS_LOGINS,
+      'trend',
       this.windowParams(w, bucket),
     );
   }
 
   getActivity(limit = 8): Observable<ActivityRow[]> {
-    return this.unwrap<ActivityRow[]>(HOME.ACTIVITY, { limit: String(limit) });
+    return this.unwrapArray<ActivityRow>(HOME.ACTIVITY, 'activity', {
+      limit: String(limit),
+    });
   }
 
   getExecutionsByModule(w: DateWindow): Observable<ModuleExecution[]> {
-    return this.unwrap<ModuleExecution[]>(
+    return this.unwrapArray<ModuleExecution>(
       HOME.EXECUTIONS_BY_MODULE,
+      'executions',
       this.windowParams(w),
     );
   }
@@ -94,15 +123,19 @@ export class HomeService {
   }
 
   getAdminTrends(w: DateWindow, bucket: TrendBucket = 'day'): Observable<AdminTrendPoint[]> {
-    return this.unwrap<AdminTrendPoint[]>(
+    // BE returns `data: { window, bucket, trend: [...] }`.
+    return this.unwrapArray<AdminTrendPoint>(
       HOME.SA_TRENDS,
+      'trend',
       this.windowParams(w, bucket),
     );
   }
 
   getOrgsCreated(w: DateWindow, bucket: TrendBucket = 'day'): Observable<OrgsCreatedPoint[]> {
-    return this.unwrap<OrgsCreatedPoint[]>(
+    // BE returns `data: { window, bucket, series: [...] }`.
+    return this.unwrapArray<OrgsCreatedPoint>(
       HOME.SA_ORGS_CREATED,
+      'series',
       this.windowParams(w, bucket),
     );
   }

@@ -13,13 +13,16 @@
 }
 
 .stat-ic {
-  width: 30px;
-  height: 30px;
+  width: 36px;
+  height: 36px;
   border-radius: var(--radius-md);
   display: grid;
   place-items: center;
-  font-size: 14px;
-  flex: 0 0 30px;
+  font-size: 16px;
+  flex: 0 0 36px;
+}
+.stat-ic i {
+  font-weight: 600;
 }
 
 /* Accent per tone — soft background + strong icon, off theme tokens. */

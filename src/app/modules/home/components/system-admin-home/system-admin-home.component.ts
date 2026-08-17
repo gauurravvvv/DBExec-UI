@@ -200,6 +200,17 @@ export class SystemAdminHomeComponent implements OnInit, OnDestroy {
 
   /* ================= helpers ================= */
 
+  /**
+   * State for the org-rollup card. The summary request can succeed with an
+   * empty rollup (a fresh platform with only the default org, which is
+   * excluded). In that case show the empty state, not a header-only table.
+   */
+  get rollupState(): WidgetState {
+    if (this.summary.state !== 'ready') return this.summary.state;
+    const rows = this.summary.data?.rollup ?? [];
+    return rows.length ? 'ready' : 'empty';
+  }
+
   /** dbStatus → chip tone for the rollup table. */
   dbStatusTone(status: string): 'success' | 'warning' | 'error' | 'neutral' {
     switch (status) {

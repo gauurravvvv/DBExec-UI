@@ -1,4 +1,9 @@
 <div class="dash">
+  <!-- Everything — Platform Overview title + date controls + refresh +
+       widgets — lives inside one parent card. The page owns its vertical
+       scroll (shell .router-pane is overflow:hidden). -->
+  <div class="dash-scroll">
+    <div class="dash-card">
   <!-- header + date controls -->
   <div class="dash-head">
     <div class="dash-greeting">
@@ -93,7 +98,7 @@
         [value]="summary.data?.totals?.queriesAllOrgs ?? null"
         format="compact"
         tone="amber"
-        icon="pi pi-database"
+        icon="pi pi-bolt"
         [caption]="'HOME_DASH.ADMIN.IN_RANGE' | translate"
       ></app-stat-tile>
     </app-widget-card>
@@ -144,7 +149,7 @@
       icon="pi pi-table"
       skeletonVariant="table"
       [skeletonRows]="5"
-      [state]="summary.state"
+      [state]="rollupState"
       [link]="{ label: ('HOME_DASH.ADMIN.ALL_ORGS_LINK' | translate) }"
       [emptyText]="'HOME_DASH.ADMIN.NO_ORGS' | translate"
       [errorText]="'HOME_DASH.ERROR' | translate"
@@ -209,5 +214,7 @@
         [height]="240"
       ></app-trend-chart>
     </app-widget-card>
+  </div>
+    </div>
   </div>
 </div>

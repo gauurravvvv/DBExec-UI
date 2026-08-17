@@ -1,33 +1,46 @@
+/* Owns its own vertical scroll (shell .router-pane is overflow:hidden):
+   fixed header + scrolling region holding one parent card. Tokens only. */
+
 :host {
   display: block;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
   background: var(--home-background-color);
-  min-height: 100%;
 }
 
 .dash {
-  padding: var(--space-8);
-  max-width: 1360px;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  // padding: var(--space-6) var(--space-8) 0;
+  max-width: 1440px;
   margin: 0 auto;
+  width: 100%;
 }
 
 .dash-head {
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
-  gap: var(--space-6);
+  gap: var(--space-5);
   flex-wrap: wrap;
-  margin-bottom: var(--space-8);
+  padding-bottom: var(--space-5);
+  margin-bottom: var(--space-1);
+  border-bottom: 1px solid var(--border-color);
 }
 .dash-greeting h1 {
   font-size: var(--fs-h1);
   font-weight: var(--fw-bold);
   color: var(--text-color);
   margin: 0;
+  letter-spacing: -0.02em;
 }
 .dash-sub {
   color: var(--text-muted);
   font-size: var(--fs-control);
-  margin: var(--space-1) 0 0;
+  margin: 3px 0 0;
 }
 
 .dash-controls {
@@ -50,7 +63,7 @@
     font-family: inherit;
     font-size: var(--fs-label);
     font-weight: var(--fw-semibold);
-    padding: 7px 13px;
+    padding: 6px 12px;
     cursor: pointer;
     border-right: 1px solid var(--border-color);
     transition: 0.15s ease;
@@ -68,14 +81,14 @@
   }
 }
 .dash-range {
-  min-width: 220px;
+  min-width: 200px;
 }
 .dash-refresh {
   display: inline-flex;
   align-items: center;
-  gap: 7px;
-  height: 34px;
-  padding: 0 13px;
+  gap: 6px;
+  height: 32px;
+  padding: 0 12px;
   background: var(--card-background);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-sm);
@@ -90,10 +103,29 @@
   }
 }
 
+.dash-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-bottom: var(--space-8);
+  scrollbar-width: thin;
+}
+
+.dash-card {
+  background: var(--card-background);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  padding: var(--space-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
 .dash-grid {
   display: grid;
-  gap: var(--space-6);
-  margin-bottom: var(--space-6);
+  gap: var(--space-5);
 }
 .kpi-row {
   grid-template-columns: repeat(4, 1fr);
@@ -119,7 +151,7 @@
     grid-template-columns: 1fr;
   }
   .dash {
-    padding: var(--space-6);
+    padding: var(--space-5) var(--space-5) 0;
   }
 }
 

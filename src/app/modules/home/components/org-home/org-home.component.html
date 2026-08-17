@@ -1,4 +1,9 @@
 <div class="dash">
+  <!-- Everything — header + date controls + widgets — lives inside one
+       parent card. The page owns its vertical scroll (shell .router-pane
+       is overflow:hidden). -->
+  <div class="dash-scroll">
+    <div class="dash-card">
   <!-- ============ header + date controls ============ -->
   <div class="dash-head">
     <div class="dash-greeting">
@@ -47,7 +52,7 @@
         [value]="(execTotal !== null ? execTotal : null)"
         format="compact"
         tone="blue"
-        icon="pi pi-database"
+        icon="pi pi-bolt"
         [caption]="'HOME_DASH.KPI.IN_RANGE' | translate"
       ></app-stat-tile>
     </app-widget-card>
@@ -82,7 +87,7 @@
         [value]="summary.data?.datasets?.current ?? null"
         format="number"
         tone="purple"
-        icon="pi pi-file"
+        icon="pi pi-table"
         [delta]="deltaOf(summary.data?.datasets)"
         deltaUnit=""
         [caption]="'HOME_DASH.KPI.VS_PREV' | translate"
@@ -187,7 +192,7 @@
           *ngIf="permission.canRead(P.QUERY_RUNNER)"
           (click)="goNewQuery()"
         >
-          <span class="qa-ic"><i class="pi pi-play"></i></span>
+          <span class="qa-ic"><i class="pi pi-bolt"></i></span>
           <span class="qa-txt">
             <span class="qa-t">{{ 'HOME_DASH.QA.NEW_QUERY' | translate }}</span>
             <span class="qa-d">{{ 'HOME_DASH.QA.NEW_QUERY_D' | translate }}</span>
@@ -283,5 +288,7 @@
         [height]="240"
       ></app-trend-chart>
     </app-widget-card>
+  </div>
+    </div>
   </div>
 </div>
