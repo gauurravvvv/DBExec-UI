@@ -2998,7 +2998,8 @@
       "ROW_COUNT": "Zeilen",
       "SERVER_MODE_HINT": "Über 500 Werte — die Laufzeit verwendet serverseitige Suche.",
       "REUPLOAD_REPLACE_WARN": "Ein erneuter Upload ersetzt die aktuelle Optionsliste."
-    }
+    },
+    "CONFIGURE_TITLE": "Configure Prompt"
   },
   "QUERY_BUILDER_MODULE": {
     "TITLE": "Query Builders",
@@ -6435,7 +6436,31 @@
     "CONFIG_IN_PROMPT_HINT": "Prompt-SQL, Werte, Darstellung und Operatoren werden im Prompt-Modul konfiguriert. Hier wählen Sie nur aus, welche Prompts erscheinen und wie das Formular angeordnet ist.",
     "JOINS_AUTO_HINT": "Verknüpfungen werden automatisch aus den Tabellen erstellt, die Ihre platzierten Prompts benötigen — konfiguriert im Prompt-Modul. Hier gibt es nichts zu erstellen.",
     "NO_JOINS_AUTO": "Keine Verknüpfungen erforderlich — jeder platzierte Prompt filtert auf seiner eigenen Basistabelle.",
-    "AUTO": "Auto"
+    "AUTO": "Auto",
+    "OPERATORS": {
+      "EQ": "Equals",
+      "NEQ": "Not equal to",
+      "GT": "Greater than",
+      "GTE": "Greater than or equal",
+      "LT": "Less than",
+      "LTE": "Less than or equal",
+      "BETWEEN": "Between",
+      "NOT_BETWEEN": "Not between",
+      "CONTAINS": "Contains",
+      "DOES_NOT_CONTAIN": "Does not contain",
+      "STARTS_WITH": "Starts with",
+      "ENDS_WITH": "Ends with",
+      "BEFORE": "Before",
+      "AFTER": "After",
+      "IN": "Is any of",
+      "NOT_IN": "Is none of",
+      "IS_NULL": "Is empty",
+      "IS_NOT_NULL": "Is not empty",
+      "IN_LAST_DAYS": "In the last N days",
+      "AND": "All of (AND)",
+      "OR": "Any of (OR)",
+      "NOT": "Not"
+    }
   },
   "ORGANISATION": {
     "ADMIN_FULL_NAME": "Vollständiger Name"

@@ -12,6 +12,7 @@ import {
   computed,
   inject,
 } from '@angular/core';
+import { TranslateService } from '@ngx-translate/core';
 import { QueryBuilderStore } from '../../services/query-builder-store';
 
 @Component({
@@ -25,6 +26,7 @@ export class QbConditionRowComponent {
   @Input({ required: true }) parentId!: string;
 
   private readonly store = inject(QueryBuilderStore);
+  private readonly translate = inject(TranslateService);
 
   readonly node = computed(() => this.store.conditionById(this.nodeId)());
   readonly errors = computed(() => this.store.errorsForNode(this.nodeId)());
@@ -51,10 +53,18 @@ export class QbConditionRowComponent {
 
   readonly operatorOptions = computed(() =>
     (this.prompt()?.operators ?? []).map(o => ({
-      label: o.label,
+      // Localize via QUERY_BUILDER.OPERATORS.<CODE>; fall back to the catalog
+      // label when a locale is missing the key (never show a raw key).
+      label: this.operatorLabel(o.code, o.label),
       value: o.code,
     })),
   );
+
+  private operatorLabel(code: string, fallback: string): string {
+    const key = `QUERY_BUILDER.OPERATORS.${code.toUpperCase()}`;
+    const t = this.translate.instant(key);
+    return t === key ? fallback : t;
+  }
 
   readonly arity = computed(() => {
     const n = this.node();

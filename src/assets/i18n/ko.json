@@ -2998,7 +2998,8 @@
       "ROW_COUNT": "행",
       "SERVER_MODE_HINT": "값이 500개를 초과합니다 — 런타임에서 서버 페이지 검색을 사용합니다.",
       "REUPLOAD_REPLACE_WARN": "다시 업로드하면 현재 옵션 집합이 바뀝니다."
-    }
+    },
+    "CONFIGURE_TITLE": "Configure Prompt"
   },
   "QUERY_BUILDER_MODULE": {
     "TITLE": "Query Builders",
@@ -6435,7 +6436,31 @@
     "CONFIG_IN_PROMPT_HINT": "프롬프트 SQL, 값, 모양 및 연산자는 프롬프트 모듈에서 구성됩니다. 여기서는 어떤 프롬프트를 표시하고 폼을 어떻게 배치할지만 선택합니다.",
     "JOINS_AUTO_HINT": "조인은 배치한 프롬프트에 필요한 테이블에서 자동으로 생성됩니다(프롬프트 모듈에서 구성). 여기서 작성할 것은 없습니다.",
     "NO_JOINS_AUTO": "조인이 필요 없습니다. 배치된 각 프롬프트는 자체 기본 테이블에서 필터링합니다.",
-    "AUTO": "자동"
+    "AUTO": "자동",
+    "OPERATORS": {
+      "EQ": "Equals",
+      "NEQ": "Not equal to",
+      "GT": "Greater than",
+      "GTE": "Greater than or equal",
+      "LT": "Less than",
+      "LTE": "Less than or equal",
+      "BETWEEN": "Between",
+      "NOT_BETWEEN": "Not between",
+      "CONTAINS": "Contains",
+      "DOES_NOT_CONTAIN": "Does not contain",
+      "STARTS_WITH": "Starts with",
+      "ENDS_WITH": "Ends with",
+      "BEFORE": "Before",
+      "AFTER": "After",
+      "IN": "Is any of",
+      "NOT_IN": "Is none of",
+      "IS_NULL": "Is empty",
+      "IS_NOT_NULL": "Is not empty",
+      "IN_LAST_DAYS": "In the last N days",
+      "AND": "All of (AND)",
+      "OR": "Any of (OR)",
+      "NOT": "Not"
+    }
   },
   "ORGANISATION": {
     "ADMIN_FULL_NAME": "이름"

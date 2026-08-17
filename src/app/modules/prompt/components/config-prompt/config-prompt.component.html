@@ -1,4 +1,43 @@
 <div class="cp">
+  <!-- Page header: back-to-prompt + title + Back/Next/Save actions on top -->
+  <div class="page-header">
+    <div class="left-section">
+      <button
+        pButton
+        class="p-button-text p-button-plain back-button"
+        [routerLink]="['/app/prompts', promptId]"
+      >
+        <i class="pi pi-arrow-left"></i>
+      </button>
+      <h2>{{ 'PROMPT_MODULE.CONFIGURE_TITLE' | translate }}</h2>
+    </div>
+    <div class="action-buttons">
+      <app-button
+        variant="secondary"
+        [disabled]="svc.currentStep() === 0"
+        (clicked)="svc.back()"
+      >
+        {{ 'COMMON.BACK' | translate }}
+      </app-button>
+      <app-button
+        *ngIf="svc.currentStep() < lastStep"
+        [disabled]="!svc.stepValid()[svc.currentStep()]"
+        (clicked)="svc.next()"
+      >
+        {{ 'COMMON.NEXT' | translate }}
+      </app-button>
+      <app-button
+        *ngIf="svc.currentStep() === lastStep"
+        icon="pi pi-save"
+        [loading]="svc.saving()"
+        [disabled]="!svc.canSave()"
+        (clicked)="save()"
+      >
+        {{ 'COMMON.SAVE' | translate }}
+      </app-button>
+    </div>
+  </div>
+
   <header class="cp__stepper">
     <button
       *ngFor="let s of steps; let i = index"
@@ -26,29 +65,4 @@
       [promptId]="promptId"
     ></cp-values-step>
   </section>
-
-  <footer class="cp__nav">
-    <app-button
-      variant="secondary"
-      [disabled]="svc.currentStep() === 0"
-      (clicked)="svc.back()"
-    >
-      {{ 'COMMON.BACK' | translate }}
-    </app-button>
-    <app-button
-      *ngIf="svc.currentStep() < lastStep"
-      [disabled]="!svc.stepValid()[svc.currentStep()]"
-      (clicked)="svc.next()"
-    >
-      {{ 'COMMON.NEXT' | translate }}
-    </app-button>
-    <app-button
-      *ngIf="svc.currentStep() === lastStep"
-      [loading]="svc.saving()"
-      [disabled]="!svc.canSave()"
-      (clicked)="save()"
-    >
-      {{ 'COMMON.SAVE' | translate }}
-    </app-button>
-  </footer>
 </div>

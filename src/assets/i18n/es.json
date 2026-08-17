@@ -2998,7 +2998,8 @@
       "ROW_COUNT": "Filas",
       "SERVER_MODE_HINT": "Más de 500 valores: se usará búsqueda paginada en el servidor.",
       "REUPLOAD_REPLACE_WARN": "Volver a subir reemplaza el conjunto de opciones actual."
-    }
+    },
+    "CONFIGURE_TITLE": "Configure Prompt"
   },
   "QUERY_BUILDER_MODULE": {
     "TITLE": "Query Builders",
@@ -6435,7 +6436,31 @@
     "CONFIG_IN_PROMPT_HINT": "El SQL, los valores, la apariencia y los operadores del prompt se configuran en el módulo de Prompts. Aquí solo eliges qué prompts aparecen y cómo se organiza el formulario.",
     "JOINS_AUTO_HINT": "Las combinaciones se crean automáticamente a partir de las tablas que necesitan tus prompts — configurado en el módulo de Prompts. No hay nada que crear aquí.",
     "NO_JOINS_AUTO": "No se necesitan combinaciones: cada prompt filtra en su propia tabla base.",
-    "AUTO": "Auto"
+    "AUTO": "Auto",
+    "OPERATORS": {
+      "EQ": "Equals",
+      "NEQ": "Not equal to",
+      "GT": "Greater than",
+      "GTE": "Greater than or equal",
+      "LT": "Less than",
+      "LTE": "Less than or equal",
+      "BETWEEN": "Between",
+      "NOT_BETWEEN": "Not between",
+      "CONTAINS": "Contains",
+      "DOES_NOT_CONTAIN": "Does not contain",
+      "STARTS_WITH": "Starts with",
+      "ENDS_WITH": "Ends with",
+      "BEFORE": "Before",
+      "AFTER": "After",
+      "IN": "Is any of",
+      "NOT_IN": "Is none of",
+      "IS_NULL": "Is empty",
+      "IS_NOT_NULL": "Is not empty",
+      "IN_LAST_DAYS": "In the last N days",
+      "AND": "All of (AND)",
+      "OR": "Any of (OR)",
+      "NOT": "Not"
+    }
   },
   "ORGANISATION": {
     "ADMIN_FULL_NAME": "Nombre completo"

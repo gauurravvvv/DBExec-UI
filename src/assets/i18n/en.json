@@ -3002,7 +3002,8 @@
       "ROW_COUNT": "Rows",
       "SERVER_MODE_HINT": "Over 500 values — the runtime will use server-paged search.",
       "REUPLOAD_REPLACE_WARN": "Re-uploading replaces the current option set."
-    }
+    },
+    "CONFIGURE_TITLE": "Configure Prompt"
   },
   "QUERY_BUILDER_MODULE": {
     "TITLE": "Query Builders",
@@ -6454,7 +6455,31 @@
     "CONFIG_IN_PROMPT_HINT": "Prompt SQL, values, appearance and operators are configured in the Prompt module. Here you only choose which prompts appear and how the form is arranged.",
     "JOINS_AUTO_HINT": "Joins are built automatically from the tables your placed prompts need — configured in the Prompt module. Nothing to author here.",
     "NO_JOINS_AUTO": "No joins needed — every placed prompt filters on its own base table.",
-    "AUTO": "Auto"
+    "AUTO": "Auto",
+    "OPERATORS": {
+      "EQ": "Equals",
+      "NEQ": "Not equal to",
+      "GT": "Greater than",
+      "GTE": "Greater than or equal",
+      "LT": "Less than",
+      "LTE": "Less than or equal",
+      "BETWEEN": "Between",
+      "NOT_BETWEEN": "Not between",
+      "CONTAINS": "Contains",
+      "DOES_NOT_CONTAIN": "Does not contain",
+      "STARTS_WITH": "Starts with",
+      "ENDS_WITH": "Ends with",
+      "BEFORE": "Before",
+      "AFTER": "After",
+      "IN": "Is any of",
+      "NOT_IN": "Is none of",
+      "IS_NULL": "Is empty",
+      "IS_NOT_NULL": "Is not empty",
+      "IN_LAST_DAYS": "In the last N days",
+      "AND": "All of (AND)",
+      "OR": "Any of (OR)",
+      "NOT": "Not"
+    }
   },
   "ORGANISATION": {
     "ADMIN_FULL_NAME": "Full Name"

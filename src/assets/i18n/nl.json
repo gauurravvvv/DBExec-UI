@@ -2998,7 +2998,8 @@
       "ROW_COUNT": "Rijen",
       "SERVER_MODE_HINT": "Meer dan 500 waarden — de runtime gebruikt server-gepagineerd zoeken.",
       "REUPLOAD_REPLACE_WARN": "Opnieuw uploaden vervangt de huidige optielijst."
-    }
+    },
+    "CONFIGURE_TITLE": "Configure Prompt"
   },
   "QUERY_BUILDER_MODULE": {
     "TITLE": "Query Builders",
@@ -6435,7 +6436,31 @@
     "CONFIG_IN_PROMPT_HINT": "Prompt-SQL, waarden, weergave en operatoren worden in de Prompt-module geconfigureerd. Hier kies je alleen welke prompts verschijnen en hoe het formulier is ingedeeld.",
     "JOINS_AUTO_HINT": "Joins worden automatisch opgebouwd uit de tabellen die je geplaatste prompts nodig hebben — geconfigureerd in de Prompt-module. Hier valt niets te maken.",
     "NO_JOINS_AUTO": "Geen joins nodig — elke geplaatste prompt filtert op zijn eigen basistabel.",
-    "AUTO": "Auto"
+    "AUTO": "Auto",
+    "OPERATORS": {
+      "EQ": "Equals",
+      "NEQ": "Not equal to",
+      "GT": "Greater than",
+      "GTE": "Greater than or equal",
+      "LT": "Less than",
+      "LTE": "Less than or equal",
+      "BETWEEN": "Between",
+      "NOT_BETWEEN": "Not between",
+      "CONTAINS": "Contains",
+      "DOES_NOT_CONTAIN": "Does not contain",
+      "STARTS_WITH": "Starts with",
+      "ENDS_WITH": "Ends with",
+      "BEFORE": "Before",
+      "AFTER": "After",
+      "IN": "Is any of",
+      "NOT_IN": "Is none of",
+      "IS_NULL": "Is empty",
+      "IS_NOT_NULL": "Is not empty",
+      "IN_LAST_DAYS": "In the last N days",
+      "AND": "All of (AND)",
+      "OR": "Any of (OR)",
+      "NOT": "Not"
+    }
   },
   "ORGANISATION": {
     "ADMIN_FULL_NAME": "Volledige naam"

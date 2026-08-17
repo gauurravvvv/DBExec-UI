@@ -6,8 +6,10 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  Injector,
   Input,
   OnInit,
+  effect,
   inject,
   signal,
 } from '@angular/core';
@@ -28,14 +30,33 @@ interface Option {
 export class CpSourceStepComponent implements OnInit {
   @Input({ required: true }) svc!: PromptConfigService;
   private readonly datasources = inject(DatasourceService);
+  private readonly injector = inject(Injector);
 
   readonly schemas = signal<Option[]>([]);
   readonly tables = signal<Option[]>([]);
   readonly loadingTables = signal(false);
 
-  async ngOnInit(): Promise<void> {
-    const dsId = this.svc.datasourceId();
-    if (!dsId) return;
+  private loadedForDsId = '';
+
+  ngOnInit(): void {
+    // React to datasourceId becoming available. The shell sets it AFTER an
+    // async loadOne(), which resolves AFTER this child's ngOnInit — so a
+    // one-shot read here would see an empty id and skip the schema fetch
+    // (the "No options available" bug). An effect re-runs when the signal
+    // lands, and the loadedForDsId guard keeps it to one fetch per datasource.
+    effect(
+      () => {
+        const dsId = this.svc.datasourceId();
+        if (dsId && dsId !== this.loadedForDsId) {
+          this.loadedForDsId = dsId;
+          void this.loadSchemas(dsId);
+        }
+      },
+      { injector: this.injector },
+    );
+  }
+
+  private async loadSchemas(dsId: string): Promise<void> {
     try {
       const res: any = await this.datasources.listDatasourceSchemas(
         { datasourceId: dsId },
@@ -44,7 +65,8 @@ export class CpSourceStepComponent implements OnInit {
       const rows: any[] = res?.data ?? [];
       this.schemas.set(
         rows.map((r: any) => {
-          const name = typeof r === 'string' ? r : r.schema_name ?? r.schemaName ?? r.name;
+          const name =
+            typeof r === 'string' ? r : r.schema_name ?? r.schemaName ?? r.name;
           return { label: name, value: name };
         }),
       );

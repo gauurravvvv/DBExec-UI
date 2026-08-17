@@ -2998,7 +2998,8 @@
       "ROW_COUNT": "行数",
       "SERVER_MODE_HINT": "500 件を超えています — 実行時にサーバーページング検索を使用します。",
       "REUPLOAD_REPLACE_WARN": "再アップロードすると現在の選択肢が置き換えられます。"
-    }
+    },
+    "CONFIGURE_TITLE": "Configure Prompt"
   },
   "QUERY_BUILDER_MODULE": {
     "TITLE": "Query Builders",
@@ -6435,7 +6436,31 @@
     "CONFIG_IN_PROMPT_HINT": "プロンプトのSQL、値、外観、演算子はプロンプトモジュールで設定します。ここでは、どのプロンプトを表示し、フォームをどう配置するかのみを選択します。",
     "JOINS_AUTO_HINT": "結合は、配置したプロンプトが必要とするテーブルから自動的に作成されます（プロンプトモジュールで設定）。ここで作成するものはありません。",
     "NO_JOINS_AUTO": "結合は不要です。配置された各プロンプトは自身のベーステーブルでフィルタリングします。",
-    "AUTO": "自動"
+    "AUTO": "自動",
+    "OPERATORS": {
+      "EQ": "Equals",
+      "NEQ": "Not equal to",
+      "GT": "Greater than",
+      "GTE": "Greater than or equal",
+      "LT": "Less than",
+      "LTE": "Less than or equal",
+      "BETWEEN": "Between",
+      "NOT_BETWEEN": "Not between",
+      "CONTAINS": "Contains",
+      "DOES_NOT_CONTAIN": "Does not contain",
+      "STARTS_WITH": "Starts with",
+      "ENDS_WITH": "Ends with",
+      "BEFORE": "Before",
+      "AFTER": "After",
+      "IN": "Is any of",
+      "NOT_IN": "Is none of",
+      "IS_NULL": "Is empty",
+      "IS_NOT_NULL": "Is not empty",
+      "IN_LAST_DAYS": "In the last N days",
+      "AND": "All of (AND)",
+      "OR": "Any of (OR)",
+      "NOT": "Not"
+    }
   },
   "ORGANISATION": {
     "ADMIN_FULL_NAME": "氏名"
