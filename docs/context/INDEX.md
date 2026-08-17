@@ -26,7 +26,7 @@
 | datasource | `src/app/modules/datasource` | [datasource](./modules/datasource.md) | 🟢 | 2026-07-24 |
 | db-access | `src/app/modules/db-access` | [db-access](./modules/db-access.md) | 🟢 | 2026-07-24 |
 | embed | `src/app/modules/embed` | [embed](./modules/embed.md) | 🟢 | 2026-07-24 |
-| form-builder | `src/app/modules/form-builder` | — | 🟡 | 2026-08-15 (Phase 7 composer) |
+| form-builder | `src/app/modules/form-builder` | [form-builder](./modules/form-builder.md) | 🟢 | 2026-08-17 (Phase 8 portability) |
 | groups | `src/app/modules/groups` | [groups](./modules/groups.md) | 🟢 | 2026-07-24 |
 | home | `src/app/modules/home` | [home](./modules/home.md) | 🟢 | 2026-07-24 |
 | login-activity | `src/app/modules/login-activity` | [login-activity](./modules/login-activity.md) | 🟢 | 2026-07-24 |

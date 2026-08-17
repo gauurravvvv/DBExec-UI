@@ -1,5 +1,22 @@
 # dbexec-ui — Session Log (newest first)
 
+### 2026-08-17 — Prompt Builder Phase 8 (frontend): portability UI
+- Added the form-builder portability surface: `FormPortabilityService` (blob
+  export with Content-Disposition filename + JSON-error-envelope detection,
+  interceptor-safe; import; save-as-template; list + clone templates),
+  `import-form-dialog` (file → JSON.parse → mirrored `importFormSchema` → POST
+  /forms/import → navigate to the new family), `save-as-template-dialog`
+  (name + description), `list-form-templates` (gallery + Clone-to-new-family).
+- Wired Export / Save-as-template / Import / Templates buttons into `view-form`
+  + a `templates` route (registered before `:id`). Byte-identical
+  `formPortability.ts` validator mirror; `FORM_BUILDER.PORTABILITY.*` +
+  `validation.formBuilder.{name,code,description}` across all 10 locales.
+- Created the FE `docs/context/modules/form-builder.md` context doc (was missing)
+  and flipped its INDEX row to 🟢.
+- Gates: tsc 0 · ngc 0 · jest (form-builder) 27/27 · prod build success (no
+  warnings). Commit `606fbbc0` on `feature/prompt-builder` (not pushed). Live
+  end-to-end smoke test against a seeded org still pending (needs a datasource).
+
 ### 2026-08-15 — Prompt Builder Phase 7 (frontend): runtime composer = the published Query Builder
 - Extracted a routeless `QbRuntimeSharedModule` (query-builder) declaring +
   exporting the six tree->SQL runtime components (qb-filter-tree, qb-group-node,
