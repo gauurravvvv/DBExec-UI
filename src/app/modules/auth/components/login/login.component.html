@@ -1,6 +1,6 @@
 <app-auth-shell
-  cardTitle="Log in"
-  cardSubtitle="Sign in to your DBExec account"
+  [cardTitle]="'AUTH.LOGIN2.TITLE' | translate"
+  [cardSubtitle]="'AUTH.LOGIN2.SUBTITLE' | translate"
 >
   <form
     autocomplete="off"
@@ -11,16 +11,16 @@
     novalidate
   >
     <div class="auth-form__field">
-      <label class="auth-visually-hidden" for="auth-account"
-        >Organisation</label
-      >
+      <label class="auth-visually-hidden" for="auth-account">{{
+        'AUTH.ORGANISATION' | translate
+      }}</label>
       <app-custom-input
         inputId="auth-account"
         formControlName="organisation"
-        placeholder="Organisation"
+        [placeholder]="'AUTH.ORGANISATION' | translate"
         icon="pi-building"
         autocomplete="organization"
-        ariaLabel="Organisation"
+        [ariaLabel]="'AUTH.ORGANISATION' | translate"
         [showError]="
           !!(
             loginForm.get('organisation')?.invalid &&
@@ -32,14 +32,16 @@
     </div>
 
     <div class="auth-form__field" *ngIf="!isSSOLogin()">
-      <label class="auth-visually-hidden" for="auth-username">Username</label>
+      <label class="auth-visually-hidden" for="auth-username">{{
+        'AUTH.USERNAME' | translate
+      }}</label>
       <app-custom-input
         inputId="auth-username"
         formControlName="username"
-        placeholder="Username"
+        [placeholder]="'AUTH.USERNAME' | translate"
         icon="pi-user"
         autocomplete="username"
-        ariaLabel="Username"
+        [ariaLabel]="'AUTH.USERNAME' | translate"
         [showError]="
           !!(
             loginForm.get('username')?.invalid &&
@@ -56,14 +58,16 @@
       (focusin)="onPasswordFocus()"
       (focusout)="onPasswordBlur()"
     >
-      <label class="auth-visually-hidden" for="auth-password">Password</label>
+      <label class="auth-visually-hidden" for="auth-password">{{
+        'AUTH.PASSWORD' | translate
+      }}</label>
       <app-custom-input
         inputId="auth-password"
         formControlName="password"
-        placeholder="Password"
+        [placeholder]="'AUTH.PASSWORD' | translate"
         icon="pi-lock"
         autocomplete="current-password"
-        ariaLabel="Password"
+        [ariaLabel]="'AUTH.PASSWORD' | translate"
         [showPasswordToggle]="true"
         [showError]="
           !!(
@@ -80,7 +84,7 @@
         aria-live="polite"
       >
         <i class="pi pi-info-circle" aria-hidden="true"></i>
-        Caps Lock is on
+        {{ 'AUTH.FIELD.CAPS_LOCK' | translate }}
       </p>
     </div>
 
@@ -102,7 +106,11 @@
       pButton
       type="submit"
       class="auth-form__submit"
-      [label]="loading() ? 'Signing in…' : 'Sign in'"
+      [label]="
+        loading()
+          ? ('AUTH.LOGIN2.SUBMITTING' | translate)
+          : ('AUTH.LOGIN2.SUBMIT' | translate)
+      "
       [disabled]="loginForm.invalid || loading()"
       [loading]="loading()"
     ></button>
@@ -125,7 +133,7 @@
 
     <div class="auth-form__footer-row">
       <a class="auth-form__link" [routerLink]="['/forgot-password']">
-        Forgot password?
+        {{ 'AUTH.LOGIN2.FORGOT' | translate }}
       </a>
       <button
         type="button"

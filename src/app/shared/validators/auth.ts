@@ -218,6 +218,18 @@ export const verifySetupTokenSchema = z.object({
   token: setupTokenSchema,
 });
 
+/**
+ * Pre-flight check the FE makes when the user lands on the reset-password
+ * page (magic-link flow). Same shape as verifySetupToken but uses the
+ * reset-token pattern. Read-only on the server — it never touches the
+ * attempt counter (see verifyResetToken.ts controller).
+ */
+export const verifyResetTokenSchema = z.object({
+  id: idSchema,
+  orgId: idSchema,
+  token: resetTokenSchema,
+});
+
 export const resendSetupLinkSchema = z.object({
   id: idSchema,
   orgId: idSchema,

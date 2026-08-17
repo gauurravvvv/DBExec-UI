@@ -1,23 +1,26 @@
+// Marketing bullets on the auth shell. title/description are i18n keys
+// (resolved with the translate pipe in auth-shell.component.html) so the
+// login/reset/set-password chrome is fully localized.
 export const LOGIN_PAGE_OPTIONS = [
   {
     icon: 'database',
-    title: 'Connect any database',
-    description: 'Postgres, MySQL, SQL Server and more — in minutes.',
+    title: 'AUTH.SHELL.FEATURE_CONNECT_TITLE',
+    description: 'AUTH.SHELL.FEATURE_CONNECT_DESC',
   },
   {
     icon: 'th-large',
-    title: 'Build dashboards visually',
-    description: 'Drag, drop and arrange charts — no SQL required.',
+    title: 'AUTH.SHELL.FEATURE_BUILD_TITLE',
+    description: 'AUTH.SHELL.FEATURE_BUILD_DESC',
   },
   {
     icon: 'chart-line',
-    title: 'Explore with rich visuals',
-    description: 'Bars, lines, pies, maps and KPIs out of the box.',
+    title: 'AUTH.SHELL.FEATURE_EXPLORE_TITLE',
+    description: 'AUTH.SHELL.FEATURE_EXPLORE_DESC',
   },
   {
     icon: 'share-alt',
-    title: 'Share with your team',
-    description: 'Governed access with row-level security by default.',
+    title: 'AUTH.SHELL.FEATURE_SHARE_TITLE',
+    description: 'AUTH.SHELL.FEATURE_SHARE_DESC',
   },
 ];
 

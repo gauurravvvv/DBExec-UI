@@ -2347,6 +2347,72 @@
       "BACK_TO_LOGIN": "Zurück zur Anmeldung",
       "CARD_TITLE": "Sie werden angemeldet",
       "CARD_SUBTITLE": "Einen Moment, wir schließen die Anmeldung ab."
+    },
+    "SHELL": {
+      "SKIP_TO_FORM": "Zum Formular springen",
+      "HOME_ARIA": "DBExec Startseite",
+      "ALL_RIGHTS": "Alle Rechte vorbehalten.",
+      "HERO_TITLE": "Verwandeln Sie Ihre Datenbanken in Dashboards.",
+      "HERO_LEDE": "Verbinden Sie eine Datenquelle, ziehen Sie die gewünschten Diagramme und teilen Sie das Dashboard — alles an einem Ort, ganz ohne SQL.",
+      "FEATURE_CONNECT_TITLE": "Jede Datenbank verbinden",
+      "FEATURE_CONNECT_DESC": "Postgres, MySQL, SQL Server und mehr — in wenigen Minuten.",
+      "FEATURE_BUILD_TITLE": "Dashboards visuell erstellen",
+      "FEATURE_BUILD_DESC": "Diagramme per Drag-and-drop anordnen — ganz ohne SQL.",
+      "FEATURE_EXPLORE_TITLE": "Mit reichhaltigen Visualisierungen erkunden",
+      "FEATURE_EXPLORE_DESC": "Balken, Linien, Kreise, Karten und KPIs von Haus aus.",
+      "FEATURE_SHARE_TITLE": "Mit Ihrem Team teilen",
+      "FEATURE_SHARE_DESC": "Gesteuerter Zugriff mit Sicherheit auf Zeilenebene standardmäßig."
+    },
+    "SET": {
+      "TITLE": "Passwort festlegen",
+      "SUBTITLE": "Erstellen Sie ein Passwort, um Ihr Konto zu aktivieren.",
+      "SUBTITLE_NAMED": "Hallo {{name}}, erstellen Sie ein Passwort, um Ihr Konto zu aktivieren.",
+      "VERIFYING_TITLE": "Link wird geprüft",
+      "VERIFYING_MSG": "Ihr Einrichtungslink wird geprüft…",
+      "EXPIRED_TITLE": "Link abgelaufen",
+      "EXPIRED_MSG": "Ihr Einrichtungslink ist abgelaufen. Fordern Sie einen neuen an, um fortzufahren.",
+      "SENT_TITLE": "Link gesendet",
+      "ALREADY_TITLE": "Bereits festgelegt",
+      "ALREADY_MSG": "Ihr Passwort wurde bereits konfiguriert. Weiterleitung zur Anmeldung…",
+      "INVALID_TITLE": "Ungültiger Link",
+      "PASSWORD_PLACEHOLDER": "Passwort wählen",
+      "SUBMIT": "Passwort festlegen",
+      "SUBMITTING": "Passwort wird festgelegt…",
+      "RESEND": "Einrichtungslink erneut senden"
+    },
+    "RESET": {
+      "TITLE": "Passwort zurücksetzen",
+      "SUBTITLE": "Wählen Sie ein neues Passwort.",
+      "SUBTITLE_NAMED": "Hallo {{name}}, wählen Sie ein neues Passwort.",
+      "VERIFYING_TITLE": "Link wird geprüft",
+      "VERIFYING_MSG": "Ihr Zurücksetzungslink wird geprüft…",
+      "INVALID_TITLE": "Ungültiger Link",
+      "INVALID_MSG": "Dieser Zurücksetzungslink ist ungültig oder abgelaufen. Fordern Sie über die Anmeldeseite einen neuen an.",
+      "NEW_PASSWORD": "Neues Passwort",
+      "SUBMIT": "Passwort zurücksetzen",
+      "SUBMITTING": "Wird zurückgesetzt…"
+    },
+    "FORGOT": {
+      "TITLE": "Passwort zurücksetzen",
+      "SUBTITLE": "Geben Sie Ihre Organisation und E-Mail-Adresse ein, und wir senden Ihnen einen Link zum Zurücksetzen.",
+      "SUBMIT": "Link zum Zurücksetzen senden",
+      "RESEND": "Link erneut senden",
+      "SENDING": "Wird gesendet…",
+      "RESEND_IN": "Erneut senden in",
+      "FAILED": "Link zum Zurücksetzen konnte nicht gesendet werden.",
+      "FAILED_RETRY": "Link zum Zurücksetzen konnte nicht gesendet werden. Bitte versuchen Sie es erneut."
+    },
+    "FIELD": {
+      "CONFIRM_PASSWORD": "Passwort bestätigen",
+      "CAPS_LOCK": "Feststelltaste ist aktiviert"
+    },
+    "LOGIN2": {
+      "TITLE": "Anmelden",
+      "SUBTITLE": "Melden Sie sich bei Ihrem DBExec-Konto an",
+      "SUBMIT": "Anmelden",
+      "SUBMITTING": "Anmeldung läuft…",
+      "FORGOT": "Passwort vergessen?",
+      "CREDENTIALS_ERROR": "Die eingegebenen Anmeldedaten sind falsch."
     }
   },
   "PASSWORD": {

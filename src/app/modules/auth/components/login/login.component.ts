@@ -7,6 +7,7 @@ import {
 } from '@angular/core';
 import { FormGroup, UntypedFormBuilder } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { TranslateService } from '@ngx-translate/core';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { LoginService } from 'src/app/core/services/login.service';
 import {
@@ -16,9 +17,9 @@ import {
 } from 'src/app/shared/validators/auth';
 import { zodValidator } from 'src/app/shared/validators/zod-validator';
 
-// Single generic message for any "wrong identifier or credential" outcome.
+// i18n key for the single generic "wrong identifier or credential" outcome.
 // Specific server-side reasons (lockout, downtime, etc.) still pass through.
-const GENERIC_AUTH_ERROR = 'The credentials you entered are incorrect.';
+const GENERIC_AUTH_ERROR_KEY = 'AUTH.LOGIN2.CREDENTIALS_ERROR';
 
 // HTTP status the BE returns for a user whose password was never set
 // (account created but the set-password link hasn't been used yet). Its
@@ -56,6 +57,7 @@ export class LoginComponent implements OnInit {
     private route: ActivatedRoute,
     private loginService: LoginService,
     private globalService: GlobalService,
+    private translate: TranslateService,
   ) {
     // Only `required` on login. Format / strength rules belong on sign-up
     // and reset flows — at sign-in, the server is the source of truth.
@@ -201,13 +203,13 @@ export class LoginComponent implements OnInit {
     if (!control?.errors?.['required']) return '';
     switch (fieldName) {
       case 'organisation':
-        return 'Organisation is required';
+        return this.translate.instant('validation.auth.organisation.required');
       case 'username':
-        return 'Username is required';
+        return this.translate.instant('validation.auth.username.required');
       case 'password':
-        return 'Password is required';
+        return this.translate.instant('validation.auth.password.required');
       default:
-        return 'This field is required';
+        return this.translate.instant('VALIDATION.FIELD_REQUIRED');
     }
   }
 
@@ -221,20 +223,24 @@ export class LoginComponent implements OnInit {
     if (code === PASSWORD_NOT_SET_CODE && message) {
       return message;
     }
-    return this.normaliseAuthError(message) || GENERIC_AUTH_ERROR;
+    return (
+      this.normaliseAuthError(message) ||
+      this.translate.instant(GENERIC_AUTH_ERROR_KEY)
+    );
   }
 
   // Heuristic: collapse any "username/password" style message into one
   // generic line so we don't leak which half is wrong. Server-sent
   // lockout / downtime / rate-limit messages are passed through unchanged.
   private normaliseAuthError(message?: string): string {
-    if (!message) return GENERIC_AUTH_ERROR;
+    const generic = this.translate.instant(GENERIC_AUTH_ERROR_KEY);
+    if (!message) return generic;
     const lower = message.toLowerCase();
     const leaksField =
       lower.includes('password') ||
       lower.includes('username') ||
       lower.includes('user not') ||
       lower.includes('invalid credentials');
-    return leaksField ? GENERIC_AUTH_ERROR : message;
+    return leaksField ? generic : message;
   }
 }

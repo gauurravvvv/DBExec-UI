@@ -1,8 +1,14 @@
 <div class="auth-page">
-  <a class="auth-skip-link" href="#auth-form">Skip to form</a>
+  <a class="auth-skip-link" href="#auth-form">{{
+    'AUTH.SHELL.SKIP_TO_FORM' | translate
+  }}</a>
 
   <header class="auth-topbar">
-    <a class="auth-topbar__brand" routerLink="/" aria-label="DBExec home">
+    <a
+      class="auth-topbar__brand"
+      routerLink="/"
+      [attr.aria-label]="'AUTH.SHELL.HOME_ARIA' | translate"
+    >
       <i class="ci ci-app-icon auth-topbar__mark" aria-hidden="true"></i>
       <span class="auth-topbar__wordmark"
         >DB<span class="auth-topbar__highlight">Exec</span></span
@@ -13,8 +19,8 @@
   <main class="auth-main">
     <section class="auth-features" *ngIf="showFeatures" aria-hidden="true">
       <div class="auth-features__heading">
-        <h1>{{ heroTitle }}</h1>
-        <p>{{ heroLede }}</p>
+        <h1>{{ heroTitle | translate }}</h1>
+        <p>{{ heroLede | translate }}</p>
       </div>
       <ul class="auth-features__list">
         <li
@@ -27,8 +33,12 @@
             <i class="pi pi-{{ feature.icon }}"></i>
           </span>
           <div class="auth-feature__body">
-            <span class="auth-feature__title">{{ feature.title }}</span>
-            <span class="auth-feature__desc">{{ feature.description }}</span>
+            <span class="auth-feature__title">{{
+              feature.title | translate
+            }}</span>
+            <span class="auth-feature__desc">{{
+              feature.description | translate
+            }}</span>
           </div>
         </li>
       </ul>
@@ -47,7 +57,7 @@
   <footer class="auth-footer">
     <p class="auth-footer__copyright">
       DBExec {{ environment.appVersion }} &middot; &copy; {{ year }} &middot;
-      All rights reserved.
+      {{ 'AUTH.SHELL.ALL_RIGHTS' | translate }}
     </p>
   </footer>
 </div>

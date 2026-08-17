@@ -2347,6 +2347,72 @@
       "BACK_TO_LOGIN": "サインインに戻る",
       "CARD_TITLE": "サインインしています",
       "CARD_SUBTITLE": "サインインを完了しています。少々お待ちください。"
+    },
+    "SHELL": {
+      "SKIP_TO_FORM": "フォームへスキップ",
+      "HOME_ARIA": "DBExec ホーム",
+      "ALL_RIGHTS": "無断複製・転載を禁じます。",
+      "HERO_TITLE": "データベースをダッシュボードに変えましょう。",
+      "HERO_LEDE": "データソースを接続し、必要なチャートをドラッグして、ダッシュボードを共有 — すべてを一か所で、SQL は不要です。",
+      "FEATURE_CONNECT_TITLE": "あらゆるデータベースに接続",
+      "FEATURE_CONNECT_DESC": "Postgres、MySQL、SQL Server など — 数分で。",
+      "FEATURE_BUILD_TITLE": "ダッシュボードを視覚的に構築",
+      "FEATURE_BUILD_DESC": "チャートをドラッグ＆ドロップで配置 — SQL は不要です。",
+      "FEATURE_EXPLORE_TITLE": "豊富なビジュアルで探索",
+      "FEATURE_EXPLORE_DESC": "棒、折れ線、円、地図、KPI をすぐに利用できます。",
+      "FEATURE_SHARE_TITLE": "チームと共有",
+      "FEATURE_SHARE_DESC": "デフォルトで行レベルセキュリティによる管理されたアクセス。"
+    },
+    "SET": {
+      "TITLE": "パスワードを設定",
+      "SUBTITLE": "アカウントを有効化するためのパスワードを作成してください。",
+      "SUBTITLE_NAMED": "{{name}} さん、アカウントを有効化するためのパスワードを作成してください。",
+      "VERIFYING_TITLE": "リンクを確認中",
+      "VERIFYING_MSG": "セットアップリンクを確認しています…",
+      "EXPIRED_TITLE": "リンクの有効期限切れ",
+      "EXPIRED_MSG": "セットアップリンクの有効期限が切れました。続行するには新しいリンクをリクエストしてください。",
+      "SENT_TITLE": "リンクを送信しました",
+      "ALREADY_TITLE": "設定済み",
+      "ALREADY_MSG": "パスワードはすでに設定されています。サインインにリダイレクトしています…",
+      "INVALID_TITLE": "無効なリンク",
+      "PASSWORD_PLACEHOLDER": "パスワードを選択",
+      "SUBMIT": "パスワードを設定",
+      "SUBMITTING": "パスワードを設定中…",
+      "RESEND": "セットアップリンクを再送信"
+    },
+    "RESET": {
+      "TITLE": "パスワードをリセット",
+      "SUBTITLE": "新しいパスワードを選択してください。",
+      "SUBTITLE_NAMED": "{{name}} さん、新しいパスワードを選択してください。",
+      "VERIFYING_TITLE": "リンクを確認中",
+      "VERIFYING_MSG": "リセットリンクを確認しています…",
+      "INVALID_TITLE": "無効なリンク",
+      "INVALID_MSG": "このリセットリンクは無効か、有効期限が切れています。サインインページから新しいリンクをリクエストしてください。",
+      "NEW_PASSWORD": "新しいパスワード",
+      "SUBMIT": "パスワードをリセット",
+      "SUBMITTING": "リセット中…"
+    },
+    "FORGOT": {
+      "TITLE": "パスワードをリセット",
+      "SUBTITLE": "組織とメールアドレスを入力すると、リセットリンクをお送りします。",
+      "SUBMIT": "リセットリンクを送信",
+      "RESEND": "リンクを再送信",
+      "SENDING": "送信中…",
+      "RESEND_IN": "再送信まで",
+      "FAILED": "リセットリンクを送信できませんでした。",
+      "FAILED_RETRY": "リセットリンクを送信できませんでした。もう一度お試しください。"
+    },
+    "FIELD": {
+      "CONFIRM_PASSWORD": "パスワードを確認",
+      "CAPS_LOCK": "Caps Lock がオンになっています"
+    },
+    "LOGIN2": {
+      "TITLE": "ログイン",
+      "SUBTITLE": "DBExec アカウントにサインインしてください",
+      "SUBMIT": "サインイン",
+      "SUBMITTING": "サインインしています…",
+      "FORGOT": "パスワードをお忘れですか？",
+      "CREDENTIALS_ERROR": "入力された認証情報が正しくありません。"
     }
   },
   "PASSWORD": {

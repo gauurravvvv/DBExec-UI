@@ -2347,6 +2347,72 @@
       "BACK_TO_LOGIN": "Voltar para o login",
       "CARD_TITLE": "Conectando você",
       "CARD_SUBTITLE": "Só um momento enquanto concluímos o acesso."
+    },
+    "SHELL": {
+      "SKIP_TO_FORM": "Ir para o formulário",
+      "HOME_ARIA": "Início do DBExec",
+      "ALL_RIGHTS": "Todos os direitos reservados.",
+      "HERO_TITLE": "Transforme seus bancos de dados em painéis.",
+      "HERO_LEDE": "Conecte uma fonte de dados, arraste os gráficos que precisar e compartilhe o painel — tudo em um só lugar, sem SQL.",
+      "FEATURE_CONNECT_TITLE": "Conecte qualquer banco de dados",
+      "FEATURE_CONNECT_DESC": "Postgres, MySQL, SQL Server e mais — em minutos.",
+      "FEATURE_BUILD_TITLE": "Crie painéis visualmente",
+      "FEATURE_BUILD_DESC": "Arraste, solte e organize gráficos — sem SQL.",
+      "FEATURE_EXPLORE_TITLE": "Explore com visualizações ricas",
+      "FEATURE_EXPLORE_DESC": "Barras, linhas, pizzas, mapas e KPIs prontos para usar.",
+      "FEATURE_SHARE_TITLE": "Compartilhe com sua equipe",
+      "FEATURE_SHARE_DESC": "Acesso controlado com segurança em nível de linha por padrão."
+    },
+    "SET": {
+      "TITLE": "Defina sua senha",
+      "SUBTITLE": "Crie uma senha para ativar sua conta.",
+      "SUBTITLE_NAMED": "Olá {{name}}, crie uma senha para ativar sua conta.",
+      "VERIFYING_TITLE": "Verificando link",
+      "VERIFYING_MSG": "Verificando seu link de configuração…",
+      "EXPIRED_TITLE": "Link expirado",
+      "EXPIRED_MSG": "Seu link de configuração expirou. Solicite um novo para continuar.",
+      "SENT_TITLE": "Link enviado",
+      "ALREADY_TITLE": "Já definida",
+      "ALREADY_MSG": "Sua senha já foi configurada. Redirecionando para o login…",
+      "INVALID_TITLE": "Link inválido",
+      "PASSWORD_PLACEHOLDER": "Escolha uma senha",
+      "SUBMIT": "Definir senha",
+      "SUBMITTING": "Definindo senha…",
+      "RESEND": "Reenviar link de configuração"
+    },
+    "RESET": {
+      "TITLE": "Redefinir senha",
+      "SUBTITLE": "Escolha uma nova senha.",
+      "SUBTITLE_NAMED": "Olá {{name}}, escolha uma nova senha.",
+      "VERIFYING_TITLE": "Verificando link",
+      "VERIFYING_MSG": "Verificando seu link de redefinição…",
+      "INVALID_TITLE": "Link inválido",
+      "INVALID_MSG": "Este link de redefinição é inválido ou expirou. Solicite um novo na página de login.",
+      "NEW_PASSWORD": "Nova senha",
+      "SUBMIT": "Redefinir senha",
+      "SUBMITTING": "Redefinindo…"
+    },
+    "FORGOT": {
+      "TITLE": "Redefinir senha",
+      "SUBTITLE": "Informe sua organização e e-mail e enviaremos um link de redefinição.",
+      "SUBMIT": "Enviar link de redefinição",
+      "RESEND": "Reenviar link",
+      "SENDING": "Enviando…",
+      "RESEND_IN": "Reenviar em",
+      "FAILED": "Falha ao enviar o link de redefinição.",
+      "FAILED_RETRY": "Falha ao enviar o link de redefinição. Tente novamente."
+    },
+    "FIELD": {
+      "CONFIRM_PASSWORD": "Confirmar senha",
+      "CAPS_LOCK": "Caps Lock está ativado"
+    },
+    "LOGIN2": {
+      "TITLE": "Entrar",
+      "SUBTITLE": "Entre na sua conta DBExec",
+      "SUBMIT": "Entrar",
+      "SUBMITTING": "Entrando…",
+      "FORGOT": "Esqueceu a senha?",
+      "CREDENTIALS_ERROR": "As credenciais que você inseriu estão incorretas."
     }
   },
   "PASSWORD": {

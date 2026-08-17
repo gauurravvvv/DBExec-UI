@@ -1,6 +1,7 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  computed,
   DestroyRef,
   HostListener,
   inject,
@@ -10,8 +11,10 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { TranslateService } from '@ngx-translate/core';
 import { AUTH } from 'src/app/core/constants/routes.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
+import { LocaleService } from 'src/app/core/services/locale.service';
 import { LoginService } from 'src/app/core/services/login.service';
 import { newPasswordSchema } from 'src/app/shared/validators/auth';
 import { passwordStrengthValidator } from 'src/app/shared/validators/password-strength.validator';
@@ -37,12 +40,42 @@ export class ResetPasswordComponent implements OnInit {
   // server-side; the user never sees or types it.
   token!: string;
 
+  // The link is pre-validated on load (mirrors set-password) so we show the
+  // form only for a good token and greet the user by name. 'invalid' also
+  // covers expired/used tokens — the BE collapses them for anti-enumeration.
+  pageState = signal<'loading' | 'valid' | 'invalid'>('loading');
+
+  // The user's name, returned by verifyResetToken on the 'valid' branch.
+  // Empty until the token is confirmed valid (never populated otherwise).
+  userName = signal('');
+
+  readonly cardTitle = computed(() => {
+    switch (this.pageState()) {
+      case 'loading':
+        return this.translate.instant('AUTH.RESET.VERIFYING_TITLE');
+      case 'invalid':
+        return this.translate.instant('AUTH.RESET.INVALID_TITLE');
+      default:
+        return this.translate.instant('AUTH.RESET.TITLE');
+    }
+  });
+
+  readonly cardSubtitle = computed(() => {
+    if (this.pageState() !== 'valid') return '';
+    const name = this.userName().trim();
+    return name
+      ? this.translate.instant('AUTH.RESET.SUBTITLE_NAMED', { name })
+      : this.translate.instant('AUTH.RESET.SUBTITLE');
+  });
+
   constructor(
     private fb: UntypedFormBuilder,
     private router: Router,
     private loginService: LoginService,
     private globalService: GlobalService,
     private route: ActivatedRoute,
+    private translate: TranslateService,
+    private localeService: LocaleService,
   ) {
     // newPassword has BOTH:
     //   - `zodValidator(newPasswordSchema)` — surfaces the FIRST error
@@ -76,6 +109,9 @@ export class ResetPasswordComponent implements OnInit {
     this.route.queryParams
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(params => {
+        // Apply the email link's locale (?lang=, ?locale= fallback) for
+        // this session — public route, so AppComponent's handler skips it.
+        this.applyLinkLocale(params['lang'] || params['locale']);
         this.userId = params['id'];
         this.orgId = params['orgId'];
         this.token = params['token'];
@@ -83,8 +119,31 @@ export class ResetPasswordComponent implements OnInit {
         // reset — bounce to login rather than render a dead form.
         if (!this.userId || !this.orgId || !this.token) {
           this.router.navigate([AUTH.LOGIN]);
+          return;
         }
+        this.verifyToken();
       });
+  }
+
+  private applyLinkLocale(lang: string | undefined): void {
+    if (lang && this.localeService.isSupported(lang)) {
+      this.localeService.applyTempLocale(lang);
+    }
+  }
+
+  verifyToken() {
+    this.pageState.set('loading');
+    this.loginService
+      .verifyResetToken(this.userId, this.orgId, this.token)
+      .then(res => {
+        if (res.status && res.data?.tokenStatus === 'valid') {
+          this.userName.set(res.data.fullName ?? '');
+          this.pageState.set('valid');
+        } else {
+          this.pageState.set('invalid');
+        }
+      })
+      .catch(() => this.pageState.set('invalid'));
   }
 
   get isFormValid(): boolean {
@@ -112,11 +171,13 @@ export class ResetPasswordComponent implements OnInit {
         if (this.globalService.handleSuccessService(res)) {
           this.router.navigate([AUTH.LOGIN], { replaceUrl: true });
         } else {
-          this.error.set(res.message || 'Password reset failed.');
+          this.error.set(
+            res.message || this.translate.instant('AUTH.RESET_FAILED'),
+          );
         }
       } catch (err: any) {
         this.error.set(
-          err?.message || 'Password reset failed. Please try again.',
+          err?.message || this.translate.instant('AUTH.RESET_FAILED_RETRY'),
         );
       } finally {
         this.loading.set(false);
@@ -127,21 +188,26 @@ export class ResetPasswordComponent implements OnInit {
 
   getPasswordError(): string {
     const control = this.resetPasswordForm.get('newPassword');
-    if (control?.errors?.['required']) return 'Password is required';
+    if (control?.errors?.['required'])
+      return this.translate.instant('PASSWORD.REQUIRED');
     if (control?.errors?.['passwordMinLength'])
-      return `Password must be at least ${control.errors['passwordMinLength'].requiredLength} characters`;
+      return this.translate.instant('PASSWORD.MIN_LENGTH', {
+        length: control.errors['passwordMinLength'].requiredLength,
+      });
     if (control?.errors?.['passwordMaxLength'])
-      return `Password must not exceed ${control.errors['passwordMaxLength'].requiredLength} characters`;
+      return this.translate.instant('PASSWORD.MAX_LENGTH', {
+        length: control.errors['passwordMaxLength'].requiredLength,
+      });
     if (control?.errors?.['passwordNoSpaces'])
-      return 'Password must not contain spaces';
+      return this.translate.instant('PASSWORD.NO_SPACES');
     if (control?.errors?.['passwordLowercase'])
-      return 'Password must contain at least one lowercase letter';
+      return this.translate.instant('PASSWORD.LOWERCASE');
     if (control?.errors?.['passwordUppercase'])
-      return 'Password must contain at least one uppercase letter';
+      return this.translate.instant('PASSWORD.UPPERCASE');
     if (control?.errors?.['passwordDigit'])
-      return 'Password must contain at least one number';
+      return this.translate.instant('PASSWORD.DIGIT');
     if (control?.errors?.['passwordSpecial'])
-      return 'Password must contain at least one special character (e.g., @$!%*?&)';
+      return this.translate.instant('PASSWORD.SPECIAL');
     return '';
   }
 

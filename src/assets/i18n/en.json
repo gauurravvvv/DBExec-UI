@@ -2350,6 +2350,72 @@
       "BACK_TO_LOGIN": "Back to sign in",
       "CARD_TITLE": "Signing you in",
       "CARD_SUBTITLE": "Just a moment while we complete sign-in."
+    },
+    "SHELL": {
+      "SKIP_TO_FORM": "Skip to form",
+      "HOME_ARIA": "DBExec home",
+      "ALL_RIGHTS": "All rights reserved.",
+      "HERO_TITLE": "Turn your databases into dashboards.",
+      "HERO_LEDE": "Connect a datasource, drag the charts you need, and share the dashboard — all in one place, no SQL required.",
+      "FEATURE_CONNECT_TITLE": "Connect any database",
+      "FEATURE_CONNECT_DESC": "Postgres, MySQL, SQL Server and more — in minutes.",
+      "FEATURE_BUILD_TITLE": "Build dashboards visually",
+      "FEATURE_BUILD_DESC": "Drag, drop and arrange charts — no SQL required.",
+      "FEATURE_EXPLORE_TITLE": "Explore with rich visuals",
+      "FEATURE_EXPLORE_DESC": "Bars, lines, pies, maps and KPIs out of the box.",
+      "FEATURE_SHARE_TITLE": "Share with your team",
+      "FEATURE_SHARE_DESC": "Governed access with row-level security by default."
+    },
+    "SET": {
+      "TITLE": "Set your password",
+      "SUBTITLE": "Create a password to activate your account.",
+      "SUBTITLE_NAMED": "Hi {{name}}, create a password to activate your account.",
+      "VERIFYING_TITLE": "Verifying link",
+      "VERIFYING_MSG": "Verifying your setup link…",
+      "EXPIRED_TITLE": "Link expired",
+      "EXPIRED_MSG": "Your setup link has expired. Request a new one to continue.",
+      "SENT_TITLE": "Link sent",
+      "ALREADY_TITLE": "Already set",
+      "ALREADY_MSG": "Your password has already been configured. Redirecting to sign in…",
+      "INVALID_TITLE": "Invalid link",
+      "PASSWORD_PLACEHOLDER": "Choose a password",
+      "SUBMIT": "Set password",
+      "SUBMITTING": "Setting password…",
+      "RESEND": "Resend setup link"
+    },
+    "RESET": {
+      "TITLE": "Reset password",
+      "SUBTITLE": "Choose a new password.",
+      "SUBTITLE_NAMED": "Hi {{name}}, choose a new password.",
+      "VERIFYING_TITLE": "Verifying link",
+      "VERIFYING_MSG": "Verifying your reset link…",
+      "INVALID_TITLE": "Invalid link",
+      "INVALID_MSG": "This reset link is invalid or has expired. Request a new one from the sign-in page.",
+      "NEW_PASSWORD": "New password",
+      "SUBMIT": "Reset password",
+      "SUBMITTING": "Resetting…"
+    },
+    "FORGOT": {
+      "TITLE": "Reset password",
+      "SUBTITLE": "Enter your organisation and email and we'll send you a reset link.",
+      "SUBMIT": "Send reset link",
+      "RESEND": "Resend link",
+      "SENDING": "Sending…",
+      "RESEND_IN": "Resend in",
+      "FAILED": "Failed to send reset link.",
+      "FAILED_RETRY": "Failed to send reset link. Please try again."
+    },
+    "FIELD": {
+      "CONFIRM_PASSWORD": "Confirm password",
+      "CAPS_LOCK": "Caps Lock is on"
+    },
+    "LOGIN2": {
+      "TITLE": "Log in",
+      "SUBTITLE": "Sign in to your DBExec account",
+      "SUBMIT": "Sign in",
+      "SUBMITTING": "Signing in…",
+      "FORGOT": "Forgot password?",
+      "CREDENTIALS_ERROR": "The credentials you entered are incorrect."
     }
   },
   "PASSWORD": {

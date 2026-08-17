@@ -2347,6 +2347,72 @@
       "BACK_TO_LOGIN": "Terug naar aanmelden",
       "CARD_TITLE": "Je wordt aangemeld",
       "CARD_SUBTITLE": "Een moment, we ronden het aanmelden af."
+    },
+    "SHELL": {
+      "SKIP_TO_FORM": "Naar formulier gaan",
+      "HOME_ARIA": "DBExec startpagina",
+      "ALL_RIGHTS": "Alle rechten voorbehouden.",
+      "HERO_TITLE": "Verander uw databases in dashboards.",
+      "HERO_LEDE": "Verbind een gegevensbron, sleep de grafieken die u nodig hebt en deel het dashboard — alles op één plek, zonder SQL.",
+      "FEATURE_CONNECT_TITLE": "Verbind elke database",
+      "FEATURE_CONNECT_DESC": "Postgres, MySQL, SQL Server en meer — in enkele minuten.",
+      "FEATURE_BUILD_TITLE": "Bouw dashboards visueel",
+      "FEATURE_BUILD_DESC": "Sleep, zet neer en rangschik grafieken — zonder SQL.",
+      "FEATURE_EXPLORE_TITLE": "Verken met rijke visualisaties",
+      "FEATURE_EXPLORE_DESC": "Staaf-, lijn-, cirkeldiagrammen, kaarten en KPI's direct beschikbaar.",
+      "FEATURE_SHARE_TITLE": "Deel met uw team",
+      "FEATURE_SHARE_DESC": "Beheerde toegang met beveiliging op rijniveau als standaard."
+    },
+    "SET": {
+      "TITLE": "Stel uw wachtwoord in",
+      "SUBTITLE": "Maak een wachtwoord om uw account te activeren.",
+      "SUBTITLE_NAMED": "Hallo {{name}}, maak een wachtwoord om uw account te activeren.",
+      "VERIFYING_TITLE": "Link verifiëren",
+      "VERIFYING_MSG": "Uw installatielink wordt geverifieerd…",
+      "EXPIRED_TITLE": "Link verlopen",
+      "EXPIRED_MSG": "Uw installatielink is verlopen. Vraag een nieuwe aan om door te gaan.",
+      "SENT_TITLE": "Link verzonden",
+      "ALREADY_TITLE": "Al ingesteld",
+      "ALREADY_MSG": "Uw wachtwoord is al geconfigureerd. U wordt doorgestuurd naar aanmelden…",
+      "INVALID_TITLE": "Ongeldige link",
+      "PASSWORD_PLACEHOLDER": "Kies een wachtwoord",
+      "SUBMIT": "Wachtwoord instellen",
+      "SUBMITTING": "Wachtwoord instellen…",
+      "RESEND": "Installatielink opnieuw verzenden"
+    },
+    "RESET": {
+      "TITLE": "Wachtwoord opnieuw instellen",
+      "SUBTITLE": "Kies een nieuw wachtwoord.",
+      "SUBTITLE_NAMED": "Hallo {{name}}, kies een nieuw wachtwoord.",
+      "VERIFYING_TITLE": "Link verifiëren",
+      "VERIFYING_MSG": "Uw resetlink wordt geverifieerd…",
+      "INVALID_TITLE": "Ongeldige link",
+      "INVALID_MSG": "Deze resetlink is ongeldig of verlopen. Vraag een nieuwe aan via de aanmeldpagina.",
+      "NEW_PASSWORD": "Nieuw wachtwoord",
+      "SUBMIT": "Wachtwoord opnieuw instellen",
+      "SUBMITTING": "Opnieuw instellen…"
+    },
+    "FORGOT": {
+      "TITLE": "Wachtwoord opnieuw instellen",
+      "SUBTITLE": "Voer uw organisatie en e-mailadres in en we sturen u een resetlink.",
+      "SUBMIT": "Resetlink verzenden",
+      "RESEND": "Link opnieuw verzenden",
+      "SENDING": "Verzenden…",
+      "RESEND_IN": "Opnieuw verzenden over",
+      "FAILED": "Kan resetlink niet verzenden.",
+      "FAILED_RETRY": "Kan resetlink niet verzenden. Probeer het opnieuw."
+    },
+    "FIELD": {
+      "CONFIRM_PASSWORD": "Wachtwoord bevestigen",
+      "CAPS_LOCK": "Caps Lock staat aan"
+    },
+    "LOGIN2": {
+      "TITLE": "Inloggen",
+      "SUBTITLE": "Log in op uw DBExec-account",
+      "SUBMIT": "Inloggen",
+      "SUBMITTING": "Bezig met inloggen…",
+      "FORGOT": "Wachtwoord vergeten?",
+      "CREDENTIALS_ERROR": "De ingevoerde inloggegevens zijn onjuist."
     }
   },
   "PASSWORD": {

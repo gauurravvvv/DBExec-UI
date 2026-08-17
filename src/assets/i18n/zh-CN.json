@@ -2347,6 +2347,72 @@
       "BACK_TO_LOGIN": "返回登录",
       "CARD_TITLE": "正在为您登录",
       "CARD_SUBTITLE": "请稍候，正在完成登录。"
+    },
+    "SHELL": {
+      "SKIP_TO_FORM": "跳至表单",
+      "HOME_ARIA": "DBExec 主页",
+      "ALL_RIGHTS": "版权所有。",
+      "HERO_TITLE": "将您的数据库变为仪表板。",
+      "HERO_LEDE": "连接数据源，拖动所需的图表，然后共享仪表板 — 一切都在一处完成，无需 SQL。",
+      "FEATURE_CONNECT_TITLE": "连接任何数据库",
+      "FEATURE_CONNECT_DESC": "Postgres、MySQL、SQL Server 等 — 只需几分钟。",
+      "FEATURE_BUILD_TITLE": "可视化构建仪表板",
+      "FEATURE_BUILD_DESC": "拖放并排列图表 — 无需 SQL。",
+      "FEATURE_EXPLORE_TITLE": "使用丰富的可视化进行探索",
+      "FEATURE_EXPLORE_DESC": "柱状图、折线图、饼图、地图和 KPI 开箱即用。",
+      "FEATURE_SHARE_TITLE": "与您的团队共享",
+      "FEATURE_SHARE_DESC": "默认通过行级安全性进行受管访问。"
+    },
+    "SET": {
+      "TITLE": "设置您的密码",
+      "SUBTITLE": "创建密码以激活您的帐户。",
+      "SUBTITLE_NAMED": "{{name}} 您好，请创建密码以激活您的帐户。",
+      "VERIFYING_TITLE": "正在验证链接",
+      "VERIFYING_MSG": "正在验证您的设置链接…",
+      "EXPIRED_TITLE": "链接已过期",
+      "EXPIRED_MSG": "您的设置链接已过期。请申请新链接以继续。",
+      "SENT_TITLE": "链接已发送",
+      "ALREADY_TITLE": "已设置",
+      "ALREADY_MSG": "您的密码已配置。正在重定向到登录…",
+      "INVALID_TITLE": "无效链接",
+      "PASSWORD_PLACEHOLDER": "选择密码",
+      "SUBMIT": "设置密码",
+      "SUBMITTING": "正在设置密码…",
+      "RESEND": "重新发送设置链接"
+    },
+    "RESET": {
+      "TITLE": "重置密码",
+      "SUBTITLE": "选择一个新密码。",
+      "SUBTITLE_NAMED": "{{name}} 您好，请选择一个新密码。",
+      "VERIFYING_TITLE": "正在验证链接",
+      "VERIFYING_MSG": "正在验证您的重置链接…",
+      "INVALID_TITLE": "无效链接",
+      "INVALID_MSG": "此重置链接无效或已过期。请从登录页面申请新链接。",
+      "NEW_PASSWORD": "新密码",
+      "SUBMIT": "重置密码",
+      "SUBMITTING": "正在重置…"
+    },
+    "FORGOT": {
+      "TITLE": "重置密码",
+      "SUBTITLE": "输入您的组织和电子邮件，我们将向您发送重置链接。",
+      "SUBMIT": "发送重置链接",
+      "RESEND": "重新发送链接",
+      "SENDING": "正在发送…",
+      "RESEND_IN": "重新发送倒计时",
+      "FAILED": "发送重置链接失败。",
+      "FAILED_RETRY": "发送重置链接失败。请重试。"
+    },
+    "FIELD": {
+      "CONFIRM_PASSWORD": "确认密码",
+      "CAPS_LOCK": "大写锁定已开启"
+    },
+    "LOGIN2": {
+      "TITLE": "登录",
+      "SUBTITLE": "登录到您的 DBExec 帐户",
+      "SUBMIT": "登录",
+      "SUBMITTING": "正在登录…",
+      "FORGOT": "忘记密码？",
+      "CREDENTIALS_ERROR": "您输入的凭据不正确。"
     }
   },
   "PASSWORD": {

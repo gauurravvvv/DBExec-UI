@@ -26,6 +26,7 @@ export const AUTH = {
   RESET_PASSWORD: '/auth/reset',
   SET_PASSWORD: '/auth/set-password',
   VERIFY_SETUP_TOKEN: '/auth/verify-setup-token',
+  VERIFY_RESET_TOKEN: '/auth/verify-reset-token',
   RESEND_SETUP_LINK: '/auth/resend-setup-link',
   // SAML SSO. Paths are relative to environment.apiServer (which
   // already ends in /api/v1) — the HTTP interceptor prepends it — so

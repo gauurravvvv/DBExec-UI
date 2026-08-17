@@ -415,6 +415,16 @@ export class LoginService implements OnDestroy {
     );
   }
 
+  verifyResetToken(id: string, orgId: string, token: string) {
+    return lastValueFrom(
+      this.http.apiPost(
+        AUTH.VERIFY_RESET_TOKEN,
+        { id, orgId, token },
+        { skipLoader: true },
+      ),
+    );
+  }
+
   resendSetupLink(id: string, orgId: string) {
     return lastValueFrom(
       this.http.apiPost(

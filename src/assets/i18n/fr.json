@@ -2347,6 +2347,72 @@
       "BACK_TO_LOGIN": "Retour à la connexion",
       "CARD_TITLE": "Connexion en cours",
       "CARD_SUBTITLE": "Un instant, nous finalisons la connexion."
+    },
+    "SHELL": {
+      "SKIP_TO_FORM": "Aller au formulaire",
+      "HOME_ARIA": "Accueil DBExec",
+      "ALL_RIGHTS": "Tous droits réservés.",
+      "HERO_TITLE": "Transformez vos bases de données en tableaux de bord.",
+      "HERO_LEDE": "Connectez une source de données, glissez les graphiques dont vous avez besoin et partagez le tableau de bord — le tout au même endroit, sans SQL.",
+      "FEATURE_CONNECT_TITLE": "Connectez n'importe quelle base de données",
+      "FEATURE_CONNECT_DESC": "Postgres, MySQL, SQL Server et plus — en quelques minutes.",
+      "FEATURE_BUILD_TITLE": "Créez des tableaux de bord visuellement",
+      "FEATURE_BUILD_DESC": "Glissez, déposez et organisez les graphiques — sans SQL.",
+      "FEATURE_EXPLORE_TITLE": "Explorez avec des visualisations riches",
+      "FEATURE_EXPLORE_DESC": "Barres, courbes, camemberts, cartes et KPI prêts à l'emploi.",
+      "FEATURE_SHARE_TITLE": "Partagez avec votre équipe",
+      "FEATURE_SHARE_DESC": "Accès contrôlé avec sécurité au niveau des lignes par défaut."
+    },
+    "SET": {
+      "TITLE": "Définissez votre mot de passe",
+      "SUBTITLE": "Créez un mot de passe pour activer votre compte.",
+      "SUBTITLE_NAMED": "Bonjour {{name}}, créez un mot de passe pour activer votre compte.",
+      "VERIFYING_TITLE": "Vérification du lien",
+      "VERIFYING_MSG": "Vérification de votre lien de configuration…",
+      "EXPIRED_TITLE": "Lien expiré",
+      "EXPIRED_MSG": "Votre lien de configuration a expiré. Demandez-en un nouveau pour continuer.",
+      "SENT_TITLE": "Lien envoyé",
+      "ALREADY_TITLE": "Déjà défini",
+      "ALREADY_MSG": "Votre mot de passe a déjà été configuré. Redirection vers la connexion…",
+      "INVALID_TITLE": "Lien non valide",
+      "PASSWORD_PLACEHOLDER": "Choisissez un mot de passe",
+      "SUBMIT": "Définir le mot de passe",
+      "SUBMITTING": "Définition du mot de passe…",
+      "RESEND": "Renvoyer le lien de configuration"
+    },
+    "RESET": {
+      "TITLE": "Réinitialiser le mot de passe",
+      "SUBTITLE": "Choisissez un nouveau mot de passe.",
+      "SUBTITLE_NAMED": "Bonjour {{name}}, choisissez un nouveau mot de passe.",
+      "VERIFYING_TITLE": "Vérification du lien",
+      "VERIFYING_MSG": "Vérification de votre lien de réinitialisation…",
+      "INVALID_TITLE": "Lien non valide",
+      "INVALID_MSG": "Ce lien de réinitialisation n'est pas valide ou a expiré. Demandez-en un nouveau depuis la page de connexion.",
+      "NEW_PASSWORD": "Nouveau mot de passe",
+      "SUBMIT": "Réinitialiser le mot de passe",
+      "SUBMITTING": "Réinitialisation…"
+    },
+    "FORGOT": {
+      "TITLE": "Réinitialiser le mot de passe",
+      "SUBTITLE": "Saisissez votre organisation et votre e-mail, et nous vous enverrons un lien de réinitialisation.",
+      "SUBMIT": "Envoyer le lien de réinitialisation",
+      "RESEND": "Renvoyer le lien",
+      "SENDING": "Envoi…",
+      "RESEND_IN": "Renvoyer dans",
+      "FAILED": "Échec de l'envoi du lien de réinitialisation.",
+      "FAILED_RETRY": "Échec de l'envoi du lien de réinitialisation. Veuillez réessayer."
+    },
+    "FIELD": {
+      "CONFIRM_PASSWORD": "Confirmer le mot de passe",
+      "CAPS_LOCK": "La touche Verr. Maj est activée"
+    },
+    "LOGIN2": {
+      "TITLE": "Se connecter",
+      "SUBTITLE": "Connectez-vous à votre compte DBExec",
+      "SUBMIT": "Se connecter",
+      "SUBMITTING": "Connexion…",
+      "FORGOT": "Mot de passe oublié ?",
+      "CREDENTIALS_ERROR": "Les identifiants que vous avez saisis sont incorrects."
     }
   },
   "PASSWORD": {

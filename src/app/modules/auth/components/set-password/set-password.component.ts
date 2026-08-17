@@ -11,8 +11,10 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { TranslateService } from '@ngx-translate/core';
 import { AUTH } from 'src/app/core/constants/routes.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
+import { LocaleService } from 'src/app/core/services/locale.service';
 import { LoginService } from 'src/app/core/services/login.service';
 import { StorageService } from 'src/app/core/services/storage.service';
 import { newPasswordSchema } from 'src/app/shared/validators/auth';
@@ -42,31 +44,40 @@ export class SetPasswordComponent implements OnInit {
   >('loading');
   resending = signal(false);
 
+  // The user's name, returned by verifySetupToken on the 'valid' branch so we
+  // can greet them by name on the form. Empty until the token is confirmed
+  // valid (never populated on invalid/expired paths — see the BE controller's
+  // anti-enumeration note).
+  userName = signal('');
+
   // Card title + subtitle change with the state so the shell still hosts
-  // every variant cleanly.
+  // every variant cleanly. Strings resolve through the translate service so
+  // the page renders in the email link's locale.
   readonly cardTitle = computed(() => {
     switch (this.pageState()) {
       case 'loading':
-        return 'Verifying link';
+        return this.translate.instant('AUTH.SET.VERIFYING_TITLE');
       case 'valid':
-        return 'Set your password';
+        return this.translate.instant('AUTH.SET.TITLE');
       case 'expired':
-        return 'Link expired';
+        return this.translate.instant('AUTH.SET.EXPIRED_TITLE');
       case 'resent':
-        return 'Link sent';
+        return this.translate.instant('AUTH.SET.SENT_TITLE');
       case 'already_set':
-        return 'Already set';
+        return this.translate.instant('AUTH.SET.ALREADY_TITLE');
       case 'invalid':
-        return 'Invalid link';
+        return this.translate.instant('AUTH.SET.INVALID_TITLE');
       default:
-        return 'Set your password';
+        return this.translate.instant('AUTH.SET.TITLE');
     }
   });
 
   readonly cardSubtitle = computed(() => {
-    return this.pageState() === 'valid'
-      ? 'Create a password to activate your account.'
-      : '';
+    if (this.pageState() !== 'valid') return '';
+    const name = this.userName().trim();
+    return name
+      ? this.translate.instant('AUTH.SET.SUBTITLE_NAMED', { name })
+      : this.translate.instant('AUTH.SET.SUBTITLE');
   });
 
   constructor(
@@ -75,6 +86,8 @@ export class SetPasswordComponent implements OnInit {
     private loginService: LoginService,
     private globalService: GlobalService,
     private route: ActivatedRoute,
+    private translate: TranslateService,
+    private localeService: LocaleService,
   ) {
     this.setPasswordForm = this.fb.group(
       {
@@ -101,6 +114,12 @@ export class SetPasswordComponent implements OnInit {
     this.route.queryParams
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(params => {
+        // The email link carries the recipient's locale (?lang=, with
+        // ?locale= as a fallback). Apply it for this session so the whole
+        // page renders in the language the invite was sent in. This is a
+        // public route (not under /app), so AppComponent's locale handler
+        // doesn't cover it — we apply it here.
+        this.applyLinkLocale(params['lang'] || params['locale']);
         this.userId = params['id'];
         this.orgId = params['orgId'];
         this.token = params['token'];
@@ -112,12 +131,19 @@ export class SetPasswordComponent implements OnInit {
       });
   }
 
+  private applyLinkLocale(lang: string | undefined): void {
+    if (lang && this.localeService.isSupported(lang)) {
+      this.localeService.applyTempLocale(lang);
+    }
+  }
+
   verifyToken() {
     this.pageState.set('loading');
     this.loginService
       .verifySetupToken(this.userId, this.orgId, this.token)
       .then(res => {
         if (res.status && res.data?.tokenStatus) {
+          this.userName.set(res.data.fullName ?? '');
           this.pageState.set(res.data.tokenStatus);
           if (this.pageState() === 'already_set') {
             setTimeout(() => this.router.navigate([AUTH.LOGIN]), 3000);
@@ -166,11 +192,15 @@ export class SetPasswordComponent implements OnInit {
           StorageService.clear();
           this.router.navigate([AUTH.LOGIN], { replaceUrl: true });
         } else {
-          this.error.set(res.message || 'Failed to set password.');
+          this.error.set(
+            res.message ||
+              this.translate.instant('AUTH.SET_PASSWORD_FAILED'),
+          );
         }
       } catch (err: any) {
         this.error.set(
-          err?.message || 'Failed to set password. Please try again.',
+          err?.message ||
+            this.translate.instant('AUTH.SET_PASSWORD_FAILED_RETRY'),
         );
       } finally {
         this.loading.set(false);
@@ -200,21 +230,26 @@ export class SetPasswordComponent implements OnInit {
 
   getPasswordError(): string {
     const control = this.setPasswordForm.get('newPassword');
-    if (control?.errors?.['required']) return 'Password is required';
+    if (control?.errors?.['required'])
+      return this.translate.instant('PASSWORD.REQUIRED');
     if (control?.errors?.['passwordMinLength'])
-      return `Password must be at least ${control.errors['passwordMinLength'].requiredLength} characters`;
+      return this.translate.instant('PASSWORD.MIN_LENGTH', {
+        length: control.errors['passwordMinLength'].requiredLength,
+      });
     if (control?.errors?.['passwordMaxLength'])
-      return `Password must not exceed ${control.errors['passwordMaxLength'].requiredLength} characters`;
+      return this.translate.instant('PASSWORD.MAX_LENGTH', {
+        length: control.errors['passwordMaxLength'].requiredLength,
+      });
     if (control?.errors?.['passwordNoSpaces'])
-      return 'Password must not contain spaces';
+      return this.translate.instant('PASSWORD.NO_SPACES');
     if (control?.errors?.['passwordLowercase'])
-      return 'Password must contain at least one lowercase letter';
+      return this.translate.instant('PASSWORD.LOWERCASE');
     if (control?.errors?.['passwordUppercase'])
-      return 'Password must contain at least one uppercase letter';
+      return this.translate.instant('PASSWORD.UPPERCASE');
     if (control?.errors?.['passwordDigit'])
-      return 'Password must contain at least one number';
+      return this.translate.instant('PASSWORD.DIGIT');
     if (control?.errors?.['passwordSpecial'])
-      return 'Password must contain at least one special character (e.g., @$!%*?&)';
+      return this.translate.instant('PASSWORD.SPECIAL');
     return '';
   }
 }

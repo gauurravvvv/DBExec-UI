@@ -2347,6 +2347,72 @@
       "BACK_TO_LOGIN": "Volver al inicio de sesión",
       "CARD_TITLE": "Iniciando tu sesión",
       "CARD_SUBTITLE": "Un momento mientras completamos el inicio de sesión."
+    },
+    "SHELL": {
+      "SKIP_TO_FORM": "Saltar al formulario",
+      "HOME_ARIA": "Inicio de DBExec",
+      "ALL_RIGHTS": "Todos los derechos reservados.",
+      "HERO_TITLE": "Convierta sus bases de datos en paneles.",
+      "HERO_LEDE": "Conecte una fuente de datos, arrastre los gráficos que necesite y comparta el panel — todo en un solo lugar, sin necesidad de SQL.",
+      "FEATURE_CONNECT_TITLE": "Conecte cualquier base de datos",
+      "FEATURE_CONNECT_DESC": "Postgres, MySQL, SQL Server y más — en minutos.",
+      "FEATURE_BUILD_TITLE": "Cree paneles de forma visual",
+      "FEATURE_BUILD_DESC": "Arrastre, suelte y organice gráficos — sin necesidad de SQL.",
+      "FEATURE_EXPLORE_TITLE": "Explore con visualizaciones enriquecidas",
+      "FEATURE_EXPLORE_DESC": "Barras, líneas, circulares, mapas y KPIs listos para usar.",
+      "FEATURE_SHARE_TITLE": "Comparta con su equipo",
+      "FEATURE_SHARE_DESC": "Acceso controlado con seguridad a nivel de fila de forma predeterminada."
+    },
+    "SET": {
+      "TITLE": "Establezca su contraseña",
+      "SUBTITLE": "Cree una contraseña para activar su cuenta.",
+      "SUBTITLE_NAMED": "Hola {{name}}, cree una contraseña para activar su cuenta.",
+      "VERIFYING_TITLE": "Verificando enlace",
+      "VERIFYING_MSG": "Verificando su enlace de configuración…",
+      "EXPIRED_TITLE": "Enlace caducado",
+      "EXPIRED_MSG": "Su enlace de configuración ha caducado. Solicite uno nuevo para continuar.",
+      "SENT_TITLE": "Enlace enviado",
+      "ALREADY_TITLE": "Ya establecida",
+      "ALREADY_MSG": "Su contraseña ya ha sido configurada. Redirigiendo al inicio de sesión…",
+      "INVALID_TITLE": "Enlace no válido",
+      "PASSWORD_PLACEHOLDER": "Elija una contraseña",
+      "SUBMIT": "Establecer contraseña",
+      "SUBMITTING": "Estableciendo contraseña…",
+      "RESEND": "Reenviar enlace de configuración"
+    },
+    "RESET": {
+      "TITLE": "Restablecer contraseña",
+      "SUBTITLE": "Elija una nueva contraseña.",
+      "SUBTITLE_NAMED": "Hola {{name}}, elija una nueva contraseña.",
+      "VERIFYING_TITLE": "Verificando enlace",
+      "VERIFYING_MSG": "Verificando su enlace de restablecimiento…",
+      "INVALID_TITLE": "Enlace no válido",
+      "INVALID_MSG": "Este enlace de restablecimiento no es válido o ha caducado. Solicite uno nuevo desde la página de inicio de sesión.",
+      "NEW_PASSWORD": "Nueva contraseña",
+      "SUBMIT": "Restablecer contraseña",
+      "SUBMITTING": "Restableciendo…"
+    },
+    "FORGOT": {
+      "TITLE": "Restablecer contraseña",
+      "SUBTITLE": "Introduzca su organización y correo electrónico y le enviaremos un enlace de restablecimiento.",
+      "SUBMIT": "Enviar enlace de restablecimiento",
+      "RESEND": "Reenviar enlace",
+      "SENDING": "Enviando…",
+      "RESEND_IN": "Reenviar en",
+      "FAILED": "No se pudo enviar el enlace de restablecimiento.",
+      "FAILED_RETRY": "No se pudo enviar el enlace de restablecimiento. Inténtelo de nuevo."
+    },
+    "FIELD": {
+      "CONFIRM_PASSWORD": "Confirmar contraseña",
+      "CAPS_LOCK": "Bloq Mayús está activado"
+    },
+    "LOGIN2": {
+      "TITLE": "Iniciar sesión",
+      "SUBTITLE": "Inicie sesión en su cuenta de DBExec",
+      "SUBMIT": "Iniciar sesión",
+      "SUBMITTING": "Iniciando sesión…",
+      "FORGOT": "¿Olvidó su contraseña?",
+      "CREDENTIALS_ERROR": "Las credenciales que introdujo son incorrectas."
     }
   },
   "PASSWORD": {

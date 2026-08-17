@@ -62,13 +62,11 @@ export class AuthShellComponent implements OnInit {
    */
   @Input() showFeatures = true;
 
-  /** Hero heading text in the features column. */
-  @Input() heroTitle = 'Turn your databases into dashboards.';
+  /** Hero heading — an i18n key, resolved with the translate pipe. */
+  @Input() heroTitle = 'AUTH.SHELL.HERO_TITLE';
 
-  /** Lede paragraph under the hero heading. */
-  @Input() heroLede =
-    'Connect a datasource, drag the charts you need, and share the ' +
-    'dashboard — all in one place, no SQL required.';
+  /** Lede paragraph — an i18n key, resolved with the translate pipe. */
+  @Input() heroLede = 'AUTH.SHELL.HERO_LEDE';
 
   /**
    * Feature list rendered as icon-chip + title + description rows.

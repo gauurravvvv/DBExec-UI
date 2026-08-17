@@ -6,8 +6,10 @@ import {
   signal,
 } from '@angular/core';
 import { FormGroup, UntypedFormBuilder } from '@angular/forms';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
+import { TranslateService } from '@ngx-translate/core';
 import { GlobalService } from 'src/app/core/services/global.service';
+import { LocaleService } from 'src/app/core/services/locale.service';
 import { LoginService } from 'src/app/core/services/login.service';
 import {
   emailSchema,
@@ -36,6 +38,9 @@ export class ForgotPasswordComponent implements OnInit, OnDestroy {
     private router: Router,
     private loginService: LoginService,
     private globalService: GlobalService,
+    private route: ActivatedRoute,
+    private translate: TranslateService,
+    private localeService: LocaleService,
   ) {
     // Field validators sourced from the SHARED Zod schema at
     // src/app/shared/validators/auth.ts (mirrored to BE).
@@ -45,7 +50,15 @@ export class ForgotPasswordComponent implements OnInit, OnDestroy {
     });
   }
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    // Honour a locale carried on the URL (?lang= / ?locale=) — this page
+    // can be linked from a localized email or the login page.
+    const params = this.route.snapshot.queryParams;
+    const lang = params['lang'] || params['locale'];
+    if (lang && this.localeService.isSupported(lang)) {
+      this.localeService.applyTempLocale(lang);
+    }
+  }
 
   ngOnDestroy(): void {
     this.clearCountdown();
@@ -57,14 +70,15 @@ export class ForgotPasswordComponent implements OnInit, OnDestroy {
     if (control.errors['required']) {
       switch (fieldName) {
         case 'organisation':
-          return 'Organisation is required';
+          return this.translate.instant('validation.auth.organisation.required');
         case 'email':
-          return 'Email is required';
+          return this.translate.instant('validation.auth.email.required');
         default:
-          return 'This field is required';
+          return this.translate.instant('VALIDATION.FIELD_REQUIRED');
       }
     }
-    if (control.errors['email']) return 'Please enter a valid email address';
+    if (control.errors['email'])
+      return this.translate.instant('validation.auth.email.invalid');
     return '';
   }
 
@@ -87,11 +101,13 @@ export class ForgotPasswordComponent implements OnInit, OnDestroy {
         if (res.data?.expiresAt) {
           this.startCountdown(new Date(res.data.expiresAt));
         } else if (!res.status) {
-          this.error.set(res.message || 'Failed to send reset link.');
+          this.error.set(
+            res.message || this.translate.instant('AUTH.FORGOT.FAILED'),
+          );
         }
       } catch (err: any) {
         this.error.set(
-          err?.message || 'Failed to send reset link. Please try again.',
+          err?.message || this.translate.instant('AUTH.FORGOT.FAILED_RETRY'),
         );
       } finally {
         this.loading.set(false);

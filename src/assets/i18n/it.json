@@ -2347,6 +2347,72 @@
       "BACK_TO_LOGIN": "Torna all'accesso",
       "CARD_TITLE": "Accesso in corso",
       "CARD_SUBTITLE": "Un momento, stiamo completando l'accesso."
+    },
+    "SHELL": {
+      "SKIP_TO_FORM": "Vai al modulo",
+      "HOME_ARIA": "Home DBExec",
+      "ALL_RIGHTS": "Tutti i diritti riservati.",
+      "HERO_TITLE": "Trasforma i tuoi database in dashboard.",
+      "HERO_LEDE": "Connetti un'origine dati, trascina i grafici che ti servono e condividi la dashboard — tutto in un unico posto, senza SQL.",
+      "FEATURE_CONNECT_TITLE": "Connetti qualsiasi database",
+      "FEATURE_CONNECT_DESC": "Postgres, MySQL, SQL Server e altri — in pochi minuti.",
+      "FEATURE_BUILD_TITLE": "Crea dashboard visivamente",
+      "FEATURE_BUILD_DESC": "Trascina, rilascia e disponi i grafici — senza SQL.",
+      "FEATURE_EXPLORE_TITLE": "Esplora con visualizzazioni ricche",
+      "FEATURE_EXPLORE_DESC": "Barre, linee, torte, mappe e KPI pronti all'uso.",
+      "FEATURE_SHARE_TITLE": "Condividi con il tuo team",
+      "FEATURE_SHARE_DESC": "Accesso controllato con sicurezza a livello di riga per impostazione predefinita."
+    },
+    "SET": {
+      "TITLE": "Imposta la tua password",
+      "SUBTITLE": "Crea una password per attivare il tuo account.",
+      "SUBTITLE_NAMED": "Ciao {{name}}, crea una password per attivare il tuo account.",
+      "VERIFYING_TITLE": "Verifica del link",
+      "VERIFYING_MSG": "Verifica del tuo link di configurazione…",
+      "EXPIRED_TITLE": "Link scaduto",
+      "EXPIRED_MSG": "Il tuo link di configurazione è scaduto. Richiedine uno nuovo per continuare.",
+      "SENT_TITLE": "Link inviato",
+      "ALREADY_TITLE": "Già impostata",
+      "ALREADY_MSG": "La tua password è già stata configurata. Reindirizzamento all'accesso…",
+      "INVALID_TITLE": "Link non valido",
+      "PASSWORD_PLACEHOLDER": "Scegli una password",
+      "SUBMIT": "Imposta password",
+      "SUBMITTING": "Impostazione password…",
+      "RESEND": "Invia di nuovo il link di configurazione"
+    },
+    "RESET": {
+      "TITLE": "Reimposta password",
+      "SUBTITLE": "Scegli una nuova password.",
+      "SUBTITLE_NAMED": "Ciao {{name}}, scegli una nuova password.",
+      "VERIFYING_TITLE": "Verifica del link",
+      "VERIFYING_MSG": "Verifica del tuo link di reimpostazione…",
+      "INVALID_TITLE": "Link non valido",
+      "INVALID_MSG": "Questo link di reimpostazione non è valido o è scaduto. Richiedine uno nuovo dalla pagina di accesso.",
+      "NEW_PASSWORD": "Nuova password",
+      "SUBMIT": "Reimposta password",
+      "SUBMITTING": "Reimpostazione…"
+    },
+    "FORGOT": {
+      "TITLE": "Reimposta password",
+      "SUBTITLE": "Inserisci la tua organizzazione e la tua email e ti invieremo un link per la reimpostazione.",
+      "SUBMIT": "Invia link di reimpostazione",
+      "RESEND": "Invia di nuovo il link",
+      "SENDING": "Invio…",
+      "RESEND_IN": "Invia di nuovo tra",
+      "FAILED": "Impossibile inviare il link di reimpostazione.",
+      "FAILED_RETRY": "Impossibile inviare il link di reimpostazione. Riprova."
+    },
+    "FIELD": {
+      "CONFIRM_PASSWORD": "Conferma password",
+      "CAPS_LOCK": "Bloc Maiusc è attivo"
+    },
+    "LOGIN2": {
+      "TITLE": "Accedi",
+      "SUBTITLE": "Accedi al tuo account DBExec",
+      "SUBMIT": "Accedi",
+      "SUBMITTING": "Accesso in corso…",
+      "FORGOT": "Password dimenticata?",
+      "CREDENTIALS_ERROR": "Le credenziali inserite non sono corrette."
     }
   },
   "PASSWORD": {
