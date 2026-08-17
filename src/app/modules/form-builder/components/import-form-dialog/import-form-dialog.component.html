@@ -1,0 +1,50 @@
+<div class="confirmation-popup" (click)="onCancel()">
+  <div
+    class="popup-content"
+    role="dialog"
+    aria-modal="true"
+    (click)="$event.stopPropagation()"
+  >
+    <div class="popup-header">
+      <div class="popup-icon">
+        <i class="pi pi-upload"></i>
+      </div>
+      <h3>{{ 'FORM_BUILDER.PORTABILITY.IMPORT_TITLE' | translate }}</h3>
+    </div>
+
+    <div class="standard-delete-section">
+      <p class="delete-intro">
+        {{ 'FORM_BUILDER.PORTABILITY.IMPORT_HINT' | translate }}
+      </p>
+
+      <app-custom-file
+        accept=".json,.form.json"
+        [maxSizeMb]="10"
+        [label]="'FORM_BUILDER.PORTABILITY.PICK_FILE' | translate"
+        (fileSelected)="onFile($event)"
+      ></app-custom-file>
+
+      <p class="parse-error" *ngIf="parseError() as err">
+        <i class="pi pi-exclamation-circle"></i> {{ err }}
+      </p>
+      <p class="parse-ok" *ngIf="!parseError() && fileName() as fn">
+        <i class="pi pi-check-circle"></i>
+        {{ 'FORM_BUILDER.PORTABILITY.FILE_READY' | translate: { name: fn } }}
+      </p>
+    </div>
+
+    <div class="popup-actions">
+      <app-button variant="secondary" (clicked)="onCancel()">{{
+        'COMMON.CANCEL' | translate
+      }}</app-button>
+      <app-button
+        variant="primary"
+        icon="pi pi-upload"
+        [disabled]="!parsedDocument() || importing()"
+        [loading]="importing()"
+        (clicked)="onConfirm()"
+        >{{ 'FORM_BUILDER.PORTABILITY.IMPORT' | translate }}</app-button
+      >
+    </div>
+  </div>
+</div>

@@ -5157,6 +5157,17 @@
         "access": {
           "invalid": "访问值无效。"
         }
+      },
+      "name": {
+        "required": "Name is required",
+        "max": "Name is too long"
+      },
+      "code": {
+        "required": "Code is required",
+        "max": "Code is too long"
+      },
+      "description": {
+        "max": "Description is too long"
       }
     }
   },
@@ -6649,6 +6660,32 @@
       "COMPOSER": "编排器预览"
     },
     "RUN": "运行",
-    "NO_PUBLISHED": "此表单尚无已发布的版本。"
+    "NO_PUBLISHED": "此表单尚无已发布的版本。",
+    "PORTABILITY": {
+      "EXPORT": "导出",
+      "IMPORT": "导入",
+      "SAVE_AS_TEMPLATE": "另存为模板",
+      "TEMPLATES": "模板",
+      "TEMPLATES_TITLE": "表单模板",
+      "IMPORT_TITLE": "导入表单",
+      "IMPORT_HINT": "选择一个表单文档 (.form.json) 以作为新表单导入。",
+      "PICK_FILE": "选择表单文档",
+      "FILE_READY": "“{{name}}”已准备好导入。",
+      "FILE_TOO_LARGE": "该文件太大。",
+      "INVALID_FILE": "该文件不是有效的表单文档。",
+      "IMPORTED": "已导入表单（{{warnings}} 条警告）。",
+      "IMPORT_FAILED": "无法导入表单。",
+      "EXPORT_FAILED": "无法导出表单。",
+      "SAVE_TEMPLATE_TITLE": "另存为模板",
+      "SAVE_TEMPLATE_HINT": "将此版本另存为组织可重复使用的模板。",
+      "TEMPLATE_SAVED": "模板已保存。",
+      "SAVE_FAILED": "无法保存模板。",
+      "SOURCE_VERSION": "源版本",
+      "CLONE": "克隆",
+      "CLONED": "已将模板克隆为新表单。",
+      "CLONE_FAILED": "无法克隆模板。",
+      "NO_TEMPLATES": "暂无模板。",
+      "TEMPLATES_LOAD_FAILED": "无法加载模板。"
+    }
   }
 }

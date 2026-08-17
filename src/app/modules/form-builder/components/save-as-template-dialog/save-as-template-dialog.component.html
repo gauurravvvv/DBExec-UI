@@ -1,0 +1,60 @@
+<div class="confirmation-popup" (click)="onCancel()">
+  <div
+    class="popup-content"
+    role="dialog"
+    aria-modal="true"
+    (click)="$event.stopPropagation()"
+  >
+    <div class="popup-header">
+      <div class="popup-icon">
+        <i class="pi pi-bookmark"></i>
+      </div>
+      <h3>{{ 'FORM_BUILDER.PORTABILITY.SAVE_TEMPLATE_TITLE' | translate }}</h3>
+    </div>
+
+    <div class="standard-delete-section">
+      <p class="delete-intro">
+        {{ 'FORM_BUILDER.PORTABILITY.SAVE_TEMPLATE_HINT' | translate }}
+      </p>
+
+      <div class="form-field">
+        <app-custom-input
+          [ngModel]="name()"
+          (ngModelChange)="onNameChange($event)"
+          [label]="'COMMON.NAME' | translate"
+          [placeholder]="'COMMON.ENTER_NAME' | translate"
+          icon="pi-id-card"
+          [required]="true"
+          [maxLength]="200"
+          [showError]="!!error()"
+          [errorMessage]="error() || ''"
+        ></app-custom-input>
+      </div>
+
+      <div class="form-field">
+        <app-custom-textarea
+          [ngModel]="description()"
+          (ngModelChange)="onDescriptionChange($event)"
+          [label]="'COMMON.DESCRIPTION' | translate"
+          [placeholder]="'COMMON.ENTER_DESCRIPTION' | translate"
+          [rows]="3"
+          [maxLength]="2000"
+        ></app-custom-textarea>
+      </div>
+    </div>
+
+    <div class="popup-actions">
+      <app-button variant="secondary" (clicked)="onCancel()">{{
+        'COMMON.CANCEL' | translate
+      }}</app-button>
+      <app-button
+        variant="primary"
+        icon="pi pi-save"
+        [disabled]="!name().trim() || saving()"
+        [loading]="saving()"
+        (clicked)="onConfirm()"
+        >{{ 'COMMON.SAVE' | translate }}</app-button
+      >
+    </div>
+  </div>
+</div>

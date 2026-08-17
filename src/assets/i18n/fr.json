@@ -5157,6 +5157,17 @@
         "access": {
           "invalid": "La valeur d'accès n'est pas valide."
         }
+      },
+      "name": {
+        "required": "Name is required",
+        "max": "Name is too long"
+      },
+      "code": {
+        "required": "Code is required",
+        "max": "Code is too long"
+      },
+      "description": {
+        "max": "Description is too long"
       }
     }
   },
@@ -6649,6 +6660,32 @@
       "COMPOSER": "Aperçu du compositeur"
     },
     "RUN": "Exécuter",
-    "NO_PUBLISHED": "Ce formulaire n'a pas encore de version publiée."
+    "NO_PUBLISHED": "Ce formulaire n'a pas encore de version publiée.",
+    "PORTABILITY": {
+      "EXPORT": "Exporter",
+      "IMPORT": "Importer",
+      "SAVE_AS_TEMPLATE": "Enregistrer comme modèle",
+      "TEMPLATES": "Modèles",
+      "TEMPLATES_TITLE": "Modèles de formulaire",
+      "IMPORT_TITLE": "Importer un formulaire",
+      "IMPORT_HINT": "Choisissez un document de formulaire (.form.json) à importer comme nouveau formulaire.",
+      "PICK_FILE": "Choisir un document de formulaire",
+      "FILE_READY": "« {{name}} » est prêt à être importé.",
+      "FILE_TOO_LARGE": "Ce fichier est trop volumineux.",
+      "INVALID_FILE": "Ce fichier n'est pas un document de formulaire valide.",
+      "IMPORTED": "Formulaire importé ({{warnings}} avertissements).",
+      "IMPORT_FAILED": "Impossible d'importer le formulaire.",
+      "EXPORT_FAILED": "Impossible d'exporter le formulaire.",
+      "SAVE_TEMPLATE_TITLE": "Enregistrer comme modèle",
+      "SAVE_TEMPLATE_HINT": "Enregistrez cette version comme modèle réutilisable pour votre organisation.",
+      "TEMPLATE_SAVED": "Modèle enregistré.",
+      "SAVE_FAILED": "Impossible d'enregistrer le modèle.",
+      "SOURCE_VERSION": "Version source",
+      "CLONE": "Cloner",
+      "CLONED": "Modèle cloné dans un nouveau formulaire.",
+      "CLONE_FAILED": "Impossible de cloner le modèle.",
+      "NO_TEMPLATES": "Aucun modèle pour le moment.",
+      "TEMPLATES_LOAD_FAILED": "Impossible de charger les modèles."
+    }
   }
 }

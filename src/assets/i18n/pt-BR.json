@@ -5157,6 +5157,17 @@
         "access": {
           "invalid": "O valor de acesso é inválido."
         }
+      },
+      "name": {
+        "required": "Name is required",
+        "max": "Name is too long"
+      },
+      "code": {
+        "required": "Code is required",
+        "max": "Code is too long"
+      },
+      "description": {
+        "max": "Description is too long"
       }
     }
   },
@@ -6649,6 +6660,32 @@
       "COMPOSER": "Prévia do compositor"
     },
     "RUN": "Executar",
-    "NO_PUBLISHED": "Este formulário ainda não tem uma versão publicada."
+    "NO_PUBLISHED": "Este formulário ainda não tem uma versão publicada.",
+    "PORTABILITY": {
+      "EXPORT": "Exportar",
+      "IMPORT": "Importar",
+      "SAVE_AS_TEMPLATE": "Salvar como modelo",
+      "TEMPLATES": "Modelos",
+      "TEMPLATES_TITLE": "Modelos de formulário",
+      "IMPORT_TITLE": "Importar um formulário",
+      "IMPORT_HINT": "Escolha um documento de formulário (.form.json) para importar como um novo formulário.",
+      "PICK_FILE": "Escolher um documento de formulário",
+      "FILE_READY": "\"{{name}}\" está pronto para importar.",
+      "FILE_TOO_LARGE": "Esse arquivo é muito grande.",
+      "INVALID_FILE": "Esse arquivo não é um documento de formulário válido.",
+      "IMPORTED": "Formulário importado ({{warnings}} avisos).",
+      "IMPORT_FAILED": "Não foi possível importar o formulário.",
+      "EXPORT_FAILED": "Não foi possível exportar o formulário.",
+      "SAVE_TEMPLATE_TITLE": "Salvar como modelo",
+      "SAVE_TEMPLATE_HINT": "Salve esta versão como um modelo reutilizável para sua organização.",
+      "TEMPLATE_SAVED": "Modelo salvo.",
+      "SAVE_FAILED": "Não foi possível salvar o modelo.",
+      "SOURCE_VERSION": "Versão de origem",
+      "CLONE": "Clonar",
+      "CLONED": "Modelo clonado em um novo formulário.",
+      "CLONE_FAILED": "Não foi possível clonar o modelo.",
+      "NO_TEMPLATES": "Ainda não há modelos.",
+      "TEMPLATES_LOAD_FAILED": "Não foi possível carregar os modelos."
+    }
   }
 }

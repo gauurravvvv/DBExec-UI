@@ -5157,6 +5157,17 @@
         "access": {
           "invalid": "アクセス値が無効です。"
         }
+      },
+      "name": {
+        "required": "Name is required",
+        "max": "Name is too long"
+      },
+      "code": {
+        "required": "Code is required",
+        "max": "Code is too long"
+      },
+      "description": {
+        "max": "Description is too long"
       }
     }
   },
@@ -6649,6 +6660,32 @@
       "COMPOSER": "コンポーザーのプレビュー"
     },
     "RUN": "実行",
-    "NO_PUBLISHED": "このフォームにはまだ公開されたバージョンがありません。"
+    "NO_PUBLISHED": "このフォームにはまだ公開されたバージョンがありません。",
+    "PORTABILITY": {
+      "EXPORT": "エクスポート",
+      "IMPORT": "インポート",
+      "SAVE_AS_TEMPLATE": "テンプレートとして保存",
+      "TEMPLATES": "テンプレート",
+      "TEMPLATES_TITLE": "フォームテンプレート",
+      "IMPORT_TITLE": "フォームをインポート",
+      "IMPORT_HINT": "フォームドキュメント (.form.json) を選択して新しいフォームとしてインポートします。",
+      "PICK_FILE": "フォームドキュメントを選択",
+      "FILE_READY": "\"{{name}}\" をインポートする準備ができました。",
+      "FILE_TOO_LARGE": "そのファイルは大きすぎます。",
+      "INVALID_FILE": "そのファイルは有効なフォームドキュメントではありません。",
+      "IMPORTED": "フォームをインポートしました（警告 {{warnings}} 件）。",
+      "IMPORT_FAILED": "フォームをインポートできませんでした。",
+      "EXPORT_FAILED": "フォームをエクスポートできませんでした。",
+      "SAVE_TEMPLATE_TITLE": "テンプレートとして保存",
+      "SAVE_TEMPLATE_HINT": "このバージョンを組織で再利用できるテンプレートとして保存します。",
+      "TEMPLATE_SAVED": "テンプレートを保存しました。",
+      "SAVE_FAILED": "テンプレートを保存できませんでした。",
+      "SOURCE_VERSION": "ソースバージョン",
+      "CLONE": "複製",
+      "CLONED": "テンプレートを新しいフォームに複製しました。",
+      "CLONE_FAILED": "テンプレートを複製できませんでした。",
+      "NO_TEMPLATES": "まだテンプレートがありません。",
+      "TEMPLATES_LOAD_FAILED": "テンプレートを読み込めませんでした。"
+    }
   }
 }

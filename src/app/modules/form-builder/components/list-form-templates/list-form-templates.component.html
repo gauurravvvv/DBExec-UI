@@ -1,0 +1,68 @@
+<div class="dataset-page-wrapper">
+  <div class="dataset-content-container">
+    <div class="page-header-section">
+      <div class="left-section">
+        <button
+          pButton
+          class="p-button-text p-button-plain back-button"
+          [routerLink]="routes.LIST"
+        >
+          <i class="pi pi-arrow-left"></i>
+        </button>
+        <h2>{{ 'FORM_BUILDER.PORTABILITY.TEMPLATES_TITLE' | translate }}</h2>
+      </div>
+    </div>
+
+    <div class="content-card">
+      <div class="table-wrapper">
+        <p-table
+          [value]="templates()"
+          [loading]="loading()"
+          styleClass="p-datatable-sm"
+        >
+          <ng-template pTemplate="header">
+            <tr>
+              <th>{{ 'COMMON.NAME' | translate }}</th>
+              <th>{{ 'COMMON.DESCRIPTION' | translate }}</th>
+              <th>{{ 'FORM_BUILDER.PORTABILITY.SOURCE_VERSION' | translate }}</th>
+              <th>{{ 'FORM_BUILDER.COL_UPDATED' | translate }}</th>
+              <th class="actions-col">{{ 'COMMON.ACTIONS' | translate }}</th>
+            </tr>
+          </ng-template>
+
+          <ng-template pTemplate="body" let-t>
+            <tr>
+              <td>{{ t.name }}</td>
+              <td>{{ t.description || '—' }}</td>
+              <td>{{ t.sourceVersionNo != null ? 'v' + t.sourceVersionNo : '—' }}</td>
+              <td>{{ t.createdOn | date: 'dd MMM yyyy, HH:mm' }}</td>
+              <td class="actions-col">
+                <app-button
+                  *hasPermission="'formBuilderScreen'; level: 'write'"
+                  variant="secondary"
+                  size="sm"
+                  icon="pi pi-clone"
+                  [loading]="cloningId() === t.id"
+                  [disabled]="!!cloningId()"
+                  (clicked)="onClone(t)"
+                  >{{ 'FORM_BUILDER.PORTABILITY.CLONE' | translate }}</app-button
+                >
+              </td>
+            </tr>
+          </ng-template>
+
+          <ng-template pTemplate="emptymessage">
+            <tr>
+              <td colspan="5" class="ct-empty-body">
+                <i class="pi pi-inbox"></i>
+                <span>{{
+                  'FORM_BUILDER.PORTABILITY.NO_TEMPLATES' | translate
+                }}</span>
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </div>
+    </div>
+  </div>
+</div>

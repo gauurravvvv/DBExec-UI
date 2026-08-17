@@ -5157,6 +5157,17 @@
         "access": {
           "invalid": "De toegangswaarde is ongeldig."
         }
+      },
+      "name": {
+        "required": "Name is required",
+        "max": "Name is too long"
+      },
+      "code": {
+        "required": "Code is required",
+        "max": "Code is too long"
+      },
+      "description": {
+        "max": "Description is too long"
       }
     }
   },
@@ -6649,6 +6660,32 @@
       "COMPOSER": "Composervoorbeeld"
     },
     "RUN": "Uitvoeren",
-    "NO_PUBLISHED": "Dit formulier heeft nog geen gepubliceerde versie."
+    "NO_PUBLISHED": "Dit formulier heeft nog geen gepubliceerde versie.",
+    "PORTABILITY": {
+      "EXPORT": "Exporteren",
+      "IMPORT": "Importeren",
+      "SAVE_AS_TEMPLATE": "Opslaan als sjabloon",
+      "TEMPLATES": "Sjablonen",
+      "TEMPLATES_TITLE": "Formuliersjablonen",
+      "IMPORT_TITLE": "Een formulier importeren",
+      "IMPORT_HINT": "Kies een formulierdocument (.form.json) om te importeren als een nieuw formulier.",
+      "PICK_FILE": "Een formulierdocument kiezen",
+      "FILE_READY": "\"{{name}}\" is klaar om te importeren.",
+      "FILE_TOO_LARGE": "Dat bestand is te groot.",
+      "INVALID_FILE": "Dat bestand is geen geldig formulierdocument.",
+      "IMPORTED": "Formulier geïmporteerd ({{warnings}} waarschuwingen).",
+      "IMPORT_FAILED": "Kan het formulier niet importeren.",
+      "EXPORT_FAILED": "Kan het formulier niet exporteren.",
+      "SAVE_TEMPLATE_TITLE": "Opslaan als sjabloon",
+      "SAVE_TEMPLATE_HINT": "Sla deze versie op als een herbruikbaar sjabloon voor uw organisatie.",
+      "TEMPLATE_SAVED": "Sjabloon opgeslagen.",
+      "SAVE_FAILED": "Kan het sjabloon niet opslaan.",
+      "SOURCE_VERSION": "Bronversie",
+      "CLONE": "Klonen",
+      "CLONED": "Sjabloon gekloond naar een nieuw formulier.",
+      "CLONE_FAILED": "Kan het sjabloon niet klonen.",
+      "NO_TEMPLATES": "Nog geen sjablonen.",
+      "TEMPLATES_LOAD_FAILED": "Kan de sjablonen niet laden."
+    }
   }
 }

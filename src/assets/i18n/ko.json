@@ -5157,6 +5157,17 @@
         "access": {
           "invalid": "접근 값이 올바르지 않습니다."
         }
+      },
+      "name": {
+        "required": "Name is required",
+        "max": "Name is too long"
+      },
+      "code": {
+        "required": "Code is required",
+        "max": "Code is too long"
+      },
+      "description": {
+        "max": "Description is too long"
       }
     }
   },
@@ -6649,6 +6660,32 @@
       "COMPOSER": "작성기 미리보기"
     },
     "RUN": "실행",
-    "NO_PUBLISHED": "이 양식에는 아직 게시된 버전이 없습니다."
+    "NO_PUBLISHED": "이 양식에는 아직 게시된 버전이 없습니다.",
+    "PORTABILITY": {
+      "EXPORT": "내보내기",
+      "IMPORT": "가져오기",
+      "SAVE_AS_TEMPLATE": "템플릿으로 저장",
+      "TEMPLATES": "템플릿",
+      "TEMPLATES_TITLE": "양식 템플릿",
+      "IMPORT_TITLE": "양식 가져오기",
+      "IMPORT_HINT": "양식 문서(.form.json)를 선택하여 새 양식으로 가져옵니다.",
+      "PICK_FILE": "양식 문서 선택",
+      "FILE_READY": "\"{{name}}\" 가져올 준비가 되었습니다.",
+      "FILE_TOO_LARGE": "파일이 너무 큽니다.",
+      "INVALID_FILE": "해당 파일은 유효한 양식 문서가 아닙니다.",
+      "IMPORTED": "양식을 가져왔습니다(경고 {{warnings}}개).",
+      "IMPORT_FAILED": "양식을 가져올 수 없습니다.",
+      "EXPORT_FAILED": "양식을 내보낼 수 없습니다.",
+      "SAVE_TEMPLATE_TITLE": "템플릿으로 저장",
+      "SAVE_TEMPLATE_HINT": "이 버전을 조직에서 재사용할 수 있는 템플릿으로 저장합니다.",
+      "TEMPLATE_SAVED": "템플릿을 저장했습니다.",
+      "SAVE_FAILED": "템플릿을 저장할 수 없습니다.",
+      "SOURCE_VERSION": "원본 버전",
+      "CLONE": "복제",
+      "CLONED": "템플릿을 새 양식으로 복제했습니다.",
+      "CLONE_FAILED": "템플릿을 복제할 수 없습니다.",
+      "NO_TEMPLATES": "아직 템플릿이 없습니다.",
+      "TEMPLATES_LOAD_FAILED": "템플릿을 불러올 수 없습니다."
+    }
   }
 }

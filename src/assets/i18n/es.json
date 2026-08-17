@@ -5157,6 +5157,17 @@
         "access": {
           "invalid": "El valor de acceso no es válido."
         }
+      },
+      "name": {
+        "required": "Name is required",
+        "max": "Name is too long"
+      },
+      "code": {
+        "required": "Code is required",
+        "max": "Code is too long"
+      },
+      "description": {
+        "max": "Description is too long"
       }
     }
   },
@@ -6649,6 +6660,32 @@
       "COMPOSER": "Vista previa del compositor"
     },
     "RUN": "Ejecutar",
-    "NO_PUBLISHED": "Este formulario aún no tiene una versión publicada."
+    "NO_PUBLISHED": "Este formulario aún no tiene una versión publicada.",
+    "PORTABILITY": {
+      "EXPORT": "Exportar",
+      "IMPORT": "Importar",
+      "SAVE_AS_TEMPLATE": "Guardar como plantilla",
+      "TEMPLATES": "Plantillas",
+      "TEMPLATES_TITLE": "Plantillas de formulario",
+      "IMPORT_TITLE": "Importar un formulario",
+      "IMPORT_HINT": "Elija un documento de formulario (.form.json) para importarlo como un nuevo formulario.",
+      "PICK_FILE": "Elegir un documento de formulario",
+      "FILE_READY": "\"{{name}}\" está listo para importar.",
+      "FILE_TOO_LARGE": "Ese archivo es demasiado grande.",
+      "INVALID_FILE": "Ese archivo no es un documento de formulario válido.",
+      "IMPORTED": "Formulario importado ({{warnings}} advertencias).",
+      "IMPORT_FAILED": "No se pudo importar el formulario.",
+      "EXPORT_FAILED": "No se pudo exportar el formulario.",
+      "SAVE_TEMPLATE_TITLE": "Guardar como plantilla",
+      "SAVE_TEMPLATE_HINT": "Guarde esta versión como una plantilla reutilizable para su organización.",
+      "TEMPLATE_SAVED": "Plantilla guardada.",
+      "SAVE_FAILED": "No se pudo guardar la plantilla.",
+      "SOURCE_VERSION": "Versión de origen",
+      "CLONE": "Clonar",
+      "CLONED": "Plantilla clonada en un nuevo formulario.",
+      "CLONE_FAILED": "No se pudo clonar la plantilla.",
+      "NO_TEMPLATES": "Aún no hay plantillas.",
+      "TEMPLATES_LOAD_FAILED": "No se pudieron cargar las plantillas."
+    }
   }
 }

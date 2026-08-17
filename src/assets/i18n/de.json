@@ -5157,6 +5157,17 @@
         "access": {
           "invalid": "Der Zugriffswert ist ungültig."
         }
+      },
+      "name": {
+        "required": "Name is required",
+        "max": "Name is too long"
+      },
+      "code": {
+        "required": "Code is required",
+        "max": "Code is too long"
+      },
+      "description": {
+        "max": "Description is too long"
       }
     }
   },
@@ -6649,6 +6660,32 @@
       "COMPOSER": "Composer-Vorschau"
     },
     "RUN": "Ausführen",
-    "NO_PUBLISHED": "Dieses Formular hat noch keine veröffentlichte Version."
+    "NO_PUBLISHED": "Dieses Formular hat noch keine veröffentlichte Version.",
+    "PORTABILITY": {
+      "EXPORT": "Exportieren",
+      "IMPORT": "Importieren",
+      "SAVE_AS_TEMPLATE": "Als Vorlage speichern",
+      "TEMPLATES": "Vorlagen",
+      "TEMPLATES_TITLE": "Formularvorlagen",
+      "IMPORT_TITLE": "Formular importieren",
+      "IMPORT_HINT": "Wählen Sie ein Formulardokument (.form.json), um es als neues Formular zu importieren.",
+      "PICK_FILE": "Formulardokument auswählen",
+      "FILE_READY": "\"{{name}}\" ist bereit zum Importieren.",
+      "FILE_TOO_LARGE": "Diese Datei ist zu groß.",
+      "INVALID_FILE": "Diese Datei ist kein gültiges Formulardokument.",
+      "IMPORTED": "Formular importiert ({{warnings}} Warnungen).",
+      "IMPORT_FAILED": "Das Formular konnte nicht importiert werden.",
+      "EXPORT_FAILED": "Das Formular konnte nicht exportiert werden.",
+      "SAVE_TEMPLATE_TITLE": "Als Vorlage speichern",
+      "SAVE_TEMPLATE_HINT": "Speichern Sie diese Version als wiederverwendbare Vorlage für Ihre Organisation.",
+      "TEMPLATE_SAVED": "Vorlage gespeichert.",
+      "SAVE_FAILED": "Die Vorlage konnte nicht gespeichert werden.",
+      "SOURCE_VERSION": "Quellversion",
+      "CLONE": "Klonen",
+      "CLONED": "Vorlage in ein neues Formular geklont.",
+      "CLONE_FAILED": "Die Vorlage konnte nicht geklont werden.",
+      "NO_TEMPLATES": "Noch keine Vorlagen.",
+      "TEMPLATES_LOAD_FAILED": "Die Vorlagen konnten nicht geladen werden."
+    }
   }
 }

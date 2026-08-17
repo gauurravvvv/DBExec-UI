@@ -35,7 +35,10 @@ import { FbRuleEditorComponent } from './components/fb-rule-builder/fb-rule-edit
 import { FbSectionComponent } from './components/fb-section/fb-section.component';
 import { FbTabStripComponent } from './components/fb-tab-strip/fb-tab-strip.component';
 import { FbVersionBarComponent } from './components/fb-version-bar/fb-version-bar.component';
+import { ImportFormDialogComponent } from './components/import-form-dialog/import-form-dialog.component';
 import { ListFormComponent } from './components/list-form/list-form.component';
+import { ListFormTemplatesComponent } from './components/list-form-templates/list-form-templates.component';
+import { SaveAsTemplateDialogComponent } from './components/save-as-template-dialog/save-as-template-dialog.component';
 import { ViewFormComponent } from './components/view-form/view-form.component';
 import { FormBuilderRoutingModule } from './form-builder-routing.module';
 
@@ -62,6 +65,10 @@ import { FormBuilderRoutingModule } from './form-builder-routing.module';
     FbRuleEditorComponent,
     FbRbacEditorComponent,
     FbPreviewComponent,
+    // Portability surface (Phase 8).
+    ImportFormDialogComponent,
+    SaveAsTemplateDialogComponent,
+    ListFormTemplatesComponent,
   ],
   imports: [
     CommonModule,

@@ -5157,6 +5157,17 @@
         "access": {
           "invalid": "Il valore di accesso non è valido."
         }
+      },
+      "name": {
+        "required": "Name is required",
+        "max": "Name is too long"
+      },
+      "code": {
+        "required": "Code is required",
+        "max": "Code is too long"
+      },
+      "description": {
+        "max": "Description is too long"
       }
     }
   },
@@ -6649,6 +6660,32 @@
       "COMPOSER": "Anteprima del compositore"
     },
     "RUN": "Esegui",
-    "NO_PUBLISHED": "Questo modulo non ha ancora una versione pubblicata."
+    "NO_PUBLISHED": "Questo modulo non ha ancora una versione pubblicata.",
+    "PORTABILITY": {
+      "EXPORT": "Esporta",
+      "IMPORT": "Importa",
+      "SAVE_AS_TEMPLATE": "Salva come modello",
+      "TEMPLATES": "Modelli",
+      "TEMPLATES_TITLE": "Modelli di modulo",
+      "IMPORT_TITLE": "Importa un modulo",
+      "IMPORT_HINT": "Scegli un documento del modulo (.form.json) da importare come nuovo modulo.",
+      "PICK_FILE": "Scegli un documento del modulo",
+      "FILE_READY": "\"{{name}}\" è pronto per l'importazione.",
+      "FILE_TOO_LARGE": "Questo file è troppo grande.",
+      "INVALID_FILE": "Questo file non è un documento del modulo valido.",
+      "IMPORTED": "Modulo importato ({{warnings}} avvisi).",
+      "IMPORT_FAILED": "Impossibile importare il modulo.",
+      "EXPORT_FAILED": "Impossibile esportare il modulo.",
+      "SAVE_TEMPLATE_TITLE": "Salva come modello",
+      "SAVE_TEMPLATE_HINT": "Salva questa versione come modello riutilizzabile per la tua organizzazione.",
+      "TEMPLATE_SAVED": "Modello salvato.",
+      "SAVE_FAILED": "Impossibile salvare il modello.",
+      "SOURCE_VERSION": "Versione di origine",
+      "CLONE": "Clona",
+      "CLONED": "Modello clonato in un nuovo modulo.",
+      "CLONE_FAILED": "Impossibile clonare il modello.",
+      "NO_TEMPLATES": "Ancora nessun modello.",
+      "TEMPLATES_LOAD_FAILED": "Impossibile caricare i modelli."
+    }
   }
 }

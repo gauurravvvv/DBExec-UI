@@ -169,6 +169,7 @@ export const QUERY_BUILDER = {
 export const FORM_BUILDER = {
   LIST: '/app/form-builder',
   NEW: '/app/form-builder/new',
+  TEMPLATES: '/app/form-builder/templates',
   view: (id: string | number) => `/app/form-builder/${id}`,
   design: (id: string | number) => `/app/form-builder/${id}/design`,
   compose: (id: string | number) => `/app/form-builder/${id}/compose`,

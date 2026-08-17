@@ -304,6 +304,18 @@ export const FORM_BUILDER = {
   fork: (id: string, v: number) => `forms/${id}/versions/${v}/fork`,
   // full resolved design tree for a version (designer + preview)
   version: (id: string, v: number) => `forms/${id}/versions/${v}`,
+  // ── Portability (Phase 8) ────────────────────────────────────────────
+  // Export streams a file (blob). Import + save-as-template + clone are WRITE.
+  exportVersion: (id: string, v: number) =>
+    `forms/${id}/versions/${v}/export`,
+  saveAsTemplate: (id: string, v: number) =>
+    `forms/${id}/versions/${v}/save-as-template`,
+  cloneVersion: (id: string, v: number) =>
+    `forms/${id}/versions/${v}/clone`,
+  IMPORT: 'forms/import',
+  TEMPLATES: 'forms/templates',
+  template: (id: string) => `forms/templates/${id}`,
+  cloneTemplate: (id: string) => `forms/templates/${id}/clone`,
 };
 
 export const QUERY = {

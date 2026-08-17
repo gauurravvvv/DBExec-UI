@@ -13,6 +13,35 @@
       </div>
       <div class="action-buttons">
         <app-button
+          variant="secondary"
+          icon="pi pi-download"
+          [disabled]="portableVersion() == null || exporting()"
+          [loading]="exporting()"
+          (clicked)="onExport()"
+          >{{ 'FORM_BUILDER.PORTABILITY.EXPORT' | translate }}</app-button
+        >
+        <app-button
+          *hasPermission="'formBuilderScreen'; level: 'write'"
+          variant="secondary"
+          icon="pi pi-bookmark"
+          [disabled]="portableVersion() == null"
+          (clicked)="openTemplateDialog()"
+          >{{ 'FORM_BUILDER.PORTABILITY.SAVE_AS_TEMPLATE' | translate }}</app-button
+        >
+        <app-button
+          *hasPermission="'formBuilderScreen'; level: 'write'"
+          variant="secondary"
+          icon="pi pi-upload"
+          (clicked)="openImportDialog()"
+          >{{ 'FORM_BUILDER.PORTABILITY.IMPORT' | translate }}</app-button
+        >
+        <app-button
+          variant="secondary"
+          icon="pi pi-th-large"
+          [routerLink]="routes.TEMPLATES"
+          >{{ 'FORM_BUILDER.PORTABILITY.TEMPLATES' | translate }}</app-button
+        >
+        <app-button
           *hasPermission="'formBuilderScreen'; level: 'write'"
           variant="secondary"
           icon="pi pi-cog"
@@ -66,5 +95,19 @@
         {{ 'COMMON.NO_RECORDS' | translate }}
       </p>
     </div>
+
+    <app-save-as-template-dialog
+      *ngIf="showTemplateDialog() && portableVersion() != null"
+      [formId]="f.id"
+      [version]="portableVersion()!"
+      (saved)="onTemplateSaved()"
+      (cancelled)="showTemplateDialog.set(false)"
+    ></app-save-as-template-dialog>
   </div>
+
+  <app-import-form-dialog
+    *ngIf="showImportDialog()"
+    (imported)="onImported()"
+    (cancelled)="showImportDialog.set(false)"
+  ></app-import-form-dialog>
 </div>
