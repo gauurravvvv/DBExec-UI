@@ -6590,140 +6590,155 @@
     "DONT_SHOW_AGAIN": "Nicht mehr anzeigen",
     "PROGRESS": "Schritt {{current}} von {{total}}",
     "WELCOME": {
-      "TITLE": "Willkommen bei DBExec 👋",
-      "DESC": "Hier ist eine kurze Tour durch Ihre Möglichkeiten. Sie können jederzeit abbrechen – und „Nicht mehr anzeigen“ aktivieren, um sie bei künftigen Anmeldungen zu überspringen."
+      "TITLE": "Willkommen zu DBExec 👋",
+      "DESC": "Schauen wir uns schnell um, damit du weißt, wo alles zu finden ist. Das dauert nur einen Moment — du kannst jederzeit stoppen und \"Nicht mehr anzeigen\" aktivieren, wenn du die Tour beim nächsten Login überspringen möchtest."
     },
     "DONE": {
-      "TITLE": "Alles bereit 🎉",
-      "DESC": "Das war die Tour. Erkunden Sie in Ihrem eigenen Tempo – Sie können diese Tour jederzeit in Ihrem Profil wieder aktivieren."
+      "TITLE": "Du bist fertig 🎉",
+      "DESC": "Das war die Schnellübersicht — jetzt kennst du die wichtigsten Bereiche von DBExec. Erkunde die App in deinem eigenen Tempo, und wenn du später eine Auffrischung brauchst, kannst du die Tour jederzeit über dein Profil wieder aktivieren."
     },
     "STEPS": {
       "search": {
         "TITLE": "Globale Suche",
-        "DESC": "Finden Sie schnell alles. Durchsuchen Sie Datasets, Dashboards, Verbindungen und mehr – oder drücken Sie überall Strg/⌘ + K."
+        "DESC": "Der schnellste Weg, um überall hinzukommen. Durchsuche deine Datasets, Dashboards, Verbindungen und mehr an einem Ort — und du kannst die Suche von jedem Bildschirm aus mit Ctrl/⌘ + K öffnen."
       },
       "notifications": {
         "TITLE": "Benachrichtigungen",
-        "DESC": "Warnungen, Freigaben und Systemmeldungen erscheinen hier in Echtzeit. Das Abzeichen zeigt die ungelesenen an."
+        "DESC": "Dein Aktivitätsfeed findest du hier: ausgelöste Alerts, mit dir geteilte Elemente und Systemmeldungen, alle in Echtzeit. Das Abzeichen zeigt dir, wie viele Benachrichtigungen du noch nicht gelesen hast."
       },
       "language": {
         "TITLE": "Sprache ändern",
-        "DESC": "Lieber eine andere Sprache? Wählen Sie hier aus zehn Sprachen – die App wird sofort aktualisiert und Ihre Wahl gespeichert."
+        "DESC": "DBExec spricht zehn Sprachen. Wähle deine Lieblingssprache und die gesamte Benutzeroberfläche wird sofort aktualisiert — deine Wahl wird gespeichert und beim nächsten Anmelden beibehalten."
       },
       "logout": {
         "TITLE": "Abmelden",
-        "DESC": "Wenn Sie fertig sind, melden Sie sich hier sicher ab. Ihre Sitzung endet und Sie kehren zur Anmeldung zurück."
+        "DESC": "Wenn du fertig bist, meldest du dich von hier aus sicher ab. Deine Sitzung endet sofort und du wirst zum Anmeldebildschirm zurückgeleitet — praktisch auf gemeinsam genutzten oder öffentlichen Computern."
       },
       "systemAdmin": {
         "TITLE": "Systemadministration",
-        "DESC": "Administration auf Plattformebene für Betreiber, die DBExec organisationsübergreifend verwalten."
+        "DESC": "Verwaltung auf Plattformebene für Betreiber, die DBExec in vielen Organisationen betreiben. Hier befinden sich organisationsübergreifende Backoffice-Kontrollen."
       },
       "orgManagement": {
         "TITLE": "Organisationen",
-        "DESC": "Erstellen und verwalten Sie die Organisationen (Mandanten) der Plattform."
+        "DESC": "Erstelle und verwalte die Organisationen (Mandanten) auf der Plattform. Jede ist ein isolierter Arbeitsbereich mit eigenen Benutzern, Daten und Einstellungen."
       },
       "systemRoleManagement": {
         "TITLE": "Systemrollen",
-        "DESC": "Definieren Sie Rollen auf Plattformebene und deren Berechtigungen."
+        "DESC": "Definiere Rollen auf Plattformebene und wähle die Berechtigungen, die jede gewährt. Rollen halten den Zugriff konsistent, statt ihn für jede Person einzeln festzulegen."
       },
       "systemGroupManagement": {
         "TITLE": "Systemgruppen",
-        "DESC": "Gruppieren Sie Plattformbetreiber und weisen Sie Systemrollen im Bulk zu."
+        "DESC": "Bündele Plattformbetreiber in Gruppen und weise der ganzen Gruppe auf einmal Systemrollen zu — eine schnellere Möglichkeit, den Zugriff in großem Maßstab zu verwalten."
       },
       "systemUserManagement": {
         "TITLE": "Systembenutzer",
-        "DESC": "Verwalten Sie die Betreiberkonten, die DBExec selbst ausführen."
+        "DESC": "Verwalte die Benutzerkonten, die DBExec selbst betreiben. Das sind Plattformmitarbeiter, getrennt von den Benutzern innerhalb einer Organisation."
       },
       "home": {
         "TITLE": "Startseite",
-        "DESC": "Ihr Ausgangspunkt – ein schneller Überblick und Verknüpfungen zu allem."
+        "DESC": "Deine Landingpage jedes Mal, wenn du dich anmeldest. Sie gibt dir einen schnellen Überblick über deine Daten und Aktivitäten und bietet Verknüpfungen zu den Dingen, mit denen du am meisten arbeitest."
       },
       "userManagement": {
         "TITLE": "Benutzer",
-        "DESC": "Laden Sie Personen in Ihre Organisation ein und verwalten Sie deren Konten und Zugriff."
+        "DESC": "Lade Personen in deine Organisation ein und verwalte ihre Konten und Zugriff. Das ist dein Startpunkt zum Onboarding eines neuen Teamkollegen."
       },
       "roleManagement": {
         "TITLE": "Rollen",
-        "DESC": "Definieren Sie Rollen und legen Sie fest, welche Bildschirme und Aktionen sie freischalten."
+        "DESC": "Definiere Rollen und wähle exakt, welche Bildschirme und Aktionen jede freischaltet. Weise eine Rolle einmal zu und jeder mit dieser Rolle erbt denselben Zugriff."
       },
       "groupManagement": {
         "TITLE": "Gruppen",
-        "DESC": "Bündeln Sie Benutzer in Gruppen und weisen Sie der ganzen Gruppe Rollen zu."
+        "DESC": "Bündele Benutzer in Gruppen und vergebe Rollen an die ganze Gruppe auf einmal. Das ist der einfachste Weg, um den Zugriff übersichtlich zu halten, wenn dein Team wächst."
       },
       "setupDB": {
         "TITLE": "Datenquellen",
-        "DESC": "Verbinden Sie die Datenbanken, aus denen DBExec liest – Postgres, MySQL, Snowflake und mehr."
+        "DESC": "Verbinde die Datenbanken, die DBExec liest — Postgres, MySQL, Snowflake und mehr. Eine Datenquelle muss nur einmal eingerichtet werden, dann baut alles andere darauf auf."
       },
       "dbRoles": {
         "TITLE": "Datenbankrollen",
-        "DESC": "Verwalten Sie die Login-Benutzer und Rollen in Ihren verbundenen Datenbanken."
+        "DESC": "Verwalte die Anmeldungsbenutzer und Rollen, die in deinen verbundenen Datenbanken vorhanden sind. Dies steuert den Zugriff auf Datenbankebene, unterhalb von DBExecs eigenen Berechtigungen."
       },
       "dbPrivileges": {
-        "TITLE": "Rechte & Zugriff",
-        "DESC": "Vergeben und prüfen Sie Rechte auf Tabellen- und Schemaebene."
+        "TITLE": "Berechtigungen und Zugriff",
+        "DESC": "Gewähre und überprüfe Berechtigungen auf Tabellen- und Schemaebene in deinen Datenbanken. Sieh auf einen Blick, wer was lesen oder ändern kann, und passe es sicher an."
       },
       "connectionManager": {
         "TITLE": "Verbindungen",
-        "DESC": "Verwalten Sie die Verbindungen zum Ausführen von SQL gegen Ihre Datenquellen."
+        "DESC": "Verwalte die aktiven Verbindungen zum Ausführen von SQL gegen deine Datenquellen. Jede Verbindung ist ein einsatzbereiter Link, den du app-weit wiederverwenden kannst."
       },
       "queryRunner": {
-        "TITLE": "SQL-Arbeitsbereich",
-        "DESC": "Schreiben und führen Sie SQL mit Autovervollständigung, gespeicherten Abfragen und Live-Ergebnissen aus."
+        "TITLE": "SQL-Workspace",
+        "DESC": "Schreibe und führe SQL in einem vollständigen Workspace mit Autovervollständigung, gespeicherten Abfragen und einem Live-Ergebnisraster aus. Es ist die Heimatbasis für jeden, der direkt mit SQL arbeitet."
       },
       "queryBuilderTab": {
-        "TITLE": "Tabs",
-        "DESC": "Organisieren Sie geführte Query-Builder-Bildschirme in Tabs."
+        "TITLE": "Registerkarten",
+        "DESC": "Organisiere geleitete Query-Builder-Bildschirme in Registerkarten, damit ein komplexer Builder einfach zu navigieren bleibt. Registerkarten gruppieren verwandte Abschnitte."
       },
       "queryBuilderSection": {
         "TITLE": "Abschnitte",
-        "DESC": "Gruppieren Sie verwandte Prompts in Abschnitten eines Query-Builder-Bildschirms."
+        "DESC": "Gruppiere verwandte Eingabefelder in Abschnitten innerhalb eines Query-Builder-Bildschirms. Abschnitte geben einer Abfrage ohne Code eine klare, logische Struktur."
       },
       "queryBuilderPrompt": {
-        "TITLE": "Prompts",
-        "DESC": "Gestalten Sie die Eingabe-Prompts für parametrisierte No-Code-Abfragen."
+        "TITLE": "Eingabefelder",
+        "DESC": "Entwerfe die Eingabefelder, die parametrisierte, codefreie Abfragen antreiben. Eingabefelder ermöglichen es nicht-technischen Benutzern, sichere, leistungsstarke Abfragen auszuführen."
       },
       "queryBuilderScreen": {
         "TITLE": "Query Builder",
-        "DESC": "Fügen Sie Tabs, Abschnitte und Prompts zu geführten No-Code-Abfragen zusammen."
+        "DESC": "Verbinde Registerkarten, Abschnitte und Eingabefelder zu geleiteten, codefreien Abfragebildschirmen. Baue es einmal auf und dein Team kann maßgeschneiderte Abfragen ausführen, ohne SQL zu berühren."
       },
       "datasetManager": {
         "TITLE": "Datasets",
-        "DESC": "Erstellen Sie wiederverwendbare Datasets – Spalten, berechnete Felder und Formeln."
+        "DESC": "Forme wiederverwendbare Datasets — wähle die Spalten, die du brauchst, und füge berechnete Felder und Formeln hinzu. Datasets sind das Fundament, auf dem jedes Diagramm und Dashboard aufbaut."
       },
       "analyses": {
         "TITLE": "Analysen",
-        "DESC": "Erstellen Sie Diagramme und visuelle Analysen auf Basis Ihrer Datasets."
+        "DESC": "Erstelle Diagramme und visuelle Analysen basierend auf deinen Datasets. Erkunde deine Daten visuell und speichere die Ansichten, die die Geschichte erzählen, die dir wichtig ist."
       },
       "dashboard": {
         "TITLE": "Dashboards",
-        "DESC": "Kombinieren Sie Visuals zu teilbaren Dashboards und veröffentlichen Sie Momentaufnahmen."
+        "DESC": "Kombiniere Visuals in teilbaren Dashboards und veröffentliche Snapshot-Versionen. So bringst du die Zahlen zusammen, die für dein Team wichtig sind."
       },
       "rlsRules": {
         "TITLE": "RLS-Regeln",
-        "DESC": "Legen Sie Zeilen- und Spaltensicherheit fest, damit jeder nur seine Daten sieht."
+        "DESC": "Stelle Sicherheit auf Zeilen- und Spaltenebene ein, damit jeder nur die Daten sieht, die er darf. Definiere die Regel einmal und sie gilt überall, wo diese Daten erscheinen."
       },
       "alertManagement": {
-        "TITLE": "Warnungen",
-        "DESC": "Planen Sie Datenprüfungen, die Sie benachrichtigen, wenn eine Bedingung erfüllt ist."
+        "TITLE": "Alerts",
+        "DESC": "Planen Sie Überprüfungen deiner Daten, die dich per E-Mail benachrichtigen oder informieren, sobald eine Bedingung erfüllt ist. Lass DBExec die Zahlen beobachten, damit du es nicht musst."
       },
       "auditLogs": {
-        "TITLE": "Audit-Protokolle",
-        "DESC": "Prüfen Sie, wer wann was geändert hat – über die gesamte Plattform."
+        "TITLE": "Audit-Logs",
+        "DESC": "Überprüfe eine vollständige Nachverfolgung, wer was und wann geändert hat, auf der gesamten Plattform. Das ist deine Quelle der Wahrheit, wenn du \"Was ist passiert?\" beantworten musst."
       },
       "loginActivity": {
         "TITLE": "Anmeldeaktivität",
-        "DESC": "Verfolgen Sie Anmeldungen und Authentifizierungsereignisse für Sicherheit und Compliance."
+        "DESC": "Verfolge Anmeldungen und Authentifizierungsereignisse in deiner Organisation. Ein klarer Überblick über die Zugriffsverlaufsverlauf für Sicherheit und Compliance."
       },
       "appSettings": {
         "TITLE": "App-Einstellungen",
-        "DESC": "Passen Sie Erscheinungsbild an – Theme, Branding und Ankündigungen."
+        "DESC": "Mache DBExec zu deiner eigenen App. Passe das Aussehen und Verhalten deiner Organisation hier an — Designfarben, Branding und die Ankündigungen, die dein Team beim Anmelden sieht."
       },
       "systemSettings": {
         "TITLE": "Systemeinstellungen",
-        "DESC": "Konfigurieren Sie Sicherheit, SSO, E-Mail und KI-Funktionen."
+        "DESC": "Das Kontrollzentrum der Plattform. Konfiguriere Sicherheitsrichtlinien, Single Sign-on, E-Mail-Versand und KI-Funktionen, die für deine gesamte Organisation gelten."
+      },
+      "userAndAccess": {
+        "DESC": "Alles darüber, wer Zugang hat und was er tun kann. Lade Personen ein und verwalte sie, organisiere sie in Gruppen und definiere Rollen, die exakt steuern, welche Bildschirme und Aktionen jede Person erreichen kann."
+      },
+      "databaseManagement": {
+        "DESC": "Verbinde und verwalte die Datenbanken, mit denen DBExec arbeitet. Füge Datenquellen wie Postgres, MySQL oder Snowflake hinzu und verwalte dann die Datenbankbenutzer, Rollen und Berechtigungen, die entscheiden, wer was anfassen darf."
+      },
+      "dbExecStudio": {
+        "DESC": "Hier fragst du deine Daten ab. Schreibe und führe SQL im Workspace mit Autovervollständigung und gespeicherten Abfragen aus, oder baue parametrisierte, codefreie Abfragen visuell für Personen, die lieber kein SQL schreiben möchten."
+      },
+      "visualizations": {
+        "DESC": "Wandle Abfrageergebnisse in Erkenntnisse um. Forme wiederverwendbare Datasets, baue Diagramme und Analysen darauf auf, stelle teilbare Dashboards zusammen und füge Sicherheit auf Zeilenebene und Alerts hinzu."
+      },
+      "auditActivity": {
+        "DESC": "Dein Datensatz, was passiert ist und wer es getan hat. Überprüfe eine vollständige Audit-Nachverfolgung von Änderungen auf der gesamten Plattform und verfolge Anmeldungen und Authentifizierungsereignisse für Sicherheit und Compliance."
       }
     },
-    "MODULE_GENERIC_DESC": "Öffnen Sie {{name}}, um mit diesen Funktionen zu arbeiten."
+    "MODULE_GENERIC_DESC": "Öffne {{name}}, um alles zu erkunden, das in diesem Bereich organisiert ist."
   },
   "FORM_BUILDER": {
     "TITLE": "Form Builder",

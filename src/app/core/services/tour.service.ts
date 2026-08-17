@@ -82,6 +82,19 @@ export class TourService {
    *  we don't fire a redundant PUT and so the current run won't re-trigger. */
   private dontShowAgain = false;
 
+  /**
+   * Full-viewport backdrop-blur layer with a clip-path "hole" punched around
+   * the active element. driver.js's own SVG overlay handles the dim (a dark
+   * scrim with a crisp evenodd cutout) but CANNOT blur the backdrop while
+   * keeping the highlighted element sharp (backdrop-filter on the SVG would
+   * blur the whole viewport, hole included). So we add this layer: a clip-path
+   * evenodd hole removes the element's rect from the layer's box, so its
+   * backdrop-filter blurs everything EXCEPT the highlighted element. Repositioned
+   * per step (onHighlighted) and on resize/scroll. Sits below driver's overlay.
+   */
+  private blurLayer: HTMLDivElement | null = null;
+  private blurReflow: (() => void) | null = null;
+
   constructor(
     private translate: TranslateService,
     private http: HttpClientService,
@@ -162,10 +175,10 @@ export class TourService {
       /* sessionStorage unavailable — server flag still governs */
     }
     this.sidebar?.forceExpandForTour();
-    // forceExpandForTour() opens every group; Angular needs a change-detection
-    // cycle + paint to render the newly-revealed submenu rows before we can
-    // query their [data-tour] anchors. 150ms comfortably covers that (the
-    // sidebar is OnPush and we markForCheck inside the expand call).
+    // forceExpandForTour() pins the sidebar open; Angular needs a change-
+    // detection cycle + paint before the top-level nav rows we anchor on are
+    // laid out. 150ms comfortably covers that (the sidebar is OnPush and we
+    // markForCheck inside the expand call).
     setTimeout(() => {
       this.steps = this.buildSteps();
       if (this.steps.length === 0) {
@@ -174,6 +187,7 @@ export class TourService {
       }
       this.dontShowAgain = false;
       this.running.set(true);
+      this.ensureBlurLayer();
       this.driverObj = driver(this.buildConfig());
       this.driverObj.drive();
     }, 150);
@@ -183,6 +197,7 @@ export class TourService {
   stop(): void {
     // Ensure any overlay we opened for the active step is closed.
     this.closeAllChrome();
+    this.destroyBlurLayer();
     if (this.driverObj) {
       try {
         this.driverObj.destroy();
@@ -263,22 +278,25 @@ export class TourService {
       allowClose: true,
       animate: false,
       smoothScroll: true,
-      // No spotlight box / cutout around the active element and NO dimming of
-      // the page: overlayOpacity 0 makes driver.js's overlay fully transparent,
-      // so the highlighted item stays crisp (no scrim, no anti-aliased cutout
-      // edge = no blur) and we rely on the popover's ARROW to point at it. The
-      // overlay layer still exists (it carries click-blocking + the arrow
-      // anchor), it's just invisible. stagePadding kept small — it only affects
-      // where the (now-invisible) cutout and the popover anchor sit.
+      // Dim the page via driver.js's SVG overlay (a dark scrim with a crisp
+      // evenodd cutout around the active element). The BLUR is added by our own
+      // clip-path layer (see ensureBlurLayer) because backdrop-filter on the
+      // SVG would blur the cutout too. stagePadding here MUST match the blur
+      // hole's pad so the dim cutout and the blur hole line up exactly.
       stagePadding: 4,
       stageRadius: 6,
       popoverClass: 'dbexec-tour',
+      // Theme-neutral scrim, same value as the app's --overlay-background
+      // (rgba(0,0,0,0.5)); driver's overlayColor is a plain string (can't read
+      // a CSS var), so we mirror the token here + set opacity below.
       overlayColor: '#000000',
-      overlayOpacity: 0,
+      overlayOpacity: 0.5,
       allowKeyboardControl: true,
       // Skip a step whose element vanished between build and drive.
       // We already filtered, but this guards a mid-tour DOM change.
       skipMissingElement: true,
+      // Re-punch the blur hole around each newly-highlighted element.
+      onHighlighted: () => this.positionBlurHole(),
       // Inject the "Don't show again" checkbox into every footer.
       onPopoverRender: (popover, opts) => this.decoratePopover(popover, opts),
       // Backdrop click must not kill the tour during an overlay step —
@@ -370,8 +388,12 @@ export class TourService {
         this.sidebar?.openAccountMenuForTour();
         break;
     }
-    // Let the menu paint, then re-anchor the popover to its final spot.
-    setTimeout(() => this.driverObj?.refresh(), 120);
+    // Let the menu paint, then re-anchor the popover + re-punch the blur hole
+    // to the element's now-final position.
+    setTimeout(() => {
+      this.driverObj?.refresh();
+      this.positionBlurHole();
+    }, 120);
   }
 
   private onStepLeave(def: TourStepDef): void {
@@ -403,6 +425,71 @@ export class TourService {
     this.globalSearchService.closeSearch();
     this.notificationModalService.close();
     this.sidebar?.closeTourPopovers();
+  }
+
+  // ── Backdrop blur layer (crisp hole around the active element) ────
+
+  /** Create the blur layer once per tour and start tracking resize/scroll so
+   *  the hole follows the highlighted element. Idempotent. */
+  private ensureBlurLayer(): void {
+    if (this.blurLayer) return;
+    const el = document.createElement('div');
+    el.className = 'dbexec-tour-blur';
+    // Everything visual (blur amount, z-index) lives in _driver-tour.scss so
+    // it stays token-driven; here we only set the geometry-driven clip-path.
+    document.body.appendChild(el);
+    this.blurLayer = el;
+    // Keep the hole aligned if the page reflows under the tour.
+    this.blurReflow = () => this.positionBlurHole();
+    window.addEventListener('resize', this.blurReflow, { passive: true });
+    window.addEventListener('scroll', this.blurReflow, {
+      passive: true,
+      capture: true,
+    });
+  }
+
+  /** Punch the clip-path hole around the current active element (or clear it
+   *  for element-less welcome/done cards → full-viewport blur, no hole). */
+  private positionBlurHole(): void {
+    if (!this.blurLayer) return;
+    const active = this.driverObj?.getActiveElement() as HTMLElement | undefined;
+    const w = window.innerWidth;
+    const h = window.innerHeight;
+    if (!active) {
+      // Bookend step: blur the whole viewport, no cutout.
+      this.blurLayer.style.clipPath = '';
+      return;
+    }
+    const r = active.getBoundingClientRect();
+    const pad = 4; // matches driver.js stagePadding so the hole lines up
+    const rad = 6;
+    const x = Math.max(0, Math.round(r.left - pad));
+    const y = Math.max(0, Math.round(r.top - pad));
+    const x2 = Math.min(w, Math.round(r.right + pad));
+    const y2 = Math.min(h, Math.round(r.bottom + pad));
+    // evenodd: outer viewport rect + inner element rect (with rounded corners)
+    // → the inner rect is subtracted, leaving a crisp hole over the element.
+    this.blurLayer.style.clipPath =
+      `path(evenodd, "M0 0 H${w} V${h} H0 Z ` +
+      `M${x + rad} ${y} H${x2 - rad} Q${x2} ${y} ${x2} ${y + rad} ` +
+      `V${y2 - rad} Q${x2} ${y2} ${x2 - rad} ${y2} ` +
+      `H${x + rad} Q${x} ${y2} ${x} ${y2 - rad} ` +
+      `V${y + rad} Q${x} ${y} ${x + rad} ${y} Z")`;
+  }
+
+  /** Remove the blur layer + its listeners. Safe to call twice. */
+  private destroyBlurLayer(): void {
+    if (this.blurReflow) {
+      window.removeEventListener('resize', this.blurReflow);
+      window.removeEventListener('scroll', this.blurReflow, {
+        capture: true,
+      } as any);
+      this.blurReflow = null;
+    }
+    if (this.blurLayer) {
+      this.blurLayer.remove();
+      this.blurLayer = null;
+    }
   }
 
   // ── Popover decoration (the "Don't show again" checkbox) ─────────

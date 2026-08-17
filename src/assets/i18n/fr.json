@@ -6591,139 +6591,154 @@
     "PROGRESS": "Étape {{current}} sur {{total}}",
     "WELCOME": {
       "TITLE": "Bienvenue dans DBExec 👋",
-      "DESC": "Voici un aperçu rapide de ce que vous pouvez faire. Vous pouvez arrêter à tout moment et cocher « Ne plus afficher » pour le passer aux prochaines connexions."
+      "DESC": "Faisons un petit tour pour que vous sachiez où trouver chaque chose. Ça ne prend qu'un instant — vous pouvez arrêter à tout moment et cocher « Ne pas montrer à nouveau » si vous préférez sauter cette visite lors de vos prochaines connexions."
     },
     "DONE": {
-      "TITLE": "Tout est prêt 🎉",
-      "DESC": "C'est la fin de la visite. Explorez à votre rythme — vous pouvez la réactiver à tout moment depuis votre profil."
+      "TITLE": "Vous êtes prêt 🎉",
+      "DESC": "C'était notre tour express — vous savez maintenant naviguer dans les principales zones de DBExec. Explorez à votre rythme, et si vous voulez un rappel à tout moment, vous pouvez réactiver cette visite dans votre profil."
     },
     "STEPS": {
       "search": {
         "TITLE": "Recherche globale",
-        "DESC": "Accédez à tout rapidement. Recherchez vos datasets, tableaux de bord, connexions et plus — ou appuyez sur Ctrl/⌘ + K partout."
+        "DESC": "Le moyen le plus rapide d'aller n'importe où. Cherchez dans vos datasets, tableaux de bord, connexions et bien plus, depuis un seul endroit — et vous pouvez l'ouvrir de n'importe quel écran en appuyant sur Ctrl/⌘ + K."
       },
       "notifications": {
         "TITLE": "Notifications",
-        "DESC": "Alertes, partages et messages système arrivent ici en temps réel. Le badge indique les non-lus."
+        "DESC": "Votre flux d'activité se trouve ici : les alertes qui se sont déclenchées, les éléments partagés avec vous et les messages système, tout en temps réel. Le badge vous indique combien de notifications vous n'avez pas encore lues."
       },
       "language": {
-        "TITLE": "Changer de langue",
-        "DESC": "Vous préférez une autre langue ? Choisissez parmi dix langues ici — l'app se met à jour instantanément et votre choix est mémorisé."
+        "TITLE": "Changer la langue",
+        "DESC": "DBExec parle dix langues. Choisissez celle dans laquelle vous vous sentez le plus à l'aise et l'interface entière se met à jour instantanément — votre choix est enregistré pour votre prochaine connexion."
       },
       "logout": {
         "TITLE": "Se déconnecter",
-        "DESC": "Quand vous avez terminé, déconnectez-vous en toute sécurité ici. Votre session se termine et vous revenez à l'écran de connexion."
+        "DESC": "Quand vous avez terminé, déconnectez-vous en toute sécurité d'ici. Votre session se termine immédiatement et vous êtes renvoyé à l'écran de connexion — pratique sur les ordinateurs partagés ou publics."
       },
       "systemAdmin": {
-        "TITLE": "Administration système",
-        "DESC": "Administration au niveau de la plateforme pour les opérateurs qui gèrent DBExec entre organisations."
+        "TITLE": "Administrateur Système",
+        "DESC": "Administration au niveau de la plateforme pour les opérateurs qui gèrent DBExec across nombreuses organisations. C'est où vivent les contrôles back-office multi-locataires."
       },
       "orgManagement": {
         "TITLE": "Organisations",
-        "DESC": "Créez et gérez les organisations (locataires) de la plateforme."
+        "DESC": "Créez et gérez les organisations (tenants) sur la plateforme. Chacune est un espace de travail isolé avec ses propres utilisateurs, données et paramètres."
       },
       "systemRoleManagement": {
-        "TITLE": "Rôles système",
-        "DESC": "Définissez des rôles au niveau de la plateforme et leurs autorisations."
+        "TITLE": "Rôles Système",
+        "DESC": "Définissez les rôles au niveau de la plateforme et choisissez les permissions que chacun accorde. Les rôles gardent l'accès cohérent plutôt que de le définir par personne."
       },
       "systemGroupManagement": {
-        "TITLE": "Groupes système",
-        "DESC": "Regroupez les opérateurs et attribuez des rôles système en masse."
+        "TITLE": "Groupes Système",
+        "DESC": "Regroupez les opérateurs de plateforme dans des groupes et attribuez les rôles système à l'ensemble du groupe à la fois — un moyen plus rapide de gérer l'accès à grande échelle."
       },
       "systemUserManagement": {
-        "TITLE": "Utilisateurs système",
-        "DESC": "Gérez les comptes opérateurs qui exécutent DBExec."
+        "TITLE": "Utilisateurs Système",
+        "DESC": "Gérez les comptes opérateurs qui exécutent DBExec lui-même. Ce sont le personnel de la plateforme, distincts des utilisateurs à l'intérieur de n'importe quelle organisation."
       },
       "home": {
         "TITLE": "Accueil",
-        "DESC": "Votre point de départ — un aperçu rapide et des raccourcis vers tout."
+        "DESC": "Votre page d'accueil à chaque connexion. Elle vous donne une vue rapide de vos données et activités, plus des raccourcis pour accéder directement aux choses sur lesquelles vous travaillez le plus."
       },
       "userManagement": {
         "TITLE": "Utilisateurs",
-        "DESC": "Invitez des personnes dans votre organisation et gérez leurs comptes et accès."
+        "DESC": "Invitez des gens dans votre organisation et gérez leurs comptes et accès. C'est votre point de départ pour intégrer un nouveau coéquipier."
       },
       "roleManagement": {
         "TITLE": "Rôles",
-        "DESC": "Définissez des rôles et choisissez les écrans et actions que chacun débloque."
+        "DESC": "Définissez les rôles et choisissez exactement quels écrans et actions chacun déverrouille. Attribuez un rôle une fois et tous ceux qui l'ont héritent du même accès."
       },
       "groupManagement": {
         "TITLE": "Groupes",
-        "DESC": "Regroupez des utilisateurs et accordez des rôles à tout le groupe."
+        "DESC": "Regroupez les utilisateurs dans des groupes et accordez les rôles à l'ensemble du groupe à la fois. C'est le moyen le plus facile de garder l'accès organisé à mesure que votre équipe grandit."
       },
       "setupDB": {
-        "TITLE": "Sources de données",
-        "DESC": "Connectez les bases lues par DBExec — Postgres, MySQL, Snowflake et plus."
+        "TITLE": "Sources de Données",
+        "DESC": "Connectez les bases de données que DBExec lit — Postgres, MySQL, Snowflake et bien d'autres. Une source de données ne doit être configurée qu'une fois, puis tout le reste s'appuie dessus."
       },
       "dbRoles": {
-        "TITLE": "Rôles de base de données",
-        "DESC": "Gérez les utilisateurs de connexion et rôles dans vos bases connectées."
+        "TITLE": "Rôles de Base de Données",
+        "DESC": "Gérez les utilisateurs de connexion et les rôles qui vivent dans vos bases de données connectées. Ceci contrôle l'accès au niveau de la base de données, sous les permissions propres de DBExec."
       },
       "dbPrivileges": {
-        "TITLE": "Privilèges et accès",
-        "DESC": "Accordez et vérifiez les privilèges au niveau table et schéma."
+        "TITLE": "Privilèges et Accès",
+        "DESC": "Accordez et examinez les privilèges au niveau table et schéma sur vos bases de données. Voyez d'un coup d'œil qui peut lire ou modifier quoi, et ajustez-le en toute sécurité."
       },
       "connectionManager": {
         "TITLE": "Connexions",
-        "DESC": "Gérez les connexions utilisées pour exécuter du SQL sur vos sources."
+        "DESC": "Gérez les connexions actives utilisées pour exécuter SQL contre vos sources de données. Chaque connexion est un lien prêt à l'emploi que vous pouvez réutiliser à travers l'application."
       },
       "queryRunner": {
-        "TITLE": "Espace SQL",
-        "DESC": "Écrivez et exécutez du SQL avec autocomplétion, requêtes enregistrées et résultats en direct."
+        "TITLE": "Espace de Travail SQL",
+        "DESC": "Écrivez et exécutez SQL dans un espace de travail complet avec autocomplétion, requêtes enregistrées et grille de résultats en direct. C'est la base pour quiconque travaille directement avec SQL."
       },
       "queryBuilderTab": {
         "TITLE": "Onglets",
-        "DESC": "Organisez les écrans du générateur de requêtes en onglets."
+        "DESC": "Organisez les écrans du générateur de requêtes guidé en onglets, pour que le générateur complexe reste facile à naviguer. Les onglets regroupent les sections connexes."
       },
       "queryBuilderSection": {
         "TITLE": "Sections",
-        "DESC": "Regroupez des prompts liés en sections dans un écran."
+        "DESC": "Regroupez les invites connexes dans des sections au sein d'un écran du générateur de requêtes. Les sections donnent à une requête sans code une structure claire et logique."
       },
       "queryBuilderPrompt": {
-        "TITLE": "Prompts",
-        "DESC": "Concevez les prompts d'entrée pour des requêtes paramétrées sans code."
+        "TITLE": "Invites",
+        "DESC": "Concevez les invites d'entrée qui pilotent les requêtes paramétrées et sans code. Les invites permettent aux utilisateurs non techniques d'exécuter des requêtes puissantes en toute sécurité."
       },
       "queryBuilderScreen": {
-        "TITLE": "Générateur de requêtes",
-        "DESC": "Assemblez onglets, sections et prompts en écrans guidés sans code."
+        "TITLE": "Générateur de Requêtes",
+        "DESC": "Assemblez les onglets, sections et invites en écrans de requête guidés et sans code. Construisez une fois et votre équipe peut exécuter des requêtes adaptées sans toucher SQL."
       },
       "datasetManager": {
         "TITLE": "Datasets",
-        "DESC": "Modélisez des datasets réutilisables — colonnes, champs calculés et formules."
+        "DESC": "Façonnez les datasets réutilisables — choisissez les colonnes dont vous avez besoin et ajoutez des champs calculés et des formules. Les datasets sont la fondation sur laquelle chaque graphique et tableau de bord est construit."
       },
       "analyses": {
         "TITLE": "Analyses",
-        "DESC": "Créez des graphiques et des analyses visuelles à partir de vos datasets."
+        "DESC": "Construisez des graphiques et des analyses visuelles basés sur vos datasets. Explorez vos données visuellement et enregistrez les vues qui racontent l'histoire qui vous intéresse."
       },
       "dashboard": {
-        "TITLE": "Tableaux de bord",
-        "DESC": "Combinez des visuels en tableaux de bord partageables et publiez des instantanés."
+        "TITLE": "Tableaux de Bord",
+        "DESC": "Combinrez les visuels en tableaux de bord partageables et publiez les snapshots au moment précis. C'est comment vous rassemblez les chiffres qui importent pour votre équipe."
       },
       "rlsRules": {
         "TITLE": "Règles RLS",
-        "DESC": "Définissez la sécurité par ligne et colonne pour que chacun ne voie que ses données."
+        "DESC": "Définissez la sécurité au niveau ligne et colonne pour que chacun ne voit que les données qu'il est autorisé à voir. Définissez la règle une fois et elle s'applique partout où cette donnée apparaît."
       },
       "alertManagement": {
         "TITLE": "Alertes",
-        "DESC": "Planifiez des vérifications de données qui vous notifient quand une condition est remplie."
+        "DESC": "Programmez des vérifications sur vos données qui vous envoient un email ou une notification dès que une condition est remplie. Laissez DBExec surveiller les chiffres pour vous."
       },
       "auditLogs": {
-        "TITLE": "Journaux d'audit",
-        "DESC": "Consultez l'historique complet de qui a modifié quoi et quand."
+        "TITLE": "Journaux d'Audit",
+        "DESC": "Examinez un enregistrement complet de qui a changé quoi et quand sur la plateforme. C'est votre source de vérité quand vous avez besoin de répondre « qu'est-ce qui s'est passé ? »."
       },
       "loginActivity": {
-        "TITLE": "Activité de connexion",
-        "DESC": "Suivez les connexions et événements d'authentification pour la sécurité."
+        "TITLE": "Activité de Connexion",
+        "DESC": "Suivez les connexions et les événements d'authentification à travers votre organisation. Une vue claire de l'historique d'accès pour la sécurité et la conformité."
       },
       "appSettings": {
-        "TITLE": "Paramètres de l'app",
-        "DESC": "Ajustez l'apparence — thème, image de marque et annonces."
+        "TITLE": "Paramètres de l'Application",
+        "DESC": "Rendez DBExec vôtre. Ajustez l'apparence et la convivialité de votre organisation ici — couleurs de thème, marque et annonces que votre équipe voit à la connexion."
       },
       "systemSettings": {
-        "TITLE": "Paramètres système",
-        "DESC": "Configurez la sécurité, le SSO, l'e-mail et les fonctions IA."
+        "TITLE": "Paramètres Système",
+        "DESC": "Le panneau de contrôle de la plateforme. Configurez les politiques de sécurité, l'authentification unique, la livraison d'e-mails et les fonctionnalités AI qui s'appliquent à toute votre organisation."
+      },
+      "userAndAccess": {
+        "DESC": "Tout ce qui concerne qui peut entrer et ce qu'il peut faire. Invitez et gérez les gens, organisez-les en groupes et définissez les rôles qui contrôlent exactement quels écrans et actions chaque personne peut atteindre."
+      },
+      "databaseManagement": {
+        "DESC": "Connectez et gouvernez les bases de données avec lesquelles DBExec travaille. Ajoutez des sources de données comme Postgres, MySQL ou Snowflake, puis gérez les utilisateurs de base de données, les rôles et les privilèges qui décident qui peut toucher quoi."
+      },
+      "dbExecStudio": {
+        "DESC": "C'est où vous interrogez réellement vos données. Écrivez et exécutez SQL dans l'espace de travail avec autocomplétion et requêtes enregistrées, ou créez visuellement des requêtes paramétrées et sans code pour ceux qui préfèrent ne pas écrire SQL."
+      },
+      "visualizations": {
+        "DESC": "Transformez les résultats de requête en insight. Façonnez les datasets réutilisables, construisez des graphiques et des analyses basés sur eux, composez des tableaux de bord partageables et superposez la sécurité au niveau ligne et les alertes."
+      },
+      "auditActivity": {
+        "DESC": "Votre enregistrement de ce qui s'est passé et qui l'a fait. Examinez une piste d'audit complète des modifications sur la plateforme et suivez les connexions et les événements d'authentification pour la sécurité et la conformité."
       }
     },
-    "MODULE_GENERIC_DESC": "Ouvrez {{name}} pour utiliser ces fonctionnalités."
+    "MODULE_GENERIC_DESC": "Ouvrez {{name}} pour explorer tout ce qui est regroupé sous cette section."
   },
   "FORM_BUILDER": {
     "TITLE": "Form Builder",

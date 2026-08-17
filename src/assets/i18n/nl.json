@@ -6591,139 +6591,154 @@
     "PROGRESS": "Stap {{current}} van {{total}}",
     "WELCOME": {
       "TITLE": "Welkom bij DBExec 👋",
-      "DESC": "Hier is een korte rondleiding langs wat je kunt doen. Je kunt op elk moment stoppen — vink «Niet meer weergeven» aan om het bij volgende aanmeldingen over te slaan."
+      "DESC": "Laten we even rondkijken zodat je weet waar alles zich bevindt. Dit duurt maar een momentje — je kunt altijd stoppen en \"Dit niet meer weergeven\" aanvinken als je dit liever overslaat bij volgende keer inloggen."
     },
     "DONE": {
       "TITLE": "Je bent klaar 🎉",
-      "DESC": "Dat was de rondleiding. Verken in je eigen tempo — je kunt hem altijd weer inschakelen vanuit je profiel."
+      "DESC": "Dat was de snelle rondleiding — je kent nu de belangrijkste onderdelen van DBExec. Verken het op je eigen tempo en als je ooit een opfrisser nodig hebt, kun je deze rondleiding terug inschakelen vanuit je profiel."
     },
     "STEPS": {
       "search": {
         "TITLE": "Globaal zoeken",
-        "DESC": "Ga snel naar alles. Zoek in je datasets, dashboards, verbindingen en meer — of druk overal op Ctrl/⌘ + K."
+        "DESC": "De snelste manier om ergens heen te gaan. Zoek in je datasets, dashboards, verbindingen en meer vanaf één plek — je kunt het vanuit elk scherm openen met Ctrl/⌘ + K."
       },
       "notifications": {
         "TITLE": "Meldingen",
-        "DESC": "Waarschuwingen, gedeelde items en systeemberichten komen hier in realtime binnen. De badge toont het ongelezen aantal."
+        "DESC": "Je activiteitenlog bevindt zich hier: waarschuwingen die zijn afgegaan, items die met je zijn gedeeld en systeemberichten, allemaal real-time. De badge toont hoeveel je nog niet hebt gelezen."
       },
       "language": {
         "TITLE": "Taal wijzigen",
-        "DESC": "Liever een andere taal? Kies hier uit tien talen — de app wordt direct bijgewerkt en je keuze wordt onthouden."
+        "DESC": "DBExec spreekt tien talen. Kies degene waarin je het prettigst bent en de hele interface werkt direct bij — je keuze wordt opgeslagen, dus het wordt onthouden volgende keer dat je inlogt."
       },
       "logout": {
         "TITLE": "Afmelden",
-        "DESC": "Als je klaar bent, meld je hier veilig af. Je sessie eindigt en je keert terug naar het aanmeldscherm."
+        "DESC": "Als je klaar bent, meld je hier veilig af. Je sessie eindigt onmiddellijk en je keert terug naar het inlogscherm — handig op gedeelde of openbare computers."
       },
       "systemAdmin": {
-        "TITLE": "Systeembeheer",
-        "DESC": "Beheer op platformniveau voor operators die DBExec over organisaties heen beheren."
+        "TITLE": "Systeembeheerder",
+        "DESC": "Beheer op platformniveau voor operators die DBExec beheren voor veel organisaties. Dit is waar cross-tenant, back-office controls zich bevinden."
       },
       "orgManagement": {
         "TITLE": "Organisaties",
-        "DESC": "Maak en beheer de organisaties (tenants) op het platform."
+        "DESC": "Maak en beheer de organisaties (tenants) op het platform. Elk is een geïsoleerde werkruimte met zijn eigen gebruikers, gegevens en instellingen."
       },
       "systemRoleManagement": {
         "TITLE": "Systeemrollen",
-        "DESC": "Definieer rollen op platformniveau en de rechten die ze verlenen."
+        "DESC": "Definieer rollen op platformniveau en kies welke machtigingen elk hiervan verleent. Rollen zorgen voor consistent toegangsbeheer in plaats van het in te stellen per persoon."
       },
       "systemGroupManagement": {
         "TITLE": "Systeemgroepen",
-        "DESC": "Groepeer operators en wijs systeemrollen in bulk toe."
+        "DESC": "Bundel platformoperators in groepen en wijs systeemrollen toe aan de hele groep tegelijk — een snellere manier om toegang op schaal te beheren."
       },
       "systemUserManagement": {
         "TITLE": "Systeemgebruikers",
-        "DESC": "Beheer de operatoraccounts die DBExec zelf draaien."
+        "DESC": "Beheer de operatoraccounts die DBExec zelf uitvoeren. Dit zijn platformmedewerkers, gescheiden van gebruikers binnen één organisatie."
       },
       "home": {
-        "TITLE": "Start",
-        "DESC": "Je startpunt — een snel overzicht en snelkoppelingen naar alles."
+        "TITLE": "Home",
+        "DESC": "Je startplek telkens als je inlogt. Dit geeft je een snelle snapshot van je gegevens en activiteiten, plus snelkoppelingen naar dingen waarmee je het meeste werkt."
       },
       "userManagement": {
         "TITLE": "Gebruikers",
-        "DESC": "Nodig mensen uit in je organisatie en beheer hun accounts en toegang."
+        "DESC": "Nodig mensen uit in je organisatie en beheer hun accounts en toegang. Dit is je startpunt voor het onboarden van een nieuwe teamlid."
       },
       "roleManagement": {
         "TITLE": "Rollen",
-        "DESC": "Definieer rollen en kies welke schermen en acties elke rol ontgrendelt."
+        "DESC": "Definieer rollen en kies precies welke schermen en acties elk daarvan ontgrendelt. Wijs een rol toe en iedereen met die rol krijgt dezelfde toegang."
       },
       "groupManagement": {
         "TITLE": "Groepen",
-        "DESC": "Bundel gebruikers in groepen en verleen de hele groep rollen."
+        "DESC": "Bundel gebruikers in groepen en verleen rollen aan de hele groep tegelijk. Het is de gemakkelijkste manier om toegang netjes te houden als je team groeit."
       },
       "setupDB": {
         "TITLE": "Gegevensbronnen",
-        "DESC": "Verbind de databases die DBExec leest — Postgres, MySQL, Snowflake en meer."
+        "DESC": "Verbind de databases waarvan DBExec leest — Postgres, MySQL, Snowflake en meer. Een gegevensbron hoeft slechts eenmaal te worden ingesteld, daarna bouw je alles erop op."
       },
       "dbRoles": {
-        "TITLE": "Databaserollen",
-        "DESC": "Beheer de login-gebruikers en rollen in je verbonden databases."
+        "TITLE": "Database-rollen",
+        "DESC": "Beheer de aanmeldingsgebruikers en rollen die in je verbonden databases leven. Dit bepaalt de toegang op databaseniveau, onder DBExec's eigen machtigingen."
       },
       "dbPrivileges": {
-        "TITLE": "Rechten en toegang",
-        "DESC": "Verleen en controleer rechten op tabel- en schemaniveau."
+        "TITLE": "Privileges & Toegang",
+        "DESC": "Verleen en controleer privileges op tabel- en schemaniveau in je databases. Zie in één oogopslag wie wat kan lezen of wijzigen, en pas het veilig aan."
       },
       "connectionManager": {
         "TITLE": "Verbindingen",
-        "DESC": "Beheer de verbindingen om SQL uit te voeren op je gegevensbronnen."
+        "DESC": "Beheer de live verbindingen die worden gebruikt om SQL uit te voeren tegen je gegevensbronnen. Elke verbinding is een gebruiksklare link die je in de hele app opnieuw kunt gebruiken."
       },
       "queryRunner": {
         "TITLE": "SQL-werkruimte",
-        "DESC": "Schrijf en voer SQL uit met aanvulling, opgeslagen query's en live resultaten."
+        "DESC": "Schrijf en voer SQL uit in een volledige werkruimte met automatisch aanvullen, opgeslagen query's en een live resultatenraster. Dit is de thuisbasis voor iedereen die rechtstreeks met SQL werkt."
       },
       "queryBuilderTab": {
         "TITLE": "Tabbladen",
-        "DESC": "Organiseer de schermen van de querybuilder in tabbladen."
+        "DESC": "Organiseer schermen van geleide query-builders in tabbladen, zodat een complexe builder gemakkelijk navigeerbaar blijft. Tabbladen groeperen gerelateerde secties."
       },
       "queryBuilderSection": {
         "TITLE": "Secties",
-        "DESC": "Groepeer gerelateerde prompts in secties binnen een scherm."
+        "DESC": "Groepeer gerelateerde prompts in secties binnen een query-builderscherm. Secties geven een no-code-query een duidelijke, logische structuur."
       },
       "queryBuilderPrompt": {
         "TITLE": "Prompts",
-        "DESC": "Ontwerp de invoerprompts voor geparametriseerde no-code query's."
+        "DESC": "Ontwerp de invoerprompts die geparametriseerde, no-code-query's aansturen. Prompts zorgen ervoor dat niet-technische gebruikers krachtige query's veilig kunnen uitvoeren."
       },
       "queryBuilderScreen": {
-        "TITLE": "Querybuilder",
-        "DESC": "Combineer tabbladen, secties en prompts tot begeleide no-code schermen."
+        "TITLE": "Query Builder",
+        "DESC": "Stel tabbladen, secties en prompts samen tot geleide, no-code-query-schermen. Bouw het eenmaal en je team kan op maat gemaakte query's uitvoeren zonder SQL aan te raken."
       },
       "datasetManager": {
         "TITLE": "Datasets",
-        "DESC": "Modelleer herbruikbare datasets — kolommen, berekende velden en formules."
+        "DESC": "Vorm herbruikbare datasets — kies de kolommen die je nodig hebt en voeg berekende velden en formules toe. Datasets zijn de basis waarop elk grafiek en dashboard is gebouwd."
       },
       "analyses": {
         "TITLE": "Analyses",
-        "DESC": "Bouw grafieken en visuele analyses op je datasets."
+        "DESC": "Bouw grafieken en visuele analyses bovenop je datasets. Verken je gegevens visueel en sla de weergaven op die het verhaal vertellen dat voor je van belang is."
       },
       "dashboard": {
         "TITLE": "Dashboards",
-        "DESC": "Combineer visuals tot deelbare dashboards en publiceer momentopnamen."
+        "DESC": "Combineer visuals tot deelbare dashboards en publiceer snapshots op een bepaald moment. Zo breng je de cijfers die voor je team van belang zijn samen."
       },
       "rlsRules": {
         "TITLE": "RLS-regels",
-        "DESC": "Stel beveiliging op rij- en kolomniveau in zodat iedereen alleen zijn data ziet."
+        "DESC": "Stel beveiliging op rij- en kolom niveau in zodat iedereen alleen de gegevens ziet die ze mogen zien. Definieer de regel eenmaal en deze wordt overal toegepast waar die gegevens verschijnen."
       },
       "alertManagement": {
         "TITLE": "Waarschuwingen",
-        "DESC": "Plan datacontroles die je melden wanneer aan een voorwaarde wordt voldaan."
+        "DESC": "Plan controles in op je gegevens die je e-mailen of notificeren zodra een voorwaarde is voldaan. Laat DBExec de cijfers in het oog houden zodat jij dat niet hoeft te doen."
       },
       "auditLogs": {
-        "TITLE": "Auditlogboeken",
-        "DESC": "Bekijk een volledig overzicht van wie wat heeft gewijzigd, en wanneer."
+        "TITLE": "Auditlogs",
+        "DESC": "Controleer een volledig spoor van wie wat en wanneer heeft veranderd op het hele platform. Dit is je bron van waarheid wanneer je \"wat is er gebeurd?\" moet beantwoorden."
       },
       "loginActivity": {
-        "TITLE": "Aanmeldactiviteit",
-        "DESC": "Volg aanmeldingen en authenticatiegebeurtenissen voor beveiliging."
+        "TITLE": "Inlogactiviteit",
+        "DESC": "Volg aanmeldingen en authenticatiegebeurtenissen in je organisatie. Een helder overzicht van toegangsgeschiedenis voor beveiliging en naleving."
       },
       "appSettings": {
         "TITLE": "App-instellingen",
-        "DESC": "Stem de uitstraling af — thema, branding en aankondigingen."
+        "DESC": "Maak DBExec van jezelf. Stem het uiterlijk en gevoel van je organisatie hier af — themakleuren, branding en de aankondigingen die je team ziet wanneer ze inloggen."
       },
       "systemSettings": {
         "TITLE": "Systeeminstellingen",
-        "DESC": "Configureer beveiliging, SSO, e-mail en AI-functies."
+        "DESC": "Het bedieningspaneel van het platform. Configureer beveiligingsbeleidsregels, eenmalige aanmelding, e-mailbezorging en AI-functies die op je hele organisatie van toepassing zijn."
+      },
+      "userAndAccess": {
+        "DESC": "Alles over wie kan inloggen en wat ze kunnen doen. Nodig mensen uit en beheer ze, organiseer ze in groepen en definieer rollen die bepalen welke schermen en acties iedereen kan bereiken."
+      },
+      "databaseManagement": {
+        "DESC": "Verbind en beheer de databases waarmee DBExec werkt. Voeg gegevensbronnen toe zoals Postgres, MySQL of Snowflake, en beheer vervolgens de databasegebruikers, rollen en privileges die bepalen wie wat mag aanraken."
+      },
+      "dbExecStudio": {
+        "DESC": "Waar je je gegevens echt query. Schrijf en voer SQL uit in de werkruimte met automatisch aanvullen en opgeslagen query's, of bouw geparametriseerde, no-code-query's visueel voor mensen die liever geen SQL schrijven."
+      },
+      "visualizations": {
+        "DESC": "Zet queryresultaten om in inzicht. Vorm herbruikbare datasets, bouw grafieken en analyses erop, stel deelbare dashboards samen en voeg beveiliging op rijniveau en waarschuwingen toe."
+      },
+      "auditActivity": {
+        "DESC": "Je registratie van wat is gebeurd en wie het heeft gedaan. Controleer een volledig auditspoor van wijzigingen op het hele platform en volg aanmeldingen en authenticatiegebeurtenissen voor beveiliging en naleving."
       }
     },
-    "MODULE_GENERIC_DESC": "Open {{name}} om met deze functies te werken."
+    "MODULE_GENERIC_DESC": "Open {{name}} om alles onder deze sectie te verkennen."
   },
   "FORM_BUILDER": {
     "TITLE": "Form Builder",

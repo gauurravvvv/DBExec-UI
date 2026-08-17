@@ -210,20 +210,35 @@
   }
 }
 
-// Spotlighted element — rounded corners on the (now un-dimmed) active element.
-// With overlayOpacity:0 there's no cutout box; this just keeps a highlighted
-// button's corners tidy where driver.js clips it.
+// Spotlighted element — rounded corners where driver.js clips the highlight.
 .driver-active-element {
   border-radius: var(--radius-md);
 }
 
-// ── Lift the account menu above driver.js's (transparent) overlay layer ──
-// Even with overlayOpacity:0 the overlay LAYER still sits at z-index 1e9 and
-// blocks pointer events / stacks above normal content. The tour opens the
-// account (avatar) menu for the language & logout steps, so it must sit above
-// that layer to be visible. We sit just below the popover (1e9) so the card
-// still wins. `html.driver-active` is present only while a tour runs.
-html.driver-active {
+// ── Backdrop blur layer ──────────────────────────────────────────────
+// Full-viewport fixed layer that blurs the page. A clip-path evenodd hole
+// (set inline per step by TourService.positionBlurHole) removes the active
+// element's rect so IT stays crisp while everything else is blurred. Sits just
+// below driver.js's SVG overlay (z 10000) — which paints the dark scrim with a
+// matching crisp cutout on top — so the effect reads as one dim+blur backdrop.
+.dbexec-tour-blur {
+  position: fixed;
+  inset: 0;
+  z-index: 9998;
+  pointer-events: none;
+  // Blur amount matches the app's command-modal backdrop (.cmd-backdrop uses
+  // blur(2px)); nudged to 3px for a touch more focus. No colour here — the dim
+  // comes from driver's overlay above.
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+}
+
+// ── Lift the account menu above the blur + overlay layers during the tour ──
+// The tour opens the account (avatar) menu for the language & logout steps, so
+// it must sit above the blur layer (9998) and driver's overlay (1e4) to stay
+// crisp + visible. Just below the popover (1e9) so the card still wins.
+// NOTE: driver.js 1.8 puts its `.driver-active` class on <body> (NOT <html>).
+body.driver-active {
   .profile-menu.show {
     z-index: 999999998 !important;
   }
