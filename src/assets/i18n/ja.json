@@ -6919,6 +6919,10 @@
       "CLONE_FAILED": "テンプレートを複製できませんでした。",
       "NO_TEMPLATES": "まだテンプレートがありません。",
       "TEMPLATES_LOAD_FAILED": "テンプレートを読み込めませんでした。"
+    },
+    "PALETTE": {
+      "NO_PROMPTS": "No prompts yet",
+      "NO_PROMPTS_HINT": "Create prompts in the Prompts module for this datasource, then drag them onto a section."
     }
   }
 }

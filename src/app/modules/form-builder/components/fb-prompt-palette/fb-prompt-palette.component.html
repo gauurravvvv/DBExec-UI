@@ -32,7 +32,12 @@
     </div>
   </div>
 
-  <p class="fb-palette__empty" *ngIf="!loading() && !filtered().length">
-    {{ 'COMMON.NO_RECORDS' | translate }}
-  </p>
+  <div class="fb-palette__empty" *ngIf="!loading() && !filtered().length">
+    <span class="fb-palette__empty-title">{{
+      'FORM_BUILDER.PALETTE.NO_PROMPTS' | translate
+    }}</span>
+    <span class="fb-palette__empty-hint">{{
+      'FORM_BUILDER.PALETTE.NO_PROMPTS_HINT' | translate
+    }}</span>
+  </div>
 </div>

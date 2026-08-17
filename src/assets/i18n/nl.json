@@ -6919,6 +6919,10 @@
       "CLONE_FAILED": "Kan het sjabloon niet klonen.",
       "NO_TEMPLATES": "Nog geen sjablonen.",
       "TEMPLATES_LOAD_FAILED": "Kan de sjablonen niet laden."
+    },
+    "PALETTE": {
+      "NO_PROMPTS": "No prompts yet",
+      "NO_PROMPTS_HINT": "Create prompts in the Prompts module for this datasource, then drag them onto a section."
     }
   }
 }

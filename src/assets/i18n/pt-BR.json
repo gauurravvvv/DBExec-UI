@@ -6919,6 +6919,10 @@
       "CLONE_FAILED": "Não foi possível clonar o modelo.",
       "NO_TEMPLATES": "Ainda não há modelos.",
       "TEMPLATES_LOAD_FAILED": "Não foi possível carregar os modelos."
+    },
+    "PALETTE": {
+      "NO_PROMPTS": "No prompts yet",
+      "NO_PROMPTS_HINT": "Create prompts in the Prompts module for this datasource, then drag them onto a section."
     }
   }
 }

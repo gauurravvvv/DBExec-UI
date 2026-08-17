@@ -6919,6 +6919,10 @@
       "CLONE_FAILED": "템플릿을 복제할 수 없습니다.",
       "NO_TEMPLATES": "아직 템플릿이 없습니다.",
       "TEMPLATES_LOAD_FAILED": "템플릿을 불러올 수 없습니다."
+    },
+    "PALETTE": {
+      "NO_PROMPTS": "No prompts yet",
+      "NO_PROMPTS_HINT": "Create prompts in the Prompts module for this datasource, then drag them onto a section."
     }
   }
 }

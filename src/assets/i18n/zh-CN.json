@@ -6919,6 +6919,10 @@
       "CLONE_FAILED": "无法克隆模板。",
       "NO_TEMPLATES": "暂无模板。",
       "TEMPLATES_LOAD_FAILED": "无法加载模板。"
+    },
+    "PALETTE": {
+      "NO_PROMPTS": "No prompts yet",
+      "NO_PROMPTS_HINT": "Create prompts in the Prompts module for this datasource, then drag them onto a section."
     }
   }
 }

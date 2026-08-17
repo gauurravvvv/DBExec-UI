@@ -6917,6 +6917,10 @@
       "CLONE_FAILED": "Could not clone the template.",
       "NO_TEMPLATES": "No templates yet.",
       "TEMPLATES_LOAD_FAILED": "Could not load the templates."
+    },
+    "PALETTE": {
+      "NO_PROMPTS": "No prompts yet",
+      "NO_PROMPTS_HINT": "Create prompts in the Prompts module for this datasource, then drag them onto a section."
     }
   }
 }
