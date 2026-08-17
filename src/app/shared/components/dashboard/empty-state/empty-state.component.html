@@ -1,0 +1,13 @@
+<div class="empty-state" [attr.data-tone]="tone">
+  <span class="es-ic"><i [class]="icon"></i></span>
+  <div class="es-title" *ngIf="title">{{ title }}</div>
+  <div class="es-desc" *ngIf="description">{{ description }}</div>
+  <button
+    *ngIf="cta"
+    type="button"
+    class="es-cta"
+    (click)="ctaClick.emit()"
+  >
+    {{ cta.label }} <i class="pi pi-arrow-right"></i>
+  </button>
+</div>

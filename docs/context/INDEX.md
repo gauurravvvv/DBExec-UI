@@ -28,7 +28,7 @@
 | embed | `src/app/modules/embed` | [embed](./modules/embed.md) | 🟢 | 2026-07-24 |
 | form-builder | `src/app/modules/form-builder` | [form-builder](./modules/form-builder.md) | 🟢 | 2026-08-17 (Phase 8 portability) |
 | groups | `src/app/modules/groups` | [groups](./modules/groups.md) | 🟢 | 2026-07-24 |
-| home | `src/app/modules/home` | [home](./modules/home.md) | 🟢 | 2026-07-24 |
+| home | `src/app/modules/home` | [home](./modules/home.md) | 🟢 | 2026-08-17 (landing dashboards rebuilt — live data) |
 | login-activity | `src/app/modules/login-activity` | [login-activity](./modules/login-activity.md) | 🟢 | 2026-07-24 |
 | migration | `src/app/modules/migration` | [migration](./modules/migration.md) | 🟢 | 2026-07-24 |
 | notifications | `src/app/modules/notifications` | [notifications](./modules/notifications.md) | 🟢 | 2026-07-24 |

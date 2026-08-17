@@ -1,82 +1,298 @@
-<div class="org-home">
-  <div class="home-header">
-    <div class="header-left">
-      <h2>{{ 'HOME.WELCOME' | translate: { name: userName } }}</h2>
-      <p class="subtitle">{{ organisationName }}</p>
+<div class="dash">
+  <!-- One fixed-height parent card (like the add/edit screens): the header
+       is a static top band that never scrolls; only the widget body below
+       scrolls. The card fills the pane and never grows with content. -->
+  <div class="dash-card">
+    <!-- ============ static header + date controls ============ -->
+    <div class="dash-head">
+    <div class="dash-greeting">
+      <h1>{{ 'HOME_DASH.GREETING' | translate: { name: userName } }}</h1>
+      <p class="dash-sub">
+        {{ 'HOME_DASH.SUBTITLE' | translate: { org: organisationName } }}
+      </p>
+    </div>
+
+    <div class="dash-controls">
+      <div class="seg" role="group" [attr.aria-label]="'HOME_DASH.RANGE' | translate">
+        <button type="button" [class.on]="preset === 'all'" (click)="setAllTime()">
+          {{ 'HOME_DASH.RANGE_ALL' | translate }}
+        </button>
+        <button type="button" [class.on]="preset === 7" (click)="setPreset(7)">
+          {{ 'HOME_DASH.RANGE_7' | translate }}
+        </button>
+        <button type="button" [class.on]="preset === 30" (click)="setPreset(30)">
+          {{ 'HOME_DASH.RANGE_30' | translate }}
+        </button>
+        <button type="button" [class.on]="preset === 90" (click)="setPreset(90)">
+          {{ 'HOME_DASH.RANGE_90' | translate }}
+        </button>
+      </div>
+
+      <app-custom-daterange
+        class="dash-range"
+        [(ngModel)]="customRange"
+        [placeholder]="'HOME_DASH.CUSTOM_RANGE' | translate"
+        (ngModelChange)="onCustomRange($event)"
+      ></app-custom-daterange>
+
+      <button type="button" class="dash-refresh" (click)="refresh()">
+        <i class="pi pi-refresh"></i> {{ 'HOME_DASH.REFRESH' | translate }}
+      </button>
     </div>
   </div>
 
-  <div class="home-content">
-    <div class="quick-nav">
-      <div class="nav-card" (click)="navigateTo('/app/query-builders')">
-        <div class="nav-icon">
-          <i class="ci ci-screen"></i>
-        </div>
-        <div class="nav-info">
-          <h4>{{ 'HOME.QUERY_BUILDERS' | translate }}</h4>
-          <p>{{ 'HOME.QUERY_BUILDERS_DESC' | translate }}</p>
-        </div>
-        <i class="pi pi-arrow-right nav-arrow"></i>
-      </div>
+    <!-- scrolling widget body (only this region scrolls) -->
+    <div class="dash-body">
+  <!-- ============ KPI row ============ -->
+  <div class="dash-grid kpi-row">
+    <app-widget-card
+      skeletonVariant="stat"
+      [state]="summary.state"
+      [errorText]="'HOME_DASH.ERROR' | translate"
+      (retry)="refresh()"
+    >
+      <app-stat-tile
+        [label]="'HOME_DASH.KPI.QUERIES' | translate"
+        [value]="(execTotal !== null ? execTotal : null)"
+        format="compact"
+        tone="blue"
+        icon="ci ci-bolt"
+        [caption]="'HOME_DASH.KPI.IN_RANGE' | translate"
+      ></app-stat-tile>
+    </app-widget-card>
 
-      <div class="nav-card" (click)="navigateTo('/app/datasets')">
-        <div class="nav-icon">
-          <i class="ci ci-dataset"></i>
-        </div>
-        <div class="nav-info">
-          <h4>{{ 'HOME.DATASETS' | translate }}</h4>
-          <p>{{ 'HOME.DATASETS_DESC' | translate }}</p>
-        </div>
-        <i class="pi pi-arrow-right nav-arrow"></i>
-      </div>
+    <app-widget-card
+      skeletonVariant="stat"
+      [state]="summary.state"
+      [errorText]="'HOME_DASH.ERROR' | translate"
+      (retry)="refresh()"
+    >
+      <app-stat-tile
+        [label]="'HOME_DASH.KPI.ACTIVE_USERS' | translate"
+        [value]="summary.data?.usersActive?.current ?? null"
+        [secondary]="summary.data?.usersTotal?.current ?? null"
+        format="number"
+        tone="green"
+        icon="ci ci-users"
+        [delta]="deltaOf(summary.data?.usersActive)"
+        deltaUnit=""
+        [caption]="'HOME_DASH.KPI.VS_PREV' | translate"
+      ></app-stat-tile>
+    </app-widget-card>
 
-      <div class="nav-card" (click)="navigateTo('/app/analyses')">
-        <div class="nav-icon">
-          <i class="ci ci-analyses"></i>
-        </div>
-        <div class="nav-info">
-          <h4>{{ 'HOME.ANALYSES' | translate }}</h4>
-          <p>{{ 'HOME.ANALYSES_DESC' | translate }}</p>
-        </div>
-        <i class="pi pi-arrow-right nav-arrow"></i>
-      </div>
+    <app-widget-card
+      skeletonVariant="stat"
+      [state]="summary.state"
+      [errorText]="'HOME_DASH.ERROR' | translate"
+      (retry)="refresh()"
+    >
+      <app-stat-tile
+        [label]="'HOME_DASH.KPI.DATASETS' | translate"
+        [value]="summary.data?.datasets?.current ?? null"
+        format="number"
+        tone="purple"
+        icon="ci ci-dataset"
+        [delta]="deltaOf(summary.data?.datasets)"
+        deltaUnit=""
+        [caption]="'HOME_DASH.KPI.VS_PREV' | translate"
+      ></app-stat-tile>
+    </app-widget-card>
 
-      <div class="nav-card" *ngIf="isAdmin" (click)="navigateTo('/app/users')">
-        <div class="nav-icon">
-          <i class="pi pi-users"></i>
-        </div>
-        <div class="nav-info">
-          <h4>{{ 'HOME.USERS' | translate }}</h4>
-          <p>{{ 'HOME.USERS_DESC' | translate }}</p>
-        </div>
-        <i class="pi pi-arrow-right nav-arrow"></i>
-      </div>
+    <!-- Dashboards KPI — gated on the dashboard permission (fixed slot). -->
+    <app-widget-card
+      skeletonVariant="stat"
+      [state]="permission.canRead(P.DASHBOARD) ? summary.state : 'denied'"
+      [deniedText]="'HOME_DASH.PERMISSION_DENIED' | translate"
+      [errorText]="'HOME_DASH.ERROR' | translate"
+      (retry)="refresh()"
+    >
+      <app-stat-tile
+        [label]="'HOME_DASH.KPI.DASHBOARDS' | translate"
+        [value]="summary.data?.dashboards?.current ?? null"
+        format="number"
+        tone="amber"
+        icon="ci ci-dashboard"
+        [delta]="deltaOf(summary.data?.dashboards)"
+        deltaUnit=""
+        [caption]="'HOME_DASH.KPI.VS_PREV' | translate"
+      ></app-stat-tile>
+    </app-widget-card>
+  </div>
 
-      <div
-        class="nav-card"
-        *ngIf="isAdmin"
-        (click)="navigateTo('/app/datasources')"
-      >
-        <div class="nav-icon">
-          <i class="pi pi-database"></i>
-        </div>
-        <div class="nav-info">
-          <h4>{{ 'HOME.DATASOURCES' | translate }}</h4>
-          <p>{{ 'HOME.DATASOURCES_DESC' | translate }}</p>
-        </div>
-        <i class="pi pi-arrow-right nav-arrow"></i>
-      </div>
+  <!-- ============ charts row ============ -->
+  <div class="dash-grid cols-2">
+    <app-widget-card
+      [title]="'HOME_DASH.WIDGET.QUERY_ACTIVITY' | translate"
+      icon="ci ci-chart-simple"
+      skeletonVariant="chart"
+      [state]="queryTrend.state"
+      [link]="{ label: ('HOME_DASH.LINK.AUDIT' | translate) }"
+      [emptyText]="'HOME_DASH.EMPTY.NO_QUERIES' | translate"
+      [deniedText]="'HOME_DASH.PERMISSION_DENIED' | translate"
+      [errorText]="'HOME_DASH.ERROR' | translate"
+      (linkClick)="goAudit()"
+      (retry)="loadQueryTrend()"
+    >
+      <app-trend-chart
+        [categories]="queryTrendCategories"
+        [series]="queryTrendSeries"
+        [height]="260"
+      ></app-trend-chart>
+    </app-widget-card>
 
-      <div class="nav-card" *ngIf="isAdmin" (click)="navigateTo('/app/audit')">
-        <div class="nav-icon">
-          <i class="pi pi-list"></i>
-        </div>
-        <div class="nav-info">
-          <h4>{{ 'HOME.AUDIT_LOGS' | translate }}</h4>
-          <p>{{ 'HOME.AUDIT_LOGS_DESC' | translate }}</p>
-        </div>
-        <i class="pi pi-arrow-right nav-arrow"></i>
+    <app-widget-card
+      [title]="'HOME_DASH.WIDGET.EXEC_BY_MODULE' | translate"
+      icon="ci ci-visualization"
+      skeletonVariant="chart"
+      [state]="execByModule.state"
+      [emptyText]="'HOME_DASH.EMPTY.NO_QUERIES' | translate"
+      [deniedText]="'HOME_DASH.PERMISSION_DENIED' | translate"
+      [errorText]="'HOME_DASH.ERROR' | translate"
+      (retry)="loadExecByModule()"
+    >
+      <app-trend-chart
+        variant="donut"
+        [slices]="donutSlices"
+        [height]="260"
+      ></app-trend-chart>
+    </app-widget-card>
+  </div>
+
+  <!-- ============ activity + quick actions ============ -->
+  <div class="dash-grid cols-2">
+    <app-widget-card
+      [title]="'HOME_DASH.WIDGET.RECENT_ACTIVITY' | translate"
+      icon="ci ci-audit-logs"
+      skeletonVariant="list"
+      [skeletonRows]="6"
+      [state]="activity.state"
+      [link]="{ label: ('HOME_DASH.LINK.VIEW_ALL' | translate) }"
+      [emptyText]="'HOME_DASH.EMPTY.NO_ACTIVITY' | translate"
+      [deniedText]="'HOME_DASH.PERMISSION_DENIED' | translate"
+      [errorText]="'HOME_DASH.ERROR' | translate"
+      (linkClick)="goAudit()"
+      (retry)="loadActivity()"
+    >
+      <div class="feed">
+        <app-activity-item
+          *ngFor="let row of activity.data"
+          [entry]="toEntry(row)"
+          [verb]="verbKey(row.action) | translate"
+        ></app-activity-item>
       </div>
+    </app-widget-card>
+
+    <!-- Quick actions — always ready; each shortcut shows only if the
+         user can reach that screen (permission-aware). -->
+    <app-widget-card
+      [title]="'HOME_DASH.WIDGET.QUICK_ACTIONS' | translate"
+      icon="ci ci-bolt"
+      [state]="'ready'"
+    >
+      <div class="qa-grid">
+        <button
+          type="button"
+          class="qa"
+          *ngIf="permission.canRead(P.QUERY_RUNNER)"
+          (click)="goNewQuery()"
+        >
+          <span class="qa-ic"><i class="ci ci-bolt dash-ci"></i></span>
+          <span class="qa-txt">
+            <span class="qa-t">{{ 'HOME_DASH.QA.NEW_QUERY' | translate }}</span>
+            <span class="qa-d">{{ 'HOME_DASH.QA.NEW_QUERY_D' | translate }}</span>
+          </span>
+        </button>
+
+        <button
+          type="button"
+          class="qa"
+          *ngIf="permission.canRead(P.DATASET)"
+          (click)="goDatasets()"
+        >
+          <span class="qa-ic"><i class="ci ci-dataset dash-ci"></i></span>
+          <span class="qa-txt">
+            <span class="qa-t">{{ 'HOME_DASH.QA.DATASETS' | translate }}</span>
+            <span class="qa-d">{{ 'HOME_DASH.QA.DATASETS_D' | translate }}</span>
+          </span>
+        </button>
+
+        <button
+          type="button"
+          class="qa"
+          *ngIf="permission.canRead(P.ANALYSES)"
+          (click)="goAnalyses()"
+        >
+          <span class="qa-ic"><i class="ci ci-analyses dash-ci"></i></span>
+          <span class="qa-txt">
+            <span class="qa-t">{{ 'HOME_DASH.QA.ANALYSES' | translate }}</span>
+            <span class="qa-d">{{ 'HOME_DASH.QA.ANALYSES_D' | translate }}</span>
+          </span>
+        </button>
+
+        <button
+          type="button"
+          class="qa"
+          *ngIf="permission.canRead(P.DASHBOARD)"
+          (click)="goDashboards()"
+        >
+          <span class="qa-ic"><i class="ci ci-dashboard dash-ci"></i></span>
+          <span class="qa-txt">
+            <span class="qa-t">{{ 'HOME_DASH.QA.DASHBOARDS' | translate }}</span>
+            <span class="qa-d">{{ 'HOME_DASH.QA.DASHBOARDS_D' | translate }}</span>
+          </span>
+        </button>
+
+        <button
+          type="button"
+          class="qa"
+          *ngIf="permission.canWrite(P.USER_MANAGEMENT)"
+          (click)="goUsers()"
+        >
+          <span class="qa-ic"><i class="ci ci-user-group dash-ci"></i></span>
+          <span class="qa-txt">
+            <span class="qa-t">{{ 'HOME_DASH.QA.INVITE_USER' | translate }}</span>
+            <span class="qa-d">{{ 'HOME_DASH.QA.INVITE_USER_D' | translate }}</span>
+          </span>
+        </button>
+
+        <button
+          type="button"
+          class="qa"
+          *ngIf="permission.canRead(P.QB_SCREEN)"
+          (click)="navigateTo('/app/query-builders')"
+        >
+          <span class="qa-ic"><i class="ci ci-query-builder dash-ci"></i></span>
+          <span class="qa-txt">
+            <span class="qa-t">{{ 'HOME_DASH.QA.QUERY_BUILDER' | translate }}</span>
+            <span class="qa-d">{{ 'HOME_DASH.QA.QUERY_BUILDER_D' | translate }}</span>
+          </span>
+        </button>
+      </div>
+    </app-widget-card>
+  </div>
+
+  <!-- ============ logins over time (full width) ============ -->
+  <div class="dash-grid cols-1">
+    <app-widget-card
+      [title]="'HOME_DASH.WIDGET.LOGINS' | translate"
+      icon="ci ci-login-activity"
+      skeletonVariant="chart"
+      [state]="loginTrend.state"
+      [link]="{ label: ('HOME_DASH.LINK.LOGIN_ACTIVITY' | translate) }"
+      [emptyText]="'HOME_DASH.EMPTY.NO_LOGINS' | translate"
+      [deniedText]="'HOME_DASH.PERMISSION_DENIED' | translate"
+      [errorText]="'HOME_DASH.ERROR' | translate"
+      (linkClick)="navigateTo('/app/audit/logins')"
+      (retry)="loadLoginTrend()"
+    >
+      <app-trend-chart
+        [categories]="loginTrendCategories"
+        [series]="loginTrendSeries"
+        [stacked]="true"
+        [height]="240"
+      ></app-trend-chart>
+    </app-widget-card>
+  </div>
     </div>
   </div>
 </div>
