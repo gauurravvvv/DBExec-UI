@@ -335,15 +335,6 @@ export class LoginService implements OnDestroy {
       JSON.stringify(d.permissions ?? []),
     );
 
-    // Guided-tour preference — the phase-2 session carries the user's
-    // `showTour` flag (default true for new users). Stash it so
-    // TourService can decide auto-start on shell init without re-reading
-    // the whole payload. Absent → default to showing (true).
-    StorageService.set(
-      StorageType.SHOW_TOUR,
-      user.showTour === false ? 'false' : 'true',
-    );
-
     // Theme + branding + (re)locale, all through the single
     // chokepoint. `null` theme/branding (system-admin path)
     // clears any previously injected style.

@@ -370,9 +370,7 @@
     "LOADING_PROFILE": "Loading profile...",
     "ROLE_SYSTEM_ADMIN": "System Admin",
     "ROLE_ORG_ADMIN": "Organisation Admin",
-    "ROLE_ORG_USER": "User",
-    "PREFERENCES": "Preferences",
-    "SHOW_TOUR_TOGGLE": "Show product tour on login"
+    "ROLE_ORG_USER": "User"
   },
   "SYSTEM_ADMIN": {
     "TITLE": "System Admins",
@@ -5233,9 +5231,6 @@
       },
       "locale": {
         "invalid": "Locale must be one of the supported languages"
-      },
-      "showTour": {
-        "invalid": "Show tour must be a boolean value"
       }
     },
     "prompts": {
@@ -6608,164 +6603,6 @@
       "SELF_LOCKOUT": "Targets the management login itself — risks locking you out.",
       "CASCADE": "Cascades the revoke to dependent grants beyond this role."
     }
-  },
-  "TOUR": {
-    "NEXT": "Next",
-    "BACK": "Back",
-    "FINISH": "Finish",
-    "SKIP": "Skip",
-    "DONT_SHOW_AGAIN": "Don't show this again",
-    "PROGRESS": "Step {{current}} of {{total}}",
-    "WELCOME": {
-      "TITLE": "Welcome to DBExec 👋",
-      "DESC": "Let's take a quick look around so you know where everything lives. It only takes a moment — you can stop whenever you like, and tick \"Don't show this again\" if you'd rather skip it on future logins."
-    },
-    "DONE": {
-      "TITLE": "You're all set 🎉",
-      "DESC": "That's the whirlwind tour — you now know your way around the main areas of DBExec. Explore at your own pace, and if you ever want a refresher you can turn this tour back on from your profile."
-    },
-    "STEPS": {
-      "search": {
-        "TITLE": "Global search",
-        "DESC": "The fastest way to get anywhere. Search across your datasets, dashboards, connections and more from one place — and you can open it from any screen by pressing Ctrl/⌘ + K."
-      },
-      "notifications": {
-        "TITLE": "Notifications",
-        "DESC": "Your activity feed lives here: alerts that have fired, items shared with you, and system messages, all in real time. The badge tells you how many you haven't read yet."
-      },
-      "language": {
-        "TITLE": "Change language",
-        "DESC": "DBExec speaks ten languages. Pick the one you're most comfortable in and the entire interface updates instantly — your choice is saved, so it's remembered next time you sign in."
-      },
-      "logout": {
-        "TITLE": "Sign out",
-        "DESC": "When you're finished, sign out safely from here. Your session ends immediately and you're returned to the login screen — handy on shared or public computers."
-      },
-      "systemAdmin": {
-        "TITLE": "System Admin",
-        "DESC": "Platform-level administration for operators who run DBExec across many organisations. This is where cross-tenant, back-office controls live."
-      },
-      "orgManagement": {
-        "TITLE": "Organisations",
-        "DESC": "Create and manage the organisations (tenants) on the platform. Each one is an isolated workspace with its own users, data and settings."
-      },
-      "systemRoleManagement": {
-        "TITLE": "System Roles",
-        "DESC": "Define platform-level roles and choose the permissions each one grants. Roles keep access consistent instead of setting it per person."
-      },
-      "systemGroupManagement": {
-        "TITLE": "System Groups",
-        "DESC": "Bundle platform operators into groups and assign system roles to the whole group at once — a faster way to manage access at scale."
-      },
-      "systemUserManagement": {
-        "TITLE": "System Users",
-        "DESC": "Manage the operator accounts that run DBExec itself. These are platform staff, separate from the users inside any one organisation."
-      },
-      "home": {
-        "TITLE": "Home",
-        "DESC": "Your landing pad every time you sign in. It gives you a quick pulse on your data and activity, plus shortcuts to jump straight into the things you work with most."
-      },
-      "userManagement": {
-        "TITLE": "Users",
-        "DESC": "Invite people into your organisation and manage their accounts and access. This is your starting point for onboarding a new teammate."
-      },
-      "roleManagement": {
-        "TITLE": "Roles",
-        "DESC": "Define roles and pick exactly which screens and actions each one unlocks. Assign a role once and everyone with it inherits the same access."
-      },
-      "groupManagement": {
-        "TITLE": "Groups",
-        "DESC": "Bundle users into groups and grant roles to the whole group at once. It's the easiest way to keep access tidy as your team grows."
-      },
-      "setupDB": {
-        "TITLE": "Data Sources",
-        "DESC": "Connect the databases DBExec reads from — Postgres, MySQL, Snowflake and more. A data source only needs to be set up once, then everything else builds on it."
-      },
-      "dbRoles": {
-        "TITLE": "Database Roles",
-        "DESC": "Manage the login users and roles that live inside your connected databases. This controls access at the database level, beneath DBExec's own permissions."
-      },
-      "dbPrivileges": {
-        "TITLE": "Privileges & Access",
-        "DESC": "Grant and review table- and schema-level privileges on your databases. See at a glance who can read or change what, and adjust it safely."
-      },
-      "connectionManager": {
-        "TITLE": "Connections",
-        "DESC": "Manage the live connections used to run SQL against your data sources. Each connection is a ready-to-use link you can reuse across the app."
-      },
-      "queryRunner": {
-        "TITLE": "SQL Workspace",
-        "DESC": "Write and run SQL in a full workspace with autocomplete, saved queries and a live results grid. It's the home base for anyone working directly with SQL."
-      },
-      "queryBuilderTab": {
-        "TITLE": "Tabs",
-        "DESC": "Organise guided query-builder screens into tabs, so a complex builder stays easy to navigate. Tabs group related sections together."
-      },
-      "queryBuilderSection": {
-        "TITLE": "Sections",
-        "DESC": "Group related prompts into sections within a query-builder screen. Sections give a no-code query a clear, logical structure."
-      },
-      "queryBuilderPrompt": {
-        "TITLE": "Prompts",
-        "DESC": "Design the input prompts that drive parameterised, no-code queries. Prompts are what let non-technical users run powerful queries safely."
-      },
-      "queryBuilderScreen": {
-        "TITLE": "Query Builder",
-        "DESC": "Assemble tabs, sections and prompts into guided, no-code query screens. Build it once and your team can run tailored queries without touching SQL."
-      },
-      "datasetManager": {
-        "TITLE": "Datasets",
-        "DESC": "Shape reusable datasets — pick the columns you need and add calculated fields and formulas. Datasets are the foundation every chart and dashboard is built on."
-      },
-      "analyses": {
-        "TITLE": "Analyses",
-        "DESC": "Build charts and visual analyses on top of your datasets. Explore your data visually and save the views that tell the story you care about."
-      },
-      "dashboard": {
-        "TITLE": "Dashboards",
-        "DESC": "Combine visuals into shareable dashboards and publish point-in-time snapshots. It's how you bring the numbers that matter together for your team."
-      },
-      "rlsRules": {
-        "TITLE": "RLS Rules",
-        "DESC": "Set row- and column-level security so each person sees only the data they're allowed to. Define the rule once and it applies everywhere that data appears."
-      },
-      "alertManagement": {
-        "TITLE": "Alerts",
-        "DESC": "Schedule checks on your data that email or notify you the moment a condition is met. Let DBExec watch the numbers so you don't have to."
-      },
-      "auditLogs": {
-        "TITLE": "Audit Logs",
-        "DESC": "Review a full trail of who changed what, and when, across the platform. It's your source of truth when you need to answer \"what happened?\"."
-      },
-      "loginActivity": {
-        "TITLE": "Activity Logs",
-        "DESC": "Track sign-ins and authentication events across your organisation. A clear view of access history for security and compliance."
-      },
-      "appSettings": {
-        "TITLE": "App Settings",
-        "DESC": "Make DBExec feel like yours. Tune your organisation's look and feel here — theme colours, branding and the announcements your team sees when they log in."
-      },
-      "systemSettings": {
-        "TITLE": "System Settings",
-        "DESC": "The platform control panel. Configure security policies, single sign-on, email delivery and AI features that apply across your whole organisation."
-      },
-      "userAndAccess": {
-        "DESC": "Everything about who can get in and what they can do. Invite and manage people, organise them into groups, and define roles that control exactly which screens and actions each person can reach."
-      },
-      "databaseManagement": {
-        "DESC": "Connect and govern the databases DBExec works with. Add data sources like Postgres, MySQL or Snowflake, then manage the database users, roles and privileges that decide who can touch what."
-      },
-      "dbExecStudio": {
-        "DESC": "Where you actually query your data. Write and run SQL in the workspace with autocomplete and saved queries, or build parameterised, no-code queries visually for people who'd rather not write SQL."
-      },
-      "visualizations": {
-        "DESC": "Turn query results into insight. Shape reusable datasets, build charts and analyses on top of them, compose shareable dashboards, and layer on row-level security and alerts."
-      },
-      "auditActivity": {
-        "DESC": "Your record of what happened and who did it. Review a full audit trail of changes across the platform and track sign-ins and authentication events for security and compliance."
-      }
-    },
-    "MODULE_GENERIC_DESC": "Open {{name}} to explore everything grouped under this section."
   },
   "FORM_BUILDER": {
     "TITLE": "Form Builder",

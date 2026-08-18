@@ -369,9 +369,7 @@
     "LOADING_PROFILE": "Profil wird geladen...",
     "ROLE_SYSTEM_ADMIN": "Systemadministrator",
     "ROLE_ORG_ADMIN": "Organisationsadministrator",
-    "ROLE_ORG_USER": "Benutzer",
-    "PREFERENCES": "Einstellungen",
-    "SHOW_TOUR_TOGGLE": "Produkttour bei der Anmeldung anzeigen"
+    "ROLE_ORG_USER": "Benutzer"
   },
   "SYSTEM_ADMIN": {
     "TITLE": "Systemadministratoren",
@@ -5235,9 +5233,6 @@
       },
       "locale": {
         "invalid": "Locale muss eine der unterstützten Sprachen sein"
-      },
-      "showTour": {
-        "invalid": "Tour anzeigen muss ein boolescher Wert sein"
       }
     },
     "prompts": {
@@ -6610,164 +6605,6 @@
     "STARTER_USERS_COUNT": "Wie viele Benutzer haben wir?",
     "STARTER_USERS_CREATE": "Erstelle einen Benutzer in der Gruppe Administrator",
     "STARTER_USERS_INACTIVE": "Welche Benutzer sind inaktiv?"
-  },
-  "TOUR": {
-    "NEXT": "Weiter",
-    "BACK": "Zurück",
-    "FINISH": "Fertig",
-    "SKIP": "Überspringen",
-    "DONT_SHOW_AGAIN": "Nicht mehr anzeigen",
-    "PROGRESS": "Schritt {{current}} von {{total}}",
-    "WELCOME": {
-      "TITLE": "Willkommen zu DBExec 👋",
-      "DESC": "Schauen wir uns schnell um, damit du weißt, wo alles zu finden ist. Das dauert nur einen Moment — du kannst jederzeit stoppen und \"Nicht mehr anzeigen\" aktivieren, wenn du die Tour beim nächsten Login überspringen möchtest."
-    },
-    "DONE": {
-      "TITLE": "Du bist fertig 🎉",
-      "DESC": "Das war die Schnellübersicht — jetzt kennst du die wichtigsten Bereiche von DBExec. Erkunde die App in deinem eigenen Tempo, und wenn du später eine Auffrischung brauchst, kannst du die Tour jederzeit über dein Profil wieder aktivieren."
-    },
-    "STEPS": {
-      "search": {
-        "TITLE": "Globale Suche",
-        "DESC": "Der schnellste Weg, um überall hinzukommen. Durchsuche deine Datasets, Dashboards, Verbindungen und mehr an einem Ort — und du kannst die Suche von jedem Bildschirm aus mit Ctrl/⌘ + K öffnen."
-      },
-      "notifications": {
-        "TITLE": "Benachrichtigungen",
-        "DESC": "Dein Aktivitätsfeed findest du hier: ausgelöste Alerts, mit dir geteilte Elemente und Systemmeldungen, alle in Echtzeit. Das Abzeichen zeigt dir, wie viele Benachrichtigungen du noch nicht gelesen hast."
-      },
-      "language": {
-        "TITLE": "Sprache ändern",
-        "DESC": "DBExec spricht zehn Sprachen. Wähle deine Lieblingssprache und die gesamte Benutzeroberfläche wird sofort aktualisiert — deine Wahl wird gespeichert und beim nächsten Anmelden beibehalten."
-      },
-      "logout": {
-        "TITLE": "Abmelden",
-        "DESC": "Wenn du fertig bist, meldest du dich von hier aus sicher ab. Deine Sitzung endet sofort und du wirst zum Anmeldebildschirm zurückgeleitet — praktisch auf gemeinsam genutzten oder öffentlichen Computern."
-      },
-      "systemAdmin": {
-        "TITLE": "Systemadministration",
-        "DESC": "Verwaltung auf Plattformebene für Betreiber, die DBExec in vielen Organisationen betreiben. Hier befinden sich organisationsübergreifende Backoffice-Kontrollen."
-      },
-      "orgManagement": {
-        "TITLE": "Organisationen",
-        "DESC": "Erstelle und verwalte die Organisationen (Mandanten) auf der Plattform. Jede ist ein isolierter Arbeitsbereich mit eigenen Benutzern, Daten und Einstellungen."
-      },
-      "systemRoleManagement": {
-        "TITLE": "Systemrollen",
-        "DESC": "Definiere Rollen auf Plattformebene und wähle die Berechtigungen, die jede gewährt. Rollen halten den Zugriff konsistent, statt ihn für jede Person einzeln festzulegen."
-      },
-      "systemGroupManagement": {
-        "TITLE": "Systemgruppen",
-        "DESC": "Bündele Plattformbetreiber in Gruppen und weise der ganzen Gruppe auf einmal Systemrollen zu — eine schnellere Möglichkeit, den Zugriff in großem Maßstab zu verwalten."
-      },
-      "systemUserManagement": {
-        "TITLE": "Systembenutzer",
-        "DESC": "Verwalte die Benutzerkonten, die DBExec selbst betreiben. Das sind Plattformmitarbeiter, getrennt von den Benutzern innerhalb einer Organisation."
-      },
-      "home": {
-        "TITLE": "Startseite",
-        "DESC": "Deine Landingpage jedes Mal, wenn du dich anmeldest. Sie gibt dir einen schnellen Überblick über deine Daten und Aktivitäten und bietet Verknüpfungen zu den Dingen, mit denen du am meisten arbeitest."
-      },
-      "userManagement": {
-        "TITLE": "Benutzer",
-        "DESC": "Lade Personen in deine Organisation ein und verwalte ihre Konten und Zugriff. Das ist dein Startpunkt zum Onboarding eines neuen Teamkollegen."
-      },
-      "roleManagement": {
-        "TITLE": "Rollen",
-        "DESC": "Definiere Rollen und wähle exakt, welche Bildschirme und Aktionen jede freischaltet. Weise eine Rolle einmal zu und jeder mit dieser Rolle erbt denselben Zugriff."
-      },
-      "groupManagement": {
-        "TITLE": "Gruppen",
-        "DESC": "Bündele Benutzer in Gruppen und vergebe Rollen an die ganze Gruppe auf einmal. Das ist der einfachste Weg, um den Zugriff übersichtlich zu halten, wenn dein Team wächst."
-      },
-      "setupDB": {
-        "TITLE": "Datenquellen",
-        "DESC": "Verbinde die Datenbanken, die DBExec liest — Postgres, MySQL, Snowflake und mehr. Eine Datenquelle muss nur einmal eingerichtet werden, dann baut alles andere darauf auf."
-      },
-      "dbRoles": {
-        "TITLE": "Datenbankrollen",
-        "DESC": "Verwalte die Anmeldungsbenutzer und Rollen, die in deinen verbundenen Datenbanken vorhanden sind. Dies steuert den Zugriff auf Datenbankebene, unterhalb von DBExecs eigenen Berechtigungen."
-      },
-      "dbPrivileges": {
-        "TITLE": "Berechtigungen und Zugriff",
-        "DESC": "Gewähre und überprüfe Berechtigungen auf Tabellen- und Schemaebene in deinen Datenbanken. Sieh auf einen Blick, wer was lesen oder ändern kann, und passe es sicher an."
-      },
-      "connectionManager": {
-        "TITLE": "Verbindungen",
-        "DESC": "Verwalte die aktiven Verbindungen zum Ausführen von SQL gegen deine Datenquellen. Jede Verbindung ist ein einsatzbereiter Link, den du app-weit wiederverwenden kannst."
-      },
-      "queryRunner": {
-        "TITLE": "SQL-Workspace",
-        "DESC": "Schreibe und führe SQL in einem vollständigen Workspace mit Autovervollständigung, gespeicherten Abfragen und einem Live-Ergebnisraster aus. Es ist die Heimatbasis für jeden, der direkt mit SQL arbeitet."
-      },
-      "queryBuilderTab": {
-        "TITLE": "Registerkarten",
-        "DESC": "Organisiere geleitete Query-Builder-Bildschirme in Registerkarten, damit ein komplexer Builder einfach zu navigieren bleibt. Registerkarten gruppieren verwandte Abschnitte."
-      },
-      "queryBuilderSection": {
-        "TITLE": "Abschnitte",
-        "DESC": "Gruppiere verwandte Eingabefelder in Abschnitten innerhalb eines Query-Builder-Bildschirms. Abschnitte geben einer Abfrage ohne Code eine klare, logische Struktur."
-      },
-      "queryBuilderPrompt": {
-        "TITLE": "Eingabefelder",
-        "DESC": "Entwerfe die Eingabefelder, die parametrisierte, codefreie Abfragen antreiben. Eingabefelder ermöglichen es nicht-technischen Benutzern, sichere, leistungsstarke Abfragen auszuführen."
-      },
-      "queryBuilderScreen": {
-        "TITLE": "Query Builder",
-        "DESC": "Verbinde Registerkarten, Abschnitte und Eingabefelder zu geleiteten, codefreien Abfragebildschirmen. Baue es einmal auf und dein Team kann maßgeschneiderte Abfragen ausführen, ohne SQL zu berühren."
-      },
-      "datasetManager": {
-        "TITLE": "Datasets",
-        "DESC": "Forme wiederverwendbare Datasets — wähle die Spalten, die du brauchst, und füge berechnete Felder und Formeln hinzu. Datasets sind das Fundament, auf dem jedes Diagramm und Dashboard aufbaut."
-      },
-      "analyses": {
-        "TITLE": "Analysen",
-        "DESC": "Erstelle Diagramme und visuelle Analysen basierend auf deinen Datasets. Erkunde deine Daten visuell und speichere die Ansichten, die die Geschichte erzählen, die dir wichtig ist."
-      },
-      "dashboard": {
-        "TITLE": "Dashboards",
-        "DESC": "Kombiniere Visuals in teilbaren Dashboards und veröffentliche Snapshot-Versionen. So bringst du die Zahlen zusammen, die für dein Team wichtig sind."
-      },
-      "rlsRules": {
-        "TITLE": "RLS-Regeln",
-        "DESC": "Stelle Sicherheit auf Zeilen- und Spaltenebene ein, damit jeder nur die Daten sieht, die er darf. Definiere die Regel einmal und sie gilt überall, wo diese Daten erscheinen."
-      },
-      "alertManagement": {
-        "TITLE": "Alerts",
-        "DESC": "Planen Sie Überprüfungen deiner Daten, die dich per E-Mail benachrichtigen oder informieren, sobald eine Bedingung erfüllt ist. Lass DBExec die Zahlen beobachten, damit du es nicht musst."
-      },
-      "auditLogs": {
-        "TITLE": "Audit-Logs",
-        "DESC": "Überprüfe eine vollständige Nachverfolgung, wer was und wann geändert hat, auf der gesamten Plattform. Das ist deine Quelle der Wahrheit, wenn du \"Was ist passiert?\" beantworten musst."
-      },
-      "loginActivity": {
-        "TITLE": "Aktivitätsprotokolle",
-        "DESC": "Verfolge Anmeldungen und Authentifizierungsereignisse in deiner Organisation. Ein klarer Überblick über die Zugriffsverlaufsverlauf für Sicherheit und Compliance."
-      },
-      "appSettings": {
-        "TITLE": "App-Einstellungen",
-        "DESC": "Mache DBExec zu deiner eigenen App. Passe das Aussehen und Verhalten deiner Organisation hier an — Designfarben, Branding und die Ankündigungen, die dein Team beim Anmelden sieht."
-      },
-      "systemSettings": {
-        "TITLE": "Systemeinstellungen",
-        "DESC": "Das Kontrollzentrum der Plattform. Konfiguriere Sicherheitsrichtlinien, Single Sign-on, E-Mail-Versand und KI-Funktionen, die für deine gesamte Organisation gelten."
-      },
-      "userAndAccess": {
-        "DESC": "Alles darüber, wer Zugang hat und was er tun kann. Lade Personen ein und verwalte sie, organisiere sie in Gruppen und definiere Rollen, die exakt steuern, welche Bildschirme und Aktionen jede Person erreichen kann."
-      },
-      "databaseManagement": {
-        "DESC": "Verbinde und verwalte die Datenbanken, mit denen DBExec arbeitet. Füge Datenquellen wie Postgres, MySQL oder Snowflake hinzu und verwalte dann die Datenbankbenutzer, Rollen und Berechtigungen, die entscheiden, wer was anfassen darf."
-      },
-      "dbExecStudio": {
-        "DESC": "Hier fragst du deine Daten ab. Schreibe und führe SQL im Workspace mit Autovervollständigung und gespeicherten Abfragen aus, oder baue parametrisierte, codefreie Abfragen visuell für Personen, die lieber kein SQL schreiben möchten."
-      },
-      "visualizations": {
-        "DESC": "Wandle Abfrageergebnisse in Erkenntnisse um. Forme wiederverwendbare Datasets, baue Diagramme und Analysen darauf auf, stelle teilbare Dashboards zusammen und füge Sicherheit auf Zeilenebene und Alerts hinzu."
-      },
-      "auditActivity": {
-        "DESC": "Dein Datensatz, was passiert ist und wer es getan hat. Überprüfe eine vollständige Audit-Nachverfolgung von Änderungen auf der gesamten Plattform und verfolge Anmeldungen und Authentifizierungsereignisse für Sicherheit und Compliance."
-      }
-    },
-    "MODULE_GENERIC_DESC": "Öffne {{name}}, um alles zu erkunden, das in diesem Bereich organisiert ist."
   },
   "FORM_BUILDER": {
     "TITLE": "Form Builder",

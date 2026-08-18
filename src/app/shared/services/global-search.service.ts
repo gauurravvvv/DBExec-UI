@@ -10,11 +10,6 @@ export class GlobalSearchService {
   private openSearchSubject = new Subject<void>();
   openSearch$ = this.openSearchSubject.asObservable();
 
-  // Programmatic close channel — the guided tour closes the search modal
-  // when its search step ends (the modal otherwise closes itself).
-  private closeSearchSubject = new Subject<void>();
-  closeSearch$ = this.closeSearchSubject.asObservable();
-
   private readonly _results = signal<any[]>([]);
   private readonly _loading = signal(false);
 
@@ -25,10 +20,6 @@ export class GlobalSearchService {
 
   openSearch() {
     this.openSearchSubject.next();
-  }
-
-  closeSearch() {
-    this.closeSearchSubject.next();
   }
 
   async globalSearch(param: any) {

@@ -1,5 +1,13 @@
 # dbexec-ui — Session Log (newest first)
 
+### 2026-08-18 — Guided application tour REMOVED entirely
+- Removed the whole guided tour feature (driver.js) — the UX wasn't working out. Deleted `core/services/tour.service.ts`, `core/constants/tour.constant.ts`, `assets/sass/_driver-tour.scss`, the design spec, and the app-tour context doc. Uninstalled the `driver.js` dependency + its two `styles.scss` imports.
+- Unwired every touchpoint: sidebar (TourSidebarApi impl, register/unregister, all forceExpand/flyout/account-menu tour methods, 10 `data-tour` attrs, the tour-guard in handleClickOutside), home shell (maybeAutoStart/stop → reverted to the original bare component), login.service (SHOW_TOUR stash), storage-type (SHOW_TOUR), api.constant (UPDATE_TOUR), profile (show-tour toggle + service method), and the tour-only close() channels added to GlobalSearchService/NotificationModalService (+ their component subscriptions).
+- i18n: stripped the `TOUR.*` block, `PROFILE.SHOW_TOUR_TOGGLE`/`PREFERENCES`, and `validation.profile.showTour.*` from all 10 locales. Removed `showTourSchema`/`updateShowTourSchema` from the mirrored profile validator (FE↔BE still byte-identical).
+- BE companion (dbexec-api): dropped the `showTour` column from both user entities, getProfile field, `updateShowTour` controller/validation/route, `PROFILE.TOUR_UPDATED` + `profile.tour_updated`/`validation.profile.showTour` in 10 BE locales.
+- Verified: zero residual tour/driver refs in either repo. FE tsc 0 → ngc 0 → prod build 0. BE tsc 0.
+
+
 ### 2026-08-18 — Profile popup → opens right; System-Admin catalog restructure
 - **Profile (avatar) menu** now opens to the RIGHT of the avatar (same idiom as
   the nav / language / theme flyouts), not stacked above it. `.profile-menu`:

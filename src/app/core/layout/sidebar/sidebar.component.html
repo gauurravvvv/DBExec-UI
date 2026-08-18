@@ -21,7 +21,7 @@
       <span class="brand-text">DB<span class="brand-highlight">Exec</span></span>
     </a>
     <div class="sidebar-top-actions" *ngIf="isExpanded">
-      <button *ngIf="showNotificationBell" class="icon-btn notification-btn" type="button" data-tour="notifications"
+      <button *ngIf="showNotificationBell" class="icon-btn notification-btn" type="button"
         (click)="openNotificationModal()" pTooltip="View notifications" tooltipPosition="bottom"
         aria-label="View notifications">
         <i class="pi pi-bell"></i>
@@ -29,7 +29,7 @@
           {{ notificationService.badgeLabel() }}
         </span>
       </button>
-      <button *ngIf="!isSystemAdmin" class="icon-btn search-btn" type="button" data-tour="search"
+      <button *ngIf="!isSystemAdmin" class="icon-btn search-btn" type="button"
         (click)="openSearchModal()" [pTooltip]="'HEADER.SEARCH' | translate" tooltipPosition="bottom"
         [attr.aria-label]="'HEADER.SEARCH' | translate">
         <i class="pi pi-search"></i>
@@ -59,7 +59,7 @@
               <!-- Inert group header: a section label when expanded; in the
                    collapsed rail it becomes the hover/click target that opens
                    the children flyout. -->
-              <div class="section-label nav-group-header" [attr.data-tour]="'nav-' + item.value"
+              <div class="section-label nav-group-header"
                 (click)="onGroupHeaderClick(item, $event)" [class.is-open]="activeFlyoutValue === item.value"
                 [pTooltip]="(isExpanded || activeFlyoutValue === item.value) ? undefined : ('SIDEBAR.' + item.value | translate)"
                 tooltipPosition="right">
@@ -72,7 +72,7 @@
                 <li *ngFor="let subItem of item.subPermissions; trackBy: trackByIndex" class="submenu-item">
                   <a [routerLink]="subItem.route" routerLinkActive="active"
                     [routerLinkActiveOptions]="{ exact: subItem.exact ?? false }" #rlaSub="routerLinkActive"
-                    [attr.aria-current]="rlaSub.isActive ? 'page' : null" [attr.data-tour]="'nav-' + subItem.value"
+                    [attr.aria-current]="rlaSub.isActive ? 'page' : null"
                     class="nav-link">
                     <div class="link-content">
                       <i [class]="subItem.icon"></i>
@@ -103,7 +103,7 @@
           <ng-template #leafRow>
             <a [routerLink]="item.route" routerLinkActive="active"
               [routerLinkActiveOptions]="{ exact: item.exact ?? false }" #rla="routerLinkActive"
-              [attr.aria-current]="rla.isActive ? 'page' : null" [attr.data-tour]="'nav-' + item.value"
+              [attr.aria-current]="rla.isActive ? 'page' : null"
               class="nav-link"
               [pTooltip]="isExpanded ? undefined : ('SIDEBAR.' + item.value | translate)" tooltipPosition="right">
               <div class="link-content">
@@ -119,7 +119,7 @@
 
   <!-- ── BOTTOM: avatar only (bell moved to .sidebar-top) ─────────── -->
   <div class="sidebar-bottom">
-    <div class="user-profile" data-tour="account" (click)="toggleProfileMenu($event)"
+    <div class="user-profile" (click)="toggleProfileMenu($event)"
       [pTooltip]="isExpanded ? undefined : userName" tooltipPosition="right" role="button" [attr.aria-label]="userName">
       <div class="avatar">{{ userInitials }}</div>
       <div class="user-meta" *ngIf="isExpanded">
@@ -151,7 +151,7 @@
     <!-- Language row — Claude-style: clicking opens a side flyout
          showing the locale list. Hover keeps the flyout open so the
          user can move across the gap.  -->
-    <li class="menu-item has-flyout" data-tour="language" [class.is-open]="showLanguageFlyout"
+    <li class="menu-item has-flyout" [class.is-open]="showLanguageFlyout"
       (mouseenter)="showLanguageFlyout = true" (mouseleave)="showLanguageFlyout = false">
       <a (click)="toggleLanguageFlyout($event)">
         <i class="pi pi-globe"></i>
@@ -162,7 +162,7 @@
     <!-- Theme row — same flyout idiom as Language: clicking opens a side
          flyout listing the org's active theme presets; hover keeps it
          open. Shown only when the org has themes (System Admins get none). -->
-    <li *ngIf="themes.length" class="menu-item has-flyout" data-tour="theme" [class.is-open]="showThemeFlyout"
+    <li *ngIf="themes.length" class="menu-item has-flyout" [class.is-open]="showThemeFlyout"
       (mouseenter)="showThemeFlyout = true" (mouseleave)="showThemeFlyout = false">
       <a (click)="toggleThemeFlyout($event)">
         <i class="pi pi-palette"></i>
@@ -171,7 +171,7 @@
       </a>
     </li>
     <div class="menu-divider"></div>
-    <li class="menu-item logout" data-tour="logout">
+    <li class="menu-item logout">
       <a (click)="logout()">
         <i class="pi pi-sign-out"></i>
         <span>{{ 'HEADER.SIGN_OUT' | translate }}</span>

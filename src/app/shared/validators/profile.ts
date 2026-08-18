@@ -82,11 +82,6 @@ export const localeSchema = z.preprocess(
     ),
 );
 
-/** Tour preference — required boolean. */
-export const showTourSchema = z.boolean({
-  message: 'validation.profile.showTour.invalid',
-});
-
 /**
  * Theme preset id — the id of a ThemePreset the user is selecting from
  * the org's theme library (sidebar theme picker). Must be a UUID; the
@@ -114,13 +109,6 @@ export const updateLocaleSchema = z.object({
 });
 
 export type UpdateLocaleInput = z.infer<typeof updateLocaleSchema>;
-
-/** PATCH /api/v1/profile/show-tour body. */
-export const updateShowTourSchema = z.object({
-  showTour: showTourSchema,
-});
-
-export type UpdateShowTourInput = z.infer<typeof updateShowTourSchema>;
 
 /** PUT /api/v1/profile/theme body. */
 export const updateThemeSchema = z.object({

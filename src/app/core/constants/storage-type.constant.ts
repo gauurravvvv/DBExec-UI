@@ -29,11 +29,6 @@ export enum StorageType {
   // response. Lets the launcher gate at session build without a separate
   // /ai/health round-trip. 'true' | 'false'.
   AI_CONFIGURED = 'ai-configured',
-  // Whether the guided application tour should auto-show. Mirrors the
-  // user's `showTour` flag from the phase-2 session; stashed here on
-  // bootstrap so TourService can decide auto-start without re-reading the
-  // whole session payload. 'true' | 'false'. Cleared on logout.
-  SHOW_TOUR = 'show-tour',
 }
 
 export enum SessionStorageType {

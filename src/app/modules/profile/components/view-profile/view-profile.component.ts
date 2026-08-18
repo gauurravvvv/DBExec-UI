@@ -3,7 +3,6 @@ import {
   Component,
   computed,
   DestroyRef,
-  effect,
   inject,
   OnDestroy,
   OnInit,
@@ -13,7 +12,6 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { TranslateService } from '@ngx-translate/core';
-import { StorageType } from 'src/app/core/constants/storage-type.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { LoginService } from 'src/app/core/services/login.service';
 import { StorageService } from 'src/app/core/services/storage.service';
@@ -37,10 +35,6 @@ export class ViewProfileComponent implements OnInit, OnDestroy {
   );
   showChangePasswordDialog = signal(false);
 
-  /** Local mirror of the persisted showTour flag, driving the toggle.
-   *  Kept in sync with the loaded profile via the effect below. */
-  readonly showTour = signal(true);
-
   constructor(
     private profileService: ProfileService,
     private globalService: GlobalService,
@@ -48,17 +42,7 @@ export class ViewProfileComponent implements OnInit, OnDestroy {
     private router: Router,
     private store: Store,
     private translate: TranslateService,
-  ) {
-    // Sync the toggle once the profile GET resolves. Default true so a
-    // payload without the field (older BE) reads as opted-in.
-    effect(
-      () => {
-        const p = this.profile();
-        if (p) this.showTour.set(p.showTour !== false);
-      },
-      { allowSignalWrites: true },
-    );
-  }
+  ) {}
 
   ngOnInit(): void {
     this.profileService.loadProfile();
@@ -114,39 +98,6 @@ export class ViewProfileComponent implements OnInit, OnDestroy {
 
   openChangePasswordDialog() {
     this.showChangePasswordDialog.set(true);
-  }
-
-  /**
-   * Toggle "show the guided tour on login". Optimistically flips the local
-   * signal, mirrors the stashed flag (so a same-session re-enable is
-   * honoured by the next shell mount), and persists to the profile. On a
-   * failed PUT we roll the toggle back and surface the error.
-   */
-  onShowTourChange(checked: boolean): void {
-    const previous = this.showTour();
-    this.showTour.set(checked);
-    StorageService.set(
-      StorageType.SHOW_TOUR,
-      checked ? 'true' : 'false',
-    );
-    this.profileService
-      .updateShowTour(checked)
-      .then((response: any) => {
-        if (!this.globalService.handleSuccessService(response)) {
-          this.showTour.set(previous);
-          StorageService.set(
-            StorageType.SHOW_TOUR,
-            previous ? 'true' : 'false',
-          );
-        }
-      })
-      .catch(() => {
-        this.showTour.set(previous);
-        StorageService.set(
-          StorageType.SHOW_TOUR,
-          previous ? 'true' : 'false',
-        );
-      });
   }
 
   onPasswordDialogClose(newPassword: string | null) {

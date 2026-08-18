@@ -26,10 +26,6 @@ import { StorageService } from 'src/app/core/services/storage.service';
 import { ThemePickerService } from 'src/app/core/services/theme-picker.service';
 import { ThemeService } from 'src/app/core/services/theme.service';
 import { ThemePreset } from 'src/app/modules/app-settings/services/theme-settings.service';
-import {
-  TourService,
-  TourSidebarApi,
-} from 'src/app/core/services/tour.service';
 import { AddAnalysesActions } from 'src/app/modules/analyses/store';
 import { GlobalSearchService } from 'src/app/shared/services/global-search.service';
 import { NotificationModalService } from 'src/app/shared/services/notification-modal.service';
@@ -98,7 +94,7 @@ interface PermissionNode {
   styleUrls: ['./sidebar.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class SidebarComponent implements OnInit, TourSidebarApi {
+export class SidebarComponent implements OnInit {
   // ── Nav-tree state ──────────────────────────────────────────────
   // Hover-to-peek removed per UX call — sidebar now only opens on
   // explicit click of the chevron handle. `isExpanded` is just the
@@ -148,10 +144,6 @@ export class SidebarComponent implements OnInit, TourSidebarApi {
   currentThemeId: string | null = null;
   changingTheme = false;
 
-  /** Snapshot of the pinned-open state before the tour forced it open, so
-   *  we can restore exactly what the user had after the tour ends. */
-  private prePinnedOpen: boolean | null = null;
-
   private destroyRef = inject(DestroyRef);
   private cdr = inject(ChangeDetectorRef);
 
@@ -168,7 +160,6 @@ export class SidebarComponent implements OnInit, TourSidebarApi {
     private permissionService: PermissionService,
     private globalSearchService: GlobalSearchService,
     private notificationModalService: NotificationModalService,
-    private tourService: TourService,
   ) {
     const tree = this.readPermissionTree();
     this.menuItems = this.processMenuItems(tree);
@@ -225,13 +216,8 @@ export class SidebarComponent implements OnInit, TourSidebarApi {
     const resizeHandler = () => this.checkScreenSize();
     window.addEventListener('resize', resizeHandler);
 
-    // Register with the guided tour so it can pin the sidebar open and
-    // drive the account menu / language flyout during its chrome steps.
-    this.tourService.registerSidebar(this);
-
     this.destroyRef.onDestroy(() => {
       window.removeEventListener('resize', resizeHandler);
-      this.tourService.unregisterSidebar(this);
     });
   }
 
@@ -411,64 +397,6 @@ export class SidebarComponent implements OnInit, TourSidebarApi {
   }
 
   // ─────────────────────────────────────────────────────────────────
-  // Guided-tour API (TourSidebarApi) — driven by TourService only.
-  // ─────────────────────────────────────────────────────────────────
-
-  /** Pin the sidebar open so every top-level nav row (group header or leaf) is
-   *  visible + anchorable. The nav is flat/always-open, so pinning open renders
-   *  the group headers the tour anchors on (it targets those parents only, not
-   *  the individual children). Remembers prior pinned state. */
-  forceExpandForTour(): void {
-    if (this.prePinnedOpen === null) this.prePinnedOpen = this.isPinnedOpen;
-    this.isPinnedOpen = true;
-    this.recomputeExpanded();
-    this.cdr.markForCheck();
-  }
-
-  /** Restore whatever pinned state the user had before the tour, and close
-   *  any tour-opened popovers. */
-  restoreAfterTour(): void {
-    if (this.prePinnedOpen !== null) {
-      this.isPinnedOpen = this.prePinnedOpen;
-      this.prePinnedOpen = null;
-    }
-    this.showProfileMenu = false;
-    this.showLanguageFlyout = false;
-    this.recomputeExpanded();
-    this.cdr.markForCheck();
-  }
-
-  /** Top-level sidebar rows to tour — one per parent (group or top-level
-   *  leaf), in display order. Already permission-filtered by processMenuItems. */
-  getTourModuleTargets(): { value: string }[] {
-    return this.menuItems.filter(i => !!i.value).map(i => ({ value: i.value }));
-  }
-
-  /** Open the account (avatar) menu for the logout / language tour steps. */
-  openAccountMenuForTour(): void {
-    this.showProfileMenu = true;
-    this.showLanguageFlyout = false;
-    this.showThemeFlyout = false;
-    this.cdr.markForCheck();
-  }
-
-  /** Open the account menu AND the language flyout for the language step. */
-  openLanguageFlyoutForTour(): void {
-    this.showProfileMenu = true;
-    this.showLanguageFlyout = true;
-    this.showThemeFlyout = false;
-    this.cdr.markForCheck();
-  }
-
-  /** Close the account menu + flyouts (tour leaving those steps). */
-  closeTourPopovers(): void {
-    this.showProfileMenu = false;
-    this.showLanguageFlyout = false;
-    this.showThemeFlyout = false;
-    this.cdr.markForCheck();
-  }
-
-  // ─────────────────────────────────────────────────────────────────
   // Header chrome (moved from HeaderComponent)
   // ─────────────────────────────────────────────────────────────────
 
@@ -607,11 +535,6 @@ export class SidebarComponent implements OnInit, TourSidebarApi {
    */
   @HostListener('document:click', ['$event'])
   handleClickOutside(event: Event): void {
-    // While the guided tour is running it owns the account menu / language
-    // flyout (opening them for the logout/language steps). A click on the
-    // driver.js overlay or popover would otherwise fall through here and
-    // slam them shut mid-step, so ignore outside-clicks during the tour.
-    if (this.tourService.running()) return;
     const target = event.target as HTMLElement;
     if (
       !target.closest('.user-profile') &&

@@ -72,13 +72,6 @@ export class GlobalSearchComponent implements OnInit {
         this.openSearchModal();
         this.cdr.markForCheck();
       });
-    // Programmatic close (guided tour ending its search step).
-    this.globalSearchService.closeSearch$
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(() => {
-        this.closeSearchModal();
-        this.cdr.markForCheck();
-      });
   }
 
   /**
