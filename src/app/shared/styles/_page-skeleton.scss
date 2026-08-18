@@ -1,0 +1,287 @@
+// =============================================================================
+// Page skeleton — the ONE shared shell every screen renders inside.
+// =============================================================================
+//
+// Purpose: every list / add / edit / view / config screen in the app sits in
+// the SAME parent card and carries the SAME header + back-button chrome, so the
+// app reads as one product rather than 28 modules each with their own card
+// treatment. This partial is the single source of truth for that shell.
+//
+// The canonical reference is the `/app/db-roles` list (list-db-roles), styled
+// through the db-access mixins these definitions generalise. Everything here is
+// driven by theme tokens — NO hard-coded colours, radii, shadows, or spacing —
+// so an org's theme (light / dark / custom brand) repaints the whole shell.
+//
+// Usage — a component `@use`s this partial and `@include`s the relevant mixin:
+//
+//   @use '../../../shared/styles/page-skeleton' as skeleton;   // path varies
+//   :host { @include skeleton.page-list; }     // list screens
+//   :host { @include skeleton.page-form; }     // add / edit / config screens
+//   :host { @include skeleton.page-view; }     // read-only view screens
+//
+// The mixins only own the SHELL (wrapper → card → header → back button). A
+// component adds its own specifics (table cells, form fields, detail sections)
+// after the include. Keep the HTML class contract below and the shell is free.
+//
+// HTML contract
+// -------------
+//  LIST : .dataset-page-wrapper > .dataset-content-container(CARD)
+//           > .page-header-section (> .header-content h2 + .header-actions)
+//           > .content-card (transparent inner block: toolbar + table)
+//  FORM : .add-admin-wrapper(CARD) > .add-admin-container
+//           > .page-header (> .left-section(.back-button + h2) + .action-buttons)
+//           > .admin-form
+//  VIEW : .view-wrapper(CARD) > .view-container
+//           > .page-header (> .left-section(.back-button + h2) + .action-buttons)
+//           > detail sections
+// =============================================================================
+
+// ── The canonical card surface ──────────────────────────────────────────────
+// One definition of "a screen's parent card". Same treatment the db-roles
+// reference uses: white surface, medium radius, small shadow. No border — the
+// shadow carries the elevation. Applied by every page-* mixin below.
+@mixin page-card-surface {
+  background: var(--card-background);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+}
+
+// ── The canonical back button ───────────────────────────────────────────────
+// A 36px circular, transparent icon button that tints on hover — the pattern
+// the majority of the app already uses. Include inside a header's left group.
+// The markup is either `<button class="back-button">` or an app-button / p-button
+// projected there; the `::ng-deep` fallbacks cover those wrappers so the arrow
+// is always the same circle regardless of which button element a screen used.
+@mixin back-button {
+  .back-button {
+    flex-shrink: 0;
+    width: 36px;
+    height: 36px;
+    min-width: 0;
+    padding: var(--space-0) !important;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: none !important;
+    border-radius: 50% !important;
+    background: transparent !important;
+    color: var(--text-color) !important;
+    cursor: pointer;
+    transition: background-color var(--motion-base) ease;
+
+    &:hover {
+      background: var(--hover-background) !important;
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--primary-color);
+      outline-offset: 2px;
+    }
+
+    i {
+      font-size: var(--fs-h2);
+      line-height: 1;
+    }
+  }
+
+  // When the back affordance is an app-button / PrimeNG text button rather than
+  // a bare .back-button, force the same circular hit area so it looks identical.
+  ::ng-deep .back-button.app-btn,
+  ::ng-deep .back-button .p-button,
+  ::ng-deep button.back-button.p-button-text {
+    width: 36px;
+    height: 36px;
+    padding: var(--space-0);
+    border-radius: 50%;
+  }
+}
+
+// ── The canonical page header row ────────────────────────────────────────────
+// Title on the left (optionally preceded by a back button), actions on the
+// right, on one baseline. Shared by form + view headers. `$border` draws the
+// bottom divider that read-only view headers use to separate header from body.
+@mixin page-header($border: false) {
+  .page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--space-6);
+    flex-shrink: 0;
+
+    @if $border {
+      padding-bottom: var(--space-6);
+      margin-bottom: var(--space-6);
+      border-bottom: 1px solid var(--border-color);
+    } @else {
+      margin-bottom: var(--space-8);
+    }
+
+    .left-section {
+      display: flex;
+      align-items: center;
+      gap: var(--space-5);
+      min-width: 0;
+
+      h2 {
+        margin: var(--space-0);
+        font-size: var(--fs-h1);
+        font-weight: var(--fw-semibold);
+        color: var(--text-color);
+        letter-spacing: -0.025em;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+    }
+
+    .action-buttons,
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: var(--space-4);
+      flex-shrink: 0;
+    }
+
+    @include back-button;
+  }
+}
+
+// ── LIST screen shell ────────────────────────────────────────────────────────
+// The wrapper is a flush flex column (the app layout supplies the page inset);
+// the CARD lives on .dataset-content-container; the header sits inside the card;
+// the .content-card that holds the toolbar + table is transparent so it reads as
+// one card, not a card-in-a-card.
+@mixin page-list {
+  display: block;
+  height: 100%;
+  min-width: 0;
+  max-width: 100%;
+
+  .dataset-page-wrapper {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
+    padding: var(--space-0);
+    min-width: 0;
+    min-height: 0;
+
+    .dataset-content-container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+      min-height: 0;
+      gap: var(--space-8);
+      padding: var(--space-8);
+
+      @include page-card-surface;
+    }
+  }
+
+  .page-header-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--space-6);
+
+    .header-content h2 {
+      margin: 0;
+      font-size: var(--fs-h1);
+      font-weight: var(--fw-semibold);
+      color: var(--text-color);
+      letter-spacing: -0.025em;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: var(--space-4);
+      flex-shrink: 0;
+    }
+  }
+
+  // Transparent inner block — the card surface is on the container above, so
+  // this stays flat to avoid a card-in-a-card around the toolbar + table.
+  .content-card {
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-width: 0;
+    min-height: 0;
+    overflow: hidden;
+  }
+}
+
+// ── FORM screen shell (add / edit / config) ──────────────────────────────────
+// The wrapper IS the card (fills the height); the inner container pads the form;
+// the header carries the back button + title + Cancel/Save actions.
+@mixin page-form {
+  display: block;
+  height: 100%;
+
+  .add-admin-wrapper {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+
+    @include page-card-surface;
+
+    .add-admin-container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      min-height: 0;
+      padding: var(--space-8);
+    }
+  }
+
+  @include page-header($border: false);
+
+  // The scrolling form body — the shared column layout (50% width, one field
+  // per row) is left to the component; only the scroll container is shared.
+  .admin-form {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+  }
+}
+
+// ── VIEW screen shell (read-only detail) ─────────────────────────────────────
+// The wrapper IS the card; the container is the scrolling body; the header
+// carries the back button + title + actions and is separated by a bottom rule.
+@mixin page-view {
+  display: block;
+  height: 100%;
+
+  .view-wrapper {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+
+    @include page-card-surface;
+  }
+
+  .view-container {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    padding: var(--space-8);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+  }
+
+  @include page-header($border: true);
+}

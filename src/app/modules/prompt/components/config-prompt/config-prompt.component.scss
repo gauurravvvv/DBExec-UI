@@ -1,8 +1,20 @@
+:host {
+  display: block;
+  height: 100%;
+}
+
 .cp {
   display: flex;
   flex-direction: column;
   gap: var(--space-6);
-  padding: var(--space-8) var(--space-9);
+  padding: var(--space-8);
+  min-height: 100%;
+
+  // Parent card surface — matches the /app/db-roles reference exactly.
+  // Theme-driven; see src/app/shared/styles/_page-skeleton.scss.
+  background: var(--card-background);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
 }
 
 // Page header — mirrors add-form / other screens: back arrow + title on the
@@ -17,7 +29,7 @@
   .left-section {
     display: flex;
     align-items: center;
-    gap: var(--space-3);
+    gap: var(--space-5);
 
     h2 {
       font-size: var(--fs-h1);

@@ -2,6 +2,7 @@
 .view-admin-wrapper {
   background-color: var(--card-background);
   border-radius: var(--radius-md);
+    overflow: hidden;
   box-shadow: var(--shadow-sm);
   height: 100%;
   display: flex;
@@ -19,7 +20,7 @@
       justify-content: space-between;
       align-items: center;
       background: var(--card-background);
-      border-radius: 8px 8px 0 0;
+      border-radius: var(--radius-md) var(--radius-md) 0 0;
       position: sticky;
       top: 0;
       z-index: var(--z-elevated);

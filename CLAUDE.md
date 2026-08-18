@@ -243,6 +243,46 @@ ko, nl, pt-BR, zh-CN`). No raw strings in templates. When adding a key,
   fill all 10 locales (reuse an existing key if the wording already exists —
   e.g. `QUERY_RUNNER.NEW_CONNECTION`).
 
+### Page skeleton — one parent card, one back button (app-wide)
+
+Every screen (list / add / edit / view / config) renders inside the SAME
+shell so the app reads as one product. The **reference is `/app/db-roles`**
+(list-db-roles). Do not invent a new wrapper/card treatment per module.
+
+- **Parent card surface (the ONLY correct card):** `background:
+  var(--card-background)` · `border-radius: var(--radius-md)` · `box-shadow:
+  var(--shadow-sm)` · `padding: var(--space-8)` · **no border**. Theme-driven
+  only — never hard-code a colour, radius, shadow, or `1.5rem 2rem`-style
+  padding literal (that literal is `var(--space-8) var(--space-9)`; the card
+  is symmetric `var(--space-8)`).
+- **Where the card lives per screen type:**
+  - LIST → on `.dataset-content-container` (inside `.dataset-page-wrapper`,
+    which stays flush `padding: var(--space-0)`). `.content-card` (toolbar +
+    table) stays **transparent** — no card-in-a-card.
+  - FORM (add/edit/config) → on `.add-admin-wrapper`; `.add-admin-container`
+    pads the form at `var(--space-8)`.
+  - VIEW → on `.view-wrapper` / the module's view container; the header gets a
+    bottom `1px solid var(--border-color)` rule.
+- **`:host` stays clean** — no `background` / `border-radius` / `overflow` on
+  `:host`; the card owns the surface (a host bg double-paints and clips the
+  shadow).
+- **Back button:** the 36px circular, transparent, hover-tinted arrow is a
+  **single global rule** in `src/styles.scss` (`.back-button`). Put
+  `class="back-button"` on the page header's back `<button>` (native,
+  `pButton`, or `app-button`) and it is styled — never re-implement it
+  per-component. Icon is `var(--fs-h2)`.
+- **Shared source of truth:** `src/app/shared/styles/_page-skeleton.scss`
+  exposes `page-list` / `page-form` / `page-view` mixins (+ `back-button`,
+  `page-card-surface` helpers). NEW screens `@use` it and `@include` the right
+  mixin instead of hand-rolling the shell. The db-access module keeps its own
+  equivalent `db-access-page/-form/-view` mixins (the proven originals these
+  generalise) — both produce the identical canonical card.
+- **Intentional exceptions:** the full-bleed IDE editors
+  (`query-editor-wrapper` — dataset/analyses add/edit) are deliberately
+  edge-to-edge (`--radius-lg`, own toolbar) and are NOT forced into the card
+  shell. Tabbed hubs (App/System Settings) own ONE card and flatten each tab
+  child's container via `::ng-deep` so tabs don't card-in-card.
+
 ## Query Runner / Executor (notable subsystem)
 
 The most complex FE module. Standalone executor tab at
@@ -265,6 +305,10 @@ The most complex FE module. Standalone executor tab at
 - New services: signals + `providedIn: 'root'` + read/write/per-id loading.
 - Lists: `app-custom-table` + server adapter (50, `createdOn DESC`).
 - Controls: shared `app-custom-*`, `appendTo="body"` on overlays.
+- Skeleton: one parent card (`--card-background` / `--radius-md` /
+  `--shadow-sm` / `--space-8`), reference `/app/db-roles`; back button via the
+  global `.back-button` class; `@use` `shared/styles/_page-skeleton.scss` for
+  new screens. See **Page skeleton** above.
 - Styling: tokens only (color / `--fs-*` / `--space-*`); no magic numbers.
 - Validators: mirror the BE file byte-for-byte; messages are i18n keys.
 - i18n: all 10 locales, no raw strings.

@@ -1,6 +1,7 @@
 .add-admin-wrapper {
   background-color: var(--card-background);
   border-radius: var(--radius-md);
+    overflow: hidden;
   box-shadow: var(--shadow-sm);
   height: 100%;
   display: flex;
@@ -29,7 +30,7 @@
       .left-section {
         display: flex;
         align-items: center;
-        gap: var(--space-6);
+        gap: var(--space-5);
 
         .back-button {
           padding: var(--space-0) !important;

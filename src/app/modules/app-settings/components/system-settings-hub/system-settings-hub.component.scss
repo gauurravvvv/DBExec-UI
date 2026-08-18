@@ -27,23 +27,28 @@
   min-height: 0;
   display: flex;
   flex-direction: column;
-  background: var(--card-background);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-lg);
   overflow: hidden;
+
+  // Parent card surface — matches the /app/db-roles reference exactly.
+  // Theme-driven; see src/app/shared/styles/_page-skeleton.scss.
+  background: var(--card-background);
+  border-radius: var(--radius-md);
   box-shadow: var(--shadow-sm);
 
-  // Hub page heading — inside the card, above the tabs.
+  // Hub page heading — inside the card, above the tabs. Top inset is
+  // --space-8 so the title sits at the SAME height as the Audit / Activity
+  // list titles (their card container is padded --space-8) and as App
+  // Settings. Bottom is tighter (--space-5) to sit close to the tab strip.
   .page-header-section {
     display: flex;
     align-items: center;
     justify-content: space-between;
     flex: 0 0 auto;
-    padding: var(--space-5) var(--space-7);
+    padding: var(--space-8) var(--space-8) var(--space-5);
 
     h2 {
       margin: 0;
-      font-size: var(--fs-h2);
+      font-size: var(--fs-h1);
       font-weight: var(--fw-semibold);
       color: var(--text-color);
     }
@@ -53,7 +58,7 @@
   // The themed strip is the shared <app-tabs>; give it the hub's side
   // padding + a bottom divider so it reads as part of the card head.
   app-tabs {
-    padding: 0 var(--space-7);
+    padding: 0 var(--space-8);
   }
 
   // ── Active tab body — the card's scrollable content region ─────────
@@ -62,7 +67,7 @@
     min-height: 0;
     overflow: auto;
     // ONE source of padding for every tab's content.
-    padding: var(--space-7);
+    padding: var(--space-8);
     background: transparent;
   }
 

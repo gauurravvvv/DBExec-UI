@@ -1,19 +1,29 @@
 :host {
   display: block;
   height: 100%;
-  background-color: var(--background-color);
 }
 
 .view-form-wrapper {
   height: 100%;
-  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+
+  // Parent card surface — matches the /app/db-roles reference exactly.
+  // Theme-driven; see src/app/shared/styles/_page-skeleton.scss.
+  background: var(--card-background);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
 }
 
 .view-form-container {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
   display: flex;
   flex-direction: column;
   gap: var(--space-8);
-  padding: var(--space-8) var(--space-9);
+  padding: var(--space-8);
   // Left-aligned, full-width (app convention — NOT centered).
   margin: var(--space-0);
   width: 100%;
@@ -29,7 +39,7 @@
   .left-section {
     display: flex;
     align-items: center;
-    gap: var(--space-3);
+    gap: var(--space-5);
 
     h2 {
       font-size: var(--fs-h1);

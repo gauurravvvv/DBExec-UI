@@ -4,14 +4,14 @@
   height: 100%;
   width: 100%;
   padding: var(--space-0);
-  background: var(--card-background);
-  border-radius: var(--radius-lg);
-  box-shadow:
-    0 4px 20px -5px var(--shadow-color),
-    var(--shadow-sm);
-  border: 1px solid var(--border-color);
   overflow: hidden;
   overflow-y: auto;
+
+  // Parent card surface — matches the /app/db-roles reference exactly.
+  // Theme-driven; see src/app/shared/styles/_page-skeleton.scss.
+  background: var(--card-background);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
 
   &.loading-state {
     justify-content: center;

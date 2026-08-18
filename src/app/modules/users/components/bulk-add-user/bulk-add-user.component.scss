@@ -3,6 +3,8 @@
   background-color: var(--card-background);
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-sm);
+  // Clip children to the rounded card so nothing squares the corners.
+  overflow: hidden;
   height: 100%;
   display: flex;
   flex-direction: column;
@@ -14,19 +16,19 @@
     flex: 1;
     display: flex;
     flex-direction: column;
-    max-height: calc(100vh - 145px);
+    min-height: 0;
 
     .page-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 2rem;
+      margin-bottom: var(--space-8);
       flex-shrink: 0;
 
       .left-section {
         display: flex;
         align-items: center;
-        gap: var(--space-6);
+        gap: var(--space-5);
 
         .back-button {
           padding: var(--space-0) !important;

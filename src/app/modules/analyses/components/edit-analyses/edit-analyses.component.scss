@@ -4836,7 +4836,7 @@
   gap: var(--space-3);
   padding: 8px var(--space-5);
   // rounded TOP corners only — folder-tab silhouette
-  border-radius: 8px 8px 0 0;
+  border-radius: var(--radius-md) var(--radius-md) 0 0;
   border: 1px solid transparent;
   border-bottom: none;
   background: transparent;

@@ -5,7 +5,7 @@
   .add-admin-container {
     background: var(--card-background);
     border-radius: var(--radius-md);
-    padding: var(--space-7);
+    padding: var(--space-8);
     height: 100%;
     display: flex;
     flex-direction: column;
@@ -20,7 +20,7 @@
       .left-section {
         display: flex;
         align-items: center;
-        gap: var(--space-6);
+        gap: var(--space-5);
 
         .back-button {
           padding: var(--space-0) !important;
@@ -154,7 +154,7 @@
           max-width: 100%;
           display: grid;
           grid-template-columns: 1fr;
-          gap: var(--space-7);
+          gap: var(--space-5);
           margin-bottom: 1rem;
 
           .form-field {

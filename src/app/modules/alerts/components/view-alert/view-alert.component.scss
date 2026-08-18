@@ -4,6 +4,7 @@
   .view-category-container {
     background: var(--card-background);
     border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
     height: 100%;
     display: flex;
     flex-direction: column;

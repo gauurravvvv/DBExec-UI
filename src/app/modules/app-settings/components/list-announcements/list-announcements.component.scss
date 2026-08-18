@@ -4,9 +4,6 @@
   height: 100%;
   min-width: 0;
   max-width: 100%;
-  overflow: hidden;
-  background-color: var(--background-color);
-  border-radius: var(--radius-lg);
 }
 
 .dataset-page-wrapper {
@@ -34,7 +31,7 @@
 .page-header-section {
   display: flex;
   justify-content: space-between;
-  align-items: flex-end;
+  align-items: center;
 
   .header-content {
     h2 {

@@ -277,6 +277,74 @@ textarea,
   font-size: var(--icon-lg);
 }
 
+// ================================================================
+// Canonical back button — ONE definition for every page header's
+// back arrow, app-wide. Any header back control carrying
+// `class="back-button"` renders as a 36px circular, transparent,
+// hover-tinted icon button — the pattern the majority of screens
+// already use. Global (not component-scoped) so a native <button>,
+// a PrimeNG `pButton`, or an `<app-button>` all read identically
+// without each module re-styling it. Add-/edit-/view-/config-
+// screens: put `class="back-button"` on the arrow button and it is
+// styled here — no per-component rule needed. Theme-driven only.
+// The shared partial src/app/shared/styles/_page-skeleton.scss
+// carries the same definition for components that @use it.
+// ================================================================
+.back-button {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  min-width: 0;
+  padding: 0 !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none !important;
+  border-radius: 50% !important;
+  background: transparent !important;
+  color: var(--text-color) !important;
+  cursor: pointer;
+  transition: background-color var(--motion-base) ease;
+
+  &:hover:not(:disabled) {
+    background: var(--hover-background) !important;
+    color: var(--text-color) !important;
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
+  }
+
+  // The arrow glyph — same size on every page.
+  i,
+  .pi {
+    font-size: var(--fs-h2);
+    line-height: 1;
+  }
+
+  // When the back control is a PrimeNG button or an app-button, the
+  // real clickable element is a nested `.p-button`. Neutralise its
+  // default chrome so the circle above shows through unchanged.
+  .p-button,
+  &.p-button {
+    width: 36px;
+    height: 36px;
+    min-width: 0;
+    padding: 0 !important;
+    border: none !important;
+    border-radius: 50% !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    color: var(--text-color) !important;
+
+    &:hover:not(:disabled),
+    &:enabled:hover {
+      background: var(--hover-background) !important;
+    }
+  }
+}
+
 // Belt-and-braces: every PrimeNG overlay/menu/dialog widget gets an
 // explicit body-size rule. The .p-component baseline above usually wins,
 // but the PrimeNG theme uses very deep selector chains for these widgets

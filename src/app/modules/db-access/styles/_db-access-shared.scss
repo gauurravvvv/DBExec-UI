@@ -690,13 +690,21 @@
   .add-admin-wrapper {
     height: 100%;
     overflow: hidden;
+    display: flex;
+    flex-direction: column;
+
+    // Parent card surface — matches the /app/db-roles reference exactly
+    // (white surface, medium radius, small shadow). Theme-driven.
+    background: var(--card-background);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
 
     .add-admin-container {
-      background: var(--card-background);
-      border-radius: var(--radius-md);
       // Match add-user's container padding (--space-8) exactly.
       padding: var(--space-8);
       height: 100%;
+      flex: 1;
+      min-height: 0;
       display: flex;
       flex-direction: column;
 

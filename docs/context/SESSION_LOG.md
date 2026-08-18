@@ -1,5 +1,36 @@
 # dbexec-ui — Session Log (newest first)
 
+### 2026-08-18 — Page skeleton unified app-wide (one card + one back button)
+- Every list/add/edit/view/config screen now renders the SAME parent card
+  (`--card-background` / `--radius-md` / `--shadow-sm` / `--space-8`, no border)
+  and back button. Reference: `/app/db-roles`. Fixes the drift where each module
+  defined its own wrapper — LIST screens had NO card (flat table, hardcoded
+  `1.5rem 2rem` + `margin:0 auto`); VIEW screens were hand-copied
+  `view-category-wrapper` copies with no shadow + hardcoded `8px 8px 0 0` header
+  radii; 6 forms had no back-button, 2 had a 28px square one.
+- NEW `src/app/shared/styles/_page-skeleton.scss` — `page-list`/`page-form`/
+  `page-view` mixins (+ `back-button`/`page-card-surface` helpers) as the single
+  source of truth for new screens.
+- NEW global `.back-button` rule in `styles.scss` — 36px circle, transparent,
+  hover-tint, `--fs-h2` icon; any `class="back-button"` on native/pButton/
+  app-button is styled once. Added the class to 6 forms + view-query-builder.
+- ~40 component SCSS fixed: list containers got the card + symmetric `--space-8`;
+  dropped `margin:0 auto` + `:host` bg/radius/overflow; view containers got
+  `--shadow-sm` + tokenized header radii; killed `calc(100vh-145px/150px)` hacks
+  (org edit/view, bulk-add ×2) → flex `min-height:0`; profile
+  (`--radius-lg`+border→`--radius-md`), dashboard polish-layer (rgba
+  shadow+border→`--shadow-sm`), system-settings-hub (`--radius-lg`→md, title
+  h2→h1), db-access-form mixin (added shadow, card→wrapper). app-settings hub
+  container got the card.
+- Intentional exceptions: dataset/analyses editors (`query-editor-wrapper`,
+  full-bleed IDE) NOT carded; App/System Settings tabbed hubs own ONE card and
+  `::ng-deep`-flatten each tab child (so list-announcements/themes/branding stay
+  card-less by design).
+- Docs: added "Page skeleton" section + checklist line to CLAUDE.md.
+- Verified: `tsc --noEmit` 0; `ng build --configuration production` exit 0 (twice,
+  no SassError). db-roles reference screenshot confirms the card renders; full
+  authenticated per-screen sweep not done (device-code login needs the user).
+
 ### 2026-08-18 — Guided application tour REMOVED entirely
 - Removed the whole guided tour feature (driver.js) — the UX wasn't working out. Deleted `core/services/tour.service.ts`, `core/constants/tour.constant.ts`, `assets/sass/_driver-tour.scss`, the design spec, and the app-tour context doc. Uninstalled the `driver.js` dependency + its two `styles.scss` imports.
 - Unwired every touchpoint: sidebar (TourSidebarApi impl, register/unregister, all forceExpand/flyout/account-menu tour methods, 10 `data-tour` attrs, the tour-guard in handleClickOutside), home shell (maybeAutoStart/stop → reverted to the original bare component), login.service (SHOW_TOUR stash), storage-type (SHOW_TOUR), api.constant (UPDATE_TOUR), profile (show-tour toggle + service method), and the tour-only close() channels added to GlobalSearchService/NotificationModalService (+ their component subscriptions).

@@ -7,6 +7,7 @@
   .add-admin-container {
     background: var(--card-background);
     border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
     padding: var(--space-8);
     height: 100%;
     display: flex;
@@ -24,18 +25,10 @@
         align-items: center;
         // Snug the arrow to the title — the fixed 36px box + a wide gap read
         // as the arrow floating away from the heading.
-        gap: var(--space-2);
+        gap: var(--space-5);
 
-        .back-button {
-          padding: 0 !important;
-          width: 28px;
-          height: 28px;
-          min-width: 28px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          color: var(--text-color);
-        }
+        // Back button styling comes from the global .back-button rule in
+        // styles.scss (36px circle, hover tint) — no local override needed.
         h2 {
           margin: 0;
           font-size: var(--fs-h1);

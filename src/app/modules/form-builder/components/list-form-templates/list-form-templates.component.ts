@@ -25,6 +25,7 @@ import {
 @Component({
   selector: 'app-list-form-templates',
   templateUrl: './list-form-templates.component.html',
+  styleUrls: ['./list-form-templates.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ListFormTemplatesComponent implements OnInit {

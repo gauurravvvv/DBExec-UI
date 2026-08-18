@@ -35,20 +35,25 @@ $auth-bg: rgba(91, 100, 112, 0.12);
     flex: 1;
     display: flex;
     flex-direction: column;
-    padding: 1.5rem 2rem;
+    padding: var(--space-8);
     max-width: 100%;
-    margin: 0 auto;
     width: 100%;
     min-width: 0;
     min-height: 0;
     gap: var(--space-8);
+
+    // Parent card surface — matches the /app/db-roles reference exactly.
+    // Theme-driven; see src/app/shared/styles/_page-skeleton.scss.
+    background: var(--card-background);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
   }
 }
 
 .page-header-section {
   display: flex;
   justify-content: space-between;
-  align-items: flex-end;
+  align-items: center;
   flex-wrap: wrap;
   gap: var(--space-6);
 

@@ -1,0 +1,7 @@
+// Page skeleton (parent card + header) from the shared standard. See
+// src/app/shared/styles/_page-skeleton.scss and CLAUDE.md "Page skeleton".
+@use '../../../../shared/styles/page-skeleton' as skeleton;
+
+:host {
+  @include skeleton.page-list;
+}

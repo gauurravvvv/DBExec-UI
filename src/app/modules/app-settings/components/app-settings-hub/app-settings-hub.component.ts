@@ -56,12 +56,12 @@ export class AppSettingsHubComponent implements OnInit {
   /** Add-button config per tab value. */
   private readonly addByTab: Record<string, TabAdd> = {
     theme: {
-      labelKey: 'THEME_SETTINGS.ADD_THEME',
+      labelKey: 'COMMON.ADD',
       route: THEME_PRESET.NEW,
       permission: PERMISSIONS.THEME_MANAGEMENT,
     },
     branding: {
-      labelKey: 'BRANDING.ADD_PRESET',
+      labelKey: 'COMMON.ADD',
       route: BRANDING_PRESET.NEW,
       permission: PERMISSIONS.BRANDING_MANAGEMENT,
     },
