@@ -373,36 +373,39 @@
 }
 
 .sidebar-nav .nav-list,
-.submenu,
-.nested-submenu {
+.submenu {
   list-style: none;
   padding: var(--space-0);
   margin: var(--space-0);
 }
 
 // ── Nav row (icon + label) ─────────────────────────────────────────
-.nav-link,
-.submenu-link,
-.submenu-item > a,
-.nested-submenu-item > a {
+// The only navigable rows now: top-level leaves (Home) and the always-open
+// children under each group header.
+.nav-link {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0.625rem 0.9rem;
-  margin: 0px 8px;
-  border-radius: var(--radius-sm);
+  padding: 0.5rem 0.75rem;
+  margin: 2px 8px;
+  border-radius: var(--radius-md);
   font-size: var(--fs-body);
-  font-weight: var(--fw-semibold);
+  font-weight: var(--fw-medium);
   color: var(--text-color);
   text-decoration: none;
   cursor: pointer;
   position: relative;
   transition:
     background-color var(--motion-fast) ease,
-    color var(--motion-fast) ease;
+    color var(--motion-fast) ease,
+    box-shadow var(--motion-fast) ease;
 
+  // Hover — a soft brand-tinted wash (not flat grey), so hover reads as part
+  // of the same colour system as the active state. Text/icon warm to full
+  // ink. Uses --primary-color-rgb so it tracks the org's brand colour.
   &:hover {
-    background: var(--hover-background);
+    background: rgba(var(--primary-color-rgb), 0.06);
+    color: var(--text-color);
   }
 
   .link-content {
@@ -416,7 +419,10 @@
       min-width: 24px;
       display: flex;
       justify-content: center;
-      font-size: var(--fs-h3);
+      // Tabler glyphs render smaller than PrimeIcons at the same font-size, so
+      // the nav icons are set to an explicit 18px (not the 15px --fs-h3) to
+      // read at a comfortable enterprise-nav weight.
+      font-size: 18px;
       color: var(--secondary-color);
       transition: color var(--motion-fast) ease;
     }
@@ -434,161 +440,116 @@
   &:hover .link-content i {
     color: var(--text-color);
   }
-
-  .submenu-arrow {
-    font-size: var(--fs-label);
-    color: var(--secondary-color);
-    margin-left: 6px;
-    opacity: 1;
-    transition:
-      transform var(--motion-base) ease,
-      opacity var(--motion-fast) ease;
-
-    &.expanded {
-      transform: rotate(-180deg);
-    }
-  }
 }
 
 // ── Active state ───────────────────────────────────────────────────
-.nav-link.active,
-.submenu-link.active,
-.submenu-item > a.active,
-.nested-submenu-item > a.active {
-  background: var(--primary-color-transparent);
+// A soft rounded brand pill (not the old hard edge-bar). A faint inset ring
+// gives it a crisp, intentional edge; the label goes semibold + primary and
+// the icon takes the brand colour. Reads as a modern "selected chip".
+.nav-link.active {
+  background: rgba(var(--primary-color-rgb), 0.12);
   color: var(--primary-color);
-  box-shadow: inset 3px 0 0 0 var(--primary-color);
+  font-weight: var(--fw-semibold);
+  box-shadow: inset 0 0 0 1px rgba(var(--primary-color-rgb), 0.22);
 
   .link-content i {
     color: var(--primary-color);
+  }
+
+  // Hover on an already-active row: deepen the tint slightly, keep the ring.
+  &:hover {
+    background: rgba(var(--primary-color-rgb), 0.16);
   }
 }
 
 .sidebar.collapsed {
-  .nav-link.active,
-  .submenu-link.active,
-  .submenu-item > a.active,
-  .nested-submenu-item > a.active {
-    box-shadow: none;
-    margin: 1px 8px;
-  }
-
-  .nav-link.has-active-child,
-  .submenu-link.has-active-child {
-    background: var(--primary-color-transparent);
-    color: var(--primary-color);
-
-    .link-content i {
-      color: var(--primary-color);
-    }
+  .nav-link.active {
+    margin: 6px 8px; // keep the active row's spacing in step with siblings
   }
 }
 
-.nav-link.has-active-child:not(.active),
-.submenu-link.has-active-child:not(.active) {
-  background: var(--hover-background);
-
-  .link-content i {
-    color: var(--primary-color);
-  }
+// ── Section group headers (inert) ──────────────────────────────────
+// A group header is a non-clickable section label. In the expanded rail it
+// shows a small leading icon + uppercase label; the group's children are
+// always rendered beneath it. It is NOT a nav target and gets no hover
+// affordance in the expanded rail.
+.nav-group {
+  position: relative; // anchors the collapsed-rail flyout
 }
 
-// ── Section group headers ──────────────────────────────────────────
 .section-label {
-  font-size: var(--fs-micro);
+  // Title-case header (as written in i18n), not uppercase. Same font-size as
+  // the child nav rows (--fs-body) so parent + children read at one size.
+  font-size: var(--fs-body);
   font-weight: var(--fw-semibold);
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
   color: var(--secondary-color);
-  padding: 16px 18px 6px;
+  // Left padding matches the nav rows (0.9rem) so the header text lines up
+  // with the row content beneath it — one consistent left edge down the rail.
+  padding: 16px 0.9rem 6px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-.sidebar.collapsed .section-label {
-  display: block;
-  font-size: 0;
-  padding: 8px 16px;
-  &::after {
-    content: '';
-    display: block;
-    height: 1px;
-    background: var(--border-color);
+// Expanded rail: the group header is a TEXT-ONLY uppercase section label —
+// only the child rows carry icons, so the rail has one clean icon column. The
+// header's icon stays in the DOM but is hidden here; it's revealed only in the
+// collapsed rail (where it's the sole affordance + flyout target).
+.nav-group-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+
+  .group-icon {
+    display: none; // shown only in the collapsed rail (see .sidebar.collapsed)
+    font-size: var(--fs-body);
+    color: var(--secondary-color);
+    min-width: 20px;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .nav-text {
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 }
 
-// ── Submenu animation ──────────────────────────────────────────────
-.submenu,
-.nested-submenu {
+// A group that owns the active route gets a subtly brighter header label.
+.nav-group.has-active-child .nav-group-header {
+  color: var(--text-color);
+}
+
+// ── Submenu — always visible (flat, no accordion) ──────────────────
+.submenu {
   list-style: none;
   padding: var(--space-0);
   margin: var(--space-0);
 }
 
-.submenu > .submenu-item,
-.nested-submenu > .nested-submenu-item {
-  max-height: 0;
-  opacity: 0;
-  overflow: hidden;
-  transform: translateY(-2px);
-  transition:
-    max-height var(--motion-base) ease,
-    opacity var(--motion-fast) ease,
-    transform var(--motion-fast) ease;
+// Children are NOT indented — they use the same left padding as every other
+// nav row (Home leaf, group header) so all icons line up in one vertical
+// column. The group header above them is a text-only label, so there is no
+// hierarchy cue lost by removing the indent. (No max-height collapse: the flat
+// nav shows children at all times in the expanded rail.)
+.submenu-item > .nav-link {
+  padding-left: 0.9rem;
 }
 
-.submenu.expanded > .submenu-item,
-.nested-submenu.expanded > .nested-submenu-item {
-  max-height: 600px;
-  opacity: 1;
-  transform: translateY(0);
-}
-
-.submenu-item > .submenu-link,
-.submenu-item > a {
-  padding-left: 2.4rem;
-}
-
-.nested-submenu-item > .submenu-link,
-.nested-submenu-item > a {
-  padding-left: 3.4rem !important;
-}
-
-// ── Collapsed mode: hide labels, hide arrows, hide submenus ────────
+// ── Collapsed mode: icon-only rail, children move to hover flyouts ──
 .sidebar.collapsed {
-  .nav-link .link-content .nav-text,
-  .submenu-link .link-content .nav-text {
+  // Top-level leaf rows (e.g. Home): centre the icon, hide the label.
+  .nav-link .link-content .nav-text {
     display: none;
   }
 
-  .nav-link .submenu-arrow,
-  .submenu-link .submenu-arrow {
-    display: none;
-  }
-
-  .nav-link,
-  .submenu-link,
-  .submenu-item > a,
-  .submenu-item > .submenu-link,
-  .nested-submenu-item > a,
-  .nested-submenu-item > .submenu-link {
-    overflow: hidden;
-  }
-
-  .section-label > * {
-    display: none;
-  }
-
-  .nav-link,
-  .submenu-link,
-  .submenu-item > a,
-  .submenu-item > .submenu-link,
-  .nested-submenu-item > a,
-  .nested-submenu-item > .submenu-link {
+  .nav-item > .nav-link {
     justify-content: center;
-    padding: 0.5rem 0 !important;
-    margin: 1px 8px;
+    padding: 0.5rem 0;
+    // More vertical breathing room between icons in the collapsed rail
+    // (was 1px) so the icon-only column doesn't read as a cramped stack.
+    margin: 6px 8px;
+    overflow: hidden;
 
     .link-content {
       flex: 0 0 auto;
@@ -603,9 +564,152 @@
     }
   }
 
-  .submenu,
-  .nested-submenu {
+  // Group header becomes the icon-only, clickable/hoverable flyout target.
+  .nav-group-header {
+    justify-content: center;
+    padding: 0.5rem 0;
+    margin: 6px 8px; // match the leaf-row spacing above
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition:
+      background-color var(--motion-fast) ease,
+      box-shadow var(--motion-fast) ease;
+
+    .nav-text {
+      display: none;
+    }
+
+    .group-icon {
+      display: flex; // revealed in the collapsed rail (hidden when expanded)
+      min-width: 0;
+      margin: 0 auto;
+      font-size: 20px; // Tabler reads small; collapsed group icon sized up
+    }
+
+    // Hover — same soft brand wash as the nav rows.
+    &:hover {
+      background: rgba(var(--primary-color-rgb), 0.06);
+      .group-icon {
+        color: var(--text-color);
+      }
+    }
+
+    // Open (its flyout is showing) — a NEUTRAL selected state, deliberately
+    // distinct from the brand-coloured active/current-page pill. This says
+    // "this menu is open", not "this is where you are". Solid neutral surface
+    // + neutral ring + ink icon (no primary tint). The has-active-child rule
+    // below still tints the icon primary if this group owns the active route.
+    &.is-open {
+      background: var(--hover-background);
+      box-shadow: inset 0 0 0 1px var(--border-color);
+      .group-icon {
+        color: var(--text-color);
+      }
+    }
+  }
+
+  // A group owning the active route keeps its icon primary-tinted collapsed.
+  .nav-group.has-active-child .nav-group-header .group-icon {
+    color: var(--primary-color);
+  }
+
+  // The always-open children list is hidden collapsed — children live in the
+  // flyout instead.
+  .submenu {
     display: none;
+  }
+}
+
+// ── Collapsed-rail children flyout ─────────────────────────────────
+// Anchored to the right of the collapsed group icon. Same visual language as
+// the profile Language/Theme flyouts. Only rendered when collapsed (the
+// template drops it with *ngIf when expanded).
+.nav-flyout {
+  // FIXED (not absolute): the nav scroll container has `overflow-y: auto`,
+  // which clips absolutely-positioned descendants at the rail edge. Fixed
+  // positioning escapes every overflow ancestor and anchors to the viewport;
+  // its `top` is set inline from the hovered group's rect (see positionFlyout).
+  position: fixed;
+  left: 60px; // just past the 64px rail so the panel abuts the icon column
+  top: 0; // overridden inline per hovered group
+  min-width: 210px;
+  list-style: none;
+  margin: 0;
+  padding: var(--space-3) 0;
+  background: var(--card-background);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  z-index: calc(var(--z-overlay) + 2);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateX(-6px);
+  transform-origin: left center;
+  transition:
+    opacity var(--motion-fast) ease,
+    transform var(--motion-fast) ease,
+    visibility 0s linear var(--motion-fast);
+
+  &.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(0);
+    transition-delay: 0s;
+  }
+
+  .nav-flyout-title {
+    // Title-case (matches the sidebar section headers), not uppercase.
+    // Same size as the flyout item rows (--fs-body).
+    font-size: var(--fs-body);
+    font-weight: var(--fw-semibold);
+    color: var(--secondary-color);
+    padding: 4px 14px 8px;
+    white-space: nowrap;
+  }
+
+  .nav-flyout-item > a {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 1px 6px; // inset so the rounded pill floats inside the panel
+    padding: 8px 12px;
+    border-radius: var(--radius-md);
+    text-decoration: none;
+    color: var(--text-color);
+    font-size: var(--fs-body);
+    font-weight: var(--fw-medium);
+    white-space: nowrap;
+    transition:
+      background var(--motion-fast) ease,
+      color var(--motion-fast) ease;
+
+    i {
+      font-size: 17px;
+      color: var(--secondary-color);
+      min-width: 18px;
+      display: flex;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: color var(--motion-fast) ease;
+    }
+
+    // Same brand-tint language as the main nav rows.
+    &:hover {
+      background: rgba(var(--primary-color-rgb), 0.06);
+      i {
+        color: var(--text-color);
+      }
+    }
+
+    &.active {
+      color: var(--primary-color);
+      font-weight: var(--fw-semibold);
+      background: rgba(var(--primary-color-rgb), 0.12);
+      box-shadow: inset 0 0 0 1px rgba(var(--primary-color-rgb), 0.22);
+      i {
+        color: var(--primary-color);
+      }
+    }
   }
 }
 
@@ -635,29 +739,31 @@
   &.show {
     opacity: 1;
     visibility: visible;
-    transform: translateY(0) scale(1);
+    transform: translate(0, 0) scale(1);
     transition-delay: 0s;
   }
 
-  // Sits ABOVE the avatar. Bottom offset clears the avatar row
-  // (~58px incl padding) + 8px breathing gap.
+  width: 260px;
+
+  // EXPANDED rail: the panel opens ABOVE the avatar, inside the rail column.
+  // Bottom clears the avatar row (~58px) + an 8px gap; fits within the 240px
+  // rail with 8px side gutters. Rises up on open.
   bottom: calc(58px + 8px);
+  left: 8px;
+  right: 8px;
+  width: auto;
   transform: translateY(8px) scale(0.98);
   transform-origin: bottom center;
 
-  // Expanded sidebar: fit inside the rail column with 8px gutters.
-  left: 8px;
-  right: 8px;
-  max-width: 224px;
-
-  // Collapsed sidebar (64px rail): 260px panel can't fit inside, so
-  // anchor its LEFT edge 8px into the rail and let the rest overflow
-  // into the page area.
+  // COLLAPSED rail (64px): the 260px panel can't fit in the narrow rail, so
+  // it opens to the RIGHT — left edge just past the rail, bottom level with
+  // the avatar. Slides in from the left.
   &.collapsed-anchor {
-    left: 8px;
+    bottom: 10px;
+    left: calc(64px + 8px);
     right: auto;
-    max-width: none;
     width: 260px;
+    transform: translateX(-6px) scale(0.98);
     transform-origin: bottom left;
   }
 }
@@ -768,22 +874,16 @@
     transform var(--motion-base) ease,
     visibility 0s linear var(--motion-base);
 
-  // Expanded mode: profile menu is INSIDE the sidebar above the
-  // avatar. Flyout opens just to the right of the sidebar at
-  // roughly the Language row's vertical position. The bottom value
-  // matches the profile-menu's bottom (58+8) plus an extra 8 of
-  // padding so the flyout's top aligns with the Language row.
+  // EXPANDED: the profile menu sits ABOVE the avatar inside the rail, so this
+  // flyout opens just to the right of the rail, level with the Language row.
   left: calc(240px + 8px);
   bottom: calc(58px + 8px + 8px);
 
-  // Collapsed mode: profile menu starts at 8px and is 260px wide,
-  // so its right edge is at 268px from the rail's left. Anchor the
-  // flyout 6px past that. Keep the same vertical offset so the
-  // flyout reads as a side-extension of the (above-the-avatar)
-  // profile menu, not as something growing off the rail itself.
+  // COLLAPSED: the profile menu opens to the RIGHT of the rail (left 72px,
+  // 260px wide → right edge 332); this flyout spills 6px past that edge.
   &.collapsed-anchor {
-    left: calc(8px + 260px + 6px);
-    bottom: calc(58px + 8px + 8px);
+    left: calc(64px + 8px + 260px + 6px);
+    bottom: 10px;
   }
 
   &.show {
@@ -870,12 +970,15 @@
     transform var(--motion-base) ease,
     visibility 0s linear var(--motion-base);
 
+  // Same placement as the language flyout. Expanded: profile menu is above
+  // the avatar in the rail, so open just right of the rail at the Theme row.
   left: calc(240px + 8px);
   bottom: calc(58px + 8px + 8px);
 
+  // Collapsed: profile menu is to the right of the rail; spill past its edge.
   &.collapsed-anchor {
-    left: calc(8px + 260px + 6px);
-    bottom: calc(58px + 8px + 8px);
+    left: calc(64px + 8px + 260px + 6px);
+    bottom: 10px;
   }
 
   &.show {

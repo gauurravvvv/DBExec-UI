@@ -37,68 +37,81 @@
     </div>
   </div>
 
-  <!-- ── MIDDLE: scrollable nav ─────────────────────────────────── -->
+  <!-- ── MIDDLE: scrollable nav ───────────────────────────────────
+       Flat, always-open model. A menu item with children is a GROUP:
+       its header is an inert section label (not clickable, doesn't
+       navigate) and its children are always visible beneath it. A
+       menu item without children is a plain nav link (e.g. Home).
+
+       Collapsed rail: children are hidden; each group renders its
+       icon only, and hovering/clicking the group icon opens a flyout
+       listing its children (same idiom as the profile Language/Theme
+       flyouts). Managed by the .nav-group hover + activeFlyoutValue. -->
   <div class="sidebar-content">
     <nav class="sidebar-nav">
       <ul class="nav-list">
         <li *ngFor="let item of menuItems; trackBy: trackByIndex" class="nav-item">
-          <!-- Menu item with subPermissions -->
-          <div *ngIf="item.subPermissions?.length" class="nav-link expandable" [attr.data-tour]="'nav-' + item.value"
-            (click)="toggleSubmenuAndExpand(item)" [class.expanded]="item.isExpanded"
-            [class.has-active-child]="hasActiveDescendant(item)">
-            <div class="link-content">
-              <i [class]="item.icon"></i>
-              <span class="nav-text">{{
-                'SIDEBAR.' + item.value | translate
-                }}</span>
-            </div>
-            <i class="pi pi-chevron-down submenu-arrow" [class.expanded]="item.isExpanded"></i>
-          </div>
 
-          <!-- Menu item without subPermissions -->
-          <a *ngIf="!item.subPermissions?.length" [routerLink]="item.route" routerLinkActive="active"
-            [routerLinkActiveOptions]="{ exact: item.exact ?? false }" #rla="routerLinkActive"
-            [attr.aria-current]="rla.isActive ? 'page' : null" [attr.data-tour]="'nav-' + item.value" class="nav-link">
-            <div class="link-content">
-              <i [class]="item.icon"></i>
-              <span class="nav-text">{{
-                'SIDEBAR.' + item.value | translate
-                }}</span>
-            </div>
-          </a>
+          <!-- GROUP (has children) -->
+          <ng-container *ngIf="item.subPermissions?.length; else leafRow">
+            <div class="nav-group" [class.has-active-child]="hasActiveDescendant(item)">
 
-          <!-- Submenu -->
-          <ul class="submenu" [class.expanded]="item.isExpanded" *ngIf="item.subPermissions">
-            <li *ngFor="let subItem of item.subPermissions; trackBy: trackByIndex" class="submenu-item">
-              <div *ngIf="subItem.subPermissions?.length" class="submenu-link" [attr.data-tour]="'nav-' + subItem.value"
-                (click)="toggleSubmenuAndExpand(subItem)" [class.expanded]="subItem.isExpanded"
-                [class.has-active-child]="hasActiveDescendant(subItem)">
-                <div class="link-content">
-                  <i [class]="subItem.icon"></i>
-                  <span class="nav-text">{{
-                    'SIDEBAR.' + subItem.value | translate
-                    }}</span>
-                </div>
-                <i class="pi pi-chevron-down submenu-arrow" [class.expanded]="subItem.isExpanded"></i>
+              <!-- Inert group header: a section label when expanded; in the
+                   collapsed rail it becomes the hover/click target that opens
+                   the children flyout. -->
+              <div class="section-label nav-group-header" [attr.data-tour]="'nav-' + item.value"
+                (click)="onGroupHeaderClick(item, $event)" [class.is-open]="activeFlyoutValue === item.value"
+                [pTooltip]="(isExpanded || activeFlyoutValue === item.value) ? undefined : ('SIDEBAR.' + item.value | translate)"
+                tooltipPosition="right">
+                <i class="group-icon" [class]="item.icon"></i>
+                <span class="nav-text">{{ 'SIDEBAR.' + item.value | translate }}</span>
               </div>
 
-              <a *ngIf="!subItem.subPermissions?.length" [routerLink]="subItem.route" routerLinkActive="active"
-                [routerLinkActiveOptions]="{ exact: subItem.exact ?? false }" #rlaSub="routerLinkActive"
-                [attr.aria-current]="rlaSub.isActive ? 'page' : null" [attr.data-tour]="'nav-' + subItem.value">
-                <div class="link-content">
-                  <i [class]="subItem.icon"></i>
-                  <span class="nav-text">{{
-                    'SIDEBAR.' + subItem.value | translate
-                    }}</span>
-                </div>
-              </a>
+              <!-- Always-visible children (expanded rail only; hidden when collapsed) -->
+              <ul class="submenu">
+                <li *ngFor="let subItem of item.subPermissions; trackBy: trackByIndex" class="submenu-item">
+                  <a [routerLink]="subItem.route" routerLinkActive="active"
+                    [routerLinkActiveOptions]="{ exact: subItem.exact ?? false }" #rlaSub="routerLinkActive"
+                    [attr.aria-current]="rlaSub.isActive ? 'page' : null" [attr.data-tour]="'nav-' + subItem.value"
+                    class="nav-link">
+                    <div class="link-content">
+                      <i [class]="subItem.icon"></i>
+                      <span class="nav-text">{{ 'SIDEBAR.' + subItem.value | translate }}</span>
+                    </div>
+                  </a>
+                </li>
+              </ul>
 
-              <ng-container *ngTemplateOutlet="
-                  nestedSubmenu;
-                  context: { $implicit: subItem }
-                "></ng-container>
-            </li>
-          </ul>
+              <!-- Collapsed-rail flyout: this group's children, shown on hover/click
+                   of the collapsed group icon. Only rendered/visible when collapsed. -->
+              <ul class="nav-flyout" *ngIf="!isExpanded"
+                [class.show]="activeFlyoutValue === item.value" [style.top.px]="flyoutTop">
+                <li class="nav-flyout-title">{{ 'SIDEBAR.' + item.value | translate }}</li>
+                <li *ngFor="let subItem of item.subPermissions; trackBy: trackByIndex" class="nav-flyout-item">
+                  <a [routerLink]="subItem.route" routerLinkActive="active"
+                    [routerLinkActiveOptions]="{ exact: subItem.exact ?? false }"
+                    (click)="closeFlyout()">
+                    <i [class]="subItem.icon"></i>
+                    <span>{{ 'SIDEBAR.' + subItem.value | translate }}</span>
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </ng-container>
+
+          <!-- LEAF (no children, e.g. Home) -->
+          <ng-template #leafRow>
+            <a [routerLink]="item.route" routerLinkActive="active"
+              [routerLinkActiveOptions]="{ exact: item.exact ?? false }" #rla="routerLinkActive"
+              [attr.aria-current]="rla.isActive ? 'page' : null" [attr.data-tour]="'nav-' + item.value"
+              class="nav-link"
+              [pTooltip]="isExpanded ? undefined : ('SIDEBAR.' + item.value | translate)" tooltipPosition="right">
+              <div class="link-content">
+                <i [class]="item.icon"></i>
+                <span class="nav-text">{{ 'SIDEBAR.' + item.value | translate }}</span>
+              </div>
+            </a>
+          </ng-template>
         </li>
       </ul>
     </nav>
@@ -205,34 +218,3 @@
   </ul>
 </div>
 
-<!-- ── Recursive nested-submenu template ──────────────────────────── -->
-<ng-template #nestedSubmenu let-item>
-  <ul class="nested-submenu" [class.expanded]="item.isExpanded" *ngIf="item.subPermissions">
-    <li *ngFor="let nestedItem of item.subPermissions; trackBy: trackByIndex" class="nested-submenu-item">
-      <div *ngIf="nestedItem.subPermissions?.length" class="submenu-link" [attr.data-tour]="'nav-' + nestedItem.value"
-        (click)="toggleSubmenuAndExpand(nestedItem)" [class.expanded]="nestedItem.isExpanded"
-        [class.has-active-child]="hasActiveDescendant(nestedItem)">
-        <div class="link-content">
-          <i [class]="nestedItem.icon"></i>
-          <span class="nav-text">{{
-            'SIDEBAR.' + nestedItem.value | translate
-            }}</span>
-        </div>
-        <i class="pi pi-chevron-down submenu-arrow" [class.expanded]="nestedItem.isExpanded"></i>
-      </div>
-
-      <a *ngIf="!nestedItem.subPermissions?.length" [routerLink]="nestedItem.route" routerLinkActive="active"
-        [routerLinkActiveOptions]="{ exact: nestedItem.exact ?? false }" #rlaNested="routerLinkActive"
-        [attr.aria-current]="rlaNested.isActive ? 'page' : null" [attr.data-tour]="'nav-' + nestedItem.value">
-        <div class="link-content">
-          <i [class]="nestedItem.icon"></i>
-          <span class="nav-text">{{
-            'SIDEBAR.' + nestedItem.value | translate
-            }}</span>
-        </div>
-      </a>
-
-      <ng-container *ngTemplateOutlet="nestedSubmenu; context: { $implicit: nestedItem }"></ng-container>
-    </li>
-  </ul>
-</ng-template>

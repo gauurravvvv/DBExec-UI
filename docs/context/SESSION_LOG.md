@@ -1,5 +1,80 @@
 # dbexec-ui — Session Log (newest first)
 
+### 2026-08-18 — Profile popup → opens right; System-Admin catalog restructure
+- **Profile (avatar) menu** now opens to the RIGHT of the avatar (same idiom as
+  the nav / language / theme flyouts), not stacked above it. `.profile-menu`:
+  `bottom: 10px`, `left: calc(rail + 8px)` (240 expanded / 64 collapsed),
+  slide-in from left. Language + theme flyouts re-anchored to spill off the
+  repositioned menu's right edge (`left: calc(rail + 8 + 260 + 6)`).
+- **System-Admin permission catalog restructured** (BE `seedPermissionCatalog.ts`
+  SYSTEM_CATALOG): System Management children shortened `System Roles/Groups/
+  Users` → `Roles/Groups/Users`; `orgManagement` MOVED out into a NEW
+  SYSTEM-scope module **`platformManagement`** ("Platform Management",
+  `ti-building-community`, seq 15); `loginActivity` label `Login Activity` →
+  `Activity Logs` (value + route unchanged). The System-Admin role grant is
+  scope-driven, so the moved `orgManagement` is granted automatically — no
+  `seedSystemAdminRole.ts` change.
+- i18n (all 10 locales): added `SIDEBAR.platformManagement`; set system RBAC
+  labels to the org-side Roles/Groups/Users translations; renamed EVERY
+  user-facing "Login Activity" → "Activity Logs" (SIDEBAR, PAGE_TITLES,
+  LOGIN_ACTIVITY.TITLE, HOME_DASH links, TOUR). Value `loginActivity` stays.
+- Gates: API tsc 0 · FE tsc 0 · ngc 0 · prod build success (0 errors).
+- **Catalog verification is FRESH-DB only** — the boot seed is guarded (runs
+  only on an empty DB; DB_SYNC=false), so these catalog changes land on a fresh
+  DB at onboarding, not on the existing one. Live catalog check pending user's
+  DB re-spin. Profile-popup reposition is pure FE (shows immediately).
+
+### 2026-08-18 — Sidebar fixes: flyout clip, icon size, click-not-hover (live-verified)
+- **Flyout was clipped under the rail.** `.sidebar-content` has `overflow-y:
+  auto`, which clips absolutely-positioned descendants — the collapsed-rail
+  children flyout was cut at the 64px edge. Fix: `.nav-flyout` →
+  `position: fixed` (escapes every overflow ancestor, anchors to viewport);
+  its `top` is set inline (`[style.top.px]="flyoutTop"`) from the clicked
+  group's `getBoundingClientRect()` via `positionFlyout()`, clamped on-screen.
+  (Verified: no transform ancestor to trap the fixed element.)
+- **Icons too small** (Tabler renders smaller than PrimeIcons at the same
+  font-size). Bumped nav icons to explicit px: expanded child/leaf 18px,
+  collapsed group icon 20px, flyout item 17px (were `--fs-h3`/`--fs-body`).
+- **Click, not hover.** Per UX call, the collapsed flyout now opens ONLY on
+  click of the group icon (toggles), so moving the pointer across the rail
+  never spawns popovers. Removed `onGroupEnter/onGroupLeave` + the close-timer;
+  `handleClickOutside` now also dismisses the nav flyout; a flyout link closes
+  it via `closeFlyout`. `onGroupHeaderClick` is the sole opener.
+- Live-verified in browser (System Admin org): expanded flat nav + i18n labels,
+  collapsed flyout floating cleanly over page content, click-open/click-close,
+  tour auto-start. Gates: tsc 0 · ngc 0 · prod build success.
+
+### 2026-08-18 — Sidebar: Tabler icons + flat always-open nav + collapsed flyout
+- Icon set moved off PrimeIcons → **Tabler webfont** for the nav only. Added
+  `@tabler/icons-webfont` + one `@import` in `styles.scss` (beside the existing
+  PrimeIcons import). PrimeIcons stays for the other ~214 files (chevrons, table
+  controls, dialogs). Icon strings live in the BE permission catalog
+  (`seedPermissionCatalog.ts`), not the component — remapped there `pi pi-*` →
+  `ti ti-*`, resolving 5 duplicate glyphs (users/key/bell/server) and weak fits
+  (dashboard→layout-dashboard, form-builder→forms, sql-workspace→terminal-2, …).
+- **Flat, always-open nav.** Group rows are now inert `.section-label` headers
+  (text-only when expanded; not clickable, don't navigate); their children are
+  always visible beneath them. Removed the accordion entirely: `isExpanded`
+  per-item state, `toggleSubmenuAndExpand`, `persistExpandedState`/localStorage
+  `sidebar.expanded`, `collapseAllMenus`, `expandMenuForCurrentRoute`,
+  `collapseDescendants`, the dead `nestedSubmenu` recursive template, and
+  `getIndentation`. Tree is only 2 levels (module→screen) so no recursion needed.
+- **Collapsed rail = hover/click flyout.** Collapsed shows one group icon
+  (`.group-icon`, hidden when expanded); hovering/clicking opens `.nav-flyout`
+  listing that group's children (same idiom as the profile Language/Theme
+  flyouts). New state: `activeFlyoutValue` + `onGroupEnter/Leave`,
+  `onGroupHeaderClick`, `closeFlyout` (180ms close grace; timer cleared on
+  destroy). Top-level leaves (Home) keep the collapsed tooltip.
+- **Tour unchanged in behaviour.** It only ever anchored on top-level parents
+  (`getTourModuleTargets` + `data-tour="nav-<value>"`, preserved on the flat
+  group headers + leaves). `forceExpandForTour` still pins the rail open (which
+  now reveals children automatically); comment updated.
+- i18n: added missing `SIDEBAR.systemRoleManagement / systemGroupManagement /
+  systemUserManagement` across all 10 locales (pre-existing gap — the System
+  Admin RBAC rows were rendering raw keys).
+- Gates: FE tsc 0 · ngc 0 · prod build success. API tsc 0. Icons land natively
+  on a FRESH DB via onboarding (`seedCatalogBulk`); no migration/backfill needed.
+
 ### 2026-08-17 — Prompt Builder Phase 8 (frontend): portability UI
 - Added the form-builder portability surface: `FormPortabilityService` (blob
   export with Content-Disposition filename + JSON-error-envelope detection,

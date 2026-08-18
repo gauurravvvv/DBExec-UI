@@ -2,6 +2,10 @@
   "SIDEBAR": {
     "home": "홈",
     "systemManagement": "시스템 관리",
+    "platformManagement": "플랫폼 관리",
+    "systemRoleManagement": "역할 관리",
+    "systemGroupManagement": "그룹 관리",
+    "systemUserManagement": "사용자",
     "systemAdmin": "시스템 관리자",
     "orgManagement": "조직 관리",
     "userAndAccess": "사용자 관리",
@@ -30,7 +34,7 @@
     "rlsRules": "RLS Rules",
     "auditActivity": "감사 및 활동",
     "auditLogs": "감사 로그",
-    "loginActivity": "로그인 활동",
+    "loginActivity": "활동 로그",
     "appSettings": "앱 설정",
     "announcementManagement": "공지 관리",
     "themeManagement": "테마",
@@ -2090,7 +2094,7 @@
     "LINK": {
       "AUDIT": "감사 로그",
       "VIEW_ALL": "모두 보기",
-      "LOGIN_ACTIVITY": "로그인 활동"
+      "LOGIN_ACTIVITY": "활동 로그"
     },
     "EMPTY": {
       "NO_QUERIES": "이 기간에 쿼리 활동이 없습니다",
@@ -2161,7 +2165,7 @@
       "ORG_LIST": "조직",
       "COL_CREATED": "생성일",
       "LOGIN_HEALTH": "로그인 상태",
-      "NO_LOGINS": "이 기간에 로그인 활동이 없습니다",
+      "NO_LOGINS": "이 기간에 활동 로그이 없습니다",
       "SUCCESS_RATE": "성공률",
       "OK_FAILED": "성공 / 실패",
       "PLATFORM_FEED": "최근 플랫폼 활동"
@@ -2344,7 +2348,7 @@
     "QUERY_BUILDERS": "쿼리 빌더",
     "FORM_BUILDER": "Form Builder",
     "AUDIT_LOGS": "감사 로그",
-    "LOGIN_ACTIVITY": "로그인 활동",
+    "LOGIN_ACTIVITY": "활동 로그",
     "APP_SETTINGS": "앱 설정",
     "MY_PROFILE": "내 프로필",
     "LOGIN": "로그인",
@@ -6736,7 +6740,7 @@
         "DESC": "플랫폼 전체에서 누가 무엇을 언제 변경했는지 완전한 기록을 검토합니다. \"무슨 일이 일어났나?\"라는 질문에 답하기 위한 신뢰할 수 있는 정보원입니다."
       },
       "loginActivity": {
-        "TITLE": "로그인 활동",
+        "TITLE": "활동 로그",
         "DESC": "조직 전체의 로그인 및 인증 이벤트를 추적합니다. 보안과 규정 준수를 위한 명확한 접근 이력 보기입니다."
       },
       "appSettings": {

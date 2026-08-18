@@ -2,6 +2,10 @@
   "SIDEBAR": {
     "home": "ホーム",
     "systemManagement": "システム管理",
+    "platformManagement": "プラットフォーム管理",
+    "systemRoleManagement": "ロール管理",
+    "systemGroupManagement": "グループ管理",
+    "systemUserManagement": "ユーザー",
     "systemAdmin": "システム管理者",
     "orgManagement": "組織管理",
     "userAndAccess": "ユーザー管理",
@@ -30,7 +34,7 @@
     "rlsRules": "RLS Rules",
     "auditActivity": "監査 & アクティビティ",
     "auditLogs": "監査ログ",
-    "loginActivity": "ログイン活動",
+    "loginActivity": "アクティビティログ",
     "appSettings": "アプリ設定",
     "announcementManagement": "お知らせ管理",
     "themeManagement": "テーマ",
@@ -2090,7 +2094,7 @@
     "LINK": {
       "AUDIT": "監査ログ",
       "VIEW_ALL": "すべて表示",
-      "LOGIN_ACTIVITY": "ログインアクティビティ"
+      "LOGIN_ACTIVITY": "アクティビティログ"
     },
     "EMPTY": {
       "NO_QUERIES": "この期間のクエリアクティビティはありません",
@@ -2161,7 +2165,7 @@
       "ORG_LIST": "組織",
       "COL_CREATED": "作成日",
       "LOGIN_HEALTH": "ログイン状態",
-      "NO_LOGINS": "この期間のログインアクティビティはありません",
+      "NO_LOGINS": "この期間のアクティビティログはありません",
       "SUCCESS_RATE": "成功率",
       "OK_FAILED": "成功 / 失敗",
       "PLATFORM_FEED": "最近のプラットフォームアクティビティ"
@@ -2344,7 +2348,7 @@
     "QUERY_BUILDERS": "クエリビルダー",
     "FORM_BUILDER": "Form Builder",
     "AUDIT_LOGS": "監査ログ",
-    "LOGIN_ACTIVITY": "ログインアクティビティ",
+    "LOGIN_ACTIVITY": "アクティビティログ",
     "APP_SETTINGS": "アプリ設定",
     "MY_PROFILE": "マイプロフィール",
     "LOGIN": "ログイン",
@@ -6736,7 +6740,7 @@
         "DESC": "プラットフォーム全体で誰が何をいつ変更したかの完全な記録を確認できます。「何が起きたのか」という質問に答えるための真実の情報源です。"
       },
       "loginActivity": {
-        "TITLE": "ログインアクティビティ",
+        "TITLE": "アクティビティログ",
         "DESC": "組織全体のサインインと認証イベントを追跡します。セキュリティとコンプライアンスのためのアクセス履歴の明確なビューです。"
       },
       "appSettings": {

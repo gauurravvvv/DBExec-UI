@@ -2,6 +2,10 @@
   "SIDEBAR": {
     "home": "Home",
     "systemManagement": "Gestione del sistema",
+    "platformManagement": "Gestione della piattaforma",
+    "systemRoleManagement": "Ruoli",
+    "systemGroupManagement": "Gruppi",
+    "systemUserManagement": "Utenti",
     "systemAdmin": "Amministratore di sistema",
     "orgManagement": "Organizzazioni",
     "userAndAccess": "Gestione utenti",
@@ -30,7 +34,7 @@
     "rlsRules": "RLS Rules",
     "auditActivity": "Audit & Attività",
     "auditLogs": "Log di audit",
-    "loginActivity": "Attività di accesso",
+    "loginActivity": "Registri attività",
     "appSettings": "Impostazioni",
     "announcementManagement": "Annunci",
     "themeManagement": "Tema",
@@ -2090,7 +2094,7 @@
     "LINK": {
       "AUDIT": "Log di audit",
       "VIEW_ALL": "Vedi tutto",
-      "LOGIN_ACTIVITY": "Attività di accesso"
+      "LOGIN_ACTIVITY": "Registri attività"
     },
     "EMPTY": {
       "NO_QUERIES": "Nessuna attività di query in questo periodo",
@@ -2344,7 +2348,7 @@
     "QUERY_BUILDERS": "Costruttori di query",
     "FORM_BUILDER": "Form Builder",
     "AUDIT_LOGS": "Registri di audit",
-    "LOGIN_ACTIVITY": "Attività di accesso",
+    "LOGIN_ACTIVITY": "Registri attività",
     "APP_SETTINGS": "Impostazioni app",
     "MY_PROFILE": "Il mio profilo",
     "LOGIN": "Accesso",
@@ -6736,7 +6740,7 @@
         "DESC": "Esamina la cronologia completa di chi ha modificato cosa e quando su tutta la piattaforma. È la fonte di verità quando hai bisogno di rispondere a \"cosa è successo?\"."
       },
       "loginActivity": {
-        "TITLE": "Attività di accesso",
+        "TITLE": "Registri attività",
         "DESC": "Traccia gli accessi e gli eventi di autenticazione nella tua organizzazione. Una visione chiara della cronologia dell'accesso per la sicurezza e la conformità."
       },
       "appSettings": {

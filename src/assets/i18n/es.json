@@ -2,6 +2,10 @@
   "SIDEBAR": {
     "home": "Inicio",
     "systemManagement": "Gestión del sistema",
+    "platformManagement": "Gestión de la plataforma",
+    "systemRoleManagement": "Roles",
+    "systemGroupManagement": "Grupos",
+    "systemUserManagement": "Usuarios",
     "systemAdmin": "Administrador del sistema",
     "orgManagement": "Organizaciones",
     "userAndAccess": "Gestión de usuarios",
@@ -30,7 +34,7 @@
     "rlsRules": "RLS Rules",
     "auditActivity": "Auditoría y Actividad",
     "auditLogs": "Registros de auditoría",
-    "loginActivity": "Actividad de inicio de sesión",
+    "loginActivity": "Registros de actividad",
     "appSettings": "Configuración",
     "announcementManagement": "Anuncios",
     "themeManagement": "Tema",
@@ -2090,7 +2094,7 @@
     "LINK": {
       "AUDIT": "Registros de auditoría",
       "VIEW_ALL": "Ver todo",
-      "LOGIN_ACTIVITY": "Actividad de inicio de sesión"
+      "LOGIN_ACTIVITY": "Registros de actividad"
     },
     "EMPTY": {
       "NO_QUERIES": "Sin actividad de consultas en este periodo",
@@ -2344,7 +2348,7 @@
     "QUERY_BUILDERS": "Constructores de consultas",
     "FORM_BUILDER": "Form Builder",
     "AUDIT_LOGS": "Registros de auditoría",
-    "LOGIN_ACTIVITY": "Actividad de inicio de sesión",
+    "LOGIN_ACTIVITY": "Registros de actividad",
     "APP_SETTINGS": "Configuración de la aplicación",
     "MY_PROFILE": "Mi perfil",
     "LOGIN": "Inicio de sesión",

@@ -2,6 +2,10 @@
   "SIDEBAR": {
     "home": "首页",
     "systemManagement": "系统管理",
+    "platformManagement": "平台管理",
+    "systemRoleManagement": "角色管理",
+    "systemGroupManagement": "群组管理",
+    "systemUserManagement": "用户",
     "systemAdmin": "系统管理员",
     "orgManagement": "组织管理",
     "userAndAccess": "用户管理",
@@ -30,7 +34,7 @@
     "rlsRules": "RLS 规则",
     "auditActivity": "审计与活动",
     "auditLogs": "审计日志",
-    "loginActivity": "登录活动",
+    "loginActivity": "活动日志",
     "appSettings": "应用设置",
     "announcementManagement": "公告管理",
     "themeManagement": "主题",
@@ -2090,7 +2094,7 @@
     "LINK": {
       "AUDIT": "审计日志",
       "VIEW_ALL": "查看全部",
-      "LOGIN_ACTIVITY": "登录活动"
+      "LOGIN_ACTIVITY": "活动日志"
     },
     "EMPTY": {
       "NO_QUERIES": "此期间没有查询活动",
@@ -2161,7 +2165,7 @@
       "ORG_LIST": "组织",
       "COL_CREATED": "创建时间",
       "LOGIN_HEALTH": "登录健康度",
-      "NO_LOGINS": "此期间没有登录活动",
+      "NO_LOGINS": "此期间没有活动日志",
       "SUCCESS_RATE": "成功率",
       "OK_FAILED": "成功 / 失败",
       "PLATFORM_FEED": "近期平台活动"
@@ -2344,7 +2348,7 @@
     "QUERY_BUILDERS": "查询构建器",
     "FORM_BUILDER": "Form Builder",
     "AUDIT_LOGS": "审计日志",
-    "LOGIN_ACTIVITY": "登录活动",
+    "LOGIN_ACTIVITY": "活动日志",
     "APP_SETTINGS": "应用设置",
     "MY_PROFILE": "我的资料",
     "LOGIN": "登录",
@@ -6736,7 +6740,7 @@
         "DESC": "审查整个平台上谁改变了什么和何时改变的完整记录。当你需要回答“发生了什么？”时，这是你的真相来源。"
       },
       "loginActivity": {
-        "TITLE": "登录活动",
+        "TITLE": "活动日志",
         "DESC": "跟踪整个组织的登录和认证事件。明确了解访问历史，以便进行安全和合规。"
       },
       "appSettings": {

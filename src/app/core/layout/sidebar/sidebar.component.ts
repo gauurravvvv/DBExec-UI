@@ -40,7 +40,6 @@ interface MenuItem {
   value: string;
   status: boolean;
   icon: string;
-  isExpanded?: boolean;
   subPermissions?: MenuItem[];
   route?: string;
   /**
@@ -110,6 +109,21 @@ export class SidebarComponent implements OnInit, TourSidebarApi {
   @HostBinding('class.is-mobile') isMobile = false;
   menuItems: MenuItem[] = [];
 
+  /**
+   * Collapsed-rail children flyout. The nav is a flat, always-open tree when
+   * the rail is expanded, so there's no per-group accordion state. When the
+   * rail is COLLAPSED the children are hidden and a group's icon opens a
+   * flyout listing them — this holds the value of the group whose flyout is
+   * open (null = none). Same hover/click idiom as the profile Language/Theme
+   * flyouts. A short close delay lets the pointer travel the gap to the panel.
+   */
+  activeFlyoutValue: string | null = null;
+  /** Viewport-relative top (px) for the open flyout, aligned to the clicked
+   *  group's icon. The flyout is `position: fixed` so it escapes the nav's
+   *  `overflow-y: auto` scroll clip; that means we position it against the
+   *  viewport and set its top from the group row's bounding rect. */
+  flyoutTop = 0;
+
   // ── Identity / header chrome (moved from HeaderComponent) ────────
   organisationName = '';
   userInitials = '';
@@ -133,9 +147,6 @@ export class SidebarComponent implements OnInit, TourSidebarApi {
   /** The preset id the user is currently on (JWT claim, else org default). */
   currentThemeId: string | null = null;
   changingTheme = false;
-
-  /** localStorage key for the user's expanded-branch set. */
-  private static readonly EXPANDED_STORAGE_KEY = 'sidebar.expanded';
 
   /** Snapshot of the pinned-open state before the tour forced it open, so
    *  we can restore exactly what the user had after the tour ends. */
@@ -161,7 +172,6 @@ export class SidebarComponent implements OnInit, TourSidebarApi {
   ) {
     const tree = this.readPermissionTree();
     this.menuItems = this.processMenuItems(tree);
-    this.restoreExpandedState();
   }
 
   ngOnInit() {
@@ -274,7 +284,6 @@ export class SidebarComponent implements OnInit, TourSidebarApi {
         value: node.value,
         status: true,
         icon: node.icon ?? '',
-        isExpanded: false,
         subPermissions:
           processedChildren.length > 0 ? processedChildren : undefined,
         route: this.appendRouteToMenu(node),
@@ -307,35 +316,13 @@ export class SidebarComponent implements OnInit, TourSidebarApi {
     );
   }
 
-  private expandMenuForCurrentRoute() {
-    this.collapseAllMenus();
-    const currentUrl = this.router.url;
-
-    const expandParents = (items: MenuItem[]): boolean => {
-      for (const item of items) {
-        if (item.route && currentUrl.includes(item.route)) {
-          item.isExpanded = true;
-          return true;
-        }
-        if (item.subPermissions && expandParents(item.subPermissions)) {
-          item.isExpanded = true;
-          return true;
-        }
-      }
-      return false;
-    };
-
-    expandParents(this.menuItems);
-  }
-
   // ── Toggle / expand actions ──────────────────────────────────────
+  // The nav is a flat, always-open tree: there is no per-group accordion to
+  // open/close. Toggling the rail only changes width (icon-only ↔ full). Any
+  // open collapsed-rail flyout is dismissed on toggle.
   toggleSidebar() {
     this.isPinnedOpen = !this.isPinnedOpen;
-    if (this.isPinnedOpen) {
-      this.expandMenuForCurrentRoute();
-    } else {
-      this.collapseAllMenus();
-    }
+    this.closeFlyout();
     this.recomputeExpanded();
   }
 
@@ -343,81 +330,42 @@ export class SidebarComponent implements OnInit, TourSidebarApi {
     this.toggleSidebar();
   }
 
-  collapseAllMenus() {
-    this.menuItems.forEach(item => {
-      item.isExpanded = false;
-      if (item.subPermissions) {
-        item.subPermissions.forEach(subItem => {
-          subItem.isExpanded = false;
-          if (subItem.subPermissions) {
-            subItem.subPermissions.forEach(nestedItem => {
-              nestedItem.isExpanded = false;
-            });
-          }
-        });
-      }
-    });
-  }
+  // ── Collapsed-rail children flyout (CLICK only) ──────────────────
+  // When the rail is collapsed, group children are hidden; CLICKING a group
+  // icon toggles a flyout listing them. Click (not hover) so simply moving the
+  // pointer across the rail never spawns unwanted popovers. Dismissed by
+  // clicking the group again, clicking a child, or clicking outside (see
+  // handleClickOutside).
 
-  toggleSubmenuAndExpand(item: MenuItem) {
-    if (!this.isExpanded) {
-      this.isPinnedOpen = true;
-      this.recomputeExpanded();
-      setTimeout(() => {
-        item.isExpanded = true;
-        this.persistExpandedState();
-        this.cdr.markForCheck();
-      }, 100);
-      return;
-    }
-    const opening = !item.isExpanded;
-    item.isExpanded = opening;
-    if (!opening) this.collapseDescendants(item);
-    this.persistExpandedState();
+  /** Toggle this group's flyout. Expanded rail: inert (children already
+   *  visible). Collapsed rail: open this group (aligned to the clicked row),
+   *  or close it if it was already open. */
+  onGroupHeaderClick(item: MenuItem, event?: Event): void {
+    if (this.isExpanded) return;
+    const opening = this.activeFlyoutValue !== item.value;
+    if (opening && event) this.positionFlyout(event);
+    this.activeFlyoutValue = opening ? item.value : null;
     this.cdr.markForCheck();
   }
 
-  private persistExpandedState(): void {
-    try {
-      const open: string[] = [];
-      const collect = (items: MenuItem[]) => {
-        for (const i of items) {
-          if (i.isExpanded && i.value) open.push(i.value);
-          if (i.subPermissions?.length) collect(i.subPermissions);
-        }
-      };
-      collect(this.menuItems);
-      localStorage.setItem(
-        SidebarComponent.EXPANDED_STORAGE_KEY,
-        JSON.stringify(open),
-      );
-    } catch {
-      // localStorage may be unavailable; persistence is a nicety.
-    }
+  /** Align the fixed flyout's top to the clicked group's header rect, clamped
+   *  so a group low in the rail doesn't push the panel off-screen. The flyout
+   *  is `position: fixed` (to escape the nav's overflow clip), so it's placed
+   *  against the viewport from the row's bounding rect. */
+  private positionFlyout(event: Event): void {
+    const el = event.currentTarget as HTMLElement | null;
+    if (!el) return;
+    const rect = el.getBoundingClientRect();
+    const desired = rect.top - 6; // title sits level with the icon
+    const maxTop = window.innerHeight - 8;
+    this.flyoutTop = Math.max(8, Math.min(desired, maxTop));
   }
 
-  private restoreExpandedState(): void {
-    try {
-      const raw = localStorage.getItem(SidebarComponent.EXPANDED_STORAGE_KEY);
-      if (!raw) return;
-      const set = new Set<string>(JSON.parse(raw) as string[]);
-      const apply = (items: MenuItem[]) => {
-        for (const i of items) {
-          if (i.value && set.has(i.value)) i.isExpanded = true;
-          if (i.subPermissions?.length) apply(i.subPermissions);
-        }
-      };
-      apply(this.menuItems);
-    } catch {
-      // ignore malformed payload
-    }
-  }
-
-  private collapseDescendants(item: MenuItem) {
-    if (!item.subPermissions) return;
-    for (const child of item.subPermissions) {
-      child.isExpanded = false;
-      this.collapseDescendants(child);
+  /** Dismiss any open flyout (called after navigating from a flyout link). */
+  closeFlyout(): void {
+    if (this.activeFlyoutValue !== null) {
+      this.activeFlyoutValue = null;
+      this.cdr.markForCheck();
     }
   }
 
@@ -435,34 +383,16 @@ export class SidebarComponent implements OnInit, TourSidebarApi {
     return false;
   }
 
-  getIndentation(level: number): string {
-    const baseIndentation = 16;
-    return `${level * baseIndentation}px`;
-  }
-
   private checkScreenSize() {
     const wasMobile = this.isMobile;
     this.isMobile = window.innerWidth <= 768;
 
+    // Crossing into mobile un-pins the rail (it becomes a drawer). Any open
+    // collapsed-rail flyout is dismissed. The nav itself is flat, so there's
+    // no per-group accordion state to reset.
     if (!wasMobile && this.isMobile) {
-      this.menuItems.forEach(item => {
-        if (item.isExpanded) {
-          item.isExpanded = false;
-          if (item.subPermissions) {
-            item.subPermissions.forEach(subItem => {
-              if (subItem.isExpanded) {
-                subItem.isExpanded = false;
-                if (subItem.subPermissions) {
-                  subItem.subPermissions.forEach(nestedItem => {
-                    nestedItem.isExpanded = false;
-                  });
-                }
-              }
-            });
-          }
-        }
-      });
       this.isPinnedOpen = false;
+      this.closeFlyout();
     }
 
     this.recomputeExpanded();
@@ -484,10 +414,10 @@ export class SidebarComponent implements OnInit, TourSidebarApi {
   // Guided-tour API (TourSidebarApi) — driven by TourService only.
   // ─────────────────────────────────────────────────────────────────
 
-  /** Pin the sidebar open so every TOP-LEVEL nav row is visible + anchorable.
-   *  The tour targets top-level parents only (groups + top leaves), which are
-   *  always rendered — so we do NOT expand groups (that would reveal dozens of
-   *  submenu rows we deliberately don't tour). Remembers prior pinned state. */
+  /** Pin the sidebar open so every top-level nav row (group header or leaf) is
+   *  visible + anchorable. The nav is flat/always-open, so pinning open renders
+   *  the group headers the tour anchors on (it targets those parents only, not
+   *  the individual children). Remembers prior pinned state. */
   forceExpandForTour(): void {
     if (this.prePinnedOpen === null) this.prePinnedOpen = this.isPinnedOpen;
     this.isPinnedOpen = true;
@@ -692,6 +622,17 @@ export class SidebarComponent implements OnInit, TourSidebarApi {
       this.showProfileMenu = false;
       this.showLanguageFlyout = false;
       this.showThemeFlyout = false;
+    }
+    // Close the collapsed-rail children flyout on any click that isn't the
+    // group header that opened it or the flyout itself. (Clicking a flyout
+    // link closes it via closeFlyout on the link; this handles clicks
+    // anywhere else on the page.)
+    if (
+      this.activeFlyoutValue !== null &&
+      !target.closest('.nav-group-header') &&
+      !target.closest('.nav-flyout')
+    ) {
+      this.closeFlyout();
     }
   }
 }

@@ -2,6 +2,10 @@
   "SIDEBAR": {
     "home": "Startseite",
     "systemManagement": "Systemverwaltung",
+    "platformManagement": "Plattformverwaltung",
+    "systemRoleManagement": "Rollen",
+    "systemGroupManagement": "Gruppen",
+    "systemUserManagement": "Benutzer",
     "systemAdmin": "Systemadministrator",
     "orgManagement": "Organisationen",
     "userAndAccess": "Benutzerverwaltung",
@@ -30,7 +34,7 @@
     "rlsRules": "RLS Rules",
     "auditActivity": "Audit & Aktivität",
     "auditLogs": "Audit-Protokolle",
-    "loginActivity": "Anmeldeaktivität",
+    "loginActivity": "Aktivitätsprotokolle",
     "appSettings": "Einstellungen",
     "announcementManagement": "Ankündigungen",
     "themeManagement": "Designs",
@@ -2090,7 +2094,7 @@
     "LINK": {
       "AUDIT": "Audit-Protokolle",
       "VIEW_ALL": "Alle anzeigen",
-      "LOGIN_ACTIVITY": "Anmeldeaktivität"
+      "LOGIN_ACTIVITY": "Aktivitätsprotokolle"
     },
     "EMPTY": {
       "NO_QUERIES": "Keine Abfrageaktivität in diesem Zeitraum",
@@ -2161,7 +2165,7 @@
       "ORG_LIST": "Organisationen",
       "COL_CREATED": "Erstellt",
       "LOGIN_HEALTH": "Anmeldezustand",
-      "NO_LOGINS": "Keine Anmeldeaktivität in diesem Zeitraum",
+      "NO_LOGINS": "Keine Aktivitätsprotokolle in diesem Zeitraum",
       "SUCCESS_RATE": "Erfolgsrate",
       "OK_FAILED": "ok / fehlgeschlagen",
       "PLATFORM_FEED": "Letzte Plattformaktivität"
@@ -2344,7 +2348,7 @@
     "QUERY_BUILDERS": "Abfrage-Builder",
     "FORM_BUILDER": "Form Builder",
     "AUDIT_LOGS": "Audit-Protokolle",
-    "LOGIN_ACTIVITY": "Anmeldeaktivität",
+    "LOGIN_ACTIVITY": "Aktivitätsprotokolle",
     "APP_SETTINGS": "App-Einstellungen",
     "MY_PROFILE": "Mein Profil",
     "LOGIN": "Anmeldung",
@@ -6736,7 +6740,7 @@
         "DESC": "Überprüfe eine vollständige Nachverfolgung, wer was und wann geändert hat, auf der gesamten Plattform. Das ist deine Quelle der Wahrheit, wenn du \"Was ist passiert?\" beantworten musst."
       },
       "loginActivity": {
-        "TITLE": "Anmeldeaktivität",
+        "TITLE": "Aktivitätsprotokolle",
         "DESC": "Verfolge Anmeldungen und Authentifizierungsereignisse in deiner Organisation. Ein klarer Überblick über die Zugriffsverlaufsverlauf für Sicherheit und Compliance."
       },
       "appSettings": {

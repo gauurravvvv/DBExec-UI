@@ -2,6 +2,10 @@
   "SIDEBAR": {
     "home": "Home",
     "systemManagement": "System Management",
+    "platformManagement": "Platform Management",
+    "systemRoleManagement": "Roles",
+    "systemGroupManagement": "Groups",
+    "systemUserManagement": "Users",
     "systemAdmin": "System Admin",
     "orgManagement": "Organisations",
     "userAndAccess": "User Management",
@@ -30,7 +34,7 @@
     "rlsRules": "RLS Rules",
     "auditActivity": "Audit & Activity",
     "auditLogs": "Audit Logs",
-    "loginActivity": "Login Activity",
+    "loginActivity": "Activity Logs",
     "appSettings": "App Settings",
     "announcementManagement": "Announcements",
     "themeManagement": "Theme",
@@ -2094,7 +2098,7 @@
     "LINK": {
       "AUDIT": "Audit logs",
       "VIEW_ALL": "View all",
-      "LOGIN_ACTIVITY": "Login activity"
+      "LOGIN_ACTIVITY": "Activity logs"
     },
     "EMPTY": {
       "NO_QUERIES": "No query activity in this period",
@@ -2165,7 +2169,7 @@
       "ORG_LIST": "Organisations",
       "COL_CREATED": "Created",
       "LOGIN_HEALTH": "Login health",
-      "NO_LOGINS": "No login activity in this period",
+      "NO_LOGINS": "No activity logs in this period",
       "SUCCESS_RATE": "success rate",
       "OK_FAILED": "ok / failed",
       "PLATFORM_FEED": "Recent platform activity"
@@ -2353,7 +2357,7 @@
     "QUERY_BUILDERS": "Query Builders",
     "FORM_BUILDER": "Form Builder",
     "AUDIT_LOGS": "Audit Logs",
-    "LOGIN_ACTIVITY": "Login Activity",
+    "LOGIN_ACTIVITY": "Activity Logs",
     "APP_SETTINGS": "App Settings",
     "MY_PROFILE": "My Profile",
     "LOGIN": "Login",
@@ -3384,7 +3388,7 @@
     "INTEGRITY_BROKEN_HINT": "The hash chain does not verify — a record may have been altered. Click to re-check."
   },
   "LOGIN_ACTIVITY": {
-    "TITLE": "Login Activity",
+    "TITLE": "Activity Logs",
     "SUBTITLE": "Monitor user login sessions and authentication events",
     "USERNAME": "Username",
     "IP_ADDRESS": "IP Address",
@@ -3394,7 +3398,7 @@
     "SEARCH_IP": "Search IP",
     "SEARCH_USER": "Search user",
     "SEARCH_ORG": "Search org",
-    "NO_ACTIVITY_FOUND": "No login activity found",
+    "NO_ACTIVITY_FOUND": "No activity logs found",
     "SUCCESS": "Success",
     "FAILED": "Failed",
     "EVENT": "Event",
@@ -6734,7 +6738,7 @@
         "DESC": "Review a full trail of who changed what, and when, across the platform. It's your source of truth when you need to answer \"what happened?\"."
       },
       "loginActivity": {
-        "TITLE": "Login Activity",
+        "TITLE": "Activity Logs",
         "DESC": "Track sign-ins and authentication events across your organisation. A clear view of access history for security and compliance."
       },
       "appSettings": {
