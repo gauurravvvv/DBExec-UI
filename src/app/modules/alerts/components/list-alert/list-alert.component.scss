@@ -130,50 +130,6 @@ app-chip + app-chip {
 }
 
 /* ── projected empty body ───────────────────────────────────────── */
-.ct-empty-body {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-4);
-  padding: var(--space-9) var(--space-6);
-  color: var(--text-muted, var(--text-color-secondary));
-  text-align: center;
-
-  .empty-icon {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 64px;
-    height: 64px;
-    border-radius: 50%;
-    background: var(--hover-background);
-    margin-bottom: var(--space-2);
-
-    i {
-      font-size: 1.9rem;
-      color: var(--primary-color);
-      opacity: 0.8;
-    }
-  }
-
-  .empty-title {
-    font-size: var(--fs-h3);
-    font-weight: var(--fw-semibold);
-    color: var(--text-color);
-  }
-
-  .empty-hint {
-    font-size: var(--fs-caption);
-    max-width: 420px;
-    line-height: var(--lh-relaxed, 1.5);
-  }
-
-  app-button {
-    margin-top: var(--space-3);
-  }
-}
-
 /* ── popups (snooze + delete) ───────────────────────────────────── */
 .confirmation-popup {
   position: fixed;

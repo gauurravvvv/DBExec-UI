@@ -511,42 +511,33 @@
      found" both ways inside it. This keeps the message in the MIDDLE of the
      listing area rather than pinned to the top. Populated tables are
      unaffected (this only targets tbody rows tagged .ct-empty-row). */
-  .p-datatable-wrapper:has(.ct-empty-row) .p-datatable-table {
-    height: 100%;
-  }
-  .p-datatable-tbody:has(> tr.ct-empty-row) {
-    height: 100%;
-  }
   .p-datatable-tbody > tr.ct-empty-row,
   .p-datatable-tbody > tr.ct-empty-row:hover {
     background: transparent;
-    height: 100%;
   }
   .p-datatable-tbody > tr.ct-empty-row > td,
   .p-datatable-tbody > tr.ct-empty-row:hover > td {
     border: none;
     background: transparent;
-    /* The <td> stays a real table cell — full-height + middle vertical-align
-       so its inner block sits in the MIDDLE of the listing area (not pinned
-       to the top). colspan width is preserved because the cell isn't a flex
-       container. */
-    height: 100%;
-    vertical-align: middle;
+    /* Compact empty state: the cell sizes to its content and pins the message
+       just below the header (top-aligned) rather than stretching to fill the
+       whole scroll body and floating in the middle of a large void. colspan
+       width is preserved because the cell isn't a flex container. */
+    vertical-align: top;
     text-align: center;
-    padding: var(--space-6);
+    padding: var(--space-9) var(--space-6);
     color: var(--text-muted);
   }
   .ct-empty-inner {
-    /* Icon + "No records found" as a centred column block. min-height keeps it
-       comfortably centred even when the container is short. */
+    /* Icon + message as a compact centred column block — no min-height, so it
+       never creates a tall empty band. */
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    min-height: 200px;
+    gap: var(--space-4);
     i {
-      font-size: var(--icon-lg);
-      margin-bottom: var(--space-4);
+      font-size: var(--icon-md);
       opacity: 0.6;
     }
   }

@@ -14,54 +14,59 @@
     </div>
 
     <div class="content-card">
-      <div class="table-wrapper">
-        <p-table
-          [value]="templates()"
-          [loading]="loading()"
-          styleClass="p-datatable-sm"
+      <div class="table-wrapper" *ngIf="adapter">
+        <app-custom-table
+          [columns]="cols"
+          [serverAdapter]="adapter"
+          [config]="tableConfig"
+          [hasProjectedEmpty]="true"
+          (refresh)="refreshList()"
         >
-          <ng-template pTemplate="header">
-            <tr>
-              <th>{{ 'COMMON.NAME' | translate }}</th>
-              <th>{{ 'COMMON.DESCRIPTION' | translate }}</th>
-              <th>{{ 'FORM_BUILDER.PORTABILITY.SOURCE_VERSION' | translate }}</th>
-              <th>{{ 'FORM_BUILDER.COL_UPDATED' | translate }}</th>
-              <th class="actions-col">{{ 'COMMON.ACTIONS' | translate }}</th>
-            </tr>
+          <!-- Empty body — always projected so only one empty state shows. -->
+          <div tableEmpty class="ct-empty-body">
+            <i class="pi pi-inbox"></i>
+            <span>{{ 'FORM_BUILDER.PORTABILITY.NO_TEMPLATES' | translate }}</span>
+          </div>
+
+          <ng-template usGridCell="name" let-t>
+            <span class="dataset-name-link">{{ t.name }}</span>
           </ng-template>
 
-          <ng-template pTemplate="body" let-t>
-            <tr>
-              <td>{{ t.name }}</td>
-              <td>{{ t.description || '—' }}</td>
-              <td>{{ t.sourceVersionNo != null ? 'v' + t.sourceVersionNo : '—' }}</td>
-              <td>{{ t.createdOn | date: 'dd MMM yyyy, HH:mm' }}</td>
-              <td class="actions-col">
-                <app-button
-                  *hasPermission="'formBuilderScreen'; level: 'write'"
-                  variant="secondary"
-                  size="sm"
-                  icon="pi pi-clone"
-                  [loading]="cloningId() === t.id"
-                  [disabled]="!!cloningId()"
-                  (clicked)="onClone(t)"
-                  >{{ 'FORM_BUILDER.PORTABILITY.CLONE' | translate }}</app-button
-                >
-              </td>
-            </tr>
+          <ng-template usGridCell="description" let-t>
+            <span
+              class="description-text"
+              [pTooltip]="t.description || ''"
+              tooltipPosition="top"
+            >
+              {{ t.description || '—' }}
+            </span>
           </ng-template>
 
-          <ng-template pTemplate="emptymessage">
-            <tr>
-              <td colspan="5" class="ct-empty-body">
-                <i class="pi pi-inbox"></i>
-                <span>{{
-                  'FORM_BUILDER.PORTABILITY.NO_TEMPLATES' | translate
-                }}</span>
-              </td>
-            </tr>
+          <ng-template usGridCell="sourceVersion" let-t>
+            {{ t.sourceVersionNo != null ? 'v' + t.sourceVersionNo : '—' }}
           </ng-template>
-        </p-table>
+
+          <ng-template usGridCell="updated" let-t>
+            <span class="date-text">
+              {{ t.createdOn | date: 'dd MMM yyyy, HH:mm' }}
+            </span>
+          </ng-template>
+
+          <ng-template usGridCell="actions" let-t>
+            <div class="row-actions">
+              <app-button
+                *hasPermission="'formBuilderScreen'; level: 'write'"
+                variant="secondary"
+                size="sm"
+                icon="pi pi-clone"
+                [loading]="cloningId() === t.id"
+                [disabled]="!!cloningId()"
+                (clicked)="onClone(t)"
+                >{{ 'FORM_BUILDER.PORTABILITY.CLONE' | translate }}</app-button
+              >
+            </div>
+          </ng-template>
+        </app-custom-table>
       </div>
     </div>
   </div>

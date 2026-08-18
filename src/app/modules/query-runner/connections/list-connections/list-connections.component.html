@@ -17,28 +17,6 @@
     </div>
 
     <div class="content-card">
-      <!-- Datasource filter — folds a top-level `datasourceId` into the list
-           call; clearing shows all. Selection is mirrored to ?datasourceId=. -->
-      <div class="list-filter-bar">
-        <app-custom-dropdown
-          class="ds-filter"
-          [ngModel]="selectedDatasourceId"
-          [ngModelOptions]="{ standalone: true }"
-          (onChangeEvent)="onDatasourceFilterChange($event)"
-          [serverMode]="true"
-          [fetcher]="loadDatasourcesPage"
-          [pageSize]="10"
-          optionLabel="name"
-          optionValue="id"
-          [filter]="true"
-          filterBy="name"
-          [showClear]="true"
-          appendTo="body"
-          icon="pi-database"
-          [placeholder]="'COMMON.ALL_DATASOURCES' | translate"
-        ></app-custom-dropdown>
-      </div>
-
       <div class="table-wrapper" *ngIf="adapter">
         <app-custom-table
           [columns]="cols"
@@ -47,6 +25,30 @@
           [hasProjectedEmpty]="true"
           (refresh)="refreshList()"
         >
+          <!-- Datasource filter on the table's toolbar row (shared with search),
+               so there is no separate filter band. Folds a top-level
+               `datasourceId` into the list call; clearing shows all. Mirrored
+               to ?datasourceId=. -->
+          <div tableToolbarStart class="qx-toolbar-start">
+            <app-custom-dropdown
+              class="ds-filter"
+              [ngModel]="selectedDatasourceId"
+              [ngModelOptions]="{ standalone: true }"
+              (onChangeEvent)="onDatasourceFilterChange($event)"
+              [serverMode]="true"
+              [fetcher]="loadDatasourcesPage"
+              [pageSize]="10"
+              optionLabel="name"
+              optionValue="id"
+              [filter]="true"
+              filterBy="name"
+              [showClear]="true"
+              appendTo="body"
+              icon="pi-database"
+              [placeholder]="'COMMON.ALL_DATASOURCES' | translate"
+            ></app-custom-dropdown>
+          </div>
+
           <!-- Empty body — always projected so only one empty state shows. -->
           <div tableEmpty class="ct-empty-body">
             <i class="pi pi-inbox"></i>

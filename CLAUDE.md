@@ -303,7 +303,14 @@ The most complex FE module. Standalone executor tab at
 - Route through `HttpClientService`; endpoints from `api.constant.ts`;
   routes from `routes.constant.ts`.
 - New services: signals + `providedIn: 'root'` + read/write/per-id loading.
-- Lists: `app-custom-table` + server adapter (50, `createdOn DESC`).
+- Lists: `app-custom-table` + server adapter (50, `createdOn DESC`). Every list
+  is identical — only the data differs. Put ANY filter control (datasource
+  picker, type chips, capability badge) in the `[tableToolbarStart]` slot so it
+  shares the ONE toolbar row with the global search — never a separate
+  `.list-filter-bar` band above the table (reference `/app/db-roles`). The empty
+  state is a projected `<div tableEmpty class="ct-empty-body"><i…><span…></div>`;
+  `.ct-empty-body` is defined ONCE globally in `styles.scss` (compact, top-
+  aligned) — do NOT re-declare it per component.
 - Controls: shared `app-custom-*`, `appendTo="body"` on overlays.
 - Skeleton: one parent card (`--card-background` / `--radius-md` /
   `--shadow-sm` / `--space-8`), reference `/app/db-roles`; back button via the

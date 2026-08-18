@@ -5,3 +5,27 @@
 :host {
   @include skeleton.page-list;
 }
+
+// Cell helpers — same look as list-form (name link, secondary text, actions).
+.dataset-name-link {
+  color: var(--primary-color);
+  font-weight: var(--fw-medium);
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.description-text,
+.date-text {
+  color: var(--text-color);
+  font-size: var(--fs-control);
+}
+
+.row-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-2);
+}

@@ -1003,6 +1003,37 @@ app-custom-table {
   }
 }
 
+// ================================================================
+// Canonical empty-state body for every list — ONE definition.
+// Lists project a `<div tableEmpty class="ct-empty-body">` into
+// app-custom-table's [tableEmpty] slot. Projected content is styled
+// by the PARENT view, so a single GLOBAL rule (not the table's own
+// scoped scss) is what makes every list's empty state identical.
+// Compact: icon + message, top-aligned by the table's empty cell,
+// no tall void. Theme-driven. Keep per-list copies OUT of component
+// scss — this rule is the source of truth.
+// ================================================================
+.ct-empty-body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-4);
+  padding: var(--space-8) var(--space-6);
+  color: var(--text-muted);
+  text-align: center;
+
+  i {
+    font-size: var(--icon-md);
+    opacity: 0.6;
+  }
+  span {
+    font-size: var(--fs-body);
+    max-width: 420px;
+    line-height: 1.5;
+  }
+}
+
 // Group ALL paginator content (page-report, page buttons, refresh,
 // rows-per-page) on the right side of the card as one cohesive
 // cluster, with readable spacing between sub-groups.

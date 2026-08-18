@@ -34,21 +34,8 @@
           <!-- Empty body — always projected so only one empty state shows.
                Friendly icon + heading + guidance + a create CTA. -->
           <div tableEmpty class="ct-empty-body">
-            <div class="empty-icon"><i class="pi pi-bell"></i></div>
-            <span class="empty-title">{{
-              'ALERTS.NO_ALERTS' | translate
-            }}</span>
-            <span class="empty-hint">{{
-              'ALERTS.NO_ALERTS_HINT' | translate
-            }}</span>
-            <app-button
-              *hasPermission="'alertManagement'; level: 'write'"
-              variant="primary"
-              icon="pi pi-plus"
-              (clicked)="onAddNewAlert()"
-            >
-              {{ 'ALERTS.CREATE_FIRST' | translate }}
-            </app-button>
+            <i class="pi pi-inbox"></i>
+            <span>{{ 'ALERTS.NO_ALERTS' | translate }}</span>
           </div>
 
           <ng-template usGridCell="name" let-alert>

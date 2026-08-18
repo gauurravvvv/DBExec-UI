@@ -3,12 +3,14 @@
  * action that creates a NEW family + draft from a template's payload and
  * navigates to it. Read on init; clone is WRITE (gated by formBuilderScreen).
  *
- * Kept modular: a light list (payload omitted server-side) rendered with the
- * shared table chrome + app-button; no server paging (templates are few).
+ * Renders through the shared <app-custom-table> so it looks identical to every
+ * other listing. Templates are few, so the adapter loads them all in one call
+ * (no real server paging) and reports total from the array length.
  */
 import {
   ChangeDetectionStrategy,
   Component,
+  OnDestroy,
   OnInit,
   inject,
   signal,
@@ -17,6 +19,11 @@ import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { FORM_BUILDER } from 'src/app/core/constants/routes.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
+import type {
+  CustomTableColumn,
+  CustomTableConfig,
+} from 'src/app/shared/components/custom-table/custom-table.types';
+import { UsServerListAdapter } from 'src/app/shared/components/us-data-grid/us-server-list-adapter';
 import {
   FormPortabilityService,
   FormTemplateRow,
@@ -28,31 +35,83 @@ import {
   styleUrls: ['./list-form-templates.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ListFormTemplatesComponent implements OnInit {
+export class ListFormTemplatesComponent implements OnInit, OnDestroy {
   private readonly portability = inject(FormPortabilityService);
   private readonly global = inject(GlobalService);
   private readonly translate = inject(TranslateService);
   private readonly router = inject(Router);
 
   readonly routes = FORM_BUILDER;
-  readonly loading = this.portability.loadingTemplates;
-  readonly cloning = this.portability.cloning;
-  readonly templates = signal<FormTemplateRow[]>([]);
   /** id of the template a clone is in flight for (per-row spinner). */
   readonly cloningId = signal<string | null>(null);
 
-  async ngOnInit(): Promise<void> {
-    await this.refresh();
+  cols: CustomTableColumn[] = [];
+  tableConfig: CustomTableConfig = {
+    pageSize: 50,
+    globalSearch: true,
+    globalSearchKey: 'name',
+    gridKey: 'form-templates-list',
+    height: 'flex',
+    rowIdField: 'id',
+  };
+
+  // Templates are few — load them all in one call and report total from the
+  // returned array. `listTemplates()` resolves to a bare FormTemplateRow[].
+  adapter = new UsServerListAdapter<any>({
+    load: () => this.portability.listTemplates(),
+    unwrap: (res: unknown) => {
+      const rows = (res as FormTemplateRow[]) ?? [];
+      return { rows, total: rows.length };
+    },
+    initial: { page: 1, limit: 50 },
+  });
+
+  ngOnInit(): void {
+    const t = (k: string) => this.translate.instant(k);
+    this.cols = [
+      {
+        colId: 'name',
+        field: 'name',
+        header: t('COMMON.NAME'),
+        width: '260px',
+        frozen: true,
+      },
+      {
+        colId: 'description',
+        field: 'description',
+        header: t('COMMON.DESCRIPTION'),
+        width: '320px',
+        sortable: false,
+      },
+      {
+        colId: 'sourceVersion',
+        field: 'sourceVersionNo',
+        header: t('FORM_BUILDER.PORTABILITY.SOURCE_VERSION'),
+        width: '160px',
+        sortable: false,
+      },
+      {
+        colId: 'updated',
+        field: 'createdOn',
+        header: t('FORM_BUILDER.COL_UPDATED'),
+        width: '200px',
+        sortable: false,
+      },
+      {
+        colId: 'actions',
+        header: t('COMMON.ACTIONS'),
+        width: '160px',
+        sortable: false,
+      },
+    ];
   }
 
-  async refresh(): Promise<void> {
-    try {
-      this.templates.set(await this.portability.listTemplates());
-    } catch {
-      this.global.showWarn(
-        this.translate.instant('FORM_BUILDER.PORTABILITY.TEMPLATES_LOAD_FAILED'),
-      );
-    }
+  ngOnDestroy(): void {
+    this.adapter?.destroy();
+  }
+
+  refreshList(): void {
+    this.adapter?.reload();
   }
 
   async onClone(template: FormTemplateRow): Promise<void> {

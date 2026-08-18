@@ -24,7 +24,14 @@
       [columns]="cols"
       [serverAdapter]="adapter"
       [config]="tableConfig"
+      [hasProjectedEmpty]="true"
     >
+      <!-- Empty body — always projected so only one empty state shows. -->
+      <div tableEmpty class="ct-empty-body">
+        <i class="pi pi-inbox"></i>
+        <span>{{ 'COMMON.NO_RECORDS' | translate }}</span>
+      </div>
+
       <ng-template usGridCell="name" let-row>
         <span class="tpl-name">{{ row.name }}</span>
       </ng-template>

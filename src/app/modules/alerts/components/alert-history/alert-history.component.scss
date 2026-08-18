@@ -51,22 +51,3 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-
-.ct-empty-body {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-4);
-  padding: var(--space-8) var(--space-6);
-  color: var(--text-muted, var(--text-color-secondary));
-  text-align: center;
-
-  i {
-    font-size: 1.6rem;
-    opacity: 0.6;
-  }
-  span {
-    font-size: var(--fs-body);
-  }
-}
