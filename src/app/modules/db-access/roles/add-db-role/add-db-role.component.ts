@@ -16,6 +16,7 @@ import { GlobalService } from 'src/app/core/services/global.service';
 import { DbAccessContextService } from '../../services/db-access-context.service';
 import { DbAccessService } from '../../services/db-access.service';
 import { DbTemplateService } from '../../services/db-template.service';
+import { ChangeIntent, describeChange } from '../../services/describe-change';
 
 /**
  * AddDbRoleComponent — full-page create for a PostgreSQL role.
@@ -56,6 +57,23 @@ export class AddDbRoleComponent implements OnInit, HasUnsavedChanges {
   // apply them as a change-set to the new role.
   copyPrivileges = false;
   cloningPrivileges = false;
+
+  // ── Change-summary / Review-SQL confirm gate (BUG-01) ───────────────────
+  // Save routes through the shared read-only SQL-preview dialog: POST with
+  // previewOnly:true → open <app-change-summary-dialog> with the BE-built SQL
+  // + danger badges → on confirm, execute with the typed phrase threaded in.
+  // NO SQL is ever composed on the FE.
+  showPreview = false;
+  previewLoading = false;
+  summaries: string[] = [];
+  previewStatements: any[] = [];
+  previewDestructive = false;
+  previewTitle = '';
+  confirmPhrase: string | null = null;
+  // Execute takes the typed confirm phrase (empty when not a critical op) so
+  // the BE can re-check it server-side.
+  private pendingExecute: ((confirmPhrase: string) => Promise<any>) | null =
+    null;
 
   constructor(
     private dbAccess: DbAccessService,
@@ -303,35 +321,119 @@ export class AddDbRoleComponent implements OnInit, HasUnsavedChanges {
     return attributes;
   }
 
+  /**
+   * Save (BUG-01): NEVER execute the create in one click. First fetch the
+   * read-only SQL preview (previewOnly:true), open the shared Review-SQL
+   * dialog with the BE-built SQL + danger badges, and only execute after the
+   * user confirms — critical attributes (SUPERUSER / BYPASSRLS) force a
+   * typed-phrase confirm that the BE re-checks server-side.
+   */
   onSubmit(): void {
     if (this.roleForm.invalid) return;
     const v = this.roleForm.getRawValue();
     const attributes = this.buildAttributes(!!v.canLogin);
-    const needsSuperuserConfirm = !!(
-      attributes.superuser || attributes.bypassrls
-    );
 
-    const body: any = { name: v.name, attributes };
-    if (this.createMode === 'clone' && v.cloneFrom)
-      body.cloneFrom = v.cloneFrom;
-    if (needsSuperuserConfirm) body.confirm = true;
+    // Base body sent on BOTH the preview and execute calls (no `confirm`
+    // flag / no SQL built here — the BE composes and classifies the SQL).
+    const base: any = { name: v.name, attributes };
+    if (this.createMode === 'clone' && v.cloneFrom) base.cloneFrom = v.cloneFrom;
 
     const wantCopy =
       this.createMode === 'clone' && !!v.cloneFrom && this.copyPrivileges;
 
-    this.dbAccess
-      .createRole(this.datasourceId, body)
-      .then(async res => {
-        if (!this.globalService.handleSuccessService(res)) return;
-        // Optionally copy the source role's object grants onto the new role.
-        if (wantCopy) {
-          await this.cloneGrants(v.cloneFrom as string, v.name);
+    this.previewTitle = this.translate.instant(
+      v.canLogin ? 'DB_ACCESS.PREVIEW_CREATE_USER' : 'DB_ACCESS.PREVIEW_CREATE_ROLE',
+    );
+    this.previewDestructive = false;
+    this.confirmPhrase = null;
+
+    const intent: ChangeIntent = {
+      kind: 'createRole',
+      name: v.name,
+      attributes,
+    };
+
+    this.runPreviewAndArm(
+      [intent],
+      () =>
+        this.dbAccess.createRole(this.datasourceId, {
+          ...base,
+          previewOnly: true,
+        }),
+      confirmPhrase =>
+        this.dbAccess
+          .createRole(this.datasourceId, { ...base, confirmPhrase })
+          .then(async res => {
+            // On success, optionally copy the source role's object grants onto
+            // the new role BEFORE confirmPreview navigates away (best-effort,
+            // unchanged behaviour). The success toast fires once in
+            // confirmPreview — don't toast here.
+            if (res?.status && wantCopy) {
+              await this.cloneGrants(v.cloneFrom as string, v.name);
+            }
+            return res;
+          }),
+    );
+  }
+
+  // ── Shared Review-SQL confirm flow (mirrors list-db-roles) ───────────────
+  private runPreviewAndArm(
+    intents: ChangeIntent[],
+    preview: () => Promise<any>,
+    execute: (confirmPhrase: string) => Promise<any>,
+  ): void {
+    this.showPreview = true;
+    this.previewLoading = true;
+    // Optimistic plain-language lines; the SQL + danger arrive from preview().
+    this.summaries = intents.map(i => describeChange(i, this.translate));
+    this.previewStatements = [];
+    this.pendingExecute = execute;
+    this.cdr.markForCheck();
+    preview()
+      .then(res => {
+        if (!res?.status) {
+          this.globalService.handleSuccessService(res);
+          this.showPreview = false;
+          return;
         }
-        this.roleForm.markAsPristine();
-        this.goBack();
+        // Bind the real SQL + danger classification returned by the BE.
+        const data = res.data ?? {};
+        this.previewStatements = data.statements ?? [];
+        if (Array.isArray(data.summary) && data.summary.length) {
+          this.summaries = data.summary;
+        }
+        this.previewDestructive = !!data.isDestructive;
+        // A critical change-set (SUPERUSER / BYPASSRLS) carries the exact
+        // phrase the user must type; only set it when the BE requires one.
+        if (data.requiresTypedConfirm && data.confirmPhrase) {
+          this.confirmPhrase = data.confirmPhrase;
+        }
+      })
+      .catch(() => (this.showPreview = false))
+      .finally(() => {
+        this.previewLoading = false;
+        this.cdr.markForCheck();
+      });
+  }
+
+  confirmPreview(confirmPhrase: string): void {
+    if (!this.pendingExecute) return;
+    this.pendingExecute(confirmPhrase)
+      .then(res => {
+        if (this.globalService.handleSuccessService(res)) {
+          this.showPreview = false;
+          this.roleForm.markAsPristine();
+          this.goBack();
+        }
       })
       .catch(() => {})
       .finally(() => this.cdr.markForCheck());
+  }
+
+  cancelPreview(): void {
+    this.showPreview = false;
+    this.pendingExecute = null;
+    this.previewStatements = [];
   }
 
   /**

@@ -68,7 +68,6 @@ import { ReplaceUnderscoresPipe } from './pipes/replace-underscores.pipe';
     CustomToggleComponent,
     JustificationDialogComponent,
     CustomColorComponent,
-    SearchInputComponent,
     CustomFileComponent,
     CommandModalComponent,
     GlobalSearchComponent,
@@ -104,6 +103,9 @@ import { ReplaceUnderscoresPipe } from './pipes/replace-underscores.pipe';
     TranslateModule,
     // Standalone canonical button — used by the calculated-fields dialog.
     ButtonComponent,
+    // Standalone shared search — re-exported below so module consumers keep
+    // using <app-search-input>; also importable by standalone components.
+    SearchInputComponent,
   ],
   exports: [
     AssetShareDialogComponent,

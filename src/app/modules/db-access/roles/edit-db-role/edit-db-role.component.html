@@ -176,3 +176,20 @@
     </div>
   </div>
 </div>
+
+<!-- Review-SQL confirm gate (BUG-01): every alter routes through the shared
+     read-only preview dialog. Neutral → one click; destructive → "I
+     understand"; critical (SUPERUSER / BYPASSRLS) → type the exact phrase. -->
+<app-change-summary-dialog
+  [visible]="showPreview"
+  [title]="previewTitle"
+  [summaries]="summaries"
+  [statements]="previewStatements"
+  [destructive]="previewDestructive"
+  [confirmPhrase]="confirmPhrase"
+  [loading]="previewLoading"
+  [executing]="saving()"
+  [readOnly]="false"
+  (confirmed)="confirmPreview($event)"
+  (cancelled)="cancelPreview()"
+></app-change-summary-dialog>

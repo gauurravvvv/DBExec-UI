@@ -3,10 +3,12 @@ import {
   ChangeDetectorRef,
   Component,
   ElementRef,
+  Input,
   OnDestroy,
   OnInit,
   inject,
 } from '@angular/core';
+import { Subscription } from 'rxjs';
 import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { DB_ACCESS } from 'src/app/core/constants/routes.constant';
@@ -32,19 +34,6 @@ const FUNCTION_PRIVS = ['EXECUTE'];
 
 type Level = 'table' | 'column' | 'schema' | 'sequence' | 'function';
 type Option = { label: string; value: string };
-
-/**
- * One object's effective privileges, grouped from the flat API rows for the
- * Effective-privileges panel. `sources` lists distinct provenance — 'Direct'
- * for a direct grant, otherwise the role the privilege is inherited through.
- */
-interface EffectiveGroup {
-  key: string; // "schema.table" — display label + filter target + trackBy id
-  privileges: string[]; // sorted, de-duplicated privilege names (full set)
-  shown: string[]; // the first N privileges rendered as chips (fits one line)
-  extra: number; // count collapsed into the "+N" chip (0 when all shown)
-  sources: string[]; // distinct provenance: 'Direct' | '<role>' …
-}
 
 /**
  * One composed access rule (a repeater row). Maps to one or more change-set
@@ -97,6 +86,24 @@ export class PrivilegesAccessComponent implements OnInit, OnDestroy {
   private cdr = inject(ChangeDetectorRef);
   private host: ElementRef<HTMLElement> = inject(ElementRef);
 
+  /**
+   * Embedded in the Privileges hub — hide this component's own page header
+   * (title + all the section-nav buttons + the Apply button), its own
+   * datasource-picker toolbar row, and the internal Compose/Effective
+   * segmented control. The hub owns those; the datasource comes from the
+   * shared context (DbAccessContextService.datasourceChanged$).
+   */
+  @Input() embedded = false;
+  /**
+   * Force which single sub-view this instance shows when embedded. The hub
+   * mounts two instances — one `compose`, one `effective` — so each tab gets
+   * full width and only the Compose instance carries the change-summary
+   * dialog + Apply. `null` (standalone) keeps the internal segmented toggle.
+   */
+  @Input() mode: 'compose' | 'effective' | null = null;
+
+  private dsSub?: Subscription;
+
   /** Rule id to flash after it's added (drives a transient highlight class). */
   highlightId: number | null = null;
   private highlightTimer: ReturnType<typeof setTimeout> | null = null;
@@ -124,20 +131,11 @@ export class PrivilegesAccessComponent implements OnInit, OnDestroy {
   // Per-rule hints (e.g. column-level pruned tables to a single table).
   ruleHints: Record<number, string> = {};
 
-  // ── Role filter → effective privileges (merged from old Effective tab) ──
+  // ── Role picker → effective privileges (unified app-privilege-tree) ──
+  // The picked role feeds <app-privilege-tree>, which server-lazy-loads the
+  // schema → table → privilege tree with the Direct/Inherited/All split and
+  // system-schema toggle. No client-side grouping/filtering here anymore.
   filterRole: string | null = null;
-  effectiveLoading = false;
-  /** Raw flat rows from the API ({schema, table, privilege, via}). */
-  private effectiveRaw: any[] = [];
-  /** Rows grouped into one entry per object (schema.table) — the display model. */
-  effectiveGroups: EffectiveGroup[] = [];
-  /** effectiveGroups narrowed by the object filter box (what the list renders). */
-  filteredGroups: EffectiveGroup[] = [];
-  /** Substring filter over schema.table. */
-  effectiveFilter = '';
-  /** Totals for the summary line. */
-  effectiveObjectCount = 0;
-  effectivePrivCount = 0;
 
   // ── Review-SQL confirm gate ─────────────────────────────────────────────
   showConfirm = false;
@@ -162,6 +160,186 @@ export class PrivilegesAccessComponent implements OnInit, OnDestroy {
     return this.ctx.canManage;
   }
 
+  // ── Intent-first (guided) compose ───────────────────────────────────────
+  // Default mode is a WHO → WHAT → WHERE guided flow that drives a SINGLE
+  // AccessRule (rules[0]); "Advanced" reveals the full multi-rule card
+  // repeater. Both feed the SAME applyChanges() preview→execute pipeline, so
+  // the guided flow is pure UX sugar over the existing change-set machinery.
+  composeMode: 'guided' | 'advanced' = 'guided';
+
+  /** Grant presets → the privilege set they expand to (table level). */
+  readonly PRESETS: { key: string; labelKey: string; descKey: string; privileges: string[] }[] =
+    [
+      {
+        key: 'read',
+        labelKey: 'DB_ACCESS.PRESET_READ',
+        descKey: 'DB_ACCESS.PRESET_READ_DESC',
+        privileges: ['SELECT'],
+      },
+      {
+        key: 'readwrite',
+        labelKey: 'DB_ACCESS.PRESET_RW',
+        descKey: 'DB_ACCESS.PRESET_RW_DESC',
+        privileges: ['SELECT', 'INSERT', 'UPDATE', 'DELETE'],
+      },
+      {
+        key: 'custom',
+        labelKey: 'DB_ACCESS.PRESET_CUSTOM',
+        descKey: 'DB_ACCESS.PRESET_CUSTOM_DESC',
+        privileges: [],
+      },
+    ];
+  /** Which preset the user picked in guided mode ('' until chosen). */
+  guidedPreset = '';
+
+  // ── Reflect current state (diff-apply) ──────────────────────────────────
+  // When a grantee + schema is chosen, we load the role's CURRENT direct
+  // grants so the guided privilege picker starts pre-selected with what the
+  // role already has — you edit against reality, and Apply sends only the
+  // GRANT/REVOKE delta. `currentPrivs` is the set of privileges the grantee
+  // already holds across the chosen scope (union of table grants in-schema).
+  currentPrivs = new Set<string>();
+  loadingCurrent = false;
+  /** True once we've loaded current grants for the active grantee+schema. */
+  private currentLoadedFor = '';
+
+  /** The single rule guided mode manipulates (always rules[0]). */
+  get primaryRule(): AccessRule | null {
+    return this.rules[0] ?? null;
+  }
+
+  setComposeMode(mode: 'guided' | 'advanced'): void {
+    if (mode === this.composeMode) return;
+    this.composeMode = mode;
+    // Switching modes clears the previous form entirely — Guided and Advanced
+    // build the rule set differently, and carrying half-filled state across is
+    // confusing. Reset to a single blank rule + clear guided selections so the
+    // user starts fresh (and Apply is re-gated to invalid).
+    this.rules = [this.blankRule()];
+    this.guidedPreset = '';
+    this.currentPrivs = new Set<string>();
+    this.currentLoadedFor = '';
+    this.cdr.markForCheck();
+  }
+
+  /** A fresh, empty access rule (grant on all tables in a schema, no privs). */
+  private blankRule(): AccessRule {
+    return {
+      id: ++this.ruleSeq,
+      schema: '',
+      allTables: true,
+      tables: [],
+      columnsByTable: {},
+      level: 'table',
+      privileges: [],
+      grantee: '',
+      action: 'grant',
+      withGrantOption: false,
+    };
+  }
+
+  /** Apply a preset: set the primary rule's privileges to the preset's set. */
+  setPreset(key: string): void {
+    const preset = this.PRESETS.find(p => p.key === key);
+    const rule = this.primaryRule;
+    if (!preset || !rule) return;
+    this.guidedPreset = key;
+    if (key !== 'custom') {
+      rule.privileges = [...preset.privileges];
+    } else if (!rule.privileges.length) {
+      rule.privileges = [];
+    }
+    rule.level = 'table';
+    this.rules = [...this.rules]; // immutable nudge → OnPush + Apply gating
+    this.cdr.markForCheck();
+  }
+
+  /** Toggle one privilege in the guided "Custom" grid. */
+  toggleGuidedPriv(priv: string): void {
+    const rule = this.primaryRule;
+    if (!rule) return;
+    rule.privileges = rule.privileges.includes(priv)
+      ? rule.privileges.filter(p => p !== priv)
+      : [...rule.privileges, priv];
+    this.guidedPreset = 'custom';
+    this.rules = [...this.rules];
+    this.cdr.markForCheck();
+  }
+
+  /** Set who the guided grant is for. */
+  setGuidedGrantee(grantee: string): void {
+    const rule = this.primaryRule;
+    if (!rule) return;
+    rule.grantee = grantee ?? '';
+    this.rules = [...this.rules];
+    this.reflectCurrentState();
+    this.cdr.markForCheck();
+  }
+
+  /** Set the guided target schema (delegates to the existing reconcile). */
+  setGuidedSchema(schema: string): void {
+    const rule = this.primaryRule;
+    if (!rule) return;
+    rule.schema = schema ?? '';
+    this.onSchemaChange(rule);
+    this.reflectCurrentState();
+  }
+
+  /**
+   * Load the grantee's CURRENT direct grants for the chosen schema and
+   * pre-select the privileges it already holds — so the guided picker reflects
+   * reality (diff-apply). Only runs when both grantee + schema are set; keyed
+   * so it doesn't re-fetch for the same pair.
+   */
+  private reflectCurrentState(): void {
+    const rule = this.primaryRule;
+    if (!rule || !rule.grantee || !rule.schema || !this.datasourceId) {
+      this.currentPrivs = new Set();
+      this.currentLoadedFor = '';
+      return;
+    }
+    const key = `${rule.grantee}::${rule.schema}`;
+    if (key === this.currentLoadedFor) return;
+    this.currentLoadedFor = key;
+    this.loadingCurrent = true;
+    this.currentPrivs = new Set();
+    this.cdr.markForCheck();
+    this.dbAccess
+      .loadRoleGrants(this.datasourceId, rule.grantee)
+      .then(res => {
+        const grants: any[] = res?.status ? (res.data ?? []) : [];
+        const inSchema = grants.filter(g => g.schema === rule.schema);
+        this.currentPrivs = new Set(
+          inSchema.map(g => String(g.privilege).toUpperCase()),
+        );
+        // Pre-select what they already have (only if the user hasn't started
+        // a custom edit yet), so the picker opens reflecting current state.
+        if (!this.guidedPreset && this.currentPrivs.size) {
+          rule.privileges = [...this.currentPrivs];
+          this.guidedPreset = 'custom';
+          this.rules = [...this.rules];
+        }
+      })
+      .catch(() => (this.currentPrivs = new Set()))
+      .finally(() => {
+        this.loadingCurrent = false;
+        this.cdr.markForCheck();
+      });
+  }
+
+  /** Does the grantee already hold this privilege on the chosen scope? */
+  alreadyHas(priv: string): boolean {
+    return this.currentPrivs.has(priv);
+  }
+
+  /** All-tables vs specific-tables in guided mode. */
+  setGuidedAllTables(all: boolean): void {
+    const rule = this.primaryRule;
+    if (!rule) return;
+    rule.allTables = all;
+    this.onAllTablesChange(rule);
+  }
+
   /** Open the live Active Sessions viewer, carrying the selected datasource. */
   goToSessions(): void {
     this.router.navigate(['/app/db-privileges/sessions'], {
@@ -175,6 +353,19 @@ export class PrivilegesAccessComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    // Embedded: this instance is locked to a single sub-view (the hub renders
+    // one per tab) and takes its datasource from the shared context.
+    if (this.mode) this.activeTab = this.mode;
+    if (this.embedded) {
+      // Hydrate any datasource already chosen (cross-section nav / the hub's
+      // shared picker), then react to future changes from the hub picker.
+      const initial = this.ctx.datasourceId() || '';
+      if (initial) this.onDatasourceChange(initial);
+      this.dsSub = this.ctx.datasourceChanged$.subscribe(id =>
+        this.onDatasourceChange(id || ''),
+      );
+    }
+
     this.levelOptions = [
       {
         label: this.translate.instant('DB_ACCESS.LEVEL_TABLE'),
@@ -201,6 +392,7 @@ export class PrivilegesAccessComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.dbAccess.cancelReads();
+    this.dsSub?.unsubscribe();
     if (this.highlightTimer) clearTimeout(this.highlightTimer);
   }
 
@@ -216,7 +408,9 @@ export class PrivilegesAccessComponent implements OnInit, OnDestroy {
     this.ruleSeq = 0;
     this.ruleHints = {};
     this.filterRole = null;
-    this.resetEffective();
+    this.guidedPreset = '';
+    this.currentPrivs = new Set();
+    this.currentLoadedFor = '';
     if (!this.datasourceId) {
       this.cdr.markForCheck();
       return;
@@ -252,7 +446,10 @@ export class PrivilegesAccessComponent implements OnInit, OnDestroy {
     this.dbAccess
       .loadDefaultPrivileges(this.datasourceId)
       .then(res => {
-        if (res?.status) this.defaultPrivileges = res.data ?? [];
+        // BE returns ready-to-render rows { scope, grantee, privileges[] },
+        // exploded from pg_default_acl and ORDER BY'd (scope, object_type,
+        // grantee) entirely in SQL — no FE parsing or sorting.
+        this.defaultPrivileges = res?.status ? (res.data ?? []) : [];
         this.cdr.markForCheck();
       })
       .catch(() => {});
@@ -263,24 +460,10 @@ export class PrivilegesAccessComponent implements OnInit, OnDestroy {
   trackByRule = (_: number, rule: AccessRule): number => rule.id;
 
   addRule(): void {
-    const id = ++this.ruleSeq;
-    this.rules = [
-      ...this.rules,
-      {
-        id,
-        schema: '',
-        allTables: true,
-        tables: [],
-        columnsByTable: {},
-        level: 'table',
-        privileges: [],
-        grantee: '',
-        action: 'grant',
-        withGrantOption: false,
-      },
-    ];
+    const rule = this.blankRule();
+    this.rules = [...this.rules, rule];
     this.cdr.markForCheck();
-    this.revealRule(id);
+    this.revealRule(rule.id);
   }
 
   /** Scroll the just-added rule into view (within the bounded scroll area)
@@ -638,6 +821,11 @@ export class PrivilegesAccessComponent implements OnInit, OnDestroy {
   // ── Apply (fix #9 — was a no-op; now POSTs to /change-set) ──────────────
 
   applyChanges(): void {
+    // Effective is read-only — never previews/executes. And a preview already
+    // open (or a save in flight) blocks a second open, so one click = one
+    // dialog even if the trigger fires twice.
+    if (this.activeTab !== 'compose' || this.showConfirm || this.saving())
+      return;
     const valid = this.rules.filter(r => this.ruleValid(r));
     if (!valid.length) return;
     this.pendingStatements = valid.flatMap(r => this.ruleToStatements(r));
@@ -701,7 +889,7 @@ export class PrivilegesAccessComponent implements OnInit, OnDestroy {
           this.ruleHints = {};
           this.addRule();
           this.loadDefaults();
-          if (this.filterRole) this.loadEffective(this.filterRole);
+          // effective tree re-reads itself via its @Input when filterRole set
         }
       })
       .catch(() => {})
@@ -713,134 +901,15 @@ export class PrivilegesAccessComponent implements OnInit, OnDestroy {
     this.pendingStatements = [];
   }
 
-  // ── Role filter → effective privileges (fix #4) ─────────────────────────
-
-  onFilterRoleChange(role: any): void {
-    // Keep null when cleared (not '') so PrimeNG's p-dropdown treats it as
-    // "no value" and hides its clear (✕) icon — an empty string counts as a
-    // present value and would leave the ✕ showing after a clear.
-    this.filterRole = role ?? null;
-    this.effectiveFilter = '';
-    if (!this.filterRole) {
-      this.resetEffective();
-      this.cdr.markForCheck();
-      return;
-    }
-    this.loadEffective(this.filterRole);
-  }
-
-  private loadEffective(role: string): void {
-    this.effectiveLoading = true;
-    this.resetEffective();
-    this.cdr.markForCheck();
-    this.dbAccess
-      .loadEffective(this.datasourceId, role)
-      .then(res => {
-        this.effectiveRaw = res?.status ? (res.data ?? []) : [];
-        this.groupEffective();
-      })
-      .catch(() => this.resetEffective())
-      .finally(() => {
-        this.effectiveLoading = false;
-        this.cdr.markForCheck();
-      });
-  }
-
-  /** Clear all effective-privilege display state. */
-  private resetEffective(): void {
-    this.effectiveRaw = [];
-    this.effectiveGroups = [];
-    this.filteredGroups = [];
-    this.effectiveObjectCount = 0;
-    this.effectivePrivCount = 0;
-  }
+  // ── Role picker → effective privileges (unified tree) ───────────────────
 
   /**
-   * Collapse the flat {schema, table, privilege, via} rows into one entry per
-   * object (schema.table): privileges de-duplicated + sorted, provenance
-   * de-duplicated ('direct' → 'Direct'). Objects sorted by name. This is what
-   * makes the panel scannable — one line per table instead of one per grant.
+   * Just record the picked role; <app-privilege-tree> does the rest
+   * (server-lazy schema→table→privilege tree, Direct/Inherited/All split,
+   * system-schema toggle). Null when cleared so PrimeNG hides its ✕ icon.
    */
-  private groupEffective(): void {
-    // Track table-wide vs column-only privileges per object separately so a
-    // column-scoped grant (r.column set) is NOT rendered as whole-table
-    // access. A privilege present table-wide wins; one that only ever appears
-    // at column level is shown with a "(col)" suffix.
-    const byKey = new Map<
-      string,
-      { tablePrivs: Set<string>; colPrivs: Set<string>; sources: Set<string> }
-    >();
-    for (const r of this.effectiveRaw) {
-      const table = r.table || r.object || r.name || '';
-      const key = (r.schema ? r.schema + '.' : '') + table;
-      if (!key) continue;
-      let g = byKey.get(key);
-      if (!g) {
-        g = {
-          tablePrivs: new Set<string>(),
-          colPrivs: new Set<string>(),
-          sources: new Set<string>(),
-        };
-        byKey.set(key, g);
-      }
-      const priv = r.privilege || r.priv;
-      if (priv) {
-        if (r.column) g.colPrivs.add(priv);
-        else g.tablePrivs.add(priv);
-      }
-      const via = r.via || 'direct';
-      g.sources.add(via === 'direct' ? 'Direct' : via);
-    }
-
-    // Chips shown inline per row before collapsing the rest into "+N". Keeps
-    // every row a single fixed-height line (required by the virtual scroll).
-    const MAX_CHIPS = 6;
-
-    let privCount = 0;
-    this.effectiveGroups = Array.from(byKey.entries())
-      .map(([key, g]) => {
-        // Table-wide privileges as-is; a privilege that exists ONLY at column
-        // level (never table-wide) is suffixed "(col)" so it isn't misread as
-        // whole-table access. Column detail itself lives in the detail tree.
-        const tableWide = Array.from(g.tablePrivs);
-        const colOnly = Array.from(g.colPrivs).filter(p => !g.tablePrivs.has(p));
-        const privileges = [
-          ...tableWide.sort(),
-          ...colOnly.sort().map(p => `${p} (col)`),
-        ];
-        privCount += privileges.length;
-        return {
-          key,
-          privileges,
-          shown: privileges.slice(0, MAX_CHIPS),
-          extra: Math.max(0, privileges.length - MAX_CHIPS),
-          // 'Direct' first, then role names alphabetically.
-          sources: Array.from(g.sources).sort((a, b) =>
-            a === 'Direct' ? -1 : b === 'Direct' ? 1 : a.localeCompare(b),
-          ),
-        };
-      })
-      .sort((a, b) => a.key.localeCompare(b.key));
-
-    this.effectiveObjectCount = this.effectiveGroups.length;
-    this.effectivePrivCount = privCount;
-    this.applyEffectiveFilter();
-  }
-
-  /** Narrow the grouped objects by the filter box (substring on schema.table). */
-  onEffectiveFilterChange(value: string): void {
-    this.effectiveFilter = value ?? '';
-    this.applyEffectiveFilter();
+  onFilterRoleChange(role: any): void {
+    this.filterRole = role ?? null;
     this.cdr.markForCheck();
   }
-
-  private applyEffectiveFilter(): void {
-    const q = this.effectiveFilter.trim().toLowerCase();
-    this.filteredGroups = q
-      ? this.effectiveGroups.filter(g => g.key.toLowerCase().includes(q))
-      : this.effectiveGroups;
-  }
-
-  /** trackBy for the virtual-scroll list. */
-  trackByGroupKey = (_: number, g: EffectiveGroup): string => g.key;
 }

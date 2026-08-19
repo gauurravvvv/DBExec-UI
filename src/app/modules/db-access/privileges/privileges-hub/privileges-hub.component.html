@@ -1,0 +1,127 @@
+<!-- Privileges & Access hub — canonical tabbed-hub chrome (parity with the
+     App/System Settings hubs): the page title on the left with ONE shared
+     datasource picker + capability hints/badges, then the shared themed tab
+     strip, then the active tab's EMBEDDED body sitting flush on the page
+     background (no card-in-card). The hub owns the header + picker; each child
+     hides its own header/title/picker and reads the selected datasource from
+     the shared DbAccessContextService. -->
+<div class="settings-page-wrapper">
+  <div class="settings-content-container">
+    <!-- Header: title left, capability badge + (Compose) Apply right. -->
+    <div class="page-header-section">
+      <div class="header-content">
+        <h2>{{ 'DB_ACCESS.PRIVILEGES_TITLE' | translate }}</h2>
+      </div>
+
+      <div class="header-actions">
+        <app-chip
+          variant="badge"
+          tone="neutral"
+          icon="pi pi-lock"
+          *ngIf="datasourceId && capability() && !canManage && !unsupported()"
+          >{{ 'DB_ACCESS.CAP_READONLY_BADGE' | translate }}</app-chip
+        >
+
+        <!-- Compose-only Apply — wired to the embedded composer child so its
+             preview→execute change-set flow is unchanged. Disabled until every
+             required field is filled correctly (canApply → child.allRulesValid). -->
+        <button
+          *ngIf="
+            activeTab === 'compose' &&
+            datasourceId &&
+            !unsupported() &&
+            !capabilityLoading() &&
+            canManage
+          "
+          pButton
+          [label]="'COMMON.APPLY' | translate"
+          [icon]="applySaving ? 'pi pi-spin pi-spinner' : 'pi pi-check'"
+          [disabled]="!canApply"
+          [pTooltip]="!canApply ? ('DB_ACCESS.APPLY_DISABLED_HINT' | translate) : ''"
+          tooltipPosition="bottom"
+          (click)="applyChanges()"
+          class="p-button-raised p-button-primary modern-button"
+        ></button>
+
+        <!-- Templates-only "New template" — on top in the header (parity with
+             the Compose Apply button). The embedded list hides its own Add row;
+             this drives it from here. -->
+        <ng-container *ngIf="activeTab === 'templates'">
+          <button
+            *hasPermission="'dbPrivileges'; level: 'write'"
+            type="button"
+            pButton
+            [label]="'COMMON.ADD' | translate"
+            icon="pi pi-plus"
+            (click)="addTemplate()"
+            class="p-button-raised p-button-primary modern-button"
+          ></button>
+        </ng-container>
+      </div>
+    </div>
+
+    <!-- ONE shared datasource picker for every tab — sits on its own row ABOVE
+         the tab strip. -->
+    <div class="hub-datasource-row">
+      <app-datasource-picker
+        (changed)="onDatasourceChange($event)"
+      ></app-datasource-picker>
+
+      <!-- Capability spinner while the chosen datasource is probed. -->
+      <span class="cap-loading" *ngIf="datasourceId && capabilityLoading()">
+        <i class="pi pi-spin pi-spinner"></i>
+        {{ 'DB_ACCESS.CHECKING_CAPABILITY' | translate }}
+      </span>
+    </div>
+
+    <!-- Shared themed tab strip. -->
+    <app-tabs
+      [tabs]="tabs"
+      [active]="activeTab"
+      (activeChange)="onTabChange($event)"
+    ></app-tabs>
+
+    <!-- Header-level state hints (shared across tabs) — pick a datasource /
+         unsupported. Rendered once here so every tab body starts from the same
+         precondition. -->
+    <div class="hub-hint" *ngIf="!datasourceId && !capabilityLoading()">
+      <i class="pi pi-database"></i>
+      <span>{{ 'DB_ACCESS.SELECT_DATASOURCE_HINT' | translate }}</span>
+    </div>
+    <div class="hub-hint unsupported" *ngIf="datasourceId && unsupported()">
+      <i class="pi pi-info-circle"></i>
+      <span>{{ 'DB_ACCESS.UNSUPPORTED_BODY' | translate }}</span>
+    </div>
+
+    <!-- Active tab body — only the selected child is instantiated. The tab
+         bodies render only once a supported datasource is chosen; the shared
+         hints above cover the empty/unsupported preconditions. -->
+    <div
+      class="settings-tab-body"
+      [ngSwitch]="activeTab"
+      *ngIf="datasourceId && !unsupported()"
+    >
+      <app-privileges-access
+        *ngSwitchCase="'compose'"
+        [embedded]="true"
+        mode="compose"
+      ></app-privileges-access>
+
+      <app-privileges-access
+        *ngSwitchCase="'effective'"
+        [embedded]="true"
+        mode="effective"
+      ></app-privileges-access>
+
+      <app-db-sessions
+        *ngSwitchCase="'sessions'"
+        [embedded]="true"
+      ></app-db-sessions>
+
+      <app-list-db-templates
+        *ngSwitchCase="'templates'"
+        [embedded]="true"
+      ></app-list-db-templates>
+    </div>
+  </div>
+</div>

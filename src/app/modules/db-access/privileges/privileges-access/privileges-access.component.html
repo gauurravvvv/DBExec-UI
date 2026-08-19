@@ -1,7 +1,8 @@
-<div class="dataset-page-wrapper">
+<div class="dataset-page-wrapper" [class.embedded]="embedded">
   <div class="dataset-content-container">
-    <!-- Header — h2 above, NO subtitle (list-user parity) -->
-    <div class="page-header-section">
+    <!-- Header — h2 above, NO subtitle (list-user parity). Hidden when embedded
+         in the Privileges hub, which owns the title + section nav + Apply. -->
+    <div class="page-header-section" *ngIf="!embedded">
       <div class="header-content">
         <h2>{{ 'DB_ACCESS.PRIVILEGES_TITLE' | translate }}</h2>
       </div>
@@ -29,7 +30,7 @@
             activeTab === 'compose'
           "
           pButton
-          [label]="'DB_ACCESS.APPLY_CHANGES' | translate"
+          [label]="'COMMON.APPLY' | translate"
           [icon]="saving() ? 'pi pi-spin pi-spinner' : 'pi pi-check'"
           [disabled]="!allRulesValid || saving()"
           [pTooltip]="
@@ -41,13 +42,6 @@
         ></button>
         <app-chip
           variant="badge"
-          tone="success"
-          icon="pi pi-check-circle"
-          *ngIf="datasourceId && capability() && canManage && !unsupported()"
-          >{{ 'DB_ACCESS.CAP_FULL_BADGE' | translate }}</app-chip
-        >
-        <app-chip
-          variant="badge"
           tone="neutral"
           icon="pi pi-lock"
           *ngIf="datasourceId && capability() && !canManage && !unsupported()"
@@ -56,9 +50,10 @@
       </div>
     </div>
 
-    <!-- Datasource picker row -->
+    <!-- Datasource picker row + state hints — hidden when embedded (the hub
+         owns the shared picker + the pick/probe/unsupported hints). -->
     <div class="content-card">
-      <div class="card-toolbar">
+      <div class="card-toolbar" *ngIf="!embedded">
         <div class="toolbar-left">
           <app-datasource-picker
             (changed)="onDatasourceChange($event)"
@@ -66,18 +61,20 @@
         </div>
       </div>
 
-      <div class="list-hint" *ngIf="!datasourceId && !capabilityLoading()">
-        <i class="pi pi-database"></i>
-        <span>{{ 'DB_ACCESS.SELECT_DATASOURCE_HINT' | translate }}</span>
-      </div>
-      <div class="cap-loading" *ngIf="datasourceId && capabilityLoading()">
-        <i class="pi pi-spin pi-spinner"></i>
-        {{ 'DB_ACCESS.CHECKING_CAPABILITY' | translate }}
-      </div>
-      <div class="list-hint unsupported" *ngIf="datasourceId && unsupported()">
-        <i class="pi pi-info-circle"></i>
-        <span>{{ 'DB_ACCESS.UNSUPPORTED_BODY' | translate }}</span>
-      </div>
+      <ng-container *ngIf="!embedded">
+        <div class="list-hint" *ngIf="!datasourceId && !capabilityLoading()">
+          <i class="pi pi-database"></i>
+          <span>{{ 'DB_ACCESS.SELECT_DATASOURCE_HINT' | translate }}</span>
+        </div>
+        <div class="cap-loading" *ngIf="datasourceId && capabilityLoading()">
+          <i class="pi pi-spin pi-spinner"></i>
+          {{ 'DB_ACCESS.CHECKING_CAPABILITY' | translate }}
+        </div>
+        <div class="list-hint unsupported" *ngIf="datasourceId && unsupported()">
+          <i class="pi pi-info-circle"></i>
+          <span>{{ 'DB_ACCESS.UNSUPPORTED_BODY' | translate }}</span>
+        </div>
+      </ng-container>
 
       <!-- Two segmented tabs: the rule composer (write) and the effective-
            privileges inspector (read-only). Each gets the full page width.
@@ -87,7 +84,7 @@
         class="composer-page"
         *ngIf="datasourceId && !unsupported() && !capabilityLoading()"
       >
-        <div class="priv-tabs" role="tablist">
+        <div class="priv-tabs" role="tablist" *ngIf="!embedded">
           <button
             type="button"
             role="tab"
@@ -112,8 +109,192 @@
 
         <!-- BODY: full-width panel for the active tab -->
         <div class="composer-body">
-          <!-- Access Rules composer (bounded scroll) -->
-          <div class="rules-panel" *ngIf="activeTab === 'compose'">
+          <!-- Compose-mode switch: guided (intent-first) vs advanced (rules) -->
+          <div class="compose-mode-bar" *ngIf="activeTab === 'compose'">
+            <div class="mode-seg" role="tablist">
+              <button
+                type="button"
+                role="tab"
+                [class.on]="composeMode === 'guided'"
+                [attr.aria-selected]="composeMode === 'guided'"
+                (click)="setComposeMode('guided')"
+              >
+                <i class="pi pi-compass"></i>
+                {{ 'DB_ACCESS.MODE_GUIDED' | translate }}
+              </button>
+              <button
+                type="button"
+                role="tab"
+                [class.on]="composeMode === 'advanced'"
+                [attr.aria-selected]="composeMode === 'advanced'"
+                (click)="setComposeMode('advanced')"
+              >
+                <i class="pi pi-sliders-h"></i>
+                {{ 'DB_ACCESS.MODE_ADVANCED' | translate }}
+              </button>
+            </div>
+          </div>
+
+          <!-- GUIDED (intent-first): WHO → WHAT → WHERE → preview -->
+          <div
+            class="guided-panel"
+            *ngIf="
+              activeTab === 'compose' &&
+              composeMode === 'guided' &&
+              primaryRule as rule
+            "
+          >
+            <!-- Step 1 — WHO -->
+            <div class="guided-step">
+              <div class="step-body">
+                <label class="step-title"
+                  >{{ 'DB_ACCESS.GUIDED_WHO' | translate
+                  }}<span class="req" aria-hidden="true">*</span></label
+                >
+                <app-custom-dropdown
+                  [ngModel]="rule.grantee"
+                  (ngModelChange)="setGuidedGrantee($event)"
+                  [options]="roleOptions"
+                  optionLabel="label"
+                  optionValue="value"
+                  [filter]="true"
+                  filterBy="label"
+                  appendTo="body"
+                  [disabled]="!canManage"
+                  [placeholder]="'DB_ACCESS.SELECT_ROLE' | translate"
+                ></app-custom-dropdown>
+              </div>
+            </div>
+
+            <!-- Step 2 — WHAT -->
+            <div class="guided-step" [class.step-muted]="!rule.grantee">
+              <div class="step-body">
+                <label class="step-title"
+                  >{{ 'DB_ACCESS.GUIDED_WHAT' | translate
+                  }}<span class="req" aria-hidden="true">*</span></label
+                >
+                <div class="preset-row">
+                  <button
+                    type="button"
+                    class="preset"
+                    *ngFor="let p of PRESETS"
+                    [class.sel]="guidedPreset === p.key"
+                    (click)="setPreset(p.key)"
+                    [disabled]="!canManage"
+                  >
+                    <span class="radio"></span>
+                    <span class="preset-text">
+                      <span class="preset-title">{{ p.labelKey | translate }}</span>
+                      <span class="preset-desc">{{ p.descKey | translate }}</span>
+                    </span>
+                  </button>
+                </div>
+                <!-- Custom privilege checkboxes. Privileges the grantee ALREADY
+                     holds are marked "has now" so you edit against reality;
+                     unticking one becomes a REVOKE in the diff. -->
+                <div class="custom-privs" *ngIf="guidedPreset === 'custom'">
+                  <span
+                    *ngFor="let p of privsFor('table')"
+                    class="pcheck"
+                    [class.on]="rule.privileges.includes(p)"
+                    [class.has-now]="alreadyHas(p)"
+                    (click)="canManage && toggleGuidedPriv(p)"
+                  >
+                    <span class="box"><i class="pi pi-check"></i></span>
+                    {{ p }}
+                    <span class="has-tag" *ngIf="alreadyHas(p)">{{
+                      'DB_ACCESS.HAS_NOW' | translate
+                    }}</span>
+                  </span>
+                </div>
+                <div class="reflect-hint" *ngIf="loadingCurrent">
+                  <i class="pi pi-spin pi-spinner"></i>
+                  {{ 'DB_ACCESS.CHECKING_CURRENT' | translate }}
+                </div>
+                <div
+                  class="reflect-hint"
+                  *ngIf="!loadingCurrent && currentPrivs.size"
+                >
+                  <i class="pi pi-info-circle"></i>
+                  {{
+                    'DB_ACCESS.REFLECT_HINT'
+                      | translate: { role: rule.grantee }
+                  }}
+                </div>
+              </div>
+            </div>
+
+            <!-- Step 3 — WHERE -->
+            <div class="guided-step" [class.step-muted]="!rule.privileges.length">
+              <div class="step-body">
+                <label class="step-title"
+                  >{{ 'DB_ACCESS.GUIDED_WHERE' | translate
+                  }}<span class="req" aria-hidden="true">*</span></label
+                >
+                <div class="where-controls">
+                  <app-custom-dropdown
+                    [ngModel]="rule.schema"
+                    (ngModelChange)="setGuidedSchema($event)"
+                    [options]="schemaOptions"
+                    optionLabel="label"
+                    optionValue="value"
+                    [filter]="true"
+                    filterBy="label"
+                    appendTo="body"
+                    [disabled]="!canManage"
+                    [placeholder]="'DB_ACCESS.SELECT_SCHEMA' | translate"
+                  ></app-custom-dropdown>
+
+                  <div class="scope-toggle" *ngIf="rule.schema">
+                    <button
+                      type="button"
+                      [class.on]="rule.allTables"
+                      (click)="setGuidedAllTables(true)"
+                    >
+                      {{ 'DB_ACCESS.SCOPE_ALL_TABLES' | translate }}
+                    </button>
+                    <button
+                      type="button"
+                      [class.on]="!rule.allTables"
+                      (click)="setGuidedAllTables(false)"
+                    >
+                      {{ 'DB_ACCESS.SCOPE_SPECIFIC' | translate }}
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Specific-tables multiselect (reuses the object list) -->
+                <div
+                  class="rule-field"
+                  *ngIf="rule.schema && !rule.allTables"
+                  style="margin-top: var(--space-4)"
+                >
+                  <app-custom-multiselect
+                    [ngModel]="rule.tables"
+                    (ngModelChange)="rule.tables = $event; onTablesChange(rule)"
+                    [options]="objectsFor(rule)"
+                    optionLabel="label"
+                    optionValue="value"
+                    [filter]="true"
+                    filterBy="label"
+                    appendTo="body"
+                    [placeholder]="'DB_ACCESS.SELECT_TABLES' | translate"
+                  ></app-custom-multiselect>
+                </div>
+              </div>
+            </div>
+
+            <div class="guided-hint">
+              <i class="pi pi-info-circle"></i>
+              {{ 'DB_ACCESS.GUIDED_HINT' | translate }}
+            </div>
+          </div>
+
+          <!-- ADVANCED: Access Rules composer (bounded scroll) -->
+          <div
+            class="rules-panel"
+            *ngIf="activeTab === 'compose' && composeMode === 'advanced'"
+          >
             <div class="panel-head">
               <div>
                 <h3>{{ 'DB_ACCESS.ACCESS_RULES' | translate }}</h3>
@@ -144,8 +325,8 @@
                     {{ 'DB_ACCESS.RULE_N' | translate: { n: i + 1 } }}
                     <app-chip
                       variant="badge"
-                      tone="warning"
-                      icon="pi pi-exclamation-circle"
+                      tone="neutral"
+                      icon="pi pi-info-circle"
                       *ngIf="!ruleValid(rule)"
                       >{{ 'DB_ACCESS.RULE_INCOMPLETE' | translate }}</app-chip
                     >
@@ -204,6 +385,7 @@
                     <app-custom-dropdown
                       [(ngModel)]="rule.schema"
                       [label]="'DB_ACCESS.SCHEMA' | translate"
+                      [required]="true"
                       [options]="schemaOptions"
                       optionLabel="label"
                       optionValue="value"
@@ -220,6 +402,7 @@
                     <app-custom-dropdown
                       [(ngModel)]="rule.grantee"
                       [label]="'DB_ACCESS.GRANTEE' | translate"
+                      [required]="true"
                       [options]="roleOptions"
                       optionLabel="label"
                       optionValue="value"
@@ -254,7 +437,8 @@
                     *ngIf="rule.level === 'column' || !rule.allTables"
                   >
                     <label class="field-label">
-                      {{ objectsLabelKey(rule) | translate }}
+                      {{ objectsLabelKey(rule) | translate
+                      }}<span class="req" aria-hidden="true">*</span>
                       <span class="field-hint" *ngIf="ruleHints[rule.id]"
                         >· {{ ruleHints[rule.id] }}</span
                       >
@@ -308,9 +492,10 @@
 
                 <!-- Privileges -->
                 <div class="rule-field">
-                  <label class="field-label">{{
-                    'DB_ACCESS.PRIVILEGES' | translate
-                  }}</label>
+                  <label class="field-label"
+                    >{{ 'DB_ACCESS.PRIVILEGES' | translate
+                    }}<span class="req" aria-hidden="true">*</span></label
+                  >
                   <div class="priv-checks">
                     <span
                       *ngFor="let p of privsFor(rule.level)"
@@ -340,10 +525,12 @@
             </div>
           </div>
 
-          <!-- Effective privileges tab: role filter (effective) + defaults.
-               Full width on its own tab. -->
+          <!-- Effective privileges tab: role picker → unified lazy tree
+               (schema → table → privilege, Direct/Inherited/All split,
+               system-schema toggle) + default privileges. Server-lazy;
+               no client-side grouping/filtering. Reuses app-privilege-tree
+               so the composer and the role detail page show ONE viewer. -->
           <div class="composer-rail" *ngIf="activeTab === 'effective'">
-            <!-- Effective privileges filter (merged from old Effective tab) -->
             <div class="rail-card">
               <h4>
                 <i class="pi pi-shield"></i
@@ -353,6 +540,7 @@
                 {{ 'DB_ACCESS.ROLE_FILTER_HINT' | translate }}
               </p>
               <app-custom-dropdown
+                class="eff-role-picker"
                 [(ngModel)]="filterRole"
                 [options]="roleOptions"
                 optionLabel="label"
@@ -366,99 +554,15 @@
                 icon="pi-id-card"
               ></app-custom-dropdown>
 
-              <div class="rail-empty" *ngIf="effectiveLoading">
-                <i class="pi pi-spin pi-spinner"></i>
-                {{ 'COMMON.LOADING' | translate }}
-              </div>
+              <app-privilege-tree
+                *ngIf="filterRole"
+                class="eff-tree-embed"
+                [datasourceId]="datasourceId"
+                [roleName]="filterRole"
+                [fill]="true"
+              ></app-privilege-tree>
 
-              <!-- Grouped, filterable, virtualised effective privileges -->
-              <ng-container *ngIf="!effectiveLoading && effectiveGroups.length">
-                <!-- Summary + object filter -->
-                <div class="eff-summary">
-                  {{
-                    'DB_ACCESS.EFFECTIVE_SUMMARY'
-                      | translate
-                        : {
-                            objects: effectiveObjectCount,
-                            privileges: effectivePrivCount,
-                          }
-                  }}
-                </div>
-                <div class="eff-filter">
-                  <i class="pi pi-search"></i>
-                  <input
-                    type="text"
-                    [ngModel]="effectiveFilter"
-                    (ngModelChange)="onEffectiveFilterChange($event)"
-                    [placeholder]="'DB_ACCESS.FILTER_OBJECTS' | translate"
-                  />
-                </div>
-
-                <cdk-virtual-scroll-viewport
-                  *ngIf="filteredGroups.length"
-                  class="eff-viewport"
-                  itemSize="58"
-                  minBufferPx="232"
-                  maxBufferPx="464"
-                >
-                  <div
-                    class="eff-group"
-                    *cdkVirtualFor="
-                      let g of filteredGroups;
-                      trackBy: trackByGroupKey
-                    "
-                  >
-                    <div class="eff-group-head">
-                      <span class="eff-obj" [title]="g.key">{{ g.key }}</span>
-                      <span class="eff-sources">
-                        <app-chip
-                          variant="tag"
-                          size="sm"
-                          *ngFor="let s of g.sources"
-                          [tone]="s === 'Direct' ? 'primary' : 'neutral'"
-                          [title]="
-                            s === 'Direct'
-                              ? ''
-                              : ('DB_ACCESS.VIA_ROLE' | translate: { role: s })
-                          "
-                          >{{
-                            s === 'Direct'
-                              ? ('DB_ACCESS.DIRECT' | translate)
-                              : s
-                          }}</app-chip
-                        >
-                      </span>
-                    </div>
-                    <div class="eff-privs" [title]="g.privileges.join(', ')">
-                      <app-chip
-                        variant="tag"
-                        tone="primary"
-                        size="sm"
-                        *ngFor="let p of g.shown"
-                        >{{ p }}</app-chip
-                      >
-                      <app-chip variant="tag" size="sm" *ngIf="g.extra"
-                        >+{{ g.extra }}</app-chip
-                      >
-                    </div>
-                  </div>
-                </cdk-virtual-scroll-viewport>
-
-                <!-- Filter matched nothing -->
-                <div class="rail-empty" *ngIf="!filteredGroups.length">
-                  {{ 'DB_ACCESS.NO_MATCHING_OBJECTS' | translate }}
-                </div>
-              </ng-container>
-
-              <div
-                class="rail-empty"
-                *ngIf="
-                  !effectiveLoading && filterRole && !effectiveGroups.length
-                "
-              >
-                {{ 'DB_ACCESS.NO_EFFECTIVE' | translate }}
-              </div>
-              <div class="rail-empty" *ngIf="!effectiveLoading && !filterRole">
+              <div class="rail-empty" *ngIf="!filterRole">
                 {{ 'DB_ACCESS.PICK_ROLE_TO_VIEW' | translate }}
               </div>
             </div>
@@ -474,9 +578,7 @@
                 *ngIf="defaultPrivileges.length; else noDefaults"
               >
                 <li *ngFor="let d of defaultPrivileges">
-                  <span class="def-scope">{{
-                    d.schema || d.objectType || '—'
-                  }}</span>
+                  <span class="def-scope">{{ d.scope || '—' }}</span>
                   <span class="def-privs">{{
                     (d.privileges || []).join(', ')
                   }}</span>
@@ -496,8 +598,11 @@
   </div>
 </div>
 
-<!-- Review-SQL confirm gate (plain-language summary + exact SQL + danger) -->
+<!-- Review-SQL confirm gate (plain-language summary + exact SQL + danger).
+     Rendered ONLY for the Compose sub-view so exactly one dialog is ever live
+     (the Effective sub-view is read-only and mounts no dialog). -->
 <app-change-summary-dialog
+  *ngIf="activeTab === 'compose'"
   [visible]="showConfirm"
   [title]="'DB_ACCESS.CONFIRM_PRIVILEGE_CHANGES' | translate"
   [summaries]="summaries"

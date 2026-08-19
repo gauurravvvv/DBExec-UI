@@ -2,6 +2,7 @@ import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
+  HostBinding,
   Input,
   OnChanges,
   OnInit,
@@ -9,41 +10,20 @@ import {
   inject,
 } from '@angular/core';
 import { DbAccessService } from '../../services/db-access.service';
+import {
+  LazyTreeLoadContext,
+  LazyTreeNode,
+} from 'src/app/shared/components/lazy-tree/lazy-tree.component';
 
 /**
- * One node in the effective-privileges tree. Schemas and tables are
- * lazy: their children are fetched on first expand. A table's leaf
- * children are its privilege chips (rendered inline, not as nodes).
- */
-interface TreeNode {
-  id: string;
-  kind: 'schema' | 'table';
-  label: string;
-  count: number;
-  hasChildren: boolean;
-  // lazy-load state
-  expanded: boolean;
-  loading: boolean;
-  loaded: boolean;
-  children: TreeNode[];
-  // leaf privileges (populated for tables on expand)
-  privileges: { privilege: string; via: string; grantable: boolean }[];
-  // paging for children (schemas: tables; large schemas page in)
-  page: number;
-  total: number;
-}
-
-/**
- * PrivilegeTreeComponent — a lazy-expanding schema → table → privileges
- * tree of a role's EFFECTIVE privileges, with `direct` / `via <role>`
- * provenance (PDM C1). Replaces the flat grid on the role/user detail
- * page that mis-bound `object`/`objectType` and rendered "—".
+ * PrivilegeTreeComponent — a role's EFFECTIVE privileges as a lazy tree
+ * (schema → table → privilege chips) with `direct` / `via <role>` provenance,
+ * a Direct/Inherited/All split, and a hide-system-schemas toggle.
  *
- * Every level is server-driven: schema roots load on init, a schema's
- * tables load when it is expanded, and a table's privilege chips load
- * when IT is expanded. A search box filters server-side at the current
- * level. Nothing is loaded until the user asks for it, so it scales to
- * large catalogs (PDM: full server lazy-load, including trees).
+ * This is now a THIN domain wrapper over the generic `app-lazy-tree`: it owns
+ * the summary header + the provenance/system controls, and hands the tree a
+ * `loadNodes` function that maps the generic level/parent/page/search contract
+ * onto the db-access effective-tree endpoints. All fetching stays server-lazy.
  */
 @Component({
   selector: 'app-privilege-tree',
@@ -57,158 +37,202 @@ export class PrivilegeTreeComponent implements OnInit, OnChanges {
 
   @Input({ required: true }) datasourceId = '';
   @Input({ required: true }) roleName = '';
+  /**
+   * Tree scroll height. Empty by default → the shared app-lazy-tree SCSS owns
+   * the responsive default (clamp, scrolls internally). Pass a number/px to
+   * override, or `'none'` to let an ancestor scroll. Ignored when `fill` set.
+   */
+  @Input() maxHeight: string | number = '';
+
+  /**
+   * Fill mode — the tree flexes to fill its (bounded flex-column) parent, so
+   * the tree body takes the remaining height on every screen. Use on full-page
+   * placements (role detail). Forwarded to app-lazy-tree.
+   */
+  @Input() fill = false;
+
+  /** Host class so the wrapper flexes to fill its parent in fill mode. */
+  @HostBinding('class.pt-fill') get isFill(): boolean {
+    return this.fill;
+  }
 
   private readonly PAGE_SIZE = 100;
 
-  roots: TreeNode[] = [];
-  loading = false;
-  loaded = false;
-  search = '';
+  /** Provenance split: 'all' (default) | 'direct' | 'inherited'. */
+  provenance: 'all' | 'direct' | 'inherited' = 'all';
+  /** Hide information_schema/pg_catalog by default; toggle to reveal. */
+  includeSystem = false;
+
+  /** Params forwarded to <app-lazy-tree>; changing the object triggers reload. */
+  treeParams: Record<string, unknown> = { provenance: 'all', includeSystem: false };
+
+  /** Header counts (direct vs inherited, object totals, system-schema count). */
+  summary: {
+    objects: number;
+    privileges: number;
+    directObjects: number;
+    inheritedObjects: number;
+    schemas: number;
+    systemObjects: number;
+    topSource: string | null;
+  } | null = null;
 
   ngOnInit(): void {
-    this.loadRoots();
+    this.syncParams();
+    this.loadSummary();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    // Reload from scratch if the role/datasource changes after init.
     if (
       (changes['roleName'] && !changes['roleName'].firstChange) ||
       (changes['datasourceId'] && !changes['datasourceId'].firstChange)
     ) {
-      this.roots = [];
-      this.loaded = false;
-      this.search = '';
-      this.loadRoots();
+      this.provenance = 'all';
+      this.includeSystem = false;
+      this.summary = null;
+      this.syncParams();
+      this.loadSummary();
     }
   }
 
-  /** Server search over the schema roots (app-search-input debounces). */
-  onSearchChange(value: string): void {
-    this.search = value ?? '';
-    this.loadRoots();
-  }
-
-  private loadRoots(): void {
-    if (!this.datasourceId || !this.roleName) return;
-    this.loading = true;
-    this.cdr.markForCheck();
-    this.dbAccess
-      .loadEffectiveTree(this.datasourceId, this.roleName, {
-        level: 'schema',
-        page: 1,
-        limit: this.PAGE_SIZE,
-        search: this.search || undefined,
-      })
-      .then(res => {
-        const nodes = res?.status ? (res.data?.nodes ?? []) : [];
-        this.roots = nodes.map((n: any) => this.toNode(n));
-      })
-      .catch(() => (this.roots = []))
-      .finally(() => {
-        this.loading = false;
-        this.loaded = true;
-        this.cdr.markForCheck();
-      });
-  }
-
-  private toNode(n: any): TreeNode {
-    return {
-      id: n.id,
-      kind: n.kind,
-      label: n.label,
-      count: n.count ?? 0,
-      hasChildren: !!n.hasChildren,
-      expanded: false,
-      loading: false,
-      loaded: false,
-      children: [],
-      privileges: n.privileges ?? [],
-      page: 1,
-      total: 0,
+  /** New object identity each time so app-lazy-tree's ngOnChanges reloads. */
+  private syncParams(): void {
+    this.treeParams = {
+      provenance: this.provenance,
+      includeSystem: this.includeSystem,
+      // role/datasource are closed over by loadNodes, but including them here
+      // guarantees a params change (→ tree reload) when the host swaps role.
+      role: this.roleName,
+      ds: this.datasourceId,
     };
   }
 
-  /** Toggle a schema node — lazy-load its tables on first expand. */
-  toggleSchema(node: TreeNode): void {
-    node.expanded = !node.expanded;
-    if (node.expanded && !node.loaded && !node.loading) {
-      this.loadTables(node);
+  /** The generic tree's data source — maps level/parent → db-access endpoints. */
+  loadNodes = async (
+    ctx: LazyTreeLoadContext,
+  ): Promise<{ nodes: LazyTreeNode[]; total: number }> => {
+    if (!this.datasourceId || !this.roleName) return { nodes: [], total: 0 };
+
+    // level 0 → schema roots
+    if (ctx.level === 0) {
+      const res = await this.dbAccess.loadEffectiveTree(
+        this.datasourceId,
+        this.roleName,
+        {
+          level: 'schema',
+          page: ctx.page,
+          limit: ctx.limit,
+          search: ctx.search || undefined,
+          provenance: this.provenance,
+          includeSystem: this.includeSystem,
+        },
+      );
+      const nodes = (res?.status ? (res.data?.nodes ?? []) : []).map(
+        (n: any) => this.schemaNode(n),
+      );
+      return { nodes, total: res?.data?.count ?? nodes.length };
     }
-    this.cdr.markForCheck();
-  }
 
-  private loadTables(schema: TreeNode): void {
-    schema.loading = true;
-    this.cdr.markForCheck();
-    this.dbAccess
-      .loadEffectiveTree(this.datasourceId, this.roleName, {
-        level: 'table',
-        schema: schema.id,
-        page: schema.page,
-        limit: this.PAGE_SIZE,
-      })
-      .then(res => {
-        const nodes = res?.status ? (res.data?.nodes ?? []) : [];
-        schema.children = [
-          ...schema.children,
-          ...nodes.map((n: any) => this.toNode(n)),
-        ];
-        schema.total = res?.data?.count ?? schema.children.length;
-      })
-      .catch(() => {})
-      .finally(() => {
-        schema.loading = false;
-        schema.loaded = true;
-        this.cdr.markForCheck();
-      });
-  }
-
-  /** Load the next page of tables under a schema (scroll/"load more"). */
-  loadMoreTables(schema: TreeNode): void {
-    schema.page += 1;
-    this.loadTables(schema);
-  }
-
-  hasMoreTables(schema: TreeNode): boolean {
-    return schema.children.length < schema.total;
-  }
-
-  /** Toggle a table node — lazy-load its privilege chips on first expand. */
-  toggleTable(schemaId: string, table: TreeNode): void {
-    table.expanded = !table.expanded;
-    if (table.expanded && !table.loaded && !table.loading) {
-      this.loadTablePrivileges(schemaId, table);
+    // level 1 → tables in a schema (parent = schema node)
+    if (ctx.level === 1 && ctx.parent) {
+      const res = await this.dbAccess.loadEffectiveTree(
+        this.datasourceId,
+        this.roleName,
+        {
+          level: 'table',
+          schema: ctx.parent.id,
+          page: ctx.page,
+          limit: ctx.limit,
+          search: ctx.search || undefined,
+          provenance: this.provenance,
+          includeSystem: this.includeSystem,
+        },
+      );
+      const schema = ctx.parent.id;
+      const nodes = (res?.status ? (res.data?.nodes ?? []) : []).map((n: any) =>
+        this.tableNode(schema, n),
+      );
+      return { nodes, total: res?.data?.count ?? nodes.length };
     }
+
+    // level 2 → a table's privilege chips (parent = table leaf node)
+    if (ctx.level === 2 && ctx.parent) {
+      const { schema, table } = ctx.parent.data ?? {};
+      const res = await this.dbAccess.loadEffectiveTree(
+        this.datasourceId,
+        this.roleName,
+        {
+          level: 'table',
+          schema,
+          table,
+          provenance: this.provenance,
+        },
+      );
+      const privileges = res?.status
+        ? (res.data?.nodes?.[0]?.privileges ?? [])
+        : [];
+      // Return a single synthetic node carrying the privilege list as data;
+      // app-lazy-tree stashes node.data.leaf for the leaf template.
+      return {
+        nodes: [{ id: `${schema}.${table}`, label: table, data: { privileges } }],
+        total: privileges.length,
+      };
+    }
+
+    return { nodes: [], total: 0 };
+  };
+
+  private schemaNode(n: any): LazyTreeNode {
+    return {
+      id: n.id,
+      label: n.label,
+      count: n.count ?? 0,
+      hasChildren: !!n.hasChildren,
+      isLeaf: false,
+      data: { schema: n.id },
+    };
+  }
+
+  private tableNode(schema: string, n: any): LazyTreeNode {
+    return {
+      id: n.id,
+      label: n.label,
+      count: n.count ?? 0,
+      hasChildren: true,
+      isLeaf: true, // its "children" are privilege chips (leaf template)
+      data: { schema, table: n.label },
+    };
+  }
+
+  setProvenance(p: 'all' | 'direct' | 'inherited'): void {
+    if (this.provenance === p) return;
+    this.provenance = p;
+    this.syncParams();
     this.cdr.markForCheck();
   }
 
-  private loadTablePrivileges(schemaId: string, table: TreeNode): void {
-    table.loading = true;
+  toggleSystem(): void {
+    this.includeSystem = !this.includeSystem;
+    this.syncParams();
     this.cdr.markForCheck();
+  }
+
+  private loadSummary(): void {
+    if (!this.datasourceId || !this.roleName) return;
     this.dbAccess
-      .loadEffectiveTree(this.datasourceId, this.roleName, {
-        level: 'table',
-        schema: schemaId,
-        table: table.label,
-      })
+      .loadEffectiveSummary(this.datasourceId, this.roleName)
       .then(res => {
-        const nodes = res?.status ? (res.data?.nodes ?? []) : [];
-        table.privileges = nodes[0]?.privileges ?? [];
+        this.summary = res?.status ? (res.data ?? null) : null;
       })
-      .catch(() => (table.privileges = []))
-      .finally(() => {
-        table.loading = false;
-        table.loaded = true;
-        this.cdr.markForCheck();
-      });
+      .catch(() => (this.summary = null))
+      .finally(() => this.cdr.markForCheck());
   }
 
-  /** Provenance chip tone: direct grants are primary, inherited are neutral. */
+  /** Provenance chip tone for a leaf privilege. */
   viaTone(via: string): 'primary' | 'neutral' {
     return via === 'direct' ? 'primary' : 'neutral';
   }
 
-  trackById = (_: number, n: TreeNode): string => n.id;
   trackByPriv = (
     _: number,
     p: { privilege: string; via: string },

@@ -20,6 +20,19 @@
   box-shadow: var(--shadow-sm);
 }
 
+// Embedded in the Privileges hub: the hub sits flush on the page (no card), so
+// the templates list must not paint its own card either — strip the surface +
+// padding so the table sits flush. Scoped in the child's own stylesheet so it
+// out-specifies the base rule reliably.
+.list-wrapper.embedded {
+  .list-container {
+    background: transparent;
+    border-radius: 0;
+    box-shadow: none;
+    padding: 0;
+  }
+}
+
 .page-header {
   display: flex;
   align-items: center;

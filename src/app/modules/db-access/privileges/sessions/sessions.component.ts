@@ -2,10 +2,12 @@ import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
+  Input,
   OnDestroy,
   OnInit,
   inject,
 } from '@angular/core';
+import { Subscription } from 'rxjs';
 import { TranslateService } from '@ngx-translate/core';
 import type {
   CustomTableColumn,
@@ -57,6 +59,12 @@ type SessionAction = 'cancel' | 'terminate';
 })
 export class SessionsComponent implements OnInit, OnDestroy {
   private cdr = inject(ChangeDetectorRef);
+
+  /** Embedded in the Privileges hub — hide this component's own header title +
+   *  its datasource picker + capability badges (the hub owns them); the
+   *  datasource comes from the shared context. */
+  @Input() embedded = false;
+  private dsSub?: Subscription;
 
   loading = this.dbAccess.loading;
   saving = this.dbAccess.saving;
@@ -132,10 +140,19 @@ export class SessionsComponent implements OnInit, OnDestroy {
     ];
     this.cols = this.buildColumns();
     this.buildAdapter();
+    // Embedded: hydrate from the shared context + react to the hub picker.
+    if (this.embedded) {
+      const initial = this.ctx.datasourceId() || '';
+      if (initial) this.onDatasourceChange(initial);
+      this.dsSub = this.ctx.datasourceChanged$.subscribe(id =>
+        this.onDatasourceChange(id || ''),
+      );
+    }
   }
 
   ngOnDestroy(): void {
     this.dbAccess.cancelReads();
+    this.dsSub?.unsubscribe();
     this.adapter?.destroy();
   }
 
@@ -288,20 +305,7 @@ export class SessionsComponent implements OnInit, OnDestroy {
     this.adapter?.setFilter(this.serverFilter());
   }
 
-  get isFilterActive(): boolean {
-    return (
-      !!this.filterValues.name ||
-      this.filterValues.state !== null ||
-      !this.filterValues.hideBackground
-    );
-  }
-
   onFilterChange(): void {
-    this.applyFilters();
-  }
-
-  clearFilters(): void {
-    this.filterValues = { name: '', state: null, hideBackground: true };
     this.applyFilters();
   }
 

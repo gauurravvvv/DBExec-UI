@@ -39,16 +39,19 @@ export class AppSettingsHubComponent implements OnInit {
     {
       value: 'theme',
       label: 'SIDEBAR.themeManagement',
+      icon: 'pi pi-palette',
       permission: PERMISSIONS.THEME_MANAGEMENT,
     },
     {
       value: 'branding',
       label: 'SIDEBAR.brandingManagement',
+      icon: 'pi pi-image',
       permission: PERMISSIONS.BRANDING_MANAGEMENT,
     },
     {
       value: 'announcements',
       label: 'SIDEBAR.announcementManagement',
+      icon: 'pi pi-megaphone',
       permission: PERMISSIONS.ANNOUNCEMENT_MANAGEMENT,
     },
   ];

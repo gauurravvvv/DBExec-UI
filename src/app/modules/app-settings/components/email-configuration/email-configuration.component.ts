@@ -7,6 +7,7 @@ import {
 } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
+import { Subscription } from 'rxjs';
 import { HasUnsavedChanges } from 'src/app/core/models/has-unsaved-changes.model';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { OrgPolicyService } from '../../services/org-policy.service';
@@ -51,10 +52,19 @@ export class EmailConfigurationComponent
     private cdr: ChangeDetectorRef,
   ) {
     this.initForm();
+    this.buildProviderOptions();
+    // Re-translate the (stable) options when the locale changes, without
+    // churning the array reference on every change-detection pass.
+    this.langSub = this.translate.onLangChange.subscribe(() => {
+      this.buildProviderOptions();
+      this.cdr.markForCheck();
+    });
     this.emailForm
       .get('emailProvider')!
       .valueChanges.subscribe(p => this.syncValidators(p));
   }
+
+  private langSub?: Subscription;
 
   get isFormDirty(): boolean {
     return this.emailForm.dirty;
@@ -76,9 +86,19 @@ export class EmailConfigurationComponent
       'NONE') as EmailProvider;
   }
 
-  /** Email-provider dropdown options (labels translated for app-custom-dropdown). */
-  get providerOptions(): Array<{ label: string; value: EmailProvider }> {
-    return [
+  /**
+   * Email-provider dropdown options. Built ONCE (rebuilt only on locale change)
+   * and held in a stable field — NOT a getter. A getter returned a fresh array
+   * literal on every change-detection pass, so `app-custom-dropdown [options]`
+   * saw a new reference each tick and re-processed/re-emitted its value, which
+   * fed back through the form's valueChanges → syncValidators → CD → new array,
+   * looping (the "value keeps changing continuously" bug). A stable reference
+   * breaks the loop.
+   */
+  providerOptions: Array<{ label: string; value: EmailProvider }> = [];
+
+  private buildProviderOptions(): void {
+    this.providerOptions = [
       {
         label: this.translate.instant('APP_SETTINGS.EMAIL_CONFIG.PROVIDER_NONE'),
         value: 'NONE',
@@ -100,6 +120,7 @@ export class EmailConfigurationComponent
 
   ngOnDestroy(): void {
     this.orgPolicyService.cancelReads();
+    this.langSub?.unsubscribe();
   }
 
   private initForm(): void {

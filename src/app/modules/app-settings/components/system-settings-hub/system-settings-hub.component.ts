@@ -36,10 +36,10 @@ export class SystemSettingsHubComponent implements OnInit {
    *  leaf, but the whole hub is already gated on ssoConfiguration at the
    *  route; per-tab permissions keep the strip honest if that changes. */
   readonly tabs: AppTab[] = [
-    { value: 'sso', label: 'SIDEBAR.ssoConfiguration', permission: PERMISSIONS.SSO_CONFIGURATION },
-    { value: 'email', label: 'SIDEBAR.emailConfiguration', permission: PERMISSIONS.EMAIL_CONFIGURATION },
-    { value: 'security', label: 'SIDEBAR.securityPolicy', permission: PERMISSIONS.SECURITY_POLICY },
-    { value: 'ai', label: 'SIDEBAR.aiFeatures', permission: PERMISSIONS.AI_FEATURES },
+    { value: 'sso', label: 'SIDEBAR.ssoConfiguration', icon: 'pi pi-key', permission: PERMISSIONS.SSO_CONFIGURATION },
+    { value: 'email', label: 'SIDEBAR.emailConfiguration', icon: 'pi pi-envelope', permission: PERMISSIONS.EMAIL_CONFIGURATION },
+    { value: 'security', label: 'SIDEBAR.securityPolicy', icon: 'pi pi-shield', permission: PERMISSIONS.SECURITY_POLICY },
+    { value: 'ai', label: 'SIDEBAR.aiFeatures', icon: 'pi pi-microchip-ai', permission: PERMISSIONS.AI_FEATURES },
   ];
   activeTab = 'sso';
 

@@ -1,144 +1,120 @@
-.edit-wrapper {
-  padding: var(--space-0);
-  height: 100%;
-  overflow-y: auto;
-}
+@use '../../../styles/db-access-shared' as db;
 
-.edit-container {
-  max-width: 860px;
-  margin: 0 auto;
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-5);
-  padding: var(--space-8);
+// Canonical add/edit screen shell — same card, spacing, widths, back button,
+// header and 50% single-column form as Add Role / Add User.
+@include db.db-access-form;
 
-  // Parent card surface — matches the /app/db-roles reference exactly.
-  // Theme-driven; see src/app/shared/styles/_page-skeleton.scss.
-  background: var(--card-background);
-  border-radius: var(--radius-md);
-    overflow: hidden;
-  box-shadow: var(--shadow-sm);
-}
-
-.page-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-
-  .left-section {
-    display: flex;
-    align-items: center;
-    gap: var(--space-5);
-
-    h2 {
-      margin: 0;
-      font-size: var(--fs-h1);
-      font-weight: var(--fw-semibold);
-      color: var(--text-color);
-    }
-  }
-  .action-buttons {
-    display: flex;
-    gap: var(--space-3);
-  }
-}
-
-.form-body {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-5);
-}
-
-.field-label,
-.form-section-title {
-  font-size: var(--fs-label);
-  font-weight: var(--fw-semibold);
-  color: var(--text-color);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  margin: 0;
-}
-
-.scope-row {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-}
-
-.scope-tabs,
-.mode-tabs {
-  display: inline-flex;
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-sm, 6px);
-  overflow: hidden;
-  width: fit-content;
-
-  button {
-    padding: var(--space-2) var(--space-5);
-    background: transparent;
-    border: none;
-    cursor: pointer;
-    font-size: var(--fs-control);
-    color: var(--text-color-secondary);
-
-    &.active {
-      background: var(--primary-color);
-      color: var(--primary-text);
-    }
-  }
-}
-
-.attr-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: var(--space-4);
-}
+// ── Template-specific extras ──────────────────────────────────────────────
+// The privilege-rules repeater lives inside the same 50% form column. Its
+// styling reuses the module's rule-card tokens but stays single-column so
+// each rule field gets the full column width (no cramped 2-up grid at 50%).
 
 .rules-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-}
-
-.rules-hint {
-  margin: 0;
-  color: var(--text-color-secondary);
-  font-size: var(--fs-control);
+  gap: var(--space-5);
 }
 
 .rule-card {
   border: 1px solid var(--border-color);
-  border-radius: var(--radius-md, 8px);
-  padding: var(--space-4);
+  border-radius: var(--radius-md);
+  padding: var(--space-6);
+  background: var(--hover-background);
   display: flex;
   flex-direction: column;
-  gap: var(--space-3);
-  background: var(--surface-50, transparent);
+  gap: var(--space-5);
 
-  .rule-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: var(--space-4);
-  }
-
-  .rule-foot {
+  .rule-card-head {
     display: flex;
     align-items: center;
     justify-content: space-between;
+
+    .rule-index {
+      font-size: var(--fs-control);
+      font-weight: var(--fw-semibold);
+      color: var(--text-color);
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    // Remove-rule (trash) — borderless icon button matching the list
+    // row-actions delete button (28px hit area, muted resting, red on hover).
+    .icon-btn {
+      width: 28px;
+      height: 28px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: none;
+      background: transparent;
+      border-radius: var(--radius-sm);
+      color: var(--text-muted);
+      cursor: pointer;
+      transition:
+        background-color var(--motion-fast) ease,
+        color var(--motion-fast) ease;
+
+      i {
+        font-size: var(--fs-body);
+      }
+
+      &:hover {
+        background: var(--card-background);
+      }
+      &.delete-btn:hover {
+        color: var(--error-color);
+      }
+
+      &:focus-visible {
+        outline: 2px solid var(--primary-color);
+        outline-offset: 1px;
+      }
+    }
   }
 
-  .rule-remove {
-    background: transparent;
-    border: 1px solid var(--border-color);
-    border-radius: var(--radius-sm, 6px);
-    width: 32px;
-    height: 32px;
-    cursor: pointer;
-    color: var(--text-color-secondary);
+  // One field per row inside the rule card — the whole form column is already
+  // ~50% wide, so a multi-column rule grid would be cramped.
+  .rule-grid {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
 
-    &:hover {
-      color: var(--error-color);
-      border-color: var(--error-color);
+    app-custom-dropdown,
+    app-custom-multiselect {
+      display: block;
+      width: 100%;
+    }
+  }
+
+  // With-grant-option toggle sits on its own row, tight against the rule grid
+  // (no grey attr-toggles container — it's already inside the rule card).
+  .attr-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-5);
+
+    .attr-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      min-width: 0;
+
+      .attr-name {
+        font-size: var(--fs-control);
+        font-weight: var(--fw-semibold);
+        color: var(--text-color);
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+      }
+    }
+
+    app-custom-toggle {
+      flex-shrink: 0;
+      .form-field {
+        margin: 0;
+      }
     }
   }
 }

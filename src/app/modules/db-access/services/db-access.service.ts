@@ -401,6 +401,8 @@ export class DbAccessService {
       page?: number;
       limit?: number;
       search?: string;
+      provenance?: 'all' | 'direct' | 'inherited';
+      includeSystem?: boolean;
     },
   ): Promise<any> {
     const params: Record<string, string> = { level: opts.level };
@@ -409,6 +411,9 @@ export class DbAccessService {
     if (opts.page) params['page'] = String(opts.page);
     if (opts.limit) params['limit'] = String(opts.limit);
     if (opts.search) params['search'] = opts.search;
+    if (opts.provenance && opts.provenance !== 'all')
+      params['provenance'] = opts.provenance;
+    if (opts.includeSystem) params['includeSystem'] = 'true';
     return lastValueFrom(
       this.http
         .apiGet(
@@ -417,6 +422,25 @@ export class DbAccessService {
             encodeURIComponent(roleName) +
             DB_ACCESS.EFFECTIVE_TREE_SUFFIX,
           { skipLoader: true, params },
+        )
+        .pipe(takeUntil(this._cancelReads$)),
+    );
+  }
+
+  /**
+   * GET /:datasourceId/effective/:roleName/summary — counts for the tree
+   * header + the Direct/Inherited/All split + the "Show system schemas (N)"
+   * toggle. One cheap call; the tree itself pages in on demand.
+   */
+  loadEffectiveSummary(datasourceId: string, roleName: string): Promise<any> {
+    return lastValueFrom(
+      this.http
+        .apiGet(
+          this.base(datasourceId) +
+            DB_ACCESS.EFFECTIVE_SEGMENT +
+            encodeURIComponent(roleName) +
+            DB_ACCESS.EFFECTIVE_SUMMARY_SUFFIX,
+          { skipLoader: true },
         )
         .pipe(takeUntil(this._cancelReads$)),
     );
@@ -439,6 +463,8 @@ export class DbAccessService {
         .pipe(takeUntil(this._cancelReads$)),
     );
   }
+
+  // ── PUBLIC grants (hardening panel) ───────────────────────────────────────
 
   // ── Export ────────────────────────────────────────────────────────────────
 

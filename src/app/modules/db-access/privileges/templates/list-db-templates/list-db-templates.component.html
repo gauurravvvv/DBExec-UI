@@ -1,6 +1,9 @@
-<div class="list-wrapper">
+<div class="list-wrapper" [class.embedded]="embedded">
   <div class="list-container">
-    <div class="page-header">
+    <!-- Standalone only: back button + title + Add. When embedded in the hub,
+         the hub owns the title AND the Add button (top-right header), so this
+         whole header row is dropped. -->
+    <div class="page-header" *ngIf="!embedded">
       <div class="left-section">
         <button pButton class="p-button-text back-button" (click)="goBack()">
           <i class="pi pi-arrow-left"></i>
@@ -18,7 +21,9 @@
       </div>
     </div>
 
-    <p class="page-subtitle">{{ 'DB_ACCESS.TEMPLATES_SUBTITLE' | translate }}</p>
+    <p class="page-subtitle" *ngIf="!embedded">
+      {{ 'DB_ACCESS.TEMPLATES_SUBTITLE' | translate }}
+    </p>
 
     <app-custom-table
       [columns]="cols"

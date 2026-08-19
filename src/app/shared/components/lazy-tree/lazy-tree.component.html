@@ -1,0 +1,124 @@
+<div class="lazy-tree">
+  <!-- Toolbar: built-in search + host-projected controls (segmented splits,
+       toggles, …). Host projects via <ng-container lazyTreeToolbar>. -->
+  <div class="lt-toolbar">
+    <!-- Shared debounced search (the app-wide list-search control). A host may
+         still override via a projected #search template if it needs to. -->
+    <ng-container
+      *ngIf="searchable && searchTpl"
+      [ngTemplateOutlet]="searchTpl"
+      [ngTemplateOutletContext]="{ $implicit: applySearch }"
+    ></ng-container>
+    <app-search-input
+      *ngIf="searchable && !searchTpl"
+      class="lt-search-input"
+      [value]="search"
+      [placeholder]="searchPlaceholder | translate"
+      (searchChange)="applySearch($event)"
+    ></app-search-input>
+    <ng-content select="[lazyTreeToolbar]"></ng-content>
+  </div>
+
+  <!-- Loading roots -->
+  <div class="lt-state" *ngIf="loading && !roots.length">
+    <i class="pi pi-spin pi-spinner"></i>{{ loadingText | translate }}
+  </div>
+
+  <!-- Empty -->
+  <div class="lt-state" *ngIf="loaded && !loading && !roots.length">
+    {{ emptyText | translate }}
+  </div>
+
+  <!-- Scrollable root list -->
+  <ul
+    class="lt-list lt-root"
+    [class.lt-scroll]="!scrollDisabled"
+    role="tree"
+    *ngIf="roots.length"
+    [style.max-height]="maxHeightCss"
+  >
+    <ng-container
+      *ngTemplateOutlet="nodeTpl; context: { $implicit: roots }"
+    ></ng-container>
+  </ul>
+</div>
+
+<!-- Recursive node renderer -->
+<ng-template #nodeTpl let-nodes>
+  <li
+    *ngFor="let node of nodes; trackBy: trackById"
+    class="lt-node"
+    role="treeitem"
+    [attr.aria-expanded]="node.hasChildren && !node.isLeaf ? node.expanded : null"
+  >
+    <button
+      type="button"
+      class="lt-row"
+      [class.is-leaf]="node.isLeaf || !node.hasChildren"
+      [style.padding-left.px]="12 + node.level * 18"
+      (click)="toggle(node)"
+    >
+      <i
+        class="pi lt-chevron"
+        [class.pi-chevron-down]="node.expanded"
+        [class.pi-chevron-right]="!node.expanded"
+        [class.lt-chevron-hidden]="node.isLeaf || !node.hasChildren"
+      ></i>
+      <i class="pi lt-icon" [ngClass]="levelIcon(node.level)"></i>
+      <span class="lt-label" [class.mono]="levelMono(node.level)">{{
+        node.label
+      }}</span>
+
+      <span class="lt-right">
+        <!-- Host badge (provenance chip, etc.) -->
+        <ng-container
+          *ngIf="nodeBadgeTpl"
+          [ngTemplateOutlet]="nodeBadgeTpl"
+          [ngTemplateOutletContext]="{ $implicit: node }"
+        ></ng-container>
+        <app-chip
+          *ngIf="node.count !== null && node.count !== undefined"
+          variant="count"
+          size="sm"
+          >{{ node.count }}</app-chip
+        >
+      </span>
+    </button>
+
+    <!-- Expanded: children (branch) OR leaf body -->
+    <ng-container *ngIf="node.expanded">
+      <!-- Leaf body via host template -->
+      <div class="lt-leaf" *ngIf="node.isLeaf && leafTpl">
+        <span class="lt-state child" *ngIf="node.loading">
+          <i class="pi pi-spin pi-spinner"></i>{{ loadingText | translate }}
+        </span>
+        <ng-container
+          *ngIf="!node.loading"
+          [ngTemplateOutlet]="leafTpl"
+          [ngTemplateOutletContext]="{ $implicit: node }"
+        ></ng-container>
+      </div>
+
+      <!-- Branch children -->
+      <ul class="lt-list child" role="group" *ngIf="!node.isLeaf">
+        <li class="lt-state child" *ngIf="node.loading && !node.children.length">
+          <i class="pi pi-spin pi-spinner"></i>{{ loadingText | translate }}
+        </li>
+        <ng-container
+          *ngTemplateOutlet="nodeTpl; context: { $implicit: node.children }"
+        ></ng-container>
+        <li class="lt-more" *ngIf="hasMore(node)">
+          <button type="button" class="lt-more-btn" (click)="loadMore(node)">
+            <i class="pi pi-angle-down"></i>{{ loadMoreText | translate }}
+          </button>
+        </li>
+        <li
+          class="lt-state child"
+          *ngIf="node.loaded && !node.loading && !node.children.length"
+        >
+          {{ emptyText | translate }}
+        </li>
+      </ul>
+    </ng-container>
+  </li>
+</ng-template>

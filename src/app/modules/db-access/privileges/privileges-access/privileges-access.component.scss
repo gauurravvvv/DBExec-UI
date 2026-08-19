@@ -16,3 +16,333 @@
   flex: 1;
   min-height: 0;
 }
+
+// Embedded in the Privileges hub: the hub sits flush on the page (no card),
+// so this child must NOT paint its own parent-card surface. Strip the
+// container's background/radius/shadow/padding when embedded so the tab body
+// is flush. (Scoped in the child's own stylesheet — same view encapsulation
+// as the db-access-page mixin rule it overrides, so it wins reliably without
+// an ::ng-deep specificity fight from the hub.)
+.dataset-page-wrapper.embedded {
+  padding: 0;
+
+  .dataset-content-container {
+    background: transparent;
+    border-radius: 0;
+    box-shadow: none;
+    padding: 0;
+  }
+}
+
+// ── Intent-first (guided) compose ──────────────────────────────────────────
+.compose-mode-bar {
+  margin-bottom: var(--space-6);
+
+  .mode-seg {
+    display: inline-flex;
+    background: var(--hover-background);
+    border-radius: var(--radius-sm, 6px);
+    padding: 3px;
+    gap: 2px;
+
+    button {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2);
+      border: none;
+      background: transparent;
+      border-radius: var(--radius-xs, 4px);
+      padding: var(--space-2) var(--space-5);
+      font-size: var(--fs-control);
+      font-weight: var(--fw-semibold, 600);
+      color: var(--text-muted);
+      cursor: pointer;
+
+      &.on {
+        background: var(--card-background);
+        color: var(--text-color);
+        box-shadow: var(--shadow-sm);
+      }
+    }
+  }
+}
+
+// Compose forms sit at 50% width, matching the canonical Add Role / Add User
+// form (`.form-grid { width: 50% }`), collapsing to full width on narrow
+// screens. Applies to both the guided panel and the advanced rules composer.
+.guided-panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  width: 50%;
+  max-width: 720px;
+
+  @media (max-width: 768px) {
+    width: 100%;
+  }
+}
+
+// Advanced (SQL rules) composer. Wider than the guided panel — the rule card
+// carries four selects + object pickers + a privilege grid, so a too-narrow
+// column made the privilege box dominate the card. A roomier max-width plus a
+// 2-up field grid keeps each rule card compact and scannable.
+.rules-panel {
+  width: 100%;
+  max-width: 860px;
+
+  @media (max-width: 768px) {
+    width: 100%;
+  }
+
+  // Two fields per row (Action + Level, then Schema + Grantee) so the card is
+  // compact instead of a tall single column. Collapses to one column on narrow
+  // screens.
+  .rule-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+
+    @media (max-width: 560px) {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+}
+
+// Effective tab "Pick a role" dropdown — cap to the SAME max-width as the
+// guided "Select role" (`.guided-panel` max 720px) so the two role pickers
+// render at the same width. width:100% + the shared 720px cap makes the cap
+// the binding constraint (the rail-card is wider than 720px). The tree below
+// stays full-width.
+.eff-role-picker {
+  display: block;
+  width: 100%;
+  max-width: 720px;
+}
+
+.guided-step {
+  display: flex;
+  flex-direction: column;
+  transition: opacity 0.15s ease;
+
+  &.step-muted {
+    opacity: 0.55;
+  }
+
+  .step-body {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  .step-title {
+    display: block;
+    font-weight: var(--fw-semibold, 600);
+    font-size: var(--fs-body);
+    color: var(--text-color);
+    margin-bottom: var(--space-4);
+  }
+}
+
+.preset-row {
+  display: flex;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+}
+
+.preset {
+  flex: 1 1 180px;
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md, 8px);
+  padding: var(--space-4) var(--space-5);
+  background: var(--card-background);
+  cursor: pointer;
+  text-align: left;
+  transition:
+    border-color 0.15s ease,
+    background 0.15s ease;
+
+  &:hover {
+    border-color: var(--primary-color);
+  }
+  &.sel {
+    border-color: var(--primary-color);
+    background: var(--primary-color-transparent);
+    box-shadow: 0 0 0 1px var(--primary-color) inset;
+  }
+
+  .radio {
+    flex: 0 0 auto;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    border: 2px solid var(--text-muted);
+    margin-top: 1px;
+    position: relative;
+  }
+  &.sel .radio {
+    border-color: var(--primary-color);
+    &::after {
+      content: '';
+      position: absolute;
+      inset: 3px;
+      border-radius: 50%;
+      background: var(--primary-color);
+    }
+  }
+
+  .preset-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .preset-title {
+    font-weight: var(--fw-semibold, 600);
+    font-size: var(--fs-control);
+    color: var(--text-color);
+  }
+  .preset-desc {
+    font-size: var(--fs-label);
+    color: var(--text-muted);
+    line-height: 1.4;
+  }
+}
+
+.custom-privs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  margin-top: var(--space-5);
+
+  .pcheck {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-3);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm, 6px);
+    padding: var(--space-3) var(--space-4);
+    font-size: var(--fs-control);
+    font-weight: var(--fw-semibold, 600);
+    background: var(--card-background);
+    color: var(--text-color);
+    cursor: pointer;
+
+    .box {
+      width: 16px;
+      height: 16px;
+      border-radius: 4px;
+      border: 2px solid var(--text-muted);
+      display: grid;
+      place-items: center;
+      color: #fff;
+      font-size: 10px;
+
+      .pi-check {
+        opacity: 0;
+      }
+    }
+
+    &.on {
+      border-color: var(--primary-color);
+      background: var(--primary-color-transparent);
+      color: var(--primary-color);
+
+      .box {
+        background: var(--primary-color);
+        border-color: var(--primary-color);
+        .pi-check {
+          opacity: 1;
+        }
+      }
+    }
+
+    // Privilege the grantee already holds — a subtle "has now" tag so the
+    // pre-selected state is understood as current reality, not a new grant.
+    .has-tag {
+      font-size: var(--fs-micro, 11px);
+      font-weight: var(--fw-semibold, 600);
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      color: var(--secondary-color);
+      background: var(--hover-background);
+      border-radius: var(--radius-xs, 4px);
+      padding: 1px 5px;
+      margin-left: var(--space-2);
+    }
+    &.has-now.on .has-tag {
+      color: var(--primary-color);
+      background: var(--primary-color-transparent);
+    }
+  }
+}
+
+.reflect-hint {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-top: var(--space-4);
+  font-size: var(--fs-label);
+  color: var(--text-muted);
+
+  .pi {
+    color: var(--primary-color);
+  }
+}
+
+.where-controls {
+  display: flex;
+  gap: var(--space-4);
+  align-items: center;
+  flex-wrap: wrap;
+
+  app-custom-dropdown {
+    flex: 1 1 240px;
+    min-width: 200px;
+  }
+
+  .scope-toggle {
+    display: inline-flex;
+    background: var(--hover-background);
+    border-radius: var(--radius-sm, 6px);
+    padding: 3px;
+    gap: 2px;
+
+    button {
+      border: none;
+      background: transparent;
+      border-radius: var(--radius-xs, 4px);
+      padding: var(--space-2) var(--space-4);
+      font-size: var(--fs-control);
+      font-weight: var(--fw-semibold, 600);
+      color: var(--text-muted);
+      cursor: pointer;
+      white-space: nowrap;
+
+      &.on {
+        background: var(--card-background);
+        color: var(--text-color);
+        box-shadow: var(--shadow-sm);
+      }
+    }
+  }
+}
+
+.guided-hint {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  font-size: var(--fs-label);
+  color: var(--text-muted);
+
+  .pi {
+    color: var(--primary-color);
+    margin-top: 1px;
+  }
+}
+
+// Mandatory-field marker — the red "*" appended to required field labels
+// (guided step titles + advanced rule labels). Matches the Add Role form's
+// required marker exactly (shared custom-input `.required` → --error-color).
+.req {
+  color: var(--error-color);
+  margin-left: 2px;
+}

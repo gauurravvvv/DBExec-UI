@@ -1,0 +1,193 @@
+// Privileges & Access hub — ONE parent card (parity with /app/db-roles) holds
+// the whole hub: the header (title + shared datasource picker + capability
+// badges + Compose Apply / templates Add), the shared themed tab strip, then
+// the active tab's EMBEDDED body. The tab bodies sit FLUSH inside that one card
+// (no inner cards): each child keeps its standard markup so it still works
+// standalone; here we strip its own card chrome (::ng-deep + each child's
+// `embedded` guard) so there is a single card, never card-in-card.
+:host {
+  display: block;
+  height: 100%;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.settings-page-wrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  padding: var(--space-0);
+  min-width: 0;
+  min-height: 0;
+}
+
+.settings-content-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-8);
+  max-width: 100%;
+  width: 100%;
+  min-width: 0;
+  min-height: 0;
+  gap: var(--space-6);
+
+  // ONE parent card holds the whole hub (title + datasource picker + tab strip
+  // + tab body) — matches the /app/db-roles reference. The tab bodies inside
+  // stay FLUSH (each embedded child suppresses its own card), so there is a
+  // single card, never card-in-card.
+  background: var(--card-background);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+}
+
+// ── Header (title left, shared picker + badges + Apply right) ──────────
+.page-header-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-6);
+  flex: 0 0 auto;
+
+  .header-content h2 {
+    font-size: clamp(1.25rem, 1.05rem + 0.4vw, 1.375rem);
+    font-weight: var(--fw-semibold);
+    color: var(--text-color);
+    letter-spacing: -0.025em;
+    margin: 0;
+  }
+
+  .header-actions {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--space-4);
+    flex-shrink: 0;
+  }
+}
+
+// ── Shared datasource picker row — its own line above the tab strip ────
+.hub-datasource-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-5);
+  flex: 0 0 auto;
+
+  app-datasource-picker {
+    flex: 0 0 auto;
+  }
+
+  // Inline capability spinner while probing the chosen datasource.
+  .cap-loading {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-3);
+    color: var(--secondary-color);
+    font-size: var(--fs-control);
+    white-space: nowrap;
+  }
+}
+
+// Button matches the canonical list-user .modern-button rhythm.
+.modern-button {
+  border-radius: var(--radius-sm) !important;
+  font-weight: var(--fw-semibold);
+  padding: 0.65rem 1.25rem;
+}
+
+// ── Header-level shared hints (pick a datasource / unsupported) ────────
+.hub-hint {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-4);
+  padding: var(--space-9) var(--space-6);
+  color: var(--secondary-color);
+  text-align: center;
+  flex: 1;
+  min-height: 0;
+
+  i {
+    font-size: 1.75rem;
+    opacity: 0.45;
+  }
+  span {
+    font-size: var(--fs-body);
+    max-width: 420px;
+    line-height: 1.5;
+  }
+
+  &.unsupported i {
+    color: var(--warning-color);
+    opacity: 1;
+  }
+}
+
+// ── Active tab body — fills the rest, owns its own scroll ─────────────
+.settings-tab-body {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  padding-top: var(--space-2);
+}
+
+// ── Flatten each embedded child into the tab body ─────────────────────
+// The db-access children (privileges-access / sessions) wrap in
+// .dataset-page-wrapper > .dataset-content-container (their own card surface).
+// Strip that card chrome so the child's body sits flush on the page. Their own
+// header rows are already hidden by the child's `embedded` guard; we neutralise
+// them here too.
+::ng-deep .settings-tab-body .dataset-page-wrapper {
+  height: 100%;
+  padding: 0;
+  flex: 1;
+  min-height: 0;
+}
+
+::ng-deep .settings-tab-body .dataset-content-container {
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  padding: 0;
+  height: 100%;
+  gap: 0;
+  flex: 1;
+  min-height: 0;
+}
+
+// NOTE: we do NOT blanket-hide the children's header rows here. Each child
+// hides its OWN title via an `embedded` guard; some children (sessions,
+// templates) intentionally KEEP a slim action-only row. Those rows carry
+// `.embedded-actions-only` so the lone action sits flush-right where the
+// title used to be.
+::ng-deep .settings-tab-body .page-header-section.embedded-actions-only,
+::ng-deep .settings-tab-body .page-header.embedded-actions-only {
+  justify-content: flex-end;
+}
+
+// The templates list uses the list-* shell instead of dataset-*; flatten it too.
+::ng-deep .settings-tab-body .list-wrapper {
+  height: 100%;
+  padding: 0;
+  flex: 1;
+  min-height: 0;
+}
+::ng-deep .settings-tab-body .list-container {
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  padding: 0;
+  height: 100%;
+  gap: 0;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}

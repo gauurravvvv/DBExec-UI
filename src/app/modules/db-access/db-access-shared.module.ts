@@ -10,6 +10,8 @@ import { CustomTableEmptyDirective } from 'src/app/shared/components/custom-tabl
 import { ChipComponent } from 'src/app/shared/components/chip/chip.component';
 import { ChangeSummaryDialogComponent } from './components/change-summary-dialog/change-summary-dialog.component';
 import { DatasourcePickerComponent } from './shared/datasource-picker/datasource-picker.component';
+import { PrivilegeTreeComponent } from './components/privilege-tree/privilege-tree.component';
+import { LazyTreeComponent } from 'src/app/shared/components/lazy-tree/lazy-tree.component';
 
 /**
  * DbAccessSharedModule — the common spine imported by the three DB-access
@@ -24,7 +26,11 @@ import { DatasourcePickerComponent } from './shared/datasource-picker/datasource
  * persist as the user moves between the sidebar sections.
  */
 @NgModule({
-  declarations: [DatasourcePickerComponent, ChangeSummaryDialogComponent],
+  declarations: [
+    DatasourcePickerComponent,
+    ChangeSummaryDialogComponent,
+    PrivilegeTreeComponent,
+  ],
   imports: [
     CommonModule,
     FormsModule,
@@ -35,6 +41,7 @@ import { DatasourcePickerComponent } from './shared/datasource-picker/datasource
     UsGridCellDirective,
     CustomTableComponent,
     ChipComponent,
+    LazyTreeComponent,
   ],
   exports: [
     CommonModule,
@@ -45,6 +52,7 @@ import { DatasourcePickerComponent } from './shared/datasource-picker/datasource
     SharedModule,
     DatasourcePickerComponent,
     ChangeSummaryDialogComponent,
+    PrivilegeTreeComponent,
     UsGridCellDirective,
     CustomTableComponent,
     ChipComponent,

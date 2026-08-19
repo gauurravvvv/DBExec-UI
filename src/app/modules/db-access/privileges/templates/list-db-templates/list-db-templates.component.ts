@@ -2,6 +2,7 @@ import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
+  Input,
   OnDestroy,
   OnInit,
   inject,
@@ -35,6 +36,11 @@ export class ListDbTemplatesComponent implements OnInit, OnDestroy {
   private router = inject(Router);
   private translate = inject(TranslateService);
   private globalService = inject(GlobalService);
+
+  /** Embedded in the Privileges hub — hide this list's own header (back button
+   *  + title + subtitle); the hub owns the title. The Add + row-edit actions
+   *  still navigate to the templates sub-pages. */
+  @Input() embedded = false;
 
   loading = this.tpl.loading;
   saving = this.tpl.saving;

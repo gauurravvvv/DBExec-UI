@@ -156,13 +156,14 @@
   // sitting over a barely-blue linear canvas (hard-coded in the shell).
   --auth-wash-tint-b: 99, 102, 241; // indigo-500 (bottom-right anchor)
   --auth-wash-tint-c: 125, 211, 252; // sky-300 (top-left highlight)
-  // Glassy surfaces — topbar, footer, login card. All use white with
-  // an alpha so the animated gradient bleeds through.
-  --auth-surface-glass: rgba(255, 255, 255, 0.92);
-  --auth-surface-chrome: rgba(255, 255, 255, 0.72);
-  --auth-input-surface: rgba(255, 255, 255, 0.6);
-  --auth-input-surface-hover: rgba(255, 255, 255, 0.85);
-  --auth-input-surface-focus: #ffffff;
+  // Glassy surfaces — topbar, footer, login card. All use a soft off-white
+  // (#FCFCFB = 252,252,251) with an alpha so the gradient bleeds through.
+  // Pure white was harsh on the eyes on the auth pages.
+  --auth-surface-glass: rgba(252, 252, 251, 0.92);
+  --auth-surface-chrome: rgba(252, 252, 251, 0.72);
+  --auth-input-surface: rgba(252, 252, 251, 0.6);
+  --auth-input-surface-hover: rgba(252, 252, 251, 0.85);
+  --auth-input-surface-focus: #fcfcfb;
   // Soft ink overlay for borders / dividers / subtle shadows on the
   // glassy surfaces — 15,23,42 = slate-900 RGB.
   --auth-ink-rgb: 15, 23, 42;

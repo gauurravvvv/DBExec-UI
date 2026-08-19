@@ -20,15 +20,18 @@
           <span>{{ 'APP_SETTINGS.EMAIL_CONFIG.PROVIDER' | translate }}</span>
         </div>
 
-        <app-custom-dropdown
-          formControlName="emailProvider"
-          icon="pi-envelope"
-          [label]="'APP_SETTINGS.EMAIL_CONFIG.PROVIDER' | translate"
-          [options]="providerOptions"
-          optionLabel="label"
-          optionValue="value"
-          [filter]="false"
-        ></app-custom-dropdown>
+        <div class="form-grid">
+          <app-custom-dropdown
+            formControlName="emailProvider"
+            icon="pi-envelope"
+            [label]="'APP_SETTINGS.EMAIL_CONFIG.PROVIDER' | translate"
+            [options]="providerOptions"
+            optionLabel="label"
+            optionValue="value"
+            [filter]="false"
+            appendTo="body"
+          ></app-custom-dropdown>
+        </div>
       </div>
 
       <!-- SMTP -->

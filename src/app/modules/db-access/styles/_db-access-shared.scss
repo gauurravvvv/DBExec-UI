@@ -40,7 +40,6 @@
       background: var(--card-background);
       border-radius: var(--radius-md);
       box-shadow: var(--shadow-sm);
-      padding: var(--space-8);
     }
   }
 
@@ -1072,11 +1071,34 @@
   .view-container {
     flex: 1;
     min-height: 0;
-    overflow-y: auto;
+    overflow-y: auto; // small-screen fallback only; the effective card flexes
     padding: var(--space-6) var(--space-8);
     display: flex;
     flex-direction: column;
     gap: var(--space-6);
+  }
+
+  // The effective-privileges card fills the remaining height so its tree flexes
+  // to fill it (consistent on all screens: tree scrolls internally, the card
+  // itself doesn't). A min-height keeps it usable before the container's
+  // fallback scroll engages on very short viewports.
+  .effective-card {
+    flex: 1 1 auto;
+    min-height: 280px;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+
+    .card-header {
+      flex: 0 0 auto;
+    }
+
+    app-privilege-tree {
+      flex: 1 1 auto;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+    }
   }
 
   .hero-card {
@@ -1733,11 +1755,13 @@
       animation: db-access-rule-pulse 1.6s ease-out 1;
     }
 
-    // Incomplete: a rule missing a mandatory field. Warning left-edge so the
-    // user can see at a glance which card is blocking Apply Changes.
+    // Incomplete: a rule still missing a mandatory field. A calm, neutral
+    // left-edge (not an alarming amber) marks which card is not yet ready —
+    // "in progress", not "error". The Apply button + the field-level required
+    // markers carry the real gating; this is just a quiet locator.
     &.rule-incomplete {
-      border-color: var(--warning-color, #d97706);
-      box-shadow: inset 3px 0 0 0 var(--warning-color, #d97706);
+      border-color: var(--border-color);
+      box-shadow: inset 3px 0 0 0 var(--secondary-color);
     }
 
     .rule-card-head {
@@ -1918,12 +1942,42 @@
     }
 
     .rail-card {
+      // Flush on the page — no per-panel card. The two panels (Effective tree,
+      // Default privileges) are separated by a single vertical divider (added
+      // on the right column below), not by two boxes.
+      background: transparent;
+      border: none;
+      border-radius: 0;
+      box-shadow: none;
       padding: var(--space-6);
       gap: var(--space-5);
-      // Bound the card to its grid track so a flex child (the viewport) can
-      // take the leftover height and scroll internally.
+      // Flex column so the embedded fill-mode privilege tree stretches to take
+      // the leftover height (below the role picker) and scrolls INTERNALLY,
+      // instead of taking its intrinsic height and being clipped by the card's
+      // overflow:hidden.
+      display: flex;
+      flex-direction: column;
       min-height: 0;
       overflow: hidden;
+
+      // Left panel: no left inset.
+      &:first-child {
+        padding-left: 0;
+      }
+      // Right panel (Default privileges): a single vertical divider separates
+      // it from the Effective tree.
+      &:last-child {
+        border-left: 1px solid var(--border-color);
+        padding-right: 0;
+      }
+
+      // The embedded effective tree fills the remaining card height.
+      .eff-tree-embed {
+        flex: 1 1 auto;
+        min-height: 0;
+        display: flex;
+        flex-direction: column;
+      }
 
       // The default-privileges card is short — let it scroll its own list if
       // it ever overflows rather than stretching the row.
@@ -1948,6 +2002,18 @@
         margin: 0;
         font-size: var(--fs-control);
         color: var(--secondary-color);
+      }
+    }
+
+    // Stacked layout (below the breakpoint): the vertical divider becomes a
+    // horizontal rule above the Default-privileges panel.
+    @media (max-width: 1100px) {
+      .rail-card:last-child {
+        border-left: none;
+        border-top: 1px solid var(--border-color);
+        padding-right: 0;
+        padding-left: 0;
+        padding-top: var(--space-6);
       }
     }
   }

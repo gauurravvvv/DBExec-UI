@@ -1,0 +1,234 @@
+// app-lazy-tree — data-agnostic lazy tree. Tokens only (light + org themes).
+
+// Fill mode: the component box + inner column stretch so the tree body flexes
+// to fill the host's bounded flex-column parent (see `fill` input). The host
+// (:host) must itself be allowed to grow — consumers give it flex:1;min-height:0.
+:host.lt-fill {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  flex: 1 1 auto;
+
+  .lazy-tree {
+    flex: 1 1 auto;
+    min-height: 0;
+  }
+
+  // In fill mode the scroll region takes the remaining space (no clamp).
+  .lt-root.lt-scroll {
+    flex: 1 1 auto;
+    min-height: 120px; // a small floor so it never fully collapses
+    max-height: none;
+  }
+}
+
+.lazy-tree {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+
+  .lt-toolbar {
+    display: flex;
+    align-items: center;
+    gap: var(--space-5);
+    // Search on the left (flexes), host toolbar (e.g. system toggle) pinned
+    // right — kept on ONE row. The search host caps its own width.
+    flex-wrap: nowrap;
+
+    // The shared search takes the available space up to a sensible cap; the
+    // projected toolbar slot (e.g. system toggle) sits after it (pinned right).
+    > app-search-input {
+      flex: 1 1 auto;
+      max-width: 360px;
+      min-width: 0;
+      display: block;
+    }
+  }
+
+  .lt-search {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    flex: 1 1 240px;
+    max-width: 340px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm, 6px);
+    padding: var(--space-3) var(--space-4);
+    background: var(--card-background);
+    color: var(--text-muted);
+
+    input {
+      flex: 1 1 auto;
+      border: none;
+      outline: none;
+      background: transparent;
+      color: var(--text-color);
+      font-family: inherit;
+      font-size: var(--fs-control);
+      min-width: 0;
+    }
+
+    .lt-search-clear {
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      cursor: pointer;
+      padding: 0;
+      display: inline-flex;
+
+      &:hover {
+        color: var(--text-color);
+      }
+    }
+  }
+
+  .lt-state {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    color: var(--text-muted);
+    font-size: var(--fs-control);
+    padding: var(--space-3) 0;
+
+    &.child {
+      padding: var(--space-2) 0 var(--space-2) var(--space-8);
+    }
+
+    .pi-spinner {
+      color: var(--primary-color);
+    }
+  }
+
+  // Root scroll region — applied unless the host opts out (maxHeight 'none').
+  // Responsive default height lives HERE (not in TS): min 240px on short
+  // screens, grows with the viewport, capped at 640px — so the tree body
+  // scrolls internally on any screen while the surrounding page stays put.
+  // A host `[maxHeight]` value overrides this via an inline style.
+  .lt-root.lt-scroll {
+    max-height: clamp(240px, 52vh, 640px);
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-right: var(--space-1);
+
+    &::-webkit-scrollbar {
+      width: 8px;
+    }
+    &::-webkit-scrollbar-thumb {
+      background: var(--border-color);
+      border-radius: var(--radius-pill, 999px);
+    }
+    &::-webkit-scrollbar-track {
+      background: transparent;
+    }
+  }
+
+  .lt-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+
+    &.child {
+      // indentation is applied per-row via padding-left (level-based), so the
+      // child <ul> itself stays flush — keeps deep trees from over-indenting.
+      margin: 0;
+    }
+  }
+
+  .lt-node {
+    margin: 0;
+  }
+
+  .lt-row {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    width: 100%;
+    background: transparent;
+    border: none;
+    border-radius: var(--radius-sm, 6px);
+    padding: var(--space-3) var(--space-4);
+    cursor: pointer;
+    text-align: left;
+    color: var(--text-color);
+    font-size: var(--fs-body);
+    transition: background 0.12s ease;
+
+    &:hover {
+      background: var(--hover-background);
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--primary-color);
+      outline-offset: -2px;
+    }
+
+    .lt-chevron {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      width: 0.9rem;
+      flex: 0 0 auto;
+
+      &.lt-chevron-hidden {
+        visibility: hidden;
+      }
+    }
+
+    .lt-icon {
+      color: var(--primary-color);
+      font-size: 0.9rem;
+      flex: 0 0 auto;
+    }
+
+    .lt-label {
+      flex: 1 1 auto;
+      font-weight: var(--fw-medium, 500);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+
+      &.mono {
+        font-family: var(--font-mono, monospace);
+        font-weight: var(--fw-semibold, 600);
+        font-size: var(--fs-control);
+      }
+    }
+
+    .lt-right {
+      margin-left: auto;
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-3);
+      flex: 0 0 auto;
+    }
+
+    &.is-leaf .lt-icon {
+      color: var(--text-muted);
+    }
+  }
+
+  .lt-leaf {
+    padding: var(--space-2) var(--space-4) var(--space-3) var(--space-9);
+  }
+
+  .lt-more {
+    list-style: none;
+
+    .lt-more-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2);
+      background: transparent;
+      border: none;
+      color: var(--primary-color);
+      font-size: var(--fs-control);
+      cursor: pointer;
+      padding: var(--space-2) var(--space-4);
+      margin-left: var(--space-6);
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+}

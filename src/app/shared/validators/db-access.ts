@@ -312,11 +312,18 @@ export type RevokeRoleInput = z.infer<typeof revokeRoleSchema>;
 /**
  * :datasourceId param schema for path validation.
  */
-export const datasourceIdParamSchema = z.object({
-  datasourceId: z
-    .string({ message: 'validation.common.id.required' })
-    .uuid({ message: 'validation.common.id.invalid' }),
-});
+// `.passthrough()` so sibling path params (e.g. :roleName) and query params
+// survive validation — zodValidate replaces req.params/req.query with the
+// parsed result, and a strict object would STRIP :roleName, leaving the
+// effective-privilege controllers reading `undefined` (they then matched only
+// PUBLIC grants). Only datasourceId is validated; the rest passes through.
+export const datasourceIdParamSchema = z
+  .object({
+    datasourceId: z
+      .string({ message: 'validation.common.id.required' })
+      .uuid({ message: 'validation.common.id.invalid' }),
+  })
+  .passthrough();
 
 export type DatasourceIdParamInput = z.infer<typeof datasourceIdParamSchema>;
 

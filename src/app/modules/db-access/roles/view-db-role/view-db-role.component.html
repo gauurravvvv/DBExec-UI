@@ -155,8 +155,10 @@
       </div>
 
       <!-- Effective privileges — lazy schema → table → privileges tree with
-           provenance (replaces the old flat grid that mis-bound object/type). -->
-      <div class="info-card">
+           provenance (replaces the old flat grid that mis-bound object/type).
+           This card FLEXES to fill the remaining space; the tree fills the card
+           and scrolls internally, so behavior is consistent on every screen. -->
+      <div class="info-card effective-card">
         <div class="card-header">
           <h3>
             <i class="pi pi-shield"></i
@@ -166,6 +168,7 @@
         <app-privilege-tree
           [datasourceId]="datasourceId"
           [roleName]="roleName"
+          [fill]="true"
         ></app-privilege-tree>
       </div>
     </ng-container>

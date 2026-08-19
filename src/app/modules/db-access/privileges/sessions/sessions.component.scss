@@ -9,6 +9,22 @@
 @include db.db-access-page;
 @include db.db-access-dialog;
 
+// Embedded in the Privileges hub: the hub owns the ONE parent card, so this
+// child must not paint its own card — strip the container surface + padding so
+// the sessions toolbar + table sit flush inside the hub card (no card-in-card).
+// Scoped in the child's own stylesheet so it out-specifies the db-access-page
+// mixin rule reliably.
+.dataset-page-wrapper.embedded {
+  padding: 0;
+
+  .dataset-content-container {
+    background: transparent;
+    border-radius: 0;
+    box-shadow: none;
+    padding: 0;
+  }
+}
+
 // Confirm popup intro text (reused from the delete wizard styling).
 .delete-intro {
   color: var(--secondary-color);
@@ -41,7 +57,50 @@
   color: var(--secondary-color);
 }
 
-// "Hide background workers" filter toggle — sits inline in the table toolbar.
+// ── Session filters — one aligned toolbar row ──────────────────────────────
+// The shared app-custom-input / app-custom-dropdown default to display:block
+// width:100%, so inside the flex-wrap toolbar-start slot they each grabbed a
+// full row (the "scattered" look). Constrain each to its content width so the
+// search + status + hide-background sit inline on ONE row, matching the
+// /app/db-roles toolbar idiom. The shared components still own their own field
+// chrome (icon, focus ring, height) — this is sizing only.
+// The shared table's left toolbar slot (.ct-toolbar-left) sizes to content and
+// wraps; our three filter controls exceeded its width, dropping hide-background
+// to a second line. Let that slot grow into the (wide) toolbar and not wrap so
+// search + status + hide-background stay on ONE row.
+:host ::ng-deep .ct-toolbar-left {
+  flex: 1 1 auto;
+  flex-wrap: nowrap;
+}
+
+.sessions-toolbar-start {
+  align-items: center;
+  flex: 1 1 auto;
+  flex-wrap: nowrap;
+
+  // Search — a normal list-toolbar search width.
+  .filter-search {
+    display: block;
+    flex: 0 1 15rem;
+    min-width: 10rem;
+
+    ::ng-deep .form-field {
+      width: 100%;
+    }
+  }
+
+  // Status filter — sized to its content (NOT full width), like a normal
+  // filter dropdown (~200px).
+  .filter-state {
+    display: block;
+    flex: 0 0 13rem;
+    width: 13rem;
+    min-width: 0;
+  }
+}
+
+// "Hide background workers" filter toggle — sits inline to the RIGHT of the
+// search + status controls (never wraps to its own line).
 .hide-bg-toggle {
   display: inline-flex;
   align-items: center;
@@ -50,4 +109,15 @@
   font-size: var(--fs-control);
   color: var(--secondary-color);
   white-space: nowrap;
+  flex: 0 0 auto;
+
+  // The binary checkbox ships a stacked, full-width .form-field (label under
+  // control); in the toolbar we want it content-width with the label inline
+  // beside the box so it doesn't grab a full row and wrap.
+  ::ng-deep .form-field {
+    width: auto;
+    gap: var(--space-3);
+    flex-direction: row;
+    align-items: center;
+  }
 }

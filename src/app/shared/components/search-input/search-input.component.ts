@@ -7,6 +7,7 @@ import {
   OnInit,
   Output,
 } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged, takeUntil } from 'rxjs/operators';
 
@@ -25,6 +26,8 @@ import { debounceTime, distinctUntilChanged, takeUntil } from 'rxjs/operators';
  */
 @Component({
   selector: 'app-search-input',
+  standalone: true,
+  imports: [CommonModule],
   templateUrl: './search-input.component.html',
   styleUrls: ['./search-input.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
