@@ -35,7 +35,7 @@
     "auditActivity": "Auditoría y Actividad",
     "auditLogs": "Registros de auditoría",
     "loginActivity": "Registros de actividad",
-    "appSettings": "Configuración",
+    "appSettings": "App",
     "announcementManagement": "Anuncios",
     "themeManagement": "Tema",
     "myProfile": "Mi perfil",
@@ -49,10 +49,11 @@
     "securityPolicy": "Política de seguridad",
     "emailConfiguration": "Configuración de correo",
     "alertManagement": "Alertas",
-    "systemSettings": "Configuración del sistema",
+    "systemSettings": "Sistema",
     "ssoConfiguration": "Configuración de SSO",
     "aiFeatures": "Funciones de IA",
-    "aiWorkspace": "Asistente de IA"
+    "aiWorkspace": "Asistente de IA",
+    "settings": "Configuración"
   },
   "COMMON": {
     "ACTIVE": "Activo",

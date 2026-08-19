@@ -32,14 +32,14 @@ import { PERMISSIONS } from 'src/app/core/constants/permissions.constant';
   styleUrls: ['./system-settings-hub.component.scss'],
 })
 export class SystemSettingsHubComponent implements OnInit {
-  /** Shared themed tab strip model. Every System tab is gated on its own
-   *  leaf, but the whole hub is already gated on ssoConfiguration at the
-   *  route; per-tab permissions keep the strip honest if that changes. */
+  /** Shared themed tab strip model. Every tab gates on the single
+   *  SYSTEM_SETTINGS grant — the per-tab leaf permissions were dropped from
+   *  the catalog, so holding the System hub unlocks all of its tabs. */
   readonly tabs: AppTab[] = [
-    { value: 'sso', label: 'SIDEBAR.ssoConfiguration', icon: 'pi pi-key', permission: PERMISSIONS.SSO_CONFIGURATION },
-    { value: 'email', label: 'SIDEBAR.emailConfiguration', icon: 'pi pi-envelope', permission: PERMISSIONS.EMAIL_CONFIGURATION },
-    { value: 'security', label: 'SIDEBAR.securityPolicy', icon: 'pi pi-shield', permission: PERMISSIONS.SECURITY_POLICY },
-    { value: 'ai', label: 'SIDEBAR.aiFeatures', icon: 'pi pi-microchip-ai', permission: PERMISSIONS.AI_FEATURES },
+    { value: 'sso', label: 'SIDEBAR.ssoConfiguration', icon: 'pi pi-key', permission: PERMISSIONS.SYSTEM_SETTINGS },
+    { value: 'email', label: 'SIDEBAR.emailConfiguration', icon: 'pi pi-envelope', permission: PERMISSIONS.SYSTEM_SETTINGS },
+    { value: 'security', label: 'SIDEBAR.securityPolicy', icon: 'pi pi-shield', permission: PERMISSIONS.SYSTEM_SETTINGS },
+    { value: 'ai', label: 'SIDEBAR.aiFeatures', icon: 'pi pi-microchip-ai', permission: PERMISSIONS.SYSTEM_SETTINGS },
   ];
   activeTab = 'sso';
 

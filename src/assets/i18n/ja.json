@@ -35,7 +35,7 @@
     "auditActivity": "監査 & アクティビティ",
     "auditLogs": "監査ログ",
     "loginActivity": "アクティビティログ",
-    "appSettings": "アプリ設定",
+    "appSettings": "アプリ",
     "announcementManagement": "お知らせ管理",
     "themeManagement": "テーマ",
     "myProfile": "マイプロフィール",
@@ -49,10 +49,11 @@
     "securityPolicy": "セキュリティポリシー",
     "emailConfiguration": "メール設定",
     "alertManagement": "アラート",
-    "systemSettings": "システム設定",
+    "systemSettings": "システム",
     "ssoConfiguration": "SSO設定",
     "aiFeatures": "AI機能",
-    "aiWorkspace": "AIアシスタント"
+    "aiWorkspace": "AIアシスタント",
+    "settings": "設定"
   },
   "COMMON": {
     "ACTIVE": "有効",

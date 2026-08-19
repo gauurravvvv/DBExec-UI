@@ -35,7 +35,7 @@
     "auditActivity": "审计与活动",
     "auditLogs": "审计日志",
     "loginActivity": "活动日志",
-    "appSettings": "应用设置",
+    "appSettings": "应用",
     "announcementManagement": "公告管理",
     "themeManagement": "主题",
     "myProfile": "我的资料",
@@ -49,10 +49,11 @@
     "securityPolicy": "安全策略",
     "emailConfiguration": "邮件配置",
     "alertManagement": "警报",
-    "systemSettings": "系统设置",
+    "systemSettings": "系统",
     "ssoConfiguration": "SSO 配置",
     "aiFeatures": "AI 功能",
-    "aiWorkspace": "AI 助手"
+    "aiWorkspace": "AI 助手",
+    "settings": "设置"
   },
   "COMMON": {
     "ACTIVE": "活跃",

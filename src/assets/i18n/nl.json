@@ -35,7 +35,7 @@
     "auditActivity": "Audit & Activiteit",
     "auditLogs": "Auditlogboeken",
     "loginActivity": "Activiteitenlogboeken",
-    "appSettings": "Instellingen",
+    "appSettings": "App",
     "announcementManagement": "Aankondigingen",
     "themeManagement": "Thema",
     "myProfile": "Mijn profiel",
@@ -49,10 +49,11 @@
     "securityPolicy": "Beveiligingsbeleid",
     "emailConfiguration": "E-mailconfiguratie",
     "alertManagement": "Waarschuwingen",
-    "systemSettings": "Systeeminstellingen",
+    "systemSettings": "Systeem",
     "ssoConfiguration": "SSO-configuratie",
     "aiFeatures": "AI-functies",
-    "aiWorkspace": "AI-assistent"
+    "aiWorkspace": "AI-assistent",
+    "settings": "Instellingen"
   },
   "COMMON": {
     "ACTIVE": "Actief",

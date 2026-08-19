@@ -21,32 +21,25 @@ import { AddBrandingComponent } from './components/add-branding/add-branding.com
 const routes: Routes = [
   { path: '', redirectTo: 'app', pathMatch: 'full' },
   {
-    // App Settings hub — Theme / Branding / Announcements. Gated on the
-    // themeManagement LEAF, not APP_SETTINGS (the module header): the
-    // permission tree gives `level` only to leaves, so canRead('appSettings')
-    // is always false even for an admin holding every child — the guard would
-    // block the page (this was the "can't open App Settings" bug). Gating on
-    // a child leaf the org admin holds makes the guard pass, mirroring the
-    // System Settings hub below (gated on ssoConfiguration).
+    // App hub — Theme / Branding / Announcements. Gated on APP_SETTINGS,
+    // which is now a GRANTABLE LEAF (a screen under the `settings` parent),
+    // so an org admin holding it passes the guard. The former per-tab leaf
+    // grants (themeManagement, …) were dropped from the catalog — one grant
+    // per hub unlocks all its tabs.
     path: 'app',
     component: AppSettingsHubComponent,
     canActivate: [roleGuard],
-    data: { permission: PERMISSIONS.THEME_MANAGEMENT, title: 'App Settings' },
+    data: { permission: PERMISSIONS.APP_SETTINGS, title: 'App Settings' },
   },
   {
-    // System Settings hub — SSO / Email / Security Policy / AI Features.
-    // Gated on SSO_CONFIGURATION (a child LEAF), NOT SYSTEM_SETTINGS (the
-    // module header): PermissionService.canRead matches the node whose
-    // `value` equals the argument and returns THAT node's `level`. Module
-    // headers carry no `level`, so canRead('systemSettings') is always
-    // false — even for an admin holding every child leaf. Gating on the
-    // ssoConfiguration leaf (which the org admin holds) makes the guard
-    // pass; the org-policy BE route already gates writes on the same leaf.
+    // System hub — SSO / Email / Security Policy / AI Features. Gated on
+    // SYSTEM_SETTINGS, now a grantable leaf under the `settings` parent
+    // (see the App hub above). One grant unlocks every System tab.
     path: 'system',
     component: SystemSettingsHubComponent,
     canActivate: [roleGuard],
     data: {
-      permission: PERMISSIONS.SSO_CONFIGURATION,
+      permission: PERMISSIONS.SYSTEM_SETTINGS,
       title: 'System Settings',
     },
   },

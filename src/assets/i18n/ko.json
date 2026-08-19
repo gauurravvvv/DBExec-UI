@@ -35,7 +35,7 @@
     "auditActivity": "감사 및 활동",
     "auditLogs": "감사 로그",
     "loginActivity": "활동 로그",
-    "appSettings": "앱 설정",
+    "appSettings": "앱",
     "announcementManagement": "공지 관리",
     "themeManagement": "테마",
     "myProfile": "내 프로필",
@@ -49,10 +49,11 @@
     "securityPolicy": "보안 정책",
     "emailConfiguration": "이메일 구성",
     "alertManagement": "알림",
-    "systemSettings": "시스템 설정",
+    "systemSettings": "시스템",
     "ssoConfiguration": "SSO 구성",
     "aiFeatures": "AI 기능",
-    "aiWorkspace": "AI 어시스턴트"
+    "aiWorkspace": "AI 어시스턴트",
+    "settings": "설정"
   },
   "COMMON": {
     "ACTIVE": "활성",

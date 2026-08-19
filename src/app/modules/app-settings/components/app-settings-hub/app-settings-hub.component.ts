@@ -34,44 +34,47 @@ interface TabAdd {
   styleUrls: ['./app-settings-hub.component.scss'],
 })
 export class AppSettingsHubComponent implements OnInit {
-  /** Tab strip model (also the source of order + the query-param slug). */
+  /** Tab strip model (also the source of order + the query-param slug).
+   *  Every tab gates on the single APP_SETTINGS grant — the per-tab leaf
+   *  permissions were dropped from the catalog, so holding the App hub
+   *  unlocks all of its tabs. */
   readonly tabs: AppTab[] = [
     {
       value: 'theme',
       label: 'SIDEBAR.themeManagement',
       icon: 'pi pi-palette',
-      permission: PERMISSIONS.THEME_MANAGEMENT,
+      permission: PERMISSIONS.APP_SETTINGS,
     },
     {
       value: 'branding',
       label: 'SIDEBAR.brandingManagement',
       icon: 'pi pi-image',
-      permission: PERMISSIONS.BRANDING_MANAGEMENT,
+      permission: PERMISSIONS.APP_SETTINGS,
     },
     {
       value: 'announcements',
       label: 'SIDEBAR.announcementManagement',
       icon: 'pi pi-megaphone',
-      permission: PERMISSIONS.ANNOUNCEMENT_MANAGEMENT,
+      permission: PERMISSIONS.APP_SETTINGS,
     },
   ];
 
-  /** Add-button config per tab value. */
+  /** Add-button config per tab value. All gate on APP_SETTINGS (write). */
   private readonly addByTab: Record<string, TabAdd> = {
     theme: {
       labelKey: 'COMMON.ADD',
       route: THEME_PRESET.NEW,
-      permission: PERMISSIONS.THEME_MANAGEMENT,
+      permission: PERMISSIONS.APP_SETTINGS,
     },
     branding: {
       labelKey: 'COMMON.ADD',
       route: BRANDING_PRESET.NEW,
-      permission: PERMISSIONS.BRANDING_MANAGEMENT,
+      permission: PERMISSIONS.APP_SETTINGS,
     },
     announcements: {
       labelKey: 'COMMON.ADD',
       route: ANNOUNCEMENT.ADD,
-      permission: PERMISSIONS.ANNOUNCEMENT_MANAGEMENT,
+      permission: PERMISSIONS.APP_SETTINGS,
     },
   };
 
