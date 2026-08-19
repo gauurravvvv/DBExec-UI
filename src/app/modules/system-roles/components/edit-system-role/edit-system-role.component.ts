@@ -214,6 +214,10 @@ export class EditSystemRoleComponent
     this.saveJustification = '';
   }
 
+  goBack(): void {
+    this.router.navigate([SYSTEM_ROLE.LIST]);
+  }
+
   proceedSave() {
     if (!this.saveJustification.trim()) return;
 

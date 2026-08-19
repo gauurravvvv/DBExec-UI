@@ -123,7 +123,7 @@ export class ViewQueryBuilderComponent implements OnInit {
       });
   }
 
-  onBack(): void {
+  goBack(): void {
     this.router.navigate([QUERY_BUILDER.LIST]);
   }
 }

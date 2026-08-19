@@ -121,6 +121,10 @@ export class ViewOrganisationComponent implements OnInit, OnDestroy {
     }
   }
 
+  goBack(): void {
+    this.router.navigate([ORGANISATION.LIST]);
+  }
+
   confirmDelete(id: string) {
     this.showDeleteConfirm = true;
   }

@@ -307,6 +307,10 @@ export class AddOrganisationComponent implements OnInit, HasUnsavedChanges {
     }
   }
 
+  goBack(): void {
+    this.router.navigate([ORGANISATION.LIST]);
+  }
+
   onCancel(): void {
     this.orgForm.reset();
     this.currentStep = 0;

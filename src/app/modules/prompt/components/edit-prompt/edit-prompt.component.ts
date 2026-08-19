@@ -181,4 +181,8 @@ export class EditPromptComponent implements OnInit, HasUnsavedChanges {
       this.promptForm.markAsPristine();
     }
   }
+
+  goBack(): void {
+    this.router.navigate([PROMPT.LIST]);
+  }
 }

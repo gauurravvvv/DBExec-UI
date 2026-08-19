@@ -102,6 +102,10 @@ export class AddFormComponent implements OnInit, HasUnsavedChanges {
     this.router.navigate([FORM_BUILDER.LIST]);
   }
 
+  goBack(): void {
+    this.router.navigate([FORM_BUILDER.LIST]);
+  }
+
   loadDatasourcesPage = async ({
     search,
     page,

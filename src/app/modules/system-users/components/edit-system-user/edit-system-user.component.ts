@@ -203,6 +203,10 @@ export class EditSystemUserComponent
     this.saveJustification = '';
   }
 
+  goBack(): void {
+    this.router.navigate([SYSTEM_USER.LIST]);
+  }
+
   async proceedSave() {
     if (this.saveJustification.trim()) {
       // Fire the request first (service.update uses getRawValue, so

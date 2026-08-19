@@ -530,6 +530,10 @@ export class EditAlertComponent implements OnInit, HasUnsavedChanges {
       });
   }
 
+  goBack(): void {
+    this.router.navigate([ALERT.LIST]);
+  }
+
   onCancel(): void {
     this.router.navigate([ALERT.LIST]);
   }

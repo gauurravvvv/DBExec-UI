@@ -354,6 +354,10 @@ export class EditSystemGroupComponent
     this.saveJustification = '';
   }
 
+  goBack(): void {
+    this.router.navigate([SYSTEM_GROUP.LIST]);
+  }
+
   async proceedSave(): Promise<void> {
     if (this.saveJustification.trim()) {
       // Reassemble the full member set: the locked self member PLUS

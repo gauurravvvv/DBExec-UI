@@ -186,6 +186,10 @@ export class AddBrandingComponent implements OnInit, HasUnsavedChanges {
     }
   }
 
+  goBack(): void {
+    this.router.navigate([BRANDING_PRESET.LIST]);
+  }
+
   onCancel(): void {
     this.router.navigateByUrl(APP_SETTINGS_HUB.tab('branding'));
   }

@@ -13,7 +13,8 @@ import {
   inject,
   signal,
 } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
+import { QUERY_BUILDER } from 'src/app/core/constants/routes.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { QueryBuilderService } from '../../services/query-builder.service';
 
@@ -27,6 +28,7 @@ type DesignTab = 'form' | 'joins' | 'columns' | 'settings';
 })
 export class QbDesignComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
   private readonly qbService = inject(QueryBuilderService);
   private readonly global = inject(GlobalService);
 
@@ -74,5 +76,9 @@ export class QbDesignComponent implements OnInit {
 
   setTab(tab: DesignTab): void {
     this.activeTab.set(tab);
+  }
+
+  goBack(): void {
+    this.router.navigate([QUERY_BUILDER.LIST]);
   }
 }

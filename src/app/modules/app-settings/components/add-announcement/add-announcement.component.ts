@@ -13,7 +13,10 @@ import {
 } from '@angular/forms';
 import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
-import { APP_SETTINGS_HUB } from 'src/app/core/constants/routes.constant';
+import {
+  ANNOUNCEMENT,
+  APP_SETTINGS_HUB,
+} from 'src/app/core/constants/routes.constant';
 import { HasUnsavedChanges } from 'src/app/core/models/has-unsaved-changes.model';
 import { GlobalService } from 'src/app/core/services/global.service';
 import {
@@ -215,6 +218,10 @@ export class AddAnnouncementComponent implements OnInit, HasUnsavedChanges {
       })
       .catch(() => {})
       .finally(() => this.cdr.markForCheck());
+  }
+
+  goBack(): void {
+    this.router.navigate([ANNOUNCEMENT.LIST]);
   }
 
   onCancel(): void {

@@ -514,6 +514,10 @@ export class EditRlsRuleComponent implements OnInit, HasUnsavedChanges {
     }
   }
 
+  goBack(): void {
+    this.router.navigate([RLS_RULE.LIST]);
+  }
+
   onCancel(): void {
     if (!this.rlsForm) return;
     if (this.isFormDirty && this.originalFormValue) {

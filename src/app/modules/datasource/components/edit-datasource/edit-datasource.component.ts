@@ -371,6 +371,10 @@ export class EditDatasourceComponent
     }
   }
 
+  goBack(): void {
+    this.router.navigate([DATASOURCE.LIST]);
+  }
+
   onCancel(): void {
     if (this.isFormDirty) {
       // Bump first so any in-flight test response is discarded; valueChanges

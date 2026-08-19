@@ -57,9 +57,7 @@ export class ViewAnnouncementComponent implements OnInit {
   }
 
   goBack(): void {
-    this.router.navigate([APP_SETTINGS_HUB.BASE], {
-      queryParams: { tab: 'announcements' },
-    });
+    this.router.navigate([ANNOUNCEMENT.LIST]);
   }
 
   confirmDelete(): void {

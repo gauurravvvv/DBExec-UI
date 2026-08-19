@@ -5,7 +5,8 @@
       <button
         pButton
         class="p-button-text p-button-plain back-button"
-        [routerLink]="['/app/prompts', promptId]"
+        (click)="goBack()"
+        [attr.aria-label]="'COMMON.BACK' | translate"
       >
         <i class="pi pi-arrow-left"></i>
       </button>

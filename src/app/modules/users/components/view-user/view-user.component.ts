@@ -105,6 +105,10 @@ export class ViewUserComponent implements OnInit, OnDestroy {
     this.router.navigate(['/app/users', this.userId, 'edit']);
   }
 
+  goBack(): void {
+    this.router.navigate([USER.LIST]);
+  }
+
   confirmDelete() {
     this.showDeleteConfirm = true;
   }

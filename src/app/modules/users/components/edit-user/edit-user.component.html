@@ -6,7 +6,7 @@
         <button
           pButton
           class="p-button-text back-button"
-          routerLink="/app/users"
+          (click)="goBack()"
           [attr.aria-label]="'COMMON.BACK' | translate"
         >
           <i class="pi pi-arrow-left"></i>

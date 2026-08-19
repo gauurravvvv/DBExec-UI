@@ -145,6 +145,10 @@ export class AddUserComponent implements OnInit, HasUnsavedChanges {
     }
   }
 
+  goBack(): void {
+    this.router.navigate([USER.LIST]);
+  }
+
   onCancel() {
     this.userForm.reset();
     Object.keys(this.userForm.controls).forEach(key => {

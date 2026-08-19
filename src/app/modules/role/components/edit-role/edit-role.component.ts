@@ -211,6 +211,10 @@ export class EditRoleComponent implements OnInit, OnDestroy, HasUnsavedChanges {
     this.saveJustification = '';
   }
 
+  goBack(): void {
+    this.router.navigate([ROLE.LIST]);
+  }
+
   proceedSave() {
     if (!this.saveJustification.trim()) return;
 

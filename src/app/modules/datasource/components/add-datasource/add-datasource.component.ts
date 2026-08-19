@@ -246,6 +246,10 @@ export class AddDatasourceComponent implements OnInit, HasUnsavedChanges {
     }
   }
 
+  goBack(): void {
+    this.router.navigate([DATASOURCE.LIST]);
+  }
+
   onCancel(): void {
     if (this.isFormDirty) {
       this.datasourceForm.reset();

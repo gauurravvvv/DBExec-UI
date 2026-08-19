@@ -7,8 +7,9 @@
           pButton
           class="p-button-text p-button-plain back-button"
           (click)="goBack()"
+          [attr.aria-label]="'COMMON.BACK' | translate"
         >
-          <i class="pi pi-arrow-left back-icon"></i>
+          <i class="pi pi-arrow-left"></i>
         </button>
         <h2>{{ 'DATASET.DATASET_DETAILS' | translate }}</h2>
       </div>

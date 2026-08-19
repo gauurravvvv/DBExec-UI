@@ -2,7 +2,12 @@
   <div class="view-category-container">
     <div class="page-header">
       <div class="left-section">
-        <button pButton class="p-button-text back-button" (click)="goBack()">
+        <button
+          pButton
+          class="p-button-text back-button"
+          (click)="goBack()"
+          [attr.aria-label]="'COMMON.BACK' | translate"
+        >
           <i class="pi pi-arrow-left"></i>
         </button>
         <h2>{{ 'ANNOUNCEMENT.VIEW_TITLE' | translate }}</h2>

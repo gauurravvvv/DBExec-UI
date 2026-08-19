@@ -108,6 +108,10 @@ export class AddQueryBuilderComponent implements OnInit, HasUnsavedChanges {
     });
   }
 
+  goBack(): void {
+    this.router.navigate([QUERY_BUILDER.LIST]);
+  }
+
   /**
    * Fetcher for the server-mode datasource dropdown.
    */

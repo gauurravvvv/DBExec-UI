@@ -165,4 +165,8 @@ export class AddPromptComponent implements OnInit, HasUnsavedChanges {
   onCancel(): void {
     this.router.navigate([PROMPT.LIST]);
   }
+
+  goBack(): void {
+    this.router.navigate([PROMPT.LIST]);
+  }
 }

@@ -350,6 +350,10 @@ export class EditGroupComponent
     }
   }
 
+  goBack(): void {
+    this.router.navigate([GROUP.LIST]);
+  }
+
   onCancel(): void {
     if (this.isFormDirty) {
       this.groupForm.patchValue(this.originalFormValue);

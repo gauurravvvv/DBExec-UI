@@ -209,6 +209,10 @@ export class BulkAddSystemUserComponent implements OnInit {
     this.cdr.markForCheck();
   }
 
+  goBack(): void {
+    this.router.navigate([SYSTEM_USER.LIST]);
+  }
+
   /** Back / cancel — navigate to the user list. */
   onCancel(): void {
     this.router.navigate([SYSTEM_USER.LIST]);

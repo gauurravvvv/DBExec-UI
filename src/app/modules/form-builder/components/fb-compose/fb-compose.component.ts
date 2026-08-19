@@ -20,7 +20,7 @@ import {
   signal,
 } from '@angular/core';
 import { toObservable } from '@angular/core/rxjs-interop';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import {
   Subject,
   debounceTime,
@@ -28,6 +28,7 @@ import {
   switchMap,
   takeUntil,
 } from 'rxjs';
+import { FORM_BUILDER } from 'src/app/core/constants/routes.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { QueryBuilderStore } from 'src/app/modules/query-builder/services/query-builder-store';
 import { FormRuntimeStore } from '../../services/form-runtime-store';
@@ -49,6 +50,7 @@ export class FbComposeComponent implements OnInit, OnDestroy {
   readonly store = inject(FormRuntimeStore);
   private readonly runtime = inject(FbRuntimeService);
   private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
   private readonly global = inject(GlobalService);
 
   private readonly destroy$ = new Subject<void>();
@@ -139,6 +141,10 @@ export class FbComposeComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
+  }
+
+  goBack(): void {
+    this.router.navigate([FORM_BUILDER.LIST]);
   }
 
   undo(): void {

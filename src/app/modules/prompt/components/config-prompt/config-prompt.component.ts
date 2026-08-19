@@ -69,6 +69,10 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
     }
   }
 
+  goBack(): void {
+    this.router.navigate([PROMPT.LIST]);
+  }
+
   ngOnDestroy(): void {
     this.prompts.cancelReads();
   }

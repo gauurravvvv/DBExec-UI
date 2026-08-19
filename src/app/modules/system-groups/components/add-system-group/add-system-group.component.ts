@@ -219,6 +219,10 @@ export class AddSystemGroupComponent implements OnInit, HasUnsavedChanges {
     }
   }
 
+  goBack(): void {
+    this.router.navigate([SYSTEM_GROUP.LIST]);
+  }
+
   onCancel() {
     this.router.navigate([SYSTEM_GROUP.LIST]);
   }

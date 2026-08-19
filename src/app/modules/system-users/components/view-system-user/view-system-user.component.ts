@@ -105,6 +105,10 @@ export class ViewSystemUserComponent implements OnInit, OnDestroy {
     this.router.navigate(['/app/system-users', this.userId, 'edit']);
   }
 
+  goBack(): void {
+    this.router.navigate([SYSTEM_USER.LIST]);
+  }
+
   confirmDelete() {
     this.showDeleteConfirm = true;
   }

@@ -6,7 +6,8 @@
         <button
           pButton
           class="p-button-text p-button-plain back-button"
-          routerLink="/app/form-builder"
+          (click)="goBack()"
+          [attr.aria-label]="'COMMON.BACK' | translate"
         >
           <i class="pi pi-arrow-left back-icon"></i>
         </button>

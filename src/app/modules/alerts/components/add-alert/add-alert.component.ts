@@ -437,6 +437,10 @@ export class AddAlertComponent implements OnInit, HasUnsavedChanges {
       .catch(() => this.cdr.markForCheck());
   }
 
+  goBack(): void {
+    this.router.navigate([ALERT.LIST]);
+  }
+
   onCancel(): void {
     this.router.navigate([ALERT.LIST]);
   }

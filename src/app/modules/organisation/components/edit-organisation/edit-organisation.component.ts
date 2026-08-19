@@ -452,6 +452,10 @@ export class EditOrganisationComponent
     this.saveJustification = '';
   }
 
+  goBack(): void {
+    this.router.navigate([ORGANISATION.LIST]);
+  }
+
   proceedSave(): void {
     if (this.saveJustification.trim()) {
       // Order matters: fire the request first (service reads

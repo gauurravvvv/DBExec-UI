@@ -196,6 +196,10 @@ export class AddGroupComponent implements OnInit, HasUnsavedChanges {
     }
   }
 
+  goBack(): void {
+    this.router.navigate([GROUP.LIST]);
+  }
+
   onCancel() {
     this.router.navigate([GROUP.LIST]);
   }

@@ -588,6 +588,10 @@ export class AddRlsRuleComponent implements OnInit, HasUnsavedChanges {
       });
   }
 
+  goBack(): void {
+    this.router.navigate([RLS_RULE.LIST]);
+  }
+
   onCancel() {
     this.router.navigate([RLS_RULE.LIST]);
   }

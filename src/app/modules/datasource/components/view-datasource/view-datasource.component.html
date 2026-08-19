@@ -11,6 +11,7 @@
             pButton
             class="p-button-text p-button-plain back-button"
             (click)="goBack()"
+            [attr.aria-label]="'COMMON.BACK' | translate"
             [pTooltip]="'COMMON.BACK' | translate"
             tooltipPosition="bottom"
           >

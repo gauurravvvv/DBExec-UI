@@ -2,13 +2,14 @@
   <div class="view-category-container">
     <div class="page-header">
       <div class="left-section">
-        <app-button
-          variant="icon"
-          icon="pi pi-arrow-left"
-          class="back-button"
-          [title]="'COMMON.BACK' | translate"
-          (clicked)="goBack()"
-        ></app-button>
+        <button
+          pButton
+          class="p-button-text back-button"
+          (click)="goBack()"
+          [attr.aria-label]="'COMMON.BACK' | translate"
+        >
+          <i class="pi pi-arrow-left"></i>
+        </button>
         <h2>{{ 'ALERTS.VIEW_TITLE' | translate }}</h2>
         <app-chip
           *ngIf="current()"

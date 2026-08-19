@@ -176,4 +176,8 @@ export class EditQueryBuilderComponent implements OnInit, HasUnsavedChanges {
       this.router.navigate([QUERY_BUILDER.LIST]);
     }
   }
+
+  goBack(): void {
+    this.router.navigate([QUERY_BUILDER.LIST]);
+  }
 }

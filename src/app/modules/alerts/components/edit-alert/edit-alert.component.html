@@ -2,13 +2,14 @@
   <div class="add-admin-container">
     <div class="page-header">
       <div class="left-section">
-        <app-button
-          variant="icon"
-          icon="pi pi-arrow-left"
-          class="back-button"
-          routerLink="/app/alerts"
-          [title]="'COMMON.BACK' | translate"
-        ></app-button>
+        <button
+          pButton
+          class="p-button-text back-button"
+          (click)="goBack()"
+          [attr.aria-label]="'COMMON.BACK' | translate"
+        >
+          <i class="pi pi-arrow-left"></i>
+        </button>
         <h2>{{ 'ALERTS.EDIT_TITLE' | translate }}</h2>
       </div>
       <div class="action-buttons">

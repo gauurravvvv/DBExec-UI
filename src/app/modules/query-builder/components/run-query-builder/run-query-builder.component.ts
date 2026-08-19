@@ -19,7 +19,7 @@ import {
   signal,
 } from '@angular/core';
 import { toObservable } from '@angular/core/rxjs-interop';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import {
   Subject,
   debounceTime,
@@ -27,6 +27,7 @@ import {
   switchMap,
   takeUntil,
 } from 'rxjs';
+import { QUERY_BUILDER } from 'src/app/core/constants/routes.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { QueryBuilderStore } from '../../services/query-builder-store';
 import { QbRuntimeService } from '../../services/qb-runtime.service';
@@ -42,6 +43,7 @@ export class RunQueryBuilderComponent implements OnInit, OnDestroy {
   readonly store = inject(QueryBuilderStore);
   private readonly runtime = inject(QbRuntimeService);
   private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
   private readonly global = inject(GlobalService);
 
   private readonly destroy$ = new Subject<void>();
@@ -117,6 +119,10 @@ export class RunQueryBuilderComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
+  }
+
+  goBack(): void {
+    this.router.navigate([QUERY_BUILDER.LIST]);
   }
 
   undo(): void {

@@ -217,6 +217,10 @@ export class EditUserComponent implements OnInit, OnDestroy, HasUnsavedChanges {
     }
   }
 
+  goBack(): void {
+    this.router.navigate([USER.LIST]);
+  }
+
   onCancel() {
     if (!this.userData) return;
     this.userForm.patchValue({

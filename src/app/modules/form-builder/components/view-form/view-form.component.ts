@@ -6,7 +6,7 @@ import {
   inject,
   signal,
 } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { FORM_BUILDER } from 'src/app/core/constants/routes.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
@@ -28,6 +28,7 @@ import { FormPortabilityService } from '../../services/form-portability.service'
 })
 export class ViewFormComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
   private readonly admin = inject(FbAdminService);
   private readonly global = inject(GlobalService);
   private readonly portability = inject(FormPortabilityService);
@@ -93,5 +94,9 @@ export class ViewFormComponent implements OnInit {
   }
   onImported(): void {
     this.showImportDialog.set(false);
+  }
+
+  goBack(): void {
+    this.router.navigate([FORM_BUILDER.LIST]);
   }
 }

@@ -114,6 +114,10 @@ export class ListFormTemplatesComponent implements OnInit, OnDestroy {
     this.adapter?.reload();
   }
 
+  goBack(): void {
+    this.router.navigate([FORM_BUILDER.LIST]);
+  }
+
   async onClone(template: FormTemplateRow): Promise<void> {
     if (this.cloningId()) return;
     this.cloningId.set(template.id);

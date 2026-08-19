@@ -205,6 +205,10 @@ export class AddRoleComponent implements OnInit, OnDestroy, HasUnsavedChanges {
       });
   }
 
+  goBack(): void {
+    this.router.navigate([ROLE.LIST]);
+  }
+
   /** Reset the form and reload meta — same shape the legacy component used. */
   onCancel() {
     this.roleForm.reset();
