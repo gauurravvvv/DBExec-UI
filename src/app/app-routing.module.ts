@@ -180,7 +180,7 @@ const routes: Routes = [
         // connectionManager — so the parent carries NO single permission.
         // Each child route in QueryRunnerModule guards itself via roleGuard
         // + its own data.permission. (Still auth-gated by the /app shell.)
-        path: 'query-runner',
+        path: 'sql',
         loadChildren: () =>
           import('./modules/query-runner/query-runner.module').then(
             m => m.QueryRunnerModule,
@@ -336,7 +336,7 @@ const routes: Routes = [
   // shell (no sidebar/topbar) so a browser tab opened from the launcher
   // is a focused, full-screen workspace. Still auth + permission gated.
   {
-    path: 'query-runner/exec',
+    path: 'sql/exec',
     loadChildren: () =>
       import('./modules/query-runner/executor/query-executor.module').then(
         m => m.QueryExecutorModule,

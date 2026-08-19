@@ -36,7 +36,10 @@
       min-height: 0;
       gap: var(--space-8);
 
-      // The parent card — same surface treatment as the Add screens.
+      // The parent card — same surface treatment as the Add screens
+      // (background + radius + shadow + interior padding). The padding was
+      // missing, so list/view content touched the card edges.
+      padding: var(--space-8);
       background: var(--card-background);
       border-radius: var(--radius-md);
       box-shadow: var(--shadow-sm);

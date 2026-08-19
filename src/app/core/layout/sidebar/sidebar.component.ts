@@ -41,7 +41,7 @@ interface MenuItem {
   /**
    * When true, routerLinkActive matches ONLY the exact URL (not as a prefix).
    * Set for nav routes that are a prefix of a sibling's route (e.g.
-   * '/app/query-runner' vs '/app/query-runner/connections') so the parent
+   * '/app/sql' vs '/app/sql/connections') so the parent
    * doesn't also highlight when a child route is active.
    */
   exact?: boolean;

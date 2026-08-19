@@ -4,7 +4,7 @@ import { QueryExecutorComponent } from './query-executor.component';
 
 /**
  * QueryExecutorModule — hosts the standalone executor route. Loaded
- * lazily OUTSIDE the app shell (see app-routing: path 'query-runner/exec')
+ * lazily OUTSIDE the app shell (see app-routing: path 'sql/exec')
  * so a browser tab opens as a focused, full-screen SQL workspace with no
  * sidebar/topbar. The component itself is standalone and imports its own
  * heavy deps (CodeMirror, AG Grid), so nothing leaks into the main bundle.

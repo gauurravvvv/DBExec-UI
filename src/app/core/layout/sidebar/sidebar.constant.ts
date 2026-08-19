@@ -24,11 +24,11 @@ export const SIDEBAR_ITEMS_ROUTES = [
   { value: 'dbPrivileges', route: '/app/db-privileges' },
   { value: 'datasetManager', route: '/app/datasets' },
   { value: 'analyses', route: '/app/analyses' },
-  { value: 'connectionManager', route: '/app/query-runner/connections' },
-  // exact: this route ('/app/query-runner') is a PREFIX of connectionManager's
-  // and of the saved-query subpaths, so without exact matching it lights up
-  // whenever any query-runner child route is active. Match only the exact URL.
-  { value: 'queryRunner', route: '/app/query-runner', exact: true },
+  { value: 'connectionManager', route: '/app/sql/connections' },
+  // exact: this route ('/app/sql') is a PREFIX of connectionManager's and of
+  // the saved-query subpaths, so without exact matching it lights up whenever
+  // any SQL-workspace child route is active. Match only the exact URL.
+  { value: 'queryRunner', route: '/app/sql', exact: true },
   { value: 'queryBuilderTab', route: '/app/tabs' },
   { value: 'queryBuilderSection', route: '/app/sections' },
   { value: 'queryBuilderPrompt', route: '/app/prompts' },

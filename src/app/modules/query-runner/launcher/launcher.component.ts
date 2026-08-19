@@ -30,6 +30,10 @@ import {
 export class LauncherComponent implements OnInit {
   private cdr = inject(ChangeDetectorRef);
 
+  /** Route builders exposed to the template so routerLink uses the canonical
+   *  constant instead of a hardcoded path (stays in sync with route changes). */
+  protected readonly routes = QUERY_RUNNER;
+
   selectedDatasourceId: string | null = null;
   selectedConnectionId: string | null = null;
 
