@@ -30,7 +30,7 @@ export interface FormRuntimeSchema {
     id: string;
     name: string;
     description: string | null;
-    datasourceId: string;
+    connectorId: string;
     defaultLimit: number;
     maxLimit: number;
     forceDistinct: boolean;
@@ -223,7 +223,7 @@ export class FormRuntimeStore extends QueryBuilderStore {
         id: schema.form.id,
         name: schema.form.name,
         description: schema.form.description ?? '',
-        datasourceId: schema.form.datasourceId,
+        connectorId: schema.form.connectorId,
         defaultLimit: schema.form.defaultLimit ?? 1000,
         maxLimit: schema.form.maxLimit ?? 50000,
         forceDistinct: !!schema.form.forceDistinct,

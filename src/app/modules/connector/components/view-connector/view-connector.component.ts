@@ -19,9 +19,9 @@ import {
 import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { EChartsOption } from 'echarts';
-import { DATASOURCE } from 'src/app/core/constants/routes.constant';
+import { CONNECTOR } from 'src/app/core/constants/routes.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
-import { DatasourceService } from '../../services/datasource.service';
+import { ConnectorService } from '../../services/connector.service';
 
 type HealthState = 'unknown' | 'ok' | 'failed' | 'testing';
 
@@ -43,12 +43,12 @@ interface ActivityEvent {
 }
 
 @Component({
-  selector: 'app-view-datasource',
-  templateUrl: './view-datasource.component.html',
-  styleUrls: ['./view-datasource.component.scss'],
+  selector: 'app-view-connector',
+  templateUrl: './view-connector.component.html',
+  styleUrls: ['./view-connector.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ViewDatasourceComponent implements OnInit, OnDestroy {
+export class ViewConnectorComponent implements OnInit, OnDestroy {
   dbId!: string;
   dbData: any = null;
 
@@ -87,17 +87,17 @@ export class ViewDatasourceComponent implements OnInit, OnDestroy {
           data: [
             {
               value: u.datasets,
-              name: this.translate.instant('DATASOURCE.USAGE_DATASETS'),
+              name: this.translate.instant('CONNECTOR.USAGE_DATASETS'),
               itemStyle: { color: '#3b82f6' },
             },
             {
               value: u.analyses,
-              name: this.translate.instant('DATASOURCE.USAGE_ANALYSES'),
+              name: this.translate.instant('CONNECTOR.USAGE_ANALYSES'),
               itemStyle: { color: '#8b5cf6' },
             },
             {
               value: u.dashboards,
-              name: this.translate.instant('DATASOURCE.USAGE_DASHBOARDS'),
+              name: this.translate.instant('CONNECTOR.USAGE_DASHBOARDS'),
               itemStyle: { color: '#10b981' },
             },
           ],
@@ -120,7 +120,7 @@ export class ViewDatasourceComponent implements OnInit, OnDestroy {
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private datasourceService: DatasourceService,
+    private datasourceService: ConnectorService,
     private globalService: GlobalService,
     private cdr: ChangeDetectorRef,
     private translate: TranslateService,
@@ -246,11 +246,11 @@ export class ViewDatasourceComponent implements OnInit, OnDestroy {
   /** Map BE audit action codes → user-facing translation keys. */
   activityLabelKey(action: string): string {
     const map: Record<string, string> = {
-      CREATE: 'DATASOURCE.ACTIVITY_CREATED',
-      UPDATE: 'DATASOURCE.ACTIVITY_UPDATED',
-      DELETE: 'DATASOURCE.ACTIVITY_DELETED',
+      CREATE: 'CONNECTOR.ACTIVITY_CREATED',
+      UPDATE: 'CONNECTOR.ACTIVITY_UPDATED',
+      DELETE: 'CONNECTOR.ACTIVITY_DELETED',
     };
-    return map[action] ?? 'DATASOURCE.ACTIVITY_OTHER';
+    return map[action] ?? 'CONNECTOR.ACTIVITY_OTHER';
   }
 
   /** PrimeIcon glyph per audit action. */
@@ -268,11 +268,11 @@ export class ViewDatasourceComponent implements OnInit, OnDestroy {
   // ─────────────────────────────────────────────────────────────────
 
   onEdit(): void {
-    this.router.navigate([DATASOURCE.LIST, this.dbId, 'edit']);
+    this.router.navigate([CONNECTOR.LIST, this.dbId, 'edit']);
   }
 
   goBack(): void {
-    this.router.navigate([DATASOURCE.LIST]);
+    this.router.navigate([CONNECTOR.LIST]);
   }
 
   // ─────────────────────────────────────────────────────────────────
@@ -298,7 +298,7 @@ export class ViewDatasourceComponent implements OnInit, OnDestroy {
       if (this.globalService.handleSuccessService(res)) {
         this.showDeleteConfirm = false;
         this.deleteJustification = '';
-        this.router.navigate([DATASOURCE.LIST]);
+        this.router.navigate([CONNECTOR.LIST]);
       }
     } catch {
       // service displays toast on failure

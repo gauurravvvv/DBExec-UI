@@ -35,7 +35,7 @@ export class PrivilegeTreeComponent implements OnInit, OnChanges {
   private cdr = inject(ChangeDetectorRef);
   private dbAccess = inject(DbAccessService);
 
-  @Input({ required: true }) datasourceId = '';
+  @Input({ required: true }) connectorId = '';
   @Input({ required: true }) roleName = '';
   /**
    * Tree scroll height. Empty by default → the shared app-lazy-tree SCSS owns
@@ -85,7 +85,7 @@ export class PrivilegeTreeComponent implements OnInit, OnChanges {
   ngOnChanges(changes: SimpleChanges): void {
     if (
       (changes['roleName'] && !changes['roleName'].firstChange) ||
-      (changes['datasourceId'] && !changes['datasourceId'].firstChange)
+      (changes['connectorId'] && !changes['connectorId'].firstChange)
     ) {
       this.provenance = 'all';
       this.includeSystem = false;
@@ -103,7 +103,7 @@ export class PrivilegeTreeComponent implements OnInit, OnChanges {
       // role/datasource are closed over by loadNodes, but including them here
       // guarantees a params change (→ tree reload) when the host swaps role.
       role: this.roleName,
-      ds: this.datasourceId,
+      ds: this.connectorId,
     };
   }
 
@@ -111,12 +111,12 @@ export class PrivilegeTreeComponent implements OnInit, OnChanges {
   loadNodes = async (
     ctx: LazyTreeLoadContext,
   ): Promise<{ nodes: LazyTreeNode[]; total: number }> => {
-    if (!this.datasourceId || !this.roleName) return { nodes: [], total: 0 };
+    if (!this.connectorId || !this.roleName) return { nodes: [], total: 0 };
 
     // level 0 → schema roots
     if (ctx.level === 0) {
       const res = await this.dbAccess.loadEffectiveTree(
-        this.datasourceId,
+        this.connectorId,
         this.roleName,
         {
           level: 'schema',
@@ -136,7 +136,7 @@ export class PrivilegeTreeComponent implements OnInit, OnChanges {
     // level 1 → tables in a schema (parent = schema node)
     if (ctx.level === 1 && ctx.parent) {
       const res = await this.dbAccess.loadEffectiveTree(
-        this.datasourceId,
+        this.connectorId,
         this.roleName,
         {
           level: 'table',
@@ -159,7 +159,7 @@ export class PrivilegeTreeComponent implements OnInit, OnChanges {
     if (ctx.level === 2 && ctx.parent) {
       const { schema, table } = ctx.parent.data ?? {};
       const res = await this.dbAccess.loadEffectiveTree(
-        this.datasourceId,
+        this.connectorId,
         this.roleName,
         {
           level: 'table',
@@ -218,9 +218,9 @@ export class PrivilegeTreeComponent implements OnInit, OnChanges {
   }
 
   private loadSummary(): void {
-    if (!this.datasourceId || !this.roleName) return;
+    if (!this.connectorId || !this.roleName) return;
     this.dbAccess
-      .loadEffectiveSummary(this.datasourceId, this.roleName)
+      .loadEffectiveSummary(this.connectorId, this.roleName)
       .then(res => {
         this.summary = res?.status ? (res.data ?? null) : null;
       })

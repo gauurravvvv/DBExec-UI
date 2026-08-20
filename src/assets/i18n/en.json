@@ -88,7 +88,7 @@
     "ACTIONS": "Actions",
     "STATUS": "Status",
     "ALL": "All",
-    "ALL_DATASOURCES": "All datasources",
+    "ALL_DATASOURCES": "All connectors",
     "TYPE": "Type",
     "SELECT_RANGE": "Select range",
     "NO_RECORD_FOUND": "No such record found",
@@ -143,7 +143,7 @@
     "CANNOT_DELETE_SELF": "Cannot delete yourself",
     "NO_DELETE_PERMISSION": "You do not have permission to delete",
     "LOCKED_NOTE": "Account is locked. Unlock from the list page to change status.",
-    "DATASOURCE": "Datasource",
+    "DATASOURCE": "Connector",
     "CONNECTION": "Connection",
     "GROUPS": "Groups",
     "USERS": "Users",
@@ -168,7 +168,7 @@
     "SECTION": "Section",
     "PROMPTS": "Prompts",
     "SECTIONS": "Sections",
-    "SELECT_DATASOURCE": "Select Datasource",
+    "SELECT_DATASOURCE": "Select Connector",
     "SELECT_TAB": "Select Tab",
     "SELECT_SECTION": "Select Section",
     "TAB_REQUIRED": "Tab is required",
@@ -271,7 +271,7 @@
     "NAME_PATTERN": "Name can only contain letters, spaces and hyphens",
     "ORGANISATION_REQUIRED": "Organisation is required",
     "ROLE_REQUIRED": "Role is required",
-    "DATASOURCE_REQUIRED": "Datasource is required",
+    "DATASOURCE_REQUIRED": "Connector is required",
     "CONNECTION_REQUIRED": "Connection is required",
     "GROUPS_REQUIRED": "Groups are required",
     "USERS_REQUIRED": "Users are required",
@@ -290,8 +290,8 @@
     "GROUP_NAME_MIN_LENGTH": "Group name must be at least {{length}} characters",
     "GROUP_NAME_MAX_LENGTH": "Group name must not exceed {{length}} characters",
     "GROUP_NAME_PATTERN": "Group name must start with a letter or number and can only contain letters, numbers, spaces, dots, underscores and hyphens",
-    "DATASOURCE_USERNAME_REQUIRED": "Datasource Username is required",
-    "DATASOURCE_PASSWORD_REQUIRED": "Datasource Password is required",
+    "DATASOURCE_USERNAME_REQUIRED": "Connector Username is required",
+    "DATASOURCE_PASSWORD_REQUIRED": "Connector Password is required",
     "CONNECTION_NAME_REQUIRED": "Connection name is required",
     "CONNECTION_NAME_MIN_LENGTH": "Connection name must be at least {{length}} characters",
     "CONNECTION_NAME_MAX_LENGTH": "Connection name must not exceed {{length}} characters",
@@ -505,15 +505,15 @@
     "USERS": "Users",
     "ADMINS": "Admins",
     "GROUPS": "Groups",
-    "DATASOURCES": "Datasources",
+    "DATASOURCES": "Connectors",
     "MASTER_DATASOURCE": "Database",
     "REFRESH_SCHEMA": "Refresh Schema",
     "REFRESHING": "Refreshing...",
     "REFRESH_SCHEMA_TOOLTIP": "Refresh database schema to sync new entities and columns",
     "HOSTNAME": "Hostname",
-    "DATASOURCE_NAME": "Datasource Name",
+    "DATASOURCE_NAME": "Connector Name",
     "CONFIGURATION_LIMITS": "Configuration Limits",
-    "MAX_DATASOURCES": "Max Datasources",
+    "MAX_DATASOURCES": "Max Connectors",
     "MAX_USERS": "Max Users",
     "MAX_ADMINS": "Max Admins",
     "ADDITIONAL_LIMITS": "Additional Limits",
@@ -523,7 +523,7 @@
     "ADMIN_LOCALE": "Locale",
     "ADMIN_LOCALE_PLACEHOLDER": "Select locale for welcome email",
     "ENCRYPTION_AUTO_TITLE": "Encryption managed for you",
-    "ENCRYPTION_AUTO_DESCRIPTION": "Every secret your organisation stores — datasource passwords, SMTP/SES credentials, user passwords — is encrypted automatically. You don't need to pick an algorithm or remember a key.",
+    "ENCRYPTION_AUTO_DESCRIPTION": "Every secret your organisation stores — connector passwords, SMTP/SES credentials, user passwords — is encrypted automatically. You don't need to pick an algorithm or remember a key.",
     "ENCRYPTION_BULLET_1": "AES-256-GCM (authenticated encryption)",
     "ENCRYPTION_BULLET_2": "A unique key is generated for your organisation",
     "ENCRYPTION_BULLET_3": "The master key is stored outside the database",
@@ -692,12 +692,12 @@
     "SEARCH_PLACEHOLDER": "Search by username, name or email",
     "CANNOT_MODIFY_SELF_HINT": "You can't change your own access"
   },
-  "DATASOURCE": {
-    "TITLE": "Datasources",
-    "SUBTITLE": "Manage client datasources and connection details",
-    "ADD_TITLE": "Add Datasource",
-    "EDIT_TITLE": "Edit Datasource",
-    "VIEW_TITLE": "Datasource Details",
+  "CONNECTOR": {
+    "TITLE": "Connectors",
+    "SUBTITLE": "Manage client connectors and connection details",
+    "ADD_TITLE": "Add Connector",
+    "EDIT_TITLE": "Edit Connector",
+    "VIEW_TITLE": "Connector Details",
     "HOST": "Host",
     "PORT": "Port",
     "ACCOUNT": "Account",
@@ -722,17 +722,17 @@
     "CONNECTION_SUCCESSFUL": "Connection Successful",
     "CONNECTION_FAILED_RETRY": "Connection Failed - Retry",
     "CONNECTION_TEST_REQUIRED": "Connection test required before saving",
-    "CONFIRM_DELETE_SINGLE": "Are you sure you want to delete this datasource?",
-    "CONFIRM_DELETE_BULK": "Are you sure you want to delete <strong>{{count}}</strong> selected datasource(s)?",
-    "CONFIRM_UPDATE_MESSAGE": "Are you sure you want to update this datasource?",
+    "CONFIRM_DELETE_SINGLE": "Are you sure you want to delete this connector?",
+    "CONFIRM_DELETE_BULK": "Are you sure you want to delete <strong>{{count}}</strong> selected connector(s)?",
+    "CONFIRM_UPDATE_MESSAGE": "Are you sure you want to update this connector?",
     "DELETE_INFO_ASSOCIATED_DATA": "All associated data will be removed",
     "DELETE_INFO_CONNECTED_DATASETS": "Connected datasets will be affected",
-    "EDIT_WARNING_TITLE": "You are editing a datasource connection",
-    "EDIT_WARNING_CHANGES": "Changes to connection details will affect all datasets and queries using this datasource",
+    "EDIT_WARNING_TITLE": "You are editing a connector connection",
+    "EDIT_WARNING_CHANGES": "Changes to connection details will affect all datasets and queries using this connector",
     "EDIT_WARNING_TEST_REQUIRED": "A successful connection test is required before saving",
     "EDIT_WARNING_CREDENTIALS": "Existing connections will be updated with the new credentials",
     "CONFIGURATION": "Configuration",
-    "DATASOURCE_TYPE": "Datasource Type",
+    "DATASOURCE_TYPE": "Connector Type",
     "CONNECTION_STATUS": "Connection Status",
     "LAST_UPDATED": "Last Updated",
     "USAGE": "Usage",
@@ -751,7 +751,7 @@
     "HEALTH_TESTING": "Testing…",
     "HEALTH_NEVER_TESTED": "Never tested",
     "TESTED": "tested",
-    "SEARCH_PLACEHOLDER": "Search datasources by name",
+    "SEARCH_PLACEHOLDER": "Search connectors by name",
     "SCHEMA": "Schema"
   },
   "DATASET": {
@@ -792,12 +792,12 @@
     "SUBTITLE": "Manage your datasets and query configurations",
     "ACTIVE_DIALECT": "Active SQL dialect",
     "ADD_CUSTOM_FIELD": "Add Custom Field",
-    "PICK_DATASOURCE": "Choose datasource",
+    "PICK_DATASOURCE": "Choose connector",
     "SCHEMA": "Schema",
     "SCHEMA_PICKER_HINT": "The editor will be scoped to this schema. Tables from other schemas will not be visible.",
-    "SCHEMA_PICKER_HINT_OPTIONAL": "Leave blank to connect to the whole datasource. Pick a schema to narrow the editor's sidebar to it.",
-    "SCHEMA_PICK_DATASOURCE_FIRST": "Pick a datasource above to choose a schema.",
-    "SCHEMA_LAZY_MODE_HINT": "Large datasource — columns load when you expand a table.",
+    "SCHEMA_PICKER_HINT_OPTIONAL": "Leave blank to connect to the whole connector. Pick a schema to narrow the editor's sidebar to it.",
+    "SCHEMA_PICK_DATASOURCE_FIRST": "Pick a connector above to choose a schema.",
+    "SCHEMA_LAZY_MODE_HINT": "Large connector — columns load when you expand a table.",
     "EDITOR_DISABLED": "Editor disabled — schema unavailable.",
     "CELL_NULL": "NULL",
     "CELL_JSON_TRUNCATED": "(truncated)",
@@ -889,7 +889,7 @@
     "LOADING_MONACO_HINT": "Setting up the SQL editor...",
     "LOADING_SCHEMA": "Loading schema...",
     "NO_ANALYSES_FOUND": "No analyses found for this dataset",
-    "NO_DATASOURCE_SELECTED": "No datasource selected",
+    "NO_DATASOURCE_SELECTED": "No connector selected",
     "NO_DESCRIPTION": "No description provided",
     "NO_FIELDS_FOUND": "No fields found",
     "NO_FUNCTIONS_FOUND": "No functions found",
@@ -918,8 +918,8 @@
     "SEARCH_QUERY_BUILDERS": "Search query builders...",
     "SEARCH_TABLES": "Search tables...",
     "SELECT_DATA_TYPE": "Select data type",
-    "SELECT_DATASOURCE_HINT": "Select a datasource to begin writing your query",
-    "SELECT_DATASOURCE_QUERY_HINT": "Choose the datasource you want to query against",
+    "SELECT_DATASOURCE_HINT": "Select a connector to begin writing your query",
+    "SELECT_DATASOURCE_QUERY_HINT": "Choose the connector you want to query against",
     "SOURCE": "Source",
     "SQL_BASED": "SQL Based",
     "SQL_QUERY": "SQL Query",
@@ -949,14 +949,14 @@
     "ERROR_KIND_PERMISSION_DENIED": "Permission denied",
     "ERROR_KIND_SYNTAX": "SQL syntax error",
     "ERROR_KIND_TIMEOUT": "Query timed out",
-    "ERROR_KIND_CONNECTION": "Could not reach the datasource",
+    "ERROR_KIND_CONNECTION": "Could not reach the connector",
     "ERROR_KIND_OBJECT_NOT_FOUND": "Object not found",
     "ERROR_KIND_SAFETY_VIOLATION": "SQL rejected by safety check",
-    "ERROR_HINT_PERMISSION_DENIED": "The datasource user does not have access to one or more objects in this query. Ask your DB admin to grant SELECT on the referenced tables.",
+    "ERROR_HINT_PERMISSION_DENIED": "The connector user does not have access to one or more objects in this query. Ask your DB admin to grant SELECT on the referenced tables.",
     "ERROR_HINT_SYNTAX": "The engine could not parse the SQL. The position in the message points at the first unexpected token.",
     "ERROR_HINT_TIMEOUT": "The query exceeded the statement timeout. Add a WHERE clause to narrow the result, or simplify the joins.",
-    "ERROR_HINT_CONNECTION": "The datasource could not be reached. Check the connection from the datasource settings.",
-    "ERROR_HINT_OBJECT_NOT_FOUND": "A table, view, or column referenced by the query does not exist on this datasource.",
+    "ERROR_HINT_CONNECTION": "The connector could not be reached. Check the connection from the connector settings.",
+    "ERROR_HINT_OBJECT_NOT_FOUND": "A table, view, or column referenced by the query does not exist on this connector.",
     "ERROR_HINT_SAFETY_VIOLATION": "Only single-statement SELECT or WITH ... SELECT queries are allowed. Remove the highlighted keyword and try again.",
     "OFFENDING_TOKEN_TOOLTIP": "Keyword the safety validator rejected",
     "TRUNCATED_BANNER": "Result truncated — only the first page is shown. Use pagination or add a WHERE clause to see more.",
@@ -2180,7 +2180,7 @@
     "SUBTITLE": "View and manage published dashboards",
     "DATASET": "Dataset",
     "SEARCH_DATASET": "Search Dataset",
-    "SEARCH_DATASOURCE": "Search Datasource",
+    "SEARCH_DATASOURCE": "Search Connector",
     "NO_DASHBOARDS_FOUND": "No dashboards found",
     "CONFIRM_DELETE_SINGLE": "Are you sure you want to delete this dashboard?",
     "CONFIRM_DELETE_BULK": "Are you sure you want to delete <strong>{{count}}</strong> selected dashboard(s)?",
@@ -2341,7 +2341,7 @@
     "GROUPS": "Groups",
     "RLS_RULES": "RLS Rules",
     "ALERTS": "Alerts",
-    "DATASOURCES": "Datasources",
+    "DATASOURCES": "Connectors",
     "DB_ACCESS": "Database Access",
     "DB_USERS": "Database Users",
     "DB_ROLES": "Database Users & Roles",
@@ -2376,7 +2376,7 @@
     "CONNECTORS_API": "Web/REST Connectors"
   },
   "AUTH": {
-    "HEADLINE_LOGIN": "Elevate Your Datasource\nManagement Experience",
+    "HEADLINE_LOGIN": "Elevate Your Connector\nManagement Experience",
     "HEADLINE_FORGOT": "Securely Reset Your\nAccount Password",
     "HEADLINE_RESET": "Set Your New\nAccount Password",
     "HEADLINE_SET_PASSWORD": "Set Your\nAccount Password",
@@ -2470,7 +2470,7 @@
       "HOME_ARIA": "DBExec home",
       "ALL_RIGHTS": "All rights reserved.",
       "HERO_TITLE": "Turn your databases into dashboards.",
-      "HERO_LEDE": "Connect a datasource, drag the charts you need, and share the dashboard — all in one place, no SQL required.",
+      "HERO_LEDE": "Connect a connector, drag the charts you need, and share the dashboard — all in one place, no SQL required.",
       "FEATURE_CONNECT_TITLE": "Connect any database",
       "FEATURE_CONNECT_DESC": "Postgres, MySQL, SQL Server and more — in minutes.",
       "FEATURE_BUILD_TITLE": "Build dashboards visually",
@@ -2568,7 +2568,7 @@
     "ACTIVE_USERS_7D": "Active Users (Last 7 Days)",
     "ACTIVE_USERS_15D": "Active Users (Last 15 Days)",
     "ACTIVE_USERS_30D": "Active Users (Last 30 Days)",
-    "TOTAL_DATASOURCES": "Total Datasources",
+    "TOTAL_DATASOURCES": "Total Connectors",
     "TOTAL_ENVIRONMENTS": "Total Environments",
     "TOTAL_ADMINS": "Total Admins",
     "TOTAL_USERS": "Total Users",
@@ -2586,17 +2586,17 @@
     "ANALYSES_DESC": "Visualize and analyze data",
     "USERS": "Users",
     "USERS_DESC": "Manage organisation users",
-    "DATASOURCES": "Datasources",
-    "DATASOURCES_DESC": "Configure datasource connections",
+    "DATASOURCES": "Connectors",
+    "DATASOURCES_DESC": "Configure connector connections",
     "AUDIT_LOGS": "Audit Logs",
     "AUDIT_LOGS_DESC": "Review activity history",
     "ADD_USER": "Add User",
-    "MANAGE_DATASOURCE": "Manage Datasource",
+    "MANAGE_DATASOURCE": "Manage Connector",
     "VIEW_REPORTS": "View Reports"
   },
   "AUTH_FEATURES": {
-    "LOGIN_1_TITLE": "Visual Datasource Explorer",
-    "LOGIN_1_DESC": "Navigate through your datasource structure with an intuitive visual interface",
+    "LOGIN_1_TITLE": "Visual Connector Explorer",
+    "LOGIN_1_DESC": "Navigate through your connector structure with an intuitive visual interface",
     "LOGIN_2_TITLE": "Performance Insights",
     "LOGIN_2_DESC": "Get real-time performance metrics and query optimization suggestions",
     "LOGIN_3_TITLE": "Secure Access",
@@ -2676,7 +2676,7 @@
   },
   "PROMPT_MODULE": {
     "TITLE": "Prompts",
-    "SUBTITLE": "Configure datasource fields for data filtering and query generation",
+    "SUBTITLE": "Configure connector fields for data filtering and query generation",
     "ADD_TITLE": "Add Prompt",
     "EDIT_TITLE": "Edit Prompt",
     "VIEW_TITLE": "Prompt Details",
@@ -3097,8 +3097,8 @@
     "MASKED_COLUMN_COUNT": "{{count}} masked column(s)",
     "MORE_CONDITIONS": "+{{count}} more",
     "SEARCH_DATASET": "Search Dataset",
-    "SELECT_DATASOURCE_MSG": "Please select a datasource to view RLS rules",
-    "NO_RULES_FOUND": "No RLS rules found for this datasource",
+    "SELECT_DATASOURCE_MSG": "Please select a connector to view RLS rules",
+    "NO_RULES_FOUND": "No RLS rules found for this connector",
     "DELETE_SINGLE": "Are you sure you want to delete this RLS rule?",
     "UPDATE_CONFIRM": "Are you sure you want to update this RLS rule?",
     "DELETE_INFO_FILTERING": "Row-level security filtering will be removed",
@@ -4104,7 +4104,7 @@
     "IMPORT": "Import",
     "IMPORTING": "Importing…",
     "EXPORT_SUCCESS": "Export downloaded",
-    "IMPORT_SUCCESS": "Import complete. A new datasource was created — set its password to run the imported assets.",
+    "IMPORT_SUCCESS": "Import complete. A new connector was created — set its password to run the imported assets.",
     "IMPORT_FAILED": "Import failed",
     "INVALID_FILE": "That file isn't a valid DBExec export file.",
     "FILE_TOO_LARGE": "File is too large (max 10 MB).",
@@ -4548,8 +4548,8 @@
         "tooLong": "Default schema must not exceed 128 characters"
       },
       "id": {
-        "required": "Datasource id is required",
-        "invalid": "Invalid datasource id"
+        "required": "Connector id is required",
+        "invalid": "Invalid connector id"
       },
       "justification": {
         "tooLong": "Justification must not exceed 500 characters"
@@ -4569,7 +4569,7 @@
         "invalid": "Connection name must start with a letter or number and can only contain letters, numbers, spaces, dots, underscores and hyphens"
       },
       "datasource": {
-        "required": "Datasource is required"
+        "required": "Connector is required"
       },
       "id": {
         "required": "Connection id is required"
@@ -4580,7 +4580,7 @@
     },
     "access": {
       "datasource": {
-        "required": "Datasource is required"
+        "required": "Connector is required"
       },
       "connection": {
         "required": "Connection is required"
@@ -4604,7 +4604,7 @@
         "tooLong": "Justification must not exceed 500 characters"
       },
       "datasource": {
-        "required": "Datasource is required"
+        "required": "Connector is required"
       },
       "sql": {
         "required": "SQL query is required",
@@ -4655,7 +4655,7 @@
         "tooLong": "Justification must not exceed 500 characters"
       },
       "datasource": {
-        "required": "Datasource is required"
+        "required": "Connector is required"
       },
       "dataset": {
         "required": "Dataset is required"
@@ -4851,15 +4851,15 @@
         "unsupported": "Unsupported migration file version"
       },
       "datasources": {
-        "required": "The migration file must include at least one datasource",
-        "tooMany": "Too many datasources in the migration file"
+        "required": "The migration file must include at least one connector",
+        "tooMany": "Too many connectors in the migration file"
       },
       "datasource": {
         "handle": {
           "required": "Datasource handle is required"
         },
         "name": {
-          "required": "Datasource name is required"
+          "required": "Connector name is required"
         },
         "dbType": {
           "invalid": "Unsupported database type in the migration file"
@@ -4870,14 +4870,14 @@
         "username": {
           "required": "Database username is required"
         },
-        "unknownField": "The migration file contains an unexpected datasource field"
+        "unknownField": "The migration file contains an unexpected connector field"
       },
       "asset": {
         "name": {
           "required": "Asset name is required"
         },
         "datasourceHandle": {
-          "required": "Asset is missing its datasource reference"
+          "required": "Asset is missing its connector reference"
         },
         "handle": {
           "required": "Asset is missing its bundle handle"
@@ -5251,8 +5251,8 @@
         "tooLong": "Description must not exceed 500 characters"
       },
       "datasource": {
-        "required": "Datasource is required",
-        "invalid": "Datasource must be a valid UUID"
+        "required": "Connector is required",
+        "invalid": "Connector must be a valid UUID"
       },
       "status": {
         "invalid": "Status must be either 0 or 1"
@@ -5276,8 +5276,8 @@
         "tooLong": "Description must not exceed 500 characters"
       },
       "datasource": {
-        "required": "Datasource is required",
-        "invalid": "Datasource must be a valid UUID"
+        "required": "Connector is required",
+        "invalid": "Connector must be a valid UUID"
       },
       "status": {
         "invalid": "Status must be either 0 or 1"
@@ -5391,15 +5391,15 @@
   },
   "DB_ACCESS": {
     "TITLE": "Database Access Management",
-    "SUBTITLE": "Manage PostgreSQL users, roles, and privileges on a datasource",
+    "SUBTITLE": "Manage PostgreSQL users, roles, and privileges on a connector",
     "EXPORT_JSON": "Export JSON",
     "EXPORT_CSV": "Export CSV",
     "EXPORT_ACCESS_HINT": "Download this account's full access profile (attributes, granted roles, effective privileges, owned objects) for audit.",
-    "SELECT_DATASOURCE": "Choose a datasource to manage",
+    "SELECT_DATASOURCE": "Choose a connector to manage",
     "CHECKING_CAPABILITY": "Checking management capability…",
     "OPEN_WORKSPACE": "Open Workspace",
     "UNSUPPORTED_TITLE": "PostgreSQL only in v1",
-    "UNSUPPORTED_BODY": "Database Access Management supports PostgreSQL datasources only in this release.",
+    "UNSUPPORTED_BODY": "Database Access Management supports PostgreSQL connectors only in this release.",
     "CAP_FULL_TITLE": "Full management available",
     "CAP_FULL_BODY": "The management login can create, alter, and drop roles and grants on this database.",
     "CAP_FULL_BADGE": "Full management",
@@ -5453,7 +5453,7 @@
     "APP_GROUPS": "App groups",
     "SELECT_APP_USERS": "Select app users to attach",
     "SELECT_APP_GROUPS": "Select app groups to attach",
-    "ATTACH_HINT": "Attach this database role to one or more app users and groups. Each selection is linked to the role for this datasource.",
+    "ATTACH_HINT": "Attach this database role to one or more app users and groups. Each selection is linked to the role for this connector.",
     "DISCARD_UNSAVED": "You have unsaved changes in the privilege composer. Discard them and switch tabs?",
     "DISCARD_TITLE": "Discard unsaved changes?",
     "DISCARD_CONFIRM": "Discard & switch",
@@ -5582,7 +5582,7 @@
     "CAN_LOGIN_DESC": "A login user has a password and can connect. A group role cannot log in — it only groups privileges.",
     "LOGIN_DETAILS": "Login details",
     "PASSWORD_UNCHANGED_PLACEHOLDER": "Leave blank to keep unchanged",
-    "SELECT_DATASOURCE_HINT": "Choose a datasource above to manage its database users, roles and privileges.",
+    "SELECT_DATASOURCE_HINT": "Choose a connector above to manage its database users, roles and privileges.",
     "NAME": "Name",
     "SEARCH_NAME": "Search name",
     "VIEW_PRIVILEGE_SET": "Saved privilege set",
@@ -5663,10 +5663,10 @@
       "GENERIC": "Apply change"
     },
     "SELECT_DATE": "Select a date",
-    "PICK_DATASOURCE_TO_CREATE": "Select a datasource to create a role.",
+    "PICK_DATASOURCE_TO_CREATE": "Select a connector to create a role.",
     "RULE_INCOMPLETE": "Incomplete",
     "APPLY_DISABLED_HINT": "Complete or remove every rule before applying.",
-    "CHOOSE_DATASOURCE": "Choose a datasource",
+    "CHOOSE_DATASOURCE": "Choose a connector",
     "TAB_COMPOSE": "Compose rules",
     "TAB_EFFECTIVE_PRIVS": "Effective privileges",
     "ALL_SEQUENCES": "All sequences in schema",
@@ -5682,7 +5682,7 @@
     "SCOPE_ORG_WIDE": "Org-wide",
     "SCOPE": "Scope",
     "RULE": "Rule",
-    "SCOPE_DATASOURCE": "Datasource",
+    "SCOPE_DATASOURCE": "Connector",
     "SEARCH_TEMPLATES_PLACEHOLDER": "Search templates…",
     "TEMPLATES_TITLE": "Role Templates",
     "TEMPLATES_SUBTITLE": "Reusable role + privilege recipes. Apply them when creating a role or composing privileges.",
@@ -5726,7 +5726,7 @@
     "PUBLIC_PRIVILEGES": "Privileges to PUBLIC",
     "PUBLIC_ALSO_DIRECT": "Also granted directly?",
     "PUBLIC_SEARCH": "Search objects",
-    "PUBLIC_NONE": "No privileges are granted to PUBLIC on this datasource.",
+    "PUBLIC_NONE": "No privileges are granted to PUBLIC on this connector.",
     "PUBLIC_VIA_PUBLIC": "Via PUBLIC",
     "PUBLIC_REVOKE_SUMMARY": "Revoke {{privileges}} from PUBLIC on {{object}}",
     "PUBLIC_CONFIRM_TITLE": "Revoke privileges from PUBLIC",
@@ -5753,7 +5753,7 @@
     "NO_CONNECTIONS": "No connections yet. Create one to start running queries.",
     "CONNECTION_NAME": "Connection name",
     "CONNECTION_NAME_PLACEHOLDER": "e.g. prod-db (analyst)",
-    "CONNECTION_HINT": "A connection binds a datasource to a database login you were given. Opening it runs your SQL as that login.",
+    "CONNECTION_HINT": "A connection binds a connector to a database login you were given. Opening it runs your SQL as that login.",
     "CREDENTIALS": "Credentials",
     "LOGIN": "Login",
     "LOGIN_PLACEHOLDER": "database username",
@@ -5769,20 +5769,20 @@
     "DISABLED": "Disabled",
     "ENABLE": "Enable",
     "DISABLE": "Disable",
-    "SET_DEFAULT": "Set as default for this datasource",
-    "IS_DEFAULT": "Default for this datasource",
-    "DEFAULT_BADGE": "Default connection for this datasource",
-    "ALL_DISABLED_FOR_DS": "All connections for this datasource are disabled. Enable one to run queries.",
+    "SET_DEFAULT": "Set as default for this connector",
+    "IS_DEFAULT": "Default for this connector",
+    "DEFAULT_BADGE": "Default connection for this connector",
+    "ALL_DISABLED_FOR_DS": "All connections for this connector are disabled. Enable one to run queries.",
     "TEST": "Verify connection",
     "OPEN": "Open SQL Editor",
     "LAUNCH_TITLE": "Open a query session",
-    "LAUNCH_SUBTITLE": "Pick a datasource and one of your connections, then open the editor in a new tab.",
-    "STEP_DATASOURCE": "Datasource",
+    "LAUNCH_SUBTITLE": "Pick a connector and one of your connections, then open the editor in a new tab.",
+    "STEP_DATASOURCE": "Connector",
     "STEP_CONNECTION": "Connection",
-    "SELECT_DATASOURCE": "Choose a datasource",
-    "SELECT_DATASOURCE_FIRST": "Choose a datasource first",
+    "SELECT_DATASOURCE": "Choose a connector",
+    "SELECT_DATASOURCE_FIRST": "Choose a connector first",
     "SELECT_CONNECTION": "Choose a connection",
-    "NO_CONNECTIONS_FOR_DS": "You have no connections for this datasource yet.",
+    "NO_CONNECTIONS_FOR_DS": "You have no connections for this connector yet.",
     "NO_CONNECTIONS_HINT": "You don't have any connections yet. Create one to get started.",
     "OPEN_EXECUTOR": "Open SQL Editor",
     "VERIFYING": "Verifying…",
@@ -5956,12 +5956,12 @@
     "SAVED_QUERIES_SEARCH_PLACEHOLDER": "Search saved queries by name",
     "NO_SAVED_QUERIES": "No saved queries yet. Create one to get started.",
     "NEW_QUERY": "New query",
-    "NEW_QUERY_SUBTITLE": "Pick a datasource and one of your connections, then open the editor in a new tab.",
+    "NEW_QUERY_SUBTITLE": "Pick a connector and one of your connections, then open the editor in a new tab.",
     "NEW_SAVED_QUERY": "New Saved Query",
     "EDIT_SAVED_QUERY": "Edit Saved Query",
     "DELETE_SAVED_QUERY": "Delete saved query",
     "DELETE_SAVED_QUERY_CONFIRM": "Delete the saved query \"{{name}}\"? This removes the saved SQL only — nothing on the database is changed.",
-    "SAVED_QUERY_HINT": "A saved query stores your SQL against a datasource + connection so you can reopen and run it later.",
+    "SAVED_QUERY_HINT": "A saved query stores your SQL against a connector + connection so you can reopen and run it later.",
     "SAVED_QUERY_NAME": "Query name",
     "SAVED_QUERY_NAME_PLACEHOLDER": "e.g. Monthly active users",
     "SAVED_QUERY_DESCRIPTION": "Description",
@@ -6335,7 +6335,7 @@
     "UNGROUPED": "Ungrouped",
     "GROUP_NAME": "Group name",
     "DROP_PROMPTS_HERE": "Drag prompts here",
-    "NO_PROMPTS": "No prompts found for this datasource.",
+    "NO_PROMPTS": "No prompts found for this connector.",
     "ALREADY_PLACED": "Already placed",
     "MANDATORY": "Mandatory",
     "LOCKED": "Locked",
@@ -6663,7 +6663,7 @@
     "COMPOSE": "Run",
     "DELETE_SINGLE": "Are you sure you want to delete this form?",
     "COL_NAME": "Name",
-    "COL_DATASOURCE": "Datasource",
+    "COL_DATASOURCE": "Connector",
     "COL_STATUS": "Status",
     "COL_UPDATED": "Updated",
     "VERSIONS": "Versions",
@@ -6838,7 +6838,7 @@
     },
     "PALETTE": {
       "NO_PROMPTS": "No prompts yet",
-      "NO_PROMPTS_HINT": "Create prompts in the Prompts module for this datasource, then drag them onto a section."
+      "NO_PROMPTS_HINT": "Create prompts in the Prompts module for this connector, then drag them onto a section."
     }
   },
   "CONNECTORS_API": {

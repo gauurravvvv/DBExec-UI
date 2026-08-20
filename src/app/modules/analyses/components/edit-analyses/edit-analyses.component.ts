@@ -122,7 +122,7 @@ export class EditAnalysesComponent
 {
   private destroyRef = inject(DestroyRef);
   analysisId: string = '';
-  datasourceId: string = '';
+  connectorId: string = '';
 
   private _isDirty = false;
 
@@ -1044,7 +1044,7 @@ export class EditAnalysesComponent
         // fields, createdOn). The page never used any of that — we
         // only project what's actually consumed.
         this.analysisDetails = a;
-        this.datasourceId = a.datasourceId;
+        this.connectorId = a.connectorId;
         this.datasetId = a.datasetId;
 
         // Dataset details — the page only needs the name (sidebar
@@ -4539,7 +4539,7 @@ export class EditAnalysesComponent
         name: formData.name,
         description: formData.description,
         datasetId: this.datasetId,
-        datasource: this.datasourceId,
+        datasource: this.connectorId,
         visuals: visualConfigurations,
         tabs: tabsPayload,
         tabDeletes: this._pendingTabDeletes,

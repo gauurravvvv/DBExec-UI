@@ -261,7 +261,7 @@ export class GlobalSearchComponent implements OnInit {
     if (result.link) {
       const queryParams: any = {};
       if (result.organisationId) queryParams.orgId = result.organisationId;
-      if (result.datasourceId) queryParams.datasourceId = result.datasourceId;
+      if (result.connectorId) queryParams.connectorId = result.connectorId;
       if (result.name) queryParams.name = result.name;
       this.router.navigate([result.link], { queryParams });
     }

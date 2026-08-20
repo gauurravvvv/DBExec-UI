@@ -4,7 +4,7 @@
 export interface QueryTab {
   id: string;
   title: string;
-  datasourceId?: string;
+  connectorId?: string;
   datasourceName: string;
   query: string;
   result: any | null;

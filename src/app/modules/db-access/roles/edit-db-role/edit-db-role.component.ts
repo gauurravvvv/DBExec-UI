@@ -33,7 +33,7 @@ export class EditDbRoleComponent implements OnInit, HasUnsavedChanges {
   private fb = inject(FormBuilder);
   private cdr = inject(ChangeDetectorRef);
 
-  datasourceId = '';
+  connectorId = '';
   roleName = '';
   loadingRole = true;
   roleForm!: FormGroup;
@@ -66,13 +66,13 @@ export class EditDbRoleComponent implements OnInit, HasUnsavedChanges {
   ngOnInit(): void {
     // Datasource comes from the shared context (never the URL). A cold
     // deep-link with no context falls through to the redirect below.
-    this.datasourceId = this.ctx.datasourceId() || '';
+    this.connectorId = this.ctx.connectorId() || '';
     this.roleName = this.route.snapshot.paramMap.get('roleName') ?? '';
-    if (!this.datasourceId) {
+    if (!this.connectorId) {
       this.router.navigate([DB_ACCESS.ROLES_LIST]);
       return;
     }
-    this.ctx.setDatasource(this.datasourceId);
+    this.ctx.setDatasource(this.connectorId);
     this.roleForm = this.fb.group({
       name: [{ value: '', disabled: true }],
       canLogin: [false],
@@ -95,7 +95,7 @@ export class EditDbRoleComponent implements OnInit, HasUnsavedChanges {
 
   private loadRole(): void {
     this.dbAccess
-      .loadRoles(this.datasourceId)
+      .loadRoles(this.connectorId)
       .then(() => {
         const all = this.dbAccess.roles() ?? [];
         const role = all.find(r => r.name === this.roleName);
@@ -183,12 +183,12 @@ export class EditDbRoleComponent implements OnInit, HasUnsavedChanges {
     this.runPreviewAndArm(
       [intent],
       () =>
-        this.dbAccess.updateRole(this.datasourceId, this.roleName, {
+        this.dbAccess.updateRole(this.connectorId, this.roleName, {
           attributes,
           previewOnly: true,
         }),
       confirmPhrase =>
-        this.dbAccess.updateRole(this.datasourceId, this.roleName, {
+        this.dbAccess.updateRole(this.connectorId, this.roleName, {
           attributes,
           confirmPhrase,
         }),

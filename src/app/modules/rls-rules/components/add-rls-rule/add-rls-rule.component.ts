@@ -29,7 +29,7 @@ import { HasUnsavedChanges } from 'src/app/core/models/has-unsaved-changes.model
 import { GlobalService } from 'src/app/core/services/global.service';
 import { ReferenceDataService } from 'src/app/core/services/reference-data.service';
 import { DatasetService } from 'src/app/modules/dataset/services/dataset.service';
-import { DatasourceService } from 'src/app/modules/datasource/services/datasource.service';
+import { ConnectorService } from 'src/app/modules/connector/services/connector.service';
 import { GroupService } from 'src/app/modules/groups/services/group.service';
 import { UserService } from 'src/app/modules/users/services/user.service';
 import { RlsRulesService } from '../../services/rls-rules.service';
@@ -127,7 +127,7 @@ export class AddRlsRuleComponent implements OnInit, HasUnsavedChanges {
     private fb: FormBuilder,
     private router: Router,
     private globalService: GlobalService,
-    private datasourceService: DatasourceService,
+    private datasourceService: ConnectorService,
     private datasetService: DatasetService,
     private rlsRulesService: RlsRulesService,
     private userService: UserService,
@@ -392,8 +392,8 @@ export class AddRlsRuleComponent implements OnInit, HasUnsavedChanges {
     }
   };
 
-  onDatasourceChange(datasourceId: string) {
-    this.selectedDatasource = datasourceId;
+  onDatasourceChange(connectorId: string) {
+    this.selectedDatasource = connectorId;
     this.datasets = [];
     // Dataset dropdown is datasource-scoped — clear preload so the next open
     // re-fetches under the new datasource.
@@ -404,7 +404,7 @@ export class AddRlsRuleComponent implements OnInit, HasUnsavedChanges {
     this.isLoadingColumnValues = {};
     this.resetConditions();
     this.rlsForm.patchValue({ datasetId: '' }, { emitEvent: false });
-    if (datasourceId) {
+    if (connectorId) {
       this.loadDatasets();
     }
   }
@@ -423,7 +423,7 @@ export class AddRlsRuleComponent implements OnInit, HasUnsavedChanges {
   }): Promise<{ items: any[]; total: number }> => {
     if (!this.selectedDatasource) return { items: [], total: 0 };
     const params: any = {
-      datasourceId: this.selectedDatasource,
+      connectorId: this.selectedDatasource,
       page,
       limit,
     };
@@ -446,7 +446,7 @@ export class AddRlsRuleComponent implements OnInit, HasUnsavedChanges {
     if (!this.selectedDatasource) return;
 
     const params = {
-      datasourceId: this.selectedDatasource,
+      connectorId: this.selectedDatasource,
       page: DEFAULT_PAGE,
       limit: 10,
     };

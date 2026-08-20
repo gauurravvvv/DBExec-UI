@@ -18,7 +18,7 @@
 import { Injectable } from '@angular/core';
 import type { LRParser } from '@lezer/lr';
 import type { Tree } from '@lezer/common';
-import { DatabaseTypeValue } from '../../datasource/constants/database-types.constant';
+import { DatabaseTypeValue } from '../../connector/constants/connector-types.constant';
 import { getDialectSpec } from '../config/sql-dialects';
 
 declare const monaco: any;

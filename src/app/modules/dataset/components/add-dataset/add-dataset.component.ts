@@ -30,8 +30,8 @@ import { MonacoLoaderService } from 'src/app/core/services/monaco-loader.service
 import {
   DATABASE_TYPES,
   DatabaseTypeOption,
-} from 'src/app/modules/datasource/constants/database-types.constant';
-import { DatasourceService } from 'src/app/modules/datasource/services/datasource.service';
+} from 'src/app/modules/connector/constants/connector-types.constant';
+import { ConnectorService } from 'src/app/modules/connector/services/connector.service';
 import {
   DIALECT_LINT_DEBOUNCE_MS,
   ENABLE_DIALECT_LINT,
@@ -129,7 +129,7 @@ export class AddDatasetComponent
   private static readonly SQL_UPLOAD_MAX_MB = 2;
 
   // Removed ViewChild as we now use dynamic containers per tab
-  @Input() datasourceId?: string;
+  @Input() connectorId?: string;
   @Input() initialQuery?: string;
 
 
@@ -243,7 +243,7 @@ export class AddDatasetComponent
 
 
   constructor(
-    private datasourceService: DatasourceService,
+    private datasourceService: ConnectorService,
     private sqlFormatterService: SqlFormatterService,
     private sqlValidatorService: SqlValidatorService,
     private router: Router,
@@ -340,10 +340,10 @@ export class AddDatasetComponent
         this.cdr.markForCheck();
       });
 
-    // The popup flow forwards `datasourceId` and an optional `schema`
+    // The popup flow forwards `connectorId` and an optional `schema`
     // on the query string. The BE derives the org from the JWT.
     const qp = this.route.snapshot.queryParamMap;
-    const queryDatasourceId = qp.get('datasourceId');
+    const queryDatasourceId = qp.get('connectorId');
     const querySchema = qp.get('schema');
     if (querySchema) {
       // Scope the editor to a single schema. The sidebar filter
@@ -365,12 +365,12 @@ export class AddDatasetComponent
   }
 
   /**
-   * Fetch the preselected datasource record (set via ?datasourceId=
+   * Fetch the preselected datasource record (set via ?connectorId=
    * from the list-dataset popup) and treat it as the active selection.
    * No dropdown UI; the dbType badge picks it up from
    * `selectedDatasourceObj.config.dbType`.
    */
-  private bootstrapPreselectedDatasource(datasourceId: string): void {
+  private bootstrapPreselectedDatasource(connectorId: string): void {
     // Fast path — the list-dataset popup carries the full datasource
     // record through router state when the user clicks Continue.
     // That record already has id / name / config (with dbType), which
@@ -387,7 +387,7 @@ export class AddDatasetComponent
       window.history?.state?.datasource ??
       null;
 
-    if (stateDs?.id && String(stateDs.id) === String(datasourceId)) {
+    if (stateDs?.id && String(stateDs.id) === String(connectorId)) {
       this.applyPreselectedDatasource(stateDs);
       return;
     }
@@ -398,7 +398,7 @@ export class AddDatasetComponent
     // dialect-aware autocomplete.
     this.isLoadingDatasources = true;
     this.datasourceService
-      .viewDatasource(datasourceId)
+      .viewDatasource(connectorId)
       .then((res: any) => {
         this.isLoadingDatasources = false;
         if (this.globalService.handleSuccessService(res, false)) {
@@ -899,7 +899,7 @@ export class AddDatasetComponent
     const startTime = Date.now();
 
     const payload: any = {
-      datasourceId: this.selectedDatasourceObj.id,
+      connectorId: this.selectedDatasourceObj.id,
       query: query,
       page: page,
       limit: limit,

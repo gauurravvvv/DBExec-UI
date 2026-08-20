@@ -10,7 +10,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { QUERY_RUNNER } from 'src/app/core/constants/routes.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
-import { DatasourceService } from 'src/app/modules/datasource/services/datasource.service';
+import { ConnectorService } from 'src/app/modules/connector/services/connector.service';
 import { UsServerListAdapter } from 'src/app/shared/components/us-data-grid/us-server-list-adapter';
 import type {
   CustomTableColumn,
@@ -62,8 +62,8 @@ export class ListSavedQueriesComponent implements OnInit, OnDestroy {
 
   /* ── datasource filter ──────────────────────────────────────────────── */
   // Chosen datasource; folded into the JSON `filter` param as
-  // `filter.datasourceId` (the BE saved-queries list matches it there).
-  // Null = all. Persisted in the URL (?datasourceId=) so a refresh keeps it.
+  // `filter.connectorId` (the BE saved-queries list matches it there).
+  // Null = all. Persisted in the URL (?connectorId=) so a refresh keeps it.
   selectedDatasourceId: string | null = null;
 
   // New-Query popup
@@ -77,7 +77,7 @@ export class ListSavedQueriesComponent implements OnInit, OnDestroy {
 
   constructor(
     private service: SavedQueriesService,
-    private datasourceService: DatasourceService,
+    private datasourceService: ConnectorService,
     private globalService: GlobalService,
     private translate: TranslateService,
     private router: Router,
@@ -93,7 +93,7 @@ export class ListSavedQueriesComponent implements OnInit, OnDestroy {
       ),
     };
     // Pre-select from the URL so a refresh keeps the datasource filter.
-    const fromUrl = this.route.snapshot.queryParamMap.get('datasourceId');
+    const fromUrl = this.route.snapshot.queryParamMap.get('connectorId');
     this.selectedDatasourceId = fromUrl && fromUrl.trim() ? fromUrl : null;
     this.buildAdapter();
     this.adapter?.reload();
@@ -127,14 +127,14 @@ export class ListSavedQueriesComponent implements OnInit, OnDestroy {
 
   /**
    * Datasource filter changed → fold it into the list call + reload, and
-   * mirror it into the URL (?datasourceId=) so a refresh keeps the filter.
+   * mirror it into the URL (?connectorId=) so a refresh keeps the filter.
    * Clearing (null) drops the param and shows all saved queries.
    */
   onDatasourceFilterChange(dsId: string | null): void {
     this.selectedDatasourceId = dsId || null;
     this.router.navigate([], {
       relativeTo: this.route,
-      queryParams: { datasourceId: this.selectedDatasourceId },
+      queryParams: { connectorId: this.selectedDatasourceId },
       queryParamsHandling: 'merge',
     });
     this.adapter?.reload();
@@ -219,7 +219,7 @@ export class ListSavedQueriesComponent implements OnInit, OnDestroy {
             limit: p.limit,
             sort: p.sort,
             // Datasource filter lives INSIDE the JSON filter as
-            // `filter.datasourceId`. Merge it into whatever the table
+            // `filter.connectorId`. Merge it into whatever the table
             // already built (global search + column filters) so both survive.
             filter: this.withDatasourceFilter(p.filter),
           })
@@ -252,7 +252,7 @@ export class ListSavedQueriesComponent implements OnInit, OnDestroy {
    * Merge the selected datasource into the table's JSON `filter` string.
    * `existing` is the adapter-built filter (search + column filters) as a
    * JSON string, or undefined when the table has none. Returns a JSON string
-   * with `datasourceId` added, or the original when no datasource is picked.
+   * with `connectorId` added, or the original when no datasource is picked.
    */
   private withDatasourceFilter(existing?: string): string | undefined {
     if (!this.selectedDatasourceId) return existing;
@@ -264,7 +264,7 @@ export class ListSavedQueriesComponent implements OnInit, OnDestroy {
         filter = {};
       }
     }
-    filter['datasourceId'] = this.selectedDatasourceId;
+    filter['connectorId'] = this.selectedDatasourceId;
     return JSON.stringify(filter);
   }
 

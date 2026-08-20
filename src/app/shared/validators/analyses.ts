@@ -928,7 +928,7 @@ export type GetDistinctFieldValuesInput = z.infer<
 // ── List schemas (query params) ──────────────────────────────────────
 
 export const listAnalysesSchema = z.object({
-  datasourceId: z.string().optional(),
+  connectorId: z.string().optional(),
   page: z.coerce.number().int().min(1).optional(),
   limit: z.coerce.number().int().min(1).max(1000).optional(),
   filter: z.string().trim().optional(),

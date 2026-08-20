@@ -1,7 +1,7 @@
 import { Injectable, signal } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { EmptyError, Subject, lastValueFrom, takeUntil } from 'rxjs';
-import { DATASET, DATASOURCE } from 'src/app/core/constants/api.constant';
+import { DATASET, CONNECTOR } from 'src/app/core/constants/api.constant';
 import { HttpClientService } from 'src/app/core/services/http-client.service';
 
 /**
@@ -312,7 +312,7 @@ export class DatasetService {
     try {
       return await lastValueFrom(
         this.http.apiPut(
-          DATASOURCE.UPDATE + id,
+          CONNECTOR.UPDATE + id,
           {
             id,
             name,
@@ -335,42 +335,42 @@ export class DatasetService {
   }
 
   listDatasourceSchemas(params: any) {
-    // GET /datasources/:datasourceId/schemas
+    // GET /datasources/:connectorId/schemas
     return lastValueFrom(
       this.http.apiGet(
-        DATASOURCE.LIST_SCHEMAS_PREFIX +
-          params.datasourceId +
-          DATASOURCE.LIST_SCHEMAS_SUFFIX,
+        CONNECTOR.LIST_SCHEMAS_PREFIX +
+          params.connectorId +
+          CONNECTOR.LIST_SCHEMAS_SUFFIX,
         { skipLoader: true },
       ),
     );
   }
 
   listSchemaTables(params: any) {
-    // GET /datasources/:datasourceId/schemas/:schema/tables
+    // GET /datasources/:connectorId/schemas/:schema/tables
     return lastValueFrom(
       this.http.apiGet(
-        DATASOURCE.LIST_SCHEMAS_PREFIX +
-          params.datasourceId +
-          DATASOURCE.SCHEMAS_SEGMENT +
+        CONNECTOR.LIST_SCHEMAS_PREFIX +
+          params.connectorId +
+          CONNECTOR.SCHEMAS_SEGMENT +
           params.schemaName +
-          DATASOURCE.TABLES_SEGMENT.replace(/\/$/, ''),
+          CONNECTOR.TABLES_SEGMENT.replace(/\/$/, ''),
         { skipLoader: true },
       ),
     );
   }
 
   listTableColumns(params: any) {
-    // GET /datasources/:datasourceId/schemas/:schema/tables/:table/columns
+    // GET /datasources/:connectorId/schemas/:schema/tables/:table/columns
     return lastValueFrom(
       this.http.apiGet(
-        DATASOURCE.LIST_SCHEMAS_PREFIX +
-          params.datasourceId +
-          DATASOURCE.SCHEMAS_SEGMENT +
+        CONNECTOR.LIST_SCHEMAS_PREFIX +
+          params.connectorId +
+          CONNECTOR.SCHEMAS_SEGMENT +
           params.schemaName +
-          DATASOURCE.TABLES_SEGMENT +
+          CONNECTOR.TABLES_SEGMENT +
           params.tableName +
-          DATASOURCE.COLUMNS_SEGMENT,
+          CONNECTOR.COLUMNS_SEGMENT,
         { skipLoader: true },
       ),
     );

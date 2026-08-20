@@ -37,7 +37,7 @@ export interface PalettePrompt {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FbPromptPaletteComponent implements OnInit {
-  @Input({ required: true }) datasourceId!: string;
+  @Input({ required: true }) connectorId!: string;
   @Input() placedIds: Set<string> = new Set();
   @Input() connectedTo: string[] = [];
   @Input() disabled = false;
@@ -73,12 +73,12 @@ export class FbPromptPaletteComponent implements OnInit {
   });
 
   async ngOnInit(): Promise<void> {
-    if (!this.datasourceId) {
+    if (!this.connectorId) {
       this.loading.set(false);
       return;
     }
     try {
-      const res = await this.admin.listPrompts(this.datasourceId);
+      const res = await this.admin.listPrompts(this.connectorId);
       const rows = res?.data?.prompts ?? res?.data ?? [];
       this.all.set(
         (Array.isArray(rows) ? rows : []).map((p: any) => ({

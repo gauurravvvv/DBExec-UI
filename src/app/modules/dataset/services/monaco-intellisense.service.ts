@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { DatabaseTypeValue } from '../../datasource/constants/database-types.constant';
+import { DatabaseTypeValue } from '../../connector/constants/connector-types.constant';
 import { COMMON_SQL_SNIPPETS, getDialectSpec } from '../config/sql-dialects';
 import {
   DatasourceSchema,

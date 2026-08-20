@@ -508,7 +508,7 @@ export class AiLauncherComponent implements OnInit {
         {
           name: draft.name,
           description: draft.description ?? '',
-          datasource: draft.datasourceId,
+          datasource: draft.connectorId,
           sql: draft.sql,
         },
         { skipLoader: true },

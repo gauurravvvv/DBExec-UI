@@ -195,13 +195,13 @@ export class DashboardService {
    * fan-out, no silent miss past the page cap.
    */
   async listForAnalysis(params: {
-    datasourceId: string;
+    connectorId: string;
     analysisId: string;
   }): Promise<any[]> {
     const res: any = await lastValueFrom(
       this.http.apiGet(DASHBOARD.LIST, {
         params: {
-          datasourceId: params.datasourceId,
+          connectorId: params.connectorId,
           sourceAnalysisId: params.analysisId,
           limit: 100,
           page: 1,

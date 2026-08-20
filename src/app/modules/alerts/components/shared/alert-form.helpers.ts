@@ -126,11 +126,11 @@ export const loadSourceFields = {
    */
   async listSources(
     sourceType: string,
-    datasourceId: string,
+    connectorId: string,
     { search, page, limit }: { search: string; page: number; limit: number },
     svc: SourceServices,
   ): Promise<{ items: any[]; total: number }> {
-    const params: any = { datasourceId, page, limit };
+    const params: any = { connectorId, page, limit };
     if (search) params.filter = JSON.stringify({ name: search });
     try {
       if (sourceType === 'analysis') {
@@ -270,7 +270,7 @@ export function buildAlertPayload(
     description: formVal.description || undefined,
     sourceType: formVal.sourceType,
     sourceId: formVal.sourceId,
-    datasourceId: formVal.datasourceId,
+    connectorId: formVal.connectorId,
     conditionMode: condition.mode,
     conditionBuilder: condition.conditionBuilder ?? undefined,
     conditionExpression: condition.conditionExpression ?? undefined,

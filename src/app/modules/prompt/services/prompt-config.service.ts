@@ -40,7 +40,7 @@ export class PromptConfigService {
   private readonly prompts = inject(PromptService);
 
   /** Datasource that owns the prompt — feeds schema/table/column + joins. */
-  readonly datasourceId = signal<string>('');
+  readonly connectorId = signal<string>('');
 
   readonly currentStep = signal(0);
   readonly dirty = signal(false);

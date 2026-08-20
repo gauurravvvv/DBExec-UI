@@ -41,7 +41,7 @@ import { DashboardService } from '../../services/dashboard.service';
  * selection.
  *
  * Dashboards do NOT require a datasource — the adapter loads ALL org
- * dashboards; a `?datasourceId=` deep-link still narrows as an optional filter
+ * dashboards; a `?connectorId=` deep-link still narrows as an optional filter
  * and `?name=` still pre-searches. The page header and delete-confirm popup
  * retain their existing behaviour.
  */
@@ -81,7 +81,7 @@ export class ListDashboardComponent implements OnInit, OnDestroy {
   shareAssetName = '';
 
   Math = Math;
-  /** Optional datasource narrow carried from a `?datasourceId=` deep-link. */
+  /** Optional datasource narrow carried from a `?connectorId=` deep-link. */
   selectedDatasource: any = null;
   today = new Date();
   statusOptions: any[] = [];
@@ -109,7 +109,7 @@ export class ListDashboardComponent implements OnInit, OnDestroy {
   };
 
   /** Server-side adapter — built once in ngOnInit; NO datasource gate. The
-   *  list browses ALL org dashboards; a `?datasourceId=` deep-link narrows it
+   *  list browses ALL org dashboards; a `?connectorId=` deep-link narrows it
    *  via the optional datasource filter. */
   adapter: UsServerListAdapter<any> | null = null;
 
@@ -153,12 +153,12 @@ export class ListDashboardComponent implements OnInit, OnDestroy {
     };
 
     // Build the datasource-free adapter once — the list browses ALL org
-    // dashboards. A `?datasourceId=` deep-link still narrows the list (optional
+    // dashboards. A `?connectorId=` deep-link still narrows the list (optional
     // filter), and `?name=` still pre-searches.
     this.route.queryParams
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(params => {
-        const dsId = params['datasourceId'] || undefined;
+        const dsId = params['connectorId'] || undefined;
         const name = params['name'] || undefined;
         this.selectedDatasource = dsId ?? null;
         this.bindAdapter(name);
@@ -229,7 +229,7 @@ export class ListDashboardComponent implements OnInit, OnDestroy {
 
   /**
    * Construct the server-side adapter. NO datasource gate — the list browses
-   * ALL org dashboards. A `datasourceId` is sent only when a deep-link /
+   * ALL org dashboards. A `connectorId` is sent only when a deep-link /
    * optional filter selected one.
    */
   private bindAdapter(deepLinkName?: string) {
@@ -238,7 +238,7 @@ export class ListDashboardComponent implements OnInit, OnDestroy {
       load: (params: UsListLoadParams) =>
         this.dashboardService.listDashboard({
           ...(this.selectedDatasource
-            ? { datasourceId: this.selectedDatasource }
+            ? { connectorId: this.selectedDatasource }
             : {}),
           page: params.page,
           limit: params.limit,

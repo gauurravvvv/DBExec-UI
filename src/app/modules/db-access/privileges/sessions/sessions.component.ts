@@ -72,7 +72,7 @@ export class SessionsComponent implements OnInit, OnDestroy {
   capabilityLoading = this.ctx.capabilityLoading;
   unsupported = this.ctx.unsupported;
 
-  datasourceId = '';
+  connectorId = '';
   sessions: SessionRow[] = [];
   selfPid = 0;
 
@@ -142,7 +142,7 @@ export class SessionsComponent implements OnInit, OnDestroy {
     this.buildAdapter();
     // Embedded: hydrate from the shared context + react to the hub picker.
     if (this.embedded) {
-      const initial = this.ctx.datasourceId() || '';
+      const initial = this.ctx.connectorId() || '';
       if (initial) this.onDatasourceChange(initial);
       this.dsSub = this.ctx.datasourceChanged$.subscribe(id =>
         this.onDatasourceChange(id || ''),
@@ -241,9 +241,9 @@ export class SessionsComponent implements OnInit, OnDestroy {
     this.adapter?.destroy();
     this.adapter = new UsServerListAdapter<any>({
       load: p => {
-        if (!this.datasourceId) return Promise.resolve({ rows: [], total: 0 });
+        if (!this.connectorId) return Promise.resolve({ rows: [], total: 0 });
         return this.dbAccess
-          .loadSessionsPaged(this.datasourceId, {
+          .loadSessionsPaged(this.connectorId, {
             page: p.page,
             limit: p.limit,
             sort: p.sort,
@@ -287,11 +287,11 @@ export class SessionsComponent implements OnInit, OnDestroy {
 
   /** Emitted by the datasource picker (init hydrate + change). */
   onDatasourceChange(id: string): void {
-    this.datasourceId = id || '';
+    this.connectorId = id || '';
     this.sessions = [];
     this.selfPid = 0;
     this.filterValues = { name: '', state: null, hideBackground: true };
-    if (!this.datasourceId) {
+    if (!this.connectorId) {
       this.adapter?.reload();
       this.cdr.markForCheck();
       return;
@@ -300,7 +300,7 @@ export class SessionsComponent implements OnInit, OnDestroy {
   }
 
   refresh(): void {
-    if (!this.datasourceId) return;
+    if (!this.connectorId) return;
     // Server-paged: re-fetch page 1 with the current filter.
     this.adapter?.setFilter(this.serverFilter());
   }
@@ -391,8 +391,8 @@ export class SessionsComponent implements OnInit, OnDestroy {
     const pid = this.confirmTarget.pid;
     const op =
       this.confirmAction === 'terminate'
-        ? this.dbAccess.terminateSession(this.datasourceId, pid)
-        : this.dbAccess.cancelSession(this.datasourceId, pid);
+        ? this.dbAccess.terminateSession(this.connectorId, pid)
+        : this.dbAccess.cancelSession(this.connectorId, pid);
     op.then(res => {
       if (this.globalService.handleSuccessService(res)) {
         this.showConfirm = false;

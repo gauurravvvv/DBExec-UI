@@ -237,7 +237,7 @@ export class SchemaTransformerHelper {
   }
 
   // ── Lazy schema responses ────────────────────────────────────────
-  // GET /datasources/:datasourceId/schemas returns
+  // GET /datasources/:connectorId/schemas returns
   //   `[{ schema_name, tables: [] }]`
   // (tables array is intentionally empty — fetched on expand). Map to
   // the legacy DatasourceSchema shape that the IntelliSense + sidebar
@@ -260,7 +260,7 @@ export class SchemaTransformerHelper {
   }
 
   /**
-   * GET /datasources/:datasourceId/schemas/:schema/tables returns
+   * GET /datasources/:connectorId/schemas/:schema/tables returns
    *   `[{ table_name, table_alias? }]`
    * Map to the legacy TableSchema shape (columns empty until the table
    * itself is expanded). Tolerates the data either being a wrapped
@@ -281,7 +281,7 @@ export class SchemaTransformerHelper {
   }
 
   /**
-   * GET /datasources/:datasourceId/schemas/:schema/tables/:table/columns
+   * GET /datasources/:connectorId/schemas/:schema/tables/:table/columns
    * returns `[{ column_name, data_type, is_nullable, column_default }]`.
    * Map to the legacy TableColumn shape; PK/FK metadata isn't part of the
    * lazy response so those fields default to undefined.

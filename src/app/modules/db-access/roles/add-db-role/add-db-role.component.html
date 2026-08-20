@@ -45,11 +45,11 @@
           ></app-datasource-picker>
 
           <!-- Prompt shown until a datasource is chosen. -->
-          <p class="form-hint" *ngIf="!datasourceId">
+          <p class="form-hint" *ngIf="!connectorId">
             {{ 'DB_ACCESS.PICK_DATASOURCE_TO_CREATE' | translate }}
           </p>
 
-          <ng-container *ngIf="datasourceId">
+          <ng-container *ngIf="connectorId">
             <!-- Field order: Role Name → Can log in → (mode) → login-only
                  Password / Connection Limit / Valid Until → Attributes. -->
             <app-custom-input

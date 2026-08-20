@@ -87,7 +87,7 @@
     "ACTIONS": "작업",
     "STATUS": "상태",
     "ALL": "전체",
-    "ALL_DATASOURCES": "모든 데이터 소스",
+    "ALL_DATASOURCES": "모든 커넥터",
     "TYPE": "유형",
     "SELECT_RANGE": "범위 선택",
     "NO_RECORD_FOUND": "해당 기록을 찾을 수 없습니다",
@@ -142,7 +142,7 @@
     "CANNOT_DELETE_SELF": "자신은 삭제할 수 없습니다",
     "NO_DELETE_PERMISSION": "삭제 권한이 없습니다",
     "LOCKED_NOTE": "계정이 잠겨 있습니다. 상태를 변경하려면 목록 페이지에서 잠금을 해제하세요.",
-    "DATASOURCE": "데이터소스",
+    "DATASOURCE": "커넥터",
     "CONNECTION": "커넥션",
     "GROUPS": "그룹",
     "USERS": "사용자",
@@ -167,7 +167,7 @@
     "SECTION": "섹션",
     "PROMPTS": "프롬프트",
     "SECTIONS": "섹션",
-    "SELECT_DATASOURCE": "데이터 소스 선택",
+    "SELECT_DATASOURCE": "커넥터 선택",
     "SELECT_TAB": "탭 선택",
     "SELECT_SECTION": "섹션 선택",
     "TAB_REQUIRED": "탭은 필수입니다",
@@ -270,7 +270,7 @@
     "NAME_PATTERN": "이름은 문자, 공백, 하이픈만 포함할 수 있습니다",
     "ORGANISATION_REQUIRED": "조직은 필수 항목입니다",
     "ROLE_REQUIRED": "역할은 필수 항목입니다",
-    "DATASOURCE_REQUIRED": "데이터소스는 필수 항목입니다",
+    "DATASOURCE_REQUIRED": "커넥터는 필수 항목입니다",
     "CONNECTION_REQUIRED": "커넥션은 필수 항목입니다",
     "GROUPS_REQUIRED": "그룹은 필수 항목입니다",
     "USERS_REQUIRED": "사용자는 필수 항목입니다",
@@ -289,8 +289,8 @@
     "GROUP_NAME_MIN_LENGTH": "그룹명은 최소 {{length}}자 이상이어야 합니다",
     "GROUP_NAME_MAX_LENGTH": "그룹명은 {{length}}자를 초과할 수 없습니다",
     "GROUP_NAME_PATTERN": "그룹명은 문자 또는 숫자로 시작해야 하며 문자, 숫자, 공백, 마침표, 밑줄, 하이픈만 포함할 수 있습니다",
-    "DATASOURCE_USERNAME_REQUIRED": "데이터소스 사용자명은 필수 항목입니다",
-    "DATASOURCE_PASSWORD_REQUIRED": "데이터소스 비밀번호는 필수 항목입니다",
+    "DATASOURCE_USERNAME_REQUIRED": "커넥터 사용자명은 필수 항목입니다",
+    "DATASOURCE_PASSWORD_REQUIRED": "커넥터 비밀번호는 필수 항목입니다",
     "CONNECTION_NAME_REQUIRED": "커넥션명은 필수 항목입니다",
     "CONNECTION_NAME_MIN_LENGTH": "커넥션명은 최소 {{length}}자 이상이어야 합니다",
     "CONNECTION_NAME_MAX_LENGTH": "커넥션명은 {{length}}자를 초과할 수 없습니다",
@@ -502,15 +502,15 @@
     "USERS": "사용자",
     "ADMINS": "관리자",
     "GROUPS": "그룹",
-    "DATASOURCES": "데이터소스",
+    "DATASOURCES": "커넥터",
     "MASTER_DATASOURCE": "데이터베이스",
     "REFRESH_SCHEMA": "스키마 새로고침",
     "REFRESHING": "새로고침 중...",
     "REFRESH_SCHEMA_TOOLTIP": "새 엔티티와 열을 동기화하려면 데이터베이스 스키마를 새로 고치세요",
     "HOSTNAME": "호스트명",
-    "DATASOURCE_NAME": "데이터소스명",
+    "DATASOURCE_NAME": "커넥터명",
     "CONFIGURATION_LIMITS": "설정 제한",
-    "MAX_DATASOURCES": "최대 데이터소스 수",
+    "MAX_DATASOURCES": "최대 커넥터 수",
     "MAX_USERS": "최대 사용자 수",
     "MAX_ADMINS": "최대 관리자 수",
     "ADDITIONAL_LIMITS": "추가 제한",
@@ -522,7 +522,7 @@
     "ADMIN_LOCALE": "관리자 언어",
     "ADMIN_LOCALE_PLACEHOLDER": "환영 이메일 언어 선택",
     "ENCRYPTION_AUTO_TITLE": "암호화 자동 관리",
-    "ENCRYPTION_AUTO_DESCRIPTION": "조직이 저장하는 모든 비밀(데이터 소스 비밀번호, SMTP/SES 자격 증명, 사용자 비밀번호)은 자동으로 암호화됩니다. 알고리즘을 선택하거나 키를 기억할 필요가 없습니다.",
+    "ENCRYPTION_AUTO_DESCRIPTION": "조직이 저장하는 모든 비밀(커넥터 비밀번호, SMTP/SES 자격 증명, 사용자 비밀번호)은 자동으로 암호화됩니다. 알고리즘을 선택하거나 키를 기억할 필요가 없습니다.",
     "ENCRYPTION_BULLET_1": "AES-256-GCM (인증된 암호화)",
     "ENCRYPTION_BULLET_2": "조직별로 고유한 키 생성",
     "ENCRYPTION_BULLET_3": "마스터 키는 데이터베이스 외부에 저장",
@@ -685,12 +685,12 @@
     "BULK_ADD_RACE_FAILURES": "생성 중 오류",
     "CANNOT_MODIFY_SELF_HINT": "본인의 접근 권한은 변경할 수 없습니다"
   },
-  "DATASOURCE": {
-    "TITLE": "데이터소스",
-    "SUBTITLE": "클라이언트 데이터소스 및 연결 정보를 관리합니다",
-    "ADD_TITLE": "데이터소스 추가",
-    "EDIT_TITLE": "데이터소스 편집",
-    "VIEW_TITLE": "데이터소스 상세 정보",
+  "CONNECTOR": {
+    "TITLE": "커넥터",
+    "SUBTITLE": "클라이언트 커넥터 및 연결 정보를 관리합니다",
+    "ADD_TITLE": "커넥터 추가",
+    "EDIT_TITLE": "커넥터 편집",
+    "VIEW_TITLE": "커넥터 상세 정보",
     "HOST": "호스트",
     "PORT": "포트",
     "DATABASE_NAME": "데이터베이스명",
@@ -707,17 +707,17 @@
     "CONNECTION_SUCCESSFUL": "연결 성공",
     "CONNECTION_FAILED_RETRY": "연결 실패 - 재시도",
     "CONNECTION_TEST_REQUIRED": "저장하기 전에 연결 테스트가 필요합니다",
-    "CONFIRM_DELETE_SINGLE": "이 데이터소스를 삭제하시겠습니까?",
-    "CONFIRM_DELETE_BULK": "선택한 <strong>{{count}}</strong>개의 데이터소스를 삭제하시겠습니까?",
-    "CONFIRM_UPDATE_MESSAGE": "이 데이터소스를 업데이트하시겠습니까?",
+    "CONFIRM_DELETE_SINGLE": "이 커넥터를 삭제하시겠습니까?",
+    "CONFIRM_DELETE_BULK": "선택한 <strong>{{count}}</strong>개의 커넥터를 삭제하시겠습니까?",
+    "CONFIRM_UPDATE_MESSAGE": "이 커넥터를 업데이트하시겠습니까?",
     "DELETE_INFO_ASSOCIATED_DATA": "관련된 모든 데이터가 삭제됩니다",
     "DELETE_INFO_CONNECTED_DATASETS": "연결된 데이터셋이 영향을 받습니다",
-    "EDIT_WARNING_TITLE": "데이터소스 연결을 편집하고 있습니다",
-    "EDIT_WARNING_CHANGES": "연결 정보 변경은 이 데이터소스를 사용하는 모든 데이터셋과 쿼리에 영향을 줍니다",
+    "EDIT_WARNING_TITLE": "커넥터 연결을 편집하고 있습니다",
+    "EDIT_WARNING_CHANGES": "연결 정보 변경은 이 커넥터를 사용하는 모든 데이터셋과 쿼리에 영향을 줍니다",
     "EDIT_WARNING_TEST_REQUIRED": "저장하기 전에 연결 테스트에 성공해야 합니다",
     "EDIT_WARNING_CREDENTIALS": "기존 연결이 새 자격 증명으로 업데이트됩니다",
     "CONFIGURATION": "설정",
-    "DATASOURCE_TYPE": "데이터소스 유형",
+    "DATASOURCE_TYPE": "커넥터 유형",
     "CONNECTION_STATUS": "연결 상태",
     "LAST_UPDATED": "마지막 업데이트",
     "USAGE": "사용",
@@ -736,7 +736,7 @@
     "HEALTH_TESTING": "테스트 중…",
     "HEALTH_NEVER_TESTED": "테스트하지 않음",
     "TESTED": "테스트됨",
-    "SEARCH_PLACEHOLDER": "이름으로 데이터 소스 검색",
+    "SEARCH_PLACEHOLDER": "이름으로 커넥터 검색",
     "ACCOUNT": "계정",
     "WAREHOUSE": "Warehouse",
     "ROLE": "역할",
@@ -864,7 +864,7 @@
     "LOADING_MONACO_HINT": "SQL 편집기를 설정하는 중...",
     "LOADING_SCHEMA": "스키마 로딩 중...",
     "NO_ANALYSES_FOUND": "이 데이터셋에 대한 분석이 없습니다",
-    "NO_DATASOURCE_SELECTED": "선택된 데이터소스가 없습니다",
+    "NO_DATASOURCE_SELECTED": "선택된 커넥터가 없습니다",
     "NO_DESCRIPTION": "설명이 없습니다",
     "NO_FIELDS_FOUND": "필드를 찾을 수 없습니다",
     "NO_FUNCTIONS_FOUND": "함수를 찾을 수 없습니다",
@@ -892,8 +892,8 @@
     "SEARCH_QUERY_BUILDERS": "쿼리 빌더 검색...",
     "SEARCH_TABLES": "테이블 검색...",
     "SELECT_DATA_TYPE": "데이터 유형 선택",
-    "SELECT_DATASOURCE_HINT": "쿼리를 작성하려면 데이터소스를 선택하세요",
-    "SELECT_DATASOURCE_QUERY_HINT": "쿼리할 데이터소스를 선택하세요",
+    "SELECT_DATASOURCE_HINT": "쿼리를 작성하려면 커넥터를 선택하세요",
+    "SELECT_DATASOURCE_QUERY_HINT": "쿼리할 커넥터를 선택하세요",
     "SOURCE": "소스",
     "SQL_BASED": "SQL 기반",
     "SQL_QUERY": "SQL 쿼리",
@@ -909,13 +909,13 @@
     "VIA_QUERY_BUILDER": "쿼리 빌더를 통해",
     "VIEW_RESULTS": "결과 보기",
     "ACTIVE_DIALECT": "활성 SQL 방언",
-    "PICK_DATASOURCE": "데이터 소스 선택",
+    "PICK_DATASOURCE": "커넥터 선택",
     "SCHEMA_PICKER_HINT": "편집기는 이 스키마로 제한됩니다. 다른 스키마의 테이블은 표시되지 않습니다.",
-    "SCHEMA_PICKER_HINT_OPTIONAL": "비워두면 전체 데이터 소스에 연결됩니다. 스키마를 선택하면 편집기 사이드바가 좁혀집니다.",
-    "SCHEMA_PICK_DATASOURCE_FIRST": "위에서 데이터 소스를 선택하여 스키마를 선택하세요.",
-    "SCHEMA_LAZY_MODE_HINT": "대용량 데이터 소스 — 테이블을 펼치면 컬럼이 로드됩니다.",
-    "SEARCH_DATASOURCES": "데이터 소스 검색…",
-    "NO_DATASOURCES": "데이터 소스를 찾을 수 없습니다",
+    "SCHEMA_PICKER_HINT_OPTIONAL": "비워두면 전체 커넥터에 연결됩니다. 스키마를 선택하면 편집기 사이드바가 좁혀집니다.",
+    "SCHEMA_PICK_DATASOURCE_FIRST": "위에서 커넥터를 선택하여 스키마를 선택하세요.",
+    "SCHEMA_LAZY_MODE_HINT": "대용량 커넥터 — 테이블을 펼치면 컬럼이 로드됩니다.",
+    "SEARCH_DATASOURCES": "커넥터 검색…",
+    "NO_DATASOURCES": "커넥터를 찾을 수 없습니다",
     "SCHEMA": "스키마",
     "EDITOR_DISABLED": "편집기가 비활성화됨 — 스키마를 사용할 수 없습니다.",
     "CELL_NULL": "NULL",
@@ -942,14 +942,14 @@
     "ERROR_KIND_PERMISSION_DENIED": "권한이 없습니다",
     "ERROR_KIND_SYNTAX": "SQL 구문 오류",
     "ERROR_KIND_TIMEOUT": "쿼리 시간이 초과되었습니다",
-    "ERROR_KIND_CONNECTION": "데이터 소스에 접근할 수 없습니다",
+    "ERROR_KIND_CONNECTION": "커넥터에 접근할 수 없습니다",
     "ERROR_KIND_OBJECT_NOT_FOUND": "객체를 찾을 수 없습니다",
     "ERROR_KIND_SAFETY_VIOLATION": "SQL이 보안 검사에서 거부되었습니다",
-    "ERROR_HINT_PERMISSION_DENIED": "데이터 소스 사용자가 객체에 접근할 수 없습니다. 관리자에게 SELECT 권한을 요청하세요.",
+    "ERROR_HINT_PERMISSION_DENIED": "커넥터 사용자가 객체에 접근할 수 없습니다. 관리자에게 SELECT 권한을 요청하세요.",
     "ERROR_HINT_SYNTAX": "엔진이 SQL을 파싱할 수 없습니다. 위치는 첫 번째 예상치 못한 토큰을 가리킵니다.",
     "ERROR_HINT_TIMEOUT": "쿼리가 명령문 제한 시간을 초과했습니다. WHERE 절을 추가하거나 JOIN을 단순화하세요.",
-    "ERROR_HINT_CONNECTION": "데이터 소스에 접근할 수 없습니다. 설정에서 연결을 확인하세요.",
-    "ERROR_HINT_OBJECT_NOT_FOUND": "쿼리에서 참조한 테이블, 뷰 또는 열이 이 데이터 소스에 존재하지 않습니다.",
+    "ERROR_HINT_CONNECTION": "커넥터에 접근할 수 없습니다. 설정에서 연결을 확인하세요.",
+    "ERROR_HINT_OBJECT_NOT_FOUND": "쿼리에서 참조한 테이블, 뷰 또는 열이 이 커넥터에 존재하지 않습니다.",
     "ERROR_HINT_SAFETY_VIOLATION": "단일 문장의 SELECT 또는 WITH … SELECT 쿼리만 허용됩니다.",
     "OFFENDING_TOKEN_TOOLTIP": "검증기가 거부한 키워드",
     "TRUNCATED_BANNER": "결과가 잘렸습니다 — 첫 페이지만 표시됩니다. 페이지네이션이나 WHERE를 사용하세요.",
@@ -2176,7 +2176,7 @@
     "SUBTITLE": "게시된 대시보드를 조회하고 관리합니다",
     "DATASET": "데이터셋",
     "SEARCH_DATASET": "데이터셋 검색",
-    "SEARCH_DATASOURCE": "데이터소스 검색",
+    "SEARCH_DATASOURCE": "커넥터 검색",
     "NO_DASHBOARDS_FOUND": "대시보드를 찾을 수 없습니다",
     "CONFIRM_DELETE_SINGLE": "이 대시보드를 삭제하시겠습니까?",
     "CONFIRM_DELETE_BULK": "선택한 <strong>{{count}}</strong>개의 대시보드를 삭제하시겠습니까?",
@@ -2337,7 +2337,7 @@
     "GROUPS": "그룹",
     "RLS_RULES": "RLS 규칙",
     "ALERTS": "알림",
-    "DATASOURCES": "데이터 소스",
+    "DATASOURCES": "커넥터",
     "ROLES": "역할",
     "DATASET": "데이터셋",
     "ANALYSES": "분석",
@@ -2372,7 +2372,7 @@
     "CONNECTORS_API": "Web/REST 커넥터"
   },
   "AUTH": {
-    "HEADLINE_LOGIN": "데이터 소스\n관리 경험을 향상시키세요",
+    "HEADLINE_LOGIN": "커넥터\n관리 경험을 향상시키세요",
     "HEADLINE_FORGOT": "계정 비밀번호를\n안전하게 재설정",
     "HEADLINE_RESET": "새 계정\n비밀번호 설정",
     "HEADLINE_SET_PASSWORD": "계정\n비밀번호 설정",
@@ -2466,7 +2466,7 @@
       "HOME_ARIA": "DBExec 홈",
       "ALL_RIGHTS": "모든 권리 보유.",
       "HERO_TITLE": "데이터베이스를 대시보드로 바꾸세요.",
-      "HERO_LEDE": "데이터 소스를 연결하고 필요한 차트를 끌어다 놓고 대시보드를 공유하세요 — 모든 것을 한곳에서, SQL 없이.",
+      "HERO_LEDE": "커넥터를 연결하고 필요한 차트를 끌어다 놓고 대시보드를 공유하세요 — 모든 것을 한곳에서, SQL 없이.",
       "FEATURE_CONNECT_TITLE": "모든 데이터베이스 연결",
       "FEATURE_CONNECT_DESC": "Postgres, MySQL, SQL Server 등 — 몇 분 만에.",
       "FEATURE_BUILD_TITLE": "대시보드를 시각적으로 구축",
@@ -2564,7 +2564,7 @@
     "ACTIVE_USERS_7D": "활성 사용자 (최근 7일)",
     "ACTIVE_USERS_15D": "활성 사용자 (최근 15일)",
     "ACTIVE_USERS_30D": "활성 사용자 (최근 30일)",
-    "TOTAL_DATASOURCES": "총 데이터 소스",
+    "TOTAL_DATASOURCES": "총 커넥터",
     "TOTAL_ENVIRONMENTS": "총 환경",
     "TOTAL_ADMINS": "총 관리자",
     "TOTAL_USERS": "총 사용자",
@@ -2582,17 +2582,17 @@
     "ANALYSES_DESC": "Visualize and analyze data",
     "USERS": "Users",
     "USERS_DESC": "Manage organisation users",
-    "DATASOURCES": "Datasources",
-    "DATASOURCES_DESC": "Configure datasource connections",
+    "DATASOURCES": "커넥터",
+    "DATASOURCES_DESC": "Configure 커넥터 connections",
     "AUDIT_LOGS": "Audit Logs",
     "AUDIT_LOGS_DESC": "Review activity history",
     "ADD_USER": "Add User",
-    "MANAGE_DATASOURCE": "Manage Datasource",
+    "MANAGE_DATASOURCE": "Manage 커넥터",
     "VIEW_REPORTS": "View Reports"
   },
   "AUTH_FEATURES": {
-    "LOGIN_1_TITLE": "시각적 데이터 소스 탐색기",
-    "LOGIN_1_DESC": "직관적인 시각적 인터페이스로 데이터 소스 구조 탐색",
+    "LOGIN_1_TITLE": "시각적 커넥터 탐색기",
+    "LOGIN_1_DESC": "직관적인 시각적 인터페이스로 커넥터 구조 탐색",
     "LOGIN_2_TITLE": "성능 인사이트",
     "LOGIN_2_DESC": "실시간 성능 메트릭과 쿼리 최적화 제안 받기",
     "LOGIN_3_TITLE": "안전한 접근",
@@ -2672,7 +2672,7 @@
   },
   "PROMPT_MODULE": {
     "TITLE": "Prompts",
-    "SUBTITLE": "Configure datasource fields for data filtering and query generation",
+    "SUBTITLE": "Configure 커넥터 fields for data filtering and query generation",
     "ADD_TITLE": "Add Prompt",
     "EDIT_TITLE": "Edit Prompt",
     "VIEW_TITLE": "Prompt Details",
@@ -3092,8 +3092,8 @@
     "CONDITION_COUNT": "{{count}} condition(s)",
     "MORE_CONDITIONS": "+{{count}} more",
     "SEARCH_DATASET": "Search Dataset",
-    "SELECT_DATASOURCE_MSG": "Please select a datasource to view RLS rules",
-    "NO_RULES_FOUND": "No RLS rules found for this datasource",
+    "SELECT_DATASOURCE_MSG": "Please select a 커넥터 to view RLS rules",
+    "NO_RULES_FOUND": "No RLS rules found for this 커넥터",
     "DELETE_SINGLE": "Are you sure you want to delete this RLS rule?",
     "UPDATE_CONFIRM": "Are you sure you want to update this RLS rule?",
     "DELETE_INFO_FILTERING": "Row-level security filtering will be removed",
@@ -4100,7 +4100,7 @@
     "IMPORT": "가져오기",
     "IMPORTING": "가져오는 중…",
     "EXPORT_SUCCESS": "내보내기를 다운로드했습니다",
-    "IMPORT_SUCCESS": "가져오기가 완료되었습니다. 새 데이터 소스가 생성되었습니다. 가져온 자산을 실행하려면 비밀번호를 설정하세요.",
+    "IMPORT_SUCCESS": "가져오기가 완료되었습니다. 새 커넥터가 생성되었습니다. 가져온 자산을 실행하려면 비밀번호를 설정하세요.",
     "IMPORT_FAILED": "가져오기에 실패했습니다",
     "INVALID_FILE": "유효한 DBExec 내보내기 파일이 아닙니다.",
     "FILE_TOO_LARGE": "파일이 너무 큽니다(최대 10MB).",
@@ -4524,8 +4524,8 @@
         "tooLong": "기본 스키마는 128자를 초과할 수 없습니다"
       },
       "id": {
-        "required": "데이터 소스 ID가 필요합니다",
-        "invalid": "잘못된 데이터 소스 ID입니다"
+        "required": "커넥터 ID가 필요합니다",
+        "invalid": "잘못된 커넥터 ID입니다"
       },
       "justification": {
         "tooLong": "사유는 500자를 초과할 수 없습니다"
@@ -4545,7 +4545,7 @@
         "invalid": "이름은 문자 또는 숫자로 시작해야 하며 문자, 숫자, 공백, 점, 밑줄, 하이픈만 사용할 수 있습니다"
       },
       "datasource": {
-        "required": "데이터 소스가 필요합니다"
+        "required": "커넥터가 필요합니다"
       },
       "id": {
         "required": "연결 ID가 필요합니다"
@@ -4556,7 +4556,7 @@
     },
     "access": {
       "datasource": {
-        "required": "데이터 소스가 필요합니다"
+        "required": "커넥터가 필요합니다"
       },
       "connection": {
         "required": "연결이 필요합니다"
@@ -4580,7 +4580,7 @@
         "tooLong": "사유는 500자를 초과할 수 없습니다"
       },
       "datasource": {
-        "required": "데이터 소스가 필요합니다"
+        "required": "커넥터가 필요합니다"
       },
       "sql": {
         "required": "SQL 쿼리가 필요합니다",
@@ -4631,7 +4631,7 @@
         "tooLong": "사유는 500자를 초과할 수 없습니다"
       },
       "datasource": {
-        "required": "데이터 소스가 필요합니다"
+        "required": "커넥터가 필요합니다"
       },
       "dataset": {
         "required": "데이터셋이 필요합니다"
@@ -4853,15 +4853,15 @@
         "unsupported": "지원되지 않는 마이그레이션 파일 버전입니다"
       },
       "datasources": {
-        "required": "마이그레이션 파일에는 최소한 하나의 데이터 소스가 포함되어야 합니다",
-        "tooMany": "마이그레이션 파일에 데이터 소스가 너무 많습니다"
+        "required": "마이그레이션 파일에는 최소한 하나의 커넥터가 포함되어야 합니다",
+        "tooMany": "마이그레이션 파일에 커넥터가 너무 많습니다"
       },
       "datasource": {
         "handle": {
           "required": "데이터 소스 핸들이 필요합니다"
         },
         "name": {
-          "required": "데이터 소스 이름이 필요합니다"
+          "required": "커넥터 이름이 필요합니다"
         },
         "dbType": {
           "invalid": "마이그레이션 파일에 지원되지 않는 데이터베이스 유형이 있습니다"
@@ -4872,14 +4872,14 @@
         "username": {
           "required": "데이터베이스 사용자 이름이 필요합니다"
         },
-        "unknownField": "마이그레이션 파일에 예기치 않은 데이터 소스 필드가 있습니다"
+        "unknownField": "마이그레이션 파일에 예기치 않은 커넥터 필드가 있습니다"
       },
       "asset": {
         "name": {
           "required": "자산 이름이 필요합니다"
         },
         "datasourceHandle": {
-          "required": "자산에 데이터 소스 참조가 없습니다"
+          "required": "자산에 커넥터 참조가 없습니다"
         },
         "handle": {
           "required": "자산에 번들 핸들이 없습니다"
@@ -5402,7 +5402,7 @@
     "NO_CONNECTIONS": "아직 연결이 없습니다. 쿼리를 실행하려면 하나를 생성하세요.",
     "CONNECTION_NAME": "연결 이름",
     "CONNECTION_NAME_PLACEHOLDER": "예: prod-db (분석가)",
-    "CONNECTION_HINT": "연결은 데이터 소스를 부여받은 데이터베이스 로그인에 연결합니다. 연결을 열면 해당 로그인으로 SQL이 실행됩니다.",
+    "CONNECTION_HINT": "연결은 커넥터를 부여받은 데이터베이스 로그인에 연결합니다. 연결을 열면 해당 로그인으로 SQL이 실행됩니다.",
     "CREDENTIALS": "자격 증명",
     "LOGIN": "로그인",
     "LOGIN_PLACEHOLDER": "데이터베이스 사용자 이름",
@@ -5418,20 +5418,20 @@
     "DISABLED": "비활성화됨",
     "ENABLE": "활성화",
     "DISABLE": "비활성화",
-    "SET_DEFAULT": "이 데이터 소스의 기본값으로 설정",
-    "IS_DEFAULT": "이 데이터 소스의 기본값",
-    "DEFAULT_BADGE": "이 데이터 소스의 기본 연결",
-    "ALL_DISABLED_FOR_DS": "이 데이터 소스의 모든 연결이 비활성화되어 있습니다. 쿼리를 실행하려면 하나를 활성화하세요.",
+    "SET_DEFAULT": "이 커넥터의 기본값으로 설정",
+    "IS_DEFAULT": "이 커넥터의 기본값",
+    "DEFAULT_BADGE": "이 커넥터의 기본 연결",
+    "ALL_DISABLED_FOR_DS": "이 커넥터의 모든 연결이 비활성화되어 있습니다. 쿼리를 실행하려면 하나를 활성화하세요.",
     "TEST": "연결 확인",
     "OPEN": "SQL 편집기 열기",
     "LAUNCH_TITLE": "쿼리 세션 열기",
-    "LAUNCH_SUBTITLE": "데이터 소스와 연결 중 하나를 선택한 다음 새 탭에서 편집기를 여세요.",
-    "STEP_DATASOURCE": "데이터 소스",
+    "LAUNCH_SUBTITLE": "커넥터와 연결 중 하나를 선택한 다음 새 탭에서 편집기를 여세요.",
+    "STEP_DATASOURCE": "커넥터",
     "STEP_CONNECTION": "연결",
-    "SELECT_DATASOURCE": "데이터 소스 선택",
-    "SELECT_DATASOURCE_FIRST": "먼저 데이터 소스를 선택하세요",
+    "SELECT_DATASOURCE": "커넥터 선택",
+    "SELECT_DATASOURCE_FIRST": "먼저 커넥터를 선택하세요",
     "SELECT_CONNECTION": "연결 선택",
-    "NO_CONNECTIONS_FOR_DS": "아직 이 데이터 소스에 대한 연결이 없습니다.",
+    "NO_CONNECTIONS_FOR_DS": "아직 이 커넥터에 대한 연결이 없습니다.",
     "NO_CONNECTIONS_HINT": "아직 연결이 없습니다. 시작하려면 하나를 생성하세요.",
     "OPEN_EXECUTOR": "SQL 편집기 열기",
     "VERIFYING": "확인 중…",
@@ -5605,12 +5605,12 @@
     "SAVED_QUERIES_SEARCH_PLACEHOLDER": "Search saved queries by name",
     "NO_SAVED_QUERIES": "No saved queries yet. Create one to get started.",
     "NEW_QUERY": "New query",
-    "NEW_QUERY_SUBTITLE": "Pick a datasource and one of your connections, then open the editor in a new tab.",
+    "NEW_QUERY_SUBTITLE": "Pick a 커넥터 and one of your connections, then open the editor in a new tab.",
     "NEW_SAVED_QUERY": "New Saved Query",
     "EDIT_SAVED_QUERY": "Edit Saved Query",
     "DELETE_SAVED_QUERY": "Delete saved query",
     "DELETE_SAVED_QUERY_CONFIRM": "Delete the saved query \"{{name}}\"? This removes the saved SQL only — nothing on the database is changed.",
-    "SAVED_QUERY_HINT": "A saved query stores your SQL against a datasource + connection so you can reopen and run it later.",
+    "SAVED_QUERY_HINT": "A saved query stores your SQL against a 커넥터 + connection so you can reopen and run it later.",
     "SAVED_QUERY_NAME": "Query name",
     "SAVED_QUERY_NAME_PLACEHOLDER": "e.g. Monthly active users",
     "SAVED_QUERY_DESCRIPTION": "Description",
@@ -5630,15 +5630,15 @@
   },
   "DB_ACCESS": {
     "TITLE": "데이터베이스 접근 관리",
-    "SUBTITLE": "데이터 소스의 PostgreSQL 사용자, 역할 및 권한을 관리합니다",
+    "SUBTITLE": "커넥터의 PostgreSQL 사용자, 역할 및 권한을 관리합니다",
     "EXPORT_JSON": "JSON 내보내기",
     "EXPORT_CSV": "CSV 내보내기",
     "EXPORT_ACCESS_HINT": "감사를 위해 이 계정의 전체 접근 프로필(속성, 부여된 역할, 유효 권한, 소유 객체)을 다운로드합니다.",
-    "SELECT_DATASOURCE": "관리할 데이터 소스 선택",
+    "SELECT_DATASOURCE": "관리할 커넥터 선택",
     "CHECKING_CAPABILITY": "관리 권한 확인 중…",
     "OPEN_WORKSPACE": "작업 공간 열기",
     "UNSUPPORTED_TITLE": "v1에서는 PostgreSQL만 지원",
-    "UNSUPPORTED_BODY": "데이터베이스 접근 관리는 이번 릴리스에서 PostgreSQL 데이터 소스만 지원합니다.",
+    "UNSUPPORTED_BODY": "데이터베이스 접근 관리는 이번 릴리스에서 PostgreSQL 커넥터만 지원합니다.",
     "CAP_FULL_TITLE": "전체 관리 가능",
     "CAP_FULL_BODY": "관리 로그인은 이 데이터베이스에서 역할과 권한을 생성, 변경, 삭제할 수 있습니다.",
     "CAP_FULL_BADGE": "전체 관리",
@@ -5692,7 +5692,7 @@
     "APP_GROUPS": "앱 그룹",
     "SELECT_APP_USERS": "연결할 앱 사용자 선택",
     "SELECT_APP_GROUPS": "연결할 앱 그룹 선택",
-    "ATTACH_HINT": "이 데이터베이스 역할을 하나 이상의 앱 사용자 및 그룹에 연결합니다. 선택한 각 항목은 이 데이터 소스의 역할에 연결됩니다.",
+    "ATTACH_HINT": "이 데이터베이스 역할을 하나 이상의 앱 사용자 및 그룹에 연결합니다. 선택한 각 항목은 이 커넥터의 역할에 연결됩니다.",
     "DISCARD_UNSAVED": "권한 작성기에 저장하지 않은 변경 사항이 있습니다. 취소하고 탭을 전환하시겠습니까?",
     "DISCARD_TITLE": "저장하지 않은 변경 사항을 취소하시겠습니까?",
     "DISCARD_CONFIRM": "취소하고 전환",
@@ -5821,7 +5821,7 @@
     "CAN_LOGIN_DESC": "로그인 사용자는 비밀번호를 가지며 연결할 수 있습니다. 그룹 역할은 로그인할 수 없으며 권한을 묶는 역할만 합니다.",
     "LOGIN_DETAILS": "로그인 정보",
     "PASSWORD_UNCHANGED_PLACEHOLDER": "변경하지 않으려면 비워 두세요",
-    "SELECT_DATASOURCE_HINT": "위에서 데이터 소스를 선택하여 데이터베이스 사용자, 역할 및 권한을 관리하세요.",
+    "SELECT_DATASOURCE_HINT": "위에서 커넥터를 선택하여 데이터베이스 사용자, 역할 및 권한을 관리하세요.",
     "NAME": "이름",
     "SEARCH_NAME": "이름 검색",
     "VIEW_PRIVILEGE_SET": "저장된 권한 세트",
@@ -5902,10 +5902,10 @@
       "GENERIC": "Apply change"
     },
     "SELECT_DATE": "Select a date",
-    "PICK_DATASOURCE_TO_CREATE": "Select a datasource to create a role.",
+    "PICK_DATASOURCE_TO_CREATE": "Select a 커넥터 to create a role.",
     "RULE_INCOMPLETE": "미완료",
     "APPLY_DISABLED_HINT": "적용하기 전에 모든 규칙을 완성하거나 제거하세요.",
-    "CHOOSE_DATASOURCE": "데이터 소스 선택",
+    "CHOOSE_DATASOURCE": "커넥터 선택",
     "TAB_COMPOSE": "규칙 작성",
     "TAB_EFFECTIVE_PRIVS": "유효 권한",
     "ALL_SEQUENCES": "스키마의 모든 시퀀스",
@@ -5921,7 +5921,7 @@
     "SCOPE_ORG_WIDE": "조직 전체",
     "SCOPE": "범위",
     "RULE": "규칙",
-    "SCOPE_DATASOURCE": "데이터 소스",
+    "SCOPE_DATASOURCE": "커넥터",
     "SEARCH_TEMPLATES_PLACEHOLDER": "템플릿 검색…",
     "TEMPLATES_TITLE": "역할 템플릿",
     "TEMPLATES_SUBTITLE": "재사용 가능한 역할 + 권한 레시피. 역할 생성 또는 권한 구성 시 적용하세요.",
@@ -5965,7 +5965,7 @@
     "PUBLIC_PRIVILEGES": "PUBLIC 권한",
     "PUBLIC_ALSO_DIRECT": "직접 부여도 있음?",
     "PUBLIC_SEARCH": "객체 검색",
-    "PUBLIC_NONE": "이 데이터 소스에는 PUBLIC에 부여된 권한이 없습니다.",
+    "PUBLIC_NONE": "이 커넥터에는 PUBLIC에 부여된 권한이 없습니다.",
     "PUBLIC_VIA_PUBLIC": "PUBLIC 경유",
     "PUBLIC_REVOKE_SUMMARY": "{{object}}에 대한 {{privileges}}을(를) PUBLIC에서 취소",
     "PUBLIC_CONFIRM_TITLE": "PUBLIC에서 권한 취소",
@@ -6316,7 +6316,7 @@
     "UNGROUPED": "그룹 없음",
     "GROUP_NAME": "그룹 이름",
     "DROP_PROMPTS_HERE": "여기에 프롬프트 끌어 놓기",
-    "NO_PROMPTS": "이 데이터 소스에 대한 프롬프트가 없습니다.",
+    "NO_PROMPTS": "이 커넥터에 대한 프롬프트가 없습니다.",
     "ALREADY_PLACED": "이미 배치됨",
     "MANDATORY": "필수",
     "LOCKED": "잠김",
@@ -6665,7 +6665,7 @@
     "COMPOSE": "Run",
     "DELETE_SINGLE": "Are you sure you want to delete this form?",
     "COL_NAME": "Name",
-    "COL_DATASOURCE": "Datasource",
+    "COL_DATASOURCE": "커넥터",
     "COL_STATUS": "Status",
     "COL_UPDATED": "Updated",
     "VERSIONS": "Versions",
@@ -6840,7 +6840,7 @@
     },
     "PALETTE": {
       "NO_PROMPTS": "No prompts yet",
-      "NO_PROMPTS_HINT": "Create prompts in the Prompts module for this datasource, then drag them onto a section."
+      "NO_PROMPTS_HINT": "Create prompts in the Prompts module for this 커넥터, then drag them onto a section."
     }
   },
   "CONNECTORS_API": {

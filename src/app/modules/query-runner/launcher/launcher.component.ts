@@ -9,7 +9,7 @@ import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { QUERY_RUNNER } from 'src/app/core/constants/routes.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
-import { DatasourceService } from 'src/app/modules/datasource/services/datasource.service';
+import { ConnectorService } from 'src/app/modules/connector/services/connector.service';
 import {
   QueryConnection,
   QueryRunnerService,
@@ -46,7 +46,7 @@ export class LauncherComponent implements OnInit {
 
   constructor(
     private service: QueryRunnerService,
-    private datasourceService: DatasourceService,
+    private datasourceService: ConnectorService,
     private globalService: GlobalService,
     private translate: TranslateService,
     private router: Router,
@@ -125,7 +125,7 @@ export class LauncherComponent implements OnInit {
       return;
     }
     const forDs = this.allConnections.filter(
-      c => c.datasourceId === this.selectedDatasourceId,
+      c => c.connectorId === this.selectedDatasourceId,
     );
     // Only ENABLED connections are selectable in the launcher.
     const usable = forDs.filter(c => c.enabled !== false);

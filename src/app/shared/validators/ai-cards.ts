@@ -86,7 +86,7 @@ export const datasetDraftCardSchema = z.object({
   name: z.string(),
   description: z.string().optional(),
   sql: z.string(),
-  datasourceId: z.string(),
+  connectorId: z.string(),
   /** True when this reflects an EXISTING dataset (read), not a new draft. */
   readOnly: z.boolean().optional(),
 });

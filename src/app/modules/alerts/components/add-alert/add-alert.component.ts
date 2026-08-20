@@ -17,7 +17,7 @@ import { HasUnsavedChanges } from 'src/app/core/models/has-unsaved-changes.model
 import { GlobalService } from 'src/app/core/services/global.service';
 import { HttpClientService } from 'src/app/core/services/http-client.service';
 import { DatasetService } from 'src/app/modules/dataset/services/dataset.service';
-import { DatasourceService } from 'src/app/modules/datasource/services/datasource.service';
+import { ConnectorService } from 'src/app/modules/connector/services/connector.service';
 import { UserService } from 'src/app/modules/users/services/user.service';
 import {
   alertDescriptionSchema,
@@ -118,7 +118,7 @@ export class AddAlertComponent implements OnInit, HasUnsavedChanges {
     private router: Router,
     private globalService: GlobalService,
     private http: HttpClientService,
-    private datasourceService: DatasourceService,
+    private datasourceService: ConnectorService,
     private datasetService: DatasetService,
     private userService: UserService,
     private alertService: AlertService,
@@ -153,7 +153,7 @@ export class AddAlertComponent implements OnInit, HasUnsavedChanges {
       description: ['', [zodValidator(alertDescriptionSchema)]],
       sourceType: ['dataset', Validators.required],
       sourceId: ['', Validators.required],
-      datasourceId: ['', Validators.required],
+      connectorId: ['', Validators.required],
       // schedule
       cronExpression: ['*/15 * * * *', Validators.required],
       timezone: ['UTC', Validators.required],
@@ -279,10 +279,10 @@ export class AddAlertComponent implements OnInit, HasUnsavedChanges {
       .catch(() => this.cdr.markForCheck());
   }
 
-  onDatasourceChange(datasourceId: string): void {
-    this.selectedDatasource = datasourceId;
+  onDatasourceChange(connectorId: string): void {
+    this.selectedDatasource = connectorId;
     this.alertForm.patchValue(
-      { sourceId: '', datasourceId: datasourceId || '' },
+      { sourceId: '', connectorId: connectorId || '' },
       { emitEvent: false },
     );
     this.preloadedSources = null;

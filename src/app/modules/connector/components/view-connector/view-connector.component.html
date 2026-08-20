@@ -32,7 +32,7 @@
                   icon="pi pi-check-circle"
                   *ngSwitchCase="'ok'"
                 >
-                  {{ 'DATASOURCE.HEALTH_CONNECTED' | translate }}
+                  {{ 'CONNECTOR.HEALTH_CONNECTED' | translate }}
                 </app-chip>
                 <app-chip
                   variant="status"
@@ -40,7 +40,7 @@
                   icon="pi pi-times-circle"
                   *ngSwitchCase="'failed'"
                 >
-                  {{ 'DATASOURCE.HEALTH_FAILED' | translate }}
+                  {{ 'CONNECTOR.HEALTH_FAILED' | translate }}
                 </app-chip>
                 <app-chip
                   variant="status"
@@ -48,7 +48,7 @@
                   icon="pi pi-spin pi-spinner"
                   *ngSwitchCase="'testing'"
                 >
-                  {{ 'DATASOURCE.HEALTH_TESTING' | translate }}
+                  {{ 'CONNECTOR.HEALTH_TESTING' | translate }}
                 </app-chip>
                 <app-chip
                   variant="status"
@@ -56,13 +56,13 @@
                   icon="pi pi-circle"
                   *ngSwitchDefault
                 >
-                  {{ 'DATASOURCE.HEALTH_NEVER_TESTED' | translate }}
+                  {{ 'CONNECTOR.HEALTH_NEVER_TESTED' | translate }}
                 </app-chip>
               </ng-container>
               <ng-container *ngIf="lastTestedAt() as t">
                 <span class="dot">·</span>
                 <span class="tested-at" [title]="t | date: 'medium'">
-                  {{ 'DATASOURCE.TESTED' | translate }}
+                  {{ 'CONNECTOR.TESTED' | translate }}
                   {{ t | relativeTime }}
                 </span>
               </ng-container>
@@ -80,7 +80,7 @@
               class="pi"
               [ngClass]="testInFlight() ? 'pi-spin pi-spinner' : 'pi-bolt'"
             ></i>
-            {{ 'DATASOURCE.TEST_CONNECTION' | translate }}
+            {{ 'CONNECTOR.TEST_CONNECTION' | translate }}
           </button>
           <button
             *hasPermission="'connectorsDb'; level: 'write'"
@@ -112,7 +112,7 @@
         <div class="card-header">
           <h3>
             <i class="pi pi-cog"></i>
-            {{ 'DATASOURCE.CONFIGURATION' | translate }}
+            {{ 'CONNECTOR.CONFIGURATION' | translate }}
           </h3>
         </div>
         <div class="card-content">
@@ -122,7 +122,7 @@
               <p>{{ dbData.description }}</p>
             </div>
             <div class="config-item">
-              <label>{{ 'DATASOURCE.CONNECTION_STATUS' | translate }}</label>
+              <label>{{ 'CONNECTOR.CONNECTION_STATUS' | translate }}</label>
               <p>
                 <app-chip
                   variant="status"
@@ -140,19 +140,19 @@
             <!-- Snowflake-only chips -->
             <ng-container *ngIf="isSnowflake">
               <div class="config-item">
-                <label>{{ 'DATASOURCE.ACCOUNT' | translate }}</label>
+                <label>{{ 'CONNECTOR.ACCOUNT' | translate }}</label>
                 <p>{{ dbData.config?.account }}</p>
               </div>
               <div class="config-item">
-                <label>{{ 'DATASOURCE.WAREHOUSE' | translate }}</label>
+                <label>{{ 'CONNECTOR.WAREHOUSE' | translate }}</label>
                 <p>{{ dbData.config?.warehouse || '—' }}</p>
               </div>
               <div class="config-item">
-                <label>{{ 'DATASOURCE.ROLE' | translate }}</label>
+                <label>{{ 'CONNECTOR.ROLE' | translate }}</label>
                 <p>{{ dbData.config?.role || '—' }}</p>
               </div>
               <div class="config-item">
-                <label>{{ 'DATASOURCE.SCHEMA' | translate }}</label>
+                <label>{{ 'CONNECTOR.SCHEMA' | translate }}</label>
                 <p>{{ dbData.config?.schemaName || '—' }}</p>
               </div>
             </ng-container>
@@ -160,21 +160,21 @@
             <!-- TypeORM engines: host + port -->
             <ng-container *ngIf="!isSnowflake">
               <div class="config-item">
-                <label>{{ 'DATASOURCE.HOST' | translate }}</label>
+                <label>{{ 'CONNECTOR.HOST' | translate }}</label>
                 <p>{{ dbData.config?.hostname }}</p>
               </div>
               <div class="config-item">
-                <label>{{ 'DATASOURCE.PORT' | translate }}</label>
+                <label>{{ 'CONNECTOR.PORT' | translate }}</label>
                 <p>{{ dbData.config?.port }}</p>
               </div>
             </ng-container>
 
             <div class="config-item">
-              <label>{{ 'DATASOURCE.DATABASE_NAME' | translate }}</label>
+              <label>{{ 'CONNECTOR.DATABASE_NAME' | translate }}</label>
               <p>{{ dbData.config?.dbName }}</p>
             </div>
             <div class="config-item">
-              <label>{{ 'DATASOURCE.USERNAME' | translate }}</label>
+              <label>{{ 'CONNECTOR.USERNAME' | translate }}</label>
               <p>{{ dbData.config?.username }}</p>
             </div>
             <div class="config-item">
@@ -182,7 +182,7 @@
               <p>{{ dbData.createdOn | date: 'medium' }}</p>
             </div>
             <div class="config-item" *ngIf="dbData.updatedOn">
-              <label>{{ 'DATASOURCE.LAST_UPDATED' | translate }}</label>
+              <label>{{ 'CONNECTOR.LAST_UPDATED' | translate }}</label>
               <p>{{ dbData.updatedOn | date: 'medium' }}</p>
             </div>
           </div>
@@ -194,7 +194,7 @@
         <div class="card-header">
           <h3>
             <i class="pi pi-sitemap"></i>
-            {{ 'DATASOURCE.USAGE' | translate }}
+            {{ 'CONNECTOR.USAGE' | translate }}
           </h3>
         </div>
         <div class="card-content">
@@ -205,19 +205,19 @@
               <div class="usage-card">
                 <div class="usage-value">{{ usage()?.datasets }}</div>
                 <div class="usage-label">
-                  {{ 'DATASOURCE.USAGE_DATASETS' | translate }}
+                  {{ 'CONNECTOR.USAGE_DATASETS' | translate }}
                 </div>
               </div>
               <div class="usage-card">
                 <div class="usage-value">{{ usage()?.analyses }}</div>
                 <div class="usage-label">
-                  {{ 'DATASOURCE.USAGE_ANALYSES' | translate }}
+                  {{ 'CONNECTOR.USAGE_ANALYSES' | translate }}
                 </div>
               </div>
               <div class="usage-card">
                 <div class="usage-value">{{ usage()?.dashboards }}</div>
                 <div class="usage-label">
-                  {{ 'DATASOURCE.USAGE_DASHBOARDS' | translate }}
+                  {{ 'CONNECTOR.USAGE_DASHBOARDS' | translate }}
                 </div>
               </div>
             </div>
@@ -234,7 +234,7 @@
             <ng-template #usageEmpty>
               <div class="empty-state">
                 <i class="pi pi-inbox"></i>
-                <p>{{ 'DATASOURCE.USAGE_EMPTY' | translate }}</p>
+                <p>{{ 'CONNECTOR.USAGE_EMPTY' | translate }}</p>
               </div>
             </ng-template>
           </ng-container>
@@ -252,7 +252,7 @@
         <div class="card-header">
           <h3>
             <i class="pi pi-history"></i>
-            {{ 'DATASOURCE.ACTIVITY' | translate }}
+            {{ 'CONNECTOR.ACTIVITY' | translate }}
           </h3>
         </div>
         <div class="card-content">
@@ -295,7 +295,7 @@
             <ng-template #activityEmpty>
               <div class="empty-state">
                 <i class="pi pi-history"></i>
-                <p>{{ 'DATASOURCE.ACTIVITY_EMPTY' | translate }}</p>
+                <p>{{ 'CONNECTOR.ACTIVITY_EMPTY' | translate }}</p>
               </div>
             </ng-template>
           </ng-container>
@@ -328,20 +328,20 @@
       </div>
 
       <p class="delete-intro">
-        {{ 'DATASOURCE.CONFIRM_DELETE_SINGLE' | translate }}
+        {{ 'CONNECTOR.CONFIRM_DELETE_SINGLE' | translate }}
       </p>
 
       <ul class="delete-info-list">
         <li>
           <i class="pi pi-info-circle"></i>
           <span>{{
-            'DATASOURCE.DELETE_INFO_ASSOCIATED_DATA' | translate
+            'CONNECTOR.DELETE_INFO_ASSOCIATED_DATA' | translate
           }}</span>
         </li>
         <li>
           <i class="pi pi-info-circle"></i>
           <span>{{
-            'DATASOURCE.DELETE_INFO_CONNECTED_DATASETS' | translate
+            'CONNECTOR.DELETE_INFO_CONNECTED_DATASETS' | translate
           }}</span>
         </li>
         <li>

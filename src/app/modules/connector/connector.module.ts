@@ -9,25 +9,25 @@ import { CustomTableEmptyDirective } from 'src/app/shared/components/custom-tabl
 import { AppPrimeNGModule } from 'src/app/shared/modules/app-primeng.module';
 import { SharedChartsModule } from 'src/app/shared/modules/shared-charts.module';
 import { SharedModule } from 'src/app/shared/shared.module';
-import { AddDatasourceComponent } from './components/add-datasource/add-datasource.component';
-import { EditDatasourceComponent } from './components/edit-datasource/edit-datasource.component';
-import { ListDatasourceComponent } from './components/list-datasource/list-datasource.component';
-import { ViewDatasourceComponent } from './components/view-datasource/view-datasource.component';
-import { DatasourceRoutingModule } from './datasource-routing.module';
+import { AddConnectorComponent } from './components/add-connector/add-connector.component';
+import { EditConnectorComponent } from './components/edit-connector/edit-connector.component';
+import { ListConnectorComponent } from './components/list-connector/list-connector.component';
+import { ViewConnectorComponent } from './components/view-connector/view-connector.component';
+import { ConnectorRoutingModule } from './connector-routing.module';
 
 @NgModule({
   declarations: [
-    AddDatasourceComponent,
-    EditDatasourceComponent,
-    ListDatasourceComponent,
-    ViewDatasourceComponent,
+    AddConnectorComponent,
+    EditConnectorComponent,
+    ListConnectorComponent,
+    ViewConnectorComponent,
   ],
   imports: [
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
     AppPrimeNGModule,
-    DatasourceRoutingModule,
+    ConnectorRoutingModule,
     SharedModule,
     SharedChartsModule,
     MenuModule,
@@ -37,4 +37,4 @@ import { DatasourceRoutingModule } from './datasource-routing.module';
     ChipComponent,
   ],
 })
-export class DatasourceModule {}
+export class ConnectorModule {}

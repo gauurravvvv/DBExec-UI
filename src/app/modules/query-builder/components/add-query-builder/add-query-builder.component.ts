@@ -12,7 +12,7 @@ import { REGEX } from 'src/app/core/constants/regex.constant';
 import { QUERY_BUILDER } from 'src/app/core/constants/routes.constant';
 import { HasUnsavedChanges } from 'src/app/core/models/has-unsaved-changes.model';
 import { GlobalService } from 'src/app/core/services/global.service';
-import { DatasourceService } from 'src/app/modules/datasource/services/datasource.service';
+import { ConnectorService } from 'src/app/modules/connector/services/connector.service';
 import { QueryBuilderService } from '../../services/query-builder.service';
 
 @Component({
@@ -34,7 +34,7 @@ export class AddQueryBuilderComponent implements OnInit, HasUnsavedChanges {
     private fb: FormBuilder,
     private router: Router,
     private globalService: GlobalService,
-    private datasourceService: DatasourceService,
+    private datasourceService: ConnectorService,
     private queryBuilderService: QueryBuilderService,
     private translate: TranslateService,
   ) {

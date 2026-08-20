@@ -56,7 +56,7 @@ export class QueryService {
    * subscription is torn down, the counter still gets decremented.
    */
   executeQuery(queryData: {
-    datasourceId: string;
+    connectorId: string;
     query: string;
     page?: number;
     limit?: number;
@@ -79,7 +79,7 @@ export class QueryService {
    */
   cancelQuery(payload: {
     requestId: string;
-    datasourceId: string;
+    connectorId: string;
   }): Observable<any> {
     return this.httpClientService.queryPost(QUERY.CANCEL, payload, {
       skipLoader: true,
@@ -93,7 +93,7 @@ export class QueryService {
    * { engine, plan, raw, durationMs }.
    */
   explainQuery(payload: {
-    datasourceId: string;
+    connectorId: string;
     query: string;
   }): Observable<any> {
     return this.httpClientService.queryPost(QUERY.EXPLAIN, payload, {
@@ -106,10 +106,10 @@ export class QueryService {
    * (schemas → tables → columns). Driven by `loadingStructure` so the
    * editor's per-section spinner can show progress.
    */
-  getDatasourceStructure(datasourceId: string): Observable<any> {
+  getDatasourceStructure(connectorId: string): Observable<any> {
     this._loadingStructureCount.update(n => n + 1);
     return this.httpClientService
-      .queryPost(QUERY.STRUCTURE, { datasourceId }, { skipLoader: true })
+      .queryPost(QUERY.STRUCTURE, { connectorId }, { skipLoader: true })
       .pipe(
         finalize(() =>
           this._loadingStructureCount.update(n => Math.max(0, n - 1)),
@@ -119,7 +119,7 @@ export class QueryService {
 
   /** POST /api/v1/queries/export — export query results as a blob (CSV/XLSX). */
   exportQueryResults(queryData: {
-    datasourceId: string;
+    connectorId: string;
     query: string;
     filter?: string;
   }): Observable<Blob> {

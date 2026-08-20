@@ -18,7 +18,7 @@
           variant="badge"
           tone="neutral"
           icon="pi pi-lock"
-          *ngIf="datasourceId && capability() && !canManage && !unsupported()"
+          *ngIf="connectorId && capability() && !canManage && !unsupported()"
           >{{ 'DB_ACCESS.CAP_READONLY_BADGE' | translate }}</app-chip
         >
 
@@ -28,7 +28,7 @@
         <button
           *ngIf="
             activeTab === 'compose' &&
-            datasourceId &&
+            connectorId &&
             !unsupported() &&
             !capabilityLoading() &&
             canManage
@@ -68,7 +68,7 @@
       ></app-datasource-picker>
 
       <!-- Capability spinner while the chosen datasource is probed. -->
-      <span class="cap-loading" *ngIf="datasourceId && capabilityLoading()">
+      <span class="cap-loading" *ngIf="connectorId && capabilityLoading()">
         <i class="pi pi-spin pi-spinner"></i>
         {{ 'DB_ACCESS.CHECKING_CAPABILITY' | translate }}
       </span>
@@ -84,11 +84,11 @@
     <!-- Header-level state hints (shared across tabs) — pick a datasource /
          unsupported. Rendered once here so every tab body starts from the same
          precondition. -->
-    <div class="hub-hint" *ngIf="!datasourceId && !capabilityLoading()">
+    <div class="hub-hint" *ngIf="!connectorId && !capabilityLoading()">
       <i class="pi pi-database"></i>
       <span>{{ 'DB_ACCESS.SELECT_DATASOURCE_HINT' | translate }}</span>
     </div>
-    <div class="hub-hint unsupported" *ngIf="datasourceId && unsupported()">
+    <div class="hub-hint unsupported" *ngIf="connectorId && unsupported()">
       <i class="pi pi-info-circle"></i>
       <span>{{ 'DB_ACCESS.UNSUPPORTED_BODY' | translate }}</span>
     </div>
@@ -99,7 +99,7 @@
     <div
       class="settings-tab-body"
       [ngSwitch]="activeTab"
-      *ngIf="datasourceId && !unsupported()"
+      *ngIf="connectorId && !unsupported()"
     >
       <app-privileges-access
         *ngSwitchCase="'compose'"

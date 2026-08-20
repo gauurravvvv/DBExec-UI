@@ -32,7 +32,7 @@ export interface PalettePrompt {
   styleUrls: ['./qb-prompt-palette.component.scss'],
 })
 export class QbPromptPaletteComponent implements OnInit {
-  @Input({ required: true }) datasourceId!: string;
+  @Input({ required: true }) connectorId!: string;
   /** promptIds already placed — rendered greyed. */
   @Input() placedIds: Set<string> = new Set();
   /** CDK drop-list id this palette connects to. */
@@ -68,7 +68,7 @@ export class QbPromptPaletteComponent implements OnInit {
 
   async ngOnInit(): Promise<void> {
     try {
-      const res = await this.admin.listPrompts(this.datasourceId);
+      const res = await this.admin.listPrompts(this.connectorId);
       const rows = res?.data?.prompts ?? res?.data ?? [];
       this.all.set(
         (Array.isArray(rows) ? rows : []).map((p: any) => ({

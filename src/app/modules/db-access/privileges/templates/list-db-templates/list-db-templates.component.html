@@ -47,7 +47,7 @@
       </ng-template>
 
       <ng-template usGridCell="scope" let-row>
-        <app-chip variant="tag" size="sm" [tone]="row.datasourceId ? 'primary' : 'neutral'">
+        <app-chip variant="tag" size="sm" [tone]="row.connectorId ? 'primary' : 'neutral'">
           {{ scopeLabel(row) }}
         </app-chip>
       </ng-template>

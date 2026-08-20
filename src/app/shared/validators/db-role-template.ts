@@ -59,7 +59,7 @@ export const templateDefinitionSchema = z.object({
   rules: z.array(templateRuleSchema).max(100).optional(),
 });
 
-/** Create body. `datasourceId` null/omitted → org-wide template. */
+/** Create body. `connectorId` null/omitted → org-wide template. */
 export const createDbRoleTemplateSchema = z.object({
   name: z
     .string({ message: 'validation.dbRoleTemplate.name.required' })
@@ -67,7 +67,7 @@ export const createDbRoleTemplateSchema = z.object({
     .min(1, { message: 'validation.dbRoleTemplate.name.required' })
     .max(100, { message: 'validation.dbRoleTemplate.name.max' }),
   description: z.string().trim().max(250).nullable().optional(),
-  datasourceId: z.string().uuid().nullable().optional(),
+  connectorId: z.string().uuid().nullable().optional(),
   definition: templateDefinitionSchema,
   sortOrder: z.number().int().min(0).optional(),
 });

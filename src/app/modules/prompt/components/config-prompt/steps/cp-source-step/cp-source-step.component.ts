@@ -1,7 +1,7 @@
 /**
  * cp-source-step — pick the prompt's source schema + table (+ optional alias).
  * Reads/writes PromptConfigService.source. Schema/table lists come from the
- * DatasourceService for the prompt's datasource (svc.datasourceId).
+ * ConnectorService for the prompt's datasource (svc.connectorId).
  */
 import {
   ChangeDetectionStrategy,
@@ -13,7 +13,7 @@ import {
   inject,
   signal,
 } from '@angular/core';
-import { DatasourceService } from 'src/app/modules/datasource/services/datasource.service';
+import { ConnectorService } from 'src/app/modules/connector/services/connector.service';
 import { PromptConfigService } from '../../../../services/prompt-config.service';
 
 interface Option {
@@ -29,7 +29,7 @@ interface Option {
 })
 export class CpSourceStepComponent implements OnInit {
   @Input({ required: true }) svc!: PromptConfigService;
-  private readonly datasources = inject(DatasourceService);
+  private readonly datasources = inject(ConnectorService);
   private readonly injector = inject(Injector);
 
   readonly schemas = signal<Option[]>([]);
@@ -39,14 +39,14 @@ export class CpSourceStepComponent implements OnInit {
   private loadedForDsId = '';
 
   ngOnInit(): void {
-    // React to datasourceId becoming available. The shell sets it AFTER an
+    // React to connectorId becoming available. The shell sets it AFTER an
     // async loadOne(), which resolves AFTER this child's ngOnInit — so a
     // one-shot read here would see an empty id and skip the schema fetch
     // (the "No options available" bug). An effect re-runs when the signal
     // lands, and the loadedForDsId guard keeps it to one fetch per datasource.
     effect(
       () => {
-        const dsId = this.svc.datasourceId();
+        const dsId = this.svc.connectorId();
         if (dsId && dsId !== this.loadedForDsId) {
           this.loadedForDsId = dsId;
           void this.loadSchemas(dsId);
@@ -59,7 +59,7 @@ export class CpSourceStepComponent implements OnInit {
   private async loadSchemas(dsId: string): Promise<void> {
     try {
       const res: any = await this.datasources.listDatasourceSchemas(
-        { datasourceId: dsId },
+        { connectorId: dsId },
         true,
       );
       const rows: any[] = res?.data ?? [];
@@ -94,7 +94,7 @@ export class CpSourceStepComponent implements OnInit {
   }
 
   private async loadTables(schema: string): Promise<void> {
-    const dsId = this.svc.datasourceId();
+    const dsId = this.svc.connectorId();
     if (!dsId || !schema) {
       this.tables.set([]);
       return;
@@ -102,7 +102,7 @@ export class CpSourceStepComponent implements OnInit {
     this.loadingTables.set(true);
     try {
       const res: any = await this.datasources.listSchemaTables(
-        { datasourceId: dsId, schemaName: schema },
+        { connectorId: dsId, schemaName: schema },
         true,
       );
       const rows: any[] = res?.data ?? [];

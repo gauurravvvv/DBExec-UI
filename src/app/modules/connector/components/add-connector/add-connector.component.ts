@@ -10,7 +10,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
-import { DATASOURCE } from 'src/app/core/constants/routes.constant';
+import { CONNECTOR } from 'src/app/core/constants/routes.constant';
 import { HasUnsavedChanges } from 'src/app/core/models/has-unsaved-changes.model';
 import { GlobalService } from 'src/app/core/services/global.service';
 import {
@@ -31,16 +31,16 @@ import { zodValidator } from 'src/app/shared/validators/zod-validator';
 import {
   DATABASE_TYPES,
   isSnowflakeType,
-} from '../../constants/database-types.constant';
-import { DatasourceService } from '../../services/datasource.service';
+} from '../../constants/connector-types.constant';
+import { ConnectorService } from '../../services/connector.service';
 
 @Component({
-  selector: 'app-add-datasource',
-  templateUrl: './add-datasource.component.html',
-  styleUrls: ['./add-datasource.component.scss'],
+  selector: 'app-add-connector',
+  templateUrl: './add-connector.component.html',
+  styleUrls: ['./add-connector.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class AddDatasourceComponent implements OnInit, HasUnsavedChanges {
+export class AddConnectorComponent implements OnInit, HasUnsavedChanges {
   private destroyRef = inject(DestroyRef);
 
   datasourceForm!: FormGroup;
@@ -60,7 +60,7 @@ export class AddDatasourceComponent implements OnInit, HasUnsavedChanges {
 
   constructor(
     private fb: FormBuilder,
-    private datasourceService: DatasourceService,
+    private datasourceService: ConnectorService,
     private globalService: GlobalService,
     private router: Router,
     private cdr: ChangeDetectorRef,
@@ -238,7 +238,7 @@ export class AddDatasourceComponent implements OnInit, HasUnsavedChanges {
         const response = await this.datasourceService.add(payload);
         if (this.globalService.handleSuccessService(response)) {
           this.datasourceForm.markAsPristine();
-          this.router.navigate([DATASOURCE.LIST]);
+          this.router.navigate([CONNECTOR.LIST]);
         }
       } finally {
         this.datasourceForm.enable({ emitEvent: false });
@@ -247,7 +247,7 @@ export class AddDatasourceComponent implements OnInit, HasUnsavedChanges {
   }
 
   goBack(): void {
-    this.router.navigate([DATASOURCE.LIST]);
+    this.router.navigate([CONNECTOR.LIST]);
   }
 
   onCancel(): void {
@@ -311,7 +311,7 @@ export class AddDatasourceComponent implements OnInit, HasUnsavedChanges {
     this.connectionTestError = null;
     const reqId = ++this.testRequestId;
 
-    // DatasourceService.testConnection() handles the engine
+    // ConnectorService.testConnection() handles the engine
     // discriminator internally — same payload shape we'd pass to
     // add()/update(), so the test path mirrors the save path.
     this.datasourceService

@@ -23,7 +23,7 @@
         ></button>
         <button
           *ngIf="
-            datasourceId &&
+            connectorId &&
             !unsupported() &&
             !capabilityLoading() &&
             canManage &&
@@ -44,7 +44,7 @@
           variant="badge"
           tone="neutral"
           icon="pi pi-lock"
-          *ngIf="datasourceId && capability() && !canManage && !unsupported()"
+          *ngIf="connectorId && capability() && !canManage && !unsupported()"
           >{{ 'DB_ACCESS.CAP_READONLY_BADGE' | translate }}</app-chip
         >
       </div>
@@ -62,15 +62,15 @@
       </div>
 
       <ng-container *ngIf="!embedded">
-        <div class="list-hint" *ngIf="!datasourceId && !capabilityLoading()">
+        <div class="list-hint" *ngIf="!connectorId && !capabilityLoading()">
           <i class="pi pi-database"></i>
           <span>{{ 'DB_ACCESS.SELECT_DATASOURCE_HINT' | translate }}</span>
         </div>
-        <div class="cap-loading" *ngIf="datasourceId && capabilityLoading()">
+        <div class="cap-loading" *ngIf="connectorId && capabilityLoading()">
           <i class="pi pi-spin pi-spinner"></i>
           {{ 'DB_ACCESS.CHECKING_CAPABILITY' | translate }}
         </div>
-        <div class="list-hint unsupported" *ngIf="datasourceId && unsupported()">
+        <div class="list-hint unsupported" *ngIf="connectorId && unsupported()">
           <i class="pi pi-info-circle"></i>
           <span>{{ 'DB_ACCESS.UNSUPPORTED_BODY' | translate }}</span>
         </div>
@@ -82,7 +82,7 @@
            lives in the page header (like Save on Add User/Role). -->
       <div
         class="composer-page"
-        *ngIf="datasourceId && !unsupported() && !capabilityLoading()"
+        *ngIf="connectorId && !unsupported() && !capabilityLoading()"
       >
         <div class="priv-tabs" role="tablist" *ngIf="!embedded">
           <button
@@ -557,7 +557,7 @@
               <app-privilege-tree
                 *ngIf="filterRole"
                 class="eff-tree-embed"
-                [datasourceId]="datasourceId"
+                [connectorId]="connectorId"
                 [roleName]="filterRole"
                 [fill]="true"
               ></app-privilege-tree>

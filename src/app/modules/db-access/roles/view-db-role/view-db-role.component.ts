@@ -30,7 +30,7 @@ import {
 export class ViewDbRoleComponent implements OnInit {
   private cdr = inject(ChangeDetectorRef);
 
-  datasourceId = '';
+  connectorId = '';
   roleName = '';
   loading = true;
   role: any = null;
@@ -48,19 +48,19 @@ export class ViewDbRoleComponent implements OnInit {
   ngOnInit(): void {
     // Datasource comes from the shared context (never the URL). A cold
     // deep-link with no context falls through to the redirect below.
-    this.datasourceId = this.ctx.datasourceId() || '';
+    this.connectorId = this.ctx.connectorId() || '';
     this.roleName = this.route.snapshot.paramMap.get('roleName') ?? '';
-    if (!this.datasourceId) {
+    if (!this.connectorId) {
       this.router.navigate([DB_ACCESS.ROLES_LIST]);
       return;
     }
-    this.ctx.setDatasource(this.datasourceId);
+    this.ctx.setDatasource(this.connectorId);
     this.load();
   }
 
   private load(): void {
     this.dbAccess
-      .loadRoles(this.datasourceId)
+      .loadRoles(this.connectorId)
       .then(() => {
         const all = this.dbAccess.roles() ?? [];
         this.role = all.find(r => r.name === this.roleName) ?? null;
@@ -153,7 +153,7 @@ export class ViewDbRoleComponent implements OnInit {
     this.exporting = true;
     this.cdr.markForCheck();
     this.dbAccess
-      .exportRoleAccess(this.datasourceId, this.roleName)
+      .exportRoleAccess(this.connectorId, this.roleName)
       .then(res => {
         if (res?.status && res.data) {
           if (format === 'csv') downloadAccessCsv(res.data);

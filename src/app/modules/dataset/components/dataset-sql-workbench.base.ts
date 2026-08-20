@@ -12,7 +12,7 @@
  * below where the base needs to call them. They are not accidents of history —
  * each is a real difference in what creating a dataset means versus editing one:
  *
- *  - `ngOnInit` — add reads `datasourceId`/`schema` query params; edit fetches a
+ *  - `ngOnInit` — add reads `connectorId`/`schema` query params; edit fetches a
  *    dataset by route id. Different entry contracts.
  *  - `initMonaco` — **add registers the SQL validator and formatter; edit registers
  *    neither**, and binds Ctrl+Enter through `editor.addCommand`, which does not
@@ -62,7 +62,7 @@ import {
 import {
   DATABASE_TYPES,
   DatabaseTypeOption,
-} from '../../datasource/constants/database-types.constant';
+} from '../../connector/constants/connector-types.constant';
 import {
   DIALECT_LINT_DEBOUNCE_MS,
   ENABLE_DIALECT_LINT,

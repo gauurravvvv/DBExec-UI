@@ -1,7 +1,7 @@
 import { Injectable, signal } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { EmptyError, Subject, lastValueFrom, takeUntil } from 'rxjs';
-import { DATASOURCE, ORGANISATION } from 'src/app/core/constants/api.constant';
+import { CONNECTOR, ORGANISATION } from 'src/app/core/constants/api.constant';
 import { HttpClientService } from 'src/app/core/services/http-client.service';
 
 @Injectable({
@@ -378,7 +378,7 @@ export class OrganisationService {
     this._validating.set(true);
     try {
       return await lastValueFrom(
-        this.http.apiPost(DATASOURCE.VALIDATE, payload, { skipLoader: true }),
+        this.http.apiPost(CONNECTOR.VALIDATE, payload, { skipLoader: true }),
       );
     } finally {
       this._validating.set(false);

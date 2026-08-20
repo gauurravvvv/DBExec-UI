@@ -11,7 +11,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { DEFAULT_PAGE } from 'src/app/core/constants';
 import { RLS_RULE } from 'src/app/core/constants/routes.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
-import { DatasourceService } from 'src/app/modules/datasource/services/datasource.service';
+import { ConnectorService } from 'src/app/modules/connector/services/connector.service';
 import {
   UsServerListAdapter,
   UsListLoadParams,
@@ -82,12 +82,12 @@ export class ListRlsRuleComponent implements OnInit, OnDestroy {
 
   /** Server-side adapter — built once in ngOnInit; NO datasource gate. The
    *  list browses ALL org rules; the optional toolbar datasource filter narrows
-   *  it via a `?datasourceId=` query param. */
+   *  it via a `?connectorId=` query param. */
   adapter: UsServerListAdapter<any> | null = null;
 
   constructor(
     private rlsRulesService: RlsRulesService,
-    private datasourceService: DatasourceService,
+    private datasourceService: ConnectorService,
     private router: Router,
     private globalService: GlobalService,
     private translate: TranslateService,
@@ -101,7 +101,7 @@ export class ListRlsRuleComponent implements OnInit, OnDestroy {
       globalSearchPlaceholder: this.translate.instant('RLS.SEARCH_PLACEHOLDER'),
     };
     // Build the datasource-free adapter once — the list browses ALL org rules.
-    // The optional toolbar datasource filter narrows it via a `?datasourceId=`
+    // The optional toolbar datasource filter narrows it via a `?connectorId=`
     // query param (no gate).
     this.bindAdapter();
     // Preload datasources purely to populate the optional filter dropdown.
@@ -232,7 +232,7 @@ export class ListRlsRuleComponent implements OnInit, OnDestroy {
 
   /**
    * Construct the server-side adapter. NO datasource gate — the list browses
-   * ALL org rules via `GET /rls-rules`. A `datasourceId` query param is sent
+   * ALL org rules via `GET /rls-rules`. A `connectorId` query param is sent
    * only when the optional toolbar filter has one selected, narrowing the rows
    * to that datasource server-side.
    */
@@ -244,7 +244,7 @@ export class ListRlsRuleComponent implements OnInit, OnDestroy {
       load: (params: UsListLoadParams) =>
         this.rlsRulesService.listAllRules({
           ...(this.selectedDatasource
-            ? { datasourceId: this.selectedDatasource }
+            ? { connectorId: this.selectedDatasource }
             : {}),
           page: params.page,
           limit: params.limit,

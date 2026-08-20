@@ -201,7 +201,7 @@ export class PromptService {
       this.http.apiPost(
         PROMPT.GET + params.promptId + PROMPT.VALUES_SUFFIX,
         {
-          datasourceId: params.datasourceId,
+          connectorId: params.connectorId,
           query: params.query,
         },
         { skipLoader: true },
@@ -215,7 +215,7 @@ export class PromptService {
       this.http.apiPost(
         PROMPT.GET + params.promptId + PROMPT.REFRESH_VALUES_SUFFIX,
         {
-          datasourceId: params.datasourceId,
+          connectorId: params.connectorId,
           promptId: params.promptId,
         },
         { skipLoader: true },
@@ -339,7 +339,7 @@ export class PromptService {
       this.http.apiPost(
         PROMPT.GET + params.promptId + PROMPT.REFRESH_VALUES_SUFFIX,
         {
-          datasourceId: params.datasourceId,
+          connectorId: params.connectorId,
           promptId: params.promptId,
         },
         { skipLoader: true },

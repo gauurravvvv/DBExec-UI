@@ -10,7 +10,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { QUERY_RUNNER } from 'src/app/core/constants/routes.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
-import { DatasourceService } from 'src/app/modules/datasource/services/datasource.service';
+import { ConnectorService } from 'src/app/modules/connector/services/connector.service';
 import { UsServerListAdapter } from 'src/app/shared/components/us-data-grid/us-server-list-adapter';
 import type {
   CustomTableColumn,
@@ -63,8 +63,8 @@ export class ListConnectionsComponent implements OnInit, OnDestroy {
 
   /* ── datasource filter ──────────────────────────────────────────────── */
   // Chosen datasource; folded into the connections list call as a TOP-LEVEL
-  // `datasourceId` query param (the BE list already accepts it). Null = all.
-  // Persisted in the URL (?datasourceId=) so a refresh keeps the filter.
+  // `connectorId` query param (the BE list already accepts it). Null = all.
+  // Persisted in the URL (?connectorId=) so a refresh keeps the filter.
   selectedDatasourceId: string | null = null;
 
   testingId: string | null = null;
@@ -76,7 +76,7 @@ export class ListConnectionsComponent implements OnInit, OnDestroy {
 
   constructor(
     private service: QueryRunnerService,
-    private datasourceService: DatasourceService,
+    private datasourceService: ConnectorService,
     private globalService: GlobalService,
     private translate: TranslateService,
     private router: Router,
@@ -93,7 +93,7 @@ export class ListConnectionsComponent implements OnInit, OnDestroy {
       ),
     };
     // Pre-select from the URL so a refresh keeps the datasource filter.
-    const fromUrl = this.route.snapshot.queryParamMap.get('datasourceId');
+    const fromUrl = this.route.snapshot.queryParamMap.get('connectorId');
     this.selectedDatasourceId = fromUrl && fromUrl.trim() ? fromUrl : null;
     this.buildAdapter();
     this.adapter?.reload();
@@ -127,14 +127,14 @@ export class ListConnectionsComponent implements OnInit, OnDestroy {
 
   /**
    * Datasource filter changed → fold it into the list call + reload, and
-   * mirror it into the URL (?datasourceId=) so a refresh keeps the filter.
+   * mirror it into the URL (?connectorId=) so a refresh keeps the filter.
    * Clearing (null) drops the param and shows all connections.
    */
   onDatasourceFilterChange(dsId: string | null): void {
     this.selectedDatasourceId = dsId || null;
     this.router.navigate([], {
       relativeTo: this.route,
-      queryParams: { datasourceId: this.selectedDatasourceId },
+      queryParams: { connectorId: this.selectedDatasourceId },
       queryParamsHandling: 'merge',
     });
     this.adapter?.reload();

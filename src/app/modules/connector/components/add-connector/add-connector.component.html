@@ -11,7 +11,7 @@
         >
           <i class="pi pi-arrow-left"></i>
         </button>
-        <h2>{{ 'DATASOURCE.ADD_TITLE' | translate }}</h2>
+        <h2>{{ 'CONNECTOR.ADD_TITLE' | translate }}</h2>
       </div>
       <div class="action-buttons">
         <app-button
@@ -100,8 +100,8 @@
             <!-- Host Field -->
             <app-custom-input
               formControlName="host"
-              [label]="'DATASOURCE.HOST' | translate"
-              [placeholder]="'DATASOURCE.ENTER_HOST' | translate"
+              [label]="'CONNECTOR.HOST' | translate"
+              [placeholder]="'CONNECTOR.ENTER_HOST' | translate"
               icon="pi-desktop"
               [required]="true"
               [showError]="
@@ -117,8 +117,8 @@
             <!-- Port Field -->
             <app-custom-input
               formControlName="port"
-              [label]="'DATASOURCE.PORT' | translate"
-              [placeholder]="'DATASOURCE.ENTER_PORT' | translate"
+              [label]="'CONNECTOR.PORT' | translate"
+              [placeholder]="'CONNECTOR.ENTER_PORT' | translate"
               icon="pi-hashtag"
               type="number"
               [required]="true"
@@ -140,8 +140,8 @@
                  deployment — NOT a port/host pair. -->
             <app-custom-input
               formControlName="account"
-              [label]="'DATASOURCE.ACCOUNT' | translate"
-              [placeholder]="'DATASOURCE.ENTER_ACCOUNT' | translate"
+              [label]="'CONNECTOR.ACCOUNT' | translate"
+              [placeholder]="'CONNECTOR.ENTER_ACCOUNT' | translate"
               icon="pi-globe"
               [required]="true"
               [showError]="
@@ -158,8 +158,8 @@
                  queries (e.g. COMPUTE_WH, ANALYTICS_WH). Required. -->
             <app-custom-input
               formControlName="warehouse"
-              [label]="'DATASOURCE.WAREHOUSE' | translate"
-              [placeholder]="'DATASOURCE.ENTER_WAREHOUSE' | translate"
+              [label]="'CONNECTOR.WAREHOUSE' | translate"
+              [placeholder]="'CONNECTOR.ENTER_WAREHOUSE' | translate"
               icon="pi-server"
               [required]="true"
               [showError]="
@@ -176,8 +176,8 @@
           <!-- Database Name Field -->
           <app-custom-input
             formControlName="database"
-            [label]="'DATASOURCE.DATABASE_NAME' | translate"
-            [placeholder]="'DATASOURCE.ENTER_DATABASE_NAME' | translate"
+            [label]="'CONNECTOR.DATABASE_NAME' | translate"
+            [placeholder]="'CONNECTOR.ENTER_DATABASE_NAME' | translate"
             icon="pi-database"
             [required]="true"
             [showError]="
@@ -193,8 +193,8 @@
           <!-- Username Field -->
           <app-custom-input
             formControlName="username"
-            [label]="'DATASOURCE.USERNAME' | translate"
-            [placeholder]="'DATASOURCE.ENTER_USERNAME' | translate"
+            [label]="'CONNECTOR.USERNAME' | translate"
+            [placeholder]="'CONNECTOR.ENTER_USERNAME' | translate"
             icon="pi-user"
             [required]="true"
             [showError]="
@@ -210,8 +210,8 @@
           <!-- Database Password Field -->
           <app-custom-input
             formControlName="password"
-            [label]="'DATASOURCE.PASSWORD' | translate"
-            [placeholder]="'DATASOURCE.ENTER_PASSWORD' | translate"
+            [label]="'CONNECTOR.PASSWORD' | translate"
+            [placeholder]="'CONNECTOR.ENTER_PASSWORD' | translate"
             icon="pi-lock"
             [required]="true"
             [showPasswordToggle]="true"
@@ -232,15 +232,15 @@
           <ng-container *ngIf="isSnowflake">
             <app-custom-input
               formControlName="role"
-              [label]="'DATASOURCE.ROLE' | translate"
-              [placeholder]="'DATASOURCE.ENTER_ROLE' | translate"
+              [label]="'CONNECTOR.ROLE' | translate"
+              [placeholder]="'CONNECTOR.ENTER_ROLE' | translate"
               icon="pi-shield"
             >
             </app-custom-input>
             <app-custom-input
               formControlName="schemaName"
-              [label]="'DATASOURCE.SCHEMA' | translate"
-              [placeholder]="'DATASOURCE.ENTER_SCHEMA' | translate"
+              [label]="'CONNECTOR.SCHEMA' | translate"
+              [placeholder]="'CONNECTOR.ENTER_SCHEMA' | translate"
               icon="pi-sitemap"
             >
             </app-custom-input>
@@ -270,8 +270,8 @@
                 ></i>
                 {{
                   connectionTestLoading
-                    ? ('DATASOURCE.TESTING' | translate)
-                    : ('DATASOURCE.TEST_CONNECTION' | translate)
+                    ? ('CONNECTOR.TESTING' | translate)
+                    : ('CONNECTOR.TEST_CONNECTION' | translate)
                 }}
               </button>
               <span
@@ -279,7 +279,7 @@
                 *ngIf="connectionTestResult === 'success'"
               >
                 <i class="pi pi-check-circle"></i>
-                {{ 'DATASOURCE.CONNECTION_SUCCESSFUL' | translate }}
+                {{ 'CONNECTOR.CONNECTION_SUCCESSFUL' | translate }}
               </span>
               <span
                 class="connection-status failed"
@@ -288,7 +288,7 @@
                 <i class="pi pi-times-circle"></i>
                 {{
                   connectionTestError ||
-                    ('DATASOURCE.CONNECTION_FAILED_RETRY' | translate)
+                    ('CONNECTOR.CONNECTION_FAILED_RETRY' | translate)
                 }}
               </span>
               <span
@@ -301,7 +301,7 @@
                 "
               >
                 <i class="pi pi-info-circle"></i>
-                {{ 'DATASOURCE.CONNECTION_TEST_REQUIRED' | translate }}
+                {{ 'CONNECTOR.CONNECTION_TEST_REQUIRED' | translate }}
               </span>
             </div>
           </div>

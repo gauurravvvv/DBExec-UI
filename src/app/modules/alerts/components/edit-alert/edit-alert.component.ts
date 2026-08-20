@@ -16,7 +16,7 @@ import { HasUnsavedChanges } from 'src/app/core/models/has-unsaved-changes.model
 import { GlobalService } from 'src/app/core/services/global.service';
 import { HttpClientService } from 'src/app/core/services/http-client.service';
 import { DatasetService } from 'src/app/modules/dataset/services/dataset.service';
-import { DatasourceService } from 'src/app/modules/datasource/services/datasource.service';
+import { ConnectorService } from 'src/app/modules/connector/services/connector.service';
 import { UserService } from 'src/app/modules/users/services/user.service';
 import {
   alertDescriptionSchema,
@@ -124,7 +124,7 @@ export class EditAlertComponent implements OnInit, HasUnsavedChanges {
     private route: ActivatedRoute,
     private globalService: GlobalService,
     private http: HttpClientService,
-    private datasourceService: DatasourceService,
+    private datasourceService: ConnectorService,
     private datasetService: DatasetService,
     private userService: UserService,
     private alertService: AlertService,
@@ -159,7 +159,7 @@ export class EditAlertComponent implements OnInit, HasUnsavedChanges {
       description: ['', [zodValidator(alertDescriptionSchema)]],
       sourceType: ['dataset', Validators.required],
       sourceId: ['', Validators.required],
-      datasourceId: ['', Validators.required],
+      connectorId: ['', Validators.required],
       cronExpression: ['*/15 * * * *', Validators.required],
       timezone: ['UTC', Validators.required],
       severity: ['warning', Validators.required],
@@ -190,7 +190,7 @@ export class EditAlertComponent implements OnInit, HasUnsavedChanges {
       .then(() => {
         const rule = this.alertService.current();
         if (!rule) return;
-        this.selectedDatasource = rule.datasourceId ?? '';
+        this.selectedDatasource = rule.connectorId ?? '';
 
         this.alertForm.patchValue(
           {
@@ -199,7 +199,7 @@ export class EditAlertComponent implements OnInit, HasUnsavedChanges {
             description: rule.description ?? '',
             sourceType: rule.sourceType,
             sourceId: rule.sourceId,
-            datasourceId: rule.datasourceId,
+            connectorId: rule.connectorId,
             cronExpression: rule.cronExpression,
             timezone: rule.timezone ?? 'UTC',
             severity: rule.severity ?? 'warning',
@@ -345,11 +345,11 @@ export class EditAlertComponent implements OnInit, HasUnsavedChanges {
       .catch(() => this.cdr.markForCheck());
   }
 
-  onDatasourceChange(datasourceId: string): void {
-    this.selectedDatasource = datasourceId;
+  onDatasourceChange(connectorId: string): void {
+    this.selectedDatasource = connectorId;
     this.alertForm.patchValue({
       sourceId: '',
-      datasourceId: datasourceId || '',
+      connectorId: connectorId || '',
     });
     this.preloadedSources = null;
     this.preloadedSourcesTotal = null;

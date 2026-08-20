@@ -87,7 +87,7 @@
     "ACTIONS": "Actions",
     "STATUS": "Statut",
     "ALL": "Tout",
-    "ALL_DATASOURCES": "Toutes les sources de données",
+    "ALL_DATASOURCES": "Toutes les connecteurs",
     "TYPE": "Type",
     "SELECT_RANGE": "Sélectionner une plage",
     "NO_RECORD_FOUND": "Aucun enregistrement trouvé",
@@ -142,7 +142,7 @@
     "CANNOT_DELETE_SELF": "Impossible de vous supprimer vous-même",
     "NO_DELETE_PERMISSION": "Vous n'avez pas la permission de supprimer",
     "LOCKED_NOTE": "Le compte est verrouillé. Déverrouillez-le depuis la page de liste pour changer le statut.",
-    "DATASOURCE": "Source de données",
+    "DATASOURCE": "Connecteur",
     "CONNECTION": "Connexion",
     "GROUPS": "Groupes",
     "USERS": "Utilisateurs",
@@ -167,7 +167,7 @@
     "SECTION": "Section",
     "PROMPTS": "Invites",
     "SECTIONS": "Sections",
-    "SELECT_DATASOURCE": "Sélectionner la source de données",
+    "SELECT_DATASOURCE": "Sélectionner la connecteur",
     "SELECT_TAB": "Sélectionner l'onglet",
     "SELECT_SECTION": "Sélectionner la section",
     "TAB_REQUIRED": "L'onglet est requis",
@@ -270,7 +270,7 @@
     "NAME_PATTERN": "Le nom ne peut contenir que des lettres, des espaces et des tirets",
     "ORGANISATION_REQUIRED": "L'organisation est requise",
     "ROLE_REQUIRED": "Le rôle est requis",
-    "DATASOURCE_REQUIRED": "La source de données est requise",
+    "DATASOURCE_REQUIRED": "La connecteur est requise",
     "CONNECTION_REQUIRED": "La connexion est requise",
     "GROUPS_REQUIRED": "Les groupes sont requis",
     "USERS_REQUIRED": "Les utilisateurs sont requis",
@@ -289,8 +289,8 @@
     "GROUP_NAME_MIN_LENGTH": "Le nom du groupe doit comporter au moins {{length}} caractères",
     "GROUP_NAME_MAX_LENGTH": "Le nom du groupe ne doit pas dépasser {{length}} caractères",
     "GROUP_NAME_PATTERN": "Le nom du groupe doit commencer par une lettre ou un chiffre et ne peut contenir que des lettres, des chiffres, des espaces, des points, des underscores et des tirets",
-    "DATASOURCE_USERNAME_REQUIRED": "Le nom d'utilisateur de la source de données est requis",
-    "DATASOURCE_PASSWORD_REQUIRED": "Le mot de passe de la source de données est requis",
+    "DATASOURCE_USERNAME_REQUIRED": "Le nom d'utilisateur de la connecteur est requis",
+    "DATASOURCE_PASSWORD_REQUIRED": "Le mot de passe de la connecteur est requis",
     "CONNECTION_NAME_REQUIRED": "Le nom de la connexion est requis",
     "CONNECTION_NAME_MIN_LENGTH": "Le nom de la connexion doit comporter au moins {{length}} caractères",
     "CONNECTION_NAME_MAX_LENGTH": "Le nom de la connexion ne doit pas dépasser {{length}} caractères",
@@ -502,15 +502,15 @@
     "USERS": "Utilisateurs",
     "ADMINS": "Administrateurs",
     "GROUPS": "Groupes",
-    "DATASOURCES": "Sources de données",
+    "DATASOURCES": "Connecteurs",
     "MASTER_DATASOURCE": "Base de données",
     "REFRESH_SCHEMA": "Actualiser le schéma",
     "REFRESHING": "Actualisation...",
     "REFRESH_SCHEMA_TOOLTIP": "Actualiser le schéma de la base de données pour synchroniser les nouvelles entités et colonnes",
     "HOSTNAME": "Nom d'hôte",
-    "DATASOURCE_NAME": "Nom de la source de données",
+    "DATASOURCE_NAME": "Nom de la connecteur",
     "CONFIGURATION_LIMITS": "Limites de configuration",
-    "MAX_DATASOURCES": "Sources de données max.",
+    "MAX_DATASOURCES": "Connecteurs max.",
     "MAX_USERS": "Utilisateurs max.",
     "MAX_ADMINS": "Administrateurs max.",
     "ADDITIONAL_LIMITS": "Limites supplémentaires",
@@ -522,7 +522,7 @@
     "ADMIN_LOCALE": "Langue de l'administrateur",
     "ADMIN_LOCALE_PLACEHOLDER": "Sélectionner la langue pour l'e-mail de bienvenue",
     "ENCRYPTION_AUTO_TITLE": "Chiffrement géré pour vous",
-    "ENCRYPTION_AUTO_DESCRIPTION": "Tous les secrets stockés par votre organisation (mots de passe des sources de données, identifiants SMTP/SES, mots de passe utilisateur) sont chiffrés automatiquement. Vous n'avez pas besoin de choisir un algorithme ni de mémoriser une clé.",
+    "ENCRYPTION_AUTO_DESCRIPTION": "Tous les secrets stockés par votre organisation (mots de passe des connecteurs, identifiants SMTP/SES, mots de passe utilisateur) sont chiffrés automatiquement. Vous n'avez pas besoin de choisir un algorithme ni de mémoriser une clé.",
     "ENCRYPTION_BULLET_1": "AES-256-GCM (chiffrement authentifié)",
     "ENCRYPTION_BULLET_2": "Une clé unique est générée pour votre organisation",
     "ENCRYPTION_BULLET_3": "La clé maître est stockée hors de la base de données",
@@ -685,12 +685,12 @@
     "BULK_ADD_RACE_FAILURES": "Échecs lors de la création",
     "CANNOT_MODIFY_SELF_HINT": "Vous ne pouvez pas modifier votre propre accès"
   },
-  "DATASOURCE": {
-    "TITLE": "Sources de données",
-    "SUBTITLE": "Gérer les sources de données clients et les détails de connexion",
-    "ADD_TITLE": "Ajouter une source de données",
-    "EDIT_TITLE": "Modifier la source de données",
-    "VIEW_TITLE": "Détails de la source de données",
+  "CONNECTOR": {
+    "TITLE": "Connecteurs",
+    "SUBTITLE": "Gérer les connecteurs clients et les détails de connexion",
+    "ADD_TITLE": "Ajouter une connecteur",
+    "EDIT_TITLE": "Modifier la connecteur",
+    "VIEW_TITLE": "Détails de la connecteur",
     "HOST": "Hôte",
     "PORT": "Port",
     "DATABASE_NAME": "Nom de la base de données",
@@ -707,17 +707,17 @@
     "CONNECTION_SUCCESSFUL": "Connexion réussie",
     "CONNECTION_FAILED_RETRY": "Échec de la connexion - Réessayer",
     "CONNECTION_TEST_REQUIRED": "Un test de connexion est requis avant l'enregistrement",
-    "CONFIRM_DELETE_SINGLE": "Êtes-vous sûr de vouloir supprimer cette source de données ?",
+    "CONFIRM_DELETE_SINGLE": "Êtes-vous sûr de vouloir supprimer cette connecteur ?",
     "CONFIRM_DELETE_BULK": "Êtes-vous sûr de vouloir supprimer <strong>{{count}}</strong> source(s) de données sélectionnée(s) ?",
-    "CONFIRM_UPDATE_MESSAGE": "Êtes-vous sûr de vouloir mettre à jour cette source de données ?",
+    "CONFIRM_UPDATE_MESSAGE": "Êtes-vous sûr de vouloir mettre à jour cette connecteur ?",
     "DELETE_INFO_ASSOCIATED_DATA": "Toutes les données associées seront supprimées",
     "DELETE_INFO_CONNECTED_DATASETS": "Les jeux de données connectés seront affectés",
-    "EDIT_WARNING_TITLE": "Vous modifiez une connexion de source de données",
-    "EDIT_WARNING_CHANGES": "Les modifications des détails de connexion affecteront tous les jeux de données et requêtes utilisant cette source de données",
+    "EDIT_WARNING_TITLE": "Vous modifiez une connexion de connecteur",
+    "EDIT_WARNING_CHANGES": "Les modifications des détails de connexion affecteront tous les jeux de données et requêtes utilisant cette connecteur",
     "EDIT_WARNING_TEST_REQUIRED": "Un test de connexion réussi est requis avant l'enregistrement",
     "EDIT_WARNING_CREDENTIALS": "Les connexions existantes seront mises à jour avec les nouveaux identifiants",
     "CONFIGURATION": "Configuration",
-    "DATASOURCE_TYPE": "Type de source de données",
+    "DATASOURCE_TYPE": "Type de connecteur",
     "CONNECTION_STATUS": "Statut de la connexion",
     "LAST_UPDATED": "Dernière mise à jour",
     "USAGE": "Utilisation",
@@ -736,7 +736,7 @@
     "HEALTH_TESTING": "Test en cours…",
     "HEALTH_NEVER_TESTED": "Jamais testé",
     "TESTED": "testé",
-    "SEARCH_PLACEHOLDER": "Rechercher des sources de données par nom",
+    "SEARCH_PLACEHOLDER": "Rechercher des connecteurs par nom",
     "ACCOUNT": "Compte",
     "WAREHOUSE": "Warehouse",
     "ROLE": "Rôle",
@@ -864,7 +864,7 @@
     "LOADING_MONACO_HINT": "Configuration de l'éditeur SQL...",
     "LOADING_SCHEMA": "Chargement du schéma...",
     "NO_ANALYSES_FOUND": "Aucune analyse trouvée pour ce jeu de données",
-    "NO_DATASOURCE_SELECTED": "Aucune source de données sélectionnée",
+    "NO_DATASOURCE_SELECTED": "Aucune connecteur sélectionnée",
     "NO_DESCRIPTION": "Aucune description fournie",
     "NO_FIELDS_FOUND": "Aucun champ trouvé",
     "NO_FUNCTIONS_FOUND": "Aucune fonction trouvée",
@@ -892,8 +892,8 @@
     "SEARCH_QUERY_BUILDERS": "Rechercher des constructeurs de requêtes...",
     "SEARCH_TABLES": "Rechercher des tables...",
     "SELECT_DATA_TYPE": "Sélectionner le type de données",
-    "SELECT_DATASOURCE_HINT": "Sélectionnez une source de données pour commencer à écrire votre requête",
-    "SELECT_DATASOURCE_QUERY_HINT": "Choisissez la source de données sur laquelle vous souhaitez exécuter votre requête",
+    "SELECT_DATASOURCE_HINT": "Sélectionnez une connecteur pour commencer à écrire votre requête",
+    "SELECT_DATASOURCE_QUERY_HINT": "Choisissez la connecteur sur laquelle vous souhaitez exécuter votre requête",
     "SOURCE": "Source",
     "SQL_BASED": "Basé sur SQL",
     "SQL_QUERY": "Requête SQL",
@@ -909,13 +909,13 @@
     "VIA_QUERY_BUILDER": "Via le constructeur de requêtes",
     "VIEW_RESULTS": "Voir les résultats",
     "ACTIVE_DIALECT": "Dialecte SQL actif",
-    "PICK_DATASOURCE": "Choisir une source de données",
+    "PICK_DATASOURCE": "Choisir une connecteur",
     "SCHEMA_PICKER_HINT": "L'éditeur sera limité à ce schéma. Les tables des autres schémas ne seront pas visibles.",
-    "SCHEMA_PICKER_HINT_OPTIONAL": "Laissez vide pour vous connecter à toute la source de données. Choisissez un schéma pour restreindre la barre latérale de l'éditeur.",
-    "SCHEMA_PICK_DATASOURCE_FIRST": "Choisissez une source de données ci-dessus pour sélectionner un schéma.",
-    "SCHEMA_LAZY_MODE_HINT": "Source de données volumineuse — les colonnes se chargent en développant une table.",
-    "SEARCH_DATASOURCES": "Rechercher des sources de données…",
-    "NO_DATASOURCES": "Aucune source de données trouvée",
+    "SCHEMA_PICKER_HINT_OPTIONAL": "Laissez vide pour vous connecter à toute la connecteur. Choisissez un schéma pour restreindre la barre latérale de l'éditeur.",
+    "SCHEMA_PICK_DATASOURCE_FIRST": "Choisissez une connecteur ci-dessus pour sélectionner un schéma.",
+    "SCHEMA_LAZY_MODE_HINT": "Connecteur volumineuse — les colonnes se chargent en développant une table.",
+    "SEARCH_DATASOURCES": "Rechercher des connecteurs…",
+    "NO_DATASOURCES": "Aucune connecteur trouvée",
     "SCHEMA": "Schéma",
     "EDITOR_DISABLED": "Éditeur désactivé — schéma indisponible.",
     "CELL_NULL": "NULL",
@@ -942,13 +942,13 @@
     "ERROR_KIND_PERMISSION_DENIED": "Autorisation refusée",
     "ERROR_KIND_SYNTAX": "Erreur de syntaxe SQL",
     "ERROR_KIND_TIMEOUT": "Délai d'exécution dépassé",
-    "ERROR_KIND_CONNECTION": "Impossible d'atteindre la source de données",
+    "ERROR_KIND_CONNECTION": "Impossible d'atteindre la connecteur",
     "ERROR_KIND_OBJECT_NOT_FOUND": "Objet introuvable",
     "ERROR_KIND_SAFETY_VIOLATION": "SQL refusé par la vérification de sécurité",
-    "ERROR_HINT_PERMISSION_DENIED": "L'utilisateur de la source de données n'a pas accès à un ou plusieurs objets de cette requête. Demandez à votre administrateur d'accorder SELECT.",
+    "ERROR_HINT_PERMISSION_DENIED": "L'utilisateur de la connecteur n'a pas accès à un ou plusieurs objets de cette requête. Demandez à votre administrateur d'accorder SELECT.",
     "ERROR_HINT_SYNTAX": "Le moteur n'a pas pu analyser le SQL. La position dans le message pointe vers le premier jeton inattendu.",
     "ERROR_HINT_TIMEOUT": "La requête a dépassé le délai. Ajoutez une clause WHERE pour réduire le résultat ou simplifiez les jointures.",
-    "ERROR_HINT_CONNECTION": "La source de données est inaccessible. Vérifiez la connexion depuis ses paramètres.",
+    "ERROR_HINT_CONNECTION": "La connecteur est inaccessible. Vérifiez la connexion depuis ses paramètres.",
     "ERROR_HINT_OBJECT_NOT_FOUND": "Une table, vue ou colonne référencée par la requête n'existe pas sur cette source.",
     "ERROR_HINT_SAFETY_VIOLATION": "Seules les requêtes SELECT (ou WITH … SELECT) à instruction unique sont autorisées.",
     "OFFENDING_TOKEN_TOOLTIP": "Mot-clé refusé par le validateur",
@@ -2176,7 +2176,7 @@
     "SUBTITLE": "Afficher et gérer les tableaux de bord publiés",
     "DATASET": "Jeu de données",
     "SEARCH_DATASET": "Rechercher un jeu de données",
-    "SEARCH_DATASOURCE": "Rechercher une source de données",
+    "SEARCH_DATASOURCE": "Rechercher une connecteur",
     "NO_DASHBOARDS_FOUND": "Aucun tableau de bord trouvé",
     "CONFIRM_DELETE_SINGLE": "Êtes-vous sûr de vouloir supprimer ce tableau de bord ?",
     "CONFIRM_DELETE_BULK": "Êtes-vous sûr de vouloir supprimer <strong>{{count}}</strong> tableau(x) de bord sélectionné(s) ?",
@@ -2337,7 +2337,7 @@
     "GROUPS": "Groupes",
     "RLS_RULES": "Règles RLS",
     "ALERTS": "Alertes",
-    "DATASOURCES": "Sources de données",
+    "DATASOURCES": "Connecteurs",
     "ROLES": "Rôles",
     "DATASET": "Jeu de données",
     "ANALYSES": "Analyses",
@@ -2372,7 +2372,7 @@
     "CONNECTORS_API": "Connecteurs Web/REST"
   },
   "AUTH": {
-    "HEADLINE_LOGIN": "Améliorez votre expérience\nde gestion de sources de données",
+    "HEADLINE_LOGIN": "Améliorez votre expérience\nde gestion de connecteurs",
     "HEADLINE_FORGOT": "Réinitialisez en toute sécurité\nle mot de passe de votre compte",
     "HEADLINE_RESET": "Définissez votre nouveau\nmot de passe",
     "HEADLINE_SET_PASSWORD": "Définissez le mot de passe\nde votre compte",
@@ -2466,7 +2466,7 @@
       "HOME_ARIA": "Accueil DBExec",
       "ALL_RIGHTS": "Tous droits réservés.",
       "HERO_TITLE": "Transformez vos bases de données en tableaux de bord.",
-      "HERO_LEDE": "Connectez une source de données, glissez les graphiques dont vous avez besoin et partagez le tableau de bord — le tout au même endroit, sans SQL.",
+      "HERO_LEDE": "Connectez une connecteur, glissez les graphiques dont vous avez besoin et partagez le tableau de bord — le tout au même endroit, sans SQL.",
       "FEATURE_CONNECT_TITLE": "Connectez n'importe quelle base de données",
       "FEATURE_CONNECT_DESC": "Postgres, MySQL, SQL Server et plus — en quelques minutes.",
       "FEATURE_BUILD_TITLE": "Créez des tableaux de bord visuellement",
@@ -2564,7 +2564,7 @@
     "ACTIVE_USERS_7D": "Utilisateurs actifs (7 derniers jours)",
     "ACTIVE_USERS_15D": "Utilisateurs actifs (15 derniers jours)",
     "ACTIVE_USERS_30D": "Utilisateurs actifs (30 derniers jours)",
-    "TOTAL_DATASOURCES": "Total sources de données",
+    "TOTAL_DATASOURCES": "Total connecteurs",
     "TOTAL_ENVIRONMENTS": "Total environnements",
     "TOTAL_ADMINS": "Total administrateurs",
     "TOTAL_USERS": "Total utilisateurs",
@@ -2582,17 +2582,17 @@
     "ANALYSES_DESC": "Visualize and analyze data",
     "USERS": "Users",
     "USERS_DESC": "Manage organisation users",
-    "DATASOURCES": "Datasources",
-    "DATASOURCES_DESC": "Configure datasource connections",
+    "DATASOURCES": "Connecteurs",
+    "DATASOURCES_DESC": "Configure connecteur connections",
     "AUDIT_LOGS": "Audit Logs",
     "AUDIT_LOGS_DESC": "Review activity history",
     "ADD_USER": "Add User",
-    "MANAGE_DATASOURCE": "Manage Datasource",
+    "MANAGE_DATASOURCE": "Manage Connecteur",
     "VIEW_REPORTS": "View Reports"
   },
   "AUTH_FEATURES": {
     "LOGIN_1_TITLE": "Explorateur visuel de données",
-    "LOGIN_1_DESC": "Parcourez la structure de vos sources de données avec une interface visuelle intuitive",
+    "LOGIN_1_DESC": "Parcourez la structure de vos connecteurs avec une interface visuelle intuitive",
     "LOGIN_2_TITLE": "Aperçus de performance",
     "LOGIN_2_DESC": "Obtenez des métriques de performance en temps réel et des suggestions d'optimisation",
     "LOGIN_3_TITLE": "Accès sécurisé",
@@ -2672,7 +2672,7 @@
   },
   "PROMPT_MODULE": {
     "TITLE": "Prompts",
-    "SUBTITLE": "Configure datasource fields for data filtering and query generation",
+    "SUBTITLE": "Configure connecteur fields for data filtering and query generation",
     "ADD_TITLE": "Add Prompt",
     "EDIT_TITLE": "Edit Prompt",
     "VIEW_TITLE": "Prompt Details",
@@ -3092,8 +3092,8 @@
     "CONDITION_COUNT": "{{count}} condition(s)",
     "MORE_CONDITIONS": "+{{count}} more",
     "SEARCH_DATASET": "Search Dataset",
-    "SELECT_DATASOURCE_MSG": "Please select a datasource to view RLS rules",
-    "NO_RULES_FOUND": "No RLS rules found for this datasource",
+    "SELECT_DATASOURCE_MSG": "Please select a connecteur to view RLS rules",
+    "NO_RULES_FOUND": "No RLS rules found for this connecteur",
     "DELETE_SINGLE": "Are you sure you want to delete this RLS rule?",
     "UPDATE_CONFIRM": "Are you sure you want to update this RLS rule?",
     "DELETE_INFO_FILTERING": "Row-level security filtering will be removed",
@@ -4100,7 +4100,7 @@
     "IMPORT": "Importer",
     "IMPORTING": "Importation…",
     "EXPORT_SUCCESS": "Export téléchargé",
-    "IMPORT_SUCCESS": "Importation terminée. Une nouvelle source de données a été créée — définissez son mot de passe pour exécuter les ressources importées.",
+    "IMPORT_SUCCESS": "Importation terminée. Une nouvelle connecteur a été créée — définissez son mot de passe pour exécuter les ressources importées.",
     "IMPORT_FAILED": "Échec de l'importation",
     "INVALID_FILE": "Ce fichier n'est pas un fichier d'export DBExec valide.",
     "FILE_TOO_LARGE": "Le fichier est trop volumineux (max. 10 Mo).",
@@ -4524,8 +4524,8 @@
         "tooLong": "Le schéma par défaut ne doit pas dépasser 128 caractères"
       },
       "id": {
-        "required": "L'identifiant de la source de données est obligatoire",
-        "invalid": "Identifiant de source de données invalide"
+        "required": "L'identifiant de la connecteur est obligatoire",
+        "invalid": "Identifiant de connecteur invalide"
       },
       "justification": {
         "tooLong": "La justification ne doit pas dépasser 500 caractères"
@@ -4545,7 +4545,7 @@
         "invalid": "Le nom doit commencer par une lettre ou un chiffre et ne peut contenir que des lettres, chiffres, espaces, points, tirets bas et tirets"
       },
       "datasource": {
-        "required": "La source de données est obligatoire"
+        "required": "La connecteur est obligatoire"
       },
       "id": {
         "required": "L'identifiant de la connexion est obligatoire"
@@ -4556,7 +4556,7 @@
     },
     "access": {
       "datasource": {
-        "required": "La source de données est obligatoire"
+        "required": "La connecteur est obligatoire"
       },
       "connection": {
         "required": "La connexion est obligatoire"
@@ -4580,7 +4580,7 @@
         "tooLong": "La justification ne doit pas dépasser 500 caractères"
       },
       "datasource": {
-        "required": "La source de données est obligatoire"
+        "required": "La connecteur est obligatoire"
       },
       "sql": {
         "required": "La requête SQL est obligatoire",
@@ -4631,7 +4631,7 @@
         "tooLong": "La justification ne doit pas dépasser 500 caractères"
       },
       "datasource": {
-        "required": "La source de données est obligatoire"
+        "required": "La connecteur est obligatoire"
       },
       "dataset": {
         "required": "Le jeu de données est obligatoire"
@@ -4853,15 +4853,15 @@
         "unsupported": "Version de fichier de migration non prise en charge"
       },
       "datasources": {
-        "required": "Le fichier de migration doit inclure au moins une source de données",
-        "tooMany": "Trop de sources de données dans le fichier de migration"
+        "required": "Le fichier de migration doit inclure au moins une connecteur",
+        "tooMany": "Trop de connecteurs dans le fichier de migration"
       },
       "datasource": {
         "handle": {
           "required": "L'identifiant de la source de données est requis"
         },
         "name": {
-          "required": "Le nom de la source de données est requis"
+          "required": "Le nom de la connecteur est requis"
         },
         "dbType": {
           "invalid": "Type de base de données non pris en charge dans le fichier de migration"
@@ -4872,14 +4872,14 @@
         "username": {
           "required": "Le nom d'utilisateur de la base de données est requis"
         },
-        "unknownField": "Le fichier de migration contient un champ de source de données inattendu"
+        "unknownField": "Le fichier de migration contient un champ de connecteur inattendu"
       },
       "asset": {
         "name": {
           "required": "Le nom de la ressource est requis"
         },
         "datasourceHandle": {
-          "required": "La référence de source de données de la ressource est manquante"
+          "required": "La référence de connecteur de la ressource est manquante"
         },
         "handle": {
           "required": "L'identifiant de bundle de la ressource est manquant"
@@ -5253,8 +5253,8 @@
         "tooLong": "La description ne doit pas dépasser 500 caractères"
       },
       "datasource": {
-        "required": "La source de données est requise",
-        "invalid": "La source de données doit être un UUID valide"
+        "required": "La connecteur est requise",
+        "invalid": "La connecteur doit être un UUID valide"
       },
       "status": {
         "invalid": "Le statut doit être 0 ou 1"
@@ -5278,8 +5278,8 @@
         "tooLong": "La description ne doit pas dépasser 500 caractères"
       },
       "datasource": {
-        "required": "La source de données est requise",
-        "invalid": "La source de données doit être un UUID valide"
+        "required": "La connecteur est requise",
+        "invalid": "La connecteur doit être un UUID valide"
       },
       "status": {
         "invalid": "Le statut doit être 0 ou 1"
@@ -5402,7 +5402,7 @@
     "NO_CONNECTIONS": "Aucune connexion pour le moment. Créez-en une pour commencer à exécuter des requêtes.",
     "CONNECTION_NAME": "Nom de la connexion",
     "CONNECTION_NAME_PLACEHOLDER": "ex. prod-db (analyste)",
-    "CONNECTION_HINT": "Une connexion associe une source de données à un identifiant de base de données qui vous a été attribué. Son ouverture exécute votre SQL sous cet identifiant.",
+    "CONNECTION_HINT": "Une connexion associe une connecteur à un identifiant de base de données qui vous a été attribué. Son ouverture exécute votre SQL sous cet identifiant.",
     "CREDENTIALS": "Identifiants",
     "LOGIN": "Connexion",
     "LOGIN_PLACEHOLDER": "nom d'utilisateur de la base de données",
@@ -5418,20 +5418,20 @@
     "DISABLED": "Désactivé",
     "ENABLE": "Activer",
     "DISABLE": "Désactiver",
-    "SET_DEFAULT": "Définir par défaut pour cette source de données",
-    "IS_DEFAULT": "Par défaut pour cette source de données",
-    "DEFAULT_BADGE": "Connexion par défaut pour cette source de données",
-    "ALL_DISABLED_FOR_DS": "Toutes les connexions de cette source de données sont désactivées. Activez-en une pour exécuter des requêtes.",
+    "SET_DEFAULT": "Définir par défaut pour cette connecteur",
+    "IS_DEFAULT": "Par défaut pour cette connecteur",
+    "DEFAULT_BADGE": "Connexion par défaut pour cette connecteur",
+    "ALL_DISABLED_FOR_DS": "Toutes les connexions de cette connecteur sont désactivées. Activez-en une pour exécuter des requêtes.",
     "TEST": "Vérifier la connexion",
     "OPEN": "Ouvrir l'éditeur SQL",
     "LAUNCH_TITLE": "Ouvrir une session de requête",
-    "LAUNCH_SUBTITLE": "Choisissez une source de données et l'une de vos connexions, puis ouvrez l'éditeur dans un nouvel onglet.",
-    "STEP_DATASOURCE": "Source de données",
+    "LAUNCH_SUBTITLE": "Choisissez une connecteur et l'une de vos connexions, puis ouvrez l'éditeur dans un nouvel onglet.",
+    "STEP_DATASOURCE": "Connecteur",
     "STEP_CONNECTION": "Connexion",
-    "SELECT_DATASOURCE": "Choisir une source de données",
-    "SELECT_DATASOURCE_FIRST": "Choisissez d'abord une source de données",
+    "SELECT_DATASOURCE": "Choisir une connecteur",
+    "SELECT_DATASOURCE_FIRST": "Choisissez d'abord une connecteur",
     "SELECT_CONNECTION": "Choisir une connexion",
-    "NO_CONNECTIONS_FOR_DS": "Vous n'avez encore aucune connexion pour cette source de données.",
+    "NO_CONNECTIONS_FOR_DS": "Vous n'avez encore aucune connexion pour cette connecteur.",
     "NO_CONNECTIONS_HINT": "Vous n'avez encore aucune connexion. Créez-en une pour commencer.",
     "OPEN_EXECUTOR": "Ouvrir l'éditeur SQL",
     "VERIFYING": "Vérification…",
@@ -5605,12 +5605,12 @@
     "SAVED_QUERIES_SEARCH_PLACEHOLDER": "Search saved queries by name",
     "NO_SAVED_QUERIES": "No saved queries yet. Create one to get started.",
     "NEW_QUERY": "New query",
-    "NEW_QUERY_SUBTITLE": "Pick a datasource and one of your connections, then open the editor in a new tab.",
+    "NEW_QUERY_SUBTITLE": "Pick a connecteur and one of your connections, then open the editor in a new tab.",
     "NEW_SAVED_QUERY": "New Saved Query",
     "EDIT_SAVED_QUERY": "Edit Saved Query",
     "DELETE_SAVED_QUERY": "Delete saved query",
     "DELETE_SAVED_QUERY_CONFIRM": "Delete the saved query \"{{name}}\"? This removes the saved SQL only — nothing on the database is changed.",
-    "SAVED_QUERY_HINT": "A saved query stores your SQL against a datasource + connection so you can reopen and run it later.",
+    "SAVED_QUERY_HINT": "A saved query stores your SQL against a connecteur + connection so you can reopen and run it later.",
     "SAVED_QUERY_NAME": "Query name",
     "SAVED_QUERY_NAME_PLACEHOLDER": "e.g. Monthly active users",
     "SAVED_QUERY_DESCRIPTION": "Description",
@@ -5630,15 +5630,15 @@
   },
   "DB_ACCESS": {
     "TITLE": "Gestion des accès à la base de données",
-    "SUBTITLE": "Gérer les utilisateurs, rôles et privilèges PostgreSQL sur une source de données",
+    "SUBTITLE": "Gérer les utilisateurs, rôles et privilèges PostgreSQL sur une connecteur",
     "EXPORT_JSON": "Exporter en JSON",
     "EXPORT_CSV": "Exporter en CSV",
     "EXPORT_ACCESS_HINT": "Téléchargez le profil d'accès complet de ce compte (attributs, rôles accordés, privilèges effectifs, objets détenus) à des fins d'audit.",
-    "SELECT_DATASOURCE": "Choisir une source de données à gérer",
+    "SELECT_DATASOURCE": "Choisir une connecteur à gérer",
     "CHECKING_CAPABILITY": "Vérification de la capacité de gestion…",
     "OPEN_WORKSPACE": "Ouvrir l'espace de travail",
     "UNSUPPORTED_TITLE": "PostgreSQL uniquement en v1",
-    "UNSUPPORTED_BODY": "La gestion des accès à la base de données ne prend en charge que les sources de données PostgreSQL dans cette version.",
+    "UNSUPPORTED_BODY": "La gestion des accès à la base de données ne prend en charge que les connecteurs PostgreSQL dans cette version.",
     "CAP_FULL_TITLE": "Gestion complète disponible",
     "CAP_FULL_BODY": "L'identifiant de gestion peut créer, modifier et supprimer des rôles et des octrois sur cette base de données.",
     "CAP_FULL_BADGE": "Gestion complète",
@@ -5692,7 +5692,7 @@
     "APP_GROUPS": "Groupes d'application",
     "SELECT_APP_USERS": "Sélectionner les utilisateurs d'application à associer",
     "SELECT_APP_GROUPS": "Sélectionner les groupes d'application à associer",
-    "ATTACH_HINT": "Associez ce rôle de base de données à un ou plusieurs utilisateurs et groupes d'application. Chaque sélection est liée au rôle pour cette source de données.",
+    "ATTACH_HINT": "Associez ce rôle de base de données à un ou plusieurs utilisateurs et groupes d'application. Chaque sélection est liée au rôle pour cette connecteur.",
     "DISCARD_UNSAVED": "Vous avez des modifications non enregistrées dans le compositeur de privilèges. Les abandonner et changer d'onglet ?",
     "DISCARD_TITLE": "Abandonner les modifications non enregistrées ?",
     "DISCARD_CONFIRM": "Abandonner et changer",
@@ -5821,7 +5821,7 @@
     "CAN_LOGIN_DESC": "Un utilisateur de connexion possède un mot de passe et peut se connecter. Un rôle de groupe ne peut pas se connecter — il regroupe uniquement des privilèges.",
     "LOGIN_DETAILS": "Détails de connexion",
     "PASSWORD_UNCHANGED_PLACEHOLDER": "Laisser vide pour ne pas modifier",
-    "SELECT_DATASOURCE_HINT": "Choisissez une source de données ci-dessus pour gérer ses utilisateurs, rôles et privilèges de base de données.",
+    "SELECT_DATASOURCE_HINT": "Choisissez une connecteur ci-dessus pour gérer ses utilisateurs, rôles et privilèges de base de données.",
     "NAME": "Nom",
     "SEARCH_NAME": "Rechercher un nom",
     "VIEW_PRIVILEGE_SET": "Ensemble de privilèges enregistré",
@@ -5902,10 +5902,10 @@
       "GENERIC": "Apply change"
     },
     "SELECT_DATE": "Select a date",
-    "PICK_DATASOURCE_TO_CREATE": "Select a datasource to create a role.",
+    "PICK_DATASOURCE_TO_CREATE": "Select a connecteur to create a role.",
     "RULE_INCOMPLETE": "Incomplète",
     "APPLY_DISABLED_HINT": "Complétez ou supprimez chaque règle avant d'appliquer.",
-    "CHOOSE_DATASOURCE": "Choisir une source de données",
+    "CHOOSE_DATASOURCE": "Choisir une connecteur",
     "TAB_COMPOSE": "Composer des règles",
     "TAB_EFFECTIVE_PRIVS": "Privilèges effectifs",
     "ALL_SEQUENCES": "Toutes les séquences du schéma",
@@ -5921,7 +5921,7 @@
     "SCOPE_ORG_WIDE": "Toute l'organisation",
     "SCOPE": "Portée",
     "RULE": "Règle",
-    "SCOPE_DATASOURCE": "Source de données",
+    "SCOPE_DATASOURCE": "Connecteur",
     "SEARCH_TEMPLATES_PLACEHOLDER": "Rechercher des modèles…",
     "TEMPLATES_TITLE": "Modèles de rôle",
     "TEMPLATES_SUBTITLE": "Recettes de rôle et de privilèges réutilisables. À appliquer lors de la création d'un rôle ou de la composition des privilèges.",
@@ -5965,7 +5965,7 @@
     "PUBLIC_PRIVILEGES": "Privilèges à PUBLIC",
     "PUBLIC_ALSO_DIRECT": "Également accordé directement ?",
     "PUBLIC_SEARCH": "Rechercher des objets",
-    "PUBLIC_NONE": "Aucun privilège n’est accordé à PUBLIC sur cette source de données.",
+    "PUBLIC_NONE": "Aucun privilège n’est accordé à PUBLIC sur cette connecteur.",
     "PUBLIC_VIA_PUBLIC": "Via PUBLIC",
     "PUBLIC_REVOKE_SUMMARY": "Révoquer {{privileges}} de PUBLIC sur {{object}}",
     "PUBLIC_CONFIRM_TITLE": "Révoquer les privilèges de PUBLIC",
@@ -6316,7 +6316,7 @@
     "UNGROUPED": "Sans groupe",
     "GROUP_NAME": "Nom du groupe",
     "DROP_PROMPTS_HERE": "Glissez des prompts ici",
-    "NO_PROMPTS": "Aucun prompt trouvé pour cette source de données.",
+    "NO_PROMPTS": "Aucun prompt trouvé pour cette connecteur.",
     "ALREADY_PLACED": "Déjà placé",
     "MANDATORY": "Obligatoire",
     "LOCKED": "Verrouillé",
@@ -6665,7 +6665,7 @@
     "COMPOSE": "Run",
     "DELETE_SINGLE": "Are you sure you want to delete this form?",
     "COL_NAME": "Name",
-    "COL_DATASOURCE": "Datasource",
+    "COL_DATASOURCE": "Connecteur",
     "COL_STATUS": "Status",
     "COL_UPDATED": "Updated",
     "VERSIONS": "Versions",
@@ -6840,7 +6840,7 @@
     },
     "PALETTE": {
       "NO_PROMPTS": "No prompts yet",
-      "NO_PROMPTS_HINT": "Create prompts in the Prompts module for this datasource, then drag them onto a section."
+      "NO_PROMPTS_HINT": "Create prompts in the Prompts module for this connecteur, then drag them onto a section."
     }
   },
   "CONNECTORS_API": {

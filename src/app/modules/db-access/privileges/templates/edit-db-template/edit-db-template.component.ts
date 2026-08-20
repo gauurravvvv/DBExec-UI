@@ -71,7 +71,7 @@ export class EditDbTemplateComponent implements OnInit, HasUnsavedChanges {
   name = '';
   description = '';
   scope: 'org' | 'datasource' = 'org';
-  datasourceId: string | null = null;
+  connectorId: string | null = null;
   attrs = {
     login: true,
     inherit: true,
@@ -130,8 +130,8 @@ export class EditDbTemplateComponent implements OnInit, HasUnsavedChanges {
         }
         this.name = d.name;
         this.description = d.description ?? '';
-        this.scope = d.datasourceId ? 'datasource' : 'org';
-        this.datasourceId = d.datasourceId ?? null;
+        this.scope = d.connectorId ? 'datasource' : 'org';
+        this.connectorId = d.connectorId ?? null;
         const def = d.definition ?? {};
         this.attrs = { ...this.attrs, ...(def.attributes ?? {}) };
         this.rules = (def.rules ?? []).map((r: any) => ({
@@ -180,7 +180,7 @@ export class EditDbTemplateComponent implements OnInit, HasUnsavedChanges {
 
   get canSave(): boolean {
     if (this.saving() || !this.name.trim()) return false;
-    if (this.scope === 'datasource' && !this.datasourceId) return false;
+    if (this.scope === 'datasource' && !this.connectorId) return false;
     // Every rule needs at least one privilege.
     if (!this.rules.length) return false;
     return this.rules.every(r => r.privileges.length > 0);
@@ -190,7 +190,7 @@ export class EditDbTemplateComponent implements OnInit, HasUnsavedChanges {
     return {
       name: this.name.trim(),
       description: this.description.trim() || null,
-      datasourceId: this.scope === 'datasource' ? this.datasourceId : null,
+      connectorId: this.scope === 'datasource' ? this.connectorId : null,
       definition: {
         attributes: this.attrs,
         rules: this.rules.map(r => ({
@@ -222,7 +222,7 @@ export class EditDbTemplateComponent implements OnInit, HasUnsavedChanges {
   }
 
   onDatasourceChange(id: string): void {
-    this.datasourceId = id || null;
+    this.connectorId = id || null;
     this.markDirty();
   }
 

@@ -16,7 +16,7 @@ export interface QbSchemaResponse {
     id: string;
     name: string;
     description: string;
-    datasourceId: string;
+    connectorId: string;
     defaultLimit: number;
     maxLimit: number;
     forceDistinct: boolean;

@@ -87,7 +87,7 @@
     "ACTIONS": "Aktionen",
     "STATUS": "Status",
     "ALL": "Alle",
-    "ALL_DATASOURCES": "Alle Datenquellen",
+    "ALL_DATASOURCES": "Alle Konnektoren",
     "TYPE": "Typ",
     "SELECT_RANGE": "Bereich auswählen",
     "NO_RECORD_FOUND": "Kein Datensatz gefunden",
@@ -142,7 +142,7 @@
     "CANNOT_DELETE_SELF": "Sie können sich nicht selbst löschen",
     "NO_DELETE_PERMISSION": "Sie haben keine Berechtigung zum Löschen",
     "LOCKED_NOTE": "Konto ist gesperrt. Entsperren Sie es auf der Listenseite, um den Status zu ändern.",
-    "DATASOURCE": "Datenquelle",
+    "DATASOURCE": "Konnektor",
     "CONNECTION": "Verbindung",
     "GROUPS": "Gruppen",
     "USERS": "Benutzer",
@@ -167,7 +167,7 @@
     "SECTION": "Abschnitt",
     "PROMPTS": "Eingaben",
     "SECTIONS": "Abschnitte",
-    "SELECT_DATASOURCE": "Datenquelle auswählen",
+    "SELECT_DATASOURCE": "Konnektor auswählen",
     "SELECT_TAB": "Registerkarte auswählen",
     "SELECT_SECTION": "Abschnitt auswählen",
     "TAB_REQUIRED": "Registerkarte ist erforderlich",
@@ -270,7 +270,7 @@
     "NAME_PATTERN": "Name darf nur Buchstaben, Leerzeichen und Bindestriche enthalten",
     "ORGANISATION_REQUIRED": "Organisation ist erforderlich",
     "ROLE_REQUIRED": "Rolle ist erforderlich",
-    "DATASOURCE_REQUIRED": "Datenquelle ist erforderlich",
+    "DATASOURCE_REQUIRED": "Konnektor ist erforderlich",
     "CONNECTION_REQUIRED": "Verbindung ist erforderlich",
     "GROUPS_REQUIRED": "Gruppen sind erforderlich",
     "USERS_REQUIRED": "Benutzer sind erforderlich",
@@ -289,8 +289,8 @@
     "GROUP_NAME_MIN_LENGTH": "Gruppenname muss mindestens {{length}} Zeichen lang sein",
     "GROUP_NAME_MAX_LENGTH": "Gruppenname darf {{length}} Zeichen nicht überschreiten",
     "GROUP_NAME_PATTERN": "Gruppenname muss mit einem Buchstaben oder einer Zahl beginnen und darf nur Buchstaben, Zahlen, Leerzeichen, Punkte, Unterstriche und Bindestriche enthalten",
-    "DATASOURCE_USERNAME_REQUIRED": "Datenquellen-Benutzername ist erforderlich",
-    "DATASOURCE_PASSWORD_REQUIRED": "Datenquellen-Passwort ist erforderlich",
+    "DATASOURCE_USERNAME_REQUIRED": "Konnektoren-Benutzername ist erforderlich",
+    "DATASOURCE_PASSWORD_REQUIRED": "Konnektoren-Passwort ist erforderlich",
     "CONNECTION_NAME_REQUIRED": "Verbindungsname ist erforderlich",
     "CONNECTION_NAME_MIN_LENGTH": "Verbindungsname muss mindestens {{length}} Zeichen lang sein",
     "CONNECTION_NAME_MAX_LENGTH": "Verbindungsname darf {{length}} Zeichen nicht überschreiten",
@@ -502,15 +502,15 @@
     "USERS": "Benutzer",
     "ADMINS": "Administratoren",
     "GROUPS": "Gruppen",
-    "DATASOURCES": "Datenquellen",
+    "DATASOURCES": "Konnektoren",
     "MASTER_DATASOURCE": "Datenbank",
     "REFRESH_SCHEMA": "Schema aktualisieren",
     "REFRESHING": "Wird aktualisiert...",
     "REFRESH_SCHEMA_TOOLTIP": "Datenbankschema aktualisieren, um neue Entitäten und Spalten zu synchronisieren",
     "HOSTNAME": "Hostname",
-    "DATASOURCE_NAME": "Datenquellenname",
+    "DATASOURCE_NAME": "Konnektorenname",
     "CONFIGURATION_LIMITS": "Konfigurationslimits",
-    "MAX_DATASOURCES": "Max. Datenquellen",
+    "MAX_DATASOURCES": "Max. Konnektoren",
     "MAX_USERS": "Max. Benutzer",
     "MAX_ADMINS": "Max. Administratoren",
     "ADDITIONAL_LIMITS": "Zusätzliche Limits",
@@ -522,7 +522,7 @@
     "ADMIN_LOCALE": "Admin-Sprache",
     "ADMIN_LOCALE_PLACEHOLDER": "Sprache für Willkommens-E-Mail auswählen",
     "ENCRYPTION_AUTO_TITLE": "Verschlüsselung für Sie verwaltet",
-    "ENCRYPTION_AUTO_DESCRIPTION": "Alle Geheimnisse, die Ihre Organisation speichert – Datenquellen-Passwörter, SMTP/SES-Zugangsdaten, Benutzerpasswörter – werden automatisch verschlüsselt. Sie müssen keinen Algorithmus auswählen und sich keinen Schlüssel merken.",
+    "ENCRYPTION_AUTO_DESCRIPTION": "Alle Geheimnisse, die Ihre Organisation speichert – Konnektoren-Passwörter, SMTP/SES-Zugangsdaten, Benutzerpasswörter – werden automatisch verschlüsselt. Sie müssen keinen Algorithmus auswählen und sich keinen Schlüssel merken.",
     "ENCRYPTION_BULLET_1": "AES-256-GCM (authentifizierte Verschlüsselung)",
     "ENCRYPTION_BULLET_2": "Ein eindeutiger Schlüssel wird für Ihre Organisation generiert",
     "ENCRYPTION_BULLET_3": "Der Master-Schlüssel wird außerhalb der Datenbank gespeichert",
@@ -685,12 +685,12 @@
     "BULK_ADD_RACE_FAILURES": "Fehler beim Erstellen",
     "CANNOT_MODIFY_SELF_HINT": "Sie können Ihren eigenen Zugriff nicht ändern"
   },
-  "DATASOURCE": {
-    "TITLE": "Datenquellen",
-    "SUBTITLE": "Client-Datenquellen und Verbindungsdetails verwalten",
-    "ADD_TITLE": "Datenquelle hinzufügen",
-    "EDIT_TITLE": "Datenquelle bearbeiten",
-    "VIEW_TITLE": "Datenquellendetails",
+  "CONNECTOR": {
+    "TITLE": "Konnektoren",
+    "SUBTITLE": "Client-Konnektoren und Verbindungsdetails verwalten",
+    "ADD_TITLE": "Konnektor hinzufügen",
+    "EDIT_TITLE": "Konnektor bearbeiten",
+    "VIEW_TITLE": "Konnektorendetails",
     "HOST": "Host",
     "PORT": "Port",
     "DATABASE_NAME": "Datenbankname",
@@ -707,17 +707,17 @@
     "CONNECTION_SUCCESSFUL": "Verbindung erfolgreich",
     "CONNECTION_FAILED_RETRY": "Verbindung fehlgeschlagen – Erneut versuchen",
     "CONNECTION_TEST_REQUIRED": "Verbindungstest vor dem Speichern erforderlich",
-    "CONFIRM_DELETE_SINGLE": "Sind Sie sicher, dass Sie diese Datenquelle löschen möchten?",
-    "CONFIRM_DELETE_BULK": "Sind Sie sicher, dass Sie <strong>{{count}}</strong> ausgewählte Datenquelle(n) löschen möchten?",
-    "CONFIRM_UPDATE_MESSAGE": "Sind Sie sicher, dass Sie diese Datenquelle aktualisieren möchten?",
+    "CONFIRM_DELETE_SINGLE": "Sind Sie sicher, dass Sie diese Konnektor löschen möchten?",
+    "CONFIRM_DELETE_BULK": "Sind Sie sicher, dass Sie <strong>{{count}}</strong> ausgewählte Konnektor(n) löschen möchten?",
+    "CONFIRM_UPDATE_MESSAGE": "Sind Sie sicher, dass Sie diese Konnektor aktualisieren möchten?",
     "DELETE_INFO_ASSOCIATED_DATA": "Alle zugehörigen Daten werden entfernt",
     "DELETE_INFO_CONNECTED_DATASETS": "Verbundene Datensätze sind betroffen",
-    "EDIT_WARNING_TITLE": "Sie bearbeiten eine Datenquellenverbindung",
-    "EDIT_WARNING_CHANGES": "Änderungen an den Verbindungsdetails betreffen alle Datensätze und Abfragen, die diese Datenquelle verwenden",
+    "EDIT_WARNING_TITLE": "Sie bearbeiten eine Konnektorenverbindung",
+    "EDIT_WARNING_CHANGES": "Änderungen an den Verbindungsdetails betreffen alle Datensätze und Abfragen, die diese Konnektor verwenden",
     "EDIT_WARNING_TEST_REQUIRED": "Ein erfolgreicher Verbindungstest ist vor dem Speichern erforderlich",
     "EDIT_WARNING_CREDENTIALS": "Bestehende Verbindungen werden mit den neuen Zugangsdaten aktualisiert",
     "CONFIGURATION": "Konfiguration",
-    "DATASOURCE_TYPE": "Datenquellentyp",
+    "DATASOURCE_TYPE": "Konnektorentyp",
     "CONNECTION_STATUS": "Verbindungsstatus",
     "LAST_UPDATED": "Zuletzt aktualisiert",
     "USAGE": "Nutzung",
@@ -736,7 +736,7 @@
     "HEALTH_TESTING": "Testen…",
     "HEALTH_NEVER_TESTED": "Nie getestet",
     "TESTED": "getestet",
-    "SEARCH_PLACEHOLDER": "Datenquellen nach Name suchen",
+    "SEARCH_PLACEHOLDER": "Konnektoren nach Name suchen",
     "ACCOUNT": "Konto",
     "WAREHOUSE": "Warehouse",
     "ROLE": "Rolle",
@@ -864,7 +864,7 @@
     "LOADING_MONACO_HINT": "SQL-Editor wird eingerichtet...",
     "LOADING_SCHEMA": "Schema wird geladen...",
     "NO_ANALYSES_FOUND": "Keine Analysen für diesen Datensatz gefunden",
-    "NO_DATASOURCE_SELECTED": "Keine Datenquelle ausgewählt",
+    "NO_DATASOURCE_SELECTED": "Keine Konnektor ausgewählt",
     "NO_DESCRIPTION": "Keine Beschreibung vorhanden",
     "NO_FIELDS_FOUND": "Keine Felder gefunden",
     "NO_FUNCTIONS_FOUND": "Keine Funktionen gefunden",
@@ -892,8 +892,8 @@
     "SEARCH_QUERY_BUILDERS": "Query Builder suchen...",
     "SEARCH_TABLES": "Tabellen suchen...",
     "SELECT_DATA_TYPE": "Datentyp auswählen",
-    "SELECT_DATASOURCE_HINT": "Wählen Sie eine Datenquelle, um mit dem Schreiben Ihrer Abfrage zu beginnen",
-    "SELECT_DATASOURCE_QUERY_HINT": "Wählen Sie die Datenquelle, gegen die Sie abfragen möchten",
+    "SELECT_DATASOURCE_HINT": "Wählen Sie eine Konnektor, um mit dem Schreiben Ihrer Abfrage zu beginnen",
+    "SELECT_DATASOURCE_QUERY_HINT": "Wählen Sie die Konnektor, gegen die Sie abfragen möchten",
     "SOURCE": "Quelle",
     "SQL_BASED": "SQL-basiert",
     "SQL_QUERY": "SQL-Abfrage",
@@ -909,13 +909,13 @@
     "VIA_QUERY_BUILDER": "Über Query Builder",
     "VIEW_RESULTS": "Ergebnisse anzeigen",
     "ACTIVE_DIALECT": "Aktiver SQL-Dialekt",
-    "PICK_DATASOURCE": "Datenquelle wählen",
+    "PICK_DATASOURCE": "Konnektor wählen",
     "SCHEMA_PICKER_HINT": "Der Editor wird auf dieses Schema eingegrenzt. Tabellen aus anderen Schemata sind nicht sichtbar.",
-    "SCHEMA_PICKER_HINT_OPTIONAL": "Leer lassen, um sich mit der gesamten Datenquelle zu verbinden. Schema wählen, um die Seitenleiste des Editors darauf einzuschränken.",
-    "SCHEMA_PICK_DATASOURCE_FIRST": "Wählen Sie oben eine Datenquelle, um ein Schema zu wählen.",
-    "SCHEMA_LAZY_MODE_HINT": "Große Datenquelle — Spalten werden beim Aufklappen einer Tabelle geladen.",
-    "SEARCH_DATASOURCES": "Datenquellen suchen…",
-    "NO_DATASOURCES": "Keine Datenquellen gefunden",
+    "SCHEMA_PICKER_HINT_OPTIONAL": "Leer lassen, um sich mit der gesamten Konnektor zu verbinden. Schema wählen, um die Seitenleiste des Editors darauf einzuschränken.",
+    "SCHEMA_PICK_DATASOURCE_FIRST": "Wählen Sie oben eine Konnektor, um ein Schema zu wählen.",
+    "SCHEMA_LAZY_MODE_HINT": "Große Konnektor — Spalten werden beim Aufklappen einer Tabelle geladen.",
+    "SEARCH_DATASOURCES": "Konnektoren suchen…",
+    "NO_DATASOURCES": "Keine Konnektoren gefunden",
     "SCHEMA": "Schema",
     "EDITOR_DISABLED": "Editor deaktiviert – Schema nicht verfügbar.",
     "CELL_NULL": "NULL",
@@ -942,14 +942,14 @@
     "ERROR_KIND_PERMISSION_DENIED": "Zugriff verweigert",
     "ERROR_KIND_SYNTAX": "SQL-Syntaxfehler",
     "ERROR_KIND_TIMEOUT": "Zeitüberschreitung der Abfrage",
-    "ERROR_KIND_CONNECTION": "Datenquelle nicht erreichbar",
+    "ERROR_KIND_CONNECTION": "Konnektor nicht erreichbar",
     "ERROR_KIND_OBJECT_NOT_FOUND": "Objekt nicht gefunden",
     "ERROR_KIND_SAFETY_VIOLATION": "SQL durch Sicherheitsprüfung abgelehnt",
-    "ERROR_HINT_PERMISSION_DENIED": "Der Datenquellen-Benutzer hat keinen Zugriff auf ein oder mehrere Objekte. Bitten Sie den DB-Admin um SELECT-Rechte.",
+    "ERROR_HINT_PERMISSION_DENIED": "Der Konnektoren-Benutzer hat keinen Zugriff auf ein oder mehrere Objekte. Bitten Sie den DB-Admin um SELECT-Rechte.",
     "ERROR_HINT_SYNTAX": "Die Engine konnte das SQL nicht parsen. Die Positionsangabe zeigt auf den ersten unerwarteten Token.",
     "ERROR_HINT_TIMEOUT": "Die Abfrage hat das Statement-Timeout überschritten. Fügen Sie ein WHERE hinzu oder vereinfachen Sie die JOINs.",
-    "ERROR_HINT_CONNECTION": "Die Datenquelle ist nicht erreichbar. Prüfen Sie die Verbindung in den Einstellungen.",
-    "ERROR_HINT_OBJECT_NOT_FOUND": "Eine Tabelle, Sicht oder Spalte aus der Abfrage existiert auf dieser Datenquelle nicht.",
+    "ERROR_HINT_CONNECTION": "Die Konnektor ist nicht erreichbar. Prüfen Sie die Verbindung in den Einstellungen.",
+    "ERROR_HINT_OBJECT_NOT_FOUND": "Eine Tabelle, Sicht oder Spalte aus der Abfrage existiert auf dieser Konnektor nicht.",
     "ERROR_HINT_SAFETY_VIOLATION": "Es sind nur einzelne SELECT- oder WITH … SELECT-Abfragen erlaubt.",
     "OFFENDING_TOKEN_TOOLTIP": "Vom Validator abgelehntes Schlüsselwort",
     "TRUNCATED_BANNER": "Ergebnis gekürzt — nur die erste Seite wird angezeigt. Verwenden Sie Paginierung oder ein WHERE.",
@@ -2176,7 +2176,7 @@
     "SUBTITLE": "Veröffentlichte Dashboards anzeigen und verwalten",
     "DATASET": "Datensatz",
     "SEARCH_DATASET": "Datensatz suchen",
-    "SEARCH_DATASOURCE": "Datenquelle suchen",
+    "SEARCH_DATASOURCE": "Konnektor suchen",
     "NO_DASHBOARDS_FOUND": "Keine Dashboards gefunden",
     "CONFIRM_DELETE_SINGLE": "Sind Sie sicher, dass Sie dieses Dashboard löschen möchten?",
     "CONFIRM_DELETE_BULK": "Sind Sie sicher, dass Sie <strong>{{count}}</strong> ausgewählte(s) Dashboard(s) löschen möchten?",
@@ -2337,7 +2337,7 @@
     "GROUPS": "Gruppen",
     "RLS_RULES": "RLS-Regeln",
     "ALERTS": "Warnungen",
-    "DATASOURCES": "Datenquellen",
+    "DATASOURCES": "Konnektoren",
     "ROLES": "Rollen",
     "DATASET": "Datensatz",
     "ANALYSES": "Analysen",
@@ -2372,7 +2372,7 @@
     "CONNECTORS_API": "Web/REST-Konnektoren"
   },
   "AUTH": {
-    "HEADLINE_LOGIN": "Verbessern Sie Ihr Datenquellen-\nManagement-Erlebnis",
+    "HEADLINE_LOGIN": "Verbessern Sie Ihr Konnektoren-\nManagement-Erlebnis",
     "HEADLINE_FORGOT": "Setzen Sie Ihr Kontopasswort\nsicher zurück",
     "HEADLINE_RESET": "Legen Sie Ihr neues\nKontopasswort fest",
     "HEADLINE_SET_PASSWORD": "Legen Sie Ihr\nKontopasswort fest",
@@ -2466,7 +2466,7 @@
       "HOME_ARIA": "DBExec Startseite",
       "ALL_RIGHTS": "Alle Rechte vorbehalten.",
       "HERO_TITLE": "Verwandeln Sie Ihre Datenbanken in Dashboards.",
-      "HERO_LEDE": "Verbinden Sie eine Datenquelle, ziehen Sie die gewünschten Diagramme und teilen Sie das Dashboard — alles an einem Ort, ganz ohne SQL.",
+      "HERO_LEDE": "Verbinden Sie eine Konnektor, ziehen Sie die gewünschten Diagramme und teilen Sie das Dashboard — alles an einem Ort, ganz ohne SQL.",
       "FEATURE_CONNECT_TITLE": "Jede Datenbank verbinden",
       "FEATURE_CONNECT_DESC": "Postgres, MySQL, SQL Server und mehr — in wenigen Minuten.",
       "FEATURE_BUILD_TITLE": "Dashboards visuell erstellen",
@@ -2564,7 +2564,7 @@
     "ACTIVE_USERS_7D": "Aktive Benutzer (letzte 7 Tage)",
     "ACTIVE_USERS_15D": "Aktive Benutzer (letzte 15 Tage)",
     "ACTIVE_USERS_30D": "Aktive Benutzer (letzte 30 Tage)",
-    "TOTAL_DATASOURCES": "Datenquellen gesamt",
+    "TOTAL_DATASOURCES": "Konnektoren gesamt",
     "TOTAL_ENVIRONMENTS": "Umgebungen gesamt",
     "TOTAL_ADMINS": "Administratoren gesamt",
     "TOTAL_USERS": "Benutzer gesamt",
@@ -2582,17 +2582,17 @@
     "ANALYSES_DESC": "Visualize and analyze data",
     "USERS": "Users",
     "USERS_DESC": "Manage organisation users",
-    "DATASOURCES": "Datasources",
-    "DATASOURCES_DESC": "Configure datasource connections",
+    "DATASOURCES": "Konnektoren",
+    "DATASOURCES_DESC": "Configure Konnektor connections",
     "AUDIT_LOGS": "Audit Logs",
     "AUDIT_LOGS_DESC": "Review activity history",
     "ADD_USER": "Add User",
-    "MANAGE_DATASOURCE": "Manage Datasource",
+    "MANAGE_DATASOURCE": "Manage Konnektor",
     "VIEW_REPORTS": "View Reports"
   },
   "AUTH_FEATURES": {
-    "LOGIN_1_TITLE": "Visueller Datenquellen-Explorer",
-    "LOGIN_1_DESC": "Navigieren Sie durch Ihre Datenquellenstruktur mit einer intuitiven visuellen Oberfläche",
+    "LOGIN_1_TITLE": "Visueller Konnektoren-Explorer",
+    "LOGIN_1_DESC": "Navigieren Sie durch Ihre Konnektorenstruktur mit einer intuitiven visuellen Oberfläche",
     "LOGIN_2_TITLE": "Leistungseinblicke",
     "LOGIN_2_DESC": "Erhalten Sie Echtzeit-Leistungsmetriken und Vorschläge zur Abfrageoptimierung",
     "LOGIN_3_TITLE": "Sicherer Zugang",
@@ -2672,7 +2672,7 @@
   },
   "PROMPT_MODULE": {
     "TITLE": "Prompts",
-    "SUBTITLE": "Configure datasource fields for data filtering and query generation",
+    "SUBTITLE": "Configure Konnektor fields for data filtering and query generation",
     "ADD_TITLE": "Add Prompt",
     "EDIT_TITLE": "Edit Prompt",
     "VIEW_TITLE": "Prompt Details",
@@ -3092,8 +3092,8 @@
     "CONDITION_COUNT": "{{count}} condition(s)",
     "MORE_CONDITIONS": "+{{count}} more",
     "SEARCH_DATASET": "Search Dataset",
-    "SELECT_DATASOURCE_MSG": "Please select a datasource to view RLS rules",
-    "NO_RULES_FOUND": "No RLS rules found for this datasource",
+    "SELECT_DATASOURCE_MSG": "Please select a Konnektor to view RLS rules",
+    "NO_RULES_FOUND": "No RLS rules found for this Konnektor",
     "DELETE_SINGLE": "Are you sure you want to delete this RLS rule?",
     "UPDATE_CONFIRM": "Are you sure you want to update this RLS rule?",
     "DELETE_INFO_FILTERING": "Row-level security filtering will be removed",
@@ -4100,7 +4100,7 @@
     "IMPORT": "Importieren",
     "IMPORTING": "Wird importiert…",
     "EXPORT_SUCCESS": "Export heruntergeladen",
-    "IMPORT_SUCCESS": "Import abgeschlossen. Eine neue Datenquelle wurde erstellt — legen Sie ihr Passwort fest, um die importierten Objekte auszuführen.",
+    "IMPORT_SUCCESS": "Import abgeschlossen. Eine neue Konnektor wurde erstellt — legen Sie ihr Passwort fest, um die importierten Objekte auszuführen.",
     "IMPORT_FAILED": "Import fehlgeschlagen",
     "INVALID_FILE": "Diese Datei ist keine gültige DBExec-Exportdatei.",
     "FILE_TOO_LARGE": "Datei ist zu groß (max. 10 MB).",
@@ -4524,8 +4524,8 @@
         "tooLong": "Das Standardschema darf 128 Zeichen nicht überschreiten"
       },
       "id": {
-        "required": "Die Datenquellen-ID ist erforderlich",
-        "invalid": "Ungültige Datenquellen-ID"
+        "required": "Die Konnektoren-ID ist erforderlich",
+        "invalid": "Ungültige Konnektoren-ID"
       },
       "justification": {
         "tooLong": "Die Begründung darf 500 Zeichen nicht überschreiten"
@@ -4545,7 +4545,7 @@
         "invalid": "Der Name muss mit einem Buchstaben oder einer Zahl beginnen und darf nur Buchstaben, Zahlen, Leerzeichen, Punkte, Unterstriche und Bindestriche enthalten"
       },
       "datasource": {
-        "required": "Die Datenquelle ist erforderlich"
+        "required": "Die Konnektor ist erforderlich"
       },
       "id": {
         "required": "Die Verbindungs-ID ist erforderlich"
@@ -4556,7 +4556,7 @@
     },
     "access": {
       "datasource": {
-        "required": "Die Datenquelle ist erforderlich"
+        "required": "Die Konnektor ist erforderlich"
       },
       "connection": {
         "required": "Die Verbindung ist erforderlich"
@@ -4580,7 +4580,7 @@
         "tooLong": "Die Begründung darf 500 Zeichen nicht überschreiten"
       },
       "datasource": {
-        "required": "Die Datenquelle ist erforderlich"
+        "required": "Die Konnektor ist erforderlich"
       },
       "sql": {
         "required": "Die SQL-Abfrage ist erforderlich",
@@ -4631,7 +4631,7 @@
         "tooLong": "Die Begründung darf 500 Zeichen nicht überschreiten"
       },
       "datasource": {
-        "required": "Die Datenquelle ist erforderlich"
+        "required": "Die Konnektor ist erforderlich"
       },
       "dataset": {
         "required": "Der Datensatz ist erforderlich"
@@ -4853,8 +4853,8 @@
         "unsupported": "Nicht unterstützte Version der Migrationsdatei"
       },
       "datasources": {
-        "required": "Die Migrationsdatei muss mindestens eine Datenquelle enthalten",
-        "tooMany": "Zu viele Datenquellen in der Migrationsdatei"
+        "required": "Die Migrationsdatei muss mindestens eine Konnektor enthalten",
+        "tooMany": "Zu viele Konnektoren in der Migrationsdatei"
       },
       "datasource": {
         "handle": {
@@ -4879,7 +4879,7 @@
           "required": "Objektname ist erforderlich"
         },
         "datasourceHandle": {
-          "required": "Dem Objekt fehlt der Datenquellenverweis"
+          "required": "Dem Objekt fehlt der Konnektorenverweis"
         },
         "handle": {
           "required": "Dem Objekt fehlt sein Bundle-Handle"
@@ -5253,8 +5253,8 @@
         "tooLong": "Beschreibung darf 500 Zeichen nicht überschreiten"
       },
       "datasource": {
-        "required": "Datenquelle ist erforderlich",
-        "invalid": "Datenquelle muss eine gültige UUID sein"
+        "required": "Konnektor ist erforderlich",
+        "invalid": "Konnektor muss eine gültige UUID sein"
       },
       "status": {
         "invalid": "Status muss 0 oder 1 sein"
@@ -5278,8 +5278,8 @@
         "tooLong": "Beschreibung darf 500 Zeichen nicht überschreiten"
       },
       "datasource": {
-        "required": "Datenquelle ist erforderlich",
-        "invalid": "Datenquelle muss eine gültige UUID sein"
+        "required": "Konnektor ist erforderlich",
+        "invalid": "Konnektor muss eine gültige UUID sein"
       },
       "status": {
         "invalid": "Status muss 0 oder 1 sein"
@@ -5402,7 +5402,7 @@
     "NO_CONNECTIONS": "Noch keine Verbindungen. Erstellen Sie eine, um Abfragen auszuführen.",
     "CONNECTION_NAME": "Verbindungsname",
     "CONNECTION_NAME_PLACEHOLDER": "z. B. prod-db (Analyst)",
-    "CONNECTION_HINT": "Eine Verbindung koppelt eine Datenquelle an ein Ihnen zugewiesenes Datenbank-Login. Beim Öffnen wird Ihr SQL unter diesem Login ausgeführt.",
+    "CONNECTION_HINT": "Eine Verbindung koppelt eine Konnektor an ein Ihnen zugewiesenes Datenbank-Login. Beim Öffnen wird Ihr SQL unter diesem Login ausgeführt.",
     "CREDENTIALS": "Anmeldedaten",
     "LOGIN": "Anmelden",
     "LOGIN_PLACEHOLDER": "Datenbank-Benutzername",
@@ -5418,20 +5418,20 @@
     "DISABLED": "Deaktiviert",
     "ENABLE": "Aktivieren",
     "DISABLE": "Deaktivieren",
-    "SET_DEFAULT": "Als Standard für diese Datenquelle festlegen",
-    "IS_DEFAULT": "Standard für diese Datenquelle",
-    "DEFAULT_BADGE": "Standardverbindung für diese Datenquelle",
-    "ALL_DISABLED_FOR_DS": "Alle Verbindungen für diese Datenquelle sind deaktiviert. Aktivieren Sie eine, um Abfragen auszuführen.",
+    "SET_DEFAULT": "Als Standard für diese Konnektor festlegen",
+    "IS_DEFAULT": "Standard für diese Konnektor",
+    "DEFAULT_BADGE": "Standardverbindung für diese Konnektor",
+    "ALL_DISABLED_FOR_DS": "Alle Verbindungen für diese Konnektor sind deaktiviert. Aktivieren Sie eine, um Abfragen auszuführen.",
     "TEST": "Verbindung überprüfen",
     "OPEN": "SQL-Editor öffnen",
     "LAUNCH_TITLE": "Abfragesitzung öffnen",
-    "LAUNCH_SUBTITLE": "Wählen Sie eine Datenquelle und eine Ihrer Verbindungen aus und öffnen Sie dann den Editor in einem neuen Tab.",
-    "STEP_DATASOURCE": "Datenquelle",
+    "LAUNCH_SUBTITLE": "Wählen Sie eine Konnektor und eine Ihrer Verbindungen aus und öffnen Sie dann den Editor in einem neuen Tab.",
+    "STEP_DATASOURCE": "Konnektor",
     "STEP_CONNECTION": "Verbindung",
-    "SELECT_DATASOURCE": "Datenquelle auswählen",
-    "SELECT_DATASOURCE_FIRST": "Zuerst eine Datenquelle auswählen",
+    "SELECT_DATASOURCE": "Konnektor auswählen",
+    "SELECT_DATASOURCE_FIRST": "Zuerst eine Konnektor auswählen",
     "SELECT_CONNECTION": "Verbindung auswählen",
-    "NO_CONNECTIONS_FOR_DS": "Sie haben noch keine Verbindungen für diese Datenquelle.",
+    "NO_CONNECTIONS_FOR_DS": "Sie haben noch keine Verbindungen für diese Konnektor.",
     "NO_CONNECTIONS_HINT": "Sie haben noch keine Verbindungen. Erstellen Sie eine, um zu beginnen.",
     "OPEN_EXECUTOR": "SQL-Editor öffnen",
     "VERIFYING": "Wird überprüft…",
@@ -5605,12 +5605,12 @@
     "SAVED_QUERIES_SEARCH_PLACEHOLDER": "Search saved queries by name",
     "NO_SAVED_QUERIES": "No saved queries yet. Create one to get started.",
     "NEW_QUERY": "New query",
-    "NEW_QUERY_SUBTITLE": "Pick a datasource and one of your connections, then open the editor in a new tab.",
+    "NEW_QUERY_SUBTITLE": "Pick a Konnektor and one of your connections, then open the editor in a new tab.",
     "NEW_SAVED_QUERY": "New Saved Query",
     "EDIT_SAVED_QUERY": "Edit Saved Query",
     "DELETE_SAVED_QUERY": "Delete saved query",
     "DELETE_SAVED_QUERY_CONFIRM": "Delete the saved query \"{{name}}\"? This removes the saved SQL only — nothing on the database is changed.",
-    "SAVED_QUERY_HINT": "A saved query stores your SQL against a datasource + connection so you can reopen and run it later.",
+    "SAVED_QUERY_HINT": "A saved query stores your SQL against a Konnektor + connection so you can reopen and run it later.",
     "SAVED_QUERY_NAME": "Query name",
     "SAVED_QUERY_NAME_PLACEHOLDER": "e.g. Monthly active users",
     "SAVED_QUERY_DESCRIPTION": "Description",
@@ -5630,15 +5630,15 @@
   },
   "DB_ACCESS": {
     "TITLE": "Datenbankzugriffsverwaltung",
-    "SUBTITLE": "PostgreSQL-Benutzer, -Rollen und -Berechtigungen auf einer Datenquelle verwalten",
+    "SUBTITLE": "PostgreSQL-Benutzer, -Rollen und -Berechtigungen auf einer Konnektor verwalten",
     "EXPORT_JSON": "JSON exportieren",
     "EXPORT_CSV": "CSV exportieren",
     "EXPORT_ACCESS_HINT": "Vollständiges Zugriffsprofil dieses Kontos (Attribute, gewährte Rollen, effektive Berechtigungen, zugehörige Objekte) für das Audit herunterladen.",
-    "SELECT_DATASOURCE": "Eine zu verwaltende Datenquelle auswählen",
+    "SELECT_DATASOURCE": "Eine zu verwaltende Konnektor auswählen",
     "CHECKING_CAPABILITY": "Verwaltungsberechtigung wird geprüft…",
     "OPEN_WORKSPACE": "Arbeitsbereich öffnen",
     "UNSUPPORTED_TITLE": "In v1 nur PostgreSQL",
-    "UNSUPPORTED_BODY": "Die Datenbankzugriffsverwaltung unterstützt in dieser Version nur PostgreSQL-Datenquellen.",
+    "UNSUPPORTED_BODY": "Die Datenbankzugriffsverwaltung unterstützt in dieser Version nur PostgreSQL-Konnektoren.",
     "CAP_FULL_TITLE": "Vollständige Verwaltung verfügbar",
     "CAP_FULL_BODY": "Das Verwaltungs-Login kann Rollen und Berechtigungen auf dieser Datenbank erstellen, ändern und löschen.",
     "CAP_FULL_BADGE": "Vollständige Verwaltung",
@@ -5692,7 +5692,7 @@
     "APP_GROUPS": "App-Gruppen",
     "SELECT_APP_USERS": "App-Benutzer zum Zuweisen auswählen",
     "SELECT_APP_GROUPS": "App-Gruppen zum Zuweisen auswählen",
-    "ATTACH_HINT": "Weisen Sie diese Datenbankrolle einem oder mehreren App-Benutzern und -Gruppen zu. Jede Auswahl wird für diese Datenquelle mit der Rolle verknüpft.",
+    "ATTACH_HINT": "Weisen Sie diese Datenbankrolle einem oder mehreren App-Benutzern und -Gruppen zu. Jede Auswahl wird für diese Konnektor mit der Rolle verknüpft.",
     "DISCARD_UNSAVED": "Sie haben nicht gespeicherte Änderungen im Berechtigungseditor. Verwerfen und Tabs wechseln?",
     "DISCARD_TITLE": "Nicht gespeicherte Änderungen verwerfen?",
     "DISCARD_CONFIRM": "Verwerfen & wechseln",
@@ -5821,7 +5821,7 @@
     "CAN_LOGIN_DESC": "Ein Login-Benutzer hat ein Passwort und kann sich verbinden. Eine Gruppenrolle kann sich nicht anmelden — sie bündelt nur Berechtigungen.",
     "LOGIN_DETAILS": "Anmeldedaten",
     "PASSWORD_UNCHANGED_PLACEHOLDER": "Leer lassen, um unverändert zu belassen",
-    "SELECT_DATASOURCE_HINT": "Wählen Sie oben eine Datenquelle aus, um deren Datenbankbenutzer, Rollen und Berechtigungen zu verwalten.",
+    "SELECT_DATASOURCE_HINT": "Wählen Sie oben eine Konnektor aus, um deren Datenbankbenutzer, Rollen und Berechtigungen zu verwalten.",
     "NAME": "Name",
     "SEARCH_NAME": "Name suchen",
     "VIEW_PRIVILEGE_SET": "Gespeichertes Berechtigungsset",
@@ -5902,10 +5902,10 @@
       "GENERIC": "Apply change"
     },
     "SELECT_DATE": "Select a date",
-    "PICK_DATASOURCE_TO_CREATE": "Select a datasource to create a role.",
+    "PICK_DATASOURCE_TO_CREATE": "Select a Konnektor to create a role.",
     "RULE_INCOMPLETE": "Unvollständig",
     "APPLY_DISABLED_HINT": "Vervollständigen oder entfernen Sie jede Regel vor dem Übernehmen.",
-    "CHOOSE_DATASOURCE": "Datenquelle auswählen",
+    "CHOOSE_DATASOURCE": "Konnektor auswählen",
     "TAB_COMPOSE": "Regeln erstellen",
     "TAB_EFFECTIVE_PRIVS": "Effektive Berechtigungen",
     "ALL_SEQUENCES": "Alle Sequenzen im Schema",
@@ -5921,7 +5921,7 @@
     "SCOPE_ORG_WIDE": "Organisationsweit",
     "SCOPE": "Geltungsbereich",
     "RULE": "Regel",
-    "SCOPE_DATASOURCE": "Datenquelle",
+    "SCOPE_DATASOURCE": "Konnektor",
     "SEARCH_TEMPLATES_PLACEHOLDER": "Vorlagen suchen…",
     "TEMPLATES_TITLE": "Rollenvorlagen",
     "TEMPLATES_SUBTITLE": "Wiederverwendbare Rollen- und Rechte-Rezepte. Beim Erstellen einer Rolle oder Komponieren von Rechten anwenden.",
@@ -5965,7 +5965,7 @@
     "PUBLIC_PRIVILEGES": "Berechtigungen für PUBLIC",
     "PUBLIC_ALSO_DIRECT": "Auch direkt vergeben?",
     "PUBLIC_SEARCH": "Objekte suchen",
-    "PUBLIC_NONE": "Für diese Datenquelle sind keine Berechtigungen an PUBLIC vergeben.",
+    "PUBLIC_NONE": "Für diese Konnektor sind keine Berechtigungen an PUBLIC vergeben.",
     "PUBLIC_VIA_PUBLIC": "Über PUBLIC",
     "PUBLIC_REVOKE_SUMMARY": "{{privileges}} von PUBLIC für {{object}} entziehen",
     "PUBLIC_CONFIRM_TITLE": "Berechtigungen von PUBLIC entziehen",
@@ -6316,7 +6316,7 @@
     "UNGROUPED": "Ohne Gruppe",
     "GROUP_NAME": "Gruppenname",
     "DROP_PROMPTS_HERE": "Prompts hierher ziehen",
-    "NO_PROMPTS": "Keine Prompts für diese Datenquelle gefunden.",
+    "NO_PROMPTS": "Keine Prompts für diese Konnektor gefunden.",
     "ALREADY_PLACED": "Bereits platziert",
     "MANDATORY": "Pflichtfeld",
     "LOCKED": "Gesperrt",
@@ -6665,7 +6665,7 @@
     "COMPOSE": "Run",
     "DELETE_SINGLE": "Are you sure you want to delete this form?",
     "COL_NAME": "Name",
-    "COL_DATASOURCE": "Datasource",
+    "COL_DATASOURCE": "Konnektor",
     "COL_STATUS": "Status",
     "COL_UPDATED": "Updated",
     "VERSIONS": "Versions",
@@ -6840,7 +6840,7 @@
     },
     "PALETTE": {
       "NO_PROMPTS": "No prompts yet",
-      "NO_PROMPTS_HINT": "Create prompts in the Prompts module for this datasource, then drag them onto a section."
+      "NO_PROMPTS_HINT": "Create prompts in the Prompts module for this Konnektor, then drag them onto a section."
     }
   },
   "CONNECTORS_API": {

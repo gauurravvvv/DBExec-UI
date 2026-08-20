@@ -53,7 +53,7 @@ interface DesignGroup {
 })
 export class QbFormDesignerComponent implements OnInit {
   @Input({ required: true }) queryBuilderId!: string;
-  @Input({ required: true }) datasourceId!: string;
+  @Input({ required: true }) connectorId!: string;
 
   private readonly admin = inject(QbAdminService);
   private readonly global = inject(GlobalService);

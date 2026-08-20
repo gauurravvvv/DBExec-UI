@@ -12,7 +12,7 @@ import {
 } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import { GlobalService } from 'src/app/core/services/global.service';
-import { DatasourceService } from 'src/app/modules/datasource/services/datasource.service';
+import { ConnectorService } from 'src/app/modules/connector/services/connector.service';
 
 /**
  * Payload emitted when the user clicks Continue.
@@ -52,7 +52,7 @@ export class DatasetPickerDialogComponent implements OnChanges {
   constructor(
     private translate: TranslateService,
     private globalService: GlobalService,
-    private datasourceService: DatasourceService,
+    private datasourceService: ConnectorService,
   ) {}
 
   // ── Selection state ────────────────────────────────────────────────
@@ -160,14 +160,14 @@ export class DatasetPickerDialogComponent implements OnChanges {
 
   // ── Schema dropdown ────────────────────────────────────────────────
 
-  private loadSchemas(datasourceId: string): void {
+  private loadSchemas(connectorId: string): void {
     const token = this.schemaToken;
     this.schemaLoading = true;
     this.schemaOptions = null;
     this.schemaError = null;
     this.cdr.markForCheck();
     this.datasourceService
-      .listDatasourceSchemas({ datasourceId })
+      .listDatasourceSchemas({ connectorId })
       .then((res: any) => {
         if (token !== this.schemaToken) return; // stale; user switched
         if (this.globalService.handleSuccessService(res, false)) {

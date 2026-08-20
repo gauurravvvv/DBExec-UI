@@ -32,7 +32,7 @@ describe('ConfigPromptComponent', () => {
         {
           provide: PromptConfigService,
           useValue: {
-            datasourceId: { set: () => {} },
+            connectorId: { set: () => {} },
             load: () => Promise.resolve(),
             currentStep: () => 0,
             stepValid: () => [false, true, false, true],

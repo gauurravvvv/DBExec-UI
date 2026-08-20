@@ -6,7 +6,7 @@ import { HttpClientService } from 'src/app/core/services/http-client.service';
 /**
  * DbAccessService — UI over the customer datasource's PostgreSQL-native
  * security model (roles / users / grants / memberships). Mirrors
- * DatasourceService's signal + skipLoader conventions: `loading` for
+ * ConnectorService's signal + skipLoader conventions: `loading` for
  * reads, `saving` for writes; every call passes `{ skipLoader: true }`
  * so the module drives its own spinners.
  *
@@ -38,23 +38,23 @@ export class DbAccessService {
 
   constructor(private http: HttpClientService) {}
 
-  private base(datasourceId: string): string {
-    return DB_ACCESS.BASE + datasourceId;
+  private base(connectorId: string): string {
+    return DB_ACCESS.BASE + connectorId;
   }
 
   // ── Capability ──────────────────────────────────────────────────────────
 
   /**
-   * GET /:datasourceId/capability. Non-postgres datasources 400 here —
+   * GET /:connectorId/capability. Non-postgres datasources 400 here —
    * the caller catches and shows "PostgreSQL only in v1". Returns the raw
    * response so the landing banner can read `data.canManage`.
    */
-  async loadCapability(datasourceId: string): Promise<any> {
+  async loadCapability(connectorId: string): Promise<any> {
     this._loading.set(true);
     try {
       const res: any = await lastValueFrom(
         this.http
-          .apiGet(this.base(datasourceId) + DB_ACCESS.CAPABILITY_SUFFIX, {
+          .apiGet(this.base(connectorId) + DB_ACCESS.CAPABILITY_SUFFIX, {
             skipLoader: true,
           })
           .pipe(takeUntil(this._cancelReads$)),
@@ -68,12 +68,12 @@ export class DbAccessService {
 
   // ── Roles / Users (all roles; split FE-side on canLogin) ─────────────────
 
-  async loadRoles(datasourceId: string): Promise<any> {
+  async loadRoles(connectorId: string): Promise<any> {
     this._loading.set(true);
     try {
       const res: any = await lastValueFrom(
         this.http
-          .apiGet(this.base(datasourceId) + DB_ACCESS.ROLES_SUFFIX, {
+          .apiGet(this.base(connectorId) + DB_ACCESS.ROLES_SUFFIX, {
             skipLoader: true,
           })
           .pipe(takeUntil(this._cancelReads$)),
@@ -96,7 +96,7 @@ export class DbAccessService {
    * signal (grantee pickers still use the full cached list via loadRoles).
    */
   loadRolesPaged(
-    datasourceId: string,
+    connectorId: string,
     opts: {
       page: number;
       limit: number;
@@ -113,7 +113,7 @@ export class DbAccessService {
     if (opts.filter) params['filter'] = opts.filter;
     return lastValueFrom(
       this.http
-        .apiGet(this.base(datasourceId) + DB_ACCESS.ROLES_SUFFIX, {
+        .apiGet(this.base(connectorId) + DB_ACCESS.ROLES_SUFFIX, {
           skipLoader: true,
           params,
         })
@@ -121,11 +121,11 @@ export class DbAccessService {
     );
   }
 
-  createRole(datasourceId: string, body: any): Promise<any> {
+  createRole(connectorId: string, body: any): Promise<any> {
     this._saving.set(true);
     return lastValueFrom(
       this.http.apiPost(
-        this.base(datasourceId) + DB_ACCESS.ROLES_SUFFIX,
+        this.base(connectorId) + DB_ACCESS.ROLES_SUFFIX,
         body,
         {
           skipLoader: true,
@@ -134,11 +134,11 @@ export class DbAccessService {
     ).finally(() => this._saving.set(false));
   }
 
-  updateRole(datasourceId: string, roleName: string, body: any): Promise<any> {
+  updateRole(connectorId: string, roleName: string, body: any): Promise<any> {
     this._saving.set(true);
     return lastValueFrom(
       this.http.apiPut(
-        this.base(datasourceId) +
+        this.base(connectorId) +
           DB_ACCESS.ROLE_SEGMENT +
           encodeURIComponent(roleName),
         body,
@@ -148,14 +148,14 @@ export class DbAccessService {
   }
 
   renameRole(
-    datasourceId: string,
+    connectorId: string,
     roleName: string,
     newName: string,
   ): Promise<any> {
     this._saving.set(true);
     return lastValueFrom(
       this.http.apiPost(
-        this.base(datasourceId) +
+        this.base(connectorId) +
           DB_ACCESS.ROLE_SEGMENT +
           encodeURIComponent(roleName) +
           DB_ACCESS.RENAME_SUFFIX,
@@ -166,14 +166,14 @@ export class DbAccessService {
   }
 
   /**
-   * POST /:datasourceId/roles/:roleName/delete — dependency wizard.
+   * POST /:connectorId/roles/:roleName/delete — dependency wizard.
    * body: { reassignTo?, dropOwned?, confirm: true, previewOnly? }.
    */
-  deleteRole(datasourceId: string, roleName: string, body: any): Promise<any> {
+  deleteRole(connectorId: string, roleName: string, body: any): Promise<any> {
     this._saving.set(true);
     return lastValueFrom(
       this.http.apiPost(
-        this.base(datasourceId) +
+        this.base(connectorId) +
           DB_ACCESS.ROLE_SEGMENT +
           encodeURIComponent(roleName) +
           DB_ACCESS.DELETE_SUFFIX,
@@ -183,12 +183,12 @@ export class DbAccessService {
     ).finally(() => this._saving.set(false));
   }
 
-  /** GET /:datasourceId/roles/:roleName/owned — objects a role owns. */
-  loadOwned(datasourceId: string, roleName: string): Promise<any> {
+  /** GET /:connectorId/roles/:roleName/owned — objects a role owns. */
+  loadOwned(connectorId: string, roleName: string): Promise<any> {
     return lastValueFrom(
       this.http
         .apiGet(
-          this.base(datasourceId) +
+          this.base(connectorId) +
             DB_ACCESS.ROLE_SEGMENT +
             encodeURIComponent(roleName) +
             DB_ACCESS.OWNED_SUFFIX,
@@ -199,15 +199,15 @@ export class DbAccessService {
   }
 
   /**
-   * GET /:datasourceId/roles/:roleName/export — full access profile
+   * GET /:connectorId/roles/:roleName/export — full access profile
    * (attributes, granted roles, effective privileges + provenance,
    * owned objects) for one role/user. Caller triggers a JSON/CSV
    * browser download.
    */
-  exportRoleAccess(datasourceId: string, roleName: string): Promise<any> {
+  exportRoleAccess(connectorId: string, roleName: string): Promise<any> {
     return lastValueFrom(
       this.http.apiGet(
-        this.base(datasourceId) +
+        this.base(connectorId) +
           DB_ACCESS.ROLE_SEGMENT +
           encodeURIComponent(roleName) +
           DB_ACCESS.ACCESS_EXPORT_SUFFIX,
@@ -218,12 +218,12 @@ export class DbAccessService {
 
   // ── Memberships ──────────────────────────────────────────────────────────
 
-  async loadMemberships(datasourceId: string): Promise<any> {
+  async loadMemberships(connectorId: string): Promise<any> {
     this._loading.set(true);
     try {
       const res: any = await lastValueFrom(
         this.http
-          .apiGet(this.base(datasourceId) + DB_ACCESS.MEMBERSHIPS_SUFFIX, {
+          .apiGet(this.base(connectorId) + DB_ACCESS.MEMBERSHIPS_SUFFIX, {
             skipLoader: true,
           })
           .pipe(takeUntil(this._cancelReads$)),
@@ -239,26 +239,26 @@ export class DbAccessService {
   }
 
   /**
-   * POST /:datasourceId/memberships — grant role. body supports arrays for
+   * POST /:connectorId/memberships — grant role. body supports arrays for
    * bulk: { role, toRole, adminOption, previewOnly? }.
    */
-  attachRole(datasourceId: string, body: any): Promise<any> {
+  attachRole(connectorId: string, body: any): Promise<any> {
     this._saving.set(true);
     return lastValueFrom(
       this.http.apiPost(
-        this.base(datasourceId) + DB_ACCESS.MEMBERSHIPS_SUFFIX,
+        this.base(connectorId) + DB_ACCESS.MEMBERSHIPS_SUFFIX,
         body,
         { skipLoader: true },
       ),
     ).finally(() => this._saving.set(false));
   }
 
-  /** POST /:datasourceId/memberships/remove — revoke ( confirm: true ). */
-  detachRole(datasourceId: string, body: any): Promise<any> {
+  /** POST /:connectorId/memberships/remove — revoke ( confirm: true ). */
+  detachRole(connectorId: string, body: any): Promise<any> {
     this._saving.set(true);
     return lastValueFrom(
       this.http.apiPost(
-        this.base(datasourceId) + DB_ACCESS.MEMBERSHIPS_REMOVE_SUFFIX,
+        this.base(connectorId) + DB_ACCESS.MEMBERSHIPS_REMOVE_SUFFIX,
         body,
         { skipLoader: true },
       ),
@@ -267,12 +267,12 @@ export class DbAccessService {
 
   // ── Schemas / Grant matrix data ──────────────────────────────────────────
 
-  async loadSchemas(datasourceId: string): Promise<any> {
+  async loadSchemas(connectorId: string): Promise<any> {
     this._loading.set(true);
     try {
       const res: any = await lastValueFrom(
         this.http
-          .apiGet(this.base(datasourceId) + DB_ACCESS.SCHEMAS_SUFFIX, {
+          .apiGet(this.base(connectorId) + DB_ACCESS.SCHEMAS_SUFFIX, {
             skipLoader: true,
           })
           .pipe(takeUntil(this._cancelReads$)),
@@ -288,11 +288,11 @@ export class DbAccessService {
     }
   }
 
-  /** GET /:datasourceId/grants/tables?schema= */
-  loadTableGrants(datasourceId: string, schema: string): Promise<any> {
+  /** GET /:connectorId/grants/tables?schema= */
+  loadTableGrants(connectorId: string, schema: string): Promise<any> {
     return lastValueFrom(
       this.http
-        .apiGet(this.base(datasourceId) + DB_ACCESS.GRANTS_TABLES_SUFFIX, {
+        .apiGet(this.base(connectorId) + DB_ACCESS.GRANTS_TABLES_SUFFIX, {
           params: { schema },
           skipLoader: true,
         })
@@ -300,11 +300,11 @@ export class DbAccessService {
     );
   }
 
-  /** GET /:datasourceId/objects/sequences?schema= → { data: [{ name }] } */
-  loadSequences(datasourceId: string, schema: string): Promise<any> {
+  /** GET /:connectorId/objects/sequences?schema= → { data: [{ name }] } */
+  loadSequences(connectorId: string, schema: string): Promise<any> {
     return lastValueFrom(
       this.http
-        .apiGet(this.base(datasourceId) + DB_ACCESS.OBJECTS_SEQUENCES_SUFFIX, {
+        .apiGet(this.base(connectorId) + DB_ACCESS.OBJECTS_SEQUENCES_SUFFIX, {
           params: { schema },
           skipLoader: true,
         })
@@ -312,11 +312,11 @@ export class DbAccessService {
     );
   }
 
-  /** GET /:datasourceId/objects/functions?schema= → { data: [{ name }] } */
-  loadFunctions(datasourceId: string, schema: string): Promise<any> {
+  /** GET /:connectorId/objects/functions?schema= → { data: [{ name }] } */
+  loadFunctions(connectorId: string, schema: string): Promise<any> {
     return lastValueFrom(
       this.http
-        .apiGet(this.base(datasourceId) + DB_ACCESS.OBJECTS_FUNCTIONS_SUFFIX, {
+        .apiGet(this.base(connectorId) + DB_ACCESS.OBJECTS_FUNCTIONS_SUFFIX, {
           params: { schema },
           skipLoader: true,
         })
@@ -324,15 +324,15 @@ export class DbAccessService {
     );
   }
 
-  /** GET /:datasourceId/grants/columns?schema=&table= */
+  /** GET /:connectorId/grants/columns?schema=&table= */
   loadColumnGrants(
-    datasourceId: string,
+    connectorId: string,
     schema: string,
     table: string,
   ): Promise<any> {
     return lastValueFrom(
       this.http
-        .apiGet(this.base(datasourceId) + DB_ACCESS.GRANTS_COLUMNS_SUFFIX, {
+        .apiGet(this.base(connectorId) + DB_ACCESS.GRANTS_COLUMNS_SUFFIX, {
           params: { schema, table },
           skipLoader: true,
         })
@@ -340,11 +340,11 @@ export class DbAccessService {
     );
   }
 
-  /** GET /:datasourceId/default-privileges */
-  loadDefaultPrivileges(datasourceId: string): Promise<any> {
+  /** GET /:connectorId/default-privileges */
+  loadDefaultPrivileges(connectorId: string): Promise<any> {
     return lastValueFrom(
       this.http
-        .apiGet(this.base(datasourceId) + DB_ACCESS.DEFAULT_PRIVILEGES_SUFFIX, {
+        .apiGet(this.base(connectorId) + DB_ACCESS.DEFAULT_PRIVILEGES_SUFFIX, {
           skipLoader: true,
         })
         .pipe(takeUntil(this._cancelReads$)),
@@ -352,17 +352,17 @@ export class DbAccessService {
   }
 
   /**
-   * POST /:datasourceId/change-set — batches pending grant / revoke /
+   * POST /:connectorId/change-set — batches pending grant / revoke /
    * revokePublic / defaultPriv edits. body:
    * { statements: [{ kind, ...intent }], previewOnly?, confirm? }.
    * The grant matrix calls this with previewOnly first (→ masked SQL),
    * then again with confirm to execute.
    */
-  applyChangeSet(datasourceId: string, body: any): Promise<any> {
+  applyChangeSet(connectorId: string, body: any): Promise<any> {
     this._saving.set(true);
     return lastValueFrom(
       this.http.apiPost(
-        this.base(datasourceId) + DB_ACCESS.CHANGE_SET_SUFFIX,
+        this.base(connectorId) + DB_ACCESS.CHANGE_SET_SUFFIX,
         body,
         { skipLoader: true },
       ),
@@ -371,12 +371,12 @@ export class DbAccessService {
 
   // ── Effective privileges ──────────────────────────────────────────────────
 
-  /** GET /:datasourceId/effective/:roleName — with `via` provenance. */
-  loadEffective(datasourceId: string, roleName: string): Promise<any> {
+  /** GET /:connectorId/effective/:roleName — with `via` provenance. */
+  loadEffective(connectorId: string, roleName: string): Promise<any> {
     return lastValueFrom(
       this.http
         .apiGet(
-          this.base(datasourceId) +
+          this.base(connectorId) +
             DB_ACCESS.EFFECTIVE_SEGMENT +
             encodeURIComponent(roleName),
           { skipLoader: true },
@@ -386,13 +386,13 @@ export class DbAccessService {
   }
 
   /**
-   * GET /:datasourceId/effective/:roleName/tree — lazy privilege tree.
+   * GET /:connectorId/effective/:roleName/tree — lazy privilege tree.
    * level 'schema' → schema roots; level 'table' (+schema) → tables;
    * level 'table' (+schema+table) → one table's privilege chips.
    * Server-paged + searchable. Returns `{ nodes, count }`.
    */
   loadEffectiveTree(
-    datasourceId: string,
+    connectorId: string,
     roleName: string,
     opts: {
       level: 'schema' | 'table';
@@ -417,7 +417,7 @@ export class DbAccessService {
     return lastValueFrom(
       this.http
         .apiGet(
-          this.base(datasourceId) +
+          this.base(connectorId) +
             DB_ACCESS.EFFECTIVE_SEGMENT +
             encodeURIComponent(roleName) +
             DB_ACCESS.EFFECTIVE_TREE_SUFFIX,
@@ -428,15 +428,15 @@ export class DbAccessService {
   }
 
   /**
-   * GET /:datasourceId/effective/:roleName/summary — counts for the tree
+   * GET /:connectorId/effective/:roleName/summary — counts for the tree
    * header + the Direct/Inherited/All split + the "Show system schemas (N)"
    * toggle. One cheap call; the tree itself pages in on demand.
    */
-  loadEffectiveSummary(datasourceId: string, roleName: string): Promise<any> {
+  loadEffectiveSummary(connectorId: string, roleName: string): Promise<any> {
     return lastValueFrom(
       this.http
         .apiGet(
-          this.base(datasourceId) +
+          this.base(connectorId) +
             DB_ACCESS.EFFECTIVE_SEGMENT +
             encodeURIComponent(roleName) +
             DB_ACCESS.EFFECTIVE_SUMMARY_SUFFIX,
@@ -447,14 +447,14 @@ export class DbAccessService {
   }
 
   /**
-   * GET /:datasourceId/roles/:roleName/grants — a role's DIRECT object
+   * GET /:connectorId/roles/:roleName/grants — a role's DIRECT object
    * grants. Pre-loads the privilege composer (diff-apply) + clone source.
    */
-  loadRoleGrants(datasourceId: string, roleName: string): Promise<any> {
+  loadRoleGrants(connectorId: string, roleName: string): Promise<any> {
     return lastValueFrom(
       this.http
         .apiGet(
-          this.base(datasourceId) +
+          this.base(connectorId) +
             DB_ACCESS.ROLE_SEGMENT +
             encodeURIComponent(roleName) +
             DB_ACCESS.ROLE_GRANTS_SUFFIX,
@@ -469,13 +469,13 @@ export class DbAccessService {
   // ── Export ────────────────────────────────────────────────────────────────
 
   /**
-   * GET /:datasourceId/grants/export — returns the full grant snapshot as
+   * GET /:connectorId/grants/export — returns the full grant snapshot as
    * JSON. Caller triggers a browser download.
    */
-  exportGrants(datasourceId: string): Promise<any> {
+  exportGrants(connectorId: string): Promise<any> {
     return lastValueFrom(
       this.http.apiGet(
-        this.base(datasourceId) + DB_ACCESS.GRANTS_EXPORT_SUFFIX,
+        this.base(connectorId) + DB_ACCESS.GRANTS_EXPORT_SUFFIX,
         { skipLoader: true },
       ),
     );
@@ -484,15 +484,15 @@ export class DbAccessService {
   // ── Active sessions (live pg_stat_activity viewer) ────────────────────────
 
   /**
-   * GET /:datasourceId/sessions — live pg_stat_activity snapshot.
+   * GET /:connectorId/sessions — live pg_stat_activity snapshot.
    * Returns the raw response; data is `{ sessions: [...], selfPid }`.
    * Sessions are volatile (NOT cached BE-side) — call on every refresh.
    */
-  loadSessions(datasourceId: string): Promise<any> {
+  loadSessions(connectorId: string): Promise<any> {
     this._loading.set(true);
     return lastValueFrom(
       this.http
-        .apiGet(this.base(datasourceId) + DB_ACCESS.SESSIONS_SUFFIX, {
+        .apiGet(this.base(connectorId) + DB_ACCESS.SESSIONS_SUFFIX, {
           skipLoader: true,
         })
         .pipe(takeUntil(this._cancelReads$)),
@@ -505,7 +505,7 @@ export class DbAccessService {
    * (filter/sort/slice server-side). Returns `{ sessions, count, selfPid }`.
    */
   loadSessionsPaged(
-    datasourceId: string,
+    connectorId: string,
     opts: { page: number; limit: number; sort?: string; filter?: string },
   ): Promise<any> {
     this._loading.set(true);
@@ -517,7 +517,7 @@ export class DbAccessService {
     if (opts.filter) params['filter'] = opts.filter;
     return lastValueFrom(
       this.http
-        .apiGet(this.base(datasourceId) + DB_ACCESS.SESSIONS_SUFFIX, {
+        .apiGet(this.base(connectorId) + DB_ACCESS.SESSIONS_SUFFIX, {
           skipLoader: true,
           params,
         })
@@ -526,14 +526,14 @@ export class DbAccessService {
   }
 
   /**
-   * POST /:datasourceId/sessions/:pid/cancel — pg_cancel_backend (gentle;
+   * POST /:connectorId/sessions/:pid/cancel — pg_cancel_backend (gentle;
    * cancels the running query, connection survives). Requires confirm.
    */
-  cancelSession(datasourceId: string, pid: number): Promise<any> {
+  cancelSession(connectorId: string, pid: number): Promise<any> {
     this._saving.set(true);
     return lastValueFrom(
       this.http.apiPost(
-        this.base(datasourceId) +
+        this.base(connectorId) +
           DB_ACCESS.SESSIONS_SEGMENT +
           pid +
           DB_ACCESS.CANCEL_SUFFIX,
@@ -544,14 +544,14 @@ export class DbAccessService {
   }
 
   /**
-   * POST /:datasourceId/sessions/:pid/terminate — pg_terminate_backend
+   * POST /:connectorId/sessions/:pid/terminate — pg_terminate_backend
    * (destructive; drops the whole connection). Requires confirm + FULL.
    */
-  terminateSession(datasourceId: string, pid: number): Promise<any> {
+  terminateSession(connectorId: string, pid: number): Promise<any> {
     this._saving.set(true);
     return lastValueFrom(
       this.http.apiPost(
-        this.base(datasourceId) +
+        this.base(connectorId) +
           DB_ACCESS.SESSIONS_SEGMENT +
           pid +
           DB_ACCESS.TERMINATE_SUFFIX,

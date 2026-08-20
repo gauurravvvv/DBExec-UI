@@ -114,7 +114,7 @@ export class PrivilegesAccessComponent implements OnInit, OnDestroy {
   capabilityLoading = this.ctx.capabilityLoading;
   unsupported = this.ctx.unsupported;
 
-  datasourceId = '';
+  connectorId = '';
 
   /** Active tab: the rule composer (write) vs the effective-privileges
    *  inspector (read-only). Split so each gets full width. */
@@ -293,7 +293,7 @@ export class PrivilegesAccessComponent implements OnInit, OnDestroy {
    */
   private reflectCurrentState(): void {
     const rule = this.primaryRule;
-    if (!rule || !rule.grantee || !rule.schema || !this.datasourceId) {
+    if (!rule || !rule.grantee || !rule.schema || !this.connectorId) {
       this.currentPrivs = new Set();
       this.currentLoadedFor = '';
       return;
@@ -305,7 +305,7 @@ export class PrivilegesAccessComponent implements OnInit, OnDestroy {
     this.currentPrivs = new Set();
     this.cdr.markForCheck();
     this.dbAccess
-      .loadRoleGrants(this.datasourceId, rule.grantee)
+      .loadRoleGrants(this.connectorId, rule.grantee)
       .then(res => {
         const grants: any[] = res?.status ? (res.data ?? []) : [];
         const inSchema = grants.filter(g => g.schema === rule.schema);
@@ -343,7 +343,7 @@ export class PrivilegesAccessComponent implements OnInit, OnDestroy {
   /** Open the live Active Sessions viewer, carrying the selected datasource. */
   goToSessions(): void {
     this.router.navigate(['/app/db-privileges/sessions'], {
-      queryParams: this.datasourceId ? { ds: this.datasourceId } : {},
+      queryParams: this.connectorId ? { ds: this.connectorId } : {},
     });
   }
 
@@ -359,7 +359,7 @@ export class PrivilegesAccessComponent implements OnInit, OnDestroy {
     if (this.embedded) {
       // Hydrate any datasource already chosen (cross-section nav / the hub's
       // shared picker), then react to future changes from the hub picker.
-      const initial = this.ctx.datasourceId() || '';
+      const initial = this.ctx.connectorId() || '';
       if (initial) this.onDatasourceChange(initial);
       this.dsSub = this.ctx.datasourceChanged$.subscribe(id =>
         this.onDatasourceChange(id || ''),
@@ -398,7 +398,7 @@ export class PrivilegesAccessComponent implements OnInit, OnDestroy {
 
   /** Emitted by the datasource picker (init hydrate + change). */
   onDatasourceChange(id: string): void {
-    this.datasourceId = id || '';
+    this.connectorId = id || '';
     // Reset ALL composer state on datasource switch (fix #12) — the context
     // already cleared its caches + cancelled in-flight for the old one.
     this.schemaOptions = [];
@@ -411,7 +411,7 @@ export class PrivilegesAccessComponent implements OnInit, OnDestroy {
     this.guidedPreset = '';
     this.currentPrivs = new Set();
     this.currentLoadedFor = '';
-    if (!this.datasourceId) {
+    if (!this.connectorId) {
       this.cdr.markForCheck();
       return;
     }
@@ -423,7 +423,7 @@ export class PrivilegesAccessComponent implements OnInit, OnDestroy {
   }
 
   private loadSchemas(): void {
-    this.ctx.loadSchemas(this.datasourceId).then(opts => {
+    this.ctx.loadSchemas(this.connectorId).then(opts => {
       this.schemaOptions = opts;
       this.cdr.markForCheck();
     });
@@ -431,7 +431,7 @@ export class PrivilegesAccessComponent implements OnInit, OnDestroy {
 
   private loadRoles(): void {
     this.dbAccess
-      .loadRoles(this.datasourceId)
+      .loadRoles(this.connectorId)
       .then(() => {
         this.roleOptions = (this.dbAccess.roles() ?? []).map(r => ({
           label: r.name,
@@ -444,7 +444,7 @@ export class PrivilegesAccessComponent implements OnInit, OnDestroy {
 
   private loadDefaults(): void {
     this.dbAccess
-      .loadDefaultPrivileges(this.datasourceId)
+      .loadDefaultPrivileges(this.connectorId)
       .then(res => {
         // BE returns ready-to-render rows { scope, grantee, privileges[] },
         // exploded from pg_default_acl and ORDER BY'd (scope, object_type,
@@ -493,7 +493,7 @@ export class PrivilegesAccessComponent implements OnInit, OnDestroy {
       r => r.id !== rule.id && r.schema === rule.schema,
     );
     if (rule.schema && !stillUsed) {
-      this.ctx.invalidateSchema(this.datasourceId, rule.schema);
+      this.ctx.invalidateSchema(this.connectorId, rule.schema);
     }
     delete this.ruleHints[rule.id];
     this.rules = this.rules.filter(r => r.id !== rule.id);
@@ -622,10 +622,10 @@ export class PrivilegesAccessComponent implements OnInit, OnDestroy {
     if (!rule.schema) return;
     const loader =
       rule.level === 'sequence'
-        ? this.ctx.loadSequences(this.datasourceId, rule.schema)
+        ? this.ctx.loadSequences(this.connectorId, rule.schema)
         : rule.level === 'function'
-          ? this.ctx.loadFunctions(this.datasourceId, rule.schema)
-          : this.ctx.loadTables(this.datasourceId, rule.schema);
+          ? this.ctx.loadFunctions(this.connectorId, rule.schema)
+          : this.ctx.loadTables(this.connectorId, rule.schema);
     loader.then(() => {
       this.rules = [...this.rules];
       this.cdr.markForCheck();
@@ -635,18 +635,18 @@ export class PrivilegesAccessComponent implements OnInit, OnDestroy {
   /** Options for the object multiselect — tables OR sequences OR functions. */
   objectsFor(rule: AccessRule): Option[] {
     if (rule.level === 'sequence' || rule.level === 'function') {
-      return this.ctx.peekObjects(this.datasourceId, rule.schema, rule.level);
+      return this.ctx.peekObjects(this.connectorId, rule.schema, rule.level);
     }
-    return this.ctx.peekTables(this.datasourceId, rule.schema);
+    return this.ctx.peekTables(this.connectorId, rule.schema);
   }
 
   columnsFor(rule: AccessRule, table: string): Option[] {
-    return this.ctx.peekColumns(this.datasourceId, rule.schema, table);
+    return this.ctx.peekColumns(this.connectorId, rule.schema, table);
   }
 
   loadColumnsFor(rule: AccessRule, table: string): void {
     if (!table) return;
-    this.ctx.loadColumns(this.datasourceId, rule.schema, table).then(() => {
+    this.ctx.loadColumns(this.connectorId, rule.schema, table).then(() => {
       this.rules = [...this.rules];
       this.cdr.markForCheck();
     });
@@ -845,7 +845,7 @@ export class PrivilegesAccessComponent implements OnInit, OnDestroy {
     // Dry-run (previewOnly) → the exact SQL + danger classification the
     // Review-SQL dialog renders.
     this.dbAccess
-      .applyChangeSet(this.datasourceId, {
+      .applyChangeSet(this.connectorId, {
         statements: this.pendingStatements,
         previewOnly: true,
       })
@@ -875,7 +875,7 @@ export class PrivilegesAccessComponent implements OnInit, OnDestroy {
 
   confirmApply(confirmPhrase: string): void {
     this.dbAccess
-      .applyChangeSet(this.datasourceId, {
+      .applyChangeSet(this.connectorId, {
         statements: this.pendingStatements,
         confirm: true,
         confirmPhrase,

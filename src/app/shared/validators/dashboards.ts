@@ -51,7 +51,7 @@ export const getDistinctDashboardFieldValuesSchema = z.object({
 
 export const listDashboardSchema = z
   .object({
-    datasourceId: z.string().optional(),
+    connectorId: z.string().optional(),
     page: z.coerce
       .number({ message: 'validation.dashboards.page.invalid' })
       .int()

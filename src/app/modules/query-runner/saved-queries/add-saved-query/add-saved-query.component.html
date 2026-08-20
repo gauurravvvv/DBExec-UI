@@ -66,7 +66,7 @@
           ></app-custom-textarea>
 
           <app-custom-dropdown
-            formControlName="datasourceId"
+            formControlName="connectorId"
             (onChangeEvent)="onDatasourceChange($event)"
             [label]="'COMMON.DATASOURCE' | translate"
             [serverMode]="true"
@@ -80,8 +80,8 @@
             appendTo="body"
             icon="pi-database"
             [required]="true"
-            [showError]="!!errors['datasourceId']"
-            [errorMessage]="errors['datasourceId'] || ''"
+            [showError]="!!errors['connectorId']"
+            [errorMessage]="errors['connectorId'] || ''"
           ></app-custom-dropdown>
 
           <app-custom-dropdown
@@ -95,9 +95,9 @@
             appendTo="body"
             icon="pi-link"
             [required]="true"
-            [disabled]="!form.get('datasourceId')?.value"
+            [disabled]="!form.get('connectorId')?.value"
             [placeholder]="
-              (form.get('datasourceId')?.value
+              (form.get('connectorId')?.value
                 ? 'QUERY_RUNNER.SELECT_CONNECTION'
                 : 'QUERY_RUNNER.SELECT_DATASOURCE_FIRST'
               ) | translate

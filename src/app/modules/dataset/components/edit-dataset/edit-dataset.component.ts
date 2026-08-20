@@ -42,7 +42,7 @@ import {
   ContextMenuItem,
   ContextMenuPosition,
 } from '../../models/query-tab.model';
-import { DatasourceService } from '../../../datasource/services/datasource.service';
+import { ConnectorService } from '../../../connector/services/connector.service';
 import { DatasetService } from '../../services/dataset.service';
 import { MonacoIntelliSenseService } from '../../services/monaco-intellisense.service';
 import { QueryService } from '../../services/query.service';
@@ -50,7 +50,7 @@ import { SqlLinterService } from '../../services/sql-linter.service';
 import {
   DATABASE_TYPES,
   DatabaseTypeOption,
-} from '../../../datasource/constants/database-types.constant';
+} from '../../../connector/constants/connector-types.constant';
 import { DatasetFormData } from '../save-dataset-dialog/save-dataset-dialog.component';
 import { DatasetParamConfig } from '../../helpers/param-tokens.helper';
 import { DatasetParamRunError } from '../dataset-params-panel/dataset-params-panel.component';
@@ -253,7 +253,7 @@ export class EditDatasetComponent
 
 
   constructor(
-    private datasourceService: DatasourceService,
+    private datasourceService: ConnectorService,
     private router: Router,
     private route: ActivatedRoute,
     private fieldsStore: DatasetFieldsStore,
@@ -626,7 +626,7 @@ export class EditDatasetComponent
     const startTime = Date.now();
 
     const payload: any = {
-      datasourceId: this.selectedDatasourceObj.id,
+      connectorId: this.selectedDatasourceObj.id,
       query: query,
       page: page,
       limit: limit,
@@ -1194,15 +1194,15 @@ export class EditDatasetComponent
           // selectedDbTypeOption getter — without it the engine
           // badge ("PostgreSQL" chip) silently disappears.
           this.selectedDatasourceObj = {
-            id: dataset.datasourceId,
+            id: dataset.connectorId,
             name: dataset.datasource?.name,
             ...(dataset.datasource || {}),
           };
           this.selectedDatasourceName = dataset.datasource?.name || '';
-          this.expandedPaths.add(dataset.datasourceId);
+          this.expandedPaths.add(dataset.connectorId);
 
           // Load schema for the selected database
-          this.tree.loadDatasourceSchema(dataset.datasourceId).then(() => {
+          this.tree.loadDatasourceSchema(dataset.connectorId).then(() => {
             // Set the SQL query in editor
             const sqlQuery = dataset.sql || SQL_EDITOR_PLACEHOLDER;
             this.initialQuery = sqlQuery;

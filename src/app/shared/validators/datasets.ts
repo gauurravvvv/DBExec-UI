@@ -492,7 +492,7 @@ export type DatasetListSortField = (typeof DATASET_LIST_SORT_FIELDS)[number];
 
 export const listDatasetSchema = z
   .object({
-    datasourceId: z
+    connectorId: z
       .string()
       .optional()
       .or(z.literal(null).transform(() => undefined)),

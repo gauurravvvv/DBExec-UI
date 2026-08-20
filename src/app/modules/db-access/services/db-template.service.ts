@@ -27,14 +27,14 @@ export class DbTemplateService {
    * server-paged + searchable. Returns the raw response ({ items, count }).
    */
   list(opts: {
-    datasourceId?: string;
+    connectorId?: string;
     search?: string;
     page?: number;
     limit?: number;
   }): Promise<any> {
     this._loading.set(true);
     const params: Record<string, string> = {};
-    if (opts.datasourceId) params['datasourceId'] = opts.datasourceId;
+    if (opts.connectorId) params['connectorId'] = opts.connectorId;
     if (opts.search) params['search'] = opts.search;
     if (opts.page) params['page'] = String(opts.page);
     if (opts.limit) params['limit'] = String(opts.limit);

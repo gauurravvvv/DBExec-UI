@@ -7,7 +7,7 @@ import {
   ANALYSIS_FILTER,
   ANALYSIS_PARAMETER,
   DATASET,
-  DATASOURCE,
+  CONNECTOR,
 } from 'src/app/core/constants/api.constant';
 import { HttpClientService } from 'src/app/core/services/http-client.service';
 
@@ -442,7 +442,7 @@ export class AnalysesService {
     } = payload;
     return lastValueFrom(
       this.http.apiPut(
-        DATASOURCE.UPDATE + id,
+        CONNECTOR.UPDATE + id,
         {
           id,
           name,
@@ -464,9 +464,9 @@ export class AnalysesService {
   listDatasourceSchemas(params: any) {
     return lastValueFrom(
       this.http.apiGet(
-        DATASOURCE.LIST_SCHEMAS_PREFIX +
-          params.datasourceId +
-          DATASOURCE.LIST_SCHEMAS_SUFFIX,
+        CONNECTOR.LIST_SCHEMAS_PREFIX +
+          params.connectorId +
+          CONNECTOR.LIST_SCHEMAS_SUFFIX,
         { skipLoader: true },
       ),
     );
@@ -475,11 +475,11 @@ export class AnalysesService {
   listSchemaTables(params: any) {
     return lastValueFrom(
       this.http.apiGet(
-        DATASOURCE.LIST_SCHEMAS_PREFIX +
-          params.datasourceId +
-          DATASOURCE.SCHEMAS_SEGMENT +
+        CONNECTOR.LIST_SCHEMAS_PREFIX +
+          params.connectorId +
+          CONNECTOR.SCHEMAS_SEGMENT +
           params.schemaName +
-          DATASOURCE.TABLES_SEGMENT.replace(/\/$/, ''),
+          CONNECTOR.TABLES_SEGMENT.replace(/\/$/, ''),
         { skipLoader: true },
       ),
     );
@@ -488,13 +488,13 @@ export class AnalysesService {
   listTableColumns(params: any) {
     return lastValueFrom(
       this.http.apiGet(
-        DATASOURCE.LIST_SCHEMAS_PREFIX +
-          params.datasourceId +
-          DATASOURCE.SCHEMAS_SEGMENT +
+        CONNECTOR.LIST_SCHEMAS_PREFIX +
+          params.connectorId +
+          CONNECTOR.SCHEMAS_SEGMENT +
           params.schemaName +
-          DATASOURCE.TABLES_SEGMENT +
+          CONNECTOR.TABLES_SEGMENT +
           params.tableName +
-          DATASOURCE.COLUMNS_SEGMENT,
+          CONNECTOR.COLUMNS_SEGMENT,
         { skipLoader: true },
       ),
     );

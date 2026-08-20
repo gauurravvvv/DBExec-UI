@@ -39,7 +39,7 @@ export class AddDbRoleComponent implements OnInit, HasUnsavedChanges {
   private cdr = inject(ChangeDetectorRef);
   private destroyRef = inject(DestroyRef);
 
-  datasourceId = '';
+  connectorId = '';
   roleForm!: FormGroup;
   createMode: 'scratch' | 'clone' = 'scratch';
   allRoleOptions: { label: string; value: string }[] = [];
@@ -93,7 +93,7 @@ export class AddDbRoleComponent implements OnInit, HasUnsavedChanges {
     // Datasource is chosen INSIDE the form (via <app-datasource-picker>), by
     // the user — nothing pre-selected, no ?ds= / ?login= route params. The
     // form body stays hidden until a datasource is picked.
-    this.datasourceId = '';
+    this.connectorId = '';
     this.roleForm = this.buildForm();
     // Password is required ONLY for a login user. Keep its validator in sync
     // with the Can-log-in toggle (and apply it for the initial default).
@@ -152,8 +152,8 @@ export class AddDbRoleComponent implements OnInit, HasUnsavedChanges {
    */
   onDatasourceChange(id: string): void {
     const next = id || '';
-    const changed = next !== this.datasourceId;
-    this.datasourceId = next;
+    const changed = next !== this.connectorId;
+    this.connectorId = next;
 
     if (changed && this.initialised) {
       // Reset everything except the datasource; keep createMode + the default
@@ -186,9 +186,9 @@ export class AddDbRoleComponent implements OnInit, HasUnsavedChanges {
     this.cdr.markForCheck();
   }
 
-  private loadCloneOptions(datasourceId: string): void {
+  private loadCloneOptions(connectorId: string): void {
     this.dbAccess
-      .loadRoles(datasourceId)
+      .loadRoles(connectorId)
       .then(() => {
         this.allRoleOptions = (this.dbAccess.roles() ?? []).map(r => ({
           label: r.name,
@@ -200,9 +200,9 @@ export class AddDbRoleComponent implements OnInit, HasUnsavedChanges {
   }
 
   /** Load org-wide + datasource-pinned templates for the apply picker. */
-  private loadTemplates(datasourceId: string): void {
+  private loadTemplates(connectorId: string): void {
     this.templates
-      .list({ datasourceId, limit: 200 })
+      .list({ connectorId, limit: 200 })
       .then(res => {
         const items = res?.status ? (res.data?.items ?? []) : [];
         this.templateOptions = items.map((t: any) => ({
@@ -272,7 +272,7 @@ export class AddDbRoleComponent implements OnInit, HasUnsavedChanges {
    * handling per the shared-component convention).
    */
   get canSave(): boolean {
-    if (!this.datasourceId || this.saving() || this.roleForm.invalid)
+    if (!this.connectorId || this.saving() || this.roleForm.invalid)
       return false;
     if (this.createMode === 'clone' && !this.roleForm.get('cloneFrom')?.value)
       return false;
@@ -356,13 +356,13 @@ export class AddDbRoleComponent implements OnInit, HasUnsavedChanges {
     this.runPreviewAndArm(
       [intent],
       () =>
-        this.dbAccess.createRole(this.datasourceId, {
+        this.dbAccess.createRole(this.connectorId, {
           ...base,
           previewOnly: true,
         }),
       confirmPhrase =>
         this.dbAccess
-          .createRole(this.datasourceId, { ...base, confirmPhrase })
+          .createRole(this.connectorId, { ...base, confirmPhrase })
           .then(async res => {
             // On success, optionally copy the source role's object grants onto
             // the new role BEFORE confirmPreview navigates away (best-effort,
@@ -447,7 +447,7 @@ export class AddDbRoleComponent implements OnInit, HasUnsavedChanges {
     this.cdr.markForCheck();
     try {
       const res = await this.dbAccess.loadRoleGrants(
-        this.datasourceId,
+        this.connectorId,
         sourceRole,
       );
       const grants: any[] = res?.status ? (res.data ?? []) : [];
@@ -473,7 +473,7 @@ export class AddDbRoleComponent implements OnInit, HasUnsavedChanges {
       }));
       if (!statements.length) return;
 
-      await this.dbAccess.applyChangeSet(this.datasourceId, {
+      await this.dbAccess.applyChangeSet(this.connectorId, {
         statements,
         confirm: true,
       });

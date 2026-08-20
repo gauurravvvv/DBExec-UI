@@ -9,7 +9,7 @@ import {
 } from '@angular/core';
 import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
-import { DATASOURCE } from 'src/app/core/constants/routes.constant';
+import { CONNECTOR } from 'src/app/core/constants/routes.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
 import {
   UsServerListAdapter,
@@ -19,7 +19,7 @@ import type {
   CustomTableColumn,
   CustomTableConfig,
 } from 'src/app/shared/components/custom-table/custom-table.types';
-import { DatasourceService } from '../../services/datasource.service';
+import { ConnectorService } from '../../services/connector.service';
 
 /**
  * Datasource listing — renders through the shared `<app-custom-table>` (the
@@ -33,12 +33,12 @@ import { DatasourceService } from '../../services/datasource.service';
  * filter dropdown, so nothing is projected into the toolbar's left slot.
  */
 @Component({
-  selector: 'app-list-datasource',
-  templateUrl: './list-datasource.component.html',
-  styleUrls: ['./list-datasource.component.scss'],
+  selector: 'app-list-connector',
+  templateUrl: './list-connector.component.html',
+  styleUrls: ['./list-connector.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class ListDatasourceComponent implements OnInit, OnDestroy {
+export class ListConnectorComponent implements OnInit, OnDestroy {
   private destroyRef = inject(DestroyRef);
   private cdr = inject(ChangeDetectorRef);
 
@@ -77,7 +77,7 @@ export class ListDatasourceComponent implements OnInit, OnDestroy {
   adapter: UsServerListAdapter<any> | null = null;
 
   constructor(
-    private datasourceService: DatasourceService,
+    private datasourceService: ConnectorService,
     private router: Router,
     private globalService: GlobalService,
     private translate: TranslateService,
@@ -94,7 +94,7 @@ export class ListDatasourceComponent implements OnInit, OnDestroy {
     this.tableConfig = {
       ...this.tableConfig,
       globalSearchPlaceholder: this.translate.instant(
-        'DATASOURCE.SEARCH_PLACEHOLDER',
+        'CONNECTOR.SEARCH_PLACEHOLDER',
       ),
     };
     this.bindAdapter();
@@ -159,7 +159,7 @@ export class ListDatasourceComponent implements OnInit, OnDestroy {
 
   /**
    * Construct the server-side adapter. Datasources are the listed
-   * entity so the adapter binds eagerly — no datasourceId close-over
+   * entity so the adapter binds eagerly — no connectorId close-over
    * required.
    */
   private bindAdapter() {
@@ -194,11 +194,11 @@ export class ListDatasourceComponent implements OnInit, OnDestroy {
   /* ── nav + per-row delete ────────────────────────────── */
 
   onAddNewDatasource() {
-    this.router.navigate([DATASOURCE.ADD]);
+    this.router.navigate([CONNECTOR.ADD]);
   }
 
   onEdit(db: any) {
-    this.router.navigate([DATASOURCE.edit(db.id)]);
+    this.router.navigate([CONNECTOR.edit(db.id)]);
   }
 
   confirmDelete(datasource: any): void {

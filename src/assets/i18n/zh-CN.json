@@ -87,7 +87,7 @@
     "ACTIONS": "操作",
     "STATUS": "状态",
     "ALL": "全部",
-    "ALL_DATASOURCES": "所有数据源",
+    "ALL_DATASOURCES": "所有连接器",
     "TYPE": "类型",
     "SELECT_RANGE": "选择范围",
     "NO_RECORD_FOUND": "未找到相关记录",
@@ -142,7 +142,7 @@
     "CANNOT_DELETE_SELF": "无法删除自己",
     "NO_DELETE_PERMISSION": "您没有删除权限",
     "LOCKED_NOTE": "账户已锁定。请在列表页面解锁后再更改状态。",
-    "DATASOURCE": "数据源",
+    "DATASOURCE": "连接器",
     "CONNECTION": "连接",
     "GROUPS": "用户组",
     "USERS": "用户",
@@ -167,7 +167,7 @@
     "SECTION": "部分",
     "PROMPTS": "提示",
     "SECTIONS": "部分",
-    "SELECT_DATASOURCE": "选择数据源",
+    "SELECT_DATASOURCE": "选择连接器",
     "SELECT_TAB": "选择选项卡",
     "SELECT_SECTION": "选择部分",
     "TAB_REQUIRED": "选项卡是必需的",
@@ -270,7 +270,7 @@
     "NAME_PATTERN": "名称只能包含字母、空格和连字符",
     "ORGANISATION_REQUIRED": "组织为必填项",
     "ROLE_REQUIRED": "角色为必填项",
-    "DATASOURCE_REQUIRED": "数据源为必填项",
+    "DATASOURCE_REQUIRED": "连接器为必填项",
     "CONNECTION_REQUIRED": "连接为必填项",
     "GROUPS_REQUIRED": "用户组为必填项",
     "USERS_REQUIRED": "用户为必填项",
@@ -289,8 +289,8 @@
     "GROUP_NAME_MIN_LENGTH": "用户组名称至少需要 {{length}} 个字符",
     "GROUP_NAME_MAX_LENGTH": "用户组名称不得超过 {{length}} 个字符",
     "GROUP_NAME_PATTERN": "用户组名称必须以字母或数字开头，且只能包含字母、数字、空格、点号、下划线和连字符",
-    "DATASOURCE_USERNAME_REQUIRED": "数据源用户名为必填项",
-    "DATASOURCE_PASSWORD_REQUIRED": "数据源密码为必填项",
+    "DATASOURCE_USERNAME_REQUIRED": "连接器用户名为必填项",
+    "DATASOURCE_PASSWORD_REQUIRED": "连接器密码为必填项",
     "CONNECTION_NAME_REQUIRED": "连接名称为必填项",
     "CONNECTION_NAME_MIN_LENGTH": "连接名称至少需要 {{length}} 个字符",
     "CONNECTION_NAME_MAX_LENGTH": "连接名称不得超过 {{length}} 个字符",
@@ -502,15 +502,15 @@
     "USERS": "用户",
     "ADMINS": "管理员",
     "GROUPS": "用户组",
-    "DATASOURCES": "数据源",
+    "DATASOURCES": "连接器",
     "MASTER_DATASOURCE": "数据库",
     "REFRESH_SCHEMA": "刷新 Schema",
     "REFRESHING": "正在刷新...",
     "REFRESH_SCHEMA_TOOLTIP": "刷新数据库架构以同步新实体和列",
     "HOSTNAME": "主机名",
-    "DATASOURCE_NAME": "数据源名称",
+    "DATASOURCE_NAME": "连接器名称",
     "CONFIGURATION_LIMITS": "配置限制",
-    "MAX_DATASOURCES": "最大数据源数",
+    "MAX_DATASOURCES": "最大连接器数",
     "MAX_USERS": "最大用户数",
     "MAX_ADMINS": "最大管理员数",
     "ADDITIONAL_LIMITS": "其他限制",
@@ -522,7 +522,7 @@
     "ADMIN_LOCALE": "管理员语言",
     "ADMIN_LOCALE_PLACEHOLDER": "选择欢迎邮件的语言",
     "ENCRYPTION_AUTO_TITLE": "加密自动管理",
-    "ENCRYPTION_AUTO_DESCRIPTION": "您的组织存储的所有机密（数据源密码、SMTP/SES 凭据、用户密码）都会自动加密。您无需选择算法或记住密钥。",
+    "ENCRYPTION_AUTO_DESCRIPTION": "您的组织存储的所有机密（连接器密码、SMTP/SES 凭据、用户密码）都会自动加密。您无需选择算法或记住密钥。",
     "ENCRYPTION_BULLET_1": "AES-256-GCM（带认证的加密）",
     "ENCRYPTION_BULLET_2": "为您的组织生成唯一的密钥",
     "ENCRYPTION_BULLET_3": "主密钥存储在数据库之外",
@@ -685,12 +685,12 @@
     "BULK_ADD_RACE_FAILURES": "创建过程中的失败",
     "CANNOT_MODIFY_SELF_HINT": "您无法更改自己的访问权限"
   },
-  "DATASOURCE": {
-    "TITLE": "数据源",
-    "SUBTITLE": "管理客户数据源和连接详情",
-    "ADD_TITLE": "添加数据源",
-    "EDIT_TITLE": "编辑数据源",
-    "VIEW_TITLE": "数据源详情",
+  "CONNECTOR": {
+    "TITLE": "连接器",
+    "SUBTITLE": "管理客户连接器和连接详情",
+    "ADD_TITLE": "添加连接器",
+    "EDIT_TITLE": "编辑连接器",
+    "VIEW_TITLE": "连接器详情",
     "HOST": "主机",
     "PORT": "端口",
     "DATABASE_NAME": "数据库名称",
@@ -707,17 +707,17 @@
     "CONNECTION_SUCCESSFUL": "连接成功",
     "CONNECTION_FAILED_RETRY": "连接失败 - 重试",
     "CONNECTION_TEST_REQUIRED": "保存前需先测试连接",
-    "CONFIRM_DELETE_SINGLE": "确定要删除此数据源吗？",
-    "CONFIRM_DELETE_BULK": "确定要删除已选中的 <strong>{{count}}</strong> 个数据源吗？",
-    "CONFIRM_UPDATE_MESSAGE": "确定要更新此数据源吗？",
+    "CONFIRM_DELETE_SINGLE": "确定要删除此连接器吗？",
+    "CONFIRM_DELETE_BULK": "确定要删除已选中的 <strong>{{count}}</strong> 个连接器吗？",
+    "CONFIRM_UPDATE_MESSAGE": "确定要更新此连接器吗？",
     "DELETE_INFO_ASSOCIATED_DATA": "所有关联数据将被移除",
     "DELETE_INFO_CONNECTED_DATASETS": "已连接的数据集将受到影响",
-    "EDIT_WARNING_TITLE": "您正在编辑数据源连接",
-    "EDIT_WARNING_CHANGES": "修改连接详情将影响所有使用此数据源的数据集和查询",
+    "EDIT_WARNING_TITLE": "您正在编辑连接器连接",
+    "EDIT_WARNING_CHANGES": "修改连接详情将影响所有使用此连接器的数据集和查询",
     "EDIT_WARNING_TEST_REQUIRED": "保存前需通过连接测试",
     "EDIT_WARNING_CREDENTIALS": "现有连接将使用新凭据更新",
     "CONFIGURATION": "配置",
-    "DATASOURCE_TYPE": "数据源类型",
+    "DATASOURCE_TYPE": "连接器类型",
     "CONNECTION_STATUS": "连接状态",
     "LAST_UPDATED": "上次更新",
     "USAGE": "使用情况",
@@ -736,7 +736,7 @@
     "HEALTH_TESTING": "测试中…",
     "HEALTH_NEVER_TESTED": "从未测试",
     "TESTED": "已测试",
-    "SEARCH_PLACEHOLDER": "按名称搜索数据源",
+    "SEARCH_PLACEHOLDER": "按名称搜索连接器",
     "ACCOUNT": "账户",
     "WAREHOUSE": "Warehouse",
     "ROLE": "角色",
@@ -864,7 +864,7 @@
     "LOADING_MONACO_HINT": "正在设置 SQL 编辑器...",
     "LOADING_SCHEMA": "正在加载 Schema...",
     "NO_ANALYSES_FOUND": "此数据集暂无分析",
-    "NO_DATASOURCE_SELECTED": "未选择数据源",
+    "NO_DATASOURCE_SELECTED": "未选择连接器",
     "NO_DESCRIPTION": "暂无描述",
     "NO_FIELDS_FOUND": "未找到字段",
     "NO_FUNCTIONS_FOUND": "未找到函数",
@@ -892,8 +892,8 @@
     "SEARCH_QUERY_BUILDERS": "搜索查询构建器...",
     "SEARCH_TABLES": "搜索表...",
     "SELECT_DATA_TYPE": "选择数据类型",
-    "SELECT_DATASOURCE_HINT": "选择数据源以开始编写查询",
-    "SELECT_DATASOURCE_QUERY_HINT": "选择要查询的数据源",
+    "SELECT_DATASOURCE_HINT": "选择连接器以开始编写查询",
+    "SELECT_DATASOURCE_QUERY_HINT": "选择要查询的连接器",
     "SOURCE": "来源",
     "SQL_BASED": "基于 SQL",
     "SQL_QUERY": "SQL 查询",
@@ -909,13 +909,13 @@
     "VIA_QUERY_BUILDER": "通过查询构建器",
     "VIEW_RESULTS": "查看结果",
     "ACTIVE_DIALECT": "当前 SQL 方言",
-    "PICK_DATASOURCE": "选择数据源",
+    "PICK_DATASOURCE": "选择连接器",
     "SCHEMA_PICKER_HINT": "编辑器将限定在该 schema 范围内,其他 schema 的表将不可见。",
-    "SCHEMA_PICKER_HINT_OPTIONAL": "留空则连接到整个数据源。选择 schema 可缩小编辑器侧边栏的范围。",
-    "SCHEMA_PICK_DATASOURCE_FIRST": "请先在上方选择数据源,然后选择 schema。",
-    "SCHEMA_LAZY_MODE_HINT": "数据源较大 — 展开表格时才会加载列。",
-    "SEARCH_DATASOURCES": "搜索数据源…",
-    "NO_DATASOURCES": "未找到数据源",
+    "SCHEMA_PICKER_HINT_OPTIONAL": "留空则连接到整个连接器。选择 schema 可缩小编辑器侧边栏的范围。",
+    "SCHEMA_PICK_DATASOURCE_FIRST": "请先在上方选择连接器,然后选择 schema。",
+    "SCHEMA_LAZY_MODE_HINT": "连接器较大 — 展开表格时才会加载列。",
+    "SEARCH_DATASOURCES": "搜索连接器…",
+    "NO_DATASOURCES": "未找到连接器",
     "SCHEMA": "Schema",
     "EDITOR_DISABLED": "编辑器已禁用 — Schema 不可用。",
     "CELL_NULL": "NULL",
@@ -942,14 +942,14 @@
     "ERROR_KIND_PERMISSION_DENIED": "权限被拒绝",
     "ERROR_KIND_SYNTAX": "SQL 语法错误",
     "ERROR_KIND_TIMEOUT": "查询超时",
-    "ERROR_KIND_CONNECTION": "无法访问数据源",
+    "ERROR_KIND_CONNECTION": "无法访问连接器",
     "ERROR_KIND_OBJECT_NOT_FOUND": "对象未找到",
     "ERROR_KIND_SAFETY_VIOLATION": "SQL 被安全检查拒绝",
-    "ERROR_HINT_PERMISSION_DENIED": "数据源用户没有访问对象的权限。请向数据库管理员申请 SELECT 权限。",
+    "ERROR_HINT_PERMISSION_DENIED": "连接器用户没有访问对象的权限。请向数据库管理员申请 SELECT 权限。",
     "ERROR_HINT_SYNTAX": "引擎无法解析 SQL。位置指向第一个意外的标记。",
     "ERROR_HINT_TIMEOUT": "查询超过语句超时限制。请添加 WHERE 子句或简化 JOIN。",
-    "ERROR_HINT_CONNECTION": "数据源不可访问。请在设置中检查连接。",
-    "ERROR_HINT_OBJECT_NOT_FOUND": "查询引用的表、视图或列在此数据源上不存在。",
+    "ERROR_HINT_CONNECTION": "连接器不可访问。请在设置中检查连接。",
+    "ERROR_HINT_OBJECT_NOT_FOUND": "查询引用的表、视图或列在此连接器上不存在。",
     "ERROR_HINT_SAFETY_VIOLATION": "仅允许单语句 SELECT 或 WITH … SELECT 查询。",
     "OFFENDING_TOKEN_TOOLTIP": "验证器拒绝的关键字",
     "TRUNCATED_BANNER": "结果已截断 — 仅显示第一页。请使用分页或 WHERE 子句查看更多。",
@@ -2176,7 +2176,7 @@
     "SUBTITLE": "查看和管理已发布的仪表盘",
     "DATASET": "数据集",
     "SEARCH_DATASET": "搜索数据集",
-    "SEARCH_DATASOURCE": "搜索数据源",
+    "SEARCH_DATASOURCE": "搜索连接器",
     "NO_DASHBOARDS_FOUND": "未找到仪表盘",
     "CONFIRM_DELETE_SINGLE": "确定要删除此仪表盘吗？",
     "CONFIRM_DELETE_BULK": "确定要删除已选中的 <strong>{{count}}</strong> 个仪表盘吗？",
@@ -2337,7 +2337,7 @@
     "GROUPS": "组",
     "RLS_RULES": "RLS规则",
     "ALERTS": "警报",
-    "DATASOURCES": "数据源",
+    "DATASOURCES": "连接器",
     "ROLES": "角色",
     "DATASET": "数据集",
     "ANALYSES": "分析",
@@ -2372,7 +2372,7 @@
     "CONNECTORS_API": "Web/REST 连接器"
   },
   "AUTH": {
-    "HEADLINE_LOGIN": "提升您的数据源\n管理体验",
+    "HEADLINE_LOGIN": "提升您的连接器\n管理体验",
     "HEADLINE_FORGOT": "安全重置您的\n账户密码",
     "HEADLINE_RESET": "设置您的新\n账户密码",
     "HEADLINE_SET_PASSWORD": "设置您的\n账户密码",
@@ -2466,7 +2466,7 @@
       "HOME_ARIA": "DBExec 主页",
       "ALL_RIGHTS": "版权所有。",
       "HERO_TITLE": "将您的数据库变为仪表板。",
-      "HERO_LEDE": "连接数据源，拖动所需的图表，然后共享仪表板 — 一切都在一处完成，无需 SQL。",
+      "HERO_LEDE": "连接连接器，拖动所需的图表，然后共享仪表板 — 一切都在一处完成，无需 SQL。",
       "FEATURE_CONNECT_TITLE": "连接任何数据库",
       "FEATURE_CONNECT_DESC": "Postgres、MySQL、SQL Server 等 — 只需几分钟。",
       "FEATURE_BUILD_TITLE": "可视化构建仪表板",
@@ -2564,7 +2564,7 @@
     "ACTIVE_USERS_7D": "活跃用户（过去7天）",
     "ACTIVE_USERS_15D": "活跃用户（过去15天）",
     "ACTIVE_USERS_30D": "活跃用户（过去30天）",
-    "TOTAL_DATASOURCES": "数据源总数",
+    "TOTAL_DATASOURCES": "连接器总数",
     "TOTAL_ENVIRONMENTS": "环境总数",
     "TOTAL_ADMINS": "管理员总数",
     "TOTAL_USERS": "用户总数",
@@ -2582,17 +2582,17 @@
     "ANALYSES_DESC": "Visualize and analyze data",
     "USERS": "Users",
     "USERS_DESC": "Manage organisation users",
-    "DATASOURCES": "Datasources",
-    "DATASOURCES_DESC": "Configure datasource connections",
+    "DATASOURCES": "连接器",
+    "DATASOURCES_DESC": "Configure 连接器 connections",
     "AUDIT_LOGS": "Audit Logs",
     "AUDIT_LOGS_DESC": "Review activity history",
     "ADD_USER": "Add User",
-    "MANAGE_DATASOURCE": "Manage Datasource",
+    "MANAGE_DATASOURCE": "Manage 连接器",
     "VIEW_REPORTS": "View Reports"
   },
   "AUTH_FEATURES": {
-    "LOGIN_1_TITLE": "可视化数据源浏览器",
-    "LOGIN_1_DESC": "通过直观的可视化界面浏览数据源结构",
+    "LOGIN_1_TITLE": "可视化连接器浏览器",
+    "LOGIN_1_DESC": "通过直观的可视化界面浏览连接器结构",
     "LOGIN_2_TITLE": "性能洞察",
     "LOGIN_2_DESC": "获取实时性能指标和查询优化建议",
     "LOGIN_3_TITLE": "安全访问",
@@ -2672,7 +2672,7 @@
   },
   "PROMPT_MODULE": {
     "TITLE": "Prompts",
-    "SUBTITLE": "Configure datasource fields for data filtering and query generation",
+    "SUBTITLE": "Configure 连接器 fields for data filtering and query generation",
     "ADD_TITLE": "Add Prompt",
     "EDIT_TITLE": "Edit Prompt",
     "VIEW_TITLE": "Prompt Details",
@@ -3092,8 +3092,8 @@
     "CONDITION_COUNT": "{{count}} condition(s)",
     "MORE_CONDITIONS": "+{{count}} more",
     "SEARCH_DATASET": "Search Dataset",
-    "SELECT_DATASOURCE_MSG": "Please select a datasource to view RLS rules",
-    "NO_RULES_FOUND": "No RLS rules found for this datasource",
+    "SELECT_DATASOURCE_MSG": "Please select a 连接器 to view RLS rules",
+    "NO_RULES_FOUND": "No RLS rules found for this 连接器",
     "DELETE_SINGLE": "Are you sure you want to delete this RLS rule?",
     "UPDATE_CONFIRM": "Are you sure you want to update this RLS rule?",
     "DELETE_INFO_FILTERING": "Row-level security filtering will be removed",
@@ -4100,7 +4100,7 @@
     "IMPORT": "导入",
     "IMPORTING": "正在导入…",
     "EXPORT_SUCCESS": "导出已下载",
-    "IMPORT_SUCCESS": "导入完成。已创建一个新数据源——请设置其密码以运行导入的资产。",
+    "IMPORT_SUCCESS": "导入完成。已创建一个新连接器——请设置其密码以运行导入的资产。",
     "IMPORT_FAILED": "导入失败",
     "INVALID_FILE": "该文件不是有效的 DBExec 导出文件。",
     "FILE_TOO_LARGE": "文件过大（最大 10 MB）。",
@@ -4524,8 +4524,8 @@
         "tooLong": "默认架构不得超过 128 个字符"
       },
       "id": {
-        "required": "数据源 ID 为必填项",
-        "invalid": "无效的数据源 ID"
+        "required": "连接器 ID 为必填项",
+        "invalid": "无效的连接器 ID"
       },
       "justification": {
         "tooLong": "理由不得超过 500 个字符"
@@ -4545,7 +4545,7 @@
         "invalid": "名称必须以字母或数字开头，且只能包含字母、数字、空格、点、下划线和连字符"
       },
       "datasource": {
-        "required": "数据源为必填项"
+        "required": "连接器为必填项"
       },
       "id": {
         "required": "连接 ID 为必填项"
@@ -4556,7 +4556,7 @@
     },
     "access": {
       "datasource": {
-        "required": "数据源为必填项"
+        "required": "连接器为必填项"
       },
       "connection": {
         "required": "连接为必填项"
@@ -4580,7 +4580,7 @@
         "tooLong": "理由不得超过 500 个字符"
       },
       "datasource": {
-        "required": "数据源为必填项"
+        "required": "连接器为必填项"
       },
       "sql": {
         "required": "SQL 查询为必填项",
@@ -4631,7 +4631,7 @@
         "tooLong": "理由不得超过 500 个字符"
       },
       "datasource": {
-        "required": "数据源为必填项"
+        "required": "连接器为必填项"
       },
       "dataset": {
         "required": "数据集为必填项"
@@ -4853,15 +4853,15 @@
         "unsupported": "不支持的迁移文件版本"
       },
       "datasources": {
-        "required": "迁移文件必须至少包含一个数据源",
-        "tooMany": "迁移文件中的数据源过多"
+        "required": "迁移文件必须至少包含一个连接器",
+        "tooMany": "迁移文件中的连接器过多"
       },
       "datasource": {
         "handle": {
           "required": "数据源句柄为必填项"
         },
         "name": {
-          "required": "数据源名称为必填项"
+          "required": "连接器名称为必填项"
         },
         "dbType": {
           "invalid": "迁移文件中包含不支持的数据库类型"
@@ -4872,14 +4872,14 @@
         "username": {
           "required": "数据库用户名为必填项"
         },
-        "unknownField": "迁移文件包含意外的数据源字段"
+        "unknownField": "迁移文件包含意外的连接器字段"
       },
       "asset": {
         "name": {
           "required": "资产名称为必填项"
         },
         "datasourceHandle": {
-          "required": "资产缺少其数据源引用"
+          "required": "资产缺少其连接器引用"
         },
         "handle": {
           "required": "资产缺少其捆绑包句柄"
@@ -5253,8 +5253,8 @@
         "tooLong": "描述不得超过500个字符"
       },
       "datasource": {
-        "required": "数据源为必填项",
-        "invalid": "数据源必须是有效的UUID"
+        "required": "连接器为必填项",
+        "invalid": "连接器必须是有效的UUID"
       },
       "status": {
         "invalid": "状态必须为0或1"
@@ -5278,8 +5278,8 @@
         "tooLong": "描述不得超过500个字符"
       },
       "datasource": {
-        "required": "数据源为必填项",
-        "invalid": "数据源必须是有效的UUID"
+        "required": "连接器为必填项",
+        "invalid": "连接器必须是有效的UUID"
       },
       "status": {
         "invalid": "状态必须为0或1"
@@ -5402,7 +5402,7 @@
     "NO_CONNECTIONS": "暂无连接。请新建一个以开始运行查询。",
     "CONNECTION_NAME": "连接名称",
     "CONNECTION_NAME_PLACEHOLDER": "例如：prod-db（分析师）",
-    "CONNECTION_HINT": "连接将数据源与分配给你的数据库登录账户绑定。打开连接后，你的 SQL 将以该登录账户身份运行。",
+    "CONNECTION_HINT": "连接将连接器与分配给你的数据库登录账户绑定。打开连接后，你的 SQL 将以该登录账户身份运行。",
     "CREDENTIALS": "凭据",
     "LOGIN": "登录",
     "LOGIN_PLACEHOLDER": "数据库用户名",
@@ -5418,20 +5418,20 @@
     "DISABLED": "已禁用",
     "ENABLE": "启用",
     "DISABLE": "禁用",
-    "SET_DEFAULT": "设为此数据源的默认项",
-    "IS_DEFAULT": "此数据源的默认项",
-    "DEFAULT_BADGE": "此数据源的默认连接",
-    "ALL_DISABLED_FOR_DS": "该数据源的所有连接均已禁用。请启用其中一个以运行查询。",
+    "SET_DEFAULT": "设为此连接器的默认项",
+    "IS_DEFAULT": "此连接器的默认项",
+    "DEFAULT_BADGE": "此连接器的默认连接",
+    "ALL_DISABLED_FOR_DS": "该连接器的所有连接均已禁用。请启用其中一个以运行查询。",
     "TEST": "验证连接",
     "OPEN": "打开 SQL 编辑器",
     "LAUNCH_TITLE": "打开查询会话",
-    "LAUNCH_SUBTITLE": "选择一个数据源和你的一个连接，然后在新标签页中打开编辑器。",
-    "STEP_DATASOURCE": "数据源",
+    "LAUNCH_SUBTITLE": "选择一个连接器和你的一个连接，然后在新标签页中打开编辑器。",
+    "STEP_DATASOURCE": "连接器",
     "STEP_CONNECTION": "连接",
-    "SELECT_DATASOURCE": "选择数据源",
-    "SELECT_DATASOURCE_FIRST": "请先选择数据源",
+    "SELECT_DATASOURCE": "选择连接器",
+    "SELECT_DATASOURCE_FIRST": "请先选择连接器",
     "SELECT_CONNECTION": "选择连接",
-    "NO_CONNECTIONS_FOR_DS": "你还没有此数据源的连接。",
+    "NO_CONNECTIONS_FOR_DS": "你还没有此连接器的连接。",
     "NO_CONNECTIONS_HINT": "你还没有任何连接。请新建一个以开始使用。",
     "OPEN_EXECUTOR": "打开 SQL 编辑器",
     "VERIFYING": "验证中…",
@@ -5605,12 +5605,12 @@
     "SAVED_QUERIES_SEARCH_PLACEHOLDER": "Search saved queries by name",
     "NO_SAVED_QUERIES": "No saved queries yet. Create one to get started.",
     "NEW_QUERY": "New query",
-    "NEW_QUERY_SUBTITLE": "Pick a datasource and one of your connections, then open the editor in a new tab.",
+    "NEW_QUERY_SUBTITLE": "Pick a 连接器 and one of your connections, then open the editor in a new tab.",
     "NEW_SAVED_QUERY": "New Saved Query",
     "EDIT_SAVED_QUERY": "Edit Saved Query",
     "DELETE_SAVED_QUERY": "Delete saved query",
     "DELETE_SAVED_QUERY_CONFIRM": "Delete the saved query \"{{name}}\"? This removes the saved SQL only — nothing on the database is changed.",
-    "SAVED_QUERY_HINT": "A saved query stores your SQL against a datasource + connection so you can reopen and run it later.",
+    "SAVED_QUERY_HINT": "A saved query stores your SQL against a 连接器 + connection so you can reopen and run it later.",
     "SAVED_QUERY_NAME": "Query name",
     "SAVED_QUERY_NAME_PLACEHOLDER": "e.g. Monthly active users",
     "SAVED_QUERY_DESCRIPTION": "Description",
@@ -5630,15 +5630,15 @@
   },
   "DB_ACCESS": {
     "TITLE": "数据库访问管理",
-    "SUBTITLE": "管理数据源上的 PostgreSQL 用户、角色和权限",
+    "SUBTITLE": "管理连接器上的 PostgreSQL 用户、角色和权限",
     "EXPORT_JSON": "导出 JSON",
     "EXPORT_CSV": "导出 CSV",
     "EXPORT_ACCESS_HINT": "下载该账户的完整访问档案（属性、已授予角色、有效权限、所属对象）以供审计。",
-    "SELECT_DATASOURCE": "选择要管理的数据源",
+    "SELECT_DATASOURCE": "选择要管理的连接器",
     "CHECKING_CAPABILITY": "正在检查管理能力…",
     "OPEN_WORKSPACE": "打开工作区",
     "UNSUPPORTED_TITLE": "v1 版仅支持 PostgreSQL",
-    "UNSUPPORTED_BODY": "本版本的数据库访问管理仅支持 PostgreSQL 数据源。",
+    "UNSUPPORTED_BODY": "本版本的数据库访问管理仅支持 PostgreSQL 连接器。",
     "CAP_FULL_TITLE": "可进行完全管理",
     "CAP_FULL_BODY": "管理登录账户可在此数据库上创建、修改和删除角色及授权。",
     "CAP_FULL_BADGE": "完全管理",
@@ -5692,7 +5692,7 @@
     "APP_GROUPS": "应用组",
     "SELECT_APP_USERS": "选择要关联的应用用户",
     "SELECT_APP_GROUPS": "选择要关联的应用组",
-    "ATTACH_HINT": "将该数据库角色关联到一个或多个应用用户和组。每项选择都会针对此数据源与该角色建立关联。",
+    "ATTACH_HINT": "将该数据库角色关联到一个或多个应用用户和组。每项选择都会针对此连接器与该角色建立关联。",
     "DISCARD_UNSAVED": "权限编辑器中有未保存的更改。是否放弃这些更改并切换标签页？",
     "DISCARD_TITLE": "是否放弃未保存的更改？",
     "DISCARD_CONFIRM": "放弃并切换",
@@ -5821,7 +5821,7 @@
     "CAN_LOGIN_DESC": "登录用户拥有密码并可建立连接。组角色无法登录，仅用于归集权限。",
     "LOGIN_DETAILS": "登录详情",
     "PASSWORD_UNCHANGED_PLACEHOLDER": "留空以保持不变",
-    "SELECT_DATASOURCE_HINT": "在上方选择数据源以管理其数据库用户、角色和权限。",
+    "SELECT_DATASOURCE_HINT": "在上方选择连接器以管理其数据库用户、角色和权限。",
     "NAME": "名称",
     "SEARCH_NAME": "搜索名称",
     "VIEW_PRIVILEGE_SET": "已保存的权限集",
@@ -5902,10 +5902,10 @@
       "GENERIC": "Apply change"
     },
     "SELECT_DATE": "Select a date",
-    "PICK_DATASOURCE_TO_CREATE": "Select a datasource to create a role.",
+    "PICK_DATASOURCE_TO_CREATE": "Select a 连接器 to create a role.",
     "RULE_INCOMPLETE": "未完成",
     "APPLY_DISABLED_HINT": "应用前请完成或移除每一条规则。",
-    "CHOOSE_DATASOURCE": "选择数据源",
+    "CHOOSE_DATASOURCE": "选择连接器",
     "TAB_COMPOSE": "编写规则",
     "TAB_EFFECTIVE_PRIVS": "有效权限",
     "ALL_SEQUENCES": "模式中的所有序列",
@@ -5921,7 +5921,7 @@
     "SCOPE_ORG_WIDE": "组织范围",
     "SCOPE": "范围",
     "RULE": "规则",
-    "SCOPE_DATASOURCE": "数据源",
+    "SCOPE_DATASOURCE": "连接器",
     "SEARCH_TEMPLATES_PLACEHOLDER": "搜索模板…",
     "TEMPLATES_TITLE": "角色模板",
     "TEMPLATES_SUBTITLE": "可重用的角色 + 权限配方。创建角色或组合权限时应用。",
@@ -5965,7 +5965,7 @@
     "PUBLIC_PRIVILEGES": "对 PUBLIC 的权限",
     "PUBLIC_ALSO_DIRECT": "是否也已直接授予？",
     "PUBLIC_SEARCH": "搜索对象",
-    "PUBLIC_NONE": "此数据源未向 PUBLIC 授予任何权限。",
+    "PUBLIC_NONE": "此连接器未向 PUBLIC 授予任何权限。",
     "PUBLIC_VIA_PUBLIC": "通过 PUBLIC",
     "PUBLIC_REVOKE_SUMMARY": "在 {{object}} 上撤销 PUBLIC 的 {{privileges}}",
     "PUBLIC_CONFIRM_TITLE": "从 PUBLIC 撤销权限",
@@ -6053,7 +6053,7 @@
     "SCHEDULE": "计划",
     "SEARCH_PLACEHOLDER": "搜索警报…",
     "SELECT_FIELD": "选择字段",
-    "SELECT_SOURCE": "选择数据源",
+    "SELECT_SOURCE": "选择连接器",
     "SELECT_USERS": "选择用户",
     "SEVERITY": "严重程度",
     "SNOOZE": "暂停提醒",
@@ -6135,7 +6135,7 @@
       "DATE": "日期",
       "BOOLEAN": "布尔值"
     },
-    "STEP_SOURCE": "数据源",
+    "STEP_SOURCE": "连接器",
     "STEP_CONDITION": "条件",
     "STEP_SCHEDULE": "计划",
     "STEP_DELIVERY": "投递",
@@ -6316,7 +6316,7 @@
     "UNGROUPED": "未分组",
     "GROUP_NAME": "分组名称",
     "DROP_PROMPTS_HERE": "将提示拖到此处",
-    "NO_PROMPTS": "未找到此数据源的提示。",
+    "NO_PROMPTS": "未找到此连接器的提示。",
     "ALREADY_PLACED": "已放置",
     "MANDATORY": "必填",
     "LOCKED": "已锁定",
@@ -6665,7 +6665,7 @@
     "COMPOSE": "Run",
     "DELETE_SINGLE": "Are you sure you want to delete this form?",
     "COL_NAME": "Name",
-    "COL_DATASOURCE": "Datasource",
+    "COL_DATASOURCE": "连接器",
     "COL_STATUS": "Status",
     "COL_UPDATED": "Updated",
     "VERSIONS": "Versions",
@@ -6840,7 +6840,7 @@
     },
     "PALETTE": {
       "NO_PROMPTS": "No prompts yet",
-      "NO_PROMPTS_HINT": "Create prompts in the Prompts module for this datasource, then drag them onto a section."
+      "NO_PROMPTS_HINT": "Create prompts in the Prompts module for this 连接器, then drag them onto a section."
     }
   },
   "CONNECTORS_API": {

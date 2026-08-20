@@ -18,7 +18,7 @@ export interface SavedQuery {
   name: string;
   description?: string | null;
   sql: string;
-  datasourceId: string;
+  connectorId: string;
   datasourceName?: string | null;
   connectionId: string;
   connectionName?: string | null;
@@ -32,7 +32,7 @@ export interface SavedQueryPayload {
   name: string;
   description?: string;
   sql: string;
-  datasourceId: string;
+  connectorId: string;
   connectionId: string;
   rowLimit?: number;
 }

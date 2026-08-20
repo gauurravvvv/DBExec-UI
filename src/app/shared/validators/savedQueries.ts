@@ -69,9 +69,9 @@ export const addSavedQuerySchema = z.object({
   name: savedQueryNameSchema,
   description: savedQueryDescriptionSchema,
   sql: savedQuerySqlSchema,
-  datasourceId: z
+  connectorId: z
     .string()
-    .uuid({ message: 'validation.savedQueries.datasourceId.invalid' }),
+    .uuid({ message: 'validation.savedQueries.connectorId.invalid' }),
   connectionId: z
     .string()
     .uuid({ message: 'validation.savedQueries.connectionId.invalid' }),

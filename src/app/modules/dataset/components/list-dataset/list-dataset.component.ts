@@ -31,7 +31,7 @@ import {
 import { GlobalService } from 'src/app/core/services/global.service';
 import { AnalysisFormData } from 'src/app/modules/analyses/components/save-analyses-dialog/save-analyses-dialog.component';
 import { AnalysesService } from 'src/app/modules/analyses/services/analyses.service';
-import { DatasourceService } from 'src/app/modules/datasource/services/datasource.service';
+import { ConnectorService } from 'src/app/modules/connector/services/connector.service';
 import { QueryBuilderService } from 'src/app/modules/query-builder/services/query-builder.service';
 import {
   UsServerListAdapter,
@@ -142,7 +142,7 @@ export class ListDatasetComponent implements OnInit, OnDestroy {
   };
 
   /** Server-side adapter — built once in ngOnInit; NO datasource gate. The
-   *  list browses ALL org datasets; a `?datasourceId=` deep-link narrows it
+   *  list browses ALL org datasets; a `?connectorId=` deep-link narrows it
    *  via the optional datasource filter. */
   adapter: UsServerListAdapter<any> | null = null;
 
@@ -167,7 +167,7 @@ export class ListDatasetComponent implements OnInit, OnDestroy {
     private router: Router,
     private globalService: GlobalService,
     private datasetService: DatasetService,
-    private datasourceService: DatasourceService,
+    private datasourceService: ConnectorService,
     private queryBuilderService: QueryBuilderService,
     private analysesService: AnalysesService,
     private route: ActivatedRoute,
@@ -211,12 +211,12 @@ export class ListDatasetComponent implements OnInit, OnDestroy {
       });
 
     // Build the datasource-free adapter once — the list browses ALL org
-    // datasets. A `?datasourceId=` deep-link still narrows the list (optional
+    // datasets. A `?connectorId=` deep-link still narrows the list (optional
     // filter), and `?name=` still pre-searches.
     this.route.queryParams
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(params => {
-        const dsId = params['datasourceId'] || undefined;
+        const dsId = params['connectorId'] || undefined;
         const name = params['name'] || undefined;
         this.selectedDatasource = dsId ?? null;
         this.bindAdapter(name);
@@ -322,7 +322,7 @@ export class ListDatasetComponent implements OnInit, OnDestroy {
 
   /**
    * Construct the server-side adapter. NO datasource gate — the list browses
-   * ALL org datasets. A `datasourceId` is sent only when a deep-link / optional
+   * ALL org datasets. A `connectorId` is sent only when a deep-link / optional
    * filter selected one.
    */
   private bindAdapter(deepLinkName?: string) {
@@ -331,7 +331,7 @@ export class ListDatasetComponent implements OnInit, OnDestroy {
       load: (params: UsListLoadParams) =>
         this.datasetService.listDatasets({
           ...(this.selectedDatasource
-            ? { datasourceId: this.selectedDatasource }
+            ? { connectorId: this.selectedDatasource }
             : {}),
           page: params.page,
           limit: params.limit,
@@ -416,7 +416,7 @@ export class ListDatasetComponent implements OnInit, OnDestroy {
   ): void {
     this.showDsPickerPopup = false;
     if (!result) return;
-    const queryParams: any = { datasourceId: result.datasource?.id };
+    const queryParams: any = { connectorId: result.datasource?.id };
     if (result.schema) queryParams.schema = result.schema;
     this.router.navigate([DATASET.ADD], {
       queryParams,
@@ -480,7 +480,7 @@ export class ListDatasetComponent implements OnInit, OnDestroy {
     // narrows results by typing. Capped to 50 per page; if there are more,
     // they can refine the query rather than scroll a huge list.
     const params: any = {
-      datasourceId: this.selectedDatasource,
+      connectorId: this.selectedDatasource,
       page: 1,
       limit: 50,
     };
@@ -627,7 +627,7 @@ export class ListDatasetComponent implements OnInit, OnDestroy {
     this.analysisDatasourceId =
       typeof row === 'string'
         ? this.selectedDatasource
-        : (row?.datasourceId ?? null);
+        : (row?.connectorId ?? null);
     this.showCreateAnalysisDialog = true;
   }
 

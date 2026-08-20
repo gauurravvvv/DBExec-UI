@@ -44,7 +44,7 @@
  * nothing here was changed on its behalf.
  */
 import type { LRParser } from '@lezer/lr';
-import { DatabaseTypeValue } from '../../../datasource/constants/database-types.constant';
+import { DatabaseTypeValue } from '../../../connector/constants/connector-types.constant';
 
 /**
  * One catalogued SQL function. Matches the legacy SQL_FUNCTIONS entry

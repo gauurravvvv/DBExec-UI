@@ -10,7 +10,7 @@ import {
 import { Router } from '@angular/router';
 import { QUERY_RUNNER } from 'src/app/core/constants/routes.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
-import { DatasourceService } from 'src/app/modules/datasource/services/datasource.service';
+import { ConnectorService } from 'src/app/modules/connector/services/connector.service';
 import {
   QueryConnection,
   QueryRunnerService,
@@ -52,7 +52,7 @@ export class NewQueryDialogComponent implements OnInit {
 
   constructor(
     private service: QueryRunnerService,
-    private datasourceService: DatasourceService,
+    private datasourceService: ConnectorService,
     private globalService: GlobalService,
     private router: Router,
   ) {}
@@ -123,7 +123,7 @@ export class NewQueryDialogComponent implements OnInit {
       return;
     }
     const forDs = this.allConnections.filter(
-      c => c.datasourceId === this.selectedDatasourceId,
+      c => c.connectorId === this.selectedDatasourceId,
     );
     // Only ENABLED connections are selectable.
     const usable = forDs.filter(c => c.enabled !== false);

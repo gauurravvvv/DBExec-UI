@@ -54,7 +54,7 @@ export interface PublishDashboardPayload {
 })
 export class PublishDashboardDialogComponent implements OnInit, OnChanges {
   @Input() visible = false;
-  @Input() datasourceId = '';
+  @Input() connectorId = '';
   @Input() analysisId = '';
   @Input() analysisName = '';
   // Saving spinner controlled by the parent (so parent can keep
@@ -143,11 +143,11 @@ export class PublishDashboardDialogComponent implements OnInit, OnChanges {
   }
 
   private async loadExisting() {
-    if (!this.datasourceId || !this.analysisId) return;
+    if (!this.connectorId || !this.analysisId) return;
     this.loadingExisting = true;
     try {
       this.existingDashboards = await this.dashboardService.listForAnalysis({
-        datasourceId: this.datasourceId,
+        connectorId: this.connectorId,
         analysisId: this.analysisId,
       });
     } catch {

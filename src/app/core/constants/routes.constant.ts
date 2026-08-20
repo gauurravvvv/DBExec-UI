@@ -75,7 +75,7 @@ export const USER = {
   ACTIVITY: '/app/users/activity',
 };
 
-export const DATASOURCE = feature('/app/datasources');
+export const CONNECTOR = feature('/app/connectors');
 
 // Database Access Management — split into THREE sidebar sections
 // (Database Users / Database Roles / Privileges & Access), each its own

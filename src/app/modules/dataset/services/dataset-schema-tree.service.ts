@@ -38,7 +38,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { first } from 'rxjs/operators';
 
 import { GlobalService } from 'src/app/core/services/global.service';
-import { DatasourceService } from '../../datasource/services/datasource.service';
+import { ConnectorService } from '../../connector/services/connector.service';
 import { SchemaTransformerHelper } from '../helpers/schema-transformer.helper';
 import { DatasourceSchema } from '../models/dataset-schema.model';
 import { MonacoIntelliSenseService } from './monaco-intellisense.service';
@@ -96,7 +96,7 @@ export class DatasetSchemaTreeService {
     private readonly store: Store,
     private readonly translate: TranslateService,
     private readonly globalService: GlobalService,
-    private readonly datasourceService: DatasourceService,
+    private readonly datasourceService: ConnectorService,
     private readonly queryService: QueryService,
     private readonly intelliSense: MonacoIntelliSenseService,
   ) {}
@@ -558,7 +558,7 @@ export class DatasetSchemaTreeService {
     this.datasourceService
       .listSchemaTables(
         {
-          datasourceId: dbIdStr,
+          connectorId: dbIdStr,
           schemaName,
         },
         background,
@@ -663,7 +663,7 @@ export class DatasetSchemaTreeService {
 
     this.datasourceService
       .listTableColumns({
-        datasourceId: dbIdStr,
+        connectorId: dbIdStr,
         schemaName,
         tableName,
       })

@@ -12,7 +12,7 @@ import { REGEX } from 'src/app/core/constants/regex.constant';
 import { FORM_BUILDER } from 'src/app/core/constants/routes.constant';
 import { HasUnsavedChanges } from 'src/app/core/models/has-unsaved-changes.model';
 import { GlobalService } from 'src/app/core/services/global.service';
-import { DatasourceService } from 'src/app/modules/datasource/services/datasource.service';
+import { ConnectorService } from 'src/app/modules/connector/services/connector.service';
 import { FbAdminService } from '../../services/fb-admin.service';
 
 /**
@@ -29,7 +29,7 @@ export class AddFormComponent implements OnInit, HasUnsavedChanges {
   private readonly fb = inject(FormBuilder);
   private readonly router = inject(Router);
   private readonly global = inject(GlobalService);
-  private readonly datasourceService = inject(DatasourceService);
+  private readonly datasourceService = inject(ConnectorService);
   private readonly translate = inject(TranslateService);
   private readonly admin = inject(FbAdminService);
 
@@ -88,7 +88,7 @@ export class AddFormComponent implements OnInit, HasUnsavedChanges {
     if (this.form.invalid) return;
     const { name, datasource, description } = this.form.value;
     this.admin
-      .createForm({ name, datasourceId: datasource, description })
+      .createForm({ name, connectorId: datasource, description })
       .then(res => {
         if (this.global.handleSuccessService(res)) {
           this.form.markAsPristine();

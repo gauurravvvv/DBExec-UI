@@ -10,7 +10,7 @@ import {
   inject,
 } from '@angular/core';
 import { GlobalService } from 'src/app/core/services/global.service';
-import { DatasourceService } from 'src/app/modules/datasource/services/datasource.service';
+import { ConnectorService } from 'src/app/modules/connector/services/connector.service';
 import { DbAccessContextService } from '../../services/db-access-context.service';
 
 /**
@@ -71,7 +71,7 @@ export class DatasourcePickerComponent implements OnInit, OnDestroy {
   preloadedDatasourcesTotal: number | null = null;
 
   constructor(
-    private datasourceService: DatasourceService,
+    private datasourceService: ConnectorService,
     private ctx: DbAccessContextService,
     private globalService: GlobalService,
   ) {}
@@ -86,7 +86,7 @@ export class DatasourcePickerComponent implements OnInit, OnDestroy {
     // app). We deliberately do NOT read or write ?ds= — the datasource is
     // never mirrored into the URL. Selection persists in memory for the
     // session via DbAccessContextService.
-    const initial = this.ctx.datasourceId() || '';
+    const initial = this.ctx.connectorId() || '';
     if (initial) {
       this.selectedDatasource = initial;
       // Push into context (no-op if unchanged) + probe once.
@@ -142,7 +142,7 @@ export class DatasourcePickerComponent implements OnInit, OnDestroy {
           if (
             this.autoSelectFirst &&
             !this.selectedDatasource &&
-            !this.ctx.datasourceId() &&
+            !this.ctx.connectorId() &&
             items.length
           ) {
             this.selectedDatasource = items[0].id;

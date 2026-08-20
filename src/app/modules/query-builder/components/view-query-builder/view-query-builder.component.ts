@@ -35,7 +35,7 @@ export class ViewQueryBuilderComponent implements OnInit {
   queryBuilderId = '';
   queryBuilderName = '';
   description = '';
-  datasourceId = '';
+  connectorId = '';
   datasourceName = '';
   status = 1;
   loading = true;
@@ -63,7 +63,7 @@ export class ViewQueryBuilderComponent implements OnInit {
           const b = response.data;
           this.queryBuilderName = b.name || '';
           this.description = b.description || '';
-          this.datasourceId = String(b.datasourceId || '');
+          this.connectorId = String(b.connectorId || '');
           this.datasourceName = b.datasourceName || b.datasource || '';
           this.status = b.status ?? 1;
         }

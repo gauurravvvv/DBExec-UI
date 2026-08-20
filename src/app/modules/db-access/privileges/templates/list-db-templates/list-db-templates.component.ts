@@ -106,7 +106,7 @@ export class ListDbTemplatesComponent implements OnInit, OnDestroy {
   }
 
   scopeLabel(row: any): string {
-    return row.datasourceId
+    return row.connectorId
       ? this.translate.instant('DB_ACCESS.SCOPE_DATASOURCE')
       : this.translate.instant('DB_ACCESS.SCOPE_ORG_WIDE');
   }

@@ -168,7 +168,7 @@ export const privilegesSchema = z
 // ── Composite schemas ──────────────────────────────────────────────
 
 /**
- * POST /api/v1/db-access/roles/:datasourceId body (alter-role).
+ * POST /api/v1/db-access/roles/:connectorId body (alter-role).
  */
 export const alterRoleSchema = z.object({
   attributes: roleAttributesSchema,
@@ -178,7 +178,7 @@ export const alterRoleSchema = z.object({
 export type AlterRoleInput = z.infer<typeof alterRoleSchema>;
 
 /**
- * POST /api/v1/db-access/change-set/:datasourceId body (apply-change-set).
+ * POST /api/v1/db-access/change-set/:connectorId body (apply-change-set).
  */
 const grantIntentSchema = z.object({
   kind: z.literal('grant', {
@@ -248,7 +248,7 @@ export const applyChangeSetSchema = z.object({
 export type ApplyChangeSetInput = z.infer<typeof applyChangeSetSchema>;
 
 /**
- * POST /api/v1/db-access/roles/:datasourceId body (create-role).
+ * POST /api/v1/db-access/roles/:connectorId body (create-role).
  */
 export const createRoleSchema = z.object({
   name: dbIdentSchema,
@@ -259,7 +259,7 @@ export const createRoleSchema = z.object({
 export type CreateRoleInput = z.infer<typeof createRoleSchema>;
 
 /**
- * DELETE /api/v1/db-access/roles/:datasourceId/:role body (delete-role).
+ * DELETE /api/v1/db-access/roles/:connectorId/:role body (delete-role).
  */
 export const deleteRoleSchema = z
   .object({
@@ -276,7 +276,7 @@ export const deleteRoleSchema = z
 export type DeleteRoleInput = z.infer<typeof deleteRoleSchema>;
 
 /**
- * POST /api/v1/db-access/member/:datasourceId body (grant-role).
+ * POST /api/v1/db-access/member/:connectorId body (grant-role).
  */
 export const grantRoleSchema = z.object({
   role: dbIdentOrArraySchema,
@@ -288,7 +288,7 @@ export const grantRoleSchema = z.object({
 export type GrantRoleInput = z.infer<typeof grantRoleSchema>;
 
 /**
- * PUT /api/v1/db-access/roles/:datasourceId/:role body (rename-role).
+ * PUT /api/v1/db-access/roles/:connectorId/:role body (rename-role).
  */
 export const renameRoleSchema = z.object({
   newName: dbIdentSchema,
@@ -298,7 +298,7 @@ export const renameRoleSchema = z.object({
 export type RenameRoleInput = z.infer<typeof renameRoleSchema>;
 
 /**
- * DELETE /api/v1/db-access/member/:datasourceId body (revoke-role).
+ * DELETE /api/v1/db-access/member/:connectorId body (revoke-role).
  */
 export const revokeRoleSchema = z.object({
   role: dbIdentOrArraySchema,
@@ -310,16 +310,16 @@ export const revokeRoleSchema = z.object({
 export type RevokeRoleInput = z.infer<typeof revokeRoleSchema>;
 
 /**
- * :datasourceId param schema for path validation.
+ * :connectorId param schema for path validation.
  */
 // `.passthrough()` so sibling path params (e.g. :roleName) and query params
 // survive validation — zodValidate replaces req.params/req.query with the
 // parsed result, and a strict object would STRIP :roleName, leaving the
 // effective-privilege controllers reading `undefined` (they then matched only
-// PUBLIC grants). Only datasourceId is validated; the rest passes through.
+// PUBLIC grants). Only connectorId is validated; the rest passes through.
 export const datasourceIdParamSchema = z
   .object({
-    datasourceId: z
+    connectorId: z
       .string({ message: 'validation.common.id.required' })
       .uuid({ message: 'validation.common.id.invalid' }),
   })
@@ -328,10 +328,10 @@ export const datasourceIdParamSchema = z
 export type DatasourceIdParamInput = z.infer<typeof datasourceIdParamSchema>;
 
 /**
- * :datasourceId + :pid params schema for session route validation.
+ * :connectorId + :pid params schema for session route validation.
  */
 export const sessionPidParamSchema = z.object({
-  datasourceId: z
+  connectorId: z
     .string({ message: 'validation.common.id.required' })
     .uuid({ message: 'validation.common.id.invalid' }),
   pid: backendPidSchema,

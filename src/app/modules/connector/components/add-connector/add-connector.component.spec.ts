@@ -1,17 +1,17 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { AddDatasourceComponent } from './add-datasource.component';
+import { AddConnectorComponent } from './add-connector.component';
 
-describe('AddDatasourceComponent', () => {
-  let component: AddDatasourceComponent;
-  let fixture: ComponentFixture<AddDatasourceComponent>;
+describe('AddConnectorComponent', () => {
+  let component: AddConnectorComponent;
+  let fixture: ComponentFixture<AddConnectorComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [AddDatasourceComponent],
+      declarations: [AddConnectorComponent],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(AddDatasourceComponent);
+    fixture = TestBed.createComponent(AddConnectorComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

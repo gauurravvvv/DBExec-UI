@@ -84,32 +84,32 @@ export const USER = {
   UNLOCK_SUFFIX: '/unlock',
 };
 
-export const DATASOURCE = {
-  LIST: '/datasources',
-  ADD: '/datasources',
-  GET: '/datasources/', // GET /datasources/:id
-  UPDATE: '/datasources/', // PUT /datasources/:id
-  DELETE: '/datasources/', // DELETE /datasources/:id
-  BULK_DELETE: '/datasources/bulk-delete',
-  VALIDATE: '/datasources/validate',
-  // GET /datasources/:datasourceId/schemas
-  LIST_SCHEMAS_PREFIX: '/datasources/',
+export const CONNECTOR = {
+  LIST: '/connectors',
+  ADD: '/connectors',
+  GET: '/connectors/', // GET /datasources/:id
+  UPDATE: '/connectors/', // PUT /datasources/:id
+  DELETE: '/connectors/', // DELETE /datasources/:id
+  BULK_DELETE: '/connectors/bulk-delete',
+  VALIDATE: '/connectors/validate',
+  // GET /datasources/:connectorId/schemas
+  LIST_SCHEMAS_PREFIX: '/connectors/',
   LIST_SCHEMAS_SUFFIX: '/schemas',
-  // GET /datasources/:datasourceId/schemas/:schema/tables
-  // GET /datasources/:datasourceId/schemas/:schema/tables/:table/columns
+  // GET /datasources/:connectorId/schemas/:schema/tables
+  // GET /datasources/:connectorId/schemas/:schema/tables/:table/columns
   SCHEMAS_SEGMENT: '/schemas/',
   TABLES_SEGMENT: '/tables/',
   COLUMNS_SEGMENT: '/columns',
-  // GET /datasources/:datasourceId/foreign-keys (no-SQL join picker)
+  // GET /datasources/:connectorId/foreign-keys (no-SQL join picker)
   FOREIGN_KEYS_SUFFIX: '/foreign-keys',
-  // POST /datasources/:datasourceId/query
-  RUN_QUERY_PREFIX: '/datasources/',
+  // POST /datasources/:connectorId/query
+  RUN_QUERY_PREFIX: '/connectors/',
   RUN_QUERY_SUFFIX: '/query',
   // GET /datasources/:id/usage — counts of dependent datasets/analyses/dashboards
-  USAGE_PREFIX: '/datasources/',
+  USAGE_PREFIX: '/connectors/',
   USAGE_SUFFIX: '/usage',
   // GET /datasources/:id/activity — last 20 audit-log events for this datasource
-  ACTIVITY_PREFIX: '/datasources/',
+  ACTIVITY_PREFIX: '/connectors/',
   ACTIVITY_SUFFIX: '/activity',
 };
 
@@ -678,64 +678,64 @@ export const ORG_POLICY = {
 
 /**
  * Database Access Management — UI over PostgreSQL native roles / users /
- * grants for a chosen datasource. Every path is scoped by :datasourceId
+ * grants for a chosen datasource. Every path is scoped by :connectorId
  * (except the org-wide /templates group). Prefixes ending in `/` are
  * concatenated with the datasource id; suffixes complete the sub-resource.
  * All under `/api/v1/db-access`.
  */
 export const DB_ACCESS = {
-  // GET /db-access/:datasourceId/capability
+  // GET /db-access/:connectorId/capability
   BASE: '/db-access/',
   CAPABILITY_SUFFIX: '/capability',
-  // GET /db-access/:datasourceId/roles  (users [canLogin] + roles split FE-side)
+  // GET /db-access/:connectorId/roles  (users [canLogin] + roles split FE-side)
   ROLES_SUFFIX: '/roles',
-  // GET /db-access/:datasourceId/memberships
+  // GET /db-access/:connectorId/memberships
   MEMBERSHIPS_SUFFIX: '/memberships',
-  // POST /db-access/:datasourceId/memberships/remove
+  // POST /db-access/:connectorId/memberships/remove
   MEMBERSHIPS_REMOVE_SUFFIX: '/memberships/remove',
-  // GET /db-access/:datasourceId/schemas
+  // GET /db-access/:connectorId/schemas
   SCHEMAS_SUFFIX: '/schemas',
-  // GET /db-access/:datasourceId/objects/sequences?schema=
+  // GET /db-access/:connectorId/objects/sequences?schema=
   OBJECTS_SEQUENCES_SUFFIX: '/objects/sequences',
-  // GET /db-access/:datasourceId/objects/functions?schema=
+  // GET /db-access/:connectorId/objects/functions?schema=
   OBJECTS_FUNCTIONS_SUFFIX: '/objects/functions',
-  // GET /db-access/:datasourceId/grants/tables?schema=
+  // GET /db-access/:connectorId/grants/tables?schema=
   GRANTS_TABLES_SUFFIX: '/grants/tables',
-  // GET /db-access/:datasourceId/grants/columns?schema=&table=
+  // GET /db-access/:connectorId/grants/columns?schema=&table=
   GRANTS_COLUMNS_SUFFIX: '/grants/columns',
-  // GET /db-access/:datasourceId/grants/export
+  // GET /db-access/:connectorId/grants/export
   GRANTS_EXPORT_SUFFIX: '/grants/export',
-  // GET /db-access/:datasourceId/default-privileges
+  // GET /db-access/:connectorId/default-privileges
   DEFAULT_PRIVILEGES_SUFFIX: '/default-privileges',
-  // GET /db-access/:datasourceId/effective/:roleName
+  // GET /db-access/:connectorId/effective/:roleName
   EFFECTIVE_SEGMENT: '/effective/',
-  // GET /db-access/:datasourceId/effective/:roleName/tree — lazy privilege tree
+  // GET /db-access/:connectorId/effective/:roleName/tree — lazy privilege tree
   EFFECTIVE_TREE_SUFFIX: '/tree',
-  // GET /db-access/:datasourceId/effective/:roleName/summary — split counts
+  // GET /db-access/:connectorId/effective/:roleName/summary — split counts
   EFFECTIVE_SUMMARY_SUFFIX: '/summary',
-  // GET /db-access/:datasourceId/roles/:roleName/owned
+  // GET /db-access/:connectorId/roles/:roleName/owned
   ROLE_SEGMENT: '/roles/',
   OWNED_SUFFIX: '/owned',
-  // GET /db-access/:datasourceId/roles/:roleName/grants — role's direct grants
+  // GET /db-access/:connectorId/roles/:roleName/grants — role's direct grants
   ROLE_GRANTS_SUFFIX: '/grants',
-  // GET /db-access/:datasourceId/roles/:roleName/export → full access profile
+  // GET /db-access/:connectorId/roles/:roleName/export → full access profile
   ACCESS_EXPORT_SUFFIX: '/export',
   RENAME_SUFFIX: '/rename',
   DELETE_SUFFIX: '/delete',
-  // POST /db-access/:datasourceId/change-set
+  // POST /db-access/:connectorId/change-set
   CHANGE_SET_SUFFIX: '/change-set',
-  // GET /db-access/:datasourceId/sessions → { sessions, selfPid }
+  // GET /db-access/:connectorId/sessions → { sessions, selfPid }
   SESSIONS_SUFFIX: '/sessions',
-  // POST /db-access/:datasourceId/sessions/:pid/cancel
-  // POST /db-access/:datasourceId/sessions/:pid/terminate
+  // POST /db-access/:connectorId/sessions/:pid/cancel
+  // POST /db-access/:connectorId/sessions/:pid/terminate
   SESSIONS_SEGMENT: '/sessions/',
   CANCEL_SUFFIX: '/cancel',
   TERMINATE_SUFFIX: '/terminate',
-  // POST /db-access/:datasourceId/roles/:roleName/reassign
+  // POST /db-access/:connectorId/roles/:roleName/reassign
   REASSIGN_SUFFIX: '/reassign',
-  // GET /db-access/:datasourceId/database-privileges
+  // GET /db-access/:connectorId/database-privileges
   DATABASE_PRIVILEGES_SUFFIX: '/database-privileges',
-  // GET /db-access/:datasourceId/rls?schema=&table=
+  // GET /db-access/:connectorId/rls?schema=&table=
   RLS_SUFFIX: '/rls',
   // Templates (org DB): /db-access/templates[/:id], /templates/bulk-delete
   TEMPLATES_BASE: '/db-access/templates',

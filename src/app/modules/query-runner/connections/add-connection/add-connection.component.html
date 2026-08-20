@@ -58,7 +58,7 @@
           ></app-custom-input>
 
           <app-custom-dropdown
-            formControlName="datasourceId"
+            formControlName="connectorId"
             [label]="'COMMON.DATASOURCE' | translate"
             [serverMode]="true"
             [fetcher]="loadDatasourcesPage"
@@ -73,11 +73,11 @@
             [required]="true"
             [showError]="
               !!(
-                form.get('datasourceId')?.invalid &&
-                form.get('datasourceId')?.touched
+                form.get('connectorId')?.invalid &&
+                form.get('connectorId')?.touched
               )
             "
-            [errorMessage]="getErrorMessage('datasourceId')"
+            [errorMessage]="getErrorMessage('connectorId')"
           ></app-custom-dropdown>
 
           <h3 class="form-section-title">

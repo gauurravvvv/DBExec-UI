@@ -137,7 +137,7 @@ export class QueryBuilderService {
 
   async saveConfig(
     configuration: any,
-    datasourceId: string,
+    connectorId: string,
     queryBuilderId: string,
   ): Promise<any> {
     this._saving.set(true);
@@ -146,7 +146,7 @@ export class QueryBuilderService {
       return await lastValueFrom(
         this.http.apiPost(
           QUERY_BUILDER.GET + queryBuilderId + QUERY_BUILDER.CONFIG_SUFFIX,
-          { configuration, datasourceId, queryBuilderId },
+          { configuration, connectorId, queryBuilderId },
         ),
       );
     } finally {
@@ -230,10 +230,10 @@ export class QueryBuilderService {
 
   saveQueryBuilderConfiguration(
     configuration: any,
-    datasourceId: string,
+    connectorId: string,
     queryBuilderId: string,
   ): Promise<any> {
-    return this.saveConfig(configuration, datasourceId, queryBuilderId);
+    return this.saveConfig(configuration, connectorId, queryBuilderId);
   }
 
   getQueryBuilderStructure(queryBuilderId: string): Promise<any> {

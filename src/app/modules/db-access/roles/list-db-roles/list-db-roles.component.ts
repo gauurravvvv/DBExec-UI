@@ -54,7 +54,7 @@ export class ListDbRolesComponent implements OnInit, OnDestroy {
   capabilityLoading = this.ctx.capabilityLoading;
   unsupported = this.ctx.unsupported;
 
-  datasourceId = '';
+  connectorId = '';
   // Current server page of roles (login + group) shown in the grid.
   roles: any[] = [];
 
@@ -229,9 +229,9 @@ export class ListDbRolesComponent implements OnInit, OnDestroy {
     this.adapter?.destroy();
     this.adapter = new UsServerListAdapter<any>({
       load: p => {
-        if (!this.datasourceId) return Promise.resolve({ rows: [], total: 0 });
+        if (!this.connectorId) return Promise.resolve({ rows: [], total: 0 });
         return this.dbAccess
-          .loadRolesPaged(this.datasourceId, {
+          .loadRolesPaged(this.connectorId, {
             page: p.page,
             limit: p.limit,
             sort: p.sort,
@@ -268,11 +268,11 @@ export class ListDbRolesComponent implements OnInit, OnDestroy {
   }
 
   onDatasourceChange(id: string): void {
-    this.datasourceId = id || '';
+    this.connectorId = id || '';
     this.roles = [];
     this.typeFilter = 'all';
     this.tableBaseFilter = {};
-    if (!this.datasourceId) {
+    if (!this.connectorId) {
       this.adapter?.reload();
       this.cdr.markForCheck();
       return;
@@ -281,7 +281,7 @@ export class ListDbRolesComponent implements OnInit, OnDestroy {
   }
 
   load(): void {
-    if (!this.datasourceId) return;
+    if (!this.connectorId) return;
     // Server-paged: the adapter fetches page 1 with the current filter.
     this.adapter?.reload();
   }
@@ -397,12 +397,12 @@ export class ListDbRolesComponent implements OnInit, OnDestroy {
     this.runPreviewAndArm(
       [intent],
       () =>
-        this.dbAccess.updateRole(this.datasourceId, role.name, {
+        this.dbAccess.updateRole(this.connectorId, role.name, {
           ...body,
           previewOnly: true,
         }),
       confirmPhrase =>
-        this.dbAccess.updateRole(this.datasourceId, role.name, {
+        this.dbAccess.updateRole(this.connectorId, role.name, {
           ...body,
           confirmPhrase,
         }),
@@ -429,8 +429,8 @@ export class ListDbRolesComponent implements OnInit, OnDestroy {
     // Load the full role list (candidates) + this principal's current
     // memberships (pre-checked). A role cannot be a member of itself.
     Promise.all([
-      this.dbAccess.loadRoles(this.datasourceId),
-      this.dbAccess.loadMemberships(this.datasourceId),
+      this.dbAccess.loadRoles(this.connectorId),
+      this.dbAccess.loadMemberships(this.connectorId),
     ])
       .then(([, memRes]) => {
         this.membershipOptions = (this.dbAccess.roles() ?? [])
@@ -543,7 +543,7 @@ export class ListDbRolesComponent implements OnInit, OnDestroy {
 
     if (toGrant.length) {
       // attachRole → POST /memberships: body { role, toRole }.
-      const g = await this.dbAccess.attachRole(this.datasourceId, {
+      const g = await this.dbAccess.attachRole(this.connectorId, {
         role: toGrant,
         toRole: principal,
         adminOption: this.membershipAdminOption,
@@ -557,7 +557,7 @@ export class ListDbRolesComponent implements OnInit, OnDestroy {
     if (toRevoke.length) {
       // detachRole → POST /memberships/remove: body requires `fromRole`
       // (the principal the roles are revoked FROM), NOT `toRole`.
-      const r = await this.dbAccess.detachRole(this.datasourceId, {
+      const r = await this.dbAccess.detachRole(this.connectorId, {
         role: toRevoke,
         fromRole: principal,
         confirm: true,
@@ -609,7 +609,7 @@ export class ListDbRolesComponent implements OnInit, OnDestroy {
     this.ownedLoading = true;
     this.cdr.markForCheck();
     this.dbAccess
-      .loadOwned(this.datasourceId, role.name)
+      .loadOwned(this.connectorId, role.name)
       .then(res => {
         if (res?.status) this.ownedSummary = res.data;
       })
@@ -655,12 +655,12 @@ export class ListDbRolesComponent implements OnInit, OnDestroy {
     this.runPreviewAndArm(
       [intent],
       () =>
-        this.dbAccess.deleteRole(this.datasourceId, name, {
+        this.dbAccess.deleteRole(this.connectorId, name, {
           ...base,
           previewOnly: true,
         }),
       confirmPhrase =>
-        this.dbAccess.deleteRole(this.datasourceId, name, {
+        this.dbAccess.deleteRole(this.connectorId, name, {
           ...base,
           confirmPhrase,
         }),

@@ -15,7 +15,7 @@
  * Lookup strategy in resolveFieldIcon:
  *   1. Exact match on the registry key (e.g. "email")
  *   2. Case-insensitive match on lowercase (e.g. "Email" → "email")
- *   3. Suffix match — fields like "datasourceId" / "userEmail" fall
+ *   3. Suffix match — fields like "connectorId" / "userEmail" fall
  *      through to the last word ("id" / "email")
  *   4. Fallback to `pi-pencil` (generic editable)
  *
@@ -250,7 +250,7 @@ export function resolveFieldIcon(controlName: string): string {
   if (FIELD_ICONS[lc]) return FIELD_ICONS[lc];
 
   // 3. camelCase suffix — pull the trailing word and lowercase its first
-  //    letter (userEmail → email, datasourceId → id, firstName → name)
+  //    letter (userEmail → email, connectorId → id, firstName → name)
   const suffixMatch = controlName.match(/[A-Z][a-z0-9]*$/);
   if (suffixMatch) {
     const suffix =

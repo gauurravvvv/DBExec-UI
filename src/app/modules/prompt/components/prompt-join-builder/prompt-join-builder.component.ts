@@ -29,7 +29,7 @@ import {
   inject,
   signal,
 } from '@angular/core';
-import { DatasourceService } from 'src/app/modules/datasource/services/datasource.service';
+import { ConnectorService } from 'src/app/modules/connector/services/connector.service';
 
 /** Raw FK edge from GET /datasources/:id/foreign-keys → { data.foreignKeys }. */
 export interface FkEdge {
@@ -80,7 +80,7 @@ export interface ReachableColumn {
   styleUrls: ['./prompt-join-builder.component.scss'],
 })
 export class PromptJoinBuilderComponent implements OnChanges {
-  @Input({ required: true }) datasourceId!: string;
+  @Input({ required: true }) connectorId!: string;
   @Input() baseSchema: string | null = null;
   @Input() baseTable: string | null = null;
   @Input() baseAlias: string | null = null;
@@ -92,7 +92,7 @@ export class PromptJoinBuilderComponent implements OnChanges {
   /** Emits the reachable columns (base + all joined targets) for the filter picker. */
   @Output() reachableChange = new EventEmitter<ReachableColumn[]>();
 
-  private readonly datasource = inject(DatasourceService);
+  private readonly datasource = inject(ConnectorService);
 
   readonly loadingFks = signal(false);
   readonly fkEdges = signal<FkEdge[]>([]);
@@ -164,8 +164,8 @@ export class PromptJoinBuilderComponent implements OnChanges {
       this.emit();
     }
     if (
-      (changes['datasourceId'] || changes['baseTable'] || changes['baseSchema']) &&
-      this.datasourceId &&
+      (changes['connectorId'] || changes['baseTable'] || changes['baseSchema']) &&
+      this.connectorId &&
       this.baseSchema
     ) {
       await this.loadFks();
@@ -178,7 +178,7 @@ export class PromptJoinBuilderComponent implements OnChanges {
   private async loadFks(): Promise<void> {
     this.loadingFks.set(true);
     try {
-      const res: any = await this.datasource.listForeignKeys(this.datasourceId, {
+      const res: any = await this.datasource.listForeignKeys(this.connectorId, {
         schema: this.baseSchema || undefined,
       });
       const list: FkEdge[] = res?.data?.foreignKeys ?? [];
@@ -195,7 +195,7 @@ export class PromptJoinBuilderComponent implements OnChanges {
   private async loadSchemas(): Promise<void> {
     try {
       const res: any = await this.datasource.listDatasourceSchemas(
-        { datasourceId: this.datasourceId },
+        { connectorId: this.connectorId },
         true,
       );
       const rows: any[] = Array.isArray(res?.data) ? res.data : [];
@@ -215,7 +215,7 @@ export class PromptJoinBuilderComponent implements OnChanges {
     if (this.columnsByTable.has(key)) return this.columnsByTable.get(key)!;
     try {
       const res: any = await this.datasource.listTableColumns(
-        { datasourceId: this.datasourceId, schemaName: schema, tableName: table },
+        { connectorId: this.connectorId, schemaName: schema, tableName: table },
         true,
       );
       const raw: any[] = Array.isArray(res?.data) ? res.data : res?.data?.columns || [];
@@ -331,7 +331,7 @@ export class PromptJoinBuilderComponent implements OnChanges {
     this.manTargetCols.set([]);
     try {
       const res: any = await this.datasource.listSchemaTables(
-        { datasourceId: this.datasourceId, schemaName: schema },
+        { connectorId: this.connectorId, schemaName: schema },
         true,
       );
       const rows: any[] = Array.isArray(res?.data) ? res.data : [];

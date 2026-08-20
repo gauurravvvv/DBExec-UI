@@ -165,7 +165,7 @@ const configSchema = z
 // ── Payload schemas ────────────────────────────────────────────────
 
 /**
- * Create a visual. `analysisId` scopes it; `datasetId` / `datasourceId` are
+ * Create a visual. `analysisId` scopes it; `datasetId` / `connectorId` are
  * re-derived from the parent analysis on the BE (never trusted from the body)
  * but accepted here for a symmetric contract with update. The grid ratios are
  * optional — the builder may drop a chart with a default placement and let the

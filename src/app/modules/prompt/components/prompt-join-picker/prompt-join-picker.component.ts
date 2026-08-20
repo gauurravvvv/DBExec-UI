@@ -22,7 +22,7 @@ import {
   signal,
 } from '@angular/core';
 import { GlobalService } from 'src/app/core/services/global.service';
-import { DatasourceService } from 'src/app/modules/datasource/services/datasource.service';
+import { ConnectorService } from 'src/app/modules/connector/services/connector.service';
 
 /** A raw FK edge as returned by GET /datasources/:id/foreign-keys. */
 export interface FkEdge {
@@ -63,7 +63,7 @@ export interface ReachedColumn {
 })
 export class PromptJoinPickerComponent implements OnChanges {
   /** The datasource whose FK graph we browse. */
-  @Input({ required: true }) datasourceId!: string;
+  @Input({ required: true }) connectorId!: string;
   /** The prompt's base schema (the FROM table's schema). */
   @Input() baseSchema: string | null = null;
   /** The prompt's base table — edges originating here are "reachable". */
@@ -76,7 +76,7 @@ export class PromptJoinPickerComponent implements OnChanges {
   /** Emits when the admin clears the join (back to a base-table column). */
   @Output() cleared = new EventEmitter<void>();
 
-  private readonly datasource = inject(DatasourceService);
+  private readonly datasource = inject(ConnectorService);
   private readonly global = inject(GlobalService);
 
   readonly loading = signal(false);
@@ -101,7 +101,7 @@ export class PromptJoinPickerComponent implements OnChanges {
   private edgeByKey = new Map<string, FkEdge>();
 
   async ngOnChanges(): Promise<void> {
-    if (!this.datasourceId || !this.baseTable) {
+    if (!this.connectorId || !this.baseTable) {
       this.edges.set([]);
       return;
     }
@@ -111,7 +111,7 @@ export class PromptJoinPickerComponent implements OnChanges {
   private async loadEdges(): Promise<void> {
     this.loading.set(true);
     try {
-      const res = await this.datasource.listForeignKeys(this.datasourceId);
+      const res = await this.datasource.listForeignKeys(this.connectorId);
       const list: FkEdge[] = res?.data?.foreignKeys ?? [];
       this.edgeByKey.clear();
       for (const e of list) this.edgeByKey.set(this.edgeKey(e), e);
@@ -144,7 +144,7 @@ export class PromptJoinPickerComponent implements OnChanges {
     try {
       const res = await this.datasource.listTableColumns(
         {
-          datasourceId: this.datasourceId,
+          connectorId: this.connectorId,
           schemaName: e.refSchema,
           tableName: e.refTable,
         },

@@ -99,7 +99,7 @@ export class EditQueryBuilderComponent implements OnInit, HasUnsavedChanges {
             id: this.queryBuilderData.id,
             name: this.queryBuilderData.name,
             description: this.queryBuilderData.description,
-            datasource: this.queryBuilderData.datasourceId,
+            datasource: this.queryBuilderData.connectorId,
             status: this.queryBuilderData.status,
           });
 

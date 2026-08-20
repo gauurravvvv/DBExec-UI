@@ -166,7 +166,7 @@ describe('FormRuntimeStore.effectiveFlags — mandatory beats rule-hide (C3)', (
         id: 'f1',
         name: 'Form',
         description: null,
-        datasourceId: 'd1',
+        connectorId: 'd1',
         defaultLimit: 1000,
         maxLimit: 50000,
         forceDistinct: false,

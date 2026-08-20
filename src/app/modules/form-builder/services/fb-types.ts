@@ -18,7 +18,7 @@ export interface FormSummary {
   id: string;
   name: string;
   description: string | null;
-  datasourceId: string;
+  connectorId: string;
   baseSchema: string | null;
   baseTable: string | null;
   baseAlias: string | null;
@@ -89,7 +89,7 @@ export interface FormSchemaData {
   form: {
     id: string;
     name: string;
-    datasourceId: string;
+    connectorId: string;
     baseSchema: string | null;
     baseTable: string | null;
     baseAlias: string | null;

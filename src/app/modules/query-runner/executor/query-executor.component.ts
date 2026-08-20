@@ -167,7 +167,7 @@ export class QueryExecutorComponent
 
   connectionId = '';
   connectionName = '';
-  datasourceId = '';
+  connectorId = '';
   datasourceName = '';
   engine = '';
 
@@ -400,7 +400,7 @@ export class QueryExecutorComponent
       .then(res => {
         if (res?.status && res.data) {
           this.connectionName = res.data.name;
-          this.datasourceId = res.data.datasourceId ?? '';
+          this.connectorId = res.data.connectorId ?? '';
           this.datasourceName = res.data.datasourceName ?? '';
           this.engine = res.data.engine ?? '';
           // Don't clobber a saved-query title (set in loadSavedQuery).
@@ -1517,7 +1517,7 @@ export class QueryExecutorComponent
   confirmSave(): void {
     if (!this.canSave) return;
     const sql = this.getAll().trim();
-    if (!sql || !this.connectionId || !this.datasourceId) {
+    if (!sql || !this.connectionId || !this.connectorId) {
       this.statusText = 'Cannot save: missing SQL or connection metadata';
       this.cdr.markForCheck();
       return;
@@ -1528,7 +1528,7 @@ export class QueryExecutorComponent
     const payload: SavedQueryPayload = {
       name: this.savePromptName.trim(),
       sql,
-      datasourceId: this.datasourceId,
+      connectorId: this.connectorId,
       connectionId: this.connectionId,
       rowLimit: this.rowLimit,
     };

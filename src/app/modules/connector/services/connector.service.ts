@@ -1,10 +1,10 @@
 import { Injectable, signal } from '@angular/core';
 import { EmptyError, Subject, lastValueFrom, takeUntil } from 'rxjs';
-import { DATASOURCE } from 'src/app/core/constants/api.constant';
+import { CONNECTOR } from 'src/app/core/constants/api.constant';
 import { HttpClientService } from 'src/app/core/services/http-client.service';
 
 /**
- * DatasourceService — list/view/CUD for datasources + schema/table/
+ * ConnectorService — list/view/CUD for datasources + schema/table/
  * column listings used by the dataset editor.
  *
  * Loading-state follows the rollout convention: `loading` for reads,
@@ -17,7 +17,7 @@ import { HttpClientService } from 'src/app/core/services/http-client.service';
  * from Phase 1).
  */
 @Injectable({ providedIn: 'root' })
-export class DatasourceService {
+export class ConnectorService {
   private _datasources = signal<any[]>([]);
   private _total = signal(0);
   private _current = signal<any>(null);
@@ -58,7 +58,7 @@ export class DatasourceService {
     try {
       const res: any = await lastValueFrom(
         this.http
-          .apiGet(DATASOURCE.LIST, { params, skipLoader: true })
+          .apiGet(CONNECTOR.LIST, { params, skipLoader: true })
           .pipe(takeUntil(this._cancelReads$)),
       );
       if (res?.status) {
@@ -77,7 +77,7 @@ export class DatasourceService {
     try {
       const res: any = await lastValueFrom(
         this.http
-          .apiGet(DATASOURCE.GET + id, { skipLoader: true })
+          .apiGet(CONNECTOR.GET + id, { skipLoader: true })
           .pipe(takeUntil(this._cancelReads$)),
       );
       if (res?.status) this._current.set(res.data);
@@ -119,7 +119,7 @@ export class DatasourceService {
     this._saving.set(true);
     try {
       return await lastValueFrom(
-        this.http.apiPost(DATASOURCE.ADD, this.buildEnginePayload(payload), {
+        this.http.apiPost(CONNECTOR.ADD, this.buildEnginePayload(payload), {
           skipLoader: true,
         }),
       );
@@ -139,7 +139,7 @@ export class DatasourceService {
       };
       return await lastValueFrom(
         // PUT /datasources/:id
-        this.http.apiPut(DATASOURCE.UPDATE + payload.id, body, {
+        this.http.apiPut(CONNECTOR.UPDATE + payload.id, body, {
           skipLoader: true,
         }),
       );
@@ -156,7 +156,7 @@ export class DatasourceService {
    */
   async testConnection(payload: any): Promise<any> {
     return await lastValueFrom(
-      this.http.apiPost(DATASOURCE.VALIDATE, this.buildEnginePayload(payload), {
+      this.http.apiPost(CONNECTOR.VALIDATE, this.buildEnginePayload(payload), {
         skipLoader: true,
       }),
     );
@@ -174,7 +174,7 @@ export class DatasourceService {
    */
   async testConnectionForExisting(id: string): Promise<any> {
     return await lastValueFrom(
-      this.http.apiPost(DATASOURCE.VALIDATE, { id }, { skipLoader: true }),
+      this.http.apiPost(CONNECTOR.VALIDATE, { id }, { skipLoader: true }),
     );
   }
 
@@ -186,7 +186,7 @@ export class DatasourceService {
   async getUsage(id: string): Promise<any> {
     return await lastValueFrom(
       this.http
-        .apiGet(DATASOURCE.USAGE_PREFIX + id + DATASOURCE.USAGE_SUFFIX, {
+        .apiGet(CONNECTOR.USAGE_PREFIX + id + CONNECTOR.USAGE_SUFFIX, {
           skipLoader: true,
         })
         .pipe(takeUntil(this._cancelReads$)),
@@ -200,7 +200,7 @@ export class DatasourceService {
   async getActivity(id: string): Promise<any> {
     return await lastValueFrom(
       this.http
-        .apiGet(DATASOURCE.ACTIVITY_PREFIX + id + DATASOURCE.ACTIVITY_SUFFIX, {
+        .apiGet(CONNECTOR.ACTIVITY_PREFIX + id + CONNECTOR.ACTIVITY_SUFFIX, {
           skipLoader: true,
         })
         .pipe(takeUntil(this._cancelReads$)),
@@ -212,7 +212,7 @@ export class DatasourceService {
     this.setDeleting(id, true);
     try {
       return await lastValueFrom(
-        this.http.apiDelete(DATASOURCE.DELETE + id, {
+        this.http.apiDelete(CONNECTOR.DELETE + id, {
           body: { justification },
           skipLoader: true,
         }),
@@ -228,7 +228,7 @@ export class DatasourceService {
     try {
       return await lastValueFrom(
         this.http.apiPost(
-          DATASOURCE.BULK_DELETE,
+          CONNECTOR.BULK_DELETE,
           { ids, justification },
           { skipLoader: true },
         ),
@@ -242,14 +242,14 @@ export class DatasourceService {
     this._current.set(null);
   }
 
-  async loadSchemas(datasourceId: string) {
+  async loadSchemas(connectorId: string) {
     try {
       const res: any = await lastValueFrom(
         this.http
           .apiGet(
-            DATASOURCE.LIST_SCHEMAS_PREFIX +
-              datasourceId +
-              DATASOURCE.LIST_SCHEMAS_SUFFIX,
+            CONNECTOR.LIST_SCHEMAS_PREFIX +
+              connectorId +
+              CONNECTOR.LIST_SCHEMAS_SUFFIX,
             { skipLoader: true },
           )
           .pipe(takeUntil(this._cancelReads$)),
@@ -283,9 +283,9 @@ export class DatasourceService {
   listDatasourceSchemas(params: any, skipLoader = false) {
     return lastValueFrom(
       this.http.apiGet(
-        DATASOURCE.LIST_SCHEMAS_PREFIX +
-          params.datasourceId +
-          DATASOURCE.LIST_SCHEMAS_SUFFIX,
+        CONNECTOR.LIST_SCHEMAS_PREFIX +
+          params.connectorId +
+          CONNECTOR.LIST_SCHEMAS_SUFFIX,
         skipLoader ? { skipLoader: true } : undefined,
       ),
     );
@@ -294,11 +294,11 @@ export class DatasourceService {
   listSchemaTables(params: any, skipLoader = false) {
     return lastValueFrom(
       this.http.apiGet(
-        DATASOURCE.LIST_SCHEMAS_PREFIX +
-          params.datasourceId +
-          DATASOURCE.SCHEMAS_SEGMENT +
+        CONNECTOR.LIST_SCHEMAS_PREFIX +
+          params.connectorId +
+          CONNECTOR.SCHEMAS_SEGMENT +
           params.schemaName +
-          DATASOURCE.TABLES_SEGMENT.replace(/\/$/, ''),
+          CONNECTOR.TABLES_SEGMENT.replace(/\/$/, ''),
         skipLoader ? { skipLoader: true } : undefined,
       ),
     );
@@ -307,13 +307,13 @@ export class DatasourceService {
   listTableColumns(params: any, skipLoader = false) {
     return lastValueFrom(
       this.http.apiGet(
-        DATASOURCE.LIST_SCHEMAS_PREFIX +
-          params.datasourceId +
-          DATASOURCE.SCHEMAS_SEGMENT +
+        CONNECTOR.LIST_SCHEMAS_PREFIX +
+          params.connectorId +
+          CONNECTOR.SCHEMAS_SEGMENT +
           params.schemaName +
-          DATASOURCE.TABLES_SEGMENT +
+          CONNECTOR.TABLES_SEGMENT +
           params.tableName +
-          DATASOURCE.COLUMNS_SEGMENT,
+          CONNECTOR.COLUMNS_SEGMENT,
         skipLoader ? { skipLoader: true } : undefined,
       ),
     );
@@ -324,7 +324,7 @@ export class DatasourceService {
    * Optionally scope to a single originating table with { schema, table }.
    */
   listForeignKeys(
-    datasourceId: string,
+    connectorId: string,
     scope?: { schema?: string; table?: string },
     skipLoader = true,
   ): Promise<any> {
@@ -333,9 +333,9 @@ export class DatasourceService {
     if (scope?.table) params['table'] = scope.table;
     return lastValueFrom(
       this.http.apiGet(
-        DATASOURCE.LIST_SCHEMAS_PREFIX +
-          datasourceId +
-          DATASOURCE.FOREIGN_KEYS_SUFFIX,
+        CONNECTOR.LIST_SCHEMAS_PREFIX +
+          connectorId +
+          CONNECTOR.FOREIGN_KEYS_SUFFIX,
         { params, ...(skipLoader ? { skipLoader: true } : {}) },
       ),
     );
@@ -344,14 +344,14 @@ export class DatasourceService {
   async runQuery(params: any): Promise<any> {
     this._queryLoading.set(true);
     try {
-      // POST /datasources/:datasourceId/query
+      // POST /datasources/:connectorId/query
       return await lastValueFrom(
         this.http.apiPost(
-          DATASOURCE.RUN_QUERY_PREFIX +
-            params.datasourceId +
-            DATASOURCE.RUN_QUERY_SUFFIX,
+          CONNECTOR.RUN_QUERY_PREFIX +
+            params.connectorId +
+            CONNECTOR.RUN_QUERY_SUFFIX,
           {
-            datasourceId: params.datasourceId,
+            connectorId: params.connectorId,
             query: params.query,
           },
           { skipLoader: true },
@@ -368,13 +368,13 @@ export class DatasourceService {
   // loading state.
   listDatasource(params: any) {
     return lastValueFrom(
-      this.http.apiGet(DATASOURCE.LIST, { params, skipLoader: true }),
+      this.http.apiGet(CONNECTOR.LIST, { params, skipLoader: true }),
     );
   }
 
   viewDatasource(id: string) {
     return lastValueFrom(
-      this.http.apiGet(DATASOURCE.GET + id, { skipLoader: true }),
+      this.http.apiGet(CONNECTOR.GET + id, { skipLoader: true }),
     );
   }
 }

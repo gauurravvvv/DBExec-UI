@@ -204,8 +204,8 @@ export class RlsRulesService {
    * List ALL org RLS rules via `GET /rls-rules`. Each row is enriched by the
    * BE with `datasetName` + `datasourceName`, so the list can show both the
    * dataset and datasource context without a per-datasource gate. An optional
-   * params object (e.g. `{ datasourceId, page, limit, filter, sort }`) is
-   * forwarded as query params — the list passes `datasourceId` when the
+   * params object (e.g. `{ connectorId, page, limit, filter, sort }`) is
+   * forwarded as query params — the list passes `connectorId` when the
    * optional toolbar filter narrows the rows server-side.
    */
   listAllRules(params?: Record<string, any>) {

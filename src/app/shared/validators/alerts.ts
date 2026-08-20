@@ -177,9 +177,9 @@ const alertBase = z.object({
   description: alertDescriptionSchema,
   sourceType: z.enum(ALERT_SOURCE_TYPES),
   sourceId: z.string().uuid({ message: 'validation.alerts.sourceId.invalid' }),
-  datasourceId: z
+  connectorId: z
     .string()
-    .uuid({ message: 'validation.alerts.datasourceId.invalid' }),
+    .uuid({ message: 'validation.alerts.connectorId.invalid' }),
 
   conditionMode: z.enum(ALERT_CONDITION_MODES).default('builder'),
   conditionBuilder: alertConditionBuilderSchema.optional(),

@@ -450,31 +450,31 @@ export const listDatasourceSchema = z.object({
 });
 
 /**
- * GET /datasource/:datasourceId/schema — fetch the full schema tree (list of schemas).
- * datasourceId: UUID of the target datasource.
+ * GET /datasource/:connectorId/schema — fetch the full schema tree (list of schemas).
+ * connectorId: UUID of the target datasource.
  */
 export const listSchemaSchema = z.object({
-  datasourceId: z.string({ message: 'validation.common.id.required' }).trim().uuid({ message: 'validation.common.id.invalid' }),
+  connectorId: z.string({ message: 'validation.common.id.required' }).trim().uuid({ message: 'validation.common.id.invalid' }),
 });
 
 /**
- * GET /datasource/:datasourceId/schema/:schema/table — fetch tables within a schema.
- * datasourceId: UUID of the target datasource.
+ * GET /datasource/:connectorId/schema/:schema/table — fetch tables within a schema.
+ * connectorId: UUID of the target datasource.
  * schema: plain string (PostgreSQL schema name, not a UUID); trimmed to remove whitespace.
  */
 export const listTableSchema = z.object({
-  datasourceId: z.string({ message: 'validation.common.id.required' }).trim().uuid({ message: 'validation.common.id.invalid' }),
+  connectorId: z.string({ message: 'validation.common.id.required' }).trim().uuid({ message: 'validation.common.id.invalid' }),
   schema: z.string({ message: 'validation.datasources.schema.required' }).trim().min(1, { message: 'validation.datasources.schema.required' }),
 });
 
 /**
- * GET /datasource/:datasourceId/schema/:schema/table/:table/column — fetch columns within a table.
- * datasourceId: UUID of the target datasource.
+ * GET /datasource/:connectorId/schema/:schema/table/:table/column — fetch columns within a table.
+ * connectorId: UUID of the target datasource.
  * schema: plain string (PostgreSQL schema name, not a UUID); trimmed to remove whitespace.
  * table: plain string (table identifier, not a UUID); trimmed to remove whitespace.
  */
 export const listTableColumnsSchema = z.object({
-  datasourceId: z.string({ message: 'validation.common.id.required' }).trim().uuid({ message: 'validation.common.id.invalid' }),
+  connectorId: z.string({ message: 'validation.common.id.required' }).trim().uuid({ message: 'validation.common.id.invalid' }),
   schema: z.string({ message: 'validation.datasources.schema.required' }).trim().min(1, { message: 'validation.datasources.schema.required' }),
   table: z.string({ message: 'validation.datasources.table.required' }).trim().min(1, { message: 'validation.datasources.table.required' }),
 });

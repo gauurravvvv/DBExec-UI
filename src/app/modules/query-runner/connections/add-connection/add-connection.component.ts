@@ -11,7 +11,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { QUERY_RUNNER } from 'src/app/core/constants/routes.constant';
 import { HasUnsavedChanges } from 'src/app/core/models/has-unsaved-changes.model';
 import { GlobalService } from 'src/app/core/services/global.service';
-import { DatasourceService } from 'src/app/modules/datasource/services/datasource.service';
+import { ConnectorService } from 'src/app/modules/connector/services/connector.service';
 import { QueryRunnerService } from '../../services/query-runner.service';
 
 /**
@@ -40,7 +40,7 @@ export class AddConnectionComponent implements OnInit, HasUnsavedChanges {
   constructor(
     private fb: FormBuilder,
     private service: QueryRunnerService,
-    private datasourceService: DatasourceService,
+    private datasourceService: ConnectorService,
     private globalService: GlobalService,
     private translate: TranslateService,
     private route: ActivatedRoute,
@@ -48,7 +48,7 @@ export class AddConnectionComponent implements OnInit, HasUnsavedChanges {
   ) {
     this.form = this.fb.group({
       name: ['', [Validators.required, Validators.maxLength(120)]],
-      datasourceId: ['', [Validators.required]],
+      connectorId: ['', [Validators.required]],
       username: ['', [Validators.required, Validators.maxLength(128)]],
       password: ['', []],
     });
@@ -111,7 +111,7 @@ export class AddConnectionComponent implements OnInit, HasUnsavedChanges {
         if (res?.status && res.data) {
           this.form.patchValue({
             name: res.data.name,
-            datasourceId: res.data.datasourceId,
+            connectorId: res.data.connectorId,
             username: res.data.username,
             password: '',
           });
@@ -144,7 +144,7 @@ export class AddConnectionComponent implements OnInit, HasUnsavedChanges {
     const raw = this.form.getRawValue();
     const payload: any = {
       name: raw.name,
-      datasourceId: raw.datasourceId,
+      connectorId: raw.connectorId,
       username: raw.username,
     };
     // Only send password when non-empty (create always has it; edit

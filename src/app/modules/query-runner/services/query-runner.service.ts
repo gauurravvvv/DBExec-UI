@@ -15,7 +15,7 @@ import { HttpClientService } from 'src/app/core/services/http-client.service';
 export interface QueryConnection {
   id: string;
   name: string;
-  datasourceId: string;
+  connectorId: string;
   datasourceName?: string | null;
   engine?: string | null;
   host?: string | null;
@@ -30,7 +30,7 @@ export interface QueryConnection {
 
 export interface ConnectionPayload {
   name: string;
-  datasourceId: string;
+  connectorId: string;
   username: string;
   password?: string;
 }
@@ -50,11 +50,11 @@ export class QueryRunnerService {
    * full list is returned.
    */
   listConnections(
-    datasourceId?: string,
+    connectorId?: string,
     paging?: { page?: number; limit?: number; sort?: string; filter?: string },
   ): Promise<any> {
     const params: Record<string, string> = {};
-    if (datasourceId) params['datasourceId'] = datasourceId;
+    if (connectorId) params['connectorId'] = connectorId;
     if (paging) {
       if (paging.page != null) params['page'] = String(paging.page);
       if (paging.limit != null) params['limit'] = String(paging.limit);

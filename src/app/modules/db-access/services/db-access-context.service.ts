@@ -13,11 +13,11 @@ import { DbAccessService } from './db-access.service';
  *  - the probed `capability` for that datasource (canManage / unsupported);
  *  - a MEMOISED introspection cache keyed by the DATA tuple, not by any
  *    component/rule id, so N rules on the same schema share ONE fetch:
- *      schemas  → key `${datasourceId}`
- *      tables   → key `${datasourceId}:${schema}`
- *      columns  → key `${datasourceId}:${schema}:${table}`
- *      sequences→ key `${datasourceId}:${schema}` (seq namespace)
- *      functions→ key `${datasourceId}:${schema}` (fn namespace)
+ *      schemas  → key `${connectorId}`
+ *      tables   → key `${connectorId}:${schema}`
+ *      columns  → key `${connectorId}:${schema}:${table}`
+ *      sequences→ key `${connectorId}:${schema}` (seq namespace)
+ *      functions→ key `${connectorId}:${schema}` (fn namespace)
  *
  * Every introspection getter dedupes in-flight requests (returns the same
  * promise) and never re-fetches a resolved tuple. When the datasource
@@ -41,7 +41,7 @@ export class DbAccessContextService {
   private _unsupported = signal<boolean>(false);
   private _capabilityLoading = signal<boolean>(false);
 
-  readonly datasourceId = this._datasourceId.asReadonly();
+  readonly connectorId = this._datasourceId.asReadonly();
   readonly capability = this._capability.asReadonly();
   readonly unsupported = this._unsupported.asReadonly();
   readonly capabilityLoading = this._capabilityLoading.asReadonly();
@@ -138,15 +138,15 @@ export class DbAccessContextService {
   }
 
   /** Schemas for the current datasource — one fetch per datasource. */
-  loadSchemas(datasourceId: string): Promise<Option[]> {
-    if (!datasourceId) return Promise.resolve([]);
-    const key = datasourceId;
+  loadSchemas(connectorId: string): Promise<Option[]> {
+    if (!connectorId) return Promise.resolve([]);
+    const key = connectorId;
     if (this.schemaCache.has(key))
       return Promise.resolve(this.schemaCache.get(key)!);
     if (this.schemaInflight.has(key)) return this.schemaInflight.get(key)!;
     const gen = this.generation;
     const p = this.dbAccess
-      .loadSchemas(datasourceId)
+      .loadSchemas(connectorId)
       .then((res: any) => {
         const opts = this.toOptions(res?.status ? (res.data ?? []) : []);
         if (gen === this.generation) this.schemaCache.set(key, opts);
@@ -159,15 +159,15 @@ export class DbAccessContextService {
   }
 
   /** Tables for (datasource, schema) — one fetch per tuple, shared by all rules. */
-  loadTables(datasourceId: string, schema: string): Promise<Option[]> {
-    if (!datasourceId || !schema) return Promise.resolve([]);
-    const key = `${datasourceId}:${schema}`;
+  loadTables(connectorId: string, schema: string): Promise<Option[]> {
+    if (!connectorId || !schema) return Promise.resolve([]);
+    const key = `${connectorId}:${schema}`;
     if (this.tableCache.has(key))
       return Promise.resolve(this.tableCache.get(key)!);
     if (this.tableInflight.has(key)) return this.tableInflight.get(key)!;
     const gen = this.generation;
     const p = this.dbAccess
-      .loadTableGrants(datasourceId, schema)
+      .loadTableGrants(connectorId, schema)
       .then((res: any) => {
         const opts = this.toOptions(
           res?.status ? (res.data ?? []) : [],
@@ -184,18 +184,18 @@ export class DbAccessContextService {
 
   /** Columns for (datasource, schema, table) — one fetch per tuple. */
   loadColumns(
-    datasourceId: string,
+    connectorId: string,
     schema: string,
     table: string,
   ): Promise<Option[]> {
-    if (!datasourceId || !schema || !table) return Promise.resolve([]);
-    const key = `${datasourceId}:${schema}:${table}`;
+    if (!connectorId || !schema || !table) return Promise.resolve([]);
+    const key = `${connectorId}:${schema}:${table}`;
     if (this.columnCache.has(key))
       return Promise.resolve(this.columnCache.get(key)!);
     if (this.columnInflight.has(key)) return this.columnInflight.get(key)!;
     const gen = this.generation;
     const p = this.dbAccess
-      .loadColumnGrants(datasourceId, schema, table)
+      .loadColumnGrants(connectorId, schema, table)
       .then((res: any) => {
         const opts = this.toOptions(
           res?.status ? (res.data ?? []) : [],
@@ -211,15 +211,15 @@ export class DbAccessContextService {
   }
 
   /** Sequences for (datasource, schema) — one fetch per tuple. */
-  loadSequences(datasourceId: string, schema: string): Promise<Option[]> {
-    if (!datasourceId || !schema) return Promise.resolve([]);
-    const key = `${datasourceId}:${schema}`;
+  loadSequences(connectorId: string, schema: string): Promise<Option[]> {
+    if (!connectorId || !schema) return Promise.resolve([]);
+    const key = `${connectorId}:${schema}`;
     if (this.sequenceCache.has(key))
       return Promise.resolve(this.sequenceCache.get(key)!);
     if (this.sequenceInflight.has(key)) return this.sequenceInflight.get(key)!;
     const gen = this.generation;
     const p = this.dbAccess
-      .loadSequences(datasourceId, schema)
+      .loadSequences(connectorId, schema)
       .then((res: any) => {
         const opts = this.toOptions(res?.status ? (res.data ?? []) : []);
         if (gen === this.generation) this.sequenceCache.set(key, opts);
@@ -232,15 +232,15 @@ export class DbAccessContextService {
   }
 
   /** Functions for (datasource, schema) — one fetch per tuple. */
-  loadFunctions(datasourceId: string, schema: string): Promise<Option[]> {
-    if (!datasourceId || !schema) return Promise.resolve([]);
-    const key = `${datasourceId}:${schema}`;
+  loadFunctions(connectorId: string, schema: string): Promise<Option[]> {
+    if (!connectorId || !schema) return Promise.resolve([]);
+    const key = `${connectorId}:${schema}`;
     if (this.functionCache.has(key))
       return Promise.resolve(this.functionCache.get(key)!);
     if (this.functionInflight.has(key)) return this.functionInflight.get(key)!;
     const gen = this.generation;
     const p = this.dbAccess
-      .loadFunctions(datasourceId, schema)
+      .loadFunctions(connectorId, schema)
       .then((res: any) => {
         const opts = this.toOptions(res?.status ? (res.data ?? []) : []);
         if (gen === this.generation) this.functionCache.set(key, opts);
@@ -253,21 +253,21 @@ export class DbAccessContextService {
   }
 
   /** Synchronous cache peek (no fetch) — for template getters. */
-  peekTables(datasourceId: string, schema: string): Option[] {
-    return this.tableCache.get(`${datasourceId}:${schema}`) ?? [];
+  peekTables(connectorId: string, schema: string): Option[] {
+    return this.tableCache.get(`${connectorId}:${schema}`) ?? [];
   }
-  peekColumns(datasourceId: string, schema: string, table: string): Option[] {
-    return this.columnCache.get(`${datasourceId}:${schema}:${table}`) ?? [];
+  peekColumns(connectorId: string, schema: string, table: string): Option[] {
+    return this.columnCache.get(`${connectorId}:${schema}:${table}`) ?? [];
   }
-  peekSchemas(datasourceId: string): Option[] {
-    return this.schemaCache.get(datasourceId) ?? [];
+  peekSchemas(connectorId: string): Option[] {
+    return this.schemaCache.get(connectorId) ?? [];
   }
   peekObjects(
-    datasourceId: string,
+    connectorId: string,
     schema: string,
     level: 'sequence' | 'function',
   ): Option[] {
-    const key = `${datasourceId}:${schema}`;
+    const key = `${connectorId}:${schema}`;
     return (
       (level === 'sequence' ? this.sequenceCache : this.functionCache).get(
         key,
@@ -276,9 +276,9 @@ export class DbAccessContextService {
   }
 
   /** Drop the cached tables + columns for a schema (used when a rule's schema clears). */
-  invalidateSchema(datasourceId: string, schema: string): void {
+  invalidateSchema(connectorId: string, schema: string): void {
     if (!schema) return;
-    const prefix = `${datasourceId}:${schema}`;
+    const prefix = `${connectorId}:${schema}`;
     this.tableCache.delete(prefix);
     this.sequenceCache.delete(prefix);
     this.functionCache.delete(prefix);

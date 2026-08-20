@@ -15,7 +15,7 @@ import { REGEX } from 'src/app/core/constants/regex.constant';
 import { PROMPT } from 'src/app/core/constants/routes.constant';
 import { HasUnsavedChanges } from 'src/app/core/models/has-unsaved-changes.model';
 import { GlobalService } from 'src/app/core/services/global.service';
-import { DatasourceService } from 'src/app/modules/datasource/services/datasource.service';
+import { ConnectorService } from 'src/app/modules/connector/services/connector.service';
 import { PROMPT_TYPES } from '../../constants/prompt.constant';
 import { PromptService } from '../../services/prompt.service';
 
@@ -48,7 +48,7 @@ export class AddPromptComponent implements OnInit, HasUnsavedChanges {
     private fb: FormBuilder,
     private router: Router,
     private globalService: GlobalService,
-    private datasourceService: DatasourceService,
+    private datasourceService: ConnectorService,
     private promptService: PromptService,
     private translate: TranslateService,
   ) {

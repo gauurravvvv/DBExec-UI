@@ -103,7 +103,7 @@ export class EditPromptComponent implements OnInit, HasUnsavedChanges {
             id: data.id,
             name: data.name,
             description: data.description,
-            datasource: data.datasourceId,
+            datasource: data.connectorId,
             status: data.status,
           });
 
@@ -173,7 +173,7 @@ export class EditPromptComponent implements OnInit, HasUnsavedChanges {
         id: this.promptData.id,
         name: this.promptData.name,
         description: this.promptData.description,
-        datasource: this.promptData.datasourceId,
+        datasource: this.promptData.connectorId,
         status: this.promptData.status,
       });
 

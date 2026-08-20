@@ -87,7 +87,7 @@
     "ACTIONS": "操作",
     "STATUS": "ステータス",
     "ALL": "すべて",
-    "ALL_DATASOURCES": "すべてのデータソース",
+    "ALL_DATASOURCES": "すべてのコネクタ",
     "TYPE": "タイプ",
     "SELECT_RANGE": "範囲を選択",
     "NO_RECORD_FOUND": "該当するレコードが見つかりません",
@@ -142,7 +142,7 @@
     "CANNOT_DELETE_SELF": "自分自身を削除することはできません",
     "NO_DELETE_PERMISSION": "削除する権限がありません",
     "LOCKED_NOTE": "アカウントはロックされています。ステータスを変更するには一覧ページからロックを解除してください。",
-    "DATASOURCE": "データソース",
+    "DATASOURCE": "コネクタ",
     "CONNECTION": "接続",
     "GROUPS": "グループ",
     "USERS": "ユーザー",
@@ -167,7 +167,7 @@
     "SECTION": "セクション",
     "PROMPTS": "プロンプト",
     "SECTIONS": "セクション",
-    "SELECT_DATASOURCE": "データソースを選択",
+    "SELECT_DATASOURCE": "コネクタを選択",
     "SELECT_TAB": "タブを選択",
     "SELECT_SECTION": "セクションを選択",
     "TAB_REQUIRED": "タブは必須です",
@@ -270,7 +270,7 @@
     "NAME_PATTERN": "名前には文字、スペース、ハイフンのみ使用できます",
     "ORGANISATION_REQUIRED": "組織は必須です",
     "ROLE_REQUIRED": "役割は必須です",
-    "DATASOURCE_REQUIRED": "データソースは必須です",
+    "DATASOURCE_REQUIRED": "コネクタは必須です",
     "CONNECTION_REQUIRED": "接続は必須です",
     "GROUPS_REQUIRED": "グループは必須です",
     "USERS_REQUIRED": "ユーザーは必須です",
@@ -289,8 +289,8 @@
     "GROUP_NAME_MIN_LENGTH": "グループ名は{{length}}文字以上で入力してください",
     "GROUP_NAME_MAX_LENGTH": "グループ名は{{length}}文字以内で入力してください",
     "GROUP_NAME_PATTERN": "グループ名は文字または数字で始まり、文字、数字、スペース、ドット、アンダースコア、ハイフンのみ使用できます",
-    "DATASOURCE_USERNAME_REQUIRED": "データソースのユーザー名は必須です",
-    "DATASOURCE_PASSWORD_REQUIRED": "データソースのパスワードは必須です",
+    "DATASOURCE_USERNAME_REQUIRED": "コネクタのユーザー名は必須です",
+    "DATASOURCE_PASSWORD_REQUIRED": "コネクタのパスワードは必須です",
     "CONNECTION_NAME_REQUIRED": "接続名は必須です",
     "CONNECTION_NAME_MIN_LENGTH": "接続名は{{length}}文字以上で入力してください",
     "CONNECTION_NAME_MAX_LENGTH": "接続名は{{length}}文字以内で入力してください",
@@ -502,15 +502,15 @@
     "USERS": "ユーザー",
     "ADMINS": "管理者",
     "GROUPS": "グループ",
-    "DATASOURCES": "データソース",
+    "DATASOURCES": "コネクタ",
     "MASTER_DATASOURCE": "データベース",
     "REFRESH_SCHEMA": "スキーマを更新",
     "REFRESHING": "更新中...",
     "REFRESH_SCHEMA_TOOLTIP": "データベーススキーマを更新して、新しいエンティティとカラムを同期します",
     "HOSTNAME": "ホスト名",
-    "DATASOURCE_NAME": "データソース名",
+    "DATASOURCE_NAME": "コネクタ名",
     "CONFIGURATION_LIMITS": "設定上限",
-    "MAX_DATASOURCES": "最大データソース数",
+    "MAX_DATASOURCES": "最大コネクタ数",
     "MAX_USERS": "最大ユーザー数",
     "MAX_ADMINS": "最大管理者数",
     "ADDITIONAL_LIMITS": "追加上限",
@@ -522,7 +522,7 @@
     "ADMIN_LOCALE": "管理者の言語",
     "ADMIN_LOCALE_PLACEHOLDER": "ウェルカムメールの言語を選択",
     "ENCRYPTION_AUTO_TITLE": "暗号化を自動管理",
-    "ENCRYPTION_AUTO_DESCRIPTION": "組織が保存するすべての機密情報（データソースのパスワード、SMTP/SES認証情報、ユーザーパスワード）は自動的に暗号化されます。アルゴリズムを選んだり、鍵を覚えたりする必要はありません。",
+    "ENCRYPTION_AUTO_DESCRIPTION": "組織が保存するすべての機密情報（コネクタのパスワード、SMTP/SES認証情報、ユーザーパスワード）は自動的に暗号化されます。アルゴリズムを選んだり、鍵を覚えたりする必要はありません。",
     "ENCRYPTION_BULLET_1": "AES-256-GCM（認証付き暗号化）",
     "ENCRYPTION_BULLET_2": "組織ごとに固有の鍵を生成",
     "ENCRYPTION_BULLET_3": "マスター鍵はデータベース外に保管",
@@ -685,12 +685,12 @@
     "BULK_ADD_RACE_FAILURES": "作成中のエラー",
     "CANNOT_MODIFY_SELF_HINT": "自分自身のアクセス権は変更できません"
   },
-  "DATASOURCE": {
-    "TITLE": "データソース",
-    "SUBTITLE": "クライアントのデータソースと接続情報を管理します",
-    "ADD_TITLE": "データソースを追加",
-    "EDIT_TITLE": "データソースを編集",
-    "VIEW_TITLE": "データソースの詳細",
+  "CONNECTOR": {
+    "TITLE": "コネクタ",
+    "SUBTITLE": "クライアントのコネクタと接続情報を管理します",
+    "ADD_TITLE": "コネクタを追加",
+    "EDIT_TITLE": "コネクタを編集",
+    "VIEW_TITLE": "コネクタの詳細",
     "HOST": "ホスト",
     "PORT": "ポート",
     "DATABASE_NAME": "データベース名",
@@ -707,17 +707,17 @@
     "CONNECTION_SUCCESSFUL": "接続成功",
     "CONNECTION_FAILED_RETRY": "接続失敗 - 再試行",
     "CONNECTION_TEST_REQUIRED": "保存する前に接続テストが必要です",
-    "CONFIRM_DELETE_SINGLE": "このデータソースを削除してもよろしいですか？",
-    "CONFIRM_DELETE_BULK": "<strong>{{count}}</strong>件の選択されたデータソースを削除してもよろしいですか？",
-    "CONFIRM_UPDATE_MESSAGE": "このデータソースを更新してもよろしいですか？",
+    "CONFIRM_DELETE_SINGLE": "このコネクタを削除してもよろしいですか？",
+    "CONFIRM_DELETE_BULK": "<strong>{{count}}</strong>件の選択されたコネクタを削除してもよろしいですか？",
+    "CONFIRM_UPDATE_MESSAGE": "このコネクタを更新してもよろしいですか？",
     "DELETE_INFO_ASSOCIATED_DATA": "関連するすべてのデータが削除されます",
     "DELETE_INFO_CONNECTED_DATASETS": "接続されたデータセットに影響があります",
-    "EDIT_WARNING_TITLE": "データソース接続を編集しています",
-    "EDIT_WARNING_CHANGES": "接続情報の変更は、このデータソースを使用するすべてのデータセットとクエリに影響します",
+    "EDIT_WARNING_TITLE": "コネクタ接続を編集しています",
+    "EDIT_WARNING_CHANGES": "接続情報の変更は、このコネクタを使用するすべてのデータセットとクエリに影響します",
     "EDIT_WARNING_TEST_REQUIRED": "保存する前に接続テストに成功する必要があります",
     "EDIT_WARNING_CREDENTIALS": "既存の接続は新しい資格情報で更新されます",
     "CONFIGURATION": "設定",
-    "DATASOURCE_TYPE": "データソースタイプ",
+    "DATASOURCE_TYPE": "コネクタタイプ",
     "CONNECTION_STATUS": "接続ステータス",
     "LAST_UPDATED": "最終更新日",
     "USAGE": "使用状況",
@@ -736,7 +736,7 @@
     "HEALTH_TESTING": "テスト中…",
     "HEALTH_NEVER_TESTED": "未テスト",
     "TESTED": "テスト",
-    "SEARCH_PLACEHOLDER": "名前でデータソースを検索",
+    "SEARCH_PLACEHOLDER": "名前でコネクタを検索",
     "ACCOUNT": "アカウント",
     "WAREHOUSE": "Warehouse",
     "ROLE": "ロール",
@@ -864,7 +864,7 @@
     "LOADING_MONACO_HINT": "SQLエディタをセットアップ中...",
     "LOADING_SCHEMA": "スキーマを読み込み中...",
     "NO_ANALYSES_FOUND": "このデータセットの分析が見つかりません",
-    "NO_DATASOURCE_SELECTED": "データソースが選択されていません",
+    "NO_DATASOURCE_SELECTED": "コネクタが選択されていません",
     "NO_DESCRIPTION": "説明はありません",
     "NO_FIELDS_FOUND": "フィールドが見つかりません",
     "NO_FUNCTIONS_FOUND": "関数が見つかりません",
@@ -892,8 +892,8 @@
     "SEARCH_QUERY_BUILDERS": "クエリビルダーを検索...",
     "SEARCH_TABLES": "テーブルを検索...",
     "SELECT_DATA_TYPE": "データ型を選択",
-    "SELECT_DATASOURCE_HINT": "データソースを選択してクエリの作成を開始してください",
-    "SELECT_DATASOURCE_QUERY_HINT": "クエリ対象のデータソースを選択してください",
+    "SELECT_DATASOURCE_HINT": "コネクタを選択してクエリの作成を開始してください",
+    "SELECT_DATASOURCE_QUERY_HINT": "クエリ対象のコネクタを選択してください",
     "SOURCE": "ソース",
     "SQL_BASED": "SQLベース",
     "SQL_QUERY": "SQLクエリ",
@@ -909,13 +909,13 @@
     "VIA_QUERY_BUILDER": "クエリビルダー経由",
     "VIEW_RESULTS": "結果を表示",
     "ACTIVE_DIALECT": "アクティブな SQL ダイアレクト",
-    "PICK_DATASOURCE": "データソースを選択",
+    "PICK_DATASOURCE": "コネクタを選択",
     "SCHEMA_PICKER_HINT": "エディタはこのスキーマに限定されます。他のスキーマのテーブルは表示されません。",
-    "SCHEMA_PICKER_HINT_OPTIONAL": "空のままにするとデータソース全体に接続します。スキーマを選択するとエディタのサイドバーが絞り込まれます。",
-    "SCHEMA_PICK_DATASOURCE_FIRST": "上でデータソースを選択するとスキーマを選択できます。",
-    "SCHEMA_LAZY_MODE_HINT": "大規模なデータソースです — テーブルを展開すると列が読み込まれます。",
-    "SEARCH_DATASOURCES": "データソースを検索…",
-    "NO_DATASOURCES": "データソースが見つかりません",
+    "SCHEMA_PICKER_HINT_OPTIONAL": "空のままにするとコネクタ全体に接続します。スキーマを選択するとエディタのサイドバーが絞り込まれます。",
+    "SCHEMA_PICK_DATASOURCE_FIRST": "上でコネクタを選択するとスキーマを選択できます。",
+    "SCHEMA_LAZY_MODE_HINT": "大規模なコネクタです — テーブルを展開すると列が読み込まれます。",
+    "SEARCH_DATASOURCES": "コネクタを検索…",
+    "NO_DATASOURCES": "コネクタが見つかりません",
     "SCHEMA": "スキーマ",
     "EDITOR_DISABLED": "エディタは無効です — スキーマを利用できません。",
     "CELL_NULL": "NULL",
@@ -942,14 +942,14 @@
     "ERROR_KIND_PERMISSION_DENIED": "アクセス権限がありません",
     "ERROR_KIND_SYNTAX": "SQL構文エラー",
     "ERROR_KIND_TIMEOUT": "クエリがタイムアウトしました",
-    "ERROR_KIND_CONNECTION": "データソースに接続できません",
+    "ERROR_KIND_CONNECTION": "コネクタに接続できません",
     "ERROR_KIND_OBJECT_NOT_FOUND": "オブジェクトが見つかりません",
     "ERROR_KIND_SAFETY_VIOLATION": "SQLは安全性チェックで拒否されました",
-    "ERROR_HINT_PERMISSION_DENIED": "データソースのユーザーがオブジェクトにアクセスできません。管理者にSELECT権限を依頼してください。",
+    "ERROR_HINT_PERMISSION_DENIED": "コネクタのユーザーがオブジェクトにアクセスできません。管理者にSELECT権限を依頼してください。",
     "ERROR_HINT_SYNTAX": "エンジンがSQLを解析できませんでした。位置は最初の予期しないトークンを示します。",
     "ERROR_HINT_TIMEOUT": "ステートメントタイムアウトを超えました。WHERE句を追加するかJOINを簡素化してください。",
-    "ERROR_HINT_CONNECTION": "データソースに到達できません。設定で接続を確認してください。",
-    "ERROR_HINT_OBJECT_NOT_FOUND": "クエリで参照されたテーブル、ビュー、または列はこのデータソースに存在しません。",
+    "ERROR_HINT_CONNECTION": "コネクタに到達できません。設定で接続を確認してください。",
+    "ERROR_HINT_OBJECT_NOT_FOUND": "クエリで参照されたテーブル、ビュー、または列はこのコネクタに存在しません。",
     "ERROR_HINT_SAFETY_VIOLATION": "単一文のSELECTまたはWITH … SELECTクエリのみ許可されています。",
     "OFFENDING_TOKEN_TOOLTIP": "バリデーターが拒否したキーワード",
     "TRUNCATED_BANNER": "結果が切り捨てられました — 最初のページのみ表示。ページネーションまたはWHEREを使用してください。",
@@ -2176,7 +2176,7 @@
     "SUBTITLE": "公開されたダッシュボードを表示・管理します",
     "DATASET": "データセット",
     "SEARCH_DATASET": "データセットを検索",
-    "SEARCH_DATASOURCE": "データソースを検索",
+    "SEARCH_DATASOURCE": "コネクタを検索",
     "NO_DASHBOARDS_FOUND": "ダッシュボードが見つかりません",
     "CONFIRM_DELETE_SINGLE": "このダッシュボードを削除してもよろしいですか？",
     "CONFIRM_DELETE_BULK": "<strong>{{count}}</strong>件の選択されたダッシュボードを削除してもよろしいですか？",
@@ -2337,7 +2337,7 @@
     "GROUPS": "グループ",
     "RLS_RULES": "RLSルール",
     "ALERTS": "アラート",
-    "DATASOURCES": "データソース",
+    "DATASOURCES": "コネクタ",
     "ROLES": "ロール",
     "DATASET": "データセット",
     "ANALYSES": "分析",
@@ -2372,7 +2372,7 @@
     "CONNECTORS_API": "Web/REST コネクタ"
   },
   "AUTH": {
-    "HEADLINE_LOGIN": "データソース管理体験を\n向上させましょう",
+    "HEADLINE_LOGIN": "コネクタ管理体験を\n向上させましょう",
     "HEADLINE_FORGOT": "アカウントのパスワードを\n安全にリセット",
     "HEADLINE_RESET": "新しいアカウント\nパスワードを設定",
     "HEADLINE_SET_PASSWORD": "アカウントの\nパスワードを設定",
@@ -2466,7 +2466,7 @@
       "HOME_ARIA": "DBExec ホーム",
       "ALL_RIGHTS": "無断複製・転載を禁じます。",
       "HERO_TITLE": "データベースをダッシュボードに変えましょう。",
-      "HERO_LEDE": "データソースを接続し、必要なチャートをドラッグして、ダッシュボードを共有 — すべてを一か所で、SQL は不要です。",
+      "HERO_LEDE": "コネクタを接続し、必要なチャートをドラッグして、ダッシュボードを共有 — すべてを一か所で、SQL は不要です。",
       "FEATURE_CONNECT_TITLE": "あらゆるデータベースに接続",
       "FEATURE_CONNECT_DESC": "Postgres、MySQL、SQL Server など — 数分で。",
       "FEATURE_BUILD_TITLE": "ダッシュボードを視覚的に構築",
@@ -2564,7 +2564,7 @@
     "ACTIVE_USERS_7D": "アクティブユーザー（過去7日間）",
     "ACTIVE_USERS_15D": "アクティブユーザー（過去15日間）",
     "ACTIVE_USERS_30D": "アクティブユーザー（過去30日間）",
-    "TOTAL_DATASOURCES": "データソース合計",
+    "TOTAL_DATASOURCES": "コネクタ合計",
     "TOTAL_ENVIRONMENTS": "環境合計",
     "TOTAL_ADMINS": "管理者合計",
     "TOTAL_USERS": "ユーザー合計",
@@ -2582,17 +2582,17 @@
     "ANALYSES_DESC": "Visualize and analyze data",
     "USERS": "Users",
     "USERS_DESC": "Manage organisation users",
-    "DATASOURCES": "Datasources",
-    "DATASOURCES_DESC": "Configure datasource connections",
+    "DATASOURCES": "コネクタ",
+    "DATASOURCES_DESC": "Configure コネクタ connections",
     "AUDIT_LOGS": "Audit Logs",
     "AUDIT_LOGS_DESC": "Review activity history",
     "ADD_USER": "Add User",
-    "MANAGE_DATASOURCE": "Manage Datasource",
+    "MANAGE_DATASOURCE": "Manage コネクタ",
     "VIEW_REPORTS": "View Reports"
   },
   "AUTH_FEATURES": {
-    "LOGIN_1_TITLE": "ビジュアルデータソースエクスプローラー",
-    "LOGIN_1_DESC": "直感的なビジュアルインターフェースでデータソース構造をナビゲート",
+    "LOGIN_1_TITLE": "ビジュアルコネクタエクスプローラー",
+    "LOGIN_1_DESC": "直感的なビジュアルインターフェースでコネクタ構造をナビゲート",
     "LOGIN_2_TITLE": "パフォーマンスインサイト",
     "LOGIN_2_DESC": "リアルタイムのパフォーマンスメトリクスとクエリ最適化の提案を取得",
     "LOGIN_3_TITLE": "安全なアクセス",
@@ -2672,7 +2672,7 @@
   },
   "PROMPT_MODULE": {
     "TITLE": "Prompts",
-    "SUBTITLE": "Configure datasource fields for data filtering and query generation",
+    "SUBTITLE": "Configure コネクタ fields for data filtering and query generation",
     "ADD_TITLE": "Add Prompt",
     "EDIT_TITLE": "Edit Prompt",
     "VIEW_TITLE": "Prompt Details",
@@ -3092,8 +3092,8 @@
     "CONDITION_COUNT": "{{count}} condition(s)",
     "MORE_CONDITIONS": "+{{count}} more",
     "SEARCH_DATASET": "Search Dataset",
-    "SELECT_DATASOURCE_MSG": "Please select a datasource to view RLS rules",
-    "NO_RULES_FOUND": "No RLS rules found for this datasource",
+    "SELECT_DATASOURCE_MSG": "Please select a コネクタ to view RLS rules",
+    "NO_RULES_FOUND": "No RLS rules found for this コネクタ",
     "DELETE_SINGLE": "Are you sure you want to delete this RLS rule?",
     "UPDATE_CONFIRM": "Are you sure you want to update this RLS rule?",
     "DELETE_INFO_FILTERING": "Row-level security filtering will be removed",
@@ -4100,7 +4100,7 @@
     "IMPORT": "インポート",
     "IMPORTING": "インポート中…",
     "EXPORT_SUCCESS": "エクスポートをダウンロードしました",
-    "IMPORT_SUCCESS": "インポートが完了しました。新しいデータソースが作成されました。インポートしたアセットを実行するにはパスワードを設定してください。",
+    "IMPORT_SUCCESS": "インポートが完了しました。新しいコネクタが作成されました。インポートしたアセットを実行するにはパスワードを設定してください。",
     "IMPORT_FAILED": "インポートに失敗しました",
     "INVALID_FILE": "そのファイルは有効な DBExec エクスポートファイルではありません。",
     "FILE_TOO_LARGE": "ファイルが大きすぎます（最大 10 MB）。",
@@ -4524,8 +4524,8 @@
         "tooLong": "デフォルトスキーマは 128 文字以内で入力してください"
       },
       "id": {
-        "required": "データソース ID は必須です",
-        "invalid": "無効なデータソース ID です"
+        "required": "コネクタ ID は必須です",
+        "invalid": "無効なコネクタ ID です"
       },
       "justification": {
         "tooLong": "理由は 500 文字以内で入力してください"
@@ -4545,7 +4545,7 @@
         "invalid": "名前は英数字で始まり、英数字、スペース、ピリオド、アンダースコア、ハイフンのみ使用できます"
       },
       "datasource": {
-        "required": "データソースは必須です"
+        "required": "コネクタは必須です"
       },
       "id": {
         "required": "接続 ID は必須です"
@@ -4556,7 +4556,7 @@
     },
     "access": {
       "datasource": {
-        "required": "データソースは必須です"
+        "required": "コネクタは必須です"
       },
       "connection": {
         "required": "接続は必須です"
@@ -4580,7 +4580,7 @@
         "tooLong": "理由は 500 文字以内で入力してください"
       },
       "datasource": {
-        "required": "データソースは必須です"
+        "required": "コネクタは必須です"
       },
       "sql": {
         "required": "SQL クエリは必須です",
@@ -4631,7 +4631,7 @@
         "tooLong": "理由は 500 文字以内で入力してください"
       },
       "datasource": {
-        "required": "データソースは必須です"
+        "required": "コネクタは必須です"
       },
       "dataset": {
         "required": "データセットは必須です"
@@ -4853,15 +4853,15 @@
         "unsupported": "サポートされていない移行ファイルのバージョンです"
       },
       "datasources": {
-        "required": "移行ファイルには少なくとも1つのデータソースが必要です",
-        "tooMany": "移行ファイル内のデータソースが多すぎます"
+        "required": "移行ファイルには少なくとも1つのコネクタが必要です",
+        "tooMany": "移行ファイル内のコネクタが多すぎます"
       },
       "datasource": {
         "handle": {
           "required": "データソースのハンドルは必須です"
         },
         "name": {
-          "required": "データソース名は必須です"
+          "required": "コネクタ名は必須です"
         },
         "dbType": {
           "invalid": "移行ファイルにサポートされていないデータベースタイプが含まれています"
@@ -4872,14 +4872,14 @@
         "username": {
           "required": "データベースのユーザー名は必須です"
         },
-        "unknownField": "移行ファイルに予期しないデータソースフィールドが含まれています"
+        "unknownField": "移行ファイルに予期しないコネクタフィールドが含まれています"
       },
       "asset": {
         "name": {
           "required": "アセット名は必須です"
         },
         "datasourceHandle": {
-          "required": "アセットにデータソース参照がありません"
+          "required": "アセットにコネクタ参照がありません"
         },
         "handle": {
           "required": "アセットにバンドルハンドルがありません"
@@ -5253,8 +5253,8 @@
         "tooLong": "説明は500文字を超えることはできません"
       },
       "datasource": {
-        "required": "データソースは必須です",
-        "invalid": "データソースは有効なUUIDである必要があります"
+        "required": "コネクタは必須です",
+        "invalid": "コネクタは有効なUUIDである必要があります"
       },
       "status": {
         "invalid": "ステータスは0または1である必要があります"
@@ -5278,8 +5278,8 @@
         "tooLong": "説明は500文字を超えることはできません"
       },
       "datasource": {
-        "required": "データソースは必須です",
-        "invalid": "データソースは有効なUUIDである必要があります"
+        "required": "コネクタは必須です",
+        "invalid": "コネクタは有効なUUIDである必要があります"
       },
       "status": {
         "invalid": "ステータスは0または1である必要があります"
@@ -5402,7 +5402,7 @@
     "NO_CONNECTIONS": "接続はまだありません。クエリの実行を開始するには接続を作成してください。",
     "CONNECTION_NAME": "接続名",
     "CONNECTION_NAME_PLACEHOLDER": "例: prod-db (analyst)",
-    "CONNECTION_HINT": "接続は、データソースと付与されたデータベースログインを結び付けます。接続を開くと、そのログインとしてSQLが実行されます。",
+    "CONNECTION_HINT": "接続は、コネクタと付与されたデータベースログインを結び付けます。接続を開くと、そのログインとしてSQLが実行されます。",
     "CREDENTIALS": "認証情報",
     "LOGIN": "ログイン",
     "LOGIN_PLACEHOLDER": "データベースのユーザー名",
@@ -5418,20 +5418,20 @@
     "DISABLED": "無効",
     "ENABLE": "有効化",
     "DISABLE": "無効化",
-    "SET_DEFAULT": "このデータソースのデフォルトに設定",
-    "IS_DEFAULT": "このデータソースのデフォルト",
-    "DEFAULT_BADGE": "このデータソースのデフォルト接続",
-    "ALL_DISABLED_FOR_DS": "このデータソースの接続はすべて無効です。クエリを実行するには接続を有効にしてください。",
+    "SET_DEFAULT": "このコネクタのデフォルトに設定",
+    "IS_DEFAULT": "このコネクタのデフォルト",
+    "DEFAULT_BADGE": "このコネクタのデフォルト接続",
+    "ALL_DISABLED_FOR_DS": "このコネクタの接続はすべて無効です。クエリを実行するには接続を有効にしてください。",
     "TEST": "接続を検証",
     "OPEN": "SQL エディターを開く",
     "LAUNCH_TITLE": "クエリセッションを開く",
-    "LAUNCH_SUBTITLE": "データソースと接続を1つ選択し、エディターを新しいタブで開いてください。",
-    "STEP_DATASOURCE": "データソース",
+    "LAUNCH_SUBTITLE": "コネクタと接続を1つ選択し、エディターを新しいタブで開いてください。",
+    "STEP_DATASOURCE": "コネクタ",
     "STEP_CONNECTION": "接続",
-    "SELECT_DATASOURCE": "データソースを選択",
-    "SELECT_DATASOURCE_FIRST": "最初にデータソースを選択してください",
+    "SELECT_DATASOURCE": "コネクタを選択",
+    "SELECT_DATASOURCE_FIRST": "最初にコネクタを選択してください",
     "SELECT_CONNECTION": "接続を選択",
-    "NO_CONNECTIONS_FOR_DS": "このデータソースの接続はまだありません。",
+    "NO_CONNECTIONS_FOR_DS": "このコネクタの接続はまだありません。",
     "NO_CONNECTIONS_HINT": "接続がまだありません。開始するには接続を作成してください。",
     "OPEN_EXECUTOR": "SQL エディターを開く",
     "VERIFYING": "検証中…",
@@ -5605,12 +5605,12 @@
     "SAVED_QUERIES_SEARCH_PLACEHOLDER": "Search saved queries by name",
     "NO_SAVED_QUERIES": "No saved queries yet. Create one to get started.",
     "NEW_QUERY": "New query",
-    "NEW_QUERY_SUBTITLE": "Pick a datasource and one of your connections, then open the editor in a new tab.",
+    "NEW_QUERY_SUBTITLE": "Pick a コネクタ and one of your connections, then open the editor in a new tab.",
     "NEW_SAVED_QUERY": "New Saved Query",
     "EDIT_SAVED_QUERY": "Edit Saved Query",
     "DELETE_SAVED_QUERY": "Delete saved query",
     "DELETE_SAVED_QUERY_CONFIRM": "Delete the saved query \"{{name}}\"? This removes the saved SQL only — nothing on the database is changed.",
-    "SAVED_QUERY_HINT": "A saved query stores your SQL against a datasource + connection so you can reopen and run it later.",
+    "SAVED_QUERY_HINT": "A saved query stores your SQL against a コネクタ + connection so you can reopen and run it later.",
     "SAVED_QUERY_NAME": "Query name",
     "SAVED_QUERY_NAME_PLACEHOLDER": "e.g. Monthly active users",
     "SAVED_QUERY_DESCRIPTION": "Description",
@@ -5630,15 +5630,15 @@
   },
   "DB_ACCESS": {
     "TITLE": "データベースアクセス管理",
-    "SUBTITLE": "データソース上のPostgreSQLユーザー、ロール、権限を管理します",
+    "SUBTITLE": "コネクタ上のPostgreSQLユーザー、ロール、権限を管理します",
     "EXPORT_JSON": "JSONをエクスポート",
     "EXPORT_CSV": "CSVをエクスポート",
     "EXPORT_ACCESS_HINT": "このアカウントの完全なアクセスプロファイル（属性、付与されたロール、実効権限、所有オブジェクト）を監査用にダウンロードします。",
-    "SELECT_DATASOURCE": "管理するデータソースを選択",
+    "SELECT_DATASOURCE": "管理するコネクタを選択",
     "CHECKING_CAPABILITY": "管理権限を確認中…",
     "OPEN_WORKSPACE": "ワークスペースを開く",
     "UNSUPPORTED_TITLE": "v1ではPostgreSQLのみ対応",
-    "UNSUPPORTED_BODY": "データベースアクセス管理は、本リリースではPostgreSQLデータソースのみをサポートします。",
+    "UNSUPPORTED_BODY": "データベースアクセス管理は、本リリースではPostgreSQLコネクタのみをサポートします。",
     "CAP_FULL_TITLE": "フル管理が利用可能",
     "CAP_FULL_BODY": "管理ログインは、このデータベース上でロールや付与を作成・変更・削除できます。",
     "CAP_FULL_BADGE": "フル管理",
@@ -5692,7 +5692,7 @@
     "APP_GROUPS": "アプリグループ",
     "SELECT_APP_USERS": "割り当てるアプリユーザーを選択",
     "SELECT_APP_GROUPS": "割り当てるアプリグループを選択",
-    "ATTACH_HINT": "このデータベースロールを1つ以上のアプリユーザーおよびグループに割り当てます。選択した各項目は、このデータソースのロールに紐付けられます。",
+    "ATTACH_HINT": "このデータベースロールを1つ以上のアプリユーザーおよびグループに割り当てます。選択した各項目は、このコネクタのロールに紐付けられます。",
     "DISCARD_UNSAVED": "権限コンポーザーに保存していない変更があります。破棄してタブを切り替えますか？",
     "DISCARD_TITLE": "保存していない変更を破棄しますか？",
     "DISCARD_CONFIRM": "破棄して切り替え",
@@ -5821,7 +5821,7 @@
     "CAN_LOGIN_DESC": "ログインユーザーはパスワードを持ち接続できます。グループロールはログインできず、権限をまとめるだけです。",
     "LOGIN_DETAILS": "ログイン情報",
     "PASSWORD_UNCHANGED_PLACEHOLDER": "変更しない場合は空欄のままにしてください",
-    "SELECT_DATASOURCE_HINT": "上でデータソースを選択して、そのデータベースユーザー、ロール、権限を管理します。",
+    "SELECT_DATASOURCE_HINT": "上でコネクタを選択して、そのデータベースユーザー、ロール、権限を管理します。",
     "NAME": "名前",
     "SEARCH_NAME": "名前を検索",
     "VIEW_PRIVILEGE_SET": "保存された権限セット",
@@ -5902,10 +5902,10 @@
       "GENERIC": "Apply change"
     },
     "SELECT_DATE": "Select a date",
-    "PICK_DATASOURCE_TO_CREATE": "Select a datasource to create a role.",
+    "PICK_DATASOURCE_TO_CREATE": "Select a コネクタ to create a role.",
     "RULE_INCOMPLETE": "未完了",
     "APPLY_DISABLED_HINT": "適用する前に、すべてのルールを完成させるか削除してください。",
-    "CHOOSE_DATASOURCE": "データソースを選択",
+    "CHOOSE_DATASOURCE": "コネクタを選択",
     "TAB_COMPOSE": "ルールを作成",
     "TAB_EFFECTIVE_PRIVS": "実効権限",
     "ALL_SEQUENCES": "スキーマ内のすべてのシーケンス",
@@ -5921,7 +5921,7 @@
     "SCOPE_ORG_WIDE": "組織全体",
     "SCOPE": "範囲",
     "RULE": "ルール",
-    "SCOPE_DATASOURCE": "データソース",
+    "SCOPE_DATASOURCE": "コネクタ",
     "SEARCH_TEMPLATES_PLACEHOLDER": "テンプレートを検索…",
     "TEMPLATES_TITLE": "ロールテンプレート",
     "TEMPLATES_SUBTITLE": "再利用可能なロール＋権限のレシピ。ロール作成時や権限構成時に適用します。",
@@ -5965,7 +5965,7 @@
     "PUBLIC_PRIVILEGES": "PUBLIC への権限",
     "PUBLIC_ALSO_DIRECT": "直接付与もあり？",
     "PUBLIC_SEARCH": "オブジェクトを検索",
-    "PUBLIC_NONE": "このデータソースでは PUBLIC に権限が付与されていません。",
+    "PUBLIC_NONE": "このコネクタでは PUBLIC に権限が付与されていません。",
     "PUBLIC_VIA_PUBLIC": "PUBLIC 経由",
     "PUBLIC_REVOKE_SUMMARY": "{{object}} の {{privileges}} を PUBLIC から取り消す",
     "PUBLIC_CONFIRM_TITLE": "PUBLIC から権限を取り消す",
@@ -6316,7 +6316,7 @@
     "UNGROUPED": "未グループ化",
     "GROUP_NAME": "グループ名",
     "DROP_PROMPTS_HERE": "ここにプロンプトをドラッグ",
-    "NO_PROMPTS": "このデータソースのプロンプトが見つかりません。",
+    "NO_PROMPTS": "このコネクタのプロンプトが見つかりません。",
     "ALREADY_PLACED": "配置済み",
     "MANDATORY": "必須",
     "LOCKED": "ロック",
@@ -6665,7 +6665,7 @@
     "COMPOSE": "Run",
     "DELETE_SINGLE": "Are you sure you want to delete this form?",
     "COL_NAME": "Name",
-    "COL_DATASOURCE": "Datasource",
+    "COL_DATASOURCE": "コネクタ",
     "COL_STATUS": "Status",
     "COL_UPDATED": "Updated",
     "VERSIONS": "Versions",
@@ -6840,7 +6840,7 @@
     },
     "PALETTE": {
       "NO_PROMPTS": "No prompts yet",
-      "NO_PROMPTS_HINT": "Create prompts in the Prompts module for this datasource, then drag them onto a section."
+      "NO_PROMPTS_HINT": "Create prompts in the Prompts module for this コネクタ, then drag them onto a section."
     }
   },
   "CONNECTORS_API": {

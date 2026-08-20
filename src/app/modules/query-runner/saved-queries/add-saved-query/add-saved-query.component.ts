@@ -11,7 +11,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { QUERY_RUNNER } from 'src/app/core/constants/routes.constant';
 import { HasUnsavedChanges } from 'src/app/core/models/has-unsaved-changes.model';
 import { GlobalService } from 'src/app/core/services/global.service';
-import { DatasourceService } from 'src/app/modules/datasource/services/datasource.service';
+import { ConnectorService } from 'src/app/modules/connector/services/connector.service';
 import {
   QueryConnection,
   QueryRunnerService,
@@ -64,7 +64,7 @@ export class AddSavedQueryComponent implements OnInit, HasUnsavedChanges {
     protected fb: FormBuilder,
     protected service: SavedQueriesService,
     protected connService: QueryRunnerService,
-    protected datasourceService: DatasourceService,
+    protected datasourceService: ConnectorService,
     protected globalService: GlobalService,
     protected translate: TranslateService,
     protected route: ActivatedRoute,
@@ -73,7 +73,7 @@ export class AddSavedQueryComponent implements OnInit, HasUnsavedChanges {
     this.form = this.fb.group({
       name: ['', [Validators.required]],
       description: [''],
-      datasourceId: ['', [Validators.required]],
+      connectorId: ['', [Validators.required]],
       connectionId: ['', [Validators.required]],
       sql: ['', [Validators.required]],
       rowLimit: [null as number | null],
@@ -143,8 +143,8 @@ export class AddSavedQueryComponent implements OnInit, HasUnsavedChanges {
 
   /** Datasource changed → filter connections + clear/keep selection. */
   onDatasourceChange(dsId: string | null): void {
-    this.form.get('datasourceId')?.setValue(dsId);
-    this.form.get('datasourceId')?.markAsDirty();
+    this.form.get('connectorId')?.setValue(dsId);
+    this.form.get('connectorId')?.markAsDirty();
     // Clear the connection when the datasource changes (it may no longer
     // belong to the new datasource). Preselect the default for the new one.
     this.form.get('connectionId')?.setValue(null);
@@ -158,12 +158,12 @@ export class AddSavedQueryComponent implements OnInit, HasUnsavedChanges {
   private usableConnectionsForDs(dsId: string | null): QueryConnection[] {
     if (!dsId) return [];
     return this.allConnections
-      .filter(c => c.datasourceId === dsId)
+      .filter(c => c.connectorId === dsId)
       .filter(c => c.enabled !== false);
   }
 
   private refreshConnectionOptions(): void {
-    const dsId = this.form.get('datasourceId')?.value ?? null;
+    const dsId = this.form.get('connectorId')?.value ?? null;
     const usable = this.usableConnectionsForDs(dsId);
     this.connectionOptions = usable.map(c => ({
       label: c.isDefault
@@ -182,7 +182,7 @@ export class AddSavedQueryComponent implements OnInit, HasUnsavedChanges {
           this.form.patchValue({
             name: d.name,
             description: d.description ?? '',
-            datasourceId: d.datasourceId,
+            connectorId: d.connectorId,
             connectionId: d.connectionId,
             sql: d.sql,
             rowLimit: d.rowLimit ?? null,
@@ -204,7 +204,7 @@ export class AddSavedQueryComponent implements OnInit, HasUnsavedChanges {
     const payload: SavedQueryPayload = {
       name: raw.name,
       sql: raw.sql,
-      datasourceId: raw.datasourceId,
+      connectorId: raw.connectorId,
       connectionId: raw.connectionId,
     };
     if (raw.description && String(raw.description).trim())

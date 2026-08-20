@@ -217,8 +217,8 @@ export class FbAdminService {
   }
 
   // ── Prompt library (palette source — read only) ───────────────────────
-  listPrompts(datasourceId: string, search = ''): Promise<any> {
-    const params: Record<string, any> = { datasourceId, page: 1, pageSize: 500 };
+  listPrompts(connectorId: string, search = ''): Promise<any> {
+    const params: Record<string, any> = { connectorId, page: 1, pageSize: 500 };
     if (search) params['filter'] = JSON.stringify({ name: search });
     return lastValueFrom(
       this.http.apiGet(PROMPT.LIST, { params, skipLoader: true }),

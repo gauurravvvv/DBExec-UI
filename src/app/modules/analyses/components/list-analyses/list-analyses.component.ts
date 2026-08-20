@@ -22,7 +22,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { DEFAULT_PAGE } from 'src/app/core/constants';
 import { ANALYSES } from 'src/app/core/constants/routes.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
-import { DatasourceService } from 'src/app/modules/datasource/services/datasource.service';
+import { ConnectorService } from 'src/app/modules/connector/services/connector.service';
 import {
   UsServerListAdapter,
   UsListLoadParams,
@@ -43,7 +43,7 @@ import { AnalysesService } from '../../services/analyses.service';
  * selection.
  *
  * There is NO datasource gate — the adapter is built once in `ngOnInit` and
- * browses ALL org analyses. A `?datasourceId=` deep-link still narrows the list
+ * browses ALL org analyses. A `?connectorId=` deep-link still narrows the list
  * (optional filter) and `?name=` still pre-searches. The page header and
  * delete-confirm popup retain their existing behaviour.
  */
@@ -114,7 +114,7 @@ export class ListAnalysesComponent implements OnInit, OnDestroy {
   };
 
   /** Server-side adapter — built once in ngOnInit; NO datasource gate. The
-   *  list browses ALL org analyses; a `?datasourceId=` deep-link narrows it
+   *  list browses ALL org analyses; a `?connectorId=` deep-link narrows it
    *  via the optional datasource filter. */
   adapter: UsServerListAdapter<any> | null = null;
 
@@ -133,7 +133,7 @@ export class ListAnalysesComponent implements OnInit, OnDestroy {
   }
 
   constructor(
-    private datasourceService: DatasourceService,
+    private datasourceService: ConnectorService,
     private analysesService: AnalysesService,
     private router: Router,
     private globalService: GlobalService,
@@ -159,12 +159,12 @@ export class ListAnalysesComponent implements OnInit, OnDestroy {
     };
 
     // Build the datasource-free adapter once — the list browses ALL org
-    // analyses. A `?datasourceId=` deep-link still narrows the list (optional
+    // analyses. A `?connectorId=` deep-link still narrows the list (optional
     // filter), and `?name=` still pre-searches.
     this.route.queryParams
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(params => {
-        const dsId = params['datasourceId'] || undefined;
+        const dsId = params['connectorId'] || undefined;
         const name = params['name'] || undefined;
         this.selectedDatasource = dsId ?? null;
         this.bindAdapter(name);
@@ -279,7 +279,7 @@ export class ListAnalysesComponent implements OnInit, OnDestroy {
 
   /**
    * Construct the server-side adapter. NO datasource gate — the list browses
-   * ALL org analyses. A `datasourceId` is sent only when a deep-link / optional
+   * ALL org analyses. A `connectorId` is sent only when a deep-link / optional
    * filter selected one.
    */
   private bindAdapter(deepLinkName?: string) {
@@ -288,7 +288,7 @@ export class ListAnalysesComponent implements OnInit, OnDestroy {
       load: (params: UsListLoadParams) =>
         this.analysesService.listAnalyses({
           ...(this.selectedDatasource
-            ? { datasourceId: this.selectedDatasource }
+            ? { connectorId: this.selectedDatasource }
             : {}),
           page: params.page,
           limit: params.limit,

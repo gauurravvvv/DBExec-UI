@@ -9,7 +9,7 @@
 
   <prompt-join-builder
     *ngIf="!svc.joins().useRaw"
-    [datasourceId]="svc.datasourceId()"
+    [connectorId]="svc.connectorId()"
     [baseSchema]="svc.source().schema"
     [baseTable]="svc.source().table"
     [baseAlias]="svc.source().alias"

@@ -74,7 +74,7 @@ export class PrivilegesHubComponent implements OnInit {
 
   /** Shared datasource + capability state (all read from the root context, so
    *  the ONE hub picker feeds every tab body). */
-  datasourceId = '';
+  connectorId = '';
   capability = this.ctx.capability;
   capabilityLoading = this.ctx.capabilityLoading;
   unsupported = this.ctx.unsupported;
@@ -86,7 +86,7 @@ export class PrivilegesHubComponent implements OnInit {
   ngOnInit(): void {
     // Hydrate from the shared context (a datasource may already be selected
     // from another db-access section this session).
-    this.datasourceId = this.ctx.datasourceId() || '';
+    this.connectorId = this.ctx.connectorId() || '';
 
     const slug = this.route.snapshot.queryParamMap.get('tab');
     if (slug && this.tabs.some(t => t.value === slug)) this.activeTab = slug;
@@ -108,7 +108,7 @@ export class PrivilegesHubComponent implements OnInit {
    *  we only track the id locally to gate the header hints/badges. Every tab
    *  body reacts on its own via DbAccessContextService.datasourceChanged$. */
   onDatasourceChange(id: string): void {
-    this.datasourceId = id || '';
+    this.connectorId = id || '';
     this.cdr.markForCheck();
   }
 

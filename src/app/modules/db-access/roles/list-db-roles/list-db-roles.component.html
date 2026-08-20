@@ -45,7 +45,7 @@
             ></app-datasource-picker>
 
             <ng-container
-              *ngIf="datasourceId && !unsupported() && !capabilityLoading()"
+              *ngIf="connectorId && !unsupported() && !capabilityLoading()"
             >
               <div class="type-filter">
                 <app-chip
@@ -91,7 +91,7 @@
                  being probed. -->
             <span
               class="cap-loading"
-              *ngIf="datasourceId && capabilityLoading()"
+              *ngIf="connectorId && capabilityLoading()"
             >
               <i class="pi pi-spin pi-spinner"></i
               >{{ 'DB_ACCESS.CHECKING_CAPABILITY' | translate }}
@@ -103,15 +103,15 @@
                inner branch picks the message: pick-a-datasource, unsupported,
                or the plain no-records fallback. -->
           <div tableEmpty class="roles-empty">
-            <ng-container *ngIf="!datasourceId">
+            <ng-container *ngIf="!connectorId">
               <i class="pi pi-database"></i>
               <span>{{ 'DB_ACCESS.SELECT_DATASOURCE_HINT' | translate }}</span>
             </ng-container>
-            <ng-container *ngIf="datasourceId && unsupported()">
+            <ng-container *ngIf="connectorId && unsupported()">
               <i class="pi pi-info-circle warn"></i>
               <span>{{ 'DB_ACCESS.UNSUPPORTED_BODY' | translate }}</span>
             </ng-container>
-            <ng-container *ngIf="datasourceId && !unsupported()">
+            <ng-container *ngIf="connectorId && !unsupported()">
               <i class="pi pi-inbox"></i>
               <span>{{ 'COMMON.NO_RECORDS' | translate }}</span>
             </ng-container>

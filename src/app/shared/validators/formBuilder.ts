@@ -20,7 +20,7 @@ export const FORM_BUILDER_LIMITS = {
 } as const;
 
 // ─── Phase 2: form family CRUD schemas ───────────────────────────────
-// Only the columns FbForm actually stores (name/description/datasourceId/
+// Only the columns FbForm actually stores (name/description/connectorId/
 // iconKey). The builder-meta fields (baseSchema/baseTable/baseAlias/limits/
 // forceDistinct) that 04-api §3.1 lists live on QueryBuilder, NOT FbForm —
 // they are a Phase-3 concern and are intentionally NOT accepted here. `code`
@@ -38,14 +38,14 @@ export const createFormSchema = z.object({
     .trim()
     .max(FORM_BUILDER_LIMITS.DESCRIPTION_MAX, { message: 'validation.formBuilder.description.max' })
     .optional(),
-  datasourceId: z
+  connectorId: z
     .string()
-    .uuid({ message: 'validation.formBuilder.datasourceId.invalid' }),
+    .uuid({ message: 'validation.formBuilder.connectorId.invalid' }),
   iconKey: z.string().trim().max(64, { message: 'validation.formBuilder.iconKey.max' }).optional(),
 });
 export type CreateFormBody = z.infer<typeof createFormSchema>;
 
-// PATCH — every field optional; datasourceId is accepted but the controller
+// PATCH — every field optional; connectorId is accepted but the controller
 // rejects a change once any version is published (DATASOURCE_LOCKED).
 export const updateFormSchema = z
   .object({
@@ -61,9 +61,9 @@ export const updateFormSchema = z
       .max(FORM_BUILDER_LIMITS.DESCRIPTION_MAX, { message: 'validation.formBuilder.description.max' })
       .nullable()
       .optional(),
-    datasourceId: z
+    connectorId: z
       .string()
-      .uuid({ message: 'validation.formBuilder.datasourceId.invalid' })
+      .uuid({ message: 'validation.formBuilder.connectorId.invalid' })
       .optional(),
     iconKey: z
       .string()
@@ -88,7 +88,7 @@ export const listFormsSchema = z.object({
     .optional()
     .default(25),
   search: z.string().trim().max(FORM_BUILDER_LIMITS.NAME_MAX).optional(),
-  datasourceId: z.string().uuid({ message: 'validation.formBuilder.datasourceId.invalid' }).optional(),
+  connectorId: z.string().uuid({ message: 'validation.formBuilder.connectorId.invalid' }).optional(),
   status: z.coerce.number().int().min(0).max(1).optional(),
 });
 export type ListFormsQuery = z.infer<typeof listFormsSchema>;

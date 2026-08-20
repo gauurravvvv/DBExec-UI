@@ -32,7 +32,7 @@ export class FbDesignComponent implements OnInit, HasUnsavedChanges {
   readonly store = inject(FormBuilderStore);
 
   readonly loading = signal(true);
-  readonly datasourceId = signal<string>('');
+  readonly connectorId = signal<string>('');
   readonly name = signal<string>('');
   readonly versions = signal<FormVersionSummary[]>([]);
 
@@ -49,7 +49,7 @@ export class FbDesignComponent implements OnInit, HasUnsavedChanges {
     try {
       const header = await this.admin.getForm(id);
       const h = header?.data;
-      this.datasourceId.set(h?.datasourceId ?? '');
+      this.connectorId.set(h?.connectorId ?? '');
       this.name.set(h?.name ?? '');
       this.versions.set(h?.versions ?? []);
       const v = h?.latestDraftVersion ?? h?.publishedVersion ?? 1;

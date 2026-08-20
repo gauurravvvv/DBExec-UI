@@ -33,7 +33,7 @@ export class QbDesignComponent implements OnInit {
   private readonly global = inject(GlobalService);
 
   readonly queryBuilderId = signal<string>('');
-  readonly datasourceId = signal<string>('');
+  readonly connectorId = signal<string>('');
   readonly name = signal<string>('');
   readonly loading = signal(true);
   readonly activeTab = signal<DesignTab>('form');
@@ -64,7 +64,7 @@ export class QbDesignComponent implements OnInit {
       const res = await this.qbService.viewQueryBuilder(id);
       const b = res?.data;
       if (b) {
-        this.datasourceId.set(b.datasourceId ?? b.datasource ?? '');
+        this.connectorId.set(b.connectorId ?? b.datasource ?? '');
         this.name.set(b.name ?? '');
       }
     } catch (e: any) {

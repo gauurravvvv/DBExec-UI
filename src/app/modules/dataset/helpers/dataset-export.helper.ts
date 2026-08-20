@@ -39,7 +39,7 @@ export function exportBaseName(
 // ── Server-side result export ────────────────────────────────────────
 
 export interface ResultExportPayload {
-  datasourceId: string;
+  connectorId: string;
   query: string;
   /** Only present when at least one column filter is active. */
   filter?: string;
@@ -54,7 +54,7 @@ export interface ResultExportPayload {
  * object differently, so this is not merely cosmetic.
  */
 export function buildResultExportPayload(
-  datasourceId: string,
+  connectorId: string,
   query: string,
   filterValues: Record<string, string>,
 ): ResultExportPayload {
@@ -65,7 +65,7 @@ export function buildResultExportPayload(
     }
   }
 
-  const payload: ResultExportPayload = { datasourceId, query };
+  const payload: ResultExportPayload = { connectorId, query };
   if (Object.keys(filter).length > 0) {
     payload.filter = JSON.stringify(filter);
   }

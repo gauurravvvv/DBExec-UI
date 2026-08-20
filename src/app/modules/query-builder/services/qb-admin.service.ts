@@ -138,9 +138,9 @@ export class QbAdminService {
   // NOTE: prompt CONFIG (appearance, operators, value-source) is owned by the
   // Prompt module, not here. QB only READS the prompt list to place prompts.
 
-  listPrompts(datasourceId: string, search = ''): Promise<any> {
+  listPrompts(connectorId: string, search = ''): Promise<any> {
     const params: Record<string, any> = {
-      datasourceId,
+      connectorId,
       page: 1,
       pageSize: 500,
     };

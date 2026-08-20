@@ -1,6 +1,6 @@
 /**
  * access-export.util — turn a per-role/user access profile (from
- * GET /:datasourceId/roles/:roleName/export) into a downloadable
+ * GET /:connectorId/roles/:roleName/export) into a downloadable
  * JSON or flat CSV file, client-side. No SQL, no server round-trip
  * beyond the profile fetch.
  *

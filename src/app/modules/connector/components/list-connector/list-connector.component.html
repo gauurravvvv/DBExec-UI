@@ -3,7 +3,7 @@
     <!-- Header Section -->
     <div class="page-header-section">
       <div class="header-content">
-        <h2>{{ 'DATASOURCE.TITLE' | translate }}</h2>
+        <h2>{{ 'CONNECTOR.TITLE' | translate }}</h2>
       </div>
 
       <div class="header-actions">
@@ -43,7 +43,7 @@
           <ng-template usGridCell="name" let-db>
             <a
               class="dataset-name-link"
-              [routerLink]="['/app/datasources', db.id]"
+              [routerLink]="['/app/connectors', db.id]"
             >
               {{ db.name }}
             </a>
@@ -158,20 +158,20 @@
       </div>
 
       <p class="delete-intro">
-        {{ 'DATASOURCE.CONFIRM_DELETE_SINGLE' | translate }}
+        {{ 'CONNECTOR.CONFIRM_DELETE_SINGLE' | translate }}
       </p>
 
       <ul class="delete-info-list">
         <li>
           <i class="pi pi-info-circle"></i>
           <span>{{
-            'DATASOURCE.DELETE_INFO_ASSOCIATED_DATA' | translate
+            'CONNECTOR.DELETE_INFO_ASSOCIATED_DATA' | translate
           }}</span>
         </li>
         <li>
           <i class="pi pi-info-circle"></i>
           <span>{{
-            'DATASOURCE.DELETE_INFO_CONNECTED_DATASETS' | translate
+            'CONNECTOR.DELETE_INFO_CONNECTED_DATASETS' | translate
           }}</span>
         </li>
         <li>

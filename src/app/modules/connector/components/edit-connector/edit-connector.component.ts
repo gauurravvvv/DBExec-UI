@@ -18,7 +18,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
-import { DATASOURCE } from 'src/app/core/constants/routes.constant';
+import { CONNECTOR } from 'src/app/core/constants/routes.constant';
 import {
   dbDisplayNameSchema,
   dbHostSchema,
@@ -33,13 +33,13 @@ import { GlobalService } from 'src/app/core/services/global.service';
 import {
   DATABASE_TYPES,
   DatabaseTypeOption,
-} from '../../constants/database-types.constant';
-import { DatasourceService } from '../../services/datasource.service';
+} from '../../constants/connector-types.constant';
+import { ConnectorService } from '../../services/connector.service';
 
 @Component({
-  selector: 'app-edit-datasource',
-  templateUrl: './edit-datasource.component.html',
-  styleUrls: ['./edit-datasource.component.scss'],
+  selector: 'app-edit-connector',
+  templateUrl: './edit-connector.component.html',
+  styleUrls: ['./edit-connector.component.scss'],
   animations: [
     trigger('slideDown', [
       transition(':enter', [
@@ -80,7 +80,7 @@ import { DatasourceService } from '../../services/datasource.service';
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class EditDatasourceComponent
+export class EditConnectorComponent
   implements OnInit, OnDestroy, HasUnsavedChanges
 {
   ngOnDestroy() {
@@ -98,7 +98,7 @@ export class EditDatasourceComponent
   }
 
   showPassword: boolean = false;
-  datasourceId: string = '';
+  connectorId: string = '';
   initialFormValues: any = null;
   isWarningExpanded: boolean = false;
 
@@ -132,7 +132,7 @@ export class EditDatasourceComponent
 
   constructor(
     private fb: FormBuilder,
-    private datasourceService: DatasourceService,
+    private datasourceService: ConnectorService,
     private globalService: GlobalService,
     private router: Router,
     private route: ActivatedRoute,
@@ -143,7 +143,7 @@ export class EditDatasourceComponent
   ngOnInit(): void {
     this.initForm();
 
-    this.datasourceId = this.route.snapshot.params['id'];
+    this.connectorId = this.route.snapshot.params['id'];
     this.loadDatasourceData();
 
     // Monitor form changes
@@ -190,7 +190,7 @@ export class EditDatasourceComponent
   }
 
   async loadDatasourceData(): Promise<void> {
-    await this.datasourceService.loadOne(this.datasourceId);
+    await this.datasourceService.loadOne(this.connectorId);
     const data = this.datasourceService.current();
     if (data) {
       // dbType is read once from the saved record and used for the
@@ -272,7 +272,7 @@ export class EditDatasourceComponent
     this.connectionTestError = null;
     const reqId = ++this.testRequestId;
 
-    // DatasourceService.testConnection() handles the engine
+    // ConnectorService.testConnection() handles the engine
     // discriminator internally (snowflake vs typeorm), so we just
     // pass the form value verbatim — same shape as save.
     this.datasourceService
@@ -320,7 +320,7 @@ export class EditDatasourceComponent
     if (this.saveJustification.trim()) {
       const formValue = this.datasourceForm.getRawValue();
 
-      // `type` is sent so DatasourceService.buildEnginePayload() can
+      // `type` is sent so ConnectorService.buildEnginePayload() can
       // discriminate between the typeorm shape (host/port) and the
       // snowflake shape (account/warehouse/role/schemaName). The BE
       // update path still treats `type` as immutable — it's used
@@ -331,7 +331,7 @@ export class EditDatasourceComponent
       // pointing at it.
       const isSf = this.dbType === 'snowflake';
       const payload: any = {
-        id: this.datasourceId,
+        id: this.connectorId,
         name: formValue.name,
         description: formValue.description,
         type: this.dbType,
@@ -363,7 +363,7 @@ export class EditDatasourceComponent
           this.saveJustification = '';
           this.isFormDirty = false;
           this.datasourceForm.markAsPristine();
-          this.router.navigate([DATASOURCE.LIST]);
+          this.router.navigate([CONNECTOR.LIST]);
         }
       } finally {
         this.datasourceForm.enable({ emitEvent: false });
@@ -372,7 +372,7 @@ export class EditDatasourceComponent
   }
 
   goBack(): void {
-    this.router.navigate([DATASOURCE.LIST]);
+    this.router.navigate([CONNECTOR.LIST]);
   }
 
   onCancel(): void {
@@ -388,7 +388,7 @@ export class EditDatasourceComponent
       this.connectionTestError = null;
       this.connectionTestLoading = false;
     } else {
-      this.router.navigate([DATASOURCE.LIST]);
+      this.router.navigate([CONNECTOR.LIST]);
     }
   }
 

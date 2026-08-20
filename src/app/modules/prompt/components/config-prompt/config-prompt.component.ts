@@ -55,7 +55,7 @@ export class ConfigPromptComponent implements OnInit, OnDestroy {
     // Source / Joins steps, then hydrate the SQL-only config.
     await this.prompts.loadOne(this.promptId);
     const prompt = this.prompts.current();
-    this.svc.datasourceId.set(prompt?.datasourceId ?? '');
+    this.svc.connectorId.set(prompt?.connectorId ?? '');
     await this.svc.load(this.promptId);
   }
 

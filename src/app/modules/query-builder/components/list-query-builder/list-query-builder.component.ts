@@ -13,7 +13,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { DEFAULT_PAGE } from 'src/app/core/constants';
 import { QUERY_BUILDER } from 'src/app/core/constants/routes.constant';
 import { GlobalService } from 'src/app/core/services/global.service';
-import { DatasourceService } from 'src/app/modules/datasource/services/datasource.service';
+import { ConnectorService } from 'src/app/modules/connector/services/connector.service';
 import {
   UsServerListAdapter,
   UsListLoadParams,
@@ -32,7 +32,7 @@ import { QueryBuilderService } from '../../services/query-builder.service';
  *
  * A query-builder list is datasource-scoped, so the screen keeps its datasource
  * dropdown (server-mode) projected into the table's toolbar-left slot. The
- * adapter closes over the selected datasourceId; selecting a datasource
+ * adapter closes over the selected connectorId; selecting a datasource
  * rebuilds the adapter so the next load carries the new scope.
  */
 @Component({
@@ -85,7 +85,7 @@ export class ListQueryBuilderComponent implements OnInit, OnDestroy {
   adapter: UsServerListAdapter<any> | null = null;
 
   constructor(
-    private datasourceService: DatasourceService,
+    private datasourceService: ConnectorService,
     private queryBuilderService: QueryBuilderService,
     private router: Router,
     private globalService: GlobalService,
@@ -103,7 +103,7 @@ export class ListQueryBuilderComponent implements OnInit, OnDestroy {
     this.route.queryParams
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(params => {
-        if (params['datasourceId'] || params['name']) {
+        if (params['connectorId'] || params['name']) {
           this.handleDeepLinking(params);
         } else {
           this.loadDatasources();
@@ -162,15 +162,15 @@ export class ListQueryBuilderComponent implements OnInit, OnDestroy {
   /* ── deep-linking ────────────────────────────────────── */
 
   handleDeepLinking(params: any) {
-    const datasourceId = params['datasourceId'] ? params['datasourceId'] : null;
+    const connectorId = params['connectorId'] ? params['connectorId'] : null;
     const name = params['name'];
 
     if (name) {
       this.deepLinkName = name;
     }
 
-    if (datasourceId) {
-      this.loadDatasources(datasourceId);
+    if (connectorId) {
+      this.loadDatasources(connectorId);
     } else {
       this.loadDatasources();
     }
@@ -254,8 +254,8 @@ export class ListQueryBuilderComponent implements OnInit, OnDestroy {
     });
   }
 
-  onDBChange(datasourceId: any) {
-    this.selectedDatasource = datasourceId;
+  onDBChange(connectorId: any) {
+    this.selectedDatasource = connectorId;
     this.bindAdapter();
   }
 
@@ -268,14 +268,14 @@ export class ListQueryBuilderComponent implements OnInit, OnDestroy {
       this.cdr.markForCheck();
       return;
     }
-    const datasourceId = this.selectedDatasource;
+    const connectorId = this.selectedDatasource;
     const name = this.deepLinkName;
     this.deepLinkName = null;
     this.adapter = new UsServerListAdapter<any>({
       load: (params: UsListLoadParams) => {
-        // datasourceId is a top-level query param, NOT inside the JSON filter.
+        // connectorId is a top-level query param, NOT inside the JSON filter.
         const req: any = {
-          datasourceId,
+          connectorId,
           page: params.page,
           limit: params.limit,
         };
