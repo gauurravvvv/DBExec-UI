@@ -139,6 +139,8 @@ const routes: Routes = [
         },
       },
       // Permission-gated
+      // Connectors → Database (connectorsDb). The datasource module is the
+      // database-connector screen until the connector rename lands.
       {
         path: 'datasources',
         loadChildren: () =>
@@ -147,8 +149,22 @@ const routes: Routes = [
           ),
         canActivate: [roleGuard],
         data: {
-          permission: PERMISSIONS.SETUP_DB,
+          permission: PERMISSIONS.CONNECTORS_DB,
           title: 'PAGE_TITLES.DATASOURCES',
+        },
+      },
+      // Connectors → Web/REST (connectorsApi). Placeholder screen until the
+      // API Studio feature is built.
+      {
+        path: 'connectors/web',
+        loadComponent: () =>
+          import(
+            './modules/connectors-api/web-connector-placeholder.component'
+          ).then(m => m.WebConnectorPlaceholderComponent),
+        canActivate: [roleGuard],
+        data: {
+          permission: PERMISSIONS.CONNECTORS_API,
+          title: 'PAGE_TITLES.CONNECTORS_API',
         },
       },
       {

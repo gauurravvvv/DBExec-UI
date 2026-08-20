@@ -19,7 +19,9 @@ export const SIDEBAR_ITEMS_ROUTES = [
   { value: 'userManagement', route: '/app/users' },
   { value: 'groupManagement', route: '/app/groups' },
   { value: 'roleManagement', route: '/app/roles' },
-  { value: 'setupDB', route: '/app/datasources' },
+  // Connectors → Database (was setupDB) + Web/REST (placeholder screen).
+  { value: 'connectorsDb', route: '/app/datasources' },
+  { value: 'connectorsApi', route: '/app/connectors/web' },
   { value: 'dbRoles', route: '/app/db-roles' },
   { value: 'dbPrivileges', route: '/app/db-privileges' },
   { value: 'datasetManager', route: '/app/datasets' },

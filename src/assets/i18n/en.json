@@ -12,8 +12,9 @@
     "roleManagement": "Roles",
     "groupManagement": "Groups",
     "userManagement": "Users",
-    "databaseManagement": "Data Management",
-    "setupDB": "Datasources",
+    "connectors": "Connectors",
+    "connectorsDb": "Database",
+    "connectorsApi": "Web/REST",
     "manageDatabaseAccess": "Database Access",
     "dbUsers": "Database Users",
     "dbRoles": "Database Roles",
@@ -22,7 +23,7 @@
     "connectionManager": "Connections",
     "queryRunner": "SQL Workspace",
     "accessManagement": "Access Manager",
-    "dbExecStudio": "DBExec Studio",
+    "dbExecStudio": "Database Operations",
     "queryBuilderTab": "Tab",
     "queryBuilderSection": "Section",
     "queryBuilderPrompt": "Prompts",
@@ -2371,7 +2372,8 @@
     "AI_WORKSPACE": "AI Assistant",
     "SYSTEM_ROLES": "System Roles",
     "SYSTEM_GROUPS": "System Groups",
-    "SYSTEM_USERS": "System Users"
+    "SYSTEM_USERS": "System Users",
+    "CONNECTORS_API": "Web/REST Connectors"
   },
   "AUTH": {
     "HEADLINE_LOGIN": "Elevate Your Datasource\nManagement Experience",
@@ -6838,5 +6840,9 @@
       "NO_PROMPTS": "No prompts yet",
       "NO_PROMPTS_HINT": "Create prompts in the Prompts module for this datasource, then drag them onto a section."
     }
+  },
+  "CONNECTORS_API": {
+    "TITLE": "Web/REST Connectors",
+    "COMING_SOON": "The API Studio workspace is coming soon."
   }
 }

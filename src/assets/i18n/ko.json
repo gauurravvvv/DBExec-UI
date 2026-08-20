@@ -12,8 +12,9 @@
     "roleManagement": "역할 관리",
     "groupManagement": "그룹 관리",
     "userManagement": "사용자",
-    "databaseManagement": "데이터 관리",
-    "setupDB": "데이터 소스",
+    "connectors": "커넥터",
+    "connectorsDb": "데이터베이스",
+    "connectorsApi": "Web/REST",
     "manageDatabaseAccess": "데이터베이스 접근",
     "dbUsers": "데이터베이스 사용자",
     "dbRoles": "데이터베이스 역할",
@@ -22,7 +23,7 @@
     "connectionManager": "연결",
     "queryRunner": "SQL 작업 공간",
     "accessManagement": "액세스 관리자",
-    "dbExecStudio": "DBExec Studio",
+    "dbExecStudio": "데이터베이스 작업",
     "queryBuilderTab": "탭",
     "queryBuilderSection": "섹션",
     "queryBuilderPrompt": "프롬프트",
@@ -2367,7 +2368,8 @@
     "AI_WORKSPACE": "AI 어시스턴트",
     "SYSTEM_ROLES": "시스템 역할",
     "SYSTEM_GROUPS": "시스템 그룹",
-    "SYSTEM_USERS": "시스템 사용자"
+    "SYSTEM_USERS": "시스템 사용자",
+    "CONNECTORS_API": "Web/REST 커넥터"
   },
   "AUTH": {
     "HEADLINE_LOGIN": "데이터 소스\n관리 경험을 향상시키세요",
@@ -6840,5 +6842,9 @@
       "NO_PROMPTS": "No prompts yet",
       "NO_PROMPTS_HINT": "Create prompts in the Prompts module for this datasource, then drag them onto a section."
     }
+  },
+  "CONNECTORS_API": {
+    "TITLE": "Web/REST 커넥터",
+    "COMING_SOON": "API Studio 작업 공간이 곧 제공됩니다."
   }
 }

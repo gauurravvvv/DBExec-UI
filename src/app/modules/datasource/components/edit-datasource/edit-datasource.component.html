@@ -21,7 +21,7 @@
           >{{ 'COMMON.CANCEL' | translate }}</app-button
         >
         <app-button
-          *hasPermission="'setupDB'; level: 'write'"
+          *hasPermission="'connectorsDb'; level: 'write'"
           variant="primary"
           icon="pi pi-save"
           [loading]="saving()"

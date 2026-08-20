@@ -12,8 +12,9 @@
     "roleManagement": "Rollen",
     "groupManagement": "Groepen",
     "userManagement": "Gebruikers",
-    "databaseManagement": "Gegevensbeheer",
-    "setupDB": "Gegevensbron",
+    "connectors": "Connectoren",
+    "connectorsDb": "Database",
+    "connectorsApi": "Web/REST",
     "manageDatabaseAccess": "Databasetoegang",
     "dbUsers": "Databasegebruikers",
     "dbRoles": "Databaserollen",
@@ -22,7 +23,7 @@
     "connectionManager": "Verbindingen",
     "queryRunner": "SQL-werkruimte",
     "accessManagement": "Toegangsbeheer",
-    "dbExecStudio": "DBExec Studio",
+    "dbExecStudio": "Databasebewerkingen",
     "queryBuilderTab": "Tab",
     "queryBuilderSection": "Sectie",
     "queryBuilderPrompt": "Prompt",
@@ -2367,7 +2368,8 @@
     "AI_WORKSPACE": "AI-assistent",
     "SYSTEM_ROLES": "Systeemrollen",
     "SYSTEM_GROUPS": "Systeemgroepen",
-    "SYSTEM_USERS": "Systeemgebruikers"
+    "SYSTEM_USERS": "Systeemgebruikers",
+    "CONNECTORS_API": "Web/REST-connectoren"
   },
   "AUTH": {
     "HEADLINE_LOGIN": "Verbeter uw ervaring met\ngegevensbronbeheer",
@@ -6840,5 +6842,9 @@
       "NO_PROMPTS": "No prompts yet",
       "NO_PROMPTS_HINT": "Create prompts in the Prompts module for this datasource, then drag them onto a section."
     }
+  },
+  "CONNECTORS_API": {
+    "TITLE": "Web/REST-connectoren",
+    "COMING_SOON": "De API Studio-werkruimte komt binnenkort beschikbaar."
   }
 }

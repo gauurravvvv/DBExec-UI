@@ -12,8 +12,9 @@
     "roleManagement": "ロール管理",
     "groupManagement": "グループ管理",
     "userManagement": "ユーザー",
-    "databaseManagement": "データ管理",
-    "setupDB": "データソース",
+    "connectors": "コネクタ",
+    "connectorsDb": "データベース",
+    "connectorsApi": "Web/REST",
     "manageDatabaseAccess": "データベースアクセス",
     "dbUsers": "データベースユーザー",
     "dbRoles": "データベースロール",
@@ -22,7 +23,7 @@
     "connectionManager": "接続",
     "queryRunner": "SQL ワークスペース",
     "accessManagement": "アクセス管理",
-    "dbExecStudio": "DBExec スタジオ",
+    "dbExecStudio": "データベース操作",
     "queryBuilderTab": "タブ",
     "queryBuilderSection": "セクション",
     "queryBuilderPrompt": "プロンプト",
@@ -2367,7 +2368,8 @@
     "AI_WORKSPACE": "AIアシスタント",
     "SYSTEM_ROLES": "システムロール",
     "SYSTEM_GROUPS": "システムグループ",
-    "SYSTEM_USERS": "システムユーザー"
+    "SYSTEM_USERS": "システムユーザー",
+    "CONNECTORS_API": "Web/REST コネクタ"
   },
   "AUTH": {
     "HEADLINE_LOGIN": "データソース管理体験を\n向上させましょう",
@@ -6840,5 +6842,9 @@
       "NO_PROMPTS": "No prompts yet",
       "NO_PROMPTS_HINT": "Create prompts in the Prompts module for this datasource, then drag them onto a section."
     }
+  },
+  "CONNECTORS_API": {
+    "TITLE": "Web/REST コネクタ",
+    "COMING_SOON": "API Studio ワークスペースは近日公開予定です。"
   }
 }

@@ -389,7 +389,7 @@ export class OrganisationService {
    * validateMasterDb — tests Postgres connectivity for an org's master
    * DB before saving the organisation. Gated server-side by the
    * `orgManagement` permission (System Admin only). Distinct from
-   * validateDatasource() which is gated by `setupDB` and is not
+   * validateDatasource() which is gated by `connectorsDb` and is not
    * available to the System Admin under the V2 permission set.
    */
   async validateMasterDb(payload: {

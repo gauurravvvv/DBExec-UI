@@ -19,14 +19,16 @@ export const PERMISSIONS = {
   ROLE_MANAGEMENT: 'roleManagement',
   USER_GROUP: 'groupManagement',
 
-  // Data Management
+  // Connectors — the umbrella source group. One grantable screen per
+  // connector type. Replaces the retired SETUP_DB "Data Sources" screen.
+  CONNECTORS_DB: 'connectorsDb', // Database connectors (SQL)
+  CONNECTORS_API: 'connectorsApi', // Web/REST connectors (API collections)
+
+  // Database Operations (group label; was "DBExec Studio").
   // A PG "user" and "role" are the same object; login users and group
   // roles are managed on one screen gated by DB_ROLES.
-  SETUP_DB: 'setupDB',
   DB_ROLES: 'dbRoles',
   DB_PRIVILEGES: 'dbPrivileges',
-
-  // DBExec Studio
   CONNECTION_MANAGER: 'connectionManager',
   QUERY_RUNNER: 'queryRunner',
   QB_PROMPT: 'queryBuilderPrompt',

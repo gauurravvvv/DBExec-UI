@@ -12,8 +12,9 @@
     "roleManagement": "角色管理",
     "groupManagement": "群组管理",
     "userManagement": "用户",
-    "databaseManagement": "数据管理",
-    "setupDB": "数据源",
+    "connectors": "连接器",
+    "connectorsDb": "数据库",
+    "connectorsApi": "Web/REST",
     "manageDatabaseAccess": "数据库访问",
     "dbUsers": "数据库用户",
     "dbRoles": "数据库角色",
@@ -22,7 +23,7 @@
     "connectionManager": "连接",
     "queryRunner": "SQL 工作区",
     "accessManagement": "访问管理",
-    "dbExecStudio": "DBExec Studio",
+    "dbExecStudio": "数据库操作",
     "queryBuilderTab": "标签页",
     "queryBuilderSection": "分区",
     "queryBuilderPrompt": "提示",
@@ -2367,7 +2368,8 @@
     "AI_WORKSPACE": "AI 助手",
     "SYSTEM_ROLES": "系统角色",
     "SYSTEM_GROUPS": "系统组",
-    "SYSTEM_USERS": "系统用户"
+    "SYSTEM_USERS": "系统用户",
+    "CONNECTORS_API": "Web/REST 连接器"
   },
   "AUTH": {
     "HEADLINE_LOGIN": "提升您的数据源\n管理体验",
@@ -6840,5 +6842,9 @@
       "NO_PROMPTS": "No prompts yet",
       "NO_PROMPTS_HINT": "Create prompts in the Prompts module for this datasource, then drag them onto a section."
     }
+  },
+  "CONNECTORS_API": {
+    "TITLE": "Web/REST 连接器",
+    "COMING_SOON": "API Studio 工作区即将推出。"
   }
 }

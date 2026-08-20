@@ -12,8 +12,9 @@
     "roleManagement": "Funções",
     "groupManagement": "Grupos",
     "userManagement": "Usuários",
-    "databaseManagement": "Gerenciamento de dados",
-    "setupDB": "Fonte de dados",
+    "connectors": "Conectores",
+    "connectorsDb": "Banco de dados",
+    "connectorsApi": "Web/REST",
     "manageDatabaseAccess": "Acesso ao banco de dados",
     "dbUsers": "Usuários do banco de dados",
     "dbRoles": "Funções de banco de dados",
@@ -22,7 +23,7 @@
     "connectionManager": "Conexões",
     "queryRunner": "Espaço de trabalho SQL",
     "accessManagement": "Gerenciador de acesso",
-    "dbExecStudio": "DBExec Studio",
+    "dbExecStudio": "Operações de banco de dados",
     "queryBuilderTab": "Aba",
     "queryBuilderSection": "Seção",
     "queryBuilderPrompt": "Prompt",
@@ -2367,7 +2368,8 @@
     "AI_WORKSPACE": "Assistente de IA",
     "SYSTEM_ROLES": "Funções do sistema",
     "SYSTEM_GROUPS": "Grupos do sistema",
-    "SYSTEM_USERS": "Usuários do sistema"
+    "SYSTEM_USERS": "Usuários do sistema",
+    "CONNECTORS_API": "Conectores Web/REST"
   },
   "AUTH": {
     "HEADLINE_LOGIN": "Eleve sua experiência de\ngerenciamento de fontes de dados",
@@ -6840,5 +6842,9 @@
       "NO_PROMPTS": "No prompts yet",
       "NO_PROMPTS_HINT": "Create prompts in the Prompts module for this datasource, then drag them onto a section."
     }
+  },
+  "CONNECTORS_API": {
+    "TITLE": "Conectores Web/REST",
+    "COMING_SOON": "O espaço de trabalho API Studio estará disponível em breve."
   }
 }

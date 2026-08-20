@@ -12,8 +12,9 @@
     "roleManagement": "Rollen",
     "groupManagement": "Gruppen",
     "userManagement": "Benutzer",
-    "databaseManagement": "Datenverwaltung",
-    "setupDB": "Datenquelle",
+    "connectors": "Konnektoren",
+    "connectorsDb": "Datenbank",
+    "connectorsApi": "Web/REST",
     "manageDatabaseAccess": "Datenbankzugriff",
     "dbUsers": "Datenbankbenutzer",
     "dbRoles": "Datenbankrollen",
@@ -22,7 +23,7 @@
     "connectionManager": "Verbindungen",
     "queryRunner": "SQL-Arbeitsbereich",
     "accessManagement": "Zugriffsverwaltung",
-    "dbExecStudio": "DBExec Studio",
+    "dbExecStudio": "Datenbankoperationen",
     "queryBuilderTab": "Tab",
     "queryBuilderSection": "Abschnitt",
     "queryBuilderPrompt": "Eingabe",
@@ -2367,7 +2368,8 @@
     "AI_WORKSPACE": "KI-Assistent",
     "SYSTEM_ROLES": "Systemrollen",
     "SYSTEM_GROUPS": "Systemgruppen",
-    "SYSTEM_USERS": "Systembenutzer"
+    "SYSTEM_USERS": "Systembenutzer",
+    "CONNECTORS_API": "Web/REST-Konnektoren"
   },
   "AUTH": {
     "HEADLINE_LOGIN": "Verbessern Sie Ihr Datenquellen-\nManagement-Erlebnis",
@@ -6840,5 +6842,9 @@
       "NO_PROMPTS": "No prompts yet",
       "NO_PROMPTS_HINT": "Create prompts in the Prompts module for this datasource, then drag them onto a section."
     }
+  },
+  "CONNECTORS_API": {
+    "TITLE": "Web/REST-Konnektoren",
+    "COMING_SOON": "Der API-Studio-Arbeitsbereich ist bald verfügbar."
   }
 }

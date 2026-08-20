@@ -83,7 +83,7 @@
             {{ 'DATASOURCE.TEST_CONNECTION' | translate }}
           </button>
           <button
-            *hasPermission="'setupDB'; level: 'write'"
+            *hasPermission="'connectorsDb'; level: 'write'"
             class="btn-primary"
             type="button"
             (click)="onEdit()"
@@ -92,7 +92,7 @@
             {{ 'COMMON.EDIT' | translate }}
           </button>
           <button
-            *hasPermission="'setupDB'; level: 'delete'"
+            *hasPermission="'connectorsDb'; level: 'delete'"
             class="btn-danger"
             type="button"
             [disabled]="isDeleting(dbId)"
