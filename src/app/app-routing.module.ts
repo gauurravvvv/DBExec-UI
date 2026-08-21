@@ -176,6 +176,24 @@ const routes: Routes = [
         },
       },
       {
+        // In-shell Query Runner executor — the SAME executor component as
+        // the standalone /sql/exec route, but mounted UNDER the `/app`
+        // shell so it renders WITH the sidebar + topbar (theme picker
+        // reachable). MUST be declared before the `sql` child below: Angular
+        // matches lazy `loadChildren` routes by prefix, so `path: 'sql'`
+        // would otherwise swallow `sql/exec` and 404 inside QueryRunnerModule.
+        path: 'sql/exec',
+        loadChildren: () =>
+          import('./modules/query-runner/executor/query-executor.module').then(
+            m => m.QueryExecutorModule,
+          ),
+        canActivate: [roleGuard],
+        data: {
+          permission: PERMISSIONS.QUERY_RUNNER,
+          title: 'PAGE_TITLES.QUERY_RUNNER',
+        },
+      },
+      {
         // Launcher gates on queryRunner; the Connections screens gate on
         // connectionManager — so the parent carries NO single permission.
         // Each child route in QueryRunnerModule guards itself via roleGuard

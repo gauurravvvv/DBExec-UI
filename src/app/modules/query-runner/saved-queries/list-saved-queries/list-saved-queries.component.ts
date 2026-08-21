@@ -299,7 +299,9 @@ export class ListSavedQueriesComponent implements OnInit, OnDestroy {
    * edited — the executor, not a metadata form.
    */
   onEdit(q: SavedQuery): void {
-    const url = QUERY_RUNNER.EXEC_SAVED(q.connectionId, q.id);
+    // In-shell route so the new tab carries the sidebar + topbar (theme
+    // picker reachable).
+    const url = QUERY_RUNNER.EXEC_SHELL_SAVED(q.connectionId, q.id);
     window.open(url, '_blank');
   }
 

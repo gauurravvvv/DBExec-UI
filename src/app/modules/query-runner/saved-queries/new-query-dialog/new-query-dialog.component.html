@@ -101,27 +101,35 @@
       </ng-container>
     </div>
 
+    <!-- Footer actions use the shared app-button so this popup matches every
+         other dialog's footer (variant/size/loading/disabled all consistent). -->
     <div class="popup-actions">
-      <button class="btn-cancel" (click)="close()">
-        <i class="pi pi-times"></i>{{ 'COMMON.CANCEL' | translate }}
-      </button>
-      <!-- "Open" only makes sense when a connection exists to open. In the pure
-           empty state it would be permanently disabled dead weight, so hide it. -->
-      <button
-        *ngIf="!hasNoConnections"
-        class="btn-confirm"
-        (click)="open()"
-        [disabled]="!canOpen"
-      >
-        <i
-          class="pi"
-          [ngClass]="verifying ? 'pi-spin pi-spinner' : 'pi-external-link'"
-        ></i>
-        {{
-          (verifying ? 'QUERY_RUNNER.VERIFYING' : 'QUERY_RUNNER.OPEN_EXECUTOR')
-            | translate
-        }}
-      </button>
+      <app-button variant="secondary" (clicked)="close()">{{
+        'COMMON.CANCEL' | translate
+      }}</app-button>
+
+      <!-- "Open" actions only make sense when a connection exists to open. In
+           the pure empty state they would be permanently disabled dead weight,
+           so hide them. Two explicit actions: "Open" (same tab) and "Open in
+           New Tab". -->
+      <ng-container *ngIf="!hasNoConnections">
+        <app-button
+          variant="ghost"
+          icon="pi pi-window-maximize"
+          [loading]="verifying"
+          [disabled]="!canOpen"
+          (clicked)="openHere()"
+          >{{ 'QUERY_RUNNER.OPEN_SAME_TAB' | translate }}</app-button
+        >
+        <app-button
+          variant="primary"
+          icon="pi pi-external-link"
+          [loading]="verifying"
+          [disabled]="!canOpen"
+          (clicked)="openNewTab()"
+          >{{ 'QUERY_RUNNER.OPEN_IN_NEW_TAB' | translate }}</app-button
+        >
+      </ng-container>
     </div>
   </div>
 </div>

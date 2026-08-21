@@ -265,10 +265,14 @@ export class ListConnectionsComponent implements OnInit, OnDestroy {
       });
   }
 
-  /** Open this connection in the standalone executor browser tab. */
+  /**
+   * Open this connection in the executor in a new browser tab. Uses the
+   * in-shell route so the tab carries the sidebar + topbar (theme picker
+   * reachable).
+   */
   onOpen(c: QueryConnection): void {
     if (c.enabled === false) return; // guarded in template too
-    const url = `${QUERY_RUNNER.EXEC}?conn=${encodeURIComponent(c.id)}`;
+    const url = `${QUERY_RUNNER.EXEC_SHELL}?conn=${encodeURIComponent(c.id)}`;
     window.open(url, '_blank');
   }
 

@@ -63,7 +63,12 @@ export class ViewSavedQueryComponent implements OnInit {
 
   openInExecutor(): void {
     if (!this.query) return;
-    const url = QUERY_RUNNER.EXEC_SAVED(this.query.connectionId, this.query.id);
+    // In-shell route so the new tab carries the sidebar + topbar (theme
+    // picker reachable).
+    const url = QUERY_RUNNER.EXEC_SHELL_SAVED(
+      this.query.connectionId,
+      this.query.id,
+    );
     window.open(url, '_blank');
   }
 

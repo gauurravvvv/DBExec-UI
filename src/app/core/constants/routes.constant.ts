@@ -117,11 +117,19 @@ export const QUERY_RUNNER = {
   CONNECTIONS_LIST: '/app/sql/connections',
   connectionNew: () => '/app/sql/connections/new',
   connectionEdit: (id: string) => `/app/sql/connections/${id}/edit`,
-  // Standalone executor tab (outside the app shell)
+  // Standalone executor tab (outside the app shell) — kept for old
+  // bookmarks / already-open tabs.
   EXEC: '/sql/exec',
   // Executor opened FROM a saved query — SQL + rowLimit preloaded via ?query=.
   EXEC_SAVED: (connId: string, queryId: string) =>
     `/sql/exec?conn=${encodeURIComponent(connId)}&query=${encodeURIComponent(queryId)}`,
+  // In-shell executor — the SAME executor component, but mounted under the
+  // `/app` shell so it renders WITH the sidebar + topbar (theme picker
+  // reachable). This is the new default target for "open in new tab" and
+  // the "open here" (same-tab) action.
+  EXEC_SHELL: '/app/sql/exec',
+  EXEC_SHELL_SAVED: (connId: string, queryId: string) =>
+    `/app/sql/exec?conn=${encodeURIComponent(connId)}&query=${encodeURIComponent(queryId)}`,
 };
 export const DATASET = feature('/app/datasets');
 

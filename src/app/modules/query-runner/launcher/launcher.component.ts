@@ -172,7 +172,9 @@ export class LauncherComponent implements OnInit {
       .testConnection(connId)
       .then(res => {
         if (res?.status && res.data?.isConnected) {
-          const url = `${QUERY_RUNNER.EXEC}?conn=${encodeURIComponent(connId)}`;
+          // In-shell route so the new tab carries the sidebar + topbar
+          // (theme picker reachable).
+          const url = `${QUERY_RUNNER.EXEC_SHELL}?conn=${encodeURIComponent(connId)}`;
           window.open(url, '_blank');
         } else {
           // Surface the connection error; do NOT open a tab.

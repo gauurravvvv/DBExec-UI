@@ -20,10 +20,15 @@ import {
  * NewQueryDialogComponent — the "New Query" popup shown from the saved
  * queries list. Reuses the (retired) launcher's datasource → connection
  * selection logic: a server-mode datasource dropdown, then the enabled
- * connections for that datasource (default preselected). "Open Executor"
- * verifies the connection, then opens a BLANK executor tab (same as the
- * old launcher's open()). Rendered as a `.confirmation-popup` overlay —
- * NOT a p-dialog — to match the app's dialog pattern.
+ * connections for that datasource (default preselected).
+ *
+ * The footer offers two actions: "Open" navigates the current tab to the
+ * executor in place of the listing; "Open in New Tab" opens it in a new
+ * browser tab. Both first verify the connection and both target the
+ * IN-SHELL executor route (`/app/sql/exec`) so the executor renders WITH
+ * the sidebar/topbar (theme picker reachable). Rendered as a
+ * `.confirmation-popup` overlay — NOT a p-dialog — to match the app's
+ * dialog pattern.
  */
 @Component({
   selector: 'app-new-query-dialog',
@@ -150,8 +155,40 @@ export class NewQueryDialogComponent implements OnInit {
     );
   }
 
-  /** Verify the chosen connection, then open a BLANK executor tab. */
-  open(): void {
+  /**
+   * "Open" — verify the connection, then open the executor IN THE SAME TAB
+   * (in place of the listing view). Uses the in-shell route so the sidebar
+   * + topbar stay (theme picker reachable).
+   */
+  openHere(): void {
+    this.verifyThen(connId => {
+      this.router.navigate([QUERY_RUNNER.EXEC_SHELL], {
+        queryParams: { conn: connId },
+      });
+      this.close();
+    });
+  }
+
+  /**
+   * "Open in New Tab" — verify the connection, then open the executor in a
+   * NEW browser tab. Targets the in-shell route so the new tab carries the
+   * sidebar + topbar (theme picker reachable).
+   */
+  openNewTab(): void {
+    this.verifyThen(connId => {
+      const url = `${QUERY_RUNNER.EXEC_SHELL}?conn=${encodeURIComponent(connId)}`;
+      window.open(url, '_blank');
+      this.close();
+    });
+  }
+
+  /**
+   * Shared verify-then-act path for both open actions. Runs the same
+   * connection test the popup has always run; only on a confirmed live
+   * connection does it invoke `onConnected`. On failure it surfaces the
+   * error and opens nothing (unchanged behavior).
+   */
+  private verifyThen(onConnected: (connId: string) => void): void {
     if (!this.canOpen || !this.selectedConnectionId) return;
     this.verifying = true;
     this.cdr.markForCheck();
@@ -160,11 +197,9 @@ export class NewQueryDialogComponent implements OnInit {
       .testConnection(connId)
       .then(res => {
         if (res?.status && res.data?.isConnected) {
-          const url = `${QUERY_RUNNER.EXEC}?conn=${encodeURIComponent(connId)}`;
-          window.open(url, '_blank');
-          this.close();
+          onConnected(connId);
         } else {
-          // Surface the connection error; do NOT open a tab.
+          // Surface the connection error; do NOT open/navigate.
           this.globalService.handleSuccessService(res);
         }
       })

@@ -117,4 +117,10 @@
       }
     }
   }
+
+  // Footer actions use the shared <app-button> (see template), which owns its
+  // own tokenised sizing/variants — so this popup's footer matches every other
+  // dialog. app-button is view-encapsulated, so the db-access-dialog mixin's
+  // `.popup-actions button` rules don't reach its inner <button>; no override
+  // needed here.
 }
