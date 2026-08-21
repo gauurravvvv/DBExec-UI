@@ -35,7 +35,7 @@
 | profile | `src/app/modules/profile` | [profile](./modules/profile.md) | 🟢 | 2026-08-14 |
 | prompt | `src/app/modules/prompt` | [prompt](./modules/prompt.md) | 🟢 | 2026-08-15 |
 | query-builder | `src/app/modules/query-builder` | [query-builder](./modules/query-builder.md) | 🟢 | 2026-08-15 (QbRuntimeSharedModule extracted) |
-| query-runner | `src/app/modules/query-runner` | [query-runner](./modules/query-runner.md) | 🟢 | 2026-08-06 |
+| query-runner | `src/app/modules/query-runner` | [query-runner](./modules/query-runner.md) | 🟢 | 2026-08-21 |
 | rls-rules | `src/app/modules/rls-rules` | [rls-rules](./modules/rls-rules.md) | 🟡 | 2026-07-24 |
 | role | `src/app/modules/role` | [role](./modules/role.md) | 🟢 | 2026-07-24 |
 | system-roles | `src/app/modules/system-roles` | — | 🟢 | 2026-08-10 |

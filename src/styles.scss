@@ -1692,6 +1692,62 @@ app-custom-table {
     }
   }
 }
+
+// Global p-menu (popup) styles — needed for appendTo="body" menus (custom
+// table row menu, dashboard menu, query executor overflow ⋮). PrimeNG's stock
+// theme paints these WHITE, which glares on dark presets; token-drive the
+// surface/border/items the same way .p-multiselect-panel is themed above.
+.p-menu.p-menu-overlay {
+  background: var(--card-background) !important;
+  border: 1px solid var(--border-color) !important;
+  border-radius: var(--radius-md) !important;
+  box-shadow: var(--shadow-md) !important;
+  padding: var(--space-2) !important;
+
+  .p-menu-list {
+    background: transparent !important;
+  }
+
+  .p-menuitem-link {
+    border-radius: var(--radius-sm) !important;
+    padding: 0.55rem 0.75rem !important;
+    background: transparent !important;
+
+    .p-menuitem-text {
+      color: var(--text-color) !important;
+      font-size: var(--fs-control) !important;
+    }
+    .p-menuitem-icon {
+      color: var(--text-muted) !important;
+      font-size: var(--fs-control) !important;
+    }
+
+    &:hover,
+    &:not(.p-disabled):hover {
+      background: var(--hover-background) !important;
+
+      .p-menuitem-text {
+        color: var(--primary-color) !important;
+      }
+      .p-menuitem-icon {
+        color: var(--primary-color) !important;
+      }
+    }
+  }
+
+  .p-menuitem-separator {
+    border-top: 1px solid var(--border-color) !important;
+    margin: var(--space-2) 0 !important;
+  }
+
+  // Section headers (submenu labels) if a caller uses them.
+  .p-submenu-header {
+    background: transparent !important;
+    color: var(--text-muted) !important;
+    font-size: var(--fs-label) !important;
+  }
+}
+
 .p-calendar:not(.p-disabled):hover {
   border-color: $hover-color;
 }
@@ -3652,4 +3708,24 @@ textarea,
   -moz-user-select: text;
   -ms-user-select: text;
   user-select: text;
+}
+
+// ============================================================================
+// Query Executor — in-shell sizing
+// ----------------------------------------------------------------------------
+// The Query Executor (app-query-executor) is mounted at TWO routes: the
+// standalone full-window /sql/exec (its own SCSS sets :host height:100vh) and
+// the in-shell /app/sql/exec, where it lives inside the shell's bounded, padded
+// `.router-pane`. There, 100vh overflows the pane (its top/bottom padding) and
+// clips the status bar. This global rule (the executor's own encapsulated SCSS
+// can't see the shell-owned .router-pane ancestor) constrains it to fill the
+// pane and presents it as a rounded card — the same treatment Add Dataset's
+// editor uses (--radius-lg + soft shadow).
+.router-pane app-query-executor {
+  height: 100%;
+
+  .qx-shell {
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+  }
 }

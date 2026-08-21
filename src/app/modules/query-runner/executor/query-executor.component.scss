@@ -25,6 +25,10 @@
   --qx-ok: var(--success-color);
 
   display: block;
+  // Standalone route (/sql/exec): fill the whole browser window. Inside the
+  // `/app` shell the host is constrained to 100% by a global rule scoped to
+  // `.router-pane app-query-executor` (see styles.scss) — kept out of this
+  // encapsulated stylesheet because it targets a shell-owned ancestor.
   height: 100vh;
   overflow: hidden;
 }
@@ -32,19 +36,26 @@
 .qx-shell {
   display: flex;
   flex-direction: column;
-  height: 100vh;
+  // Fill the host (viewport when standalone, router-pane when in-shell).
+  height: 100%;
   background: var(--qx-bg);
   color: var(--qx-text);
   font-family: var(--font-ui);
+  overflow: hidden;
 }
 
 /* ── top bar ─────────────────────────────────────────────────────── */
+// Single row: [brand ....flex-grow gap.... toolbar]. The brand is the ONLY
+// shrinkable part (long datasource names ellipsis), so the action toolbar is
+// never clipped. If the viewport is so narrow the toolbar itself can't fit,
+// it scrolls horizontally as a last resort (buttons stay reachable, never
+// hidden under the panel edge) — the thin themed scrollbar keeps it tidy.
 .qx-topbar {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: var(--space-6);
-  padding: var(--space-4) var(--space-6);
+  gap: var(--space-4);
+  // Compact: one tight control row, not a tall banner.
+  padding: var(--space-2) var(--space-4);
   background: var(--qx-elev);
   border-bottom: 1px solid var(--qx-border);
   flex-shrink: 0;
@@ -52,63 +63,95 @@
 .qx-brand {
   display: flex;
   align-items: center;
-  gap: var(--space-4);
+  min-width: 0; // allow the chip to ellipsis
+  flex: 0 1 auto; // shrink before the toolbar does
+  overflow: hidden;
+}
+
+// Connection scope chip — one line, one quiet surface: [db-glyph]
+// datasource · connection | ENGINE. Sits on the same 30px control row as
+// every toolbar button so the whole header reads as a single slim bar.
+// The db glyph is accent-COLOURED text, not an accent-filled square — the
+// only filled accent in the header stays the Run button.
+.qx-context-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+  height: 30px;
+  padding: 0 var(--space-4);
   min-width: 0;
+  border: 1px solid var(--qx-border);
+  border-radius: var(--radius-sm);
+  // A step BELOW the elevated header surface, so the chip reads as an inset
+  // scope indicator, not another button.
+  background: var(--qx-bg);
 
   > i {
-    width: 30px;
-    height: 30px;
-    display: grid;
-    place-items: center;
-    border-radius: var(--radius-sm);
-    background: var(--qx-accent);
-    color: var(--qx-accent-text);
+    font-size: var(--fs-control);
+    color: var(--qx-accent);
     flex-shrink: 0;
   }
-}
-.qx-title {
-  display: flex;
-  flex-direction: column;
-  line-height: 1.2;
-  min-width: 0;
+
   .qx-ds {
     font-weight: var(--fw-semibold);
-    font-size: var(--fs-card-title);
+    font-size: var(--fs-control);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
   }
+
+  .qx-dot-sep {
+    color: var(--qx-muted);
+    flex-shrink: 0;
+  }
+
   .qx-conn {
     font-size: var(--fs-control);
     color: var(--qx-muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  // Engine as a tiny divided suffix INSIDE the chip (no chip-in-chip pill).
+  .qx-engine {
+    font-size: var(--fs-label);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--qx-muted);
+    border-left: 1px solid var(--qx-border);
+    padding-left: var(--space-3);
+    margin-left: var(--space-1);
+    flex-shrink: 0;
   }
 }
-.qx-engine {
-  font-size: var(--fs-label);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: var(--qx-muted);
-  border: 1px solid var(--qx-border);
-  border-radius: 999px;
-  padding: 2px 8px;
-}
 // ── toolbar button system ───────────────────────────────────────────────
-// Every action is a REAL button on an even 34px row (was a mix of flat blue
-// text links). Explicit rules + !important because PrimeNG's own p-button /
-// p-button-text / p-button-outlined selectors are high-specificity and were
-// winning, leaving the icon buttons chromeless.
-$qx-btn-h: 34px;
+// Every action is a REAL button on an even, COMPACT 30px row (was 34px — the
+// header read oversized). Explicit rules + !important because PrimeNG's own
+// p-button / p-button-text / p-button-outlined selectors are high-specificity
+// and were winning, leaving the icon buttons chromeless.
+$qx-btn-h: 30px;
 
 .qx-toolbar {
   display: flex;
   align-items: center;
   gap: var(--space-4);
-  flex-shrink: 0;
+  flex: 0 0 auto; // never shrink; brand yields first
+  margin-left: auto; // pin to the right edge (topbar no longer space-between)
+  // Last-resort safety on very narrow widths: let the toolbar scroll instead
+  // of clipping actions under the panel edge. Thin themed bar via the mixin.
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  @include editor-scrollbar;
+  // Keep the scrollbar from crowding the buttons when it does appear.
+  scrollbar-gutter: stable;
 
   .qx-btn-group {
     display: inline-flex;
     align-items: center;
     gap: var(--space-3);
+    flex-shrink: 0;
   }
 
   // Base: normalise every toolbar button to the app button shape.
@@ -133,7 +176,7 @@ $qx-btn-h: 34px;
     box-shadow: none;
 
     .pi {
-      font-size: 0.95rem;
+      font-size: 0.85rem;
     }
   }
 
@@ -1239,3 +1282,74 @@ $qx-btn-h: 34px;
    src/assets/sass/_codemirror-theme.scss — CM appends those layers to
    document.body, outside this component's Emulated-encapsulation subtree, so
    scoped :global rules here did not reliably reach them. Do not re-add them. */
+
+/* ── Scrollbars ──────────────────────────────────────────────────────────
+   One consistent, thin, theme-aware scrollbar for EVERY scrollable surface in
+   the workspace. The app's GLOBAL ::-webkit-scrollbar (styles.scss) hard-codes
+   a bright WHITE track + 8px width, which glares against this dark workspace
+   (esp. the result grid's horizontal bar). These scoped rules override it for
+   everything under the executor host: a 8px→10px-free thin bar, a transparent
+   track (so it blends into whatever pane it sits on), and a rounded neutral
+   thumb that brightens on hover. Firefox uses scrollbar-width/color. */
+:host {
+  // Firefox
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--border-strong, var(--border-color)) transparent;
+  }
+
+  // Chromium / Safari — every scroll surface in the subtree.
+  *::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  *::-webkit-scrollbar-track {
+    background: transparent; // kills the global white track
+  }
+  *::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: var(--radius-pill);
+    // Inset the thumb so it reads as a slim pill with breathing room, not a
+    // fat block flush to the edges.
+    border: 2px solid transparent;
+    background-clip: padding-box;
+    &:hover {
+      background: var(--border-strong, var(--secondary-color));
+      background-clip: padding-box;
+    }
+  }
+  *::-webkit-scrollbar-corner {
+    background: transparent;
+  }
+}
+
+/* AG Grid renders its own scroll viewports inside the result grid; they need
+   ::ng-deep to reach past the component boundary. The rules above already
+   match them (they're descendants of :host), but AG Grid also sets an explicit
+   scrollbar background on its horizontal scroll track in some themes — pin it
+   transparent so the fat white bar in the result grid is gone. */
+:host ::ng-deep {
+  .ag-body-horizontal-scroll-viewport,
+  .ag-body-vertical-scroll-viewport,
+  .ag-body-viewport,
+  .ag-center-cols-viewport,
+  .ag-virtual-list-viewport {
+    &::-webkit-scrollbar {
+      width: 10px;
+      height: 10px;
+    }
+    &::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    &::-webkit-scrollbar-thumb {
+      background: var(--border-color);
+      border-radius: var(--radius-pill);
+      border: 2px solid transparent;
+      background-clip: padding-box;
+      &:hover {
+        background: var(--border-strong, var(--secondary-color));
+        background-clip: padding-box;
+      }
+    }
+  }
+}

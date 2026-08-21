@@ -1,15 +1,26 @@
 <div class="qx-shell">
   <!-- Top bar -->
   <header class="qx-topbar">
+    <!-- Connection scope chip — the IDE-style "you are here": one quiet
+         bordered chip holding datasource · connection · engine on a single
+         line. Replaces the old two-line title block + accent play square
+         (which visually duplicated the Run button). -->
     <div class="qx-brand">
-      <i class="pi pi-play"></i>
-      <div class="qx-title">
+      <span
+        class="qx-context-chip"
+        [pTooltip]="datasourceName + (connectionName ? ' — ' + connectionName : '')"
+        tooltipPosition="bottom"
+      >
+        <i class="pi pi-database"></i>
         <span class="qx-ds">{{
           datasourceName || ('QUERY_RUNNER.TITLE' | translate)
         }}</span>
-        <span class="qx-conn" *ngIf="connectionName">{{ connectionName }}</span>
-      </div>
-      <span class="qx-engine" *ngIf="engine">{{ engine }}</span>
+        <ng-container *ngIf="connectionName">
+          <span class="qx-dot-sep">·</span>
+          <span class="qx-conn">{{ connectionName }}</span>
+        </ng-container>
+        <span class="qx-engine" *ngIf="engine">{{ engine }}</span>
+      </span>
     </div>
 
     <div class="qx-toolbar">

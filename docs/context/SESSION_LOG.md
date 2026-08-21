@@ -1,5 +1,21 @@
 # dbexec-ui — Session Log (newest first)
 
+### 2026-08-21 — In-shell SQL executor (open here / new tab) + executor header & scrollbar polish
+- New-Query popup now offers TWO shared-`app-button` actions — "Open" (same tab) and
+  "Open in New Tab" — both targeting a NEW in-shell executor route `/app/sql/exec`
+  (executor renders WITH the sidebar → theme picker reachable from the editor tab).
+  All 5 open-executor sites repointed to the shell route; standalone `/sql/exec` kept
+  for old bookmarks. In-shell sizing is CSS-only (`.router-pane app-query-executor`
+  global rule: fill the pane + Add-Dataset card treatment). i18n: +`OPEN_SAME_TAB`,
+  +`OPEN_IN_NEW_TAB`, +`OPEN_HERE` (unused, leftover), subtitle updated — 10 locales.
+- Executor polish: header rebuilt as a compact 38px IDE bar (single-line connection
+  scope chip replaces play-square + 2-line title; 30px control row; brand shrinks
+  before the toolbar, which scrolls as last resort). Thin themed scrollbars scoped
+  to the executor (incl. AG Grid viewports via ::ng-deep). Global
+  `.p-menu.p-menu-overlay` token theming (kebab menu was PrimeNG stock white on dark).
+- Verified live on dark preset + gates green (tsc/ngc/prod build). Details in
+  [query-runner](./modules/query-runner.md).
+
 ### 2026-08-21 — Dark-theme-aware code editors + result grid (per-user dark presets)
 - Root cause: the editor/grid subsystem was built "there is no dark mode" (verbatim in
   monaco-theme.ts + CLAUDE.md), but the per-user theme picker (2026-08-14) lets users

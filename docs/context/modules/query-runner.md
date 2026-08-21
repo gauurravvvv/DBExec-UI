@@ -24,6 +24,40 @@
 - Out of scope: visual query building (query-builder), semantic datasets (dataset).
 
 ## 3. Progress (newest first)
+### 2026-08-21 — In-shell executor + open-here/new-tab + header redesign + scrollbars
+- **In-shell executor route**: the executor is now ALSO mounted INSIDE the `/app`
+  shell at `/app/sql/exec` (new child route declared BEFORE the `sql` prefix route
+  in app-routing; `QUERY_RUNNER.EXEC_SHELL` / `EXEC_SHELL_SAVED` constants). All 5
+  "open executor" sites (New-Query popup, launcher, saved-query view/list,
+  connections list) now target the in-shell route so a new tab carries the
+  sidebar/topbar (theme picker reachable). Standalone `/sql/exec` kept for old
+  bookmarks. Sizing is CSS-only: executor host stays `height:100vh` standalone;
+  a global `styles.scss` rule (`.router-pane app-query-executor`) constrains it to
+  `100%` in-shell + gives `.qx-shell` the Add-Dataset card treatment
+  (`--radius-lg` + `--shadow-sm`). Verified: in-shell 100% no clip (status bar
+  visible), standalone unchanged.
+- **New-Query popup**: split-button iteration replaced by TWO explicit actions
+  using the shared `app-button` (matches every dialog footer): "Open" (ghost,
+  same-tab `router.navigate`) + "Open in New Tab" (primary, `window.open`), both
+  behind the existing verify-connection gate. New i18n `QUERY_RUNNER.OPEN_SAME_TAB`
+  (all 10 locales); `OPEN_HERE` key now unused (left in place). Subtitle no longer
+  says "in a new tab".
+- **Header redesign (compact IDE bar)**: topbar is one 38px row — left is a
+  single-line "connection scope chip" (`[db-glyph] datasource · connection |
+  ENGINE`, quiet inset border, ellipsis) replacing the old accent play-square +
+  two-line title (the play square duplicated the Run button). Toolbar row height
+  34px→30px (`$qx-btn-h`), brand never clips the toolbar (brand shrinks first,
+  toolbar `overflow-x:auto` as last resort).
+- **Scrollbars**: `:host`-scoped thin themed scrollbars for every pane (transparent
+  track — the GLOBAL styles.scss scrollbar has a white track that glared on dark)
+  + `::ng-deep` rules for AG Grid's own viewports (its DOM lacks `_ngcontent`
+  attrs so `:host *` can't reach it). Kebab overflow ⋮ menu: global
+  `.p-menu.p-menu-overlay` token theming added in styles.scss (appendTo=body —
+  PrimeNG stock painted it white on dark), benefits custom-table + dashboard
+  menus too.
+- Verified live (dark theme): header 38px/no clip, grid h-scroll thin, menu themed,
+  standalone route regression-free. tsc/ngc/prod-build 0.
+
 ### 2026-08-21 — Result grid follows dark themes (was hard-coded light)
 - The AG Grid result grid was pinned to `themeQuartz.withPart(colorSchemeLightWarm)`
   with static params → bright white on a dark theme (the per-user picker lets users pick
