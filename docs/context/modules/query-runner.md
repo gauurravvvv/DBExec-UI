@@ -1,6 +1,6 @@
 # query-runner
 > Update the Progress log on every change.
-> Code path: `src/app/modules/query-runner` · Status: 🟢 · Last updated: 2026-08-06
+> Code path: `src/app/modules/query-runner` · Status: 🟢 · Last updated: 2026-08-21
 
 ## 1. Context
 - Responsibility: The "SQL Workspace" — owner-private saved queries (home list + CRUD), private connection profiles CRUD, and a full-screen SQL executor (**Monaco** editor + shared SQL IntelliSense + server-side result grid + object explorer). This is the most complex FE module.
@@ -24,6 +24,18 @@
 - Out of scope: visual query building (query-builder), semantic datasets (dataset).
 
 ## 3. Progress (newest first)
+### 2026-08-21 — Result grid follows dark themes (was hard-coded light)
+- The AG Grid result grid was pinned to `themeQuartz.withPart(colorSchemeLightWarm)`
+  with static params → bright white on a dark theme (the per-user picker lets users pick
+  dark presets). Now `gridTheme` is a `computed()` reading `ThemeService.isDark`:
+  `colorSchemeDarkBlue` vs `colorSchemeLightWarm` base + every colour param
+  (`backgroundColor`/`foregroundColor`/`borderColor`/`headerBackgroundColor`/
+  `headerTextColor`/`accentColor`/`oddRowBackgroundColor`) read from the matching CSS
+  variable (`--card-background`, `--text-color`, …); a param is omitted (scheme default
+  shows) if a var is empty — no literal hex. Template binds `[theme]="gridTheme()"`.
+  Companion Monaco editor fix (dark-aware base + syntax rules) is in `shared/editor/`.
+- Verified live (dark theme, TestingOrg): grid renders dark-correct. tsc/ngc/build 0.
+
 ### 2026-08-06 — Datasource dropdown filter on the two list screens
 - Added an `app-custom-dropdown` (server-mode datasource picker, `optionLabel=name`/`optionValue=id`, `showClear`, `appendTo="body"`) above the table toolbar on both **Connections** and **Saved Queries** lists, in a new `.list-filter-bar` row inside `.content-card`. The fetcher mirrors New-Query popup's `loadDatasourcesPage` (`datasourceService.listDatasource`).
 - Data path differs per list, matching each BE list contract: **Connections** passes the chosen id as the TOP-LEVEL first arg of `listConnections(selectedDatasourceId ?? undefined, {…})` (a `datasourceId` query param). **Saved Queries** folds it INTO the JSON `filter` as `filter.datasourceId` via a `withDatasourceFilter()` helper that parse-merges whatever the table already built (global search + column filters) so all survive together.

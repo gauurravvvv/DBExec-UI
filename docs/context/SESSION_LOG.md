@@ -1,5 +1,34 @@
 # dbexec-ui — Session Log (newest first)
 
+### 2026-08-21 — Dark-theme-aware code editors + result grid (per-user dark presets)
+- Root cause: the editor/grid subsystem was built "there is no dark mode" (verbatim in
+  monaco-theme.ts + CLAUDE.md), but the per-user theme picker (2026-08-14) lets users
+  choose DARK presets. On a dark preset the Monaco editor chrome darkened but its syntax
+  tokens + suggest/hover widget internals stayed `vs`-light (unreadable), and the AG Grid
+  result grid stayed hard-coded `colorSchemeLightWarm` (bright white). Confirmed live.
+- Fix (all driven off the design tokens — no hard-coded colours):
+  - `ThemeService` exposes `isDark` (signal), derived from the resolved `--background`/
+    `--card-background` luminance on every apply. Single source of truth for surfaces that
+    can't read our CSS vars.
+  - `monaco-theme.ts` `defineDbexecThemes` now picks `base: vs-dark|vs` from the resolved
+    `--card-background` luminance and pins explicit syntax `rules` (keyword=--primary,
+    string=--success, number=--warning, comment=--text-subtle, identifier=--text-color) so
+    text is legible + on-brand on either surface. Monaco can't take `var(--x)`, so tokens
+    are resolved to computed hex (existing pattern). Selection fills blend toward the live
+    surface (`mixToward`) instead of always toward white.
+  - Executor AG Grid `gridTheme` is now a `computed()` reacting to `isDark`: `colorSchemeDarkBlue`
+    vs `colorSchemeLightWarm` base + every colour param (`backgroundColor`, `foregroundColor`,
+    `borderColor`, `headerBackgroundColor`, `headerTextColor`, `accentColor`,
+    `oddRowBackgroundColor`) read from the matching CSS variable; a param is omitted (scheme
+    default shows) if a var is empty — no literal hex. `[theme]="gridTheme()"`.
+  - The existing `CodeEditorService` effect (re-runs on theme change) already calls
+    `refreshTheme()` → re-`defineDbexecThemes` + `setTheme`, so a LIVE switch repaints open
+    editors; the grid recomputes via the signal.
+- Verified LIVE (TestingOrg/gaurav.goel on a dark theme): SQL editor text, suggest widget,
+  and result grid all render dark-correct now (screenshots). tsc 0 → ngc 0 → prod build 0.
+  version_261 (local; user pushes). Covers add-dataset / add-custom-fields too (same
+  CodeEditorService + monaco-theme).
+
 ### 2026-08-18 — Page skeleton unified app-wide (one card + one back button)
 - Every list/add/edit/view/config screen now renders the SAME parent card
   (`--card-background` / `--radius-md` / `--shadow-sm` / `--space-8`, no border)

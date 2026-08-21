@@ -199,7 +199,13 @@ otherwise never re-render), and disposes every listener through one
   one definition each. The theme is built at runtime from the **computed** design
   tokens, because `ThemeService` rewrites the brand colour per organisation.
 - Chrome: `@import 'assets/sass/editor-chrome'` and use the `editor-*` mixins.
-- There is **no dark mode**; don't add a `dark-theme` branch.
+- **Dark-aware (2026-08-21):** themes can now be dark presets (the per-user
+  theme picker). `monaco-theme.ts` picks `base: vs-dark|vs` from the resolved
+  `--card-background` luminance and pins explicit syntax `rules` from tokens, so
+  editor text + suggest/hover widgets follow the theme. This is NOT the old
+  `body.dark-theme` class branch (still don't add that) — it derives light/dark
+  from the surface colour via `ThemeService.isDark`. The AG Grid result grid does
+  the same (`colorSchemeDarkBlue|colorSchemeLightWarm` + token-driven params).
 - `@codemirror/lang-sql` is still installed but is a **data** dependency (dialect
   keyword lists + a Lezer parser for the disabled dialect lint). Don't import it
   as an editor, and don't remove it without reading

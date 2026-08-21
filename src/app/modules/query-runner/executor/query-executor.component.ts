@@ -9,6 +9,7 @@ import {
   OnDestroy,
   OnInit,
   ViewChild,
+  computed,
   inject,
 } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
@@ -32,6 +33,7 @@ import {
   ClientSideRowModelModule,
   themeQuartz,
   colorSchemeLightWarm,
+  colorSchemeDarkBlue,
 } from 'ag-grid-community';
 
 import { ButtonModule } from 'primeng/button';
@@ -46,6 +48,7 @@ import {
   SavedQueryPayload,
 } from '../services/saved-queries.service';
 import { GlobalService } from 'src/app/core/services/global.service';
+import { ThemeService } from 'src/app/core/services/theme.service';
 import { SchemaCatalog } from './schema-catalog';
 import { TypedCellComponent } from './typed-cell.component';
 import { splitStatements, statementAtCursor } from './split-statements';
@@ -275,17 +278,46 @@ export class QueryExecutorComponent
   detailTable = ''; // for triggers (owning table)
 
   // AG Grid
-  // Same AG Grid theme the canonical us-data-grid uses, plus explicit compact
-  // sizing so the executor result grid matches the app's data density. The
-  // raw ag-grid-angular here doesn't inherit us-data-grid's SCSS
-  // (--ag-font-size: 13px), so Quartz defaulted to ~14-16px text in tall
-  // ~36px rows and read "large". Pin the density via theme params.
-  gridTheme = themeQuartz.withPart(colorSchemeLightWarm).withParams({
-    fontSize: 13, // matches --fs-control (13px), the app's grid text size
-    headerFontSize: 13,
-    rowHeight: 30,
-    headerHeight: 34,
-    cellHorizontalPadding: 10,
+  // The AG Grid result theme, driven by the app's design tokens so the grid
+  // follows the org/user theme (including dark presets) instead of a fixed
+  // light scheme. A `computed` so it recomputes when ThemeService.isDark flips
+  // on a live theme switch. Colour params are read from the SAME CSS variables
+  // the rest of the app uses (--card-background, --text-color, --border-color,
+  // --primary-color, ...) — AG Grid can't consume `var(--x)` directly, so we
+  // resolve each token to its computed value here. Density params are pinned
+  // (Quartz defaults read "large" for this app's data density).
+  readonly gridTheme = computed(() => {
+    const dark = this.themeService.isDark();
+    // The base scheme sets sensible dark/light defaults for anything we don't
+    // map; every colour we DO map comes from the app's design tokens, never a
+    // literal. If a token resolves empty (shouldn't — :root always carries the
+    // SCSS defaults), the param is omitted so the scheme default shows through
+    // rather than a hard-coded colour.
+    const scheme = dark ? colorSchemeDarkBlue : colorSchemeLightWarm;
+
+    // Density params only — colours are added below, from tokens.
+    const params: Record<string, unknown> = {
+      fontSize: 13, // matches --fs-control (13px), the app's grid text size
+      headerFontSize: 13,
+      rowHeight: 30,
+      headerHeight: 34,
+      cellHorizontalPadding: 10,
+    };
+
+    // token -> AG Grid param, only when the CSS variable actually resolves.
+    const set = (param: string, cssVar: string) => {
+      const v = getComputedStyle(document.body).getPropertyValue(cssVar).trim();
+      if (v) params[param] = v;
+    };
+    set('backgroundColor', '--card-background');
+    set('foregroundColor', '--text-color');
+    set('borderColor', '--border-color');
+    set('headerBackgroundColor', '--table-header-bg');
+    set('headerTextColor', '--table-header-text');
+    set('accentColor', '--primary-color');
+    set('oddRowBackgroundColor', '--secondary-background');
+
+    return themeQuartz.withPart(scheme).withParams(params);
   });
   private gridApi: GridApi | null = null;
   quickFilter = '';
@@ -316,6 +348,7 @@ export class QueryExecutorComponent
     private intelliSense: MonacoIntelliSenseService,
     private sqlValidator: SqlValidatorService,
     private sqlFormatter: SqlFormatterService,
+    private themeService: ThemeService,
   ) {}
 
   ngOnInit(): void {

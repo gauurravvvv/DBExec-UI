@@ -66,6 +66,15 @@ export class ThemeService {
   private readonly _theme = signal<ThemePayload | null>(null);
   readonly theme = this._theme.asReadonly();
 
+  // Whether the currently-applied theme is dark (a dark page/card
+  // surface). Derived from the resolved `background` colour's luminance
+  // on every apply. Surfaces that carry their OWN colour system rather
+  // than reading our CSS variables — Monaco's editor theme, the AG Grid
+  // result grid — read this to pick a light vs dark base. Defaults false
+  // (the SCSS default palette is light).
+  private readonly _isDark = signal(false);
+  readonly isDark = this._isDark.asReadonly();
+
   constructor(@Inject(DOCUMENT) private readonly doc: Document) {}
 
   /**
@@ -96,17 +105,43 @@ export class ThemeService {
       // controls the response body could otherwise smuggle in
       // additional declarations (e.g. `}body{display:none}`).
       this._theme.set(null);
+      this._isDark.set(false);
       this.removeInjectedStyle();
       return;
     }
     this._theme.set(theme);
+    this._isDark.set(this.computeIsDark(theme));
     this.injectCssVars(this.resolveVars(theme));
+  }
+
+  /**
+   * Decide whether a payload is a DARK theme from its page/card surface.
+   *
+   * Reads the resolved `background` colour (falling back to
+   * `cardBackground`, then the light SCSS default) and returns true when
+   * its relative luminance is low. Used by editor + grid surfaces that
+   * don't consume our CSS variables and must pick a light/dark base.
+   */
+  private computeIsDark(theme: ThemePayload): boolean {
+    const colors = theme.colors ?? {};
+    const surface = colors['background'] ?? colors['cardBackground'];
+    if (!this.isValidHex(surface)) return false;
+    const rgb = this.hexToRgb(surface);
+    if (!rgb) return false;
+    const lin = (c: number) => {
+      const v = c / 255;
+      return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
+    };
+    const L =
+      0.2126 * lin(rgb.r) + 0.7152 * lin(rgb.g) + 0.0722 * lin(rgb.b);
+    return L < 0.4;
   }
 
   /** Clear injected styles. Called on logout / auth-shell mount so
    *  unauthenticated screens render with the SCSS defaults. */
   clear(): void {
     this._theme.set(null);
+    this._isDark.set(false);
     this.removeInjectedStyle();
   }
 

@@ -71,6 +71,30 @@ function token(name: string, fallback: string): string {
 }
 
 /**
+ * Whether the current theme is dark, from the resolved editor surface.
+ *
+ * The org/user theme can now be a DARK preset. Monaco's `vs` base paints
+ * syntax tokens (keywords, strings, comments) and the suggest/hover
+ * widget internals in colours tuned for a light surface — unreadable on
+ * a dark editor. We pick the `vs-dark` base when the surface is dark so
+ * those built-ins flip with it, then still override the chrome from our
+ * tokens on top. Luminance test mirrors ThemeService.computeIsDark.
+ */
+function surfaceIsDark(surfaceHex: string): boolean {
+  const h = surfaceHex.replace('#', '');
+  if (h.length < 6) return false;
+  const r = parseInt(h.slice(0, 2), 16);
+  const g = parseInt(h.slice(2, 4), 16);
+  const b = parseInt(h.slice(4, 6), 16);
+  const lin = (c: number) => {
+    const v = c / 255;
+    return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
+  };
+  const L = 0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b);
+  return L < 0.4;
+}
+
+/**
  * Blend a colour with white at the given alpha.
  *
  * The suggest widget's selected row needs a solid fill, not a translucent one:
@@ -86,6 +110,39 @@ function tint(hex: string, alpha: number): string {
   const mix = (c: number) => Math.round(c * alpha + 255 * (1 - alpha));
   const two = (n: number) => n.toString(16).padStart(2, '0');
   return `#${two(mix(r))}${two(mix(g))}${two(mix(b))}`;
+}
+
+/**
+ * Blend `hex` toward `toward` by `alpha` (0 = all `hex`, 1 = all `toward`).
+ *
+ * `tint` only blends toward white, which washes a selection fill out on a dark
+ * surface. This generalises it so a selection can be blended toward the actual
+ * editor surface — dark or light — keeping the brand hue while staying subtle.
+ */
+function mixToward(hex: string, toward: string, alpha: number): string {
+  const a = hex.replace('#', '');
+  const b = toward.replace('#', '');
+  if (a.length < 6 || b.length < 6) return hex;
+  const two = (n: number) => Math.max(0, Math.min(255, Math.round(n)))
+    .toString(16)
+    .padStart(2, '0');
+  const ch = (i: number) => {
+    const from = parseInt(a.slice(i, i + 2), 16);
+    const to = parseInt(b.slice(i, i + 2), 16);
+    return two(from * (1 - alpha) + to * alpha);
+  };
+  return `#${ch(0)}${ch(2)}${ch(4)}`;
+}
+
+/**
+ * Monaco `rules[].foreground` wants a hex WITHOUT the leading `#` (unlike the
+ * `colors` map, which requires it). Normalise a resolved colour to that form,
+ * expanding shorthand as needed.
+ */
+function strip(hex: string): string {
+  const h = hex.replace('#', '');
+  if (h.length === 3) return `${h[0]}${h[0]}${h[1]}${h[1]}${h[2]}${h[2]}`;
+  return h.slice(0, 6);
 }
 
 /**
@@ -109,18 +166,47 @@ export function defineDbexecThemes(): void {
   const codeBg = token('--code-bg', '#f8fafc');
   const error = token('--error-color', '#f44336');
   const warning = token('--warning-color', '#ff9800');
+  const success = token('--success-color', '#4caf50');
+
+  const dark = surfaceIsDark(surface);
 
   // Solid fills derived from the live brand colour, so a red-branded org gets a
-  // red-tinted selection rather than a stray blue one.
-  const selection = tint(primary, 0.18);
-  const selectionSoft = tint(primary, 0.1);
+  // red-tinted selection rather than a stray blue one. On a dark surface a
+  // white-ward tint would wash the selection out, so blend toward the surface.
+  const selection = mixToward(primary, surface, dark ? 0.55 : 0.82);
+  const selectionSoft = mixToward(primary, surface, dark ? 0.75 : 0.9);
+
+  // Syntax token colours. `vs`/`vs-dark` ship a light/dark-tuned set, but its
+  // keyword/comment hues are fixed blues/greens that ignore the brand and, on a
+  // dark surface via inherit alone, some tokens (operators, delimiters) fall
+  // back to near-black. Pin an explicit, surface-appropriate palette derived
+  // from the live tokens so SQL/formula text is always legible and on-brand.
+  const identifier = text;
+  const keyword = primary;
+  const stringLit = success;
+  const numberLit = warning;
+  const comment = subtle;
+  const delimiter = muted;
 
   monaco.editor.defineTheme(DBEXEC_THEME, {
-    // Inherit every syntax rule from `vs`; only chrome colours are overridden,
-    // so SQL and formula highlighting stay exactly as they are today.
-    base: 'vs',
+    // Pick the base that matches the surface so Monaco's own built-ins (the
+    // suggest/hover widget internals, whitespace, guides) flip with it; our
+    // explicit rules + colours then override on top for brand + legibility.
+    base: dark ? 'vs-dark' : 'vs',
     inherit: true,
-    rules: [],
+    rules: [
+      { token: '', foreground: strip(identifier) },
+      { token: 'keyword', foreground: strip(keyword) },
+      { token: 'keyword.sql', foreground: strip(keyword) },
+      { token: 'operator.sql', foreground: strip(delimiter) },
+      { token: 'string', foreground: strip(stringLit) },
+      { token: 'string.sql', foreground: strip(stringLit) },
+      { token: 'number', foreground: strip(numberLit) },
+      { token: 'comment', foreground: strip(comment), fontStyle: 'italic' },
+      { token: 'delimiter', foreground: strip(delimiter) },
+      { token: 'identifier', foreground: strip(identifier) },
+      { token: 'predefined.sql', foreground: strip(keyword) },
+    ],
     colors: {
       'editor.background': surface,
       'editor.foreground': text,
