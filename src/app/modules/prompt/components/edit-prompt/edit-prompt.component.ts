@@ -15,6 +15,7 @@ import { REGEX } from 'src/app/core/constants/regex.constant';
 import { PROMPT } from 'src/app/core/constants/routes.constant';
 import { HasUnsavedChanges } from 'src/app/core/models/has-unsaved-changes.model';
 import { GlobalService } from 'src/app/core/services/global.service';
+import { PROMPT_DATA_TYPE_OPTIONS } from '../../constants/prompt.constant';
 import { PromptService } from '../../services/prompt.service';
 
 @Component({
@@ -30,6 +31,8 @@ export class EditPromptComponent implements OnInit, HasUnsavedChanges {
   promptForm!: FormGroup;
   promptId: string = '';
   selectedDatasourceName: string = '';
+  selectedTypeLabel: string = '';
+  dataTypeOptions: { value: string; label: string }[] = [];
   promptData: any = null;
   isCancelClicked = false;
   showSaveConfirm = false;
@@ -50,6 +53,10 @@ export class EditPromptComponent implements OnInit, HasUnsavedChanges {
 
   ngOnInit(): void {
     this.promptId = this.route.snapshot.params['id'];
+    this.dataTypeOptions = PROMPT_DATA_TYPE_OPTIONS.map(o => ({
+      value: o.value,
+      label: this.translate.instant(o.labelKey),
+    }));
 
     if (this.promptId) {
       this.loadPromptData();
@@ -86,6 +93,7 @@ export class EditPromptComponent implements OnInit, HasUnsavedChanges {
       ],
       description: [''],
       datasource: [''],
+      dataType: [''],
       status: [false],
     });
   }
@@ -104,10 +112,12 @@ export class EditPromptComponent implements OnInit, HasUnsavedChanges {
             name: data.name,
             description: data.description,
             datasource: data.datasourceId,
+            dataType: data.dataType || '',
             status: data.status,
           });
 
           this.selectedDatasourceName = data.datasource?.name || '';
+          this.selectedTypeLabel = data.type || '';
           this.promptForm.markAsPristine();
         }
         this.cdr.markForCheck();
@@ -174,6 +184,7 @@ export class EditPromptComponent implements OnInit, HasUnsavedChanges {
         name: this.promptData.name,
         description: this.promptData.description,
         datasource: this.promptData.datasourceId,
+        dataType: this.promptData.dataType || '',
         status: this.promptData.status,
       });
 

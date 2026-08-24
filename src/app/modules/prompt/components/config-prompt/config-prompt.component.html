@@ -1,5 +1,5 @@
 <div class="cp">
-  <!-- Page header: back-to-prompt + title + Back/Next/Save actions on top -->
+  <!-- Page header: back + title + identity strip + Save -->
   <div class="page-header">
     <div class="left-section">
       <button
@@ -10,25 +10,23 @@
       >
         <i class="pi pi-arrow-left"></i>
       </button>
-      <h2>{{ 'PROMPT_MODULE.CONFIGURE_TITLE' | translate }}</h2>
+      <div class="title-block">
+        <h2>{{ 'PROMPT_MODULE.CONFIGURE_TITLE' | translate }}</h2>
+        <div class="identity-strip" *ngIf="svc.promptType()">
+          <span class="chip">
+            <i class="pi pi-sliders-h"></i>{{ svc.promptType() }}
+          </span>
+          <span class="chip" *ngIf="svc.dataType()">
+            <i class="pi pi-database"></i>{{ svc.dataType() }}
+            <small>({{ svc.dataTypeMode() === 'override'
+              ? ('PROMPT_MODULE.CFG.DATATYPE_OVERRIDE' | translate)
+              : ('PROMPT_MODULE.CFG.DATATYPE_AUTO' | translate) }})</small>
+          </span>
+        </div>
+      </div>
     </div>
     <div class="action-buttons">
       <app-button
-        variant="secondary"
-        [disabled]="svc.currentStep() === 0"
-        (clicked)="svc.back()"
-      >
-        {{ 'COMMON.BACK' | translate }}
-      </app-button>
-      <app-button
-        *ngIf="svc.currentStep() < lastStep"
-        [disabled]="!svc.stepValid()[svc.currentStep()]"
-        (clicked)="svc.next()"
-      >
-        {{ 'COMMON.NEXT' | translate }}
-      </app-button>
-      <app-button
-        *ngIf="svc.currentStep() === lastStep"
         icon="pi pi-save"
         [loading]="svc.saving()"
         [disabled]="!svc.canSave()"
@@ -39,31 +37,70 @@
     </div>
   </div>
 
-  <header class="cp__stepper">
-    <button
-      *ngFor="let s of steps; let i = index"
-      type="button"
-      class="cp__step"
-      [class.cp__step--active]="svc.currentStep() === i"
-      [class.cp__step--done]="svc.stepValid()[i] && svc.currentStep() > i"
-      (click)="svc.goto(i)"
-    >
-      <i class="pi {{ s.icon }}"></i>
-      <span>{{ s.titleKey | translate }}</span>
-    </button>
-  </header>
+  <!-- Two-column builder: editor (left) + sticky preview rail (right) -->
+  <div class="cp__builder">
+    <div class="cp__editor">
+      <!-- Source (always) -->
+      <app-custom-accordion
+        class="cp__acc"
+        icon="pi pi-database"
+        [header]="'PROMPT_MODULE.CFG.SOURCE' | translate"
+        [expanded]="true"
+      >
+        <p class="cp__acc-hint">{{ 'PROMPT_MODULE.CFG.SOURCE_HINT' | translate }}</p>
+        <cp-source-step [svc]="svc"></cp-source-step>
+      </app-custom-accordion>
 
-  <section class="cp__body">
-    <cp-source-step *ngIf="svc.currentStep() === 0" [svc]="svc"></cp-source-step>
-    <cp-joins-step *ngIf="svc.currentStep() === 1" [svc]="svc"></cp-joins-step>
-    <cp-column-filter-step
-      *ngIf="svc.currentStep() === 2"
-      [svc]="svc"
-    ></cp-column-filter-step>
-    <cp-values-step
-      *ngIf="svc.currentStep() === 3"
-      [svc]="svc"
-      [promptId]="promptId"
-    ></cp-values-step>
-  </section>
+      <!-- Filter (optional) -->
+      <app-custom-accordion
+        class="cp__acc"
+        icon="pi pi-filter"
+        [header]="'PROMPT_MODULE.CFG.FILTER_OPTIONAL' | translate"
+        [expanded]="true"
+      >
+        <p class="cp__acc-hint">{{ 'PROMPT_MODULE.CFG.FILTER_HINT' | translate }}</p>
+        <cp-column-filter-step [svc]="svc"></cp-column-filter-step>
+      </app-custom-accordion>
+
+      <!-- Joins (reach a related table) -->
+      <app-custom-accordion
+        class="cp__acc"
+        icon="pi pi-sitemap"
+        [header]="'PROMPT_MODULE.CFG.ADD_RELATED_TABLE' | translate"
+        [expanded]="false"
+      >
+        <cp-joins-step [svc]="svc"></cp-joins-step>
+      </app-custom-accordion>
+
+      <!-- Values (choice widgets) OR Input constraints (free-input widgets) -->
+      <app-custom-accordion
+        *ngIf="svc.isChoice(); else constraints"
+        class="cp__acc"
+        icon="pi pi-list"
+        [header]="'PROMPT_MODULE.CFG.VALUES' | translate"
+        [expanded]="true"
+      >
+        <p class="cp__acc-hint">{{ 'PROMPT_MODULE.CFG.VALUES_HINT' | translate }}</p>
+        <cp-values-step [svc]="svc" [promptId]="promptId"></cp-values-step>
+      </app-custom-accordion>
+      <ng-template #constraints>
+        <app-custom-accordion
+          class="cp__acc"
+          icon="pi pi-sliders-h"
+          [header]="'PROMPT_MODULE.CFG.CONSTRAINTS' | translate"
+          [expanded]="true"
+        >
+          <p class="cp__acc-hint">
+            {{ 'PROMPT_MODULE.CFG.CONSTRAINTS_HINT' | translate }}
+          </p>
+          <cp-constraints-step [svc]="svc"></cp-constraints-step>
+        </app-custom-accordion>
+      </ng-template>
+    </div>
+
+    <!-- Sticky live-preview rail -->
+    <aside class="cp__preview">
+      <cp-preview-rail [svc]="svc" [promptId]="promptId"></cp-preview-rail>
+    </aside>
+  </div>
 </div>

@@ -1,0 +1,48 @@
+<div class="rail">
+  <!-- SQL preview -->
+  <div class="rail__block">
+    <div class="rail__head">
+      <h4>{{ 'PROMPT_MODULE.CFG.SQL_PREVIEW' | translate }}</h4>
+    </div>
+    <pre class="rail__sql" *ngIf="svc.previewSql(); else noSql">{{ svc.previewSql() }}</pre>
+    <ng-template #noSql>
+      <p class="rail__empty">{{ 'PROMPT_MODULE.CFG.SOURCE_HINT' | translate }}</p>
+    </ng-template>
+    <small class="rail__note">
+      {{ 'PROMPT_MODULE.CFG.SQL_PREVIEW_NOTE' | translate }}
+    </small>
+  </div>
+
+  <!-- Value sample (on-demand) -->
+  <div class="rail__block">
+    <div class="rail__head">
+      <h4>{{ 'PROMPT_MODULE.CFG.SAMPLE_VALUES' | translate }}</h4>
+      <app-button
+        size="sm"
+        variant="secondary"
+        icon="pi pi-play"
+        [loading]="running()"
+        [disabled]="!canRun()"
+        (clicked)="runPreview()"
+      >
+        {{ 'PROMPT_MODULE.CFG.RUN_PREVIEW' | translate }}
+      </app-button>
+    </div>
+
+    <p class="rail__stale" *ngIf="stale()">
+      <i class="pi pi-exclamation-triangle"></i>
+      {{ 'PROMPT_MODULE.CFG.SAMPLE_STALE' | translate }}
+    </p>
+
+    <p class="rail__error" *ngIf="sampleError()">{{ sampleError() }}</p>
+
+    <ul class="rail__values" *ngIf="sample().length; else emptySample">
+      <li *ngFor="let v of sample()">{{ v }}</li>
+    </ul>
+    <ng-template #emptySample>
+      <p class="rail__empty" *ngIf="!sampleError()">
+        {{ 'PROMPT_MODULE.CFG.SAMPLE_EMPTY' | translate }}
+      </p>
+    </ng-template>
+  </div>
+</div>

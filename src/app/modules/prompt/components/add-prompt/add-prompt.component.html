@@ -83,17 +83,34 @@
             </app-custom-input>
           </div>
 
-          <!-- Type -->
+          <!-- Control type (widget). Flat, ordered list; each label carries its
+               group (Choice / Input / Date) as a prefix. -->
           <div class="form-field">
             <app-custom-dropdown
               formControlName="type"
               [label]="'PROMPT_MODULE.TYPE' | translate"
               [placeholder]="'PROMPT_MODULE.SELECT_TYPE' | translate"
-              [options]="promptTypes"
+              [options]="typeOptions"
               optionLabel="label"
               optionValue="value"
               [required]="true"
               icon="pi-sliders-h"
+              (onChangeEvent)="onTypeChange($event)"
+            >
+            </app-custom-dropdown>
+          </div>
+
+          <!-- Data type (drives operator applicability; free-form) -->
+          <div class="form-field">
+            <app-custom-dropdown
+              formControlName="dataType"
+              [label]="'PROMPT_MODULE.DATATYPE_LABEL' | translate"
+              [placeholder]="'PROMPT_MODULE.DATATYPE_PLACEHOLDER' | translate"
+              [options]="dataTypeOptions"
+              optionLabel="label"
+              optionValue="value"
+              [showClear]="true"
+              icon="pi-database"
             >
             </app-custom-dropdown>
           </div>

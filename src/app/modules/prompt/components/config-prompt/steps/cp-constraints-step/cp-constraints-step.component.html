@@ -1,0 +1,65 @@
+<div class="cp-step">
+  <!-- Text / enum / uuid: length + pattern -->
+  <ng-container *ngIf="family() === 'text'">
+    <div class="cp-step__row">
+      <app-custom-number
+        label="{{ 'PROMPT_MODULE.CONSTRAINT.MIN_LEN' | translate }}"
+        [ngModel]="svc.inputConstraints().minLen"
+        (onChangeEvent)="onMinLen($event)"
+      ></app-custom-number>
+      <app-custom-number
+        label="{{ 'PROMPT_MODULE.CONSTRAINT.MAX_LEN' | translate }}"
+        [ngModel]="svc.inputConstraints().maxLen"
+        (onChangeEvent)="onMaxLen($event)"
+      ></app-custom-number>
+    </div>
+    <app-custom-input
+      label="{{ 'PROMPT_MODULE.CONSTRAINT.PATTERN' | translate }}"
+      [ngModel]="svc.inputConstraints().pattern"
+      (ngModelChange)="onPattern($event)"
+    ></app-custom-input>
+  </ng-container>
+
+  <!-- Number / rangeslider: min / max / step -->
+  <ng-container *ngIf="family() === 'number'">
+    <div class="cp-step__row">
+      <app-custom-number
+        label="{{ 'PROMPT_MODULE.CONSTRAINT.MIN' | translate }}"
+        [ngModel]="svc.inputConstraints().min"
+        (onChangeEvent)="onMin($event)"
+      ></app-custom-number>
+      <app-custom-number
+        label="{{ 'PROMPT_MODULE.CONSTRAINT.MAX' | translate }}"
+        [ngModel]="svc.inputConstraints().max"
+        (onChangeEvent)="onMax($event)"
+      ></app-custom-number>
+      <app-custom-number
+        label="{{ 'PROMPT_MODULE.CONSTRAINT.STEP' | translate }}"
+        [ngModel]="svc.inputConstraints().step"
+        (onChangeEvent)="onStep($event)"
+      ></app-custom-number>
+    </div>
+  </ng-container>
+
+  <!-- Date / datetime: earliest / latest (ISO string) -->
+  <ng-container *ngIf="family() === 'date'">
+    <div class="cp-step__row">
+      <app-custom-input
+        label="{{ 'PROMPT_MODULE.CONSTRAINT.EARLIEST' | translate }}"
+        placeholder="YYYY-MM-DD"
+        [ngModel]="svc.inputConstraints().earliest"
+        (ngModelChange)="onEarliest($event)"
+      ></app-custom-input>
+      <app-custom-input
+        label="{{ 'PROMPT_MODULE.CONSTRAINT.LATEST' | translate }}"
+        placeholder="YYYY-MM-DD"
+        [ngModel]="svc.inputConstraints().latest"
+        (ngModelChange)="onLatest($event)"
+      ></app-custom-input>
+    </div>
+  </ng-container>
+
+  <p class="cp-step__note" *ngIf="family() === 'none'">
+    {{ 'PROMPT_MODULE.VALUES_NOT_APPLICABLE' | translate }}
+  </p>
+</div>

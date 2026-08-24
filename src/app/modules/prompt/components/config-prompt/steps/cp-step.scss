@@ -10,6 +10,24 @@
   align-items: center;
 }
 
+// A row of side-by-side controls (e.g. min / max / step constraint fields).
+.cp-step__row {
+  display: flex;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+
+  > * {
+    flex: 1 1 160px;
+    min-width: 0;
+  }
+}
+
+.cp-step__note {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: var(--fs-label);
+}
+
 .cp-step__sql {
   border: 1px solid var(--border-color);
   border-radius: var(--space-2);
@@ -41,7 +59,9 @@
     display: flex;
     flex-direction: column;
     gap: var(--space-1);
-    color: var(--text-color-secondary);
+    // --text-color-secondary does not exist in the token set → it fell back to
+    // near-black and was invisible on dark surfaces. Use the real muted token.
+    color: var(--text-muted);
     font-size: var(--fs-control);
   }
 }

@@ -1,6 +1,6 @@
 # prompt
 > Update the Progress log on every change.
-> Code path: `src/app/modules/prompt` · Status: 🟢 · Last updated: 2026-08-15
+> Code path: `src/app/modules/prompt` · Status: 🟢 · Last updated: 2026-08-21 (config rebuild)
 
 ## 1. Context
 - Responsibility: DBExec **Studio** primitive — a reusable parameterised input control (a "prompt"). Each prompt has a control **type** (one of ~9: text, number, dropdown, multiselect, checkbox, radio, calendar, daterange, rangeslider), is bound to a datasource + tab + section, and supplies values either statically or from a SQL query. Prompts are the form fields that `query-builder` (and older Studio flows) arrange and run.
@@ -23,6 +23,29 @@
 - Out of scope: chart/BI parameters (analyses), dataset `{{name}}` params (dataset).
 
 ## 3. Progress (newest first)
+### 2026-08-21 — Config REBUILD: single-page accordion builder + dataType-driven operators (fixes #1/#2/#3)
+- **Spec:** `docs/superpowers/specs/2026-08-21-prompt-config-rebuild-design.md` (+ PROGRESS).
+- **Add/edit:** `PROMPT_TYPE_OPTIONS` (grouped choice/input/date, icons, defaultDataType) replaces the flat `PROMPT_TYPES`; Add shows a "Group · Widget" list (PrimeNG group mode didn't render through the shared dropdown → flattened) + a **dataType** field that auto-seeds from the widget (`onTypeChange`). edit-prompt shows read-only Type + editable dataType. Both send `dataType`.
+- **Config = single-page builder** (no more stepper/app-tabs): two columns — accordion sections (`app-custom-accordion`: Source / Filter / Joins / Values|Constraints) with body max-height+scroll, and a sticky `cp-preview-rail` (client-side live SQL + on-demand value sample via `getPromptValuesBySQL`). Parent card + editor column bounded/scroll.
+- **type drives sections:** choice types → Values; free-input → new `cp-constraints-step` (min/max/step | minLen/maxLen/pattern | earliest/latest by dataType family). `isChoiceType()` gates.
+- **Operators fixed (4 stacked bugs):** (1) `firstValueFrom(getOptions)` → persistent `getFamily().subscribe()`; (2) **`ReferenceDataService.load()` never subscribed its own cold HTTP** → added `this.load$.subscribe()` (fixes refdata **app-wide**); (3) empty-string dataType skipped the text default → coerce `''`→`null`; (4) operators was an `effect` doing `.set()` → NG0600 → converted to a **`computed`**. Operators now filter by dataType via the Form Builder's `operatorOptionsFromCatalog` (text→10 ops, number→12 with gt/lt/between, live-verified).
+- **PromptConfigService:** dropped step machinery; added `promptType/dataType/dataTypeMode/inputConstraints` + `isChoice` + `previewSql` computed; `load()` now reads the **nested** `{prompt,configuration}` shape (fixed a latent flat-read bug that never re-hydrated source/filter); payload sends `filterOperator/dataType/inputConstraints`.
+- **Shared dropdown:** added `group/optionGroupLabel/optionGroupChildren` passthrough + a group pTemplate (additive; used nowhere critically after the flatten).
+- Gates: tsc 0 · ngc 0 · prod build 0. LIVE round-trip (TestingOrg) persisted `filter_operator`/`dataType` + re-hydrated on reopen. version_261, awaiting push.
+
+### 2026-08-21 — config-prompt stepper → canonical `app-tabs` tab view (settings parity)
+- Replaced config-prompt's bespoke `.cp__stepper` pill/box strip with the shared **`<app-tabs>`** component (`shared/components/tabs`) — the same themed underline tab strip used by `/app/settings/app` + `/app/settings/system`. Source / Joins / Column & Filter / Values now render as a `role="tablist"` with an active-underline tab in `--primary-color`.
+- Wiring: `tabs: AppTab[]` with `value` = step index (`'0'..'3'`), `[active]="svc.currentStep().toString()"`, `(activeChange)="onTabChange($event)" → svc.goto(+value)`. Tabs are **freely clickable** (free navigation, like the settings hubs); the top-right Back/Next buttons keep the guided-progression affordance. Removed the now-dead `steps[]` array + `.cp__stepper`/`.cp__step*` SCSS. Registered standalone `TabsComponent` in `prompt.module.ts` imports.
+- **Verified LIVE** (TestOrg): tab strip renders Source(selected)/Joins/Column & Filter/Values as underline tabs; clicking Joins switches `[active][selected]` and renders the Joins body. Screenshot `cp-tabview.png`.
+- Gates: `tsc --noEmit` 0 · `ngc -p tsconfig.app.json --noEmit` 0. Awaiting push.
+
+### 2026-08-21 — Fix: Joins-tab infinite columns fetch (crashed the UI)
+- **Symptom:** opening config-prompt's Joins tab hammered `GET /datasources/:id/schemas/:schema/tables/:table/columns` in an unbounded loop, freezing the browser.
+- **Root cause (feedback loop through the parent, not an in-component reactivity loop):** `prompt-join-builder.ngOnChanges` called `emit()` on the `initialEdges` **seed** branch. `emit()` fires `edgesChange` → `cp-joins-step.onEdges()` → `svc.patchJoins({ edges })`, which `.update`s the service `joins` signal with the child's fresh `edges` array. The template binds `[initialEdges]="svc.joins().edges"`, so the new reference re-fired `ngOnChanges` → `emit()` → … forever. `emit()` also calls `emitReachable()`, which fetches columns for every in-scope table each cycle — hence the storm.
+- **Fix (`prompt-join-builder.component.ts`):** the `initialEdges` seed is now inbound-only — it adopts the edges (`joins.set([...])`) but no longer `emit()`s them back. FK/schema load and seeding refresh the reachable-column set exactly once (`void this.emitReachable()`) instead of echoing `edgesChange`. User add/remove of joins still emits via `pushJoin`/`removeJoin` (correct). Added an `emittingReachable` re-entrancy guard so column fetches can never stack even under upstream over-firing.
+- **Verified LIVE** (org TestOrg, prompt on `sales.orders`): entering Joins fires the columns endpoint exactly **1×** (was ∞); a Source→Joins round trip adds exactly 1 more (one clean fetch per tab entry). FK (`foreign-keys?schema=sales`) 1×, `schemas` bounded. Joins panel renders the builder + empty state + "Add join" correctly; UI stays responsive.
+- Gates: `tsc --noEmit` 0 · `ngc -p tsconfig.app.json --noEmit` 0. Awaiting push.
+
 ### 2026-08-15 — Phase 1: appearance removed; config-prompt rebuilt as a modular 4-step stepper
 - **Appearance subsystem deleted (FE):** removed `prompt-appearance-form`, the `prompt-appearance-fields` registry, and the mirrored `promptAppearance` validator; dropped `APPEARANCE_SUFFIX` from the PROMPT api constant and the `updateAppearance`/`getAppearance`/`getAppearence` service methods; removed the `PROMPT_MODULE.APPEARANCE`/`CUSTOMISE_*` i18n keys across all 10 locales. (The `QUERY_BUILDER.APPEARANCE` i18n block is the QB-runtime namespace — deliberately left; out of scope.)
 - **config-prompt rebuilt** from the 1768-line monolith into a thin shell (`config-prompt.component`) + a signal-based `prompt-config.service.ts` + four small step children under `config-prompt/steps/`: `cp-source-step` (schema/table/alias from DatasourceService), `cp-joins-step` (visual `prompt-join-builder` + Advanced Monaco raw-SQL escape), `cp-column-filter-step` (select expr + filter column/operator from the `filter_operator` catalog + Advanced Monaco), `cp-values-step` (hosts `prompt-value-source` + a review summary). Shared `cp-step.scss`. Save gated valid+dirty → `POST /prompts/:id/config`. No file over ~400 lines. The NgRx `store/` slice is retained (shared schema cache used by dataset/analyses) but the new stepper is signals-only.

@@ -118,6 +118,8 @@ export class PromptJoinBuilderComponent implements OnChanges {
 
   private fkByKey = new Map<string, FkEdge>();
   private columnsByTable = new Map<string, string[]>(); // `${schema}.${table}` → cols
+  /** Re-entrancy guard so reachable-column fetches can never stack up. */
+  private emittingReachable = false;
 
   /** All tables currently in scope: base + every joined target. */
   readonly scope = computed<ScopeTable[]>(() => {
@@ -159,9 +161,13 @@ export class PromptJoinBuilderComponent implements OnChanges {
   });
 
   async ngOnChanges(changes: SimpleChanges): Promise<void> {
+    // `initialEdges` is an inbound SEED only. It must NOT echo `edgesChange`
+    // back to the parent: the parent patches svc.joins().edges from that event,
+    // which re-binds [initialEdges] with a fresh array reference, which re-fires
+    // ngOnChanges — an infinite loop that also re-fetches columns every cycle.
+    // Just adopt the seed; the picker's reachable columns refresh below.
     if (changes['initialEdges'] && this.initialEdges) {
       this.joins.set([...this.initialEdges]);
-      this.emit();
     }
     if (
       (changes['datasourceId'] || changes['baseTable'] || changes['baseSchema']) &&
@@ -170,7 +176,12 @@ export class PromptJoinBuilderComponent implements OnChanges {
     ) {
       await this.loadFks();
       await this.loadSchemas();
-      this.emit();
+      // Loading reference data (FKs, schemas) or seeding must not echo edges —
+      // only refresh the reachable-column set once. User add/remove of joins
+      // emits via pushJoin/removeJoin.
+      void this.emitReachable();
+    } else if (changes['initialEdges'] && this.initialEdges) {
+      void this.emitReachable();
     }
   }
 
@@ -356,21 +367,27 @@ export class PromptJoinBuilderComponent implements OnChanges {
 
   // ── Emit reachable columns + edges ──────────────────────────────────
   private async emitReachable(): Promise<void> {
-    const out: ReachableColumn[] = [];
-    for (const s of this.scope()) {
-      const cols = await this.columnsFor(s.schema, s.table);
-      cols.forEach(c =>
-        out.push({
-          label: `${s.alias}.${c}`,
-          value: `${s.alias}.${c}`,
-          schema: s.schema,
-          table: s.table,
-          alias: s.alias,
-          column: c,
-        }),
-      );
+    if (this.emittingReachable) return;
+    this.emittingReachable = true;
+    try {
+      const out: ReachableColumn[] = [];
+      for (const s of this.scope()) {
+        const cols = await this.columnsFor(s.schema, s.table);
+        cols.forEach(c =>
+          out.push({
+            label: `${s.alias}.${c}`,
+            value: `${s.alias}.${c}`,
+            schema: s.schema,
+            table: s.table,
+            alias: s.alias,
+            column: c,
+          }),
+        );
+      }
+      this.reachableChange.emit(out);
+    } finally {
+      this.emittingReachable = false;
     }
-    this.reachableChange.emit(out);
   }
 
   private emit(): void {

@@ -16,7 +16,12 @@ import { PROMPT } from 'src/app/core/constants/routes.constant';
 import { HasUnsavedChanges } from 'src/app/core/models/has-unsaved-changes.model';
 import { GlobalService } from 'src/app/core/services/global.service';
 import { DatasourceService } from 'src/app/modules/datasource/services/datasource.service';
-import { PROMPT_TYPES } from '../../constants/prompt.constant';
+import {
+  DEFAULT_DATATYPE_BY_TYPE,
+  PROMPT_DATA_TYPE_OPTIONS,
+  PROMPT_TYPE_OPTIONS,
+  type PromptTypeOption,
+} from '../../constants/prompt.constant';
 import { PromptService } from '../../services/prompt.service';
 
 /**
@@ -37,7 +42,13 @@ export class AddPromptComponent implements OnInit, HasUnsavedChanges {
   private cdr = inject(ChangeDetectorRef);
 
   promptForm!: FormGroup;
-  promptTypes = PROMPT_TYPES;
+
+  /** Widget types as a flat, ordered (choice→input→date) option list. Each
+   *  label is prefixed with its group so the list still reads grouped without
+   *  relying on PrimeNG group mode (which didn't render through the wrapper). */
+  typeOptions: { value: string; label: string }[] = [];
+  /** Suggested logical data types (dataType is free-form; these are hints). */
+  dataTypeOptions: { value: string; label: string }[] = [];
 
   preloadedDatasources: any[] | null = null;
   preloadedDatasourcesTotal: number | null = null;
@@ -56,11 +67,39 @@ export class AddPromptComponent implements OnInit, HasUnsavedChanges {
   }
 
   ngOnInit(): void {
+    // Build a flat, ordered option list (choice → input → date), each label
+    // prefixed with its translated group so the list reads grouped.
+    const groups: PromptTypeOption['group'][] = ['choice', 'input', 'date'];
+    this.typeOptions = groups.flatMap(g => {
+      const groupLabel = this.translate.instant(
+        `PROMPT_MODULE.TYPE_GROUP.${g.toUpperCase()}`,
+      );
+      return PROMPT_TYPE_OPTIONS.filter(
+        (o: PromptTypeOption) => o.group === g,
+      ).map(o => ({
+        value: o.value,
+        label: `${groupLabel} · ${this.translate.instant(o.labelKey)}`,
+      }));
+    });
+    this.dataTypeOptions = PROMPT_DATA_TYPE_OPTIONS.map(o => ({
+      value: o.value,
+      label: this.translate.instant(o.labelKey),
+    }));
+
     this.loadDatasources();
 
     this.promptForm.valueChanges
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(() => this.cdr.markForCheck());
+  }
+
+  /** When the widget type changes, seed dataType from its default (only if the
+   *  admin hasn't already set dataType, so we never clobber a manual choice). */
+  onTypeChange(type: string): void {
+    const dt = this.promptForm.get('dataType');
+    if (dt && !dt.value) {
+      dt.setValue(DEFAULT_DATATYPE_BY_TYPE[type] ?? 'text');
+    }
   }
 
   get isFormDirty(): boolean {
@@ -85,6 +124,9 @@ export class AddPromptComponent implements OnInit, HasUnsavedChanges {
       ],
       description: [''],
       type: ['', Validators.required],
+      // dataType is free-form (accept data in any form); defaulted from the
+      // widget on type change, refined in config from the source column.
+      dataType: [''],
     });
   }
 

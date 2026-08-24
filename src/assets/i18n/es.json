@@ -3002,7 +3002,81 @@
       "SERVER_MODE_HINT": "Más de 500 valores: se usará búsqueda paginada en el servidor.",
       "REUPLOAD_REPLACE_WARN": "Volver a subir reemplaza el conjunto de opciones actual."
     },
-    "CONFIGURE_TITLE": "Configure Prompt"
+    "CONFIGURE_TITLE": "Configure Prompt",
+    "TYPE_GROUP": {
+      "CHOICE": "Choice",
+      "INPUT": "Input",
+      "DATE": "Date"
+    },
+    "TYPE_OPT": {
+      "DROPDOWN": "Dropdown",
+      "MULTISELECT": "Multi-select",
+      "RADIO": "Radio",
+      "CHECKBOX": "Checkbox",
+      "TEXT": "Text",
+      "NUMBER": "Number",
+      "RANGESLIDER": "Range slider",
+      "CALENDAR": "Calendar",
+      "DATERANGE": "Date range"
+    },
+    "TYPE_HINT": {
+      "DROPDOWN": "One value from a list",
+      "MULTISELECT": "Several values from a list",
+      "RADIO": "One value, shown inline",
+      "CHECKBOX": "On/off, or a few toggles",
+      "TEXT": "Free text",
+      "NUMBER": "Numeric entry",
+      "RANGESLIDER": "Numeric range on a track",
+      "CALENDAR": "A single date",
+      "DATERANGE": "From and to dates"
+    },
+    "DATATYPE_LABEL": "Data type",
+    "DATATYPE_PLACEHOLDER": "Auto — refine in config",
+    "DATATYPE": {
+      "TEXT": "Text",
+      "NUMBER": "Number",
+      "DATE": "Date",
+      "DATETIME": "Date & time",
+      "BOOL": "Boolean",
+      "ENUM": "Enum / category",
+      "UUID": "UUID"
+    },
+    "CFG": {
+      "SOURCE": "Source",
+      "SOURCE_HINT": "Where this prompt reads its column from.",
+      "FILTER": "Filter",
+      "FILTER_HINT": "Optionally narrow the rows this prompt draws from.",
+      "FILTER_OPTIONAL": "Filter (optional)",
+      "VALUES": "Values",
+      "VALUES_HINT": "The option list this control offers.",
+      "CONSTRAINTS": "Input constraints",
+      "CONSTRAINTS_HINT": "Bounds for what the user may enter.",
+      "PREVIEW": "Preview",
+      "SQL_PREVIEW": "SQL",
+      "SQL_PREVIEW_NOTE": "Generated at run time — the server compiles the final query.",
+      "SAMPLE_VALUES": "Sample values",
+      "RUN_PREVIEW": "Run preview",
+      "SAMPLE_STALE": "Config changed — run again to refresh the sample.",
+      "SAMPLE_EMPTY": "No sample rows yet. Run the preview to see values.",
+      "SAMPLE_MORE": "{count} more",
+      "ADD_RELATED_TABLE": "Add related table (join)",
+      "DATATYPE_AUTO": "Auto",
+      "DATATYPE_OVERRIDE": "Override",
+      "VALUE_SOURCE_MANUAL": "Manual",
+      "VALUE_SOURCE_QUERY": "From query",
+      "VALUE_SOURCE_UPLOAD": "Upload",
+      "NO_OPERATORS": "No operators available for this data type."
+    },
+    "CONSTRAINT": {
+      "MIN_LEN": "Minimum length",
+      "MAX_LEN": "Maximum length",
+      "PATTERN": "Pattern (regex)",
+      "MIN": "Minimum",
+      "MAX": "Maximum",
+      "STEP": "Step",
+      "EARLIEST": "Earliest date",
+      "LATEST": "Latest date"
+    }
   },
   "QUERY_BUILDER_MODULE": {
     "TITLE": "Query Builders",

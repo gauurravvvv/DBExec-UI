@@ -20,19 +20,33 @@
   gap: var(--space-2);
   padding: var(--space-2) var(--space-4);
   border: 1px solid var(--border-color);
-  border-radius: var(--radius-md, 8px);
-  background: var(--surface-card, #fff);
-  color: var(--text-color);
+  border-radius: var(--radius-md);
+  // Theme tokens only (was `--surface-card, #fff` — the #fff fallback rendered
+  // glaring white chips on dark presets). Inactive chip = card surface + muted
+  // label; hover tints; active = brand outline + tint.
+  background: var(--card-background);
+  color: var(--text-muted);
   font-size: var(--fs-control);
+  font-weight: var(--fw-medium);
   cursor: pointer;
+  transition:
+    border-color var(--motion-fast) ease,
+    background-color var(--motion-fast) ease,
+    color var(--motion-fast) ease;
+
+  i {
+    font-size: var(--fs-control);
+  }
 
   &:hover {
     border-color: var(--primary-color);
+    color: var(--text-color);
+    background: var(--hover-background);
   }
   &--active {
     border-color: var(--primary-color);
     color: var(--primary-color);
-    background: var(--primary-color-transparent, rgba(0, 0, 0, 0.03));
+    background: rgba(var(--primary-color-rgb), 0.12);
   }
 }
 

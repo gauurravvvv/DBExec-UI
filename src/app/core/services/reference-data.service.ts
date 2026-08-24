@@ -229,6 +229,13 @@ export class ReferenceDataService {
         shareReplay(1),
       );
 
+    // Kick the HTTP ourselves. `getFamily()`/`getOptions()` return the
+    // `_data$` stream (NOT load$), so without this internal subscription the
+    // cold apiGet pipe would never execute and `_data$` would stay empty —
+    // the "operators never load" bug. shareReplay(1) means any external
+    // subscriber to load$ shares this single request; it fires exactly once.
+    this.load$.subscribe();
+
     return this.load$;
   }
 

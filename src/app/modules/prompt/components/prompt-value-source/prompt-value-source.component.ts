@@ -120,14 +120,39 @@ export class PromptValueSourceComponent
       const res = await this.admin.getValueSource(this.promptId);
       const d = res?.data;
       if (d) {
-        this.kind.set((d.valueSourceKind as Kind) ?? 'free');
+        const k = (d.valueSourceKind as Kind) ?? 'free';
+        this.kind.set(k);
         this.cardinality.set(d.cardinality ?? null);
         this.lookupSql = d.valuesSql ?? '';
+
+        // Repatch the authoring state per kind so reopen shows what was saved
+        // (previously only the KIND was restored — the fixed list / distinct
+        // pickers came back empty).
+        if (k === 'static') {
+          const opts: any[] = Array.isArray(d.options) ? d.options : [];
+          this.staticRows.set(
+            opts.map(o => ({
+              value: String(o.value ?? ''),
+              display: String(o.display ?? o.value ?? ''),
+            })),
+          );
+        }
+        const meta = d.meta ?? {};
+        if (k === 'distinct_column') {
+          this.dcSchema.set(meta.schema ?? '');
+          this.dcTable.set(meta.table ?? '');
+          this.dcColumn.set(meta.column ?? '');
+          this.dcDisplay.set(meta.displayColumn ?? '');
+        }
       }
     } catch (e: any) {
       this.global.showWarn(e?.error?.message || 'Failed to load value source');
     } finally {
       this.loading.set(false);
+      // If the saved kind is lookup_query, mount Monaco once the host renders.
+      if (this.kind() === 'lookup_query') {
+        setTimeout(() => this.mountSqlIfNeeded(), 0);
+      }
     }
   }
 

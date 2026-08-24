@@ -155,6 +155,9 @@
       [options]="serverMode ? serverOptions : options"
       [optionLabel]="optionLabel"
       [optionValue]="$any(optionValue)"
+      [group]="group"
+      [optionGroupLabel]="optionGroupLabel"
+      [optionGroupChildren]="optionGroupChildren"
       [(ngModel)]="value"
       [filter]="filter"
       [filterBy]="filterBy || optionLabel"
@@ -189,6 +192,12 @@
         <ng-container
           *ngTemplateOutlet="triggerTemplate; context: { $implicit: option }"
         ></ng-container>
+      </ng-template>
+      <!-- Group header (only meaningful in group mode). PrimeNG's default group
+           header does not reliably resolve optionGroupLabel through this wrapper,
+           so render it explicitly. -->
+      <ng-template *ngIf="group" let-grp pTemplate="group">
+        <span class="dropdown-group-label">{{ grp[optionGroupLabel] }}</span>
       </ng-template>
       <ng-template *ngIf="itemTemplate" let-option pTemplate="item">
         <ng-container

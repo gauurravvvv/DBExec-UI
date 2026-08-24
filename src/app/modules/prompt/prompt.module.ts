@@ -25,6 +25,8 @@ import { CpSourceStepComponent } from './components/config-prompt/steps/cp-sourc
 import { CpJoinsStepComponent } from './components/config-prompt/steps/cp-joins-step/cp-joins-step.component';
 import { CpColumnFilterStepComponent } from './components/config-prompt/steps/cp-column-filter-step/cp-column-filter-step.component';
 import { CpValuesStepComponent } from './components/config-prompt/steps/cp-values-step/cp-values-step.component';
+import { CpConstraintsStepComponent } from './components/config-prompt/steps/cp-constraints-step/cp-constraints-step.component';
+import { CpPreviewRailComponent } from './components/config-prompt/cp-preview-rail/cp-preview-rail.component';
 import { EditPromptComponent } from './components/edit-prompt/edit-prompt.component';
 import { ListPromptComponent } from './components/list-prompt/list-prompt.component';
 import { PromptJoinPickerComponent } from './components/prompt-join-picker/prompt-join-picker.component';
@@ -42,12 +44,15 @@ import { configPromptReducer, CONFIG_PROMPT_FEATURE_KEY } from './store';
     ListPromptComponent,
     ViewPromptComponent,
     ConfigPromptComponent,
-    // config-prompt 4-step stepper children (Source / Joins / Column+Filter /
-    // Values) — the shell is a thin host; each step owns its own controls.
+    // config-prompt single-page builder sections (Source / Filter / Joins /
+    // Values | Constraints) + the sticky preview rail. The shell is a thin
+    // host; each section owns its own controls.
     CpSourceStepComponent,
     CpJoinsStepComponent,
     CpColumnFilterStepComponent,
     CpValuesStepComponent,
+    CpConstraintsStepComponent,
+    CpPreviewRailComponent,
     SqlQueryDialogComponent,
     // Prompt-level config editors (value source) — relocated from the
     // query-builder module; this is now the single home for prompt config.

@@ -71,6 +71,15 @@ export class CustomDropdownComponent
   @Input() options: any[] = [];
   @Input() optionLabel = 'label';
   @Input() optionValue: string | null = '';
+  /**
+   * Grouped options (PrimeNG p-dropdown group mode). When `group` is true the
+   * `options` are group objects: each has `optionGroupLabel` (the header text)
+   * and `optionGroupChildren` (the array of child option objects). Off by
+   * default — flat lists are unaffected.
+   */
+  @Input() group = false;
+  @Input() optionGroupLabel = 'label';
+  @Input() optionGroupChildren = 'items';
   @Input() required = false;
   @Input() filter = true;
   @Input() filterBy = '';

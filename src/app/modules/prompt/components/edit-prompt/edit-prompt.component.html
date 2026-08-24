@@ -80,6 +80,32 @@
           >
           </app-custom-input>
 
+          <!-- Control type (read-only; change requires recreating the prompt) -->
+          <app-custom-input
+            [ngModel]="selectedTypeLabel"
+            [ngModelOptions]="{ standalone: true }"
+            [label]="'PROMPT_MODULE.TYPE' | translate"
+            [placeholder]="'PROMPT_MODULE.TYPE' | translate"
+            icon="pi-sliders-h"
+            [inputDisabled]="true"
+          >
+          </app-custom-input>
+
+          <!-- Data type (free-form; drives operator applicability) -->
+          <div class="form-field">
+            <app-custom-dropdown
+              formControlName="dataType"
+              [label]="'PROMPT_MODULE.DATATYPE_LABEL' | translate"
+              [placeholder]="'PROMPT_MODULE.DATATYPE_PLACEHOLDER' | translate"
+              [options]="dataTypeOptions"
+              optionLabel="label"
+              optionValue="value"
+              [showClear]="true"
+              icon="pi-database"
+            >
+            </app-custom-dropdown>
+          </div>
+
           <!-- Status -->
           <app-custom-toggle
             formControlName="status"

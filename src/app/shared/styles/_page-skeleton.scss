@@ -46,6 +46,35 @@
   box-shadow: var(--shadow-sm);
 }
 
+// ── The canonical thin scrollbar ─────────────────────────────────────────────
+// The same slim, rounded, muted-grey scrollbar the modern listing table wrapper
+// uses (styles.scss `.modern-table … .p-datatable-wrapper`). Any scroll region
+// that wants to match the app's look @includes this instead of hand-rolling
+// ::-webkit rules. Firefox uses scrollbar-color/-width; Chromium + Safari use
+// the legacy ::-webkit pseudo-elements.
+@mixin thin-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-strong) transparent;
+
+  &::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: var(--border-strong);
+    border-radius: 999px;
+  }
+  &::-webkit-scrollbar-thumb:hover {
+    background: var(--text-subtle);
+  }
+  &::-webkit-scrollbar-corner {
+    background: transparent;
+  }
+}
+
 // ── The canonical back button ───────────────────────────────────────────────
 // A 36px circular, transparent icon button that tints on hover — the pattern
 // the majority of the app already uses. Include inside a header's left group.

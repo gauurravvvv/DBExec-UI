@@ -82,8 +82,39 @@ export const promptGroupNameSchema = z.preprocess(
   z.string().max(255).optional(),
 );
 
+/**
+ * The seven CANONICAL logical data types the filter_operator catalog's
+ * `meta.dataTypes` is keyed on. This is a reference/mapping set, NOT a
+ * whitelist — a prompt's dataType may be any string (a datasource column can be
+ * json, array, interval, bytea, …). Operator filtering maps anything outside
+ * this set to the `text` default (see the FE operator catalog + BE
+ * applicableOperatorCodes). Kept exported so the FE Add screen can offer these
+ * as suggested options while still accepting a free value.
+ */
+export const PROMPT_DATA_TYPES = [
+  'text',
+  'number',
+  'date',
+  'datetime',
+  'bool',
+  'enum',
+  'uuid',
+] as const;
+
+/**
+ * dataType is optional and free-form (accept data in any form). Trimmed +
+ * lower-cased when present; empty → undefined. No enum gate — operator
+ * applicability degrades unknown types to `text` rather than rejecting a save.
+ */
 export const promptDataTypeSchema = z.preprocess(
-  nullableTrim,
+  (v) => {
+    if (v === null) return undefined;
+    if (typeof v === 'string') {
+      const t = v.trim().toLowerCase();
+      return t.length === 0 ? undefined : t;
+    }
+    return v;
+  },
   z.string().max(255).optional(),
 );
 

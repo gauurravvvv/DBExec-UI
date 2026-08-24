@@ -12,11 +12,17 @@ import {
   OnDestroy,
   OnInit,
   ViewChild,
+  computed,
   inject,
   signal,
 } from '@angular/core';
-import { firstValueFrom } from 'rxjs';
-import { ReferenceDataService } from 'src/app/core/services/reference-data.service';
+// (Injector no longer needed — operators is a computed, not an effect.)
+import { Subject, takeUntil } from 'rxjs';
+import {
+  ReferenceDataService,
+  ReferenceRow,
+} from 'src/app/core/services/reference-data.service';
+import { operatorOptionsFromCatalog } from 'src/app/modules/form-builder/helpers/fb-operator-catalog';
 import {
   CodeEditorService,
   EditorHandle,
@@ -36,18 +42,40 @@ export class CpColumnFilterStepComponent implements OnInit, OnDestroy {
 
   @ViewChild('sqlHost') sqlHost?: ElementRef<HTMLElement>;
   private sqlHandle: EditorHandle | null = null;
+  private readonly destroy$ = new Subject<void>();
 
-  readonly operators = signal<{ label: string; value: string }[]>([]);
+  /** Raw filter_operator catalog rows (persistent subscription — never the
+   *  empty initial BehaviorSubject emission the old firstValueFrom grabbed). */
+  private readonly catalogRows = signal<ReferenceRow[]>([]);
 
-  async ngOnInit(): Promise<void> {
-    try {
-      const ops = await firstValueFrom(
-        this.refData.getOptions('filter_operator'),
-      );
-      this.operators.set(ops ?? []);
-    } catch {
-      this.operators.set([]);
-    }
+  /**
+   * Operators applicable to the prompt's dataType, filtered via the SAME rule
+   * the Form Builder + BE use (operatorOptionsFromCatalog). A `computed`
+   * (NOT an effect — writing a signal inside an effect throws NG0600) so it
+   * re-derives whenever the catalog loads OR the dataType changes.
+   */
+  readonly operators = computed<{ label: string; value: string }[]>(() => {
+    const rows = this.catalogRows();
+    // Empty/whitespace dataType → null so the catalog helper applies its
+    // `text` default (nullish coalescing would keep an empty string and match
+    // no operators). Unknown types also fall through to text.
+    const raw = (this.svc.dataType() || '').trim();
+    const dt = raw.length ? raw : null;
+    return operatorOptionsFromCatalog(rows, dt).map(o => ({
+      label: o.label,
+      value: o.code,
+    }));
+  });
+
+  ngOnInit(): void {
+    // Persistent subscribe — the reference-data load resolves asynchronously,
+    // and getFamily re-emits when it lands (the old firstValueFrom resolved on
+    // the empty initial cache snapshot → the "operators don't load" bug).
+    this.refData
+      .getFamily('filter_operator')
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(rows => this.catalogRows.set(rows ?? []));
+
     // Advanced-on edit case: mount Monaco after view init.
     if (this.svc.columnFilter().useRaw) {
       setTimeout(() => this.mountSql(), 0);
@@ -92,6 +120,8 @@ export class CpColumnFilterStepComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
     this.persistRaw();
     this.sqlHandle?.dispose();
     this.sqlHandle = null;

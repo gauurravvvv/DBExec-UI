@@ -1,3 +1,9 @@
+@use 'src/app/shared/styles/page-skeleton' as skeleton;
+
+// Height contract matches every other form/view screen: the host fills the
+// routed viewport, the card fills the host and clips, the header is a fixed
+// flex child, and the builder is the flex-1 min-height:0 scroll region. No
+// 100vh math (that drifted from the real available height).
 :host {
   display: block;
   height: 100%;
@@ -8,34 +14,69 @@
   flex-direction: column;
   gap: var(--space-6);
   padding: var(--space-8);
-  min-height: 100%;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
 
   // Parent card surface — matches the /app/db-roles reference exactly.
-  // Theme-driven; see src/app/shared/styles/_page-skeleton.scss.
-  background: var(--card-background);
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-sm);
+  @include skeleton.page-card-surface;
 }
 
-// Page header — mirrors add-form / other screens: back arrow + title on the
-// left, the Back / Next / Save actions on the top-right.
+// Page header — back arrow + title + identity chips on the left, Save right.
+// Fixed flex child (does not scroll).
 .page-header {
+  flex: 0 0 auto;
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
   gap: var(--space-6);
   flex-wrap: wrap;
 
   .left-section {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     gap: var(--space-5);
+  }
+
+  .title-block {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
 
     h2 {
       font-size: var(--fs-h1);
       font-weight: var(--fw-semibold);
       color: var(--text-color);
       margin: 0;
+    }
+  }
+
+  .identity-strip {
+    display: flex;
+    gap: var(--space-3);
+    flex-wrap: wrap;
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2);
+      padding: var(--space-1) var(--space-3);
+      border-radius: var(--radius-pill);
+      background: var(--hover-background);
+      color: var(--text-muted);
+      font-size: var(--fs-label);
+      font-weight: var(--fw-medium);
+      text-transform: capitalize;
+
+      i {
+        font-size: var(--fs-label);
+        color: var(--primary-color);
+      }
+      small {
+        color: var(--text-muted);
+        font-size: var(--fs-micro);
+        text-transform: none;
+      }
     }
   }
 
@@ -46,62 +87,82 @@
   }
 }
 
-.cp__stepper {
-  display: flex;
-  gap: var(--space-3);
-  border-bottom: 1px solid var(--border-color);
-  padding-bottom: var(--space-5);
-  flex-wrap: wrap;
-}
+// Two-column builder — fills the card's remaining height; each column
+// manages its own scroll so the page body never scrolls horizontally.
+// `align-items: stretch` + the grid's own bounded height force each cell to
+// the builder height so the editor/rail overflow-y:auto actually engages
+// (with `start`, cells grew to content and never scrolled).
+.cp__builder {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(320px, 40%);
+  gap: var(--space-7);
+  align-items: stretch;
+  flex: 1 1 auto;
+  min-height: 0; // let the grid children shrink so inner overflow scrolls
+  overflow: hidden; // the columns scroll, not the grid
 
-.cp__step {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  padding: var(--space-3) var(--space-5);
-  border: 1px solid var(--border-color);
-  border-radius: var(--space-2);
-  background: var(--surface-hover, var(--surface-card));
-  color: var(--text-color);
-  font-size: var(--fs-control);
-  font-weight: var(--fw-medium);
-  cursor: pointer;
-  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
-
-  i {
-    font-size: var(--fs-body);
-    color: var(--primary-color);
-  }
-
-  &:hover {
-    border-color: var(--primary-color);
-    background: var(--surface-card);
-  }
-
-  // Active step — solid primary fill, white text + icon.
-  &--active {
-    background: var(--primary-color);
-    border-color: var(--primary-color);
-    color: var(--primary-color-text, #fff);
-
-    i {
-      color: var(--primary-color-text, #fff);
-    }
-  }
-
-  // Completed step — primary outline + tint.
-  &--done {
-    border-color: var(--primary-color);
-    color: var(--primary-color);
+  @media (max-width: 1024px) {
+    grid-template-columns: 1fr;
+    overflow-y: auto; // stacked layout: scroll the whole builder
+    @include skeleton.thin-scrollbar;
   }
 }
 
-.cp__body {
-  min-height: 240px;
-  // Left-aligned form body at 50% width, matching the app form convention.
-  width: 50%;
+.cp__editor {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  min-width: 0;
+  // The editor column scrolls independently so the sticky preview rail stays
+  // in view on tall configs. Canonical thin scrollbar (matches the app).
+  min-height: 0;
+  overflow-y: auto;
+  padding-right: var(--space-2); // room for the scrollbar, no content clip
+  @include skeleton.thin-scrollbar;
 
-  @media (max-width: 768px) {
-    width: 100%;
+  @media (max-width: 1024px) {
+    overflow-y: visible; // stacked layout scrolls at the builder level
+  }
+}
+
+// Accordion section: hint line above the section body, with a scrollable body.
+.cp__acc {
+  display: block;
+
+  .cp__acc-hint {
+    margin: 0 0 var(--space-3);
+    font-size: var(--fs-label);
+    color: var(--text-muted);
+  }
+
+  // Pad + bound the accordion body (shared component ships it padding:0).
+  // A max-height keeps any one section from pushing the others off-screen;
+  // the body scrolls within that bound with the canonical thin scrollbar.
+  ::ng-deep .p-accordion-content {
+    padding: var(--space-6) !important;
+    max-height: 420px;
+    overflow-y: auto;
+    @include skeleton.thin-scrollbar;
+  }
+
+  // Active header: a left brand accent + primary icon so the open section
+  // reads clearly against the others.
+  ::ng-deep .p-accordion-header.p-highlight .p-accordion-header-link {
+    border-left: 3px solid var(--primary-color);
+  }
+  ::ng-deep .p-accordion-header.p-highlight .accordion-header-content i {
+    color: var(--primary-color);
+    opacity: 1;
+  }
+}
+
+// Preview rail — fills the builder height and scrolls internally on desktop.
+.cp__preview {
+  align-self: stretch;
+  min-height: 0;
+  height: 100%;
+
+  @media (max-width: 1024px) {
+    height: auto;
   }
 }

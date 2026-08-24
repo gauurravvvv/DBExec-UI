@@ -24,4 +24,17 @@
     [ngModel]="svc.source().alias"
     (ngModelChange)="onAlias($event)"
   ></app-custom-input>
+
+  <!-- Data type — drives the operator list in the Filter section. Defaulted
+       from the widget at Add; override here. Free-form; these are suggestions. -->
+  <app-custom-dropdown
+    label="{{ 'PROMPT_MODULE.DATATYPE_LABEL' | translate }}"
+    [options]="dataTypeOptions"
+    optionLabel="label"
+    optionValue="value"
+    [showClear]="true"
+    [ngModel]="svc.dataType()"
+    (onChangeEvent)="onDataType($event)"
+    appendTo="body"
+  ></app-custom-dropdown>
 </div>

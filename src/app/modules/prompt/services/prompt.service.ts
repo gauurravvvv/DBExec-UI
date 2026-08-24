@@ -105,7 +105,7 @@ export class PromptService {
       // v2: a prompt is datasource-scoped (no tab/section). The API accepts a
       // batch — POST { datasource, prompts: [...] } — so wrap the single flat
       // form into a one-element prompts array.
-      const { datasource, name, description, type } = promptForm;
+      const { datasource, name, description, type, dataType } = promptForm;
       return await lastValueFrom(
         this.http.apiPost(
           PROMPT.ADD,
@@ -116,6 +116,9 @@ export class PromptService {
                 name,
                 description: description || '',
                 type,
+                // dataType drives operator applicability in config; sent as-is
+                // (free-form). Undefined/empty is fine — BE treats it as unset.
+                dataType: dataType || undefined,
               },
             ],
           },
@@ -130,7 +133,8 @@ export class PromptService {
   async update(form: FormGroup, justification?: string): Promise<any> {
     this._saving.set(true);
     try {
-      const { id, datasource, name, description, status } = form.value;
+      const { id, datasource, name, description, status, dataType } =
+        form.value;
       // PUT /prompts/:promptId
       return await lastValueFrom(
         this.http.apiPut(
@@ -141,6 +145,7 @@ export class PromptService {
             name,
             description,
             status: status ? 1 : 0,
+            dataType: dataType || undefined,
             justification,
           },
           { skipLoader: true },
