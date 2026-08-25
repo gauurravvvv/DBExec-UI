@@ -66,8 +66,14 @@
     border-radius: var(--radius-xs);
     white-space: nowrap;
 
+    transition:
+      background 0.15s ease,
+      color 0.15s ease;
+
     &:hover {
-      background: var(--primary-light);
+      /* theme-derived subtle primary tint (works in light + dark presets) */
+      background: var(--primary-color-transparent);
+      color: var(--primary-hover);
     }
     i {
       font-size: 10px;
