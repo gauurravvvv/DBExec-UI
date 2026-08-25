@@ -72,9 +72,21 @@
   animation: relay-fade 240ms ease-out 60ms both;
 }
 
-.relay__top-mark {
-  font-size: 18px;
-  color: var(--primary-color);
+// `i.relay__top-mark` (element+class, (0,1,1) + component attr) out-specifies
+// the GLOBAL `.ci.ci-app-icon` (0,2,0) rule so the mask + colour below win over
+// its `content: url()` + inherited `filter: brightness(0)`.
+i.relay__top-mark {
+  // Render the app mark via CSS mask so it takes --primary-color (the base
+  // .ci-app-icon uses content:url() with a baked-in colour, which ignores
+  // `color`). Override that here and tint the silhouette to the brand colour.
+  width: 2rem;
+  height: 2rem;
+  content: none;
+  background-color: var(--primary-color);
+  filter: none;
+  opacity: 1;
+  -webkit-mask: url('/assets/icons/dbexec_icon.svg') no-repeat center / contain;
+  mask: url('/assets/icons/dbexec_icon.svg') no-repeat center / contain;
 }
 
 .relay__top-wordmark {

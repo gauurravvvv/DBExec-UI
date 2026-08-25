@@ -11,14 +11,14 @@
   </button>
 
   <!-- ── TOP: brand + bell + search ─────────────────────────────────
-       Expanded: brand wordmark on the left, bell + search icons on
-       the right. Collapsed: brand icon centred, action icons hidden
-       (same as today's search behaviour). -->
+       Expanded: plain "DBExec" wordmark (single colour) on the left,
+       bell + search on the right. Collapsed: just the app icon, centred;
+       the wordmark and the action icons are hidden. -->
   <div class="sidebar-top">
     <a class="brand" [routerLink]="['/']" [pTooltip]="isExpanded ? undefined : 'Go to home'" tooltipPosition="right"
       aria-label="DBExec — go to home">
       <i class="ci ci-app-icon brand-icon"></i>
-      <span class="brand-text">DB<span class="brand-highlight">Exec</span></span>
+      <span class="brand-text">DBExec</span>
     </a>
     <div class="sidebar-top-actions" *ngIf="isExpanded">
       <button *ngIf="showNotificationBell" class="icon-btn notification-btn" type="button"

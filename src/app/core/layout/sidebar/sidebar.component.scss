@@ -117,25 +117,34 @@
   // Hover affordance intentionally removed — the brand wordmark is
   // a static label, not a button-ish target.
 
-  .brand-icon {
+  // App icon — the masked database mark, tinted to the brand --primary-color.
+  // Shown ONLY when the rail is collapsed (see .sidebar.collapsed); the
+  // expanded rail shows the "DBExec" wordmark (--text-color) instead.
+  //
+  // Selector `& i.brand-icon` → `.brand i.brand-icon` (0,2,1), which
+  // out-specifies the GLOBAL `.ci.ci-app-icon` rule (0,2,0) in
+  // _custom-icons.scss. That rule sets `content: url()` (baked-in colour) and
+  // inherits `filter: brightness(0)` from `.ci`; without the higher
+  // specificity here they'd override this mask + colour.
+  & i.brand-icon {
+    display: none;
     width: 24px;
     height: 24px;
     flex-shrink: 0;
-    // Tint the mark to the org's brand colour so the sidebar identity
-    // follows the active theme (the source SVG is a single-colour database
-    // silhouette, so masking it with --primary-color reads cleanly). The
-    // `content: url()` image is masked out and replaced by a solid fill.
-    content: none;
+    content: none; // cancel the global content:url() image
+    filter: none; // cancel .ci's brightness(0) so the tint shows
+    opacity: 1;
     background-color: var(--primary-color);
-    // Runtime-served path (not bundler-resolved) so it works regardless of
-    // this file's nesting depth; `assets/` is a static served directory.
     -webkit-mask: url('/assets/icons/dbexec_icon.svg') no-repeat center /
       contain;
     mask: url('/assets/icons/dbexec_icon.svg') no-repeat center / contain;
   }
 
+  // Plain "DBExec" wordmark — single ink colour, no two-tone.
   .brand-text {
-    font-size: var(--fs-h1);
+    // A touch larger than the --fs-h1 page-title size so the brand reads as
+    // the identity anchor at the top of the expanded rail.
+    font-size: 22px;
     font-weight: var(--fw-bold);
     letter-spacing: -0.4px;
     font-family: var(--font-brand);
@@ -144,20 +153,6 @@
     overflow: hidden;
     text-overflow: ellipsis;
     transition: opacity var(--motion-fast) ease;
-
-    // "Exec" follows the brand: gradient from the primary to its lighter
-    // companion, both theme tokens, so it tracks the org colour instead of
-    // the old hard-coded blue.
-    .brand-highlight {
-      background: linear-gradient(
-        135deg,
-        var(--primary-color),
-        var(--primary-light)
-      );
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
   }
 }
 
@@ -297,21 +292,23 @@
 
 // ── Collapsed mode: stack everything vertically, hide text ─────────
 .sidebar.collapsed {
+  // Collapsed top: just the app icon, centred. The wordmark is hidden and the
+  // action icons (bell + search) are dropped from the DOM (template *ngIf).
   .sidebar-top {
-    justify-content: center; // centre the lone brand icon
+    justify-content: center;
     padding: 14px 0 8px;
     min-height: auto;
   }
 
   .brand {
     justify-content: center;
+    gap: 0;
     padding: 0;
     margin: 0;
     width: 100%;
 
     .brand-icon {
-      // Belt + braces: explicit horizontal centring of the icon glyph
-      // inside the full-width brand link.
+      display: block; // revealed collapsed (hidden when expanded)
       margin: 0 auto;
     }
 
@@ -386,7 +383,9 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0.5rem 0.75rem;
+  // One consistent left padding for EVERY nav row (Home leaf + group children)
+  // so all icons align in a single vertical column.
+  padding: 0.5rem 0.9rem;
   margin: 2px 8px;
   border-radius: var(--radius-md);
   font-size: var(--fs-body);
@@ -527,14 +526,9 @@
   margin: var(--space-0);
 }
 
-// Children are NOT indented — they use the same left padding as every other
-// nav row (Home leaf, group header) so all icons line up in one vertical
-// column. The group header above them is a text-only label, so there is no
-// hierarchy cue lost by removing the indent. (No max-height collapse: the flat
-// nav shows children at all times in the expanded rail.)
-.submenu-item > .nav-link {
-  padding-left: 0.9rem;
-}
+// Children are NOT indented — they inherit the base .nav-link padding (0.9rem
+// left), same as the Home leaf, so every icon lines up in one vertical column.
+// The group header above is a text-only label, so no hierarchy cue is lost.
 
 // ── Collapsed mode: icon-only rail, children move to hover flyouts ──
 .sidebar.collapsed {
