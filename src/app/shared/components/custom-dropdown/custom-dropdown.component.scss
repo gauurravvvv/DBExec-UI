@@ -276,8 +276,26 @@
     // chevron (right: 2.25rem instead of PrimeNG's 3rem default) so
     // narrow columns (status filter at 9rem) don't waste horizontal
     // space, and the label gets enough padding to clear BOTH icons.
-    .p-dropdown-clear-icon {
+    // PrimeNG 17 renders the clear ✕ as an inline <TimesIcon> SVG, so it
+    // tints via `fill`, not `color`. It otherwise defaults to a fixed grey
+    // that ignores the app theme — drive both color + fill off the token so
+    // it tracks light/dark + branded presets (svg:not(...) also covers the
+    // case where PrimeNG nests a <path>).
+    .p-dropdown-clear-icon,
+    svg.p-dropdown-clear-icon {
       right: 2.25rem !important;
+      color: var(--text-color) !important;
+      fill: var(--text-color) !important;
+      opacity: 0.7;
+      transition: opacity 0.15s ease;
+
+      path {
+        fill: var(--text-color) !important;
+      }
+
+      &:hover {
+        opacity: 1;
+      }
     }
     &.p-dropdown-clearable .p-dropdown-label {
       padding-right: 3.5rem !important;
