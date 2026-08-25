@@ -68,9 +68,27 @@ app-custom-daterange {
       border: 1px solid var(--border-color) !important;
       color: var(--secondary-color) !important;
 
+      // Calendar glyph is a PrimeNG SVG (.p-icon) — tint via fill too, else
+      // it stays PrimeNG grey. Mirrors custom-calendar's trigger fix.
+      .p-icon {
+        width: var(--fs-body);
+        height: var(--fs-body);
+        color: var(--secondary-color) !important;
+        fill: var(--secondary-color) !important;
+
+        path {
+          fill: currentColor;
+        }
+      }
+
       &:hover {
         border-color: var(--primary-color) !important;
         color: var(--primary-color) !important;
+
+        .p-icon {
+          color: var(--primary-color) !important;
+          fill: var(--primary-color) !important;
+        }
       }
     }
 
@@ -145,6 +163,19 @@ app-custom-daterange {
 
       .pi {
         font-size: var(--fs-control);
+      }
+
+      // Nav chevrons are PrimeNG SVGs (.p-icon) — tint via fill too.
+      // Mirrors custom-calendar's nav-chevron fix.
+      .p-icon {
+        width: var(--fs-control);
+        height: var(--fs-control);
+        color: var(--text-color) !important;
+        fill: var(--text-color) !important;
+
+        path {
+          fill: currentColor;
+        }
       }
     }
   }

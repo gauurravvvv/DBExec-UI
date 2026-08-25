@@ -189,8 +189,21 @@
 
     // Reposition clear icon next to the chevron + extend label padding
     // when clearable. Same pattern as custom-dropdown.
+    // PrimeNG 17 renders the clear ✕ as a <TimesIcon> SVG (fill, not color)
+    // that otherwise stays PrimeNG grey. Drive color + fill off the token.
     .p-multiselect-clear-icon {
       right: 2.25rem !important;
+      color: var(--text-color) !important;
+      fill: var(--text-color) !important;
+      opacity: 0.7;
+      transition: opacity 0.15s ease;
+
+      path {
+        fill: var(--text-color) !important;
+      }
+      &:hover {
+        opacity: 1;
+      }
     }
     &.p-multiselect-clearable .p-multiselect-label {
       padding-right: 3.5rem !important;
@@ -199,6 +212,17 @@
     .p-multiselect-trigger {
       color: var(--text-color);
       opacity: 0.7;
+
+      // Chevron is a ChevronDownIcon SVG — tint via fill too.
+      .p-multiselect-trigger-icon,
+      svg {
+        color: var(--text-color) !important;
+        fill: var(--text-color) !important;
+
+        path {
+          fill: var(--text-color) !important;
+        }
+      }
     }
 
     .p-multiselect-token {
@@ -212,13 +236,18 @@
       align-items: center;
       gap: var(--space-3);
 
+      // Chip remove ✕ is a TimesCircleIcon SVG — tint fill to the token text.
       .p-multiselect-token-icon {
-        color: var(--primary-text);
+        color: var(--primary-text) !important;
+        fill: var(--primary-text) !important;
         font-size: var(--fs-micro);
         cursor: pointer;
         border-radius: 50%;
         transition: all var(--motion-base);
 
+        path {
+          fill: var(--primary-text) !important;
+        }
         &:hover {
           background: rgba(255, 255, 255, 0.2);
         }
@@ -269,10 +298,16 @@
           }
         }
 
+        // SearchIcon SVG — tint via fill as well as color.
         .p-multiselect-filter-icon {
           color: var(--text-color) !important;
+          fill: var(--text-color) !important;
           opacity: 0.5;
           font-size: var(--fs-label) !important;
+
+          path {
+            fill: var(--text-color) !important;
+          }
         }
       }
 
@@ -321,6 +356,17 @@
         justify-content: center;
         flex-shrink: 0;
         cursor: pointer;
+
+        // Close glyph is a TimesIcon SVG — tint fill to the token.
+        .p-multiselect-close-icon,
+        svg {
+          color: var(--text-color) !important;
+          fill: var(--text-color) !important;
+
+          path {
+            fill: var(--text-color) !important;
+          }
+        }
 
         &:hover {
           background: var(--hover-background);
